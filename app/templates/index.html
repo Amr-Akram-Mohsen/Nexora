@@ -1,0 +1,24 @@
+<!-- index.html -->
+{% extends"base.html" %}
+{% block title %}New Tech | Home{% endblock %}
+{% block content %}
+{% from"components/section.html" import section %}
+{% include "components/hero-sliders.html" %}
+<div class="container">
+
+  {% from"components/grid.html" import grid %}
+  {% set sections = [
+  {"section":"reviews","section_title":"latest reviews" ,"cards": latest_reviews, },
+  {"section":"news","section_title":"tech news & trends", "cards": tech_news, },
+  {"section":"deals","section_title":"hot deals", "cards": items, },
+  {"section":"tutorials","section_title":"how-to guides & tutorials", "cards": tutorials, } ] %}
+
+  {% for s in sections %}
+  {% call section(s.section_title, s.section ) %}
+  {{ grid(s.cards) }}
+  {% endcall %}
+  {% endfor %}
+
+</div>
+
+{% endblock %}

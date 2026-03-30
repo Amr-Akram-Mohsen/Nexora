@@ -1,0 +1,7 @@
+{% macro grid(items) %}
+<div class="grid-auto">
+  {% for item in items %}
+  {% include"components/cards/" ~ item.card_type ~ "-card.html" %}
+  {% endfor %}
+</div>
+{% endmacro %}

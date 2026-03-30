@@ -1,0 +1,12 @@
+{% from"components/page.html" import page %}
+{% call page(content.title, content.name ~"-page") %}
+<p class="page__text">{{ content.description }}</p>
+<ul class="page__items">
+  {% for subtitle in content.subtitles %}
+  <li class="page__item">
+    <strong>{{ subtitle.title }}</strong>
+    {{ subtitle.text }}
+  </li>
+  {% endfor %}
+</ul>
+{% endcall %}

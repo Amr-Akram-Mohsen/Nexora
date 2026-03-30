@@ -1,0 +1,45 @@
+{% from "components/filter_chip.html" import filter_chip %}
+{% from "components/ui/button.html" import button %}
+<div class="section-filters">
+  {# -------- Active Filters -------- #}
+  {% if active_filters %}
+  <div class="active-filters flex flex-wrap items-center">
+    <span class="active-filters__label">Filters:</span>
+    {% for filter_name, values in active_filters.items() %}
+      {% for value in values %}
+        {% for instance in filter_options[filter_name] %}
+          {% if instance.slug == value %}
+            {{ filter_chip(section.name, filter_name ~ '_slug', instance, active_filters[filter_name], true) }}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    {% endfor %}
+    <a
+      href="{{ url_for('main.sections', section_slug=section.name) }}"
+      class="clear-filters"
+    >
+      {{ button(text="Clear All", variant="ghost") }}
+    </a>
+  </div>
+  {% endif %}
+  {# -------- Filter Groups -------- #}
+  <div class="filters-wrapper flex flex-col">
+    {% for allowed_filter in allowed_filters %}
+    <div class="filter-group">
+      <div class="filter-title">
+        {{ allowed_filter | title }}
+      </div>
+      <div class="filter-items flex flex-wrap">
+        {% for instance in filter_options[allowed_filter] %}
+          {{ filter_chip(
+              section.name,
+              allowed_filter ~ '_slug',
+              instance,
+              active_filters[allowed_filter]
+          ) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>

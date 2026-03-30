@@ -1,0 +1,20 @@
+{% macro form(class="", variant="default", form_action=None, attrs=None) %}
+{% set default_classes = 'form flex flex-col '
+  if variant == 'default'
+  else ''
+%}
+<form
+method="POST"
+{% if form_action %}
+action="{{ form_action }}"
+{% endif %}
+class="{{ default_classes }}{{ class }}"
+{% if attrs %}
+  {% for key, value in attrs.items() %}
+    {{ key }}="{{ value }}"
+  {% endfor %}
+{% endif %}
+>
+  {{ caller() }}
+</form>
+{% endmacro %}

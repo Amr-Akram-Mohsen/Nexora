@@ -1,0 +1,24 @@
+{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs=None) %}
+<button
+  type="{{ type }}"
+  class="btn variant--{{ variant }} btn--{{ variant }} {{ class }} inline-flex items-center justify-center"
+  {% if attrs %}
+    {% for key, value in attrs.items() %}
+      {{ key }}="{{ value }}"
+    {% endfor %}
+  {% endif %}
+>
+  {% if icon %}
+  <i class="{{ icon }}"></i>
+  {% endif %}
+
+  {% if text %}
+    <span class="btn-text {{ btn_span_class }}">
+      {{ text }}
+    </span>
+  {% endif %}
+  {% if caller is defined %}
+    {{ caller() }}
+  {% endif %}
+</button>
+{% endmacro %}

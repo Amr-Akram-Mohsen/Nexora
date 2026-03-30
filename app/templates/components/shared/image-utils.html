@@ -1,0 +1,5 @@
+{% macro render_image(src, alt, additional_classes='') %}
+<img src="{{ url_for('static', filename=src or 'img/error.svg') }}" alt="{{ alt }}"
+  class="card__img img-cover{{ additional_classes }}" loading="lazy"
+  onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/fallback-image.png') }}';" />
+{% endmacro %}

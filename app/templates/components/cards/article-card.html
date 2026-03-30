@@ -1,0 +1,48 @@
+{% from"components/shared/image-utils.html" import render_image %}
+{% from"components/ui/badge.html" import badge %}
+{% set article = item %}
+<article
+  class="card card--article"
+  data-type="article"
+  data-id="{{ item.id }}">
+    <a href="{{ url_for('main.article_page', article_id=article.id) }}" target="_blank">
+        <div class="card__img-wrapper">
+            {{ render_image(
+                article.image or article.image_url,
+                article.title)
+            }}
+            <div class="card__img-overlay"></div>
+            {{ badge('Article', 'badge--card-type') }}
+        </div>
+    </a>
+    <div class="card__content">
+        <div class="card__meta-top flex items-center">
+            {% for topic in article.topics[:2] %}
+                {{ badge(topic.name, 'badge--category', 'secondary') }}
+            {% endfor %}
+            {% for brand in article.brands[:2] %}
+                {{ badge(brand.name, 'badge--brand', 'secondary') }}
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('main.article_page', article_id=article.id) }}" target="_blank">
+            <h3 class="card__title">
+                {{ article.title }}
+            </h3>
+        </a>
+        <p class="card__excerpt">{{ article.description }}</p>
+        <div class="card__meta-bottom flex items-center">
+            <div class="card__meta-item flex items-center">
+                <i class="fas fa-user"></i>
+                <span>Enstien</span>
+            </div>
+            <div class="card__meta-item flex items-center">
+                <i class="far fa-clock"></i>
+                <span>5 min</span>
+            </div>
+            <span class="meta-date inline-flex items-center">
+                <i class="far fa-calendar"></i>
+                {{ article.published_at.strftime('%b %d, %Y') }}
+            </span>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,8 @@
+{% macro label(text, for_id, class="") %}
+<label
+for="{{ for_id }}"
+class="label flex items-center {{ class }}"
+>
+  {{ text }}
+</label>
+{% endmacro %}

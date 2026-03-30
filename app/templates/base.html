@@ -1,0 +1,76 @@
+<!-- base.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">  <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}"> -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script>
+      window.APP = {{ {"isAuthenticated": is_authenticated,"userEmail": user_email  } | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+    <script
+      src="{{ url_for('static', filename='js/forms.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/comments.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/interactions.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/affiliates.js') }}"
+      defer
+    ></script>
+    <script
+      src="{{ url_for('static', filename='js/tracking.js') }}"
+      defer
+    ></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script>
+      (function () {
+        if (localStorage.getItem("theme") ==="dark") {
+          document.documentElement.classList.add("dark-mode");
+        }
+      })();
+    </script>
+    <meta
+      name="description"
+      content="Your source for the latest tech news, reviews, tutorials, and deals in Saudi Arabia and UAE"
+    />
+  </head>
+  <body class="light-mode">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-messages flex flex-col">
+      {% for category, message in messages %}
+      <div class="alert flex items-center justify-between alert-{{ category }}">
+        {{ message }} <button class="alert-close">&times;</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+    {% set selected_country = request.cookies.get("country","") %}
+    {% include 'partials/header.html' %}
+    <main id="main-content">{% block content %}{% endblock %}</main>
+    <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
+    {% include 'partials/footer.html' %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

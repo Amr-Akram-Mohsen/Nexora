@@ -1,0 +1,35 @@
+{% macro render_details(details) %}
+{% for key, value in details.items() %}
+
+{% if value is mapping %}
+
+<div class="item-details-group flex flex-col">
+
+  <h4 class="item-details-group__title">
+    {{ key.replace('_', ' ') }}
+  </h4>
+
+  <div class="item-details-group__items flex flex-col">
+    {{ render_details(value) | safe }}
+  </div>
+
+</div>
+
+{% else %}
+
+<div class="item-detail-item item-detail-item--full flex justify-between items-start">
+
+  <span class="item-detail-item__key">
+    {{ key.replace('_', ' ') }}
+  </span>
+
+  <span class="item-detail-item__value">
+    {{ value }}
+  </span>
+
+</div>
+
+{% endif %}
+
+{% endfor %}
+{% endmacro %}

@@ -1,0 +1,28 @@
+<div class="item-buy-links">
+  <h3 class="item-buy-links__title flex items-center">
+    <span class="item-buy-links__bar"></span>
+    Where to Buy
+  </h3>
+  <div class="item-buy-links__items flex flex-col">
+    {% for link in store_links %}
+    <a href="{{ link.affiliate_url }}" target="_blank" rel="noopener noreferrer"
+      class="link item-buy-link flex items-center justify-between" data-link-id="{{ link.id }}">
+      <div class="item-buy-link__info flex flex-col">
+        <div class="item-buy-link__store">
+          {{ link.store.name }}
+        </div>
+        {% if link.price %}
+        <div class="item-buy-link__price">
+          {{ link.currency }}{{ link.price }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- External link icon -->
+      <span class="item-buy-link__icon">
+        <i class="fas fa-external-link-alt"></i>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+</div>

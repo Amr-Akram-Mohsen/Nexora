@@ -1,0 +1,58 @@
+{% macro media_gallery(item) %}
+{% if item.images %}
+
+<div class="item-gallery flex flex-col" data-gallery>
+
+  <!-- MAIN IMAGE -->
+  <div class="item-gallery__viewer">
+
+    <img src="{{ url_for('static', filename=item.images[0].image_path) }}"
+      alt="{{ item.images[0].alt_text or item.name }}" class="item-gallery__img img-cover" loading="lazy"
+      data-gallery-main="1">
+
+    <!-- Fullscreen button -->
+    <button class="item-gallery__fullscreen flex items-center justify-center" data-gallery-open>
+      <i class="fa fa-expand"></i>
+    </button>
+
+    {% if item.images|length > 1 %}
+
+    <!-- arrows -->
+    <button class="item-gallery__nav item-gallery__nav--prev disabled" data-gallery-new-image>
+      <i class="fa fa-chevron-left"></i>
+    </button>
+
+    <button class="item-gallery__nav item-gallery__nav--next" data-gallery-new-image="2">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+
+    <!-- counter -->
+    <div class="item-gallery__counter">
+      <span data-gallery-index>1</span> /
+      <span data-gallery-length>{{ item.images|length }}</span>
+    </div>
+
+    {% endif %}
+
+  </div>
+
+  {% if item.images|length > 1 %}
+
+  <!-- thumbnails -->
+  <div class="item-gallery__thumbs is-hidden">
+
+    {% for image in item.images %}
+    <button class="item-gallery__thumb" data-gallery-thumb="{{ loop.index }}">
+      <img src="{{ url_for('static', filename=image.image_path) }}" alt="{{ image.alt_text or item.name }}"
+        class="img-cover">
+    </button>
+    {% endfor %}
+
+  </div>
+
+  {% endif %}
+
+</div>
+
+{% endif %}
+{% endmacro %}

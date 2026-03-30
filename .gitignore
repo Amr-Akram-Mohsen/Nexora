@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Flask instance (db, secrets)
+instance/
+
+# VS Code
+.vscode/
+
+# Static generated images (your existing ones)
+app/static/article_images
+app/static/images
+
+app/templates_copy
+app/sentiment_model
+
+# OS junk
+.DS_Store
+Thumbs.db

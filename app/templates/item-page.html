@@ -1,0 +1,90 @@
+{% extends"base.html" %}
+{% from"components/features/media-gallery.html" import media_gallery %}
+{% from"components/render-details.html" import render_details %}
+{% from"components/ui/badge.html" import badge %}
+
+{% from"components/detail-page.html" import detail_page with context %}
+{% block content %}
+{% macro header_block() %}
+<div class="detail-page__header-content">
+  <div class="detail-page__badges">
+    {{ badge(item.category.name, 'badge--category') }}
+    {{ badge(item.brand.name, 'badge--brand') }}
+  </div>
+
+  <h1 class="detail-page__title">{{ item.name }}</h1>
+
+  <div class="detail-page__meta flex items-center">
+    <div class="meta-item flex items-center">
+      <i class="fas fa-star"></i>
+    </div>
+    <span class="item-rating">4.7</span>
+    <span class="item-reviews-count">982 reviews</span>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro image_block() %}
+{{ media_gallery(item) }}
+{% endmacro %}
+
+{% macro content_block() %}
+<!-- optional: description, highlights, etc. -->
+<div class="item-content">
+  {{ item.description }}
+</div>
+{% endmacro %}
+
+{% macro sidebar_block() %}
+{% if item.quick_details %}
+<div class="item-details-card">
+
+  <h3 class="item-details-card__title flex items-center">
+    <span class="item-details-card__bar"></span>
+    Key Specifications
+  </h3>
+
+  <div class="item-details-card__items flex flex-col">
+
+    {% for detail in item.quick_details[:4] %}
+    <div class="item-detail-item flex items-center justify-between">
+      <span class="item-detail-item__key">
+        {{ detail.key }}
+      </span>
+
+      <span class="item-detail-item__value">
+        {{ detail.value }}
+      </span>
+    </div>
+    {% endfor %}
+
+  </div>
+
+  {% if item.full_details|length > 4 %}
+  <button class="btn btn--outline item-details-dialog__action item-details-dialog__open" data-full-details-open
+    data-id="{{ item.id }}">
+    View Full Specifications
+  </button>
+  {% endif %}
+
+</div>
+{% endif %}
+
+{% if item.store_links %}
+{% set store_links = item.store_links %}
+{% include"components/features/purchase-options.html" %}
+{% endif %}
+{% endmacro %}
+
+
+{{ detail_page(
+item,
+header=header_block,
+image=image_block,
+content=content_block,
+sidebar=sidebar_block
+) }}
+
+{% set full_details = item.full_details %}
+{% include "components/features/full-details.html" %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% from "components/listing-page.html" import listing_page %}
+{% from "components/grid.html" import grid %}
+{% from "components/ui/form.html" import form %}
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/input.html" import input %}
+
+{% call(slot) listing_page("search-results-page") %}
+
+{% if slot == 'title' %}
+<h1 class="page__title">Search</h1>
+{% endif %}
+
+
+{% if slot == 'search' %}
+{% call form("search-form", variant="") %}
+<div class="search-input-wrapper">
+  {{ input(
+  name="query", type="search",
+  placeholder="Search articles and items...",
+  class="search-input"
+  ) }}
+  {{ button(type="submit", icon="fas fa-search search-icon") }}
+</div>
+{% endcall %}
+
+{% if query %}
+<p class="results-count text">
+  Found {{ search_results|length }} result{{ '' if search_results|length == 1 else 's' }} for "{{ query }}"
+</p>
+{% endif %}
+{% endif %}
+
+{% if search_results %}
+{% if slot == 'found_content' %}
+{{ grid(search_results) }}
+{% endif %}
+{% else %}
+{% if slot == 'empty_content' %}
+<div class="listing-page__empty">
+  <p class="text">No results found. Try different keywords.</p>
+</div>
+{% endif %}
+{% endif %}
+
+{% endcall %}

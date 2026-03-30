@@ -1,0 +1,71 @@
+{% extends"base.html" %}
+{% from"components/detail-page.html" import detail_page with context %}
+{% from"components/features/snippet-utils.html" import article_snippet %}
+{% from"components/shared/image-utils.html" import render_image %}
+{% from"components/ui/badge.html" import badge %}
+{% block content %}
+{% macro header_block() %}
+<div class="detail-page__header-content flex flex-col">
+  <div class="detail-page__badges flex flex-wrap">
+    {% for topic in article.topics[:2] %}
+    {{ badge(topic.name, 'badge--category') }}
+    {% endfor %}
+    {% for brand in article.brands[:2] %}
+    {{ badge(brand.name, 'badge--brand') }}
+    {% endfor %}
+  </div>
+
+  <h1 class="detail-page__title">{{ article.title }}</h1>
+
+  <div class="detail-page__meta flex flex-wrap items-center">
+    <div class="meta-item meta-user flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-user"></i>
+      </div>
+      <span class="article__author">Enstien</span>
+    </div>
+    <div class="meta-item meta-clock flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-clock"></i>
+      </div>
+      <span>5 min</span>
+    </div>
+    <div class="meta-item meta-calendar flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-calendar"></i>
+      </div>
+      <span>{{ article.published_at.strftime('%b %d, %Y') }}</span>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro image_block() %}
+{{ render_image(article.image or article.image_url, article.title) }}
+{% endmacro %}
+
+{% macro content_block() %}
+<!-- article body goes here -->
+<div class="article-content">
+  {{ article.content | safe }}
+</div>
+{% endmacro %}
+
+{% macro sidebar_block() %}
+{% if trending_articles %}
+{{ article_snippet(trending_articles, 'Trending This Week') }}
+{% endif %}
+{% if related_articles %}
+{{ article_snippet(related_articles, 'You may also like') }}
+{% endif %}
+{% endmacro %}
+
+{{ detail_page(
+article,
+header=header_block,
+image=image_block,
+content=content_block,
+sidebar=sidebar_block
+) }}
+
+{% endblock %}

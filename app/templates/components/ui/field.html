@@ -1,0 +1,7 @@
+  {% from "components/ui/label.html" import label %}
+{% macro field(label_text="", for_id="", class="", label_class="") %}
+<div class="field-wrapper flex flex-col {{ class }}">
+  {{ label(label_text, for_id, label_class) }}
+  {{ caller() }}
+</div>
+{% endmacro %}

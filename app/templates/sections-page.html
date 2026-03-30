@@ -1,0 +1,27 @@
+{% extends"base.html" %}
+{% block title %}
+{{ section.name|title }}
+{% endblock %}
+
+{% block content %}
+{% from"components/listing-page.html" import listing_page %}
+{% from"components/grid.html" import grid %}
+{% call(slot) listing_page("sections-page") %}
+{% if slot == 'title' %}
+<h1 class="page__title">{{ section.name|title }}</h1>
+{% endif %}
+{% if articles %}
+  {% if slot == 'found_content' %}
+    {% include"components/section-filters.html" %}
+    {{ grid(articles) }}
+  {% endif %}
+{% else %}
+  {% if slot == 'empty_content' %}
+    <div class="listing-page__empty">
+      <p>No articles found matching your filters.</p>
+    </div>
+  {% endif %}
+{% endif %}
+
+{% endcall %}
+{% endblock %}

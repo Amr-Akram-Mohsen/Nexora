@@ -1,0 +1,10 @@
+{% macro listing_page(class_name="") %}
+<section class="listing-page {{ class_name }}">
+  <div class="container">
+    {{ caller('title') }}
+    {{ caller('search') }}
+    {{ caller('found_content') }}
+    {{ caller('empty_content') }}
+  </div>
+</section>
+{% endmacro %}

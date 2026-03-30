@@ -1,0 +1,31 @@
+{% from "components/ui/form.html" import form %}
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/textarea.html" import textarea %}
+
+<div class="comments comments--collapsed" data-type="{{ item.card_type }}" data-id="{{ item.id }}">
+  <!-- Comment Form -->
+  {% if current_user.is_authenticated %}
+  {% call form("comment-form comment__form flex flex-col") %}
+  {{ textarea(
+  name="content",
+  placeholder="Share your thoughts...",
+  class="comments__textarea"
+  ) }}
+
+  {{ button(type="submit", text="Post Comment",
+  class=btn_class ~ " comment__send-btn",
+  icon="fa fa-paper-plane"
+  ) }}
+  {% endcall %}
+  {% else %}
+  <p class="comments__login-hint">
+    <a href="{{ url_for('main.login') }}">Log in</a> to comment.
+  </p>
+  {% endif %}
+
+  <!-- Comments List -->
+  <div class="comments__list flex flex-col">
+    <!-- JS injects comment-card here -->
+  </div>
+
+</div>

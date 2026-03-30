@@ -1,0 +1,47 @@
+{% from"components/shared/image-utils.html" import render_image %}
+{% from"components/ui/button.html" import button %}
+{% from"components/ui/badge.html" import badge %}
+<article class="card card--item" data-type="item" data-id="{{ item.id }}">
+  <a href="{{ url_for('main.item_page', item_id=item.id) }}">
+    <div class="card__img-wrapper">
+      {{ render_image(
+      item.images[0].image_path,
+      item.name)
+      }}
+      <div class="card__img-overlay"></div>
+      {{ badge('Product', 'badge--card-type') }}
+    </div>
+  </a>
+  <div class="card__content">
+    <div class="card__meta-top flex items-center">
+      {{ badge(item.category.name, 'badge--category', 'secondary') }}
+      {{ badge(item.brand.name, 'badge--brand', 'secondary') }}
+    </div>
+
+    <a href="{{ url_for('main.item_page', item_id=item.id) }}">
+      <h3 class="card__title item-name">
+        {{ item.name }}
+      </h3>
+    </a>
+
+    <div class="card__meta-bottom flex items-center">
+      <div class="card__meta-item card__rating flex items-center">
+        <i class="fas fa-star"></i>
+        <span class="item-rating">4.7</span>
+      </div>
+      <span class="item-reviews-count">982 reviews</span>
+    </div>
+
+    <div class="item-actions flex items-center justify-between">
+      <div class="item-price-range">
+        {{ item.store_links[0].price if item.store_links else '' }}
+      </div>
+      <a href="{{ url_for('main.item_page', item_id=item.id) }}" class="item__view-link">
+        {{ button(
+        text="View", class="item__view-btn",
+        icon="fa-solid fa-cart-shopping"
+        ) }}
+      </a>
+    </div>
+  </div>
+</article>

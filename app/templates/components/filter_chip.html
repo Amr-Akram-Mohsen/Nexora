@@ -1,0 +1,30 @@
+{% from"components/ui/badge.html" import badge %}
+
+{% macro filter_chip(section_name, filter_name, instance, active_values, removable=false) %}
+
+{% set is_active = instance.slug in active_values %}
+
+{% set params = request.args.to_dict(flat=False) %}
+
+{% if is_active %}
+  {% set _ = params[filter_name].remove(instance.slug) %}
+  {% if not params[filter_name] %}
+    {% set _ = params.pop(filter_name) %}
+  {% endif %}
+{% else %}
+  {% set _ = params.setdefault(filter_name, []).append(instance.slug) %}
+{% endif %}
+
+
+<a
+  href="{{ url_for('main.sections', section_slug=section_name, **params) }}"
+  class="filter-item">
+  {{ badge(instance.name, "filter-chip",
+    "secondary" if removable
+    else ("primary" if is_active else "outline")) }}
+  {% if removable %}
+      <span class="chip-remove inline-flex items-center justify-center">&times;</span>
+  {% endif %}
+</a>
+
+{% endmacro %}
