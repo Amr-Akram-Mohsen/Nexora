@@ -1,6 +1,6 @@
 from app.constants import TargetType, INTERACTION_TYPE
 def parse_target_type(value: str) -> str:
-    if value not in (TargetType.ARTICLE, TargetType.PRODUCT):
+    if value not in (TargetType.ARTICLE, TargetType.ITEM):
         raise ValueError("Invalid target type")
     return value
 

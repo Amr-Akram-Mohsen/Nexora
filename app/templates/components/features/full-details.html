@@ -13,7 +13,13 @@
 
       <h3 class="item-details-dialog__title flex items-center">
         <span class="item-details-dialog__bar"></span>
+        {% if item.item_type == 'perfumes' %}
+        Full Fragrance Details
+        {% elif item.item_type == 'accessories' %}
+        Full Product Details
+        {% elif item.item_type == 'electronics' %}
         Full Specifications
+        {% endif %}
       </h3>
 
     </div>

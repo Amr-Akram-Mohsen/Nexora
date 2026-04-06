@@ -12,24 +12,43 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
-    
     # Google OAuth
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 
-    # ============ Those Were Added When Working On The Contact Form =============
-    # Mail settings (Gmail example, adjust if using another provider)
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
-    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
-    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "True") == "True"
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")  # your email
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")  # app password
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
+    # ── Mail ─────────────────────────────────────────────────────
+    MAIL_SERVER        = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+    MAIL_PORT          = int(os.environ.get("MAIL_PORT", 587))
+    MAIL_USE_TLS       = os.environ.get("MAIL_USE_TLS", "True") == "True"
+    MAIL_USERNAME      = os.environ.get("MAIL_USERNAME")
+    MAIL_PASSWORD      = os.environ.get("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER= os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
+    ADMIN_EMAIL        = os.environ.get("ADMIN_EMAIL", "support@yoursite.com")
+    MAIL_ENABLED       = True
 
-    ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "support@yoursite.com")
-    MAIL_ENABLED = True  # you can disable in dev with False
+    # ── Article / News APIs ───────────────────────────────────────
+    NEWS_API_KEY    = os.environ.get("NEWS_API_KEY")
+    GNEWS_API_KEY   = os.environ.get("GNEWS_API_KEY")
+    YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
+    # ── Reddit API ────────────────────────────────────────────────
+    # Create an app at: https://www.reddit.com/prefs/apps  (type: "script")
+    REDDIT_CLIENT_ID     = os.environ.get("REDDIT_CLIENT_ID")
+    REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
+
+    # ── Amazon PA-API 5.0 ─────────────────────────────────────────
+    # Requires two Amazon Associates accounts:
+    #   SA → https://affiliate-program.amazon.sa
+    #   AE → https://affiliate-program.amazon.ae
+    # Keys come from AWS IAM, linked to your Associates account.
+    AMAZON_ACCESS_KEY       = os.environ.get("AMAZON_ACCESS_KEY")
+    AMAZON_SECRET_KEY       = os.environ.get("AMAZON_SECRET_KEY")
+    AMAZON_ASSOCIATE_TAG_SA = os.environ.get("AMAZON_ASSOCIATE_TAG_SA", "nexora-sa-21")
+    AMAZON_ASSOCIATE_TAG_AE = os.environ.get("AMAZON_ASSOCIATE_TAG_AE", "nexora-ae-21")
+
+    # ── ArabClicks (Noon & other regional stores) ─────────────────
+    # Sign up at: https://www.arabclicks.com
+    ARABCLICKS_PUBLISHER_ID = os.environ.get("ARABCLICKS_PUBLISHER_ID")
 
 
 # ================================================

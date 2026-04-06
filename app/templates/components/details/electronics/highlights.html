@@ -1,0 +1,14 @@
+{% set highlights = item.structured_details.get('highlights') %}
+
+{% if highlights %}
+<div class="item-highlights flex flex-wrap">
+
+  {% for key, value in highlights.items() %}
+  <div class="highlight-item">
+    <span class="highlight-label">{{ key.replace('_', ' ') }}</span>
+    <span class="highlight-value">{{ value }}</span>
+  </div>
+  {% endfor %}
+
+</div>
+{% endif %}

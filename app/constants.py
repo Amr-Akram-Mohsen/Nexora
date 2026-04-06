@@ -1,6 +1,6 @@
 class TargetType:
     ARTICLE = "article"
-    PRODUCT = "item"
+    ITEM = "item"
 
 class INTERACTION_TYPE:
     REACT = "react"

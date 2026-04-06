@@ -10,61 +10,70 @@
     {% from "components/ui/button.html" import button %}
     {% from "components/ui/field.html" import field %}
 
-    
-    {% call form("auth-form") %}  
-      {% if is_new_user %}
-        {% call field(label_text="Full Name", for_id="name") %}
-          {{ input(name="name", placeholder="Your name i.e. John Doe") }}
-        {% endcall %}
-      {% endif %}
-      {% call field(label_text="Email", for_id="email") %}
-        {{ input(name="email", type="email", placeholder="you@example.com") }}
-      {% endcall %}
-      {% call field(label_text="Password", for_id="password") %}
-        {{ input(name="password", type="password", placeholder="••••••••") }}
-        {% if is_new_user %}
-          <p class="field-hint">Must be at least 8 characters</p>
-        {% endif %}
-      {% endcall %}
-      {% set label_name = "newsletter" if is_new_user else "remember" %}
-      {% set label_text = "Subscribe to newsletter" if is_new_user
-      else "Remember me"
+
+    {% set auth_url = url_for('main.google_login') %}
+    {{ button(
+    text="Continue with Google",
+    type="button",
+    class="google-auth-btn",
+    icon="fa-brands fa-google",
+    attrs={"onclick": "window.location.href='" ~ auth_url ~ "'"}
+    ) }}
+
+    {% call form("auth-form") %}
+    {% if is_new_user %}
+    {% call field(label_text="Full Name", for_id="name") %}
+    {{ input(name="name", placeholder="Your name i.e. John Doe") }}
+    {% endcall %}
+    {% endif %}
+    {% call field(label_text="Email", for_id="email") %}
+    {{ input(name="email", type="email", placeholder="you@example.com") }}
+    {% endcall %}
+    {% call field(label_text="Password", for_id="password") %}
+    {{ input(name="password", type="password", placeholder="••••••••", attrs={"minlength": "8"} if is_new_user else {})
+    }}
+    {% if is_new_user %}
+    <p class="field-hint">Must be at least 8 characters</p>
+    {% endif %}
+    {% endcall %}
+    {% set label_name = "newsletter" if is_new_user else "remember" %}
+    {% set label_text = "Subscribe to newsletter" if is_new_user
+    else "Remember me"
+    %}
+    {% if not is_new_user %}
+    <div class="flex items-center justify-between">
+      {% call field(
+      label_text=label_text,
+      for_id=label_name,
+      class="checkbox-wrapper flex items-center",
+      label_class=label_name ~ "-label")
       %}
-      {% if not is_new_user %}
-        <div class="flex items-center justify-between">
-          {% call field(
-            label_text=label_text,
-            for_id=label_name,
-            class="checkbox-wrapper flex items-center",
-            label_class=label_name ~ "-label")
-          %}
-            {{ input(id=label_name, type="checkbox", required=False) }}
-          {% endcall %}
-          <a href="" class="redirect-link">Forgot password?</a>
-        </div>
-      {% else %}
-        {% call field(
-          label_text=label_text,
-          for_id=label_name,
-          class="checkbox-wrapper flex items-center",
-          label_class=label_name ~ "-label")
-        %}
-          {{ input(name=label_name, type="checkbox", value="1", required=False) }}
-        {% endcall %}
-      {% endif %}
-      {{ button(text=title, type="submit", class="auth-btn") }}
+      {{ input(id=label_name, type="checkbox", required=False) }}
+      {% endcall %}
+      <a href="" class="redirect-link">Forgot password?</a>
+    </div>
+    {% else %}
+    {% call field(
+    label_text=label_text,
+    for_id=label_name,
+    class="checkbox-wrapper flex items-center",
+    label_class=label_name ~ "-label")
+    %}
+    {{ input(name=label_name, type="checkbox", value="1", required=False) }}
+    {% endcall %}
+    {% endif %}
+    {{ button(text=title, type="submit", class="auth-btn") }}
     {% endcall %}
     <div class="user-status-wrapper">
-      {% set link_text = 
-        "Login" if is_new_user 
-        else "Sign Up" 
+      {% set link_text =
+      "Login" if is_new_user
+      else "Sign Up"
       %}
       <span class="auth-status-text">
         {{ "Already have an account?" if is_new_user else "Don't have an account?" }}
       </span>
-      <a href="{{ url_for('main.login') if is_new_user else url_for('main.register') }}"
-      class="redirect-link">
-        {{ link_text }} 
+      <a href="{{ url_for('main.login') if is_new_user else url_for('main.register') }}" class="redirect-link">
+        {{ link_text }}
       </a>
     </div>
   </div>

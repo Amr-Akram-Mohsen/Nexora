@@ -1,11 +1,17 @@
-{% from"components/shared/image-utils.html" import render_image %}
+{% from"components/shared/image-utils.html" import render_image_url %}
 {% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
 <article class="card card--item" data-type="item" data-id="{{ item.id }}">
   <a href="{{ url_for('main.item_page', item_id=item.id) }}">
     <div class="card__img-wrapper">
-      {{ render_image(
-      item.images[0].image_path,
+      {% if item.item_type %}
+      <div class="card__tag card__tag--{{ item.item_type }}">
+        {{ item.item_type }}
+      </div>
+      {% endif %}
+
+      {{ render_image_url(
+      item.image_url,
       item.name)
       }}
       <div class="card__img-overlay"></div>

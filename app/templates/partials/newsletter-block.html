@@ -4,45 +4,41 @@
 
 <p class="newsletter-description">
   {% if is_subscribed %}
-    You are currently subscribed to our newsletter.
+  You are currently subscribed to our newsletter.
   {% else %}
-    Get the latest tech news and reviews delivered to your inbox weekly.
+  Get the latest tech news and reviews delivered to your inbox weekly.
   {% endif %}
 </p>
 
-{% set action = url_for('main.unsubscribe') if is_subscribed
-  else url_for('main.subscribe') %}
+{% set action = url_for('main.unsubscribe_auth') if is_subscribed
+else url_for('main.subscribe') %}
 
 {% if is_subscribed %}
-  <p class="newsletter-success">
-    Thanks for subscribing!
-  </p>
+<p class="newsletter-success">
+  You are subscribed 🎉
+</p>
 {% endif %}
 
 {% call form("justify-center newsletter-form", form_action=action, attrs={"data-newsletter-form": ""}) %}
-  {% if is_subscribed %}
-    {{ button(text="Unsubscribe", type='submit') }}
-  {% else %}
-    {{ input(name='email', type='email',
-      placeholder="Enter your email",
-      required=not is_authenticated)
-    }}
-
-    {% set attrs = {'name': 'mode', 'value': 'guest'} %}
-
-    {{ button(text="Subscribe", type='submit', attrs=attrs) }}
-
-    {% if is_authenticated %}
-      {{ input(name='email', type='hidden',
-        value=current_user.email)
-      }}
-      <div class="newsletter-or flex items-center justify-center">or</div>
-
-      {% set _ = attrs.update({'value': 'account'}) %}
-      
-      {{ button(text="Subscribe with " ~ current_user.email, type='submit', attrs=attrs) }}
-
-    {% endif %}
-
+{% if not is_authenticated %}
+{{ input(
+name='email',
+type='email',
+placeholder="Enter your email"
+) }}
+{% else %}
+<p class="newsletter-info">
+  {% if is_pending %}
+  Check your email to confirm your subscription 📬
+  {% elif not is_subscribed %}
+  Subscribing as <strong>{{ current_user.email }}</strong>
   {% endif %}
+</p>
+{% endif %}
+
+{{ button(
+text="Unsubscribe" if is_subscribed else "Subscribe",
+type='submit'
+) }}
+
 {% endcall %}

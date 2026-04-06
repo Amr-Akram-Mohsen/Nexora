@@ -63,7 +63,7 @@ def prepare_store_links(item):
             func.coalesce(View.user_id, View.ip_address)
         ))
     ).filter(
-        View.target_type == TargetType.PRODUCT,
+        View.target_type == TargetType.ITEM,
         View.target_id == item.id,
         View.created_at >= last_24h
     ).scalar() or 0

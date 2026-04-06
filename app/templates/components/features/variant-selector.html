@@ -1,0 +1,45 @@
+{% if item.has_variants %}
+
+<div class="item-variants">
+
+  <h3 class="item-variants__title">
+    Choose Option
+  </h3>
+
+  {% if item.variants and item.variants|length > 0 %}
+  {% set attributes = item.variants[0].attributes.keys() if item.variants[0].attributes else [] %}
+
+  {% for attr in attributes %}
+
+  <div class="variant-group">
+
+    <div class="variant-group__label">
+      {{ attr.replace('_', ' ') }}
+    </div>
+
+    <div class="variant-group__options flex flex-wrap">
+
+      {% set values = item.variants | map(attribute='attributes') | map(attribute=attr) | list | unique %}
+
+      {% for value in values %}
+
+      {% if attr in ['color', 'finish'] %}
+      <button class="variant-option variant-option--color" style="background: {{ value }}" title="{{ value }}">
+      </button>
+      {% else %}
+      <button class="variant-option">
+        {{ value }}
+      </button>
+      {% endif %}
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+  {% endfor %}
+
+</div>
+{% endif %}
+{% endif %}

@@ -4,7 +4,9 @@ from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from .models import db, User
 from config import Config
-from .extensions import mail
+from .extensions import mail, csrf, limiter
+from dotenv import load_dotenv
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
@@ -19,18 +21,19 @@ def create_app():
 
     # Initialize Flask-Mail
     mail.init_app(app)
-    
+
+    # Initialize CSRF Protection
+    csrf.init_app(app)
+
+    limiter.init_app(app)
+
     # Initialize OAuth
     oauth = OAuth(app)
     google = oauth.register(
         name='google',
         client_id=app.config.get('GOOGLE_CLIENT_ID'),
         client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
-        access_token_url='https://accounts.google.com/o/oauth2/token',
-        access_token_params=None,
-        authorize_url='https://accounts.google.com/o/oauth2/auth',
-        authorize_params=None,
-        api_base_url='https://www.googleapis.com/oauth2/v1/',
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
         client_kwargs={'scope': 'openid email profile'},
     )
     app.google = google
@@ -42,7 +45,65 @@ def create_app():
     from .routes import bp
     app.register_blueprint(bp)
 
+    # ── Ensure api_models tables are created ─────────────────────
+    from .api_models import LastAPIFetch, APIUsage  # noqa: F401
+
     with app.app_context():
         db.create_all()
+
+    # ── CLI Commands ─────────────────────────────────────────────
+    @app.cli.command("seed-db")
+    def seed_db_command():
+        from .utils.seeder import seed_db
+        seed_db()
+        print("Database seeded successfully!")
+
+    @app.cli.command("seed-test-data")
+    def seed_test_data_command():
+        from tmp.test_data_generator import generate_mock_data
+        from .utils.matcher import match_articles_to_items
+        print("Generating mock products and variants...")
+        generate_mock_data()
+        print("Mock data generation complete!")
+        print("Running matcher to link items with existing articles...")
+        match_articles_to_items()
+        print("Done!")
+
+    @app.cli.command("link-articles")
+    def link_articles_command():
+        from .utils.matcher import match_articles_to_items
+        print("Starting article-to-item matcher...")
+        count = match_articles_to_items()
+        print(f"Matcher complete! Created {count} new links.")
+
+    @app.cli.command("fetch-all")
+    def fetch_all_command():
+        """Runs active fetchers in one go."""
+        from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery
+        from .utils.matcher import match_articles_to_items
+        print("--- [1/3] Fetching Articles (RSS/NewsAPI/GNews) ---")
+        run_article_fetch()
+        
+        # Reddit and Amazon are currently disabled in runner.py per user request,
+        # but we call them here - they will log that they are skipping.
+        print("--- [2/3] Fetching Reddit Communities ---")
+        run_reddit_fetch()
+        print("--- [3/3] Discovering Amazon Products ---")
+        run_amazon_discovery()
+        
+        # Link newly fetched items to existing articles
+        print("--- [Matcher] Linking Articles to Items ---")
+        match_articles_to_items()
+        
+        print("Done! All active ingestion jobs complete.")
+
+    # ── Start background scheduler ───────────────────────────────
+    from .jobs.scheduler import init_scheduler
+    # init_scheduler(app)
+
+    import os
+    if os.environ.get("RENDER") != "true":
+        init_scheduler(app)
+    
 
     return app

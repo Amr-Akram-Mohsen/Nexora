@@ -1,7 +1,8 @@
 {% extends"base.html" %}
 {% from"components/detail-page.html" import detail_page with context %}
 {% from"components/features/snippet-utils.html" import article_snippet %}
-{% from"components/shared/image-utils.html" import render_image %}
+{% from"components/shared/image-utils.html" import render_image_url %}
+{% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
 {% block content %}
 {% macro header_block() %}
@@ -22,7 +23,7 @@
       <div class="meta-icon-wrapper">
         <i class="far fa-user"></i>
       </div>
-      <span class="article__author">Enstien</span>
+      <span class="article__author">{{ article.source_name}}</span>
     </div>
     <div class="meta-item meta-clock flex items-center">
       <div class="meta-icon-wrapper">
@@ -41,13 +42,18 @@
 {% endmacro %}
 
 {% macro image_block() %}
-{{ render_image(article.image or article.image_url, article.title) }}
+{{ render_image_url(article.image_url, article.title) }}
 {% endmacro %}
 
 {% macro content_block() %}
 <!-- article body goes here -->
 <div class="article-content">
-  {{ article.content | safe }}
+  {{ article.description | safe }}
+  <a href="{{ article.url }}" class="article__view-link" target="_blank">
+    {{ button(text="Read Full Article", class="article__view-btn") }}
+  </a>
+
+
 </div>
 {% endmacro %}
 

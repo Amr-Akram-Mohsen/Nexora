@@ -8,7 +8,10 @@
     <a href="{{ link.affiliate_url }}" target="_blank" rel="noopener noreferrer"
       class="link item-buy-link flex items-center justify-between" data-link-id="{{ link.id }}">
       <div class="item-buy-link__info flex flex-col">
-        <div class="item-buy-link__store">
+        <div class="item-buy-link__store flex items-center">
+          {% if link.store.logo_url %}
+          <img src="{{ link.store.logo_url }}" alt="{{ link.store.name }}" class="store-logo" loading="lazy" style="height: 24px; margin-right: 8px;">
+          {% endif %}
           {{ link.store.name }}
         </div>
         {% if link.price %}

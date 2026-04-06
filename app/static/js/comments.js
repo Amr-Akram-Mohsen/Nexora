@@ -32,7 +32,7 @@ async function showComments(btn) {
         params.append("parent_id", wrapper.dataset.commentId);
     }
     else {
-        const parent = wrapper.closest(".detail-page__footer")
+        const parent = wrapper.closest(".detail-page__extra")
         wrapper = parent.querySelector(".comments");
         opening = !wrapper.classList.contains("comments--collapsed")
         wrapper.classList.toggle("comments--collapsed");

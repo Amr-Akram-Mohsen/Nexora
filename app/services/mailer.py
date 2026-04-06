@@ -3,7 +3,6 @@ from flask import current_app
 from flask_mail import Message
 from app.extensions import mail
 
-
 def send_admin_email(data):
     if not current_app.config.get("MAIL_ENABLED", True):
         current_app.logger.info("MAIL_ENABLED=False, skipping email")

@@ -68,10 +68,12 @@
             <div class="user-info {{ item_class }}">
               <span class="user-email">{{ user_email }}</span>
             </div>
-            <a href="{{ url_for('main.logout') }}" class="{{ item_class }}">
-              <i class="fas fa-sign-out-alt"></i>
-              Logout
-            </a>
+            {% call form(variant="", form_action=url_for('main.logout'), class="logout-form") %}
+            {{ button(
+            text="Logout", variant="",
+            type="submit", icon="fas fa-sign-out-alt",
+            class=item_class ~ " logout-btn")}}
+            {% endcall %}
             {% else %}
             <a href="{{ url_for('main.login') }}" class="{{ item_class }}">
               <i class="fas fa-sign-in-alt"></i>
@@ -98,7 +100,7 @@
     <!-- Search Bar -->
 
     <div class="header-search">
-      {% call form("header-search__form", variant="") %}
+      {% call form("header-search__form", variant="", method="GET", include_csrf=False) %}
       {{ input(
       name="query", type="search",
       placeholder="Search articles and products...",

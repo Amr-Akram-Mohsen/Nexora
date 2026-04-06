@@ -18,9 +18,15 @@ instance/
 app/static/article_images
 app/static/images
 
-app/templates_copy
+tmp/
 app/sentiment_model
 
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Build / batch scripts (optional)
+*.bat
+
+# Logs
+*.log

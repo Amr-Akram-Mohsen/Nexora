@@ -1,0 +1,3811 @@
+[
+  {
+    "name": "iPhone 17 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_17_pro_max-13964.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, September 09",
+        "status": "Available. Released 2025, September 19"
+      },
+      "body": {
+        "dimensions": "163.4 x 78 x 8.8 mm (6.43 x 3.07 x 0.35 in)",
+        "weight": "233 g (8.22 oz)",
+        "build": "Glass front (Ceramic Shield 2), aluminum alloy frame, aluminum alloy back/ glass back (Ceramic Shield)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (HBM), 3000 nits (peak)",
+        "size": "6.9 inches, 115.6 cm 2 (~90.7% screen-to-body ratio)",
+        "resolution": "1320 x 2868 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield 2, Mohs level 5"
+      },
+      "platform": {
+        "os": "iOS 26, upgradable to iOS 26.1",
+        "chipset": "Apple A19 Pro (3 nm)",
+        "cpu": "Hexa-core (2x4.26 GHz + 4xX.X GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 12GB RAM, 512GB 12GB RAM, 1TB 12GB RAM, 2TB 12GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 48 MP, f/2.8, 100mm (periscope telephoto), 1/2.55\", 0.7µm, PDAF, 3D sensor‑shift OIS, 4x optical zoom 48 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 0.7µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60/100/120fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 120fps), ProRes, ProRes RAW (up to 120fps), Apple Log 2, 3D (spatial) video/audio, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "18 MP multi-aspect, f/1.9, 20mm (ultrawide), PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec., ProRes RAW, Apple Log 2",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Market-dependent versions: · Li-Ion 4823 mAh - Nano SIM model · Li-Ion 5088 mAh - eSIM only model",
+        "charging": "Wired, PD3.2, AVS, 50% in 20 min 25W wireless MagSafe/Qi2, 50% in 30 min (15W - China) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class A",
+        "battery": "53:00h endurance, 1000 cycles",
+        "free fall": "Class B (180 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-max-nano-sim.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-max-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-max-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 17 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_17_pro-14049.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, September 09",
+        "status": "Available. Released 2025, September 19"
+      },
+      "body": {
+        "dimensions": "150 x 71.9 x 8.8 mm (5.91 x 2.83 x 0.35 in)",
+        "weight": "206 g (7.27 oz)",
+        "build": "Glass front (Ceramic Shield 2), aluminum alloy frame, aluminum alloy back/ glass back (Ceramic Shield)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (HBM), 3000 nits (peak)",
+        "size": "6.3 inches, 96.4 cm 2 (~89.4% screen-to-body ratio)",
+        "resolution": "1206 x 2622 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield 2, Mohs level 5"
+      },
+      "platform": {
+        "os": "iOS 26, upgradable to iOS 26.1",
+        "chipset": "Apple A19 Pro (3 nm)",
+        "cpu": "Hexa-core (2x4.26 GHz + 4xX.X GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 12GB RAM, 512GB 12GB RAM, 1TB 12GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 48 MP, f/2.8, 100mm (periscope telephoto), 1/2.55\", 0.7µm, PDAF, 3D sensor‑shift OIS, 4x optical zoom 48 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 0.7µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60/100/120fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 120fps), ProRes, ProRes RAW (up to 120fps), Apple Log 2, 3D (spatial) video/audio, stereo"
+      },
+      "selfie_camera": {
+        "single": "18 MP multi-aspect, f/1.9, 20mm (ultrawide), PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec., ProRes RAW, Apple Log 2",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Market-dependent versions: · Li-Ion 3998 mAh - Nano SIM model · Li-Ion 4252 mAh - eSIM only model",
+        "charging": "Wired, PD3.2, AVS, 50% in 20 min 25W wireless MagSafe/Qi2, 50% in 30 min (15W - China) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class A",
+        "battery": "47:00h endurance, 1000 cycles",
+        "free fall": "Class B (180 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-nano-sim.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-pro-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone Air",
+    "link": "https://www.gsmarena.com/apple_iphone_17_air-13502.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, September 09",
+        "status": "Available. Released 2025, September 19"
+      },
+      "body": {
+        "dimensions": "156.2 x 74.7 x 5.6 mm (6.15 x 2.94 x 0.22 in)",
+        "weight": "165 g (5.82 oz)",
+        "build": "Glass front (Ceramic Shield 2), titanium frame (grade 5), glass back (Ceramic Shield)",
+        "sim": "eSIM + eSIM (8 or more, max 2 at a time)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (HBM), 3000 nits (peak)",
+        "size": "6.5 inches, 104.9 cm 2 (~89.9% screen-to-body ratio)",
+        "resolution": "1260 x 2736 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield 2, Mohs level 5"
+      },
+      "platform": {
+        "os": "iOS 26, upgradable to iOS 26.1",
+        "chipset": "Apple A19 Pro (3 nm)",
+        "cpu": "Hexa-core (2x4.26 GHz + 4xX.X GHz)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 12GB RAM, 512GB 12GB RAM, 1TB 12GB RAM"
+      },
+      "main_camera": {
+        "single": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "18 MP multi-aspect, f/1.9, 20mm (ultrawide), PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE",
+        "positioning": "GPS, GALILEO, GLONASS, QZSS, BDS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3149 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 20 wireless MagSafe/Qi2, 50% in 30 min (15W - China) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class A",
+        "battery": "40:00h endurance, 1000 cycles",
+        "free fall": "Class B (180 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-air-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-air-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-air-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 17",
+    "link": "https://www.gsmarena.com/apple_iphone_17-14050.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, September 09",
+        "status": "Available. Released 2025, September 19"
+      },
+      "body": {
+        "dimensions": "149.6 x 71.5 x 8 mm (5.89 x 2.81 x 0.31 in)",
+        "weight": "177 g (6.24 oz)",
+        "build": "Glass front (Ceramic Shield 2), aluminum frame, glass back",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (HBM), 3000 nits (peak)",
+        "size": "6.3 inches, 96.4 cm 2 (~90.1% screen-to-body ratio)",
+        "resolution": "1206 x 2622 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield 2, Mohs level 5"
+      },
+      "platform": {
+        "os": "iOS 26, upgradable to iOS 26.1",
+        "chipset": "Apple A19 (3 nm)",
+        "cpu": "Hexa-core (2x4.26 GHz + 4xX.X GHz)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 8GB RAM, 512GB 8GB RAM"
+      },
+      "main_camera": {
+        "dual": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS 48 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 0.7µm, PDAF",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "18 MP multi-aspect, f/1.9, 20mm (ultrawide), PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6/7, tri-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3692 mAh",
+        "charging": "Wired, PD3.2, AVS, 50% in 20 min 25W wireless MagSafe/Qi2, 50% in 30 min (15W - China) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class A",
+        "battery": "41:00h endurance, 1000 cycles",
+        "free fall": "Class B (180 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-no-nano-sim.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-17-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 16e",
+    "link": "https://www.gsmarena.com/apple_iphone_16e-13395.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, February 19",
+        "status": "Available. Released 2025, February 28"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.8 mm (5.78 x 2.81 x 0.31 in)",
+        "weight": "167 g (5.89 oz)",
+        "build": "Glass front (Ceramic Shield), glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass, Mohs level 4"
+      },
+      "platform": {
+        "os": "iOS 18.3.1, upgradable to iOS 26.1",
+        "chipset": "Apple A18 (3 nm)",
+        "cpu": "Hexa-core (2x4.04 GHz + 4x2.20 GHz)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "48 MP, f/1.6, 26mm (wide), 1/2.55\", 0.7µm, PDAF, OIS",
+        "features": "Dual-LED dual-tone flash, HDR, panorama, 3D (spatial) audio",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, Dolby Vision HDR, OIS, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4005 mAh",
+        "charging": "Wired, 50% in 30 min 7.5W wireless (Qi)"
+      },
+      "misc": {
+        "energy": "Class B",
+        "battery": "41:00h endurance, 1000 cycles",
+        "free fall": "Class C (90 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16e-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16e-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16e-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16e-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 16 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_16_pro_max-13123.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, September 09",
+        "status": "Available. Released 2024, September 20"
+      },
+      "body": {
+        "dimensions": "163 x 77.6 x 8.3 mm (6.42 x 3.06 x 0.33 in)",
+        "weight": "227 g (8.01 oz)",
+        "build": "Glass front (Ceramic Shield), glass back, titanium frame (grade 5)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.9 inches, 115.6 cm 2 (~91.4% screen-to-body ratio)",
+        "resolution": "1320 x 2868 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass (2024 gen), Mohs level 4"
+      },
+      "platform": {
+        "os": "iOS 18, upgradable to iOS 26.1",
+        "chipset": "Apple A18 Pro (3 nm)",
+        "cpu": "Hexa-core (2x4.05 GHz + 4x2.42 GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 120mm (periscope telephoto), 1/3.06\", 1.12µm, dual pixel PDAF, 3D sensor‑shift OIS, 5x optical zoom 48 MP, f/2.2, 13mm (ultrawide), 1/2.55\", 0.7µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60/100/120fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, 3D (spatial) video/audio, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4685 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 25W wireless (MagSafe), 15W wireless (China only) 15W wireless (Qi2) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class B",
+        "battery": "48:00h endurance, 1000 cycles",
+        "free fall": "Class C (90 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-max-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-max-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 16 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_16_pro-13315.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, September 09",
+        "status": "Available. Released 2024, September 20"
+      },
+      "body": {
+        "dimensions": "149.6 x 71.5 x 8.3 mm (5.89 x 2.81 x 0.33 in)",
+        "weight": "199 g (7.02 oz)",
+        "build": "Glass front (Ceramic Shield), glass back, titanium frame (grade 5)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.3 inches, 96.4 cm 2 (~90.1% screen-to-body ratio)",
+        "resolution": "1206 x 2622 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass (2024 gen), Mohs level 4"
+      },
+      "platform": {
+        "os": "iOS 18, upgradable to iOS 26.1",
+        "chipset": "Apple A18 Pro (3 nm)",
+        "cpu": "Hexa-core (2x4.05 GHz + 4x2.42 GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 120mm (periscope telephoto), 1/3.06\", 1.12µm, dual pixel PDAF, 3D sensor‑shift OIS, 5x optical zoom 48 MP, f/2.2, 13mm (ultrawide), 1/2.55\", 0.7µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60/100/120fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, 3D (spatial) video/audio, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3582 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 25W wireless (MagSafe), 15W wireless (China only) 15W wireless (Qi2) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class B",
+        "battery": "37:00h endurance, 1000 cycles",
+        "free fall": "Class C (90 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 16 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_16_plus-13316.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, September 09",
+        "status": "Available. Released 2024, September 20"
+      },
+      "body": {
+        "dimensions": "160.9 x 77.8 x 7.8 mm (6.33 x 3.06 x 0.31 in)",
+        "weight": "199 g (7.02 oz)",
+        "build": "Glass front (Ceramic Shield), glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.7 inches, 110.2 cm 2 (~88.0% screen-to-body ratio)",
+        "resolution": "1290 x 2796 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass (2024 gen), Mohs level 4"
+      },
+      "platform": {
+        "os": "iOS 18, upgradable to iOS 26.1",
+        "chipset": "Apple A18 (3 nm)",
+        "cpu": "Hexa-core (2x4.04 GHz + 4x2.20 GHz)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM"
+      },
+      "main_camera": {
+        "dual": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 0.7µm, dual pixel PDAF",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6/7, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4674 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 25W wireless (MagSafe), 15W wireless (China only) 15W wireless (Qi2) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class B",
+        "battery": "48:00h endurance, 1000 cycles",
+        "free fall": "Class C (90 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-plus-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-plus-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-plus-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 16",
+    "link": "https://www.gsmarena.com/apple_iphone_16-13317.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, September 09",
+        "status": "Available. Released 2024, September 20"
+      },
+      "body": {
+        "dimensions": "147.6 x 71.6 x 7.8 mm (5.81 x 2.82 x 0.31 in)",
+        "weight": "170 g (6.00 oz)",
+        "build": "Glass front (Ceramic Shield), glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.1 inches, 91.7 cm 2 (~86.8% screen-to-body ratio)",
+        "resolution": "1179 x 2556 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass (2024 gen), Mohs level 4"
+      },
+      "platform": {
+        "os": "iOS 18, upgradable to iOS 26.1",
+        "chipset": "Apple A18 (3 nm)",
+        "cpu": "Hexa-core (2x4.04 GHz + 4x2.20 GHz)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM"
+      },
+      "main_camera": {
+        "dual": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 0.7µm, dual pixel PDAF",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR, 3D (spatial) audio, stereo sound rec.",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6/7, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3561 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 25W wireless (MagSafe), 15W wireless (China only) 15W wireless (Qi2) 4.5W reverse wired"
+      },
+      "misc": {
+        "energy": "Class B",
+        "battery": "37:00h endurance, 1000 cycles",
+        "free fall": "Class C (90 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 15 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_15_pro_max-12548.php",
+    "specifications": {
+      "launch": {
+        "announced": "2023, September 12",
+        "status": "Available. Released 2023, September 22"
+      },
+      "body": {
+        "dimensions": "159.9 x 76.7 x 8.3 mm (6.30 x 3.02 x 0.33 in)",
+        "weight": "221 g (7.80 oz)",
+        "build": "Glass front, glass back, titanium frame (grade 5)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.7 inches, 110.2 cm 2 (~89.8% screen-to-body ratio)",
+        "resolution": "1290 x 2796 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 17, upgradable to iOS 26.1",
+        "chipset": "Apple A17 Pro (3 nm)",
+        "cpu": "Hexa-core (2x3.78 GHz + 4x2.11 GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 120mm (periscope telephoto), 1/3.06\", 1.12µm, dual pixel PDAF, 3D sensor‑shift OIS, 5x optical zoom 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, 3D (spatial) video, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4441 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update 4.5W reverse wired"
+      },
+      "misc": {
+        "performance": "AnTuTu: 1487203 (v10) GeekBench: 7237 (v6.0)",
+        "display": "1787 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.5 LUFS (Very good)",
+        "battery": "Active use score 16:01h",
+        "battery (old)": "Endurance rating 118h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 15 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_15_pro-12557.php",
+    "specifications": {
+      "launch": {
+        "announced": "2023, September 12",
+        "status": "Available. Released 2023, September 22"
+      },
+      "body": {
+        "dimensions": "146.6 x 70.6 x 8.3 mm (5.77 x 2.78 x 0.33 in)",
+        "weight": "187 g (6.60 oz)",
+        "build": "Glass front, glass back, titanium frame (grade 5)",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.1 inches, 91.3 cm 2 (~88.2% screen-to-body ratio)",
+        "resolution": "1179 x 2556 pixels, 19.5:9 ratio (~461 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 17, upgradable to iOS 26.1",
+        "chipset": "Apple A17 Pro (3 nm)",
+        "cpu": "Hexa-core (2x3.78 GHz + 4x2.11 GHz)",
+        "gpu": "Apple GPU (6-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 77mm (telephoto), 1/3.5\", 1.0µm, PDAF, OIS, 3x optical zoom 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, 3D (spatial) video, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, tri-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS, NavIC",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 3.2 Gen 2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3274 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update 4.5W reverse wired"
+      },
+      "misc": {
+        "display": "1786 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-26.4 LUFS (Good)",
+        "battery": "Active use score 12:58h",
+        "battery (old)": "Endurance rating 86h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 15 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_15_plus-12558.php",
+    "specifications": {
+      "launch": {
+        "announced": "2023, September 12",
+        "status": "Available. Released 2023, September 22"
+      },
+      "body": {
+        "dimensions": "160.9 x 77.8 x 7.8 mm (6.33 x 3.06 x 0.31 in)",
+        "weight": "201 g (7.09 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 1000 nits (HBM), 2000 nits (peak)",
+        "size": "6.7 inches, 110.2 cm 2 (~88.0% screen-to-body ratio)",
+        "resolution": "1290 x 2796 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 17, upgradable to iOS 26.1",
+        "chipset": "Apple A16 Bionic (4 nm)",
+        "cpu": "Hexa-core (2x3.46 GHz Everest + 4x2.02 GHz Sawtooth)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 0.7µm",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4383 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update 4.5W reverse wired"
+      },
+      "misc": {
+        "performance": "AnTuTu: 1385649 (v10) GeekBench: 6618 (v6) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1642 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-27.7 LUFS (Good)",
+        "battery": "Active use score 16:33h",
+        "battery (old)": "Endurance rating 111h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-plus-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-plus-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-plus-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-plus-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 15",
+    "link": "https://www.gsmarena.com/apple_iphone_15-12559.php",
+    "specifications": {
+      "launch": {
+        "announced": "2023, September 12",
+        "status": "Available. Released 2023, September 22"
+      },
+      "body": {
+        "dimensions": "147.6 x 71.6 x 7.8 mm (5.81 x 2.82 x 0.31 in)",
+        "weight": "171 g (6.03 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 1000 nits (HBM), 2000 nits (peak)",
+        "size": "6.1 inches, 91.3 cm 2 (~86.4% screen-to-body ratio)",
+        "resolution": "1179 x 2556 pixels, 19.5:9 ratio (~461 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 17, upgradable to iOS 26.1",
+        "chipset": "Apple A16 Bionic (4 nm)",
+        "cpu": "Hexa-core (2x3.46 GHz Everest + 4x2.02 GHz Sawtooth)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "48 MP, f/1.6, 26mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 0.7µm",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR, Dolby Vision HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3349 mAh",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update 4.5W reverse wired"
+      },
+      "misc": {
+        "performance": "AnTuTu: 1354651 (v10) GeekBench: 6526 (v6) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1643 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-26.2 LUFS (Good)",
+        "battery": "Active use score 13:20h",
+        "battery (old)": "Endurance rating 98h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 14 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_14_pro_max-11773.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, September 07",
+        "status": "Available. Released 2022, September 16"
+      },
+      "body": {
+        "dimensions": "160.7 x 77.6 x 7.9 mm (6.33 x 3.06 x 0.31 in)",
+        "weight": "240 g (8.47 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.7 inches, 110.2 cm 2 (~88.3% screen-to-body ratio)",
+        "resolution": "1290 x 2796 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 16, upgradable to iOS 26.1",
+        "chipset": "Apple A16 Bionic (4 nm)",
+        "cpu": "Hexa-core (2x3.46 GHz Everest + 4x2.02 GHz Sawtooth)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 77mm (telephoto), 1/3.5\", 1.0µm, PDAF, OIS, 3x optical zoom 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4323 mAh (16.68 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 955884 (v9) GeekBench: 5423 (v5.1) GFXBench: 54fps (ES 3.1 onscreen)",
+        "display": "1760 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.3 LUFS (Very good)",
+        "battery (old)": "Endurance rating 121h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-5.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 14 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_14_pro-11860.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, September 07",
+        "status": "Available. Released 2022, September 16"
+      },
+      "body": {
+        "dimensions": "147.5 x 71.5 x 7.9 mm (5.81 x 2.81 x 0.31 in)",
+        "weight": "206 g (7.27 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM)",
+        "size": "6.1 inches, 91.7 cm 2 (~87.0% screen-to-body ratio)",
+        "resolution": "1179 x 2556 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 16, upgradable to iOS 26.1",
+        "chipset": "Apple A16 Bionic (4 nm)",
+        "cpu": "Hexa-core (2x3.46 GHz Everest + 4x2.02 GHz Sawtooth)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 77mm (telephoto), 1/3.5\", 1.0µm, PDAF, OIS, 3x optical zoom 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS (L1+L5), GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3200 mAh (12.38 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 968412 (v9) GeekBench: 5346 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1791 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-26.2 LUFS (Good)",
+        "battery (old)": "Endurance rating 86h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-5.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 14 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_14_plus-11862.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, September 07",
+        "status": "Available. Released 2022, October 07"
+      },
+      "body": {
+        "dimensions": "160.8 x 78.1 x 7.8 mm (6.33 x 3.07 x 0.31 in)",
+        "weight": "203 g (7.16 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.7 inches, 109.8 cm 2 (~87.4% screen-to-body ratio)",
+        "resolution": "1284 x 2778 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 16, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.5, 26mm (wide), 1/1.7\", 1.9µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4323 mAh (16.68 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 797976 (v9) GeekBench: 4582 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "797 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.7 LUFS (Very good)",
+        "battery (old)": "Endurance rating 102h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-plus-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-plus-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-plus-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/iphone-14-plus-yellow.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 14",
+    "link": "https://www.gsmarena.com/apple_iphone_14-11861.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, September 07",
+        "status": "Available. Released 2022, September 16"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.8 mm (5.78 x 2.81 x 0.31 in)",
+        "weight": "172 g (6.07 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM + eSIM (max 2 at a time; International) · eSIM + eSIM (8 or more, max 2 at a time; USA) · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 16, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.5, 26mm (wide), 1/1.7\", 1.9µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3279 mAh (12.68 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 817125 (v9) GeekBench: 4761 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "804 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-25.2 LUFS (Very good)",
+        "battery (old)": "Endurance rating 90h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/iphone-14-plus-yellow.jpg"
+    ]
+  },
+  {
+    "name": "iPhone SE (2022)",
+    "link": "https://www.gsmarena.com/apple_iphone_se_(2022)-11410.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, March 08",
+        "status": "Available. Released 2022, March 18"
+      },
+      "body": {
+        "dimensions": "138.4 x 67.3 x 7.3 mm (5.45 x 2.65 x 0.29 in)",
+        "weight": "144 g (5.08 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "4.7 inches, 60.9 cm 2 (~65.4% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 15.4, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.22 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 128GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8 (wide), PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR, panorama",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps, HDR, OIS, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2",
+        "features": "HDR",
+        "video": "1080p@30/120fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, proximity, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2018 mAh (6.96 Wh)",
+        "charging": "20W wired, 50% in 30 min 7.5W wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 723486 (v9) GeekBench: 4629 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1424:1 contrast ratio, 605 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-25.2 LUFS (Very good)",
+        "battery (old)": "Endurance rating 62h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2022-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2022-2.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 13 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_13_pro_max-11089.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "160.8 x 78.1 x 7.7 mm (6.33 x 3.07 x 0.30 in)",
+        "weight": "240 g (8.47 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1200 nits (peak)",
+        "size": "6.7 inches, 109.8 cm 2 (~87.4% screen-to-body ratio)",
+        "resolution": "1284 x 2778 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 15, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.5, 26mm (wide), 1/1.7\", 1.9µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 77mm (telephoto), PDAF, 1/3.4\", 1.0µm, OIS, 3x optical zoom 12 MP, f/1.8, 13mm, 120˚ (ultrawide), 1/3.4\", 1.0µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 4352 mAh (16.75 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 801691 (v9) GeekBench: 4706 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1050 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.0 LUFS (Very good)",
+        "battery (old)": "Endurance rating 121h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 13 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_13_pro-11102.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.7 mm (5.78 x 2.81 x 0.30 in)",
+        "weight": "204 g (7.20 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 15, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.5, 26mm (wide), 1/1.7\", 1.9µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.8, 77mm (telephoto), PDAF, 1/3.4\", 1.0µm, OIS, 3x optical zoom 12 MP, f/1.8, 13mm, 120˚ (ultrawide), 1/3.4\", 1.0µm, PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10‑bit HDR, Dolby Vision HDR (up to 60fps), ProRes, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3095 mAh (12.11 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 794348 (v9) GeekBench: 4687 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1063 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.9 LUFS (Very good)",
+        "battery (old)": "Endurance rating 85h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-pro-max-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 13",
+    "link": "https://www.gsmarena.com/apple_iphone_13-11103.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.7 mm (5.78 x 2.81 x 0.30 in)",
+        "weight": "174 g (6.14 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 15, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.6, 26mm (wide), 1/1.9\", 1.7µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 120˚, 13mm (ultrawide), 1/3.4\", 1.0µm",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3240 mAh (12.41 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 775519 (v9) GeekBench: 4645 (v5.1) GFXBench: 59fps (ES 3.1 onscreen)",
+        "display": "802 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-25.5 LUFS (Very good)",
+        "battery (old)": "Endurance rating 89h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 13 mini",
+    "link": "https://www.gsmarena.com/apple_iphone_13_mini-11104.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "131.5 x 64.2 x 7.7 mm (5.18 x 2.53 x 0.30 in)",
+        "weight": "141 g (4.97 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "5.4 inches, 71.9 cm 2 (~85.1% screen-to-body ratio)",
+        "resolution": "1080 x 2340 pixels, 19.5:9 ratio (~476 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 15, upgradable to iOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.23 GHz Avalanche + 4x1.82 GHz Blizzard)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.6, 26mm (wide), 1/1.9\", 1.7µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.4, 120˚, 13mm (ultrawide), 1/3.4\", 1.0µm",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2438 mAh (9.34 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.2 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 772512 (v9) GeekBench: 4681 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "831 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-25.9 LUFS (Very good)",
+        "battery (old)": "Endurance rating 75h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-mini-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-mini-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-mini-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-13-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 12 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_12_pro_max-10237.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, October 13",
+        "status": "Available. Released 2020, November 13"
+      },
+      "body": {
+        "dimensions": "160.8 x 78.1 x 7.4 mm (6.33 x 3.07 x 0.29 in)",
+        "weight": "228 g (8.04 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.7 inches, 109.8 cm 2 (~87.4% screen-to-body ratio)",
+        "resolution": "1284 x 2778 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 14.1, upgradable to iOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.1 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.6, 26mm (wide), 1/1.9\", 1.7µm, dual pixel PDAF, sensor-shift OIS 12 MP, f/2.2, 65mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2.5x optical zoom 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 1/3.4\", 1.0µm TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10‑bit HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3687 mAh (14.13 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.4 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 638584 (v8) GeekBench: 4240 (v5.1) GFXBench: 55fps (ES 3.1 onscreen)",
+        "display": "822 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-23.8 LUFS (Very good)",
+        "battery (old)": "Endurance rating 95h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-6.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 12 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_12_pro-10508.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, October 13",
+        "status": "Available. Released 2020, October 23"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.4 mm (5.78 x 2.81 x 0.29 in)",
+        "weight": "189 g (6.67 oz)",
+        "build": "Glass front, glass back, stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 14.1, upgradable to iOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.1 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.6, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.0, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 1/3.4\", 1.0µm TOF 3D LiDAR scanner (depth)",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10‑bit HDR, Dolby Vision HDR (up to 60fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2815 mAh (10.78 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.4 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 596244 (v8) GeekBench: 4056 (v5.1) GFXBench: 58fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: Infinite (nominal)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.2 LUFS (Very good)",
+        "battery (old)": "Endurance rating 81h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-r1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-max-6.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 12",
+    "link": "https://www.gsmarena.com/apple_iphone_12-10509.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, October 13",
+        "status": "Available. Released 2020, October 23"
+      },
+      "body": {
+        "dimensions": "146.7 x 71.5 x 7.4 mm (5.78 x 2.81 x 0.29 in)",
+        "weight": "164 g (5.78 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 625 nits (HBM), 1200 nits (peak)",
+        "size": "6.1 inches, 90.2 cm 2 (~86.0% screen-to-body ratio)",
+        "resolution": "1170 x 2532 pixels, 19.5:9 ratio (~460 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 14.1, upgradable to iOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.1 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 128GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.6, 26mm (wide), 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 1/3.6\"",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 30fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2815 mAh (10.78 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.4 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 568674 (v8) GeekBench: 4067 (v5.1) GFXBench: 58fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: Infinite (nominal)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.4 LUFS (Very good)",
+        "battery (old)": "Endurance rating 84h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-r1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 12 mini",
+    "link": "https://www.gsmarena.com/apple_iphone_12_mini-10510.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, October 13",
+        "status": "Available. Released 2020, November 13"
+      },
+      "body": {
+        "dimensions": "131.5 x 64.2 x 7.4 mm (5.18 x 2.53 x 0.29 in)",
+        "weight": "135 g (4.76 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 625 nits (HBM), 1200 nits (peak)",
+        "size": "5.4 inches, 71.9 cm 2 (~85.1% screen-to-body ratio)",
+        "resolution": "1080 x 2340 pixels, 19.5:9 ratio (~476 ppi density)",
+        "protection": "Ceramic Shield glass"
+      },
+      "platform": {
+        "os": "iOS 14.1, upgradable to iOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.1 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 128GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.6, 26mm (wide), 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 1/3.6\"",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, Dolby Vision HDR (up to 30fps), stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2227 mAh (8.57 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min 15W wireless (MagSafe) 15W wireless (Qi2) - requires iOS 17.4 update"
+      },
+      "misc": {
+        "performance": "AnTuTu: 589616 (v8) GeekBench: 4174 (v5.1) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "627 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.6 LUFS (Very good)",
+        "battery (old)": "Endurance rating 69h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-mini-r1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-mini-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone SE (2020)",
+    "link": "https://www.gsmarena.com/apple_iphone_se_(2020)-10170.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, April 15",
+        "status": "Available. Released 2020, April 24"
+      },
+      "body": {
+        "dimensions": "138.4 x 67.3 x 7.3 mm (5.45 x 2.65 x 0.29 in)",
+        "weight": "148 g (5.22 oz)",
+        "build": "Glass front, glass back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "4.7 inches, 60.9 cm 2 (~65.4% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 13, upgradable to iOS 26.1",
+        "chipset": "Apple A13 Bionic (7 nm+)",
+        "cpu": "Hexa-core (2x2.65 GHz Lightning + 4x1.8 GHz Thunder)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 128GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8 (wide), PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR, panorama",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps, HDR, OIS, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2",
+        "features": "HDR",
+        "video": "1080p@30fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, proximity, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 1821 mAh (6.91 Wh)",
+        "charging": "18W wired, 50% in 30 min 7.5W wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 462253 (v8) GeekBench: 3237 (v5.1)",
+        "display": "1544:1 contrast ratio, 670 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.1 LUFS (Very good)",
+        "battery (old)": "Endurance rating 59h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2020-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2020-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-2020-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 11 Pro Max",
+    "link": "https://www.gsmarena.com/apple_iphone_11_pro_max-9846.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, September 10",
+        "status": "Available. Released 2019, September 20"
+      },
+      "body": {
+        "dimensions": "158 x 77.8 x 8.1 mm (6.22 x 3.06 x 0.32 in)",
+        "weight": "226 g (7.97 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "6.5 inches, 102.9 cm 2 (~83.7% screen-to-body ratio)",
+        "resolution": "1242 x 2688 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 13, upgradable to iOS 26.1",
+        "chipset": "Apple A13 Bionic (7 nm+)",
+        "cpu": "Hexa-core (2x2.65 GHz Lightning + 4x1.8 GHz Thunder)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.0, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom 12 MP, f/2.4, 120˚, 13mm (ultrawide), 1/3.6\"",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3969 mAh, non-removable (15.04 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 459713 (v7), 536883 (v8) GeekBench: 13870 (v4.4), 3503 (v5.1) GFXBench: 57fps (ES 3.1 onscreen)",
+        "display": "820 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-25.6 LUFS (Very good)",
+        "audio quality": "Noise -94.3dB / Crosstalk -81.5dB",
+        "battery (old)": "Endurance rating 102h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-pro-10.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-6.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 11 Pro",
+    "link": "https://www.gsmarena.com/apple_iphone_11_pro-9847.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, September 10",
+        "status": "Available. Released 2019, September 20"
+      },
+      "body": {
+        "dimensions": "144 x 71.4 x 8.1 mm (5.67 x 2.81 x 0.32 in)",
+        "weight": "188 g (6.63 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak)",
+        "size": "5.8 inches, 84.4 cm 2 (~82.1% screen-to-body ratio)",
+        "resolution": "1125 x 2436 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 13, upgradable to iOS 26.1",
+        "chipset": "Apple A13 Bionic (7 nm+)",
+        "cpu": "Hexa-core (2x2.65 GHz Lightning + 4x1.8 GHz Thunder)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "triple": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.0, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom 12 MP, f/2.4, 120˚, 13mm (ultrawide), 1/3.6\"",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3046 mAh, non-removable (11.67 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 460784 (v7) GeekBench: 13829 (v4.4) GFXBench: 57fps (ES 3.1 onscreen)",
+        "display": "805 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-24.3 LUFS (Very good)",
+        "audio quality": "Noise -94.2dB / Crosstalk -81.0dB",
+        "battery (old)": "Endurance rating 86h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-pro-10.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-pro-max-6.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 11",
+    "link": "https://www.gsmarena.com/apple_iphone_11-9848.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, September 10",
+        "status": "Available. Released 2019, September 20"
+      },
+      "body": {
+        "dimensions": "150.9 x 75.7 x 8.3 mm (5.94 x 2.98 x 0.33 in)",
+        "weight": "194 g (6.84 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), aluminum frame (7000 series)",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 625 nits (typ)",
+        "size": "6.1 inches, 90.3 cm 2 (~79.0% screen-to-body ratio)",
+        "resolution": "828 x 1792 pixels, 19.5:9 ratio (~326 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 13, upgradable to iOS 26.1",
+        "chipset": "Apple A13 Bionic (7 nm+)",
+        "cpu": "Hexa-core (2x2.65 GHz Lightning + 4x1.8 GHz Thunder)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 128GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.4, 120˚, 13mm (ultrawide), 1/3.6\"",
+        "features": "Dual-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3110 mAh, non-removable (11.91 Wh)",
+        "charging": "Wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 419453 (v7) GeekBench: 13882 (v4.4) GFXBench: 60fps (ES 3.1 onscreen)",
+        "display": "1505:1 contrast ratio, 644 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 70dB / Noise 72dB / Ring 76dB",
+        "audio quality": "Noise -94.2dB / Crosstalk -80.8dB",
+        "battery (old)": "Endurance rating 94h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-11-9.jpg"
+    ]
+  },
+  {
+    "name": "iPhone XS Max",
+    "link": "https://www.gsmarena.com/apple_iphone_xs_max-9319.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, September 12. Released 2018, September 21",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "157.5 x 77.4 x 7.7 mm (6.20 x 3.05 x 0.30 in)",
+        "weight": "208 g (7.34 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), stainless steel frame",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Super Retina OLED, HDR10, Dolby Vision, 625 nits (HBM)",
+        "size": "6.5 inches, 102.9 cm 2 (~84.4% screen-to-body ratio)",
+        "resolution": "1242 x 2688 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 12, upgradable to iOS 18.7",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.4, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom",
+        "features": "Quad-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard) SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "1080p@30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 3174 mAh, non-removable (12.08 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 353210 (v7) GeekBench: 11432 (v4.4) GFXBench: 47fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: Infinite (nominal), 4.516 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 70dB / Noise 74dB / Ring 84dB",
+        "audio quality": "Noise -93.7dB / Crosstalk -82.8dB",
+        "battery (old)": "Endurance rating 79h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone XS",
+    "link": "https://www.gsmarena.com/apple_iphone_xs-9318.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, September 12. Released 2018, September 21",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "143.6 x 70.9 x 7.7 mm (5.65 x 2.79 x 0.30 in)",
+        "weight": "177 g (6.24 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), stainless steel frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Super Retina OLED, HDR10, Dolby Vision, 625 nits (HBM)",
+        "size": "5.8 inches, 84.4 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1125 x 2436 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 12, upgradable to iOS 18.7",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS 12 MP, f/2.4, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom",
+        "features": "Quad-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard) SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "1080p@30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2658 mAh, non-removable (10.13 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 346379 (v7) GeekBench: 11472 (v4.4) GFXBench: 47fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: Infinite (nominal), 5.171 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 71dB / Noise 75dB / Ring 78dB",
+        "audio quality": "Noise -93.7dB / Crosstalk -82.8dB",
+        "battery (old)": "Endurance rating 72h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xs-max-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone XR",
+    "link": "https://www.gsmarena.com/apple_iphone_xr-9320.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, September 12. Released 2018, October 26",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "150.9 x 75.7 x 8.3 mm (5.94 x 2.98 x 0.33 in)",
+        "weight": "194 g (6.84 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), aluminum frame (7000 series)",
+        "sim": "· Nano-SIM + eSIM · Nano-SIM + Nano-SIM (China)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 625 nits (HBM)",
+        "size": "6.1 inches, 90.3 cm 2 (~79.0% screen-to-body ratio)",
+        "resolution": "828 x 1792 pixels, 19.5:9 ratio (~326 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 12, upgradable to iOS 18.7",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 128GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 26mm (wide), 1/2.55\", 1.4µm, PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR (photo/panorama)",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard) SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "1080p@60fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2942 mAh, non-removable (11.16 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 341196 (v7), 422465 (v8) GeekBench: 11437 (v4.4), 2690 (v5.1) GFXBench: 58fps (ES 3.1 onscreen)",
+        "battery (old)": "Endurance rating 78h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xr-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xr-6.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xr-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xr-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-xr-5.jpg"
+    ]
+  },
+  {
+    "name": "iPhone X",
+    "link": "https://www.gsmarena.com/apple_iphone_x-8858.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, September 12. Released 2017, November 03",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "143.6 x 70.9 x 7.7 mm (5.65 x 2.79 x 0.30 in)",
+        "weight": "174 g (6.14 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), stainless steel frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "Super Retina OLED, HDR10, Dolby Vision, 625 nits (HBM)",
+        "size": "5.8 inches, 84.4 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1125 x 2436 pixels, 19.5:9 ratio (~458 ppi density)",
+        "protection": "Scratch-resistant glass"
+      },
+      "platform": {
+        "os": "iOS 11.1.1, up to iOS 16.7.12",
+        "chipset": "Apple A11 Bionic (10 nm)",
+        "cpu": "Hexa-core 2.39 GHz (2x Monsoon + 4x Mistral)",
+        "gpu": "Apple GPU (three-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 28mm (wide), 1/3.0\", 1.22µm, dual pixel PDAF, OIS 12 MP, f/2.4, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom",
+        "features": "Quad-LED dual-tone flash, HDR (photo/panorama), panorama, HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard) SL 3D, (depth/biometrics sensor)",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2716 mAh, non-removable (10.35 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)",
+        "talk time": "Up to 21 h (3G)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 233100 (v7) GeekBench: 10215 (v4.4) GFXBench: 28fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: Infinity (nominal), 5.013 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 68dB / Noise 74dB / Ring 76dB",
+        "audio quality": "Noise -93.7dB / Crosstalk -82.8dB",
+        "battery (old)": "Endurance rating 74h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-x-new-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-x-new-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-x-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 8 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_8_plus-8131.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, September 12. Released 2017, September 22",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "158.4 x 78.1 x 7.5 mm (6.24 x 3.07 x 0.30 in)",
+        "weight": "202 g (7.13 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "5.5 inches, 83.4 cm 2 (~67.4% screen-to-body ratio)",
+        "resolution": "1080 x 1920 pixels, 16:9 ratio (~401 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 11, up to iOS 16.7.12",
+        "chipset": "Apple A11 Bionic (10 nm)",
+        "cpu": "Hexa-core (2x Monsoon + 4x Mistral)",
+        "gpu": "Apple GPU (three-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 128GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 28mm (wide), PDAF, OIS 12 MP, f/2.8, 57mm (telephoto), PDAF, 2x optical zoom",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2691 mAh, non-removable (10.28 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)",
+        "talk time": "Up to 21 h (3G)"
+      },
+      "misc": {
+        "performance": "GeekBench: 10037 (v4.4)",
+        "display": "Contrast ratio: 1395:1 (nominal), 3.957 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 76dB / Noise 74dB / Ring 79dB",
+        "audio quality": "Noise -93.5dB / Crosstalk -80.2dB",
+        "battery (old)": "Endurance rating 81h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-plus-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-plus-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-plus-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-plus-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 8",
+    "link": "https://www.gsmarena.com/apple_iphone_8-8573.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, September 12. Released 2017, September 22",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "138.4 x 67.3 x 7.3 mm (5.45 x 2.65 x 0.29 in)",
+        "weight": "148 g (5.22 oz)",
+        "build": "Glass front (Corning-made glass), glass back (Corning-made glass), aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "4.7 inches, 60.9 cm 2 (~65.4% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 11, up to iOS 16.7.12",
+        "chipset": "Apple A11 Bionic (10 nm)",
+        "cpu": "Hexa-core (2x Monsoon + 4x Mistral)",
+        "gpu": "Apple GPU (three-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 2GB RAM, 128GB 2GB RAM, 256GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 28mm (wide), PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 1821 mAh, non-removable (6.96 Wh)",
+        "charging": "15W wired, PD2.0, 50% in 30 min Wireless (Qi)",
+        "talk time": "Up to 14 h (3G)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 237594 (v7) GeekBench: 10214 (v4.4) GFXBench: 20fps (ES 3.1 onscreen)",
+        "display": "Contrast ratio: 1395:1 (nominal), 3.957 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 71dB / Noise 77dB / Ring 80dB",
+        "audio quality": "Noise -93.5dB / Crosstalk -80.4dB",
+        "battery (old)": "Endurance rating 66h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-new-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-8-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 7 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_7_plus-8065.php",
+    "specifications": {
+      "launch": {
+        "announced": "2016, September 07. Released 2016, September 16",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "158.2 x 77.9 x 7.3 mm (6.23 x 3.07 x 0.29 in)",
+        "weight": "188 g (6.63 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "5.5 inches, 83.4 cm 2 (~67.7% screen-to-body ratio)",
+        "resolution": "1080 x 1920 pixels, 16:9 ratio (~401 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 10.0.1, upgradable to iOS 15.8.5",
+        "chipset": "Apple A10 Fusion (16 nm)",
+        "cpu": "Quad-core 2.34 GHz (2x Hurricane + 2x Zephyr)",
+        "gpu": "PowerVR Series7XT Plus (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 3GB RAM, 128GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, 28mm (wide), 1/3.0\", PDAF, OIS 12 MP, f/2.8, 56mm (telephoto), 1/3.6\", AF, 2x optical zoom",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60/120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2900 mAh, non-removable (11.1 Wh)",
+        "stand-by": "Up to 384 h (3G)",
+        "talk time": "Up to 21 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark OS II 2.0: 3796",
+        "display": "Contrast ratio: 1398:1 (nominal), 3.588 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 68dB / Noise 72dB / Ring 72dB",
+        "audio quality": "Noise -93.1dB / Crosstalk -80.5dB",
+        "battery (old)": "Endurance rating 75h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-plus-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-plus-03.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-plus-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-plus-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-plus-red.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 7",
+    "link": "https://www.gsmarena.com/apple_iphone_7-8064.php",
+    "specifications": {
+      "launch": {
+        "announced": "2016, September 07. Released 2016, September 16",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "138.3 x 67.1 x 7.1 mm (5.44 x 2.64 x 0.28 in)",
+        "weight": "138 g (4.87 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 625 nits (typ)",
+        "size": "4.7 inches, 60.9 cm 2 (~65.6% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass"
+      },
+      "platform": {
+        "os": "iOS 10.0.1, upgradable to iOS 15.8.5",
+        "chipset": "Apple A10 Fusion (16 nm)",
+        "cpu": "Quad-core 2.34 GHz (2x Hurricane + 2x Zephyr)",
+        "gpu": "PowerVR Series7XT Plus (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 2GB RAM, 128GB 2GB RAM, 256GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 28mm (wide), 1/3.0\", PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60/120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 1960 mAh, non-removable (7.45 Wh)",
+        "talk time": "Up to 14 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark OS II 2.0: 3416",
+        "display": "Contrast ratio: 1603:1 (nominal), 3.964 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 67dB / Noise 73dB / Ring 75dB",
+        "audio quality": "Noise -92.4dB / Crosstalk -80.9dB",
+        "battery (old)": "Endurance rating 61h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-7-red.jpg"
+    ]
+  },
+  {
+    "name": "iPhone SE",
+    "link": "https://www.gsmarena.com/apple_iphone_se-7969.php",
+    "specifications": {
+      "launch": {
+        "announced": "2016, March 21. Released 2016, March 31",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "123.8 x 58.6 x 7.6 mm (4.87 x 2.31 x 0.30 in)",
+        "weight": "113 g (3.99 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "4.0 inches, 44.1 cm 2 (~60.8% screen-to-body ratio)",
+        "resolution": "640 x 1136 pixels, 16:9 ratio (~326 ppi density)"
+      },
+      "platform": {
+        "os": "iOS 9.3.2, upgradable to iOS 15.8.5",
+        "chipset": "Apple A9 (14 nm)",
+        "cpu": "Dual-core 1.84 GHz Twister",
+        "gpu": "PowerVR GT7600 (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 2GB RAM, 32GB 2GB RAM, 64GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/2.2, 29mm (standard), 1/3.0\", 1.22µm, PDAF",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60fps, 1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.4, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, hotspot",
+        "bluetooth": "4.2, A2DP, LE",
+        "positioning": "GPS, GLONASS",
+        "nfc": "Yes (Apple Pay only)",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass"
+      },
+      "battery": {
+        "type": "Li-Po 1624 mAh, non-removable (6.21 Wh)",
+        "stand-by": "Up to 240 h (3G)",
+        "talk time": "Up to 14 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark OS II 2.0: 2163",
+        "display": "Contrast ratio: 804:1 (nominal), 3.681 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 66dB / Noise 65dB / Ring 69dB",
+        "audio quality": "Noise -93.0dB / Crosstalk -72.9dB",
+        "battery (old)": "Endurance rating 73h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-00.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-se-1.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 6s Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_6s_plus-7243.php",
+    "specifications": {
+      "launch": {
+        "announced": "2015, September 09. Released 2015, September 25",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "158.2 x 77.9 x 7.3 mm (6.23 x 3.07 x 0.29 in)",
+        "weight": "192 g (6.77 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "5.5 inches, 83.4 cm 2 (~67.7% screen-to-body ratio)",
+        "resolution": "1080 x 1920 pixels, 16:9 ratio (~401 ppi density)",
+        "protection": "Ion-strengthened glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 9, upgradable to iOS 15.8.5",
+        "chipset": "Apple A9 (14/16 nm - maker dependant)",
+        "cpu": "Dual-core 1.84 GHz Twister",
+        "gpu": "PowerVR GT7600 (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 2GB RAM, 32GB 2GB RAM, 64GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/2.2, 29mm (standard), 1/3.0\", 1.22µm, PDAF, OIS",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@60fps, 1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "5 MP, f/2.2, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes (Apple Pay only)",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 2750 mAh, non-removable (10.45 Wh)",
+        "stand-by": "Up to 384 h (3G)",
+        "talk time": "Up to 24 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark OS II 2.0: 2261",
+        "display": "Contrast ratio: 1382:1 (nominal), 3.530 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 65dB / Noise 65dB / Ring 64dB",
+        "audio quality": "Noise -93.4dB / Crosstalk -71.1dB",
+        "battery (old)": "Endurance rating 85h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone6s-plus-1.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 6s",
+    "link": "https://www.gsmarena.com/apple_iphone_6s-7242.php",
+    "specifications": {
+      "launch": {
+        "announced": "2015, September 09. Released 2015, September 25",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "138.3 x 67.1 x 7.1 mm (5.44 x 2.64 x 0.28 in)",
+        "weight": "143 g (5.04 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD, 500 nits",
+        "size": "4.7 inches, 60.9 cm 2 (~65.6% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 9, upgradable to iOS 15.8.5",
+        "chipset": "Apple A9 (14/16 nm - maker dependant)",
+        "cpu": "Dual-core 1.84 GHz Twister",
+        "gpu": "PowerVR GT7600 (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 2GB RAM, 32GB 2GB RAM, 64GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/2.2, 29mm (standard), 1/3.0\", 1.22µm, PDAF",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@60fps,1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "5 MP, f/2.2, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS",
+        "nfc": "Yes (Apple Pay only)",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 1715 mAh, non-removable (6.91 Wh)",
+        "stand-by": "Up to 240 h (3G)",
+        "talk time": "Up to 14 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark OS II 2.0: 2195",
+        "display": "Contrast ratio: 1481 (nominal),  3.783 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 66dB / Noise 64dB / Ring 65dB",
+        "audio quality": "Noise -93.8dB / Crosstalk -73.2dB",
+        "battery (old)": "Endurance rating 62h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6s-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6s-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6s-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6s-4.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 6 Plus",
+    "link": "https://www.gsmarena.com/apple_iphone_6_plus-6665.php",
+    "specifications": {
+      "launch": {
+        "announced": "2014, September 09. Released 2014, September 19",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "158.1 x 77.8 x 7.1 mm (6.22 x 3.06 x 0.28 in)",
+        "weight": "172 g (6.07 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "5.5 inches, 83.4 cm 2 (~67.8% screen-to-body ratio)",
+        "resolution": "1080 x 1920 pixels, 16:9 ratio (~401 ppi density)",
+        "protection": "Ion-strengthened glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 8, upgradable to iOS 12.5.7",
+        "chipset": "Apple A8 (20 nm)",
+        "cpu": "Dual-core 1.4 GHz Typhoon (ARM v8-based)",
+        "gpu": "PowerVR GX6450 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.2, 29mm (standard), 1/3.0\", 1.5µm, PDAF, OIS",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "1080p@60fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "face detection, HDR, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, LE",
+        "positioning": "GPS, GLONASS",
+        "nfc": "Yes (Apple Pay only)",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 2915 mAh, non-removable (11.1 Wh)",
+        "stand-by": "Up to 384 h (3G)",
+        "talk time": "Up to 24 h (3G)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 1361 (nominal), 3.023 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 67dB / Noise 65dB / Ring 66dB",
+        "audio quality": "Noise -94dB / Crosstalk -72dB",
+        "battery (old)": "Endurance rating 79h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-plus-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-plus-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-plus-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-and-iphone-6-plus.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 6",
+    "link": "https://www.gsmarena.com/apple_iphone_6-6378.php",
+    "specifications": {
+      "launch": {
+        "announced": "2014, September 09. Released 2014, September 19",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "138.1 x 67 x 6.9 mm (5.44 x 2.64 x 0.27 in)",
+        "weight": "129 g (4.55 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "4.7 inches, 60.9 cm 2 (~65.8% screen-to-body ratio)",
+        "resolution": "750 x 1334 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Ion-strengthened glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 8, upgradable to iOS 12.5.7",
+        "chipset": "Apple A8 (20 nm)",
+        "cpu": "Dual-core 1.4 GHz Typhoon (ARM v8-based)",
+        "gpu": "PowerVR GX6450 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.2, 29mm (standard), 1/3.0\", 1.5µm, PDAF",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "1080p@60fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "face detection, HDR, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, LE",
+        "positioning": "GPS, GLONASS",
+        "nfc": "Yes (Apple Pay only)",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 1810 mAh, non-removable (6.9 Wh)",
+        "stand-by": "Up to 250 h (3G)",
+        "talk time": "Up to 14 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark X: 15841",
+        "display": "Contrast ratio: 1213 (nominal), 3.838 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 66dB / Noise 65dB / Ring 72dB",
+        "audio quality": "Noise -94dB / Crosstalk -73.4dB",
+        "battery (old)": "Endurance rating 61h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-6-and-iphone-6-plus.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 5s",
+    "link": "https://www.gsmarena.com/apple_iphone_5s-5685.php",
+    "specifications": {
+      "launch": {
+        "announced": "2013, September 10. Released 2013, September 20",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "123.8 x 58.6 x 7.6 mm (4.87 x 2.31 x 0.30 in)",
+        "weight": "112 g (3.95 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "4.0 inches, 44.1 cm 2 (~60.8% screen-to-body ratio)",
+        "resolution": "640 x 1136 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 7, upgradable to iOS 12.5.7",
+        "chipset": "Apple A7 (28 nm)",
+        "cpu": "Dual-core 1.3 GHz Cyclone (ARM v8-based)",
+        "gpu": "PowerVR G6430 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.2, 29mm (standard), 1/3.0\", 1.5µm, AF",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "1080p@30fps, 720p@120fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.4, 31mm (standard)",
+        "features": "face detection, HDR, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP",
+        "positioning": "GPS, GLONASS",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, proximity, compass"
+      },
+      "battery": {
+        "type": "Li-Po 1560 mAh, non-removable (5.92 Wh)",
+        "stand-by": "Up to 250 h (3G)",
+        "talk time": "Up to 10 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark X: 14341",
+        "display": "Contrast ratio: 1219:1 (nominal) / 3.565:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 68dB / Noise 66dB / Ring 69dB",
+        "audio quality": "Noise -93.6dB / Crosstalk -90.3dB",
+        "battery (old)": "Endurance rating 54h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5s-ofic.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5s-ofic1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5s-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5s-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5s-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 5c",
+    "link": "https://www.gsmarena.com/apple_iphone_5c-5690.php",
+    "specifications": {
+      "launch": {
+        "announced": "2013, September 10. Released 2013, September 20",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "124.4 x 59.2 x 9 mm (4.90 x 2.33 x 0.35 in)",
+        "weight": "132 g (4.66 oz)",
+        "build": "Glass front, plastic back, plastic frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "4.0 inches, 44.1 cm 2 (~59.9% screen-to-body ratio)",
+        "resolution": "640 x 1136 pixels, 16:9 ratio (~326 ppi density)"
+      },
+      "platform": {
+        "os": "iOS 7, upgradable to iOS 10.3.3",
+        "chipset": "Apple A6 (32 nm)",
+        "cpu": "Dual-core 1.3 GHz Swift (ARM v7-based)",
+        "gpu": "PowerVR SGX 543MP3 (triple-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "8GB 1GB RAM, 16GB 1GB RAM, 32GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 33mm (standard), 1/3.2\", 1.4µm, AF",
+        "features": "LED flash, panorama, HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP, LE",
+        "positioning": "GPS, GLONASS",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, proximity, compass"
+      },
+      "battery": {
+        "type": "Li-Po 1510 mAh, non-removable (5.73 Wh)",
+        "stand-by": "Up to 250 h (3G)",
+        "talk time": "Up to 10 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark X: 2225",
+        "display": "Contrast ratio: 1233:1 (nominal) / 3.512:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 66dB / Noise 65dB / Ring 66dB",
+        "audio quality": "Noise -93.9dB / Crosstalk -80.3dB",
+        "battery (old)": "Endurance rating 52h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5c-ofic.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5c-ofic1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5c-colors.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 5",
+    "link": "https://www.gsmarena.com/apple_iphone_5-4910.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, September 12. Released 2012, September  21",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "123.8 x 58.6 x 7.6 mm (4.87 x 2.31 x 0.30 in)",
+        "weight": "112 g (3.95 oz)",
+        "build": "Glass front (Corning-made glass), aluminum back, aluminum frame",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "4.0 inches, 44.1 cm 2 (~60.8% screen-to-body ratio)",
+        "resolution": "640 x 1136 pixels, 16:9 ratio (~326 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 6, upgradable to iOS 10.3.4",
+        "chipset": "Apple A6 (32 nm)",
+        "cpu": "Dual-core 1.3 GHz Swift (ARM v7-based)",
+        "gpu": "PowerVR SGX 543MP3 (triple-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 33mm (standard), 1/3.2\", 1.4µm, AF",
+        "features": "LED flash, panorama, HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.4, 35mm (standard)",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, LE",
+        "positioning": "GPS, A-GPS, GLONASS",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, proximity, compass"
+      },
+      "battery": {
+        "type": "Li-Po 1440 mAh, non-removable (5.45 Wh)",
+        "stand-by": "Up to 225 h (3G)",
+        "talk time": "Up to 8 h (3G)"
+      },
+      "misc": {
+        "performance": "Basemark X: 2229",
+        "display": "Contrast ratio: 1320:1 (nominal) / 3.997:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 66dB / Noise 66dB / Ring 67dB",
+        "audio quality": "Noise -91.3dB / Crosstalk -76.5dB",
+        "battery (old)": "Endurance rating 51h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5-front.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5-white.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5-white-all-sides.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5-black-all-sides.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-5-black.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 4s",
+    "link": "https://www.gsmarena.com/apple_iphone_4s-4212.php",
+    "specifications": {
+      "launch": {
+        "announced": "2011, October 04. Released 2011, October 14",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115.2 x 58.6 x 9.3 mm (4.54 x 2.31 x 0.37 in)",
+        "weight": "140 g (4.94 oz)",
+        "build": "Glass front (Corning-made glass), glass back, stainless steel frame",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "3.5 inches, 36.5 cm 2 (~54.0% screen-to-body ratio)",
+        "resolution": "640 x 960 pixels, 3:2 ratio (~330 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 5, upgradable to iOS 9.3.6",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "8GB 512MB RAM, 16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 35mm (standard), 1/3.2\", 1.4µm, AF",
+        "features": "LED flash, panorama, HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA, videocalling over Wi-Fi and 3G",
+        "video": "480p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 b/g/n, hotspot",
+        "bluetooth": "4.0, A2DP, LE",
+        "positioning": "GPS, A-GPS, GLONASS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, proximity, compass"
+      },
+      "battery": {
+        "type": "Li-Po 1432 mAh, non-removable (5.3 Wh)",
+        "stand-by": "Up to 200 h (3G)",
+        "talk time": "Up to 8 h (3G)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 1261:1 (nominal) / 2.269:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 65dB / Noise 64dB / Ring 74dB",
+        "audio quality": "Noise -91.2dB / Crosstalk -93.0dB",
+        "battery (old)": "Endurance rating 45h"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4s-white-black-official.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4s-all-sides.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4s-side-view.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 4",
+    "link": "https://www.gsmarena.com/apple_iphone_4-3275.php",
+    "specifications": {
+      "launch": {
+        "announced": "2010, June. Released 2010, June",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115.2 x 58.6 x 9.3 mm (4.54 x 2.31 x 0.37 in)",
+        "weight": "137 g (4.83 oz)",
+        "build": "Glass front (Corning-made glass), glass back, stainless steel frame",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "3.5 inches, 36.5 cm 2 (~54.0% screen-to-body ratio)",
+        "resolution": "640 x 960 pixels, 3:2 ratio (~330 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 7.1.2",
+        "chipset": "Apple A4 (45 nm)",
+        "cpu": "1.0 GHz Cortex-A8",
+        "gpu": "PowerVR SGX535"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "8GB 512MB RAM, 16GB 512MB RAM, 32GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, f/2.8, 1/3.2\", 1.75µm, AF",
+        "features": "LED flash, HDR",
+        "video": "720p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA, videocalling over Wi-Fi only",
+        "video": "480p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 b/g/n, hotspot",
+        "bluetooth": "2.1, A2DP",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, proximity, compass",
+        "browser": "HTML5 (Safari)"
+      },
+      "battery": {
+        "type": "Li-Po 1420 mAh, non-removable",
+        "stand-by": "Up to 300 h (3G)",
+        "talk time": "Up to 7 h (3G)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 1242:1 (nominal) / 2.016:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 65dB / Noise 60dB / Ring 66dB",
+        "audio quality": "Noise -90.1dB / Crosstalk -89.6dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4-ofic-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4-ofic-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-4-ofic-3.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 4 CDMA",
+    "link": "https://www.gsmarena.com/apple_iphone_4_cdma-3716.php",
+    "specifications": {
+      "launch": {
+        "announced": "2011, January. Released 2011, February",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115.2 x 58.6 x 9.3 mm (4.54 x 2.31 x 0.37 in)",
+        "weight": "137 g (4.83 oz)",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "3.5 inches, 36.5 cm 2 (~54.0% screen-to-body ratio)",
+        "resolution": "640 x 960 pixels, 3:2 ratio (~330 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 7.1.1",
+        "chipset": "Apple A4 (45 nm)",
+        "cpu": "1.0 GHz Cortex-A8",
+        "gpu": "PowerVR SGX535"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "features": "LED flash, HDR",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 b/g/n",
+        "bluetooth": "2.1, A2DP",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, proximity, compass",
+        "browser": "HTML5 (Safari)"
+      },
+      "battery": {
+        "type": "Li-Po 1420 mAh, non-removable"
+      },
+      "misc": {
+        "colors": "Black, White",
+        "models": "iPhone 3,3",
+        "sar": "1.18 W/kg (head)     0.87 W/kg (body)",
+        "price": "About 150 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone4-cdma-1.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 3GS",
+    "link": "https://www.gsmarena.com/apple_iphone_3gs-2826.php",
+    "specifications": {
+      "launch": {
+        "announced": "2009, June. Released 2009, June",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115.5 x 62.1 x 12.3 mm (4.55 x 2.44 x 0.48 in)",
+        "weight": "135 g (4.76 oz)",
+        "sim": "Mini-SIM"
+      },
+      "display": {
+        "type": "TFT",
+        "size": "3.5 inches, 36.5 cm 2 (~50.9% screen-to-body ratio)",
+        "resolution": "320 x 480 pixels, 3:2 ratio (~165 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 3, upgradable to iOS 6.1.6",
+        "cpu": "600 MHz Cortex-A8",
+        "gpu": "PowerVR SGX535"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "8GB 256MB RAM, 16GB 256MB RAM, 32GB 256MB RAM"
+      },
+      "main_camera": {
+        "single": "3.15 MP, f/2.8, AF",
+        "video": "480p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 b/g",
+        "bluetooth": "2.1, A2DP (headset support only)",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, proximity, compass",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Li-Ion 1400 mAh, non-removable",
+        "talk time": "Up to 5 h (3G)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 201:1 (nominal)",
+        "camera": "Photo",
+        "loudspeaker": "Voice 69dB / Noise 69dB / Ring 71dB",
+        "audio quality": "Noise -92.1dB / Crosstalk -95.0dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-3gs-00.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-3gs-01.jpg"
+    ]
+  },
+  {
+    "name": "iPhone 3G",
+    "link": "https://www.gsmarena.com/apple_iphone_3g-2424.php",
+    "specifications": {
+      "launch": {
+        "announced": "2008, June. Released 2008, July",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115.5 x 62.1 x 12.3 mm (4.55 x 2.44 x 0.48 in)",
+        "weight": "133 g (4.69 oz)",
+        "sim": "Mini-SIM"
+      },
+      "display": {
+        "type": "TFT",
+        "size": "3.5 inches, 36.5 cm 2 (~50.9% screen-to-body ratio)",
+        "resolution": "320 x 480 pixels, 3:2 ratio (~165 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS, upgradable to iOS 4.2.1",
+        "cpu": "412 MHz ARM 11",
+        "gpu": "PowerVR MBX"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "8GB 128MB RAM, 16GB 128MB RAM"
+      },
+      "main_camera": {
+        "single": "2 MP",
+        "video": "No"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "alert types": "Vibration, proprietary ringtones",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11b/g",
+        "bluetooth": "2.0, A2DP (headset support only)",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, proximity",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Li-Ion 1220 mAh, non-removable"
+      },
+      "misc": {
+        "loudspeaker": "Voice 66dB / Noise 62dB / Ring 71dB",
+        "audio quality": "Noise -89.9dB / Crosstalk -93.1dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-3g-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-3g-02.jpg"
+    ]
+  },
+  {
+    "name": "iPhone",
+    "link": "https://www.gsmarena.com/apple_iphone-1827.php",
+    "specifications": {
+      "launch": {
+        "announced": "2007, January. Released 2007, June",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "115 x 61 x 11.6 mm (4.53 x 2.40 x 0.46 in)",
+        "weight": "135 g (4.76 oz)",
+        "sim": "Mini-SIM"
+      },
+      "display": {
+        "type": "TFT",
+        "size": "3.5 inches, 36.5 cm 2 (~52.0% screen-to-body ratio)",
+        "resolution": "320 x 480 pixels, 3:2 ratio (~165 ppi density)",
+        "protection": "Corning Gorilla Glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS, upgradable to iOS 3.1.3",
+        "cpu": "412 MHz ARM 11",
+        "gpu": "PowerVR MBX"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "4/8/16GB"
+      },
+      "main_camera": {
+        "single": "2 MP",
+        "video": "No"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "alert types": "Vibration, proprietary ringtones",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11b/g",
+        "bluetooth": "2.0 (headset support only)",
+        "positioning": "No",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, proximity",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Li-Ion 1400 mAh, non-removable"
+      },
+      "misc": {
+        "colors": "Black",
+        "models": "A1203, iPhone1,1",
+        "sar": "0.97 W/kg (head)     0.38 W/kg (body)",
+        "sar eu": "0.97 W/kg (head)     0.69 W/kg (body)",
+        "price": "About 420 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple_iphone_00.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple_iphone_01.jpg"
+    ]
+  }
+]

@@ -1,0 +1,3434 @@
+[
+  {
+    "name": "iPad Pro 13 (2025)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_13_5g_(2025)-14233.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, October 16",
+        "status": "Available. Released 2025, October 22"
+      },
+      "body": {
+        "dimensions": "281.6 x 215.5 x 5.1 mm (11.09 x 8.48 x 0.20 in)",
+        "weight": "579 g (Wi-Fi), 582 g (5G) (1.28 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM - cellular model only"
+      },
+      "display": {
+        "type": "Ultra Retina Tandem OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1600 nits (peak)",
+        "size": "13.0 inches, 523.4 cm 2 (~86.2% screen-to-body ratio)",
+        "resolution": "2064 x 2752 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 26, upgradable to iPadOS 26.1",
+        "chipset": "Apple M5",
+        "cpu": "9-core (3 performance cores, 6 efficiency cores) - 256/512GB models 10-core (4 performance cores, 6 efficiency cores) - 1/2TB models",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 12GB RAM, 512GB 12GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes (4K, 1080p)"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, dual-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 10290 mAh",
+        "charging": "50% in 30 min"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "76:00h endurance, 1000 cycles",
+        "free fall": "Class E (40 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-13-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-13-2024-5.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2025)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_5g_(2025)-14234.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, October 16",
+        "status": "Available. Released 2025, October 22"
+      },
+      "body": {
+        "dimensions": "249.7 x 177.5 x 5.3 mm (9.83 x 6.99 x 0.21 in)",
+        "weight": "444 g (Wi-Fi), 446 g (5G) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM - cellular model only"
+      },
+      "display": {
+        "type": "Ultra Retina Tandem OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1600 nits (peak)",
+        "size": "11.0 inches, 364.8 cm 2 (~82.3% screen-to-body ratio)",
+        "resolution": "1668 x 2420 pixels, 3:2 ratio (~267 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 26, upgradable to iPadOS 26.1",
+        "chipset": "Apple M5",
+        "cpu": "9-core (3 performance cores, 6 efficiency cores) - 256/512GB models 10-core (4 performance cores, 6 efficiency cores) - 1/2TB models",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 12GB RAM, 512GB 12GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes (4K, 1080p)"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e/7, dual-band, hotspot",
+        "bluetooth": "6.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8160 mAh",
+        "charging": "50% in 30 min"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "71:00h endurance, 1000 cycles",
+        "free fall": "Class E (47 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2024-5.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air 13 (2025)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_13_(2025)-13704.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, March 04",
+        "status": "Available. Released 2025, March 12"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 6.1 mm (11.05 x 8.46 x 0.24 in)",
+        "weight": "616 g (Wi-Fi) / 617 g (5G) (1.36 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 600 nits (typ)",
+        "size": "13.0 inches, 519.3 cm 2 (~86.1% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 18.3.2, upgradable to iPadOS 26.1",
+        "chipset": "Apple M3",
+        "cpu": "Octa-core (4 performance cores and 4 efficiency cores)",
+        "gpu": "Apple GPU (9-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS (5G model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 9705 mAh (36.59 Wh)"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "72:00h endurance, 1000 cycles",
+        "free fall": "Class E (0 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-13-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-13-2024-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air 11 (2025)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_11_(2025)-13703.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, March 04",
+        "status": "Available. Released 2025, March 12"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 6.1 mm (9.75 x 7.03 x 0.24 in)",
+        "weight": "460 g (1.01 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "11.0 inches, 357.6 cm 2 (~80.9% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 18.3.2, upgradable to iPadOS 26.1",
+        "chipset": "Apple M3",
+        "cpu": "Octa-core (4 performance cores and 4 efficiency cores)",
+        "gpu": "Apple GPU (9-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS (5G model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7606 mAh (28.93 Wh)"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "62:00h endurance, 1000 cycles",
+        "free fall": "Class E (0 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-11-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-11-2024-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad (2025)",
+    "link": "https://www.gsmarena.com/apple_ipad_(2025)-13702.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, March 04",
+        "status": "Available. Released 2025, March 12"
+      },
+      "body": {
+        "dimensions": "248.6 x 179.5 x 7 mm (9.79 x 7.07 x 0.28 in)",
+        "weight": "477 g (Wi-Fi) / 481 g (LTE) (1.05 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "11.0 inches, 357.6 cm 2 (~80.1% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 18.3.2, upgradable to iPadOS 26.1",
+        "chipset": "Apple A16 Bionic (4 nm)",
+        "cpu": "5-core",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), PDAF",
+        "features": "HDR, panorama",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po (28.93 Wh)",
+        "charging": "45W wired, PD"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "67:00h endurance, 1000 cycles",
+        "free fall": "Class E (0 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini (2024)",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_(2024)-13437.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, October 15",
+        "status": "Available. Released 2024, October 23"
+      },
+      "body": {
+        "dimensions": "195.4 x 134.8 x 6.3 mm (7.69 x 5.31 x 0.25 in)",
+        "weight": "293 g (Wi-Fi) / 297 g (Wi-Fi + Cellular) (10.34 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "8.3 inches, 203.9 cm 2 (~77.4% screen-to-body ratio)",
+        "resolution": "1488 x 2266 pixels, 3:2 ratio (~327 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 18, upgradable to iPadOS 26.1",
+        "chipset": "Apple A17 Pro (3 nm)",
+        "cpu": "Hexa-core (2x3.78 GHz performance cores and 4 efficiency cores)",
+        "gpu": "Apple GPU (5-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), AF",
+        "features": "Quad-LED dual-tone flash, HDR, panorama",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort"
+      },
+      "features": {
+        "sensors": "Fingerprint (side-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 5078 mAh (19.3 Wh)"
+      },
+      "misc": {
+        "energy": "Class E",
+        "battery": "67:00h endurance, 1000 cycles",
+        "free fall": "Class D (52 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2024-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2024-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 13 (2024)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_13_(2024)-12987.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, May 07",
+        "status": "Available. Released 2024, May 15"
+      },
+      "body": {
+        "dimensions": "281.6 x 215.5 x 5.1 mm (11.09 x 8.48 x 0.20 in)",
+        "weight": "579 g (Wi-Fi), 582 g (5G) (1.28 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "Ultra Retina Tandem OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1600 nits (peak)",
+        "size": "13.0 inches, 527.3 cm 2 (~86.9% screen-to-body ratio)",
+        "resolution": "2064 x 2752 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 17.5.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M4",
+        "cpu": "9-core 4.4 GHz (3 performance cores, 6 efficiency cores) - 256/512GB models 10-core 4.4 GHz (4 performance cores, 6 efficiency cores) - 1/2TB models",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes (4K, 1080p)"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 10290 mAh"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "77:00h endurance, 1000 cycles",
+        "free fall": "Class E (0 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-13-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-13-2024-5.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2024)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_(2024)-12986.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, May 07",
+        "status": "Available. Released 2024, May 15"
+      },
+      "body": {
+        "dimensions": "249.7 x 177.5 x 5.3 mm (9.83 x 6.99 x 0.21 in)",
+        "weight": "444 g (Wi-Fi), 446 g (5G) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "Ultra Retina Tandem OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (HBM), 1600 nits (peak)",
+        "size": "11.0 inches, 373.1 cm 2 (~84.2% screen-to-body ratio)",
+        "resolution": "1668 x 2420 pixels, 3:2 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating, Mohs level 4"
+      },
+      "platform": {
+        "os": "iPadOS 17.5.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M4",
+        "cpu": "9-core 4.4 GHz (3 performance cores, 6 efficiency cores) - 256/512GB models 10-core 4.4 GHz (4 performance cores, 6 efficiency cores) - 1/2TB models",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), dual pixel PDAF TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes (4K, 1080p)"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8160 mAh"
+      },
+      "misc": {
+        "energy": "Class G",
+        "battery": "73:00h endurance, 1000 cycles",
+        "free fall": "Class E (0 falls)",
+        "repairability": "Class C"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2024-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2024-5.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air 13 (2024)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_13_(2024)-12985.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, May 07",
+        "status": "Available. Released 2024, May 15"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 6.1 mm (11.05 x 8.46 x 0.24 in)",
+        "weight": "617 g (Wi-Fi) / 618 g (5G) (1.36 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 600 nits (typ)",
+        "size": "13.0 inches, 519.3 cm 2 (~86.1% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 17.5.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M2",
+        "cpu": "Octa-core (4x3.46 GHz performance cores and 4 efficiency cores)",
+        "gpu": "Apple GPU (9-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS (5G model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 9705 mAh (36.59 Wh)",
+        "charging": "45W wired"
+      },
+      "misc": {
+        "colors": "Space Gray, Starlight, Purple, Blue",
+        "models": "A2898, A2899, A2900, iPad14,10, iPad14,11",
+        "price": "About 950 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-13-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-13-2024-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air 11 (2024)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_11_(2024)-12984.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, May 07",
+        "status": "Available. Released 2024, May 15"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 6.1 mm (9.75 x 7.03 x 0.24 in)",
+        "weight": "462 g (1.02 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "11.0 inches, 357.6 cm 2 (~80.9% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 17.4, upgradable to iPadOS 26.1",
+        "chipset": "Apple M2",
+        "cpu": "Octa-core (4x3.48 GHz performance cores and 4 efficiency cores)",
+        "gpu": "Apple GPU (9-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.0, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps; gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS (cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7606 mAh (28.93 Wh)",
+        "charging": "45W wired"
+      },
+      "misc": {
+        "colors": "Space Gray, Starlight, Purple, Blue",
+        "models": "A2902, A2903, A2904, iPad14,8, iPad14,9",
+        "price": "About 700 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-11-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2024-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-11-2024-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2022)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2022)-11939.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, October 18",
+        "status": "Available. Released 2022, October 26"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 6.4 mm (11.05 x 8.46 x 0.25 in)",
+        "weight": "682 g (Wi-Fi), 685 g (5G) (1.50 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Liquid Retina XDR mini-LED LCD, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (peak)",
+        "size": "12.9 inches, 515.3 cm 2 (~85.4% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 16.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M2",
+        "cpu": "Octa-core (4x3.49 GHz performance cores, 4 efficiency cores)",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF 10 MP, f/2.4, 125˚ (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 10758 mAh (40.88 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2764, A2437, A2766, A2436, iPad14,5, iPad14,6",
+        "price": "About 1450 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2022-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2022.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2022)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_(2022)-11940.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, October 18",
+        "status": "Available. Released 2022, October 26"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 5.9 mm (9.75 x 7.03 x 0.23 in)",
+        "weight": "466 g (Wi-Fi), 470 g (5G) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 120Hz, HDR10, Dolby Vision, 600 nits (typ)",
+        "size": "11.0 inches, 366.5 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1668 x 2388 pixels (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 16.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M2",
+        "cpu": "Octa-core (4x3.49 GHz performance cores, 4 efficiency cores)",
+        "gpu": "Apple GPU (10-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF 10 MP, f/2.4, 125˚ (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS, ProRes"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS, HDR"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6e, dual-band, hotspot",
+        "bluetooth": "5.3, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 3), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7538 mAh (28.65 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2435, A2761, A2762, A2759, iPad8,9, iPad8,10, iPad14,3, iPad14,4",
+        "price": "About 1050 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2022-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2022.jpg"
+    ]
+  },
+  {
+    "name": "iPad (2022)",
+    "link": "https://www.gsmarena.com/apple_ipad_(2022)-11941.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, October 18",
+        "status": "Available. Released 2022, October 26"
+      },
+      "body": {
+        "dimensions": "248.6 x 179.5 x 7 mm (9.79 x 7.07 x 0.28 in)",
+        "weight": "477 g (Wi-Fi) / 481 g (LTE) (1.05 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "10.9 inches, 359.2 cm 2 (~80.5% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 16.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.0 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), PDAF",
+        "features": "HDR, panorama",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 2.0, DisplayPort; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7606 mAh (28.6 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Blue, Pink, Yellow",
+        "models": "A3162, A2757, A2777, A2696, iPad13,18, iPad13,19",
+        "price": "About 430 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-10-2022-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air (2022)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_(2022)-11411.php",
+    "specifications": {
+      "launch": {
+        "announced": "2022, March 08",
+        "status": "Available. Released 2022, March 18"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 6.1 mm (9.75 x 7.03 x 0.24 in)",
+        "weight": "461 g (Wi-Fi) / 462 g (5G) (1.02 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "10.9 inches, 359.2 cm 2 (~81.3% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 15.4, upgradable to iPadOS 26.1",
+        "chipset": "Apple M1",
+        "cpu": "Octa-core (4x3.2 GHz & 4xX.X GHz)",
+        "gpu": "Apple GPU (8-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB, 256GB 8GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@30/60fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (5G model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1 Gen2, DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 7600 mAh (28.6 Wh)"
+      },
+      "misc": {
+        "colors": "Space Gray, Starlight, Pink, Purple, Blue",
+        "models": "A2588, A2589, A2591, iPad13,16, iPad13,17",
+        "price": "About 550 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2022-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2022-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2022-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2022-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini (2021)",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_(2021)-11105.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "195.4 x 134.8 x 6.3 mm (7.69 x 5.31 x 0.25 in)",
+        "weight": "293 g (Wi-Fi) / 297 g (Wi-Fi + Cellular) (10.34 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "8.3 inches, 203.9 cm 2 (~77.4% screen-to-body ratio)",
+        "resolution": "1488 x 2266 pixels, 3:2 ratio (~327 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 15, upgradable to iPadOS 26.1",
+        "chipset": "Apple A15 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x2.93 GHz + 4xX.X GHz)",
+        "gpu": "Apple GPU (5-core)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), AF",
+        "features": "Quad-LED dual-tone flash, HDR, panorama",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1, DisplayPort"
+      },
+      "features": {
+        "sensors": "Fingerprint (side-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 5078 mAh (19.3 Wh)"
+      },
+      "misc": {
+        "display": "1325:1 contrast ratio, 518 nits max brightness (measured)",
+        "loudspeaker": "-29.7 LUFS (Average)"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2021-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad 10.2 (2021)",
+    "link": "https://www.gsmarena.com/apple_ipad_10_2_(2021)-11106.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, September 14",
+        "status": "Available. Released 2021, September 24"
+      },
+      "body": {
+        "dimensions": "250.6 x 174.1 x 7.5 mm (9.87 x 6.85 x 0.30 in)",
+        "weight": "487 g (Wi-Fi) / 498 g (LTE) (1.07 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 500 nits (typ)",
+        "size": "10.2 inches, 322.2 cm 2 (~73.8% screen-to-body ratio)",
+        "resolution": "1620 x 2160 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 15, upgradable to iPadOS 26.1",
+        "chipset": "Apple A13 Bionic (7 nm+)",
+        "cpu": "Hexa-core (2x2.65 GHz Lightning + 4x1.8 GHz Thunder)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR, panorama",
+        "video": "1080p@25/30fps, 720p@120fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "HDR",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 8557 mAh (32.4 Wh)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 617292(v9) GeekBench: 3124 (v5.1) GFXBench: 44fps (ES 3.1 onscreen)",
+        "display": "1123:1 contrast ratio, 513 nits max brightness (measured)",
+        "camera": "Photo / Video",
+        "loudspeaker": "-29.4 LUFS (Average)"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-102-2021-1.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2021)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2021)-10864.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, April 20",
+        "status": "Available. Released 2021, May 21"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 6.4 mm (11.05 x 8.46 x 0.25 in)",
+        "weight": "682 g (Wi-Fi), 685 g (5G) (1.50 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Liquid Retina XDR mini-LED LCD, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 1600 nits (peak)",
+        "size": "12.9 inches, 515.3 cm 2 (~85.4% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 14.5.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M1",
+        "cpu": "Octa-core (4x3.2 GHz & 4xX.X GHz)",
+        "gpu": "Apple GPU (8-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF 10 MP, f/2.4, 125˚ (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 4), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 10758 mAh (40.88 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2379, A2461, A2462, iPad13,8, iPad13,9, iPad13,10, iPad13,11",
+        "price": "About 1200 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2021-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2021-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2021)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_(2021)-10865.php",
+    "specifications": {
+      "launch": {
+        "announced": "2021, April 20",
+        "status": "Available. Released 2021, May 21"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 5.9 mm (9.75 x 7.03 x 0.23 in)",
+        "weight": "466 g (Wi-Fi), 470 g (5G) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 120Hz, HDR10, Dolby Vision, 600 nits (typ)",
+        "size": "11.0 inches, 366.5 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1668 x 2388 pixels (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 14.5.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple M1",
+        "cpu": "Octa-core (4x3.2 GHz & 4xX.X GHz)",
+        "gpu": "Apple GPU (8-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 16GB RAM, 2TB 16GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF 10 MP, f/2.4, 125˚ (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "12 MP, f/2.4, 122˚ (ultrawide)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@25/30/60fps, gyro-EIS"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 4 (Thunderbolt 4), DisplayPort, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7538 mAh (28.65 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2301, A2459, A2460, iPad13,4, iPad13,5, iPad13,6, iPad13,7",
+        "price": "About 870 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2021-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2021-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air (2020)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_(2020)-10444.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, September 15",
+        "status": "Available. Released 2020, October 23"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 6.1 mm (9.75 x 7.03 x 0.24 in)",
+        "weight": "458 g (Wi-Fi) / 460 g (3G/LTE) (1.01 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Liquid Retina IPS LCD, 500 nits (typ)",
+        "size": "10.9 inches, 359.2 cm 2 (~81.3% screen-to-body ratio)",
+        "resolution": "1640 x 2360 pixels (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 14.1, upgradable to iPadOS 26.1",
+        "chipset": "Apple A14 Bionic (5 nm)",
+        "cpu": "Hexa-core (2x3.0 GHz Firestorm + 4x1.8 GHz Icestorm)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM,  256GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm, dual pixel PDAF",
+        "features": "HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.0, 31mm (standard)",
+        "features": "HDR",
+        "video": "1080p@30/60fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (LTE model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C, magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (top-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 7606 mAh (28.93 Wh)"
+      },
+      "misc": {
+        "colors": "Space Gray, Silver, Rose Gold, Green, Sky Blue",
+        "models": "A2324, A2072, A2325, A2316, iPad13,1, iPad13,2",
+        "price": "About 640 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air4-2020-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air4-2020-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air4-2020-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air4-2020-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air4-2020-5.jpg"
+    ]
+  },
+  {
+    "name": "iPad 10.2 (2020)",
+    "link": "https://www.gsmarena.com/apple_ipad_10_2_(2020)-10445.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, September 15",
+        "status": "Available. Released 2020, September 18"
+      },
+      "body": {
+        "dimensions": "250.6 x 174.1 x 7.5 mm (9.87 x 6.85 x 0.30 in)",
+        "weight": "490 g (Wi-Fi) / 495 g (LTE) (1.08 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "Retina IPS LCD, 500 nits (typ)",
+        "size": "10.2 inches, 324.6 cm 2 (~74.4% screen-to-body ratio)",
+        "resolution": "1620 x 2160 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 14, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 3GB RAM, 128GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR, panorama",
+        "video": "1080p@30fps, 720p@120fps, HDR"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "HDR",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 8827 mAh (32.4 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Gold, Space Gray",
+        "models": "A2428, A2429, A2270, A2430, iPad11,6, iPad11,7",
+        "price": "About 370 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad8-102-inches-2020-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad8-102-inches-2020-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad8-102-inches-2020-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad8-102-inches-2020-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2020)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2020)-10136.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, March 18",
+        "status": "Available. Released 2020, March 19"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 5.9 mm (11.05 x 8.46 x 0.23 in)",
+        "weight": "641 g (Wi-Fi), 643 g (LTE) (1.41 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz, 600 nits (typ)",
+        "size": "12.9 inches, 515.3 cm 2 (~85.4% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 13.4, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12Z Bionic",
+        "cpu": "Octa-core (4x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (8-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm,  dual pixel PDAF 10 MP, f/2.4, 11mm (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30/60fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 9720 mAh (36.71 Wh)"
+      },
+      "misc": {
+        "display": "1330:1 contrast ratio, 625 nits max brightness (measured)"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-12-2020-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2020-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2020-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2020)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_(2020)-10137.php",
+    "specifications": {
+      "launch": {
+        "announced": "2020, March 18",
+        "status": "Available. Released 2020, March 19"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 5.9 mm (9.75 x 7.03 x 0.23 in)",
+        "weight": "471 g (Wi-Fi), 473 g (LTE) (1.04 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz, 600 nits (typ)",
+        "size": "11.0 inches, 366.5 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1668 x 2388 pixels (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iPadOS 13.4, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12Z Bionic",
+        "cpu": "Octa-core (4x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (8-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "128GB 6GB RAM, 256GB 6GB RAM, 512GB 6GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "dual": "12 MP, f/1.8, (wide), 1/3.0\", 1.22µm,  dual pixel PDAF 10 MP, f/2.4, 11mm (ultrawide) TOF 3D LiDAR scanner (depth)",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@24/30/60fps, 1080p@30/60/120/240fps; gyro-EIS"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30/60fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac/6, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7538 mAh (28.65 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2068, A2230, A2228, A2231, iPad8,9, iPad8,10",
+        "price": "About 800 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2020-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2020-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2020-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad 10.2 (2019)",
+    "link": "https://www.gsmarena.com/apple_ipad_10_2_(2019)-9857.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, September 12. Released 2019, September 21",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "250.6 x 174.1 x 7.5 mm (9.87 x 6.85 x 0.30 in)",
+        "weight": "483 g (Wi-Fi) / 493 g (LTE) (1.06 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "10.2 inches, 324.6 cm 2 (~74.4% screen-to-body ratio)",
+        "resolution": "1620 x 2160 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 13, upgradable to iPadOS 18.7",
+        "chipset": "Apple A10 Fusion (16 nm)",
+        "cpu": "Quad-core 2.34 GHz (2x Hurricane + 2x Zephyr)",
+        "gpu": "PowerVR Series7XT Plus (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 3GB RAM, 128GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps, 720p@120fps, HDR"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "HDR",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8827 mAh, non-removable (32.9 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Silver, Gold, Space Gray",
+        "models": "A2197, A2200, A2198, iPad7,11, iPad7,12",
+        "price": "About 350 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad7-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad7-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air (2019)",
+    "link": "https://www.gsmarena.com/apple_ipad_air_(2019)-9638.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, March 18. Released 2019, March 18",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "250.6 x 174.1 x 6.1 mm (9.87 x 6.85 x 0.24 in)",
+        "weight": "456 g (Wi-Fi) / 464 g (3G/LTE) (1.01 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "10.5 inches, 341.4 cm 2 (~78.3% screen-to-body ratio)",
+        "resolution": "1668 x 2224 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 12.1.3, upgradable to iPadOS 18.6",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 31mm (standard)",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (LTE model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8134 mAh, non-removable (30.8 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Space Gray, Silver, Gold",
+        "models": "A2153, A2123, A2154, A2152, iPad11,3, iPad11,4",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 550 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air3-2019-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air3-2019-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air3-2019-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini (2019)",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_(2019)-9637.php",
+    "specifications": {
+      "launch": {
+        "announced": "2019, March 18. Released 2019, March 18",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "203.2 x 134.8 x 6.1 mm (8.0 x 5.31 x 0.24 in)",
+        "weight": "300.5 g (Wi-Fi) / 308.2 g (3G/LTE) (10.86 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~70.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~324 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 12.1.3, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12 Bionic (7 nm)",
+        "cpu": "Hexa-core (2x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (4-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 3GB RAM, 256GB 3GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 32mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 31mm (standard)",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 5124 mAh, non-removable (19.1 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Space Gray, Silver, Gold",
+        "models": "A2126, A2124, A2133, A2125, iPad11,1, iPad11,2",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 450 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2019-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2019-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2019-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-2019-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2018)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2018)-9387.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, October. Released 2018, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "280.6 x 214.9 x 5.9 mm (11.05 x 8.46 x 0.23 in)",
+        "weight": "631 g (Wi-Fi), 633 g (LTE) (1.39 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz",
+        "size": "12.9 inches, 515.3 cm 2 (~85.4% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 12, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12X Bionic (7 nm)",
+        "cpu": "Octa-core (4x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (7-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 29mm (standard), 1/3.0\", 1.22µm, PDAF",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30/60fps, 1080p@30/60/120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 9720 mAh, non-removable (36.71 Wh)"
+      },
+      "misc": {
+        "performance": "AnTuTu: 552771 (v7) GeekBench: 5040 (v4.4) GFXBench: 39fps (ES 3.1 onscreen)",
+        "loudspeaker": "-22.1 LUFS (Excellent)"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2018-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-000.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-0.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 11 (2018)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_11_(2018)-9386.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, October. Released 2018, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "247.6 x 178.5 x 5.9 mm (9.75 x 7.03 x 0.23 in)",
+        "weight": "468 g (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz",
+        "size": "11.0 inches, 366.5 cm 2 (~82.9% screen-to-body ratio)",
+        "resolution": "1668 x 2388 pixels (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 12, upgradable to iPadOS 26.1",
+        "chipset": "Apple A12X Bionic (7 nm)",
+        "cpu": "Octa-core (4x2.5 GHz Vortex + 4x1.6 GHz Tempest)",
+        "gpu": "Apple GPU (7-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM, 1TB 6GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 29mm (standard), 1/3.0\", 1.22µm, PDAF",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30/60fps, 1080p@30/60/120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "5.0, A2DP, LE, EDR",
+        "positioning": "GPS, GLONASS, GALILEO, QZSS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "USB Type-C 3.1, magnetic connector"
+      },
+      "features": {
+        "sensors": "Face ID, accelerometer, gyro, proximity, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7812 mAh, non-removable (29.45 Wh)"
+      },
+      "misc": {
+        "colors": "Silver, Space Gray",
+        "models": "A2013, A1934, A1980, A1979, iPad8,1, iPad8,2, iPad8,3, iPad8,4",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 880 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-11-2018-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-000.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-0.jpg"
+    ]
+  },
+  {
+    "name": "iPad 9.7 (2018)",
+    "link": "https://www.gsmarena.com/apple_ipad_9_7_(2018)-9142.php",
+    "specifications": {
+      "launch": {
+        "announced": "2018, March 27. Released 2018, March 27",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "240 x 169.5 x 7.5 mm (9.45 x 6.67 x 0.30 in)",
+        "weight": "469 g (Wi-Fi) / 478 g (LTE) (1.05 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~71.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 11.3, upgradable to iPadOS 17.6.1",
+        "chipset": "Apple A10 Fusion (16 nm)",
+        "cpu": "Quad-core 2.34 GHz (2x Hurricane + 2x Zephyr)",
+        "gpu": "PowerVR Series7XT Plus (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps, 720p@120fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8827 mAh, non-removable (32.9 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Silver, Gold, Space Gray",
+        "models": "A1893, A1954, iPad7,5, iPad7,6",
+        "sar": "1.18 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 350 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2018-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2018-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2018-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2017)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2017)-8717.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, June. Released 2017, June",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "305.7 x 220.6 x 6.9 mm (12.04 x 8.69 x 0.27 in)",
+        "weight": "677 g (Wi-Fi) / 692 g (LTE) (1.49 lb)",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz",
+        "size": "12.9 inches, 515.3 cm 2 (~76.4% screen-to-body ratio)",
+        "resolution": "2732 x 2048 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 10.3.2, upgradable to iPadOS 17.7.10",
+        "chipset": "Apple A10X Fusion (10 nm)",
+        "cpu": "Hexa-core 2.38 GHz (3x Hurricane & 3x Zephyr)",
+        "gpu": "PowerVR Series 7 (12-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 1/3.0\", PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60fps, 1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 3.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 10,891 mAh, non-removable (41 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Space Gray, Gold, Silver",
+        "models": "A1670, A1671, A1821, iPad7,1, iPad7,2",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.97 W/kg (body)",
+        "price": "About 900 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2017-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-129-2017-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 10.5 (2017)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_10_5_(2017)-8716.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, June. Released 2017, June",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "250.6 x 174.1 x 6.1 mm (9.87 x 6.85 x 0.24 in)",
+        "weight": "469 g (Wi-Fi) / 477 g (LTE) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD, 120Hz",
+        "size": "10.5 inches, 341.4 cm 2 (~78.3% screen-to-body ratio)",
+        "resolution": "1668 x 2224 pixels, 4:3 ratio (~265 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 10.3.2, upgradable to iPadOS 17.7.10",
+        "chipset": "Apple A10X Fusion (10 nm)",
+        "cpu": "Hexa-core 2.38 GHz (3x Hurricane & 3x Zephyr)",
+        "gpu": "PowerVR Series 7 (12-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "64GB 4GB RAM, 256GB 4GB RAM, 512GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/1.8, 1/3.0\", PDAF, OIS",
+        "features": "Quad-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60fps, 1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "7 MP, f/2.2, 32mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 3.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 8134 mAh, non-removable (30.8 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Space Gray, Rose Gold, Gold, Silver",
+        "models": "A1701, A1709, A1852, iPad7,3, iPad7,4",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.93 W/kg (body)",
+        "price": "About 730 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-105-2017-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2017.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-105-2017-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad 9.7 (2017)",
+    "link": "https://www.gsmarena.com/apple_ipad_9_7_(2017)-8620.php",
+    "specifications": {
+      "launch": {
+        "announced": "2017, March. Released 2017, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "240 x 169.5 x 7.5 mm (9.45 x 6.67 x 0.30 in)",
+        "weight": "469 g (Wi-Fi) / 478 g (LTE) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~71.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 10.3, upgradable to iPadOS 16.7.12",
+        "chipset": "Apple A9 (14 nm)",
+        "cpu": "Dual-core 1.84 GHz (Twister)",
+        "gpu": "PowerVR GT7600 (six-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps, 720p@120fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR, LE",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 8827 mAh, non-removable (32.9 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Silver, Gold, Space Gray",
+        "models": "A1822, A1823, iPad6,11, iPad6,12",
+        "sar": "1.18 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 390 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2017-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2017-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-97-2017-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 9.7 (2016)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_9_7_(2016)-7984.php",
+    "specifications": {
+      "launch": {
+        "announced": "2016, March. Released 2016, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "240 x 169.5 x 6.1 mm (9.45 x 6.67 x 0.24 in)",
+        "weight": "437 g (Wi-Fi) / 444 g (LTE) (15.41 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~71.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 9.3.2, upgradable to iPadOS 16.7.12",
+        "chipset": "Apple A9X (16 nm)",
+        "cpu": "Dual-core 2.16 GHz (Twister)",
+        "gpu": "PowerVR Series 7 (12-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 2GB RAM, 128GB 2GB RAM, 256GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "12 MP, f/2.2, 29mm (standard), 1/3.0\", 1.22µm, PDAF",
+        "features": "Dual-LED dual-tone flash, HDR",
+        "video": "4K@30fps, 1080p@30/60fps, 1080p@120fps, 720p@240fps"
+      },
+      "selfie_camera": {
+        "single": "5 MP, f/2.2, 31mm (standard)",
+        "features": "Face detection, HDR, panorama",
+        "video": "1080p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.2, A2DP, EDR",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 7306 mAh, non-removable (27.9 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Silver, Gold, Space Gray, Rose Gold",
+        "models": "A1673, A1674, A1675, iPad6,4, iPad6,3",
+        "sar": "1.19 W/kg (body)",
+        "sar eu": "0.99 W/kg (body)",
+        "price": "About 690 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-97-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-97-1.jpg"
+    ]
+  },
+  {
+    "name": "iPad Pro 12.9 (2015)",
+    "link": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2015)-7562.php",
+    "specifications": {
+      "launch": {
+        "announced": "2015, September. Released 2015, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "305.7 x 220.6 x 6.9 mm (12.04 x 8.69 x 0.27 in)",
+        "weight": "713 g (Wi-Fi) / 723 g (LTE) (1.57 lb)",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "12.9 inches, 519.2 cm 2 (~77.0% screen-to-body ratio)",
+        "resolution": "2048 x 2732 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 9, upgradable to iPadOS 16.7.12",
+        "chipset": "Apple A9X (16 nm)",
+        "cpu": "Dual-core 2.26 GHz (Twister)",
+        "gpu": "PowerVR Series 7 (12-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "32GB 4GB RAM, 128GB 4GB RAM, 256GB 4GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps, 720p@120fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, HDR, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers (4 speakers)",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (Wi‑Fi + Cellular model only)",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "Lightning, USB 3.0; magnetic connector"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 10,307 mAh, non-removable (38.8 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "camera": "Photo / Video"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-5.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-pro-6.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini 4 (2015)",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_4_(2015)-7561.php",
+    "specifications": {
+      "launch": {
+        "announced": "2015, September. Released 2015, September",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "203.2 x 134.8 x 6.1 mm (8.0 x 5.31 x 0.24 in)",
+        "weight": "299 g (Wi-Fi) / 304 g (3G/LTE) (10.55 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~70.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~324 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 9, upgradable to iPadOS 15.8.5",
+        "chipset": "Apple A8 (20 nm)",
+        "cpu": "Dual-core 1.5 GHz Typhoon",
+        "gpu": "PowerVR GX6450 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 2GB RAM, 32GB 2GB RAM, 64GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 32mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "HDR",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS (3G/LTE model only)",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Ion 5124 mAh, non-removable (19.1 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "colors": "Space Gray, Silver, Gold",
+        "models": "A1538, A1550, iPad5,1, iPad5,2",
+        "sar": "1.18 W/kg (body)",
+        "sar eu": "0.42 W/kg (body)",
+        "price": "About 360 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-4-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-4-0.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-4-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-4-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air 2",
+    "link": "https://www.gsmarena.com/apple_ipad_air_2-6742.php",
+    "specifications": {
+      "launch": {
+        "announced": "2014, October 16. Released 2014, October 24",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "240 x 169.5 x 6.1 mm (9.45 x 6.67 x 0.24 in)",
+        "weight": "437 g (Wi-Fi) / 444 g (3G/LTE) (15.41 oz)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~71.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 8.1, upgradable to iPadOS 15.8.5",
+        "chipset": "Apple A8X (20 nm)",
+        "cpu": "Triple-core 1.5 GHz Typhoon",
+        "gpu": "PowerVR GXA6850 (octa-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 2GB RAM, 32GB 2GB RAM, 64GB 2GB RAM, 128GB 2GB RAM"
+      },
+      "main_camera": {
+        "single": "8 MP, f/2.4, 31mm (standard), 1.12µm, AF",
+        "features": "HDR",
+        "video": "1080p@30fps, 720p@120fps, HDR, stereo sound rec."
+      },
+      "selfie_camera": {
+        "single": "1.2 MP, f/2.2, 31mm (standard)",
+        "features": "face detection, HDR, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n/ac, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass, barometer"
+      },
+      "battery": {
+        "type": "Li-Po 7340 mAh, non-removable (27.62 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "performance": "Basemark X: 29753",
+        "display": "Contrast ratio: 1048 (nominal)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 75dB / Noise 70dB / Ring 78dB",
+        "audio quality": "Noise -93.9dB / Crosstalk -83.9dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-2-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini 3",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_3-6741.php",
+    "specifications": {
+      "launch": {
+        "announced": "2014, October. Released 2014, October",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "200 x 134.7 x 7.5 mm (7.87 x 5.30 x 0.30 in)",
+        "weight": "331 g (Wi-Fi) / 341 g (3G/LTE) (11.68 oz)",
+        "sim": "Nano-SIM + eSIM (cellular model only)"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~71.7% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~324 ppi density)",
+        "protection": "Oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 8.1, upgradable to iPadOS 12.5.7",
+        "chipset": "Apple A7 (28 nm)",
+        "cpu": "Dual-core 1.3 GHz Cyclone (ARM v8-based)",
+        "gpu": "PowerVR G6430 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, f/2.4, 32mm (standard), AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Fingerprint (front-mounted), accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 6470 mAh, non-removable (24.3 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "performance": "Basemark X: 14781",
+        "display": "Contrast ratio: 812 (nominal)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 65dB / Noise 63dB / Ring 70dB",
+        "audio quality": "Noise -93.7dB / Crosstalk -85.2dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-3-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-3-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-3-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-3-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad Air",
+    "link": "https://www.gsmarena.com/apple_ipad_air-5797.php",
+    "specifications": {
+      "launch": {
+        "announced": "2013, October 22. Released 2013, November 01",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "240 x 169.5 x 7.5 mm (9.45 x 6.67 x 0.30 in)",
+        "weight": "469 g (Wi-Fi) / 478 g (3G/LTE) (1.03 lb)",
+        "build": "Glass front, aluminum back, aluminum frame",
+        "sim": "Nano-SIM (cellular model only)"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~71.6% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 7, upgradable to iPadOS 12.5.7",
+        "chipset": "Apple A7 (28 nm)",
+        "cpu": "Dual-core 1.3 GHz Cyclone (ARM v8-based)",
+        "gpu": "PowerVR G6430 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, f/2.4, 33mm (standard), AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 8600 mAh, non-removable (32.4 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "performance": "Basemark X: 13597",
+        "display": "Contrast ratio: 968:1 (nominal) / 2.504:1 (sunlight)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 67dB / Noise 65dB / Ring 76dB",
+        "audio quality": "Noise -93.9dB / Crosstalk -89.9dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-air-3.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini 2",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_2-5735.php",
+    "specifications": {
+      "launch": {
+        "announced": "2013, October. Released 2013, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "200 x 134.7 x 7.5 mm (7.87 x 5.30 x 0.30 in)",
+        "weight": "331 g (Wi-Fi) / 341 g (3G/LTE) (11.68 oz)",
+        "sim": "Nano-SIM (cellular model only)"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~71.7% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~324 ppi density)",
+        "protection": "Oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 7, upgradable to iPadOS 12.5.7",
+        "chipset": "Apple A7 (28 nm)",
+        "cpu": "Dual-core 1.3 GHz Cyclone (ARM v8-based)",
+        "gpu": "PowerVR G6430 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, f/2.4, 33mm (standard), AF",
+        "features": "HDR",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS - cellular model only",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 6470 mAh, non-removable (24.3 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "performance": "Basemark X: 13286",
+        "display": "Contrast ratio: 804:1 (nominal)",
+        "camera": "Photo / Video",
+        "loudspeaker": "Voice 65dB / Noise 62dB / Ring 72dB",
+        "audio quality": "Noise -93.8dB / Crosstalk -82.9dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-4.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini Wi-Fi",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_wi_fi-5070.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, October. Released 2012, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "200 x 134.7 x 7.2 mm (7.87 x 5.30 x 0.28 in)",
+        "weight": "308 g (10.86 oz)",
+        "sim": "No"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~71.7% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~162 ppi density)",
+        "protection": "Oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 6, upgradable to iOS 9.3.5",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "Face detection, FaceTime over Wi-Fi",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "No",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 4490 mAh, non-removable (16.7 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "camera": "Photo / Video"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-white.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-black.jpg"
+    ]
+  },
+  {
+    "name": "iPad mini Wi-Fi + Cellular",
+    "link": "https://www.gsmarena.com/apple_ipad_mini_wi_fi_+_cellular-5061.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, October. Released 2012, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "200 x 134.7 x 7.2 mm (7.87 x 5.30 x 0.28 in)",
+        "weight": "312 g (11.01 oz)",
+        "sim": "Nano-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "7.9 inches, 193.3 cm 2 (~71.7% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~162 ppi density)",
+        "protection": "Oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 6, upgradable to iOS 9.3.6",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes, with stereo speakers",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP, EDR",
+        "positioning": "GPS, GLONASS",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 4490 mAh, non-removable (16.7 Wh)",
+        "talk time": "Up to 10 h (multimedia)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 812:1 (nominal)",
+        "loudspeaker": "Voice 68dB / Noise 65dB / Ring 75dB",
+        "audio quality": "Noise -82.8dB / Crosstalk -80.8dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-white.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-mini-black.jpg"
+    ]
+  },
+  {
+    "name": "iPad 4 Wi-Fi",
+    "link": "https://www.gsmarena.com/apple_ipad_4_wi_fi-5072.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, October. Released 2012, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 9.4 mm (9.50 x 7.31 x 0.37 in)",
+        "weight": "652 g (1.44 lb)",
+        "sim": "No"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 6, upgradable to iOS 10.3",
+        "chipset": "Apple A6X (32 nm)",
+        "cpu": "Dual-core 1.4 GHz",
+        "gpu": "PowerVR SGX554MP4 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "Face detection, FaceTime over Wi-Fi",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP",
+        "positioning": "No",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 11560 mAh, non-removable (42.5 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 10 h"
+      },
+      "misc": {
+        "camera": "Photo / Video"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-001.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-4-lightning.jpg"
+    ]
+  },
+  {
+    "name": "iPad 4 Wi-Fi + Cellular",
+    "link": "https://www.gsmarena.com/apple_ipad_4_wi_fi_+_cellular-5071.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, October. Released 2012, November",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 9.4 mm (9.50 x 7.31 x 0.37 in)",
+        "weight": "662 g (1.46 lb)",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 6, upgradable to iOS 10.3",
+        "chipset": "Apple A6X (32 nm)",
+        "cpu": "Dual-core 1.4 GHz",
+        "gpu": "PowerVR SGX554MP4 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM, 128GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "1.2 MP",
+        "features": "face detection, FaceTime over Wi-Fi or Cellular",
+        "video": "720p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP",
+        "positioning": "GPS, GLONASS",
+        "nfc": "No",
+        "radio": "No",
+        "usb": "Lightning, USB 2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Li-Po 11560 mAh, non-removable (42.5 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 9 h"
+      },
+      "misc": {
+        "display": "Contrast ratio: 762:1 (nominal)",
+        "loudspeaker": "Voice 67dB / Noise 66dB / Ring 75dB",
+        "audio quality": "Noise -85.7dB / Crosstalk -85.2dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-002.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-4-lightning.jpg"
+    ]
+  },
+  {
+    "name": "iPad 3 Wi-Fi + Cellular",
+    "link": "https://www.gsmarena.com/apple_ipad_3_wi_fi_+_cellular-4620.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, March. Released 2012, March 16",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 9.4 mm (9.50 x 7.31 x 0.37 in)",
+        "weight": "662 g (1.46 lb)",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 5.1, upgradable to iOS 9.3.5",
+        "chipset": "Apple A5X (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP4 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA, videocalling over Wi-Fi only",
+        "video": "480p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band, hotspot",
+        "bluetooth": "4.0, A2DP",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 11560 mAh battery (42.5 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 9 h"
+      },
+      "misc": {
+        "camera": "Photo / Video"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-002.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-000.jpg"
+    ]
+  },
+  {
+    "name": "iPad 3 Wi-Fi",
+    "link": "https://www.gsmarena.com/apple_ipad_3_wi_fi-4621.php",
+    "specifications": {
+      "launch": {
+        "announced": "2012, March. Released 2012, March 16",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 9.4 mm (9.50 x 7.31 x 0.37 in)",
+        "weight": "652 g (1.44 lb)",
+        "sim": "No"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "1536 x 2048 pixels, 4:3 ratio (~264 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 5.1, upgradable to iOS 9.3.5",
+        "chipset": "Apple A5X (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP4 (quad-core graphics)"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 1GB RAM, 32GB 1GB RAM, 64GB 1GB RAM"
+      },
+      "main_camera": {
+        "single": "5 MP, AF",
+        "video": "1080p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA, videocalling over Wi-Fi only",
+        "video": "480p@30fps"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "4.0, A2DP",
+        "positioning": "No",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 11560 mAh battery (42.5 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 10 h"
+      },
+      "misc": {
+        "display": "Contrast ratio: 779:1 (nominal)",
+        "loudspeaker": "Voice 66dB / Noise 66dB / Ring 77dB",
+        "audio quality": "Noise -90.9dB / Crosstalk -92.7dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-001.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/ipad-3-000.jpg"
+    ]
+  },
+  {
+    "name": "iPad 2 Wi-Fi + 3G",
+    "link": "https://www.gsmarena.com/apple_ipad_2_wi_fi_+_3g-3848.php",
+    "specifications": {
+      "launch": {
+        "announced": "2011, March. Released 2011, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 8.8 mm (9.50 x 7.31 x 0.35 in)",
+        "weight": "607 g (1.34 lb)",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~132 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 9.3.5",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "0.7 MP",
+        "video": "720p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "2.1, A2DP, EDR",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 6930 mAh battery (25 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 9 h"
+      },
+      "misc": {
+        "display": "Contrast ratio: 775:1 (nominal)",
+        "camera": "Video",
+        "loudspeaker": "Voice 65dB / Noise 65dB / Ring 75dB",
+        "audio quality": "Noise -91.0dB / Crosstalk -93.0dB"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-02.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-03.jpg"
+    ]
+  },
+  {
+    "name": "iPad 2 Wi-Fi",
+    "link": "https://www.gsmarena.com/apple_ipad_2_wi_fi-3847.php",
+    "specifications": {
+      "launch": {
+        "announced": "2011, March. Released 2011, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 8.8 mm (9.50 x 7.31 x 0.35 in)",
+        "weight": "601 g (1.32 lb)",
+        "sim": "No"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~132 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 9.3.5",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "0.7 MP",
+        "video": "720p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "2.1, A2DP, EDR",
+        "positioning": "No",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 6930 mAh battery (25 Wh)",
+        "stand-by": "Up to 720 h",
+        "talk time": "Up to 10 h"
+      },
+      "misc": {
+        "colors": "Black, White",
+        "models": "A1395,  iPad2,1, iPad2,4",
+        "price": "About 200 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-02.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-03.jpg"
+    ]
+  },
+  {
+    "name": "iPad 2 CDMA",
+    "link": "https://www.gsmarena.com/apple_ipad_2_cdma-3849.php",
+    "specifications": {
+      "launch": {
+        "announced": "2011, March. Released 2011, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "241.2 x 185.7 x 8.8 mm (9.50 x 7.31 x 0.35 in)",
+        "weight": "607 g (1.34 lb)",
+        "sim": "Mini-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~65.1% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~132 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 9.2.1",
+        "chipset": "Apple A5 (45 nm)",
+        "cpu": "Dual-core 1.0 GHz Cortex-A9",
+        "gpu": "PowerVR SGX543MP2"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 512MB RAM, 32GB 512MB RAM, 64GB 512MB RAM"
+      },
+      "main_camera": {
+        "single": "0.7 MP",
+        "video": "720p@30fps"
+      },
+      "selfie_camera": {
+        "single": "VGA"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "2.1, A2DP, EDR",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, compass",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 6930 mAh battery (25 Wh)"
+      },
+      "misc": {
+        "colors": "Black, White",
+        "models": "A1397, iPad2,3",
+        "price": "About 200 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-02.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-03.jpg"
+    ]
+  },
+  {
+    "name": "iPad Wi-Fi + 3G",
+    "link": "https://www.gsmarena.com/apple_ipad_wi_fi_+_3g-3827.php",
+    "specifications": {
+      "launch": {
+        "announced": "2010, January. Released 2010, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "242.8 x 189.7 x 13.4 mm (9.56 x 7.47 x 0.53 in)",
+        "weight": "730 g (1.61 lb)",
+        "sim": "Micro-SIM"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~63.3% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~132 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 5.1.1",
+        "chipset": "Apple A4 (45 nm)",
+        "cpu": "1.0 GHz Cortex-A8",
+        "gpu": "PowerVR SGX535"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 256MB RAM, 32GB 256MB RAM, 64GB 256MB RAM"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "2.1, A2DP, EDR",
+        "positioning": "GPS, A-GPS",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer, compass",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 6600 mAh battery (24.8 Wh)"
+      },
+      "misc": {
+        "colors": "Silver",
+        "models": "iPad1,2",
+        "price": "About 410 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-wifi-3g-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-wifi-3g-2.jpg"
+    ]
+  },
+  {
+    "name": "iPad Wi-Fi",
+    "link": "https://www.gsmarena.com/apple_ipad_wi_fi-3828.php",
+    "specifications": {
+      "launch": {
+        "announced": "2010, January. Released 2010, March",
+        "status": "Discontinued"
+      },
+      "body": {
+        "dimensions": "242.8 x 189.7 x 13.4 mm (9.56 x 7.47 x 0.53 in)",
+        "weight": "680 g (1.50 lb)",
+        "sim": "No"
+      },
+      "display": {
+        "type": "IPS LCD",
+        "size": "9.7 inches, 291.4 cm 2 (~63.3% screen-to-body ratio)",
+        "resolution": "768 x 1024 pixels, 4:3 ratio (~132 ppi density)",
+        "protection": "Scratch-resistant glass, oleophobic coating"
+      },
+      "platform": {
+        "os": "iOS 4, upgradable to iOS 5.1.1",
+        "chipset": "Apple A4 (45 nm)",
+        "cpu": "1.0 GHz Cortex-A8",
+        "gpu": "PowerVR SGX535"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "16GB 256MB RAM, 32GB 256MB RAM, 64GB 256MB RAM"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "Yes"
+      },
+      "comms": {
+        "wlan": "Wi-Fi 802.11 a/b/g/n, dual-band",
+        "bluetooth": "2.1, A2DP, EDR",
+        "positioning": "No",
+        "radio": "No",
+        "usb": "2.0"
+      },
+      "features": {
+        "sensors": "Accelerometer",
+        "browser": "HTML (Safari)"
+      },
+      "battery": {
+        "type": "Non-removable Li-Po 6600 mAh battery (24.8 Wh)"
+      },
+      "misc": {
+        "display": "Contrast ratio: 776:1 (nominal)"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/apple/apple-ipad-wifi-1.jpg"
+    ]
+  }
+]

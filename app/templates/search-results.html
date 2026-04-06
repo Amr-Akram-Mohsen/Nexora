@@ -12,7 +12,7 @@
 
 
 {% if slot == 'search' %}
-{% call form("search-form", variant="") %}
+{% call form("search-form", variant="", method="GET", include_csrf=False) %}
 <div class="search-input-wrapper">
   {{ input(
   name="query", type="search",

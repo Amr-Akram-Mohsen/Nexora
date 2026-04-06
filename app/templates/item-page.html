@@ -31,25 +31,50 @@
 {% macro content_block() %}
 <!-- optional: description, highlights, etc. -->
 <div class="item-content">
-  {{ item.description }}
+  {{ item.description or '' }}
+
+  {% if item.item_type == 'electronics' %}
+  {% include "components/details/electronics/highlights.html" %}
+
+  {% elif item.item_type == 'perfumes' %}
+  {% include "components/details/perfume/scent-pyramid.html" %}
+  {% include "components/details/perfume/meta.html" %}
+
+  {% elif item.item_type == 'accessories' %}
+  {% include "components/details/accessory/material-badges.html" %}
+  {% include "components/details/accessory/size-guide.html" %}
+
+  {% endif %}
 </div>
 {% endmacro %}
 
 {% macro sidebar_block() %}
-{% if item.quick_details %}
+
+<!-- ✅ VARIANTS FIRST -->
+{% if item.has_variants %}
+{% include "components/features/variant-selector.html" %}
+{% endif %}
+
+{% if item.quick_details and item.quick_details|length > 0 %}
 <div class="item-details-card">
 
   <h3 class="item-details-card__title flex items-center">
     <span class="item-details-card__bar"></span>
+    {% if item.item_type == 'perfumes' %}
+    Fragrance Details
+    {% elif item.item_type == 'accessories' %}
+    Product Details
+    {% elif item.item_type == 'electronics' %}
     Key Specifications
+    {% endif %}
   </h3>
 
   <div class="item-details-card__items flex flex-col">
 
     {% for detail in item.quick_details[:4] %}
     <div class="item-detail-item flex items-center justify-between">
-      <span class="item-detail-item__key">
-        {{ detail.key }}
+      <span class="item-detail-item__label">
+        {{ detail.label }}
       </span>
 
       <span class="item-detail-item__value">
@@ -60,10 +85,10 @@
 
   </div>
 
-  {% if item.full_details|length > 4 %}
+  {% if item.specifications and item.specifications|length > 0 %}
   <button class="btn btn--outline item-details-dialog__action item-details-dialog__open" data-full-details-open
     data-id="{{ item.id }}">
-    View Full Specifications
+    View Full Details
   </button>
   {% endif %}
 
@@ -85,6 +110,7 @@ content=content_block,
 sidebar=sidebar_block
 ) }}
 
-{% set full_details = item.full_details %}
+<!-- {% set full_details = item.full_details %} -->
+{% set full_details = item.structured_details.get('groups') %}
 {% include "components/features/full-details.html" %}
 {% endblock %}

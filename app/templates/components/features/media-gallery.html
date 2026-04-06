@@ -1,3 +1,5 @@
+{% from "components/shared/image-utils.html" import render_image_url %}
+{% from "components/ui/button.html" import button %}
 {% macro media_gallery(item) %}
 {% if item.images %}
 
@@ -6,25 +8,37 @@
   <!-- MAIN IMAGE -->
   <div class="item-gallery__viewer">
 
-    <img src="{{ url_for('static', filename=item.images[0].image_path) }}"
-      alt="{{ item.images[0].alt_text or item.name }}" class="item-gallery__img img-cover" loading="lazy"
-      data-gallery-main="1">
+    {{ render_image_url(
+    item.images[0].image_url,
+    item.name,
+    'item-gallery__img img-cover',
+    {'data-gallery-main': '1'}
+    ) }}
 
     <!-- Fullscreen button -->
-    <button class="item-gallery__fullscreen flex items-center justify-center" data-gallery-open>
-      <i class="fa fa-expand"></i>
-    </button>
+    {{ button(
+    text="",
+    class="item-gallery__fullscreen flex items-center justify-center",
+    icon="fa-expand",
+    attrs={'data-gallery-open': '1'}
+    ) }}
 
     {% if item.images|length > 1 %}
 
     <!-- arrows -->
-    <button class="item-gallery__nav item-gallery__nav--prev disabled" data-gallery-new-image>
-      <i class="fa fa-chevron-left"></i>
-    </button>
+    {{ button(
+    text="",
+    class="item-gallery__nav item-gallery__nav--prev disabled",
+    icon="fa-chevron-left",
+    attrs={'data-gallery-new-image': '1'}
+    ) }}
 
-    <button class="item-gallery__nav item-gallery__nav--next" data-gallery-new-image="2">
-      <i class="fa fa-chevron-right"></i>
-    </button>
+    {{ button(
+    text="",
+    class="item-gallery__nav item-gallery__nav--next",
+    icon="fa-chevron-right",
+    attrs={'data-gallery-new-image': '2'}
+    ) }}
 
     <!-- counter -->
     <div class="item-gallery__counter">
@@ -42,10 +56,9 @@
   <div class="item-gallery__thumbs is-hidden">
 
     {% for image in item.images %}
-    <button class="item-gallery__thumb" data-gallery-thumb="{{ loop.index }}">
-      <img src="{{ url_for('static', filename=image.image_path) }}" alt="{{ image.alt_text or item.name }}"
-        class="img-cover">
-    </button>
+    {% call button(class='item-gallery__thumb', attrs={'data-gallery-thumb': loop.index}) %}
+    {{ render_image_url(image.image_url, item.name, 'img-cover') }}
+    {% endcall %}
     {% endfor %}
 
   </div>

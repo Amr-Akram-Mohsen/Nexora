@@ -1,0 +1,333 @@
+[
+  {
+    "name": "Watch GT 2",
+    "link": "https://www.gsmarena.com/vivo_watch_gt_2-14227.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, October 13",
+        "status": "Available. Released 2025, October 17"
+      },
+      "body": {
+        "dimensions": "47.5 x 40.2 x 11 mm (1.87 x 1.58 x 0.43 in)",
+        "weight": "34.8 g or 35.8 g (1.23 oz)",
+        "build": "Glass front, aluminum alloy frame, plastic back",
+        "sim": "eSIM - cellular model only"
+      },
+      "display": {
+        "type": "AMOLED, 2400 nits (peak)",
+        "size": "2.07 inches",
+        "resolution": "432 x 514 pixels (~324 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS 3.0"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "Unspecified"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.4, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, compass, SpO2"
+      },
+      "battery": {
+        "type": "· 595 mAh - eSIM version · 695 mAh - bluetooth version"
+      },
+      "misc": {
+        "colors": "Glossy Black (eSIM only), Matte Silver, Matte Dark Blue",
+        "models": "WA2536B",
+        "price": "About 90 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt2-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt2-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt2-3.jpg"
+    ]
+  },
+  {
+    "name": "Watch 5",
+    "link": "https://www.gsmarena.com/vivo_watch_5-13813.php",
+    "specifications": {
+      "launch": {
+        "announced": "2025, April 21",
+        "status": "Available. Released 2025, April 29"
+      },
+      "body": {
+        "dimensions": "45 x 45 x 11.4 mm (1.77 x 1.77 x 0.45 in)",
+        "weight": "32 g or 35 g (1.13 oz)",
+        "build": "Glass front, aluminum alloy frame or Stainless steel frame",
+        "sim": "eSIM - cellular model only"
+      },
+      "display": {
+        "type": "AMOLED, 1500 nits (peak)",
+        "size": "1.43 inches",
+        "resolution": "466 x 466 pixels (~326 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS 2"
+      },
+      "memory": {
+        "card slot": "No"
+      },
+      "sound": {
+        "loudspeaker": "No",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.4, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, compass, SpO2"
+      },
+      "battery": {
+        "type": "505 mAh"
+      },
+      "misc": {
+        "colors": "Black, White, Stainless steel silver",
+        "price": "About 100 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch5-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch5-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch5-4.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch5-3.jpg"
+    ]
+  },
+  {
+    "name": "iQOO Watch GT",
+    "link": "https://www.gsmarena.com/vivo_iqoo_watch_gt-13199.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, July 11",
+        "status": "Available. Released 2024, July 16"
+      },
+      "body": {
+        "dimensions": "45.8 x 39.6 x 11.2 mm (1.80 x 1.56 x 0.44 in)",
+        "weight": "33 g (1.16 oz)",
+        "build": "Glass front, aluminum frame, plastic back",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "AMOLED",
+        "size": "1.85 inches",
+        "resolution": "390 x 450 pixels (~322 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS"
+      },
+      "memory": {
+        "card slot": "No"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, compass, SpO2"
+      },
+      "battery": {
+        "type": "505 mAh"
+      },
+      "misc": {
+        "colors": "Black",
+        "price": "About 60 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-gt-01.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-gt-02.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-gt-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-gt-4.jpg"
+    ]
+  },
+  {
+    "name": "Watch GT",
+    "link": "https://www.gsmarena.com/vivo_watch_gt-13089.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, May 30",
+        "status": "Available. Released 2024, May 30"
+      },
+      "body": {
+        "dimensions": "45.8 x 39.6 x 11.2 mm (1.80 x 1.56 x 0.44 in)",
+        "weight": "33 g (1.16 oz)",
+        "build": "Glass front, aluminum frame, plastic back",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "AMOLED",
+        "size": "1.85 inches",
+        "resolution": "390 x 450 pixels (~322 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "Unspecified"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.3, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, compass, SpO2"
+      },
+      "battery": {
+        "type": "505 mAh"
+      },
+      "misc": {
+        "colors": "Black, Silver",
+        "price": "About 100 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch-gt-4.jpg"
+    ]
+  },
+  {
+    "name": "iQOO Watch",
+    "link": "https://www.gsmarena.com/vivo_iqoo_watch-12960.php",
+    "specifications": {
+      "launch": {
+        "announced": "2024, April 24",
+        "status": "Available. Released 2024, April 24"
+      },
+      "body": {
+        "dimensions": "46.1 x 46.1 x 11.3 mm (1.81 x 1.81 x 0.44 in)",
+        "weight": "36 g (1.27 oz)",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "AMOLED",
+        "size": "1.43 inches",
+        "resolution": "466 x 466 pixels (~326 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "4GB 64MB RAM"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, barometer, compass, SpO2"
+      },
+      "battery": {
+        "type": "505 mAh"
+      },
+      "misc": {
+        "colors": "Black",
+        "price": "About 160 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-iqoo-watch-3.jpg"
+    ]
+  },
+  {
+    "name": "Watch 3",
+    "link": "https://www.gsmarena.com/vivo_watch_3-12696.php",
+    "specifications": {
+      "launch": {
+        "announced": "2023, November 13",
+        "status": "Available. Released 2023, November 21"
+      },
+      "body": {
+        "dimensions": "46.1 x 46.1 x 13.8 mm (1.81 x 1.81 x 0.54 in)",
+        "weight": "36 g (1.27 oz)",
+        "sim": "eSIM"
+      },
+      "display": {
+        "type": "AMOLED",
+        "size": "1.43 inches",
+        "resolution": "466 x 466 pixels (~326 ppi density)"
+      },
+      "platform": {
+        "os": "Blue OS"
+      },
+      "memory": {
+        "card slot": "No",
+        "internal": "4GB 64MB RAM"
+      },
+      "sound": {
+        "loudspeaker": "Yes",
+        "3.5mm jack": "No"
+      },
+      "comms": {
+        "wlan": "No",
+        "bluetooth": "5.2, A2DP, LE",
+        "positioning": "GPS, GLONASS, GALILEO, BDS, QZSS",
+        "nfc": "Yes",
+        "radio": "No",
+        "usb": "No"
+      },
+      "features": {
+        "sensors": "Accelerometer, gyro, heart rate, barometer, compass, altimeter, SpO2"
+      },
+      "battery": {
+        "type": "505 mAh"
+      },
+      "misc": {
+        "colors": "Black, Silver",
+        "price": "About 150 EUR"
+      }
+    },
+    "image_urls": [
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch3-1.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch3-2.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch3-3.jpg",
+      "https://fdn2.gsmarena.com/vv/pics/vivo/vivo-watch3-4.jpg"
+    ]
+  }
+]

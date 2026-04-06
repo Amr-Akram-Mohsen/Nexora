@@ -3,6 +3,10 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 db = SQLAlchemy()
+import secrets
+from functools import cached_property
+from app.utils.sanitizer import sanitize_json
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +15,7 @@ class User(db.Model, UserMixin):
     google_id = db.Column(db.String(120), unique=True, nullable=True)
     provider = db.Column(db.String(50), nullable=True)  # 'google' or 'local'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     
     # Relationships
@@ -55,10 +60,22 @@ class NewsletterSubscriber(db.Model):
         db.ForeignKey('users.id', ondelete='SET NULL'),
         nullable=True
     )
-    is_active = db.Column(db.Boolean, default=False)
-    subscribed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_confirmed = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     unsubscribed_at = db.Column(db.DateTime, nullable=True)
+    confirmation_token = db.Column(db.String(255), nullable=True)
+    unsubscribe_token = db.Column(db.String(255), nullable=True)    
     user = db.relationship("User", back_populates="newsletter_subscription")
+
+    # 🔥 Helpers
+    def generate_tokens(self):
+        self.confirmation_token = secrets.token_urlsafe(32)
+        self.unsubscribe_token = secrets.token_urlsafe(32)
+
+    @property
+    def is_active(self):
+        return self.is_confirmed and self.unsubscribed_at is None
+        
     def __repr__(self):
         return f'<NewsletterSubscriber {self.email}>'
 # ==================== ASSOCIATION TABLES ====================
@@ -93,12 +110,20 @@ item_topics = db.Table(
     db.Column("item_id", db.Integer, db.ForeignKey("items.id"), primary_key=True),
     db.Column("topic_id", db.Integer, db.ForeignKey("topics.id"), primary_key=True)
 )
+# Links a review/article directly to the product(s) it covers
+article_items = db.Table(
+    "article_items",
+    db.Column("article_id", db.Integer, db.ForeignKey("articles.id"), primary_key=True),
+    db.Column("item_id",    db.Integer, db.ForeignKey("items.id"),    primary_key=True)
+)
 # ==================== SECTION ====================
 class Section(db.Model):
     __tablename__ = "sections"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     slug = db.Column(db.String(120), unique=True, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    allowed_filters = db.Column(db.JSON, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     sort_order = db.Column(db.Integer, default=0)
     articles = db.relationship(
@@ -199,7 +224,7 @@ class Article(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
-    card_type = db.Column(db.TEXT)
+    card_type = db.Column(db.TEXT, default="article")
     # ---------- RELATIONSHIPS ----------
     topics = db.relationship(
         "Topic", secondary=article_topics, back_populates="articles")
@@ -207,9 +232,14 @@ class Article(db.Model):
         "Section", secondary=article_sections, back_populates="articles")
     brands = db.relationship(
         "Brand", secondary=article_brands, back_populates="articles")
-    # inside Article class
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     category = db.relationship("Category", back_populates="articles")
+    # Products this article reviews / mentions (admin-managed or matched by a future job)
+    linked_items = db.relationship(
+        "Item",
+        secondary=article_items,
+        back_populates="linked_articles"
+    )
     # Reactions made on this article
     reactions = db.relationship(
         "Reaction",
@@ -251,6 +281,10 @@ class Article(db.Model):
     def add_topic(self, topic_obj):
         if topic_obj not in self.topics:
             self.topics.append(topic_obj)
+    def link_item(self, item_obj):
+        """Link this article to a product it reviews/mentions."""
+        if item_obj not in self.linked_items:
+            self.linked_items.append(item_obj)
 
 class Store(db.Model):
     __tablename__ = "stores"
@@ -261,6 +295,7 @@ class Store(db.Model):
     country = db.Column(db.String(50))
     currency = db.Column(db.String(10))
     affiliate_network = db.Column(db.String(100))
+    logo_url = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     item_links = db.relationship(
@@ -268,11 +303,13 @@ class Store(db.Model):
         back_populates="store",
         cascade="all, delete-orphan"
     )
+
+
 class Item(db.Model):
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
-    slug = db.Column(db.String(220), nullable=False)
+    slug = db.Column(db.String(220), nullable=False, unique=True)
     description = db.Column(db.Text)  # optional short description
     
     # 🔥 NEW
@@ -288,14 +325,21 @@ class Item(db.Model):
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
     click_count = db.Column(db.Integer, default=0)
-    card_type = db.Column(db.TEXT)
+    card_type = db.Column(db.TEXT, default="item")
+    searchable_attributes = db.Column(db.JSON) # Hoisted data for filtering
     
-    # 🔥 FIXED RELATIONSHIPS
+    # ── RELATIONSHIPS ──────────────────────────────────────────────
     category = db.relationship("Category", back_populates="items")
     brand = db.relationship("Brand", back_populates="items")
     sections = db.relationship(
-        "Section", secondary=item_sections, back_populates="items")    
+        "Section", secondary=item_sections, back_populates="items")
     topics = db.relationship("Topic", secondary=item_topics, back_populates="items")
+    # Articles that review or mention this product
+    linked_articles = db.relationship(
+        "Article",
+        secondary=article_items,
+        back_populates="linked_items"
+    )
     # Relationships
     variants = db.relationship(
         "ItemVariant",
@@ -308,7 +352,8 @@ class Item(db.Model):
         back_populates="item",
         cascade="all, delete-orphan",
         order_by="ItemImage.position",
-        lazy="selectin"
+        lazy="selectin",
+        overlaps="images" # Avoid collision if variant relationship uses back_populates="images"
     )    
     specifications = db.relationship(
         "ItemSpecification",
@@ -325,11 +370,19 @@ class Item(db.Model):
             self.variants[0].is_default = True
     
     @property
+    def image_url(self):
+        return self.images[0].image_url if self.images else None
+
+    @property
     def default_variant(self):
         return next(
             (v for v in self.variants if v.is_default),
             self.variants[0] if self.variants else None
         )
+
+    @property
+    def price(self):
+        return self.default_variant.price if self.default_variant else None
     
     @property
     def has_variants(self):
@@ -359,43 +412,121 @@ class Item(db.Model):
     
     @property
     def full_details(self):
+        """
+        Consolidates and sanitizes all specification fragments.
+        """
         return {
-            spec.category: spec.spec_json
+            spec.category: sanitize_json(spec.spec_json)
             for spec in self.specifications
             if isinstance(spec.spec_json, dict)
         }
-    @property
-    def details(self):
+
+    @cached_property
+    def structured_details(self):
         """
-        Derived main details (subset of specifications)
+        Normalized structure for frontend based on item_type.
+        No hardcoding of values, only structure mapping.
         """
-        # Convert specifications rows → dict by category
-        details_by_category = self.full_details
-        result = {
-            "launch": self.pick_keys(details_by_category.get("launch"), ["status"]),
-            "display": self.pick_keys(details_by_category.get("display"), ["size"]),
-            "platform": self.pick_keys(details_by_category.get("platform"), ["chipset"]),
-            "battery": self.pick_keys(details_by_category.get("battery"), ["type"]),
-            "misc": self.pick_keys(details_by_category.get("misc"), ["price", "colors"]),
+        data = self.full_details
+
+        if self.item_type == "electronics":
+            return {
+                "highlights": self.pick_keys(
+                    {
+                        **data.get("display", {}),
+                        **data.get("platform", {}),
+                        **data.get("battery", {}),
+                    },
+                    ["size", "chipset", "type"]
+                ),
+                "quick_details": data,
+                "groups": data
+            }
+
+        elif self.item_type == "perfumes":
+            fp = data.get("fragrance_profile", {})
+
+            return {
+                "scent": {
+                    "top": fp.get("top_notes"),
+                    "heart": fp.get("heart_notes"),
+                    "base": fp.get("base_notes"),
+                },
+                "meta": self.pick_keys(
+                    fp,
+                    ["concentration", "scent_family"]
+                ),
+                "performance": data.get("performance", {}),
+                "quick_details": data.get("performance", {}),
+                "groups": data
+            }
+
+        elif self.item_type == "accessories":
+            return {
+                "materials": data.get("material_build", {}),
+                "dimensions": data.get("dimensions", {}),
+                "movement": data.get("movement", {}),
+                "quick_details": data.get("movement", {}),
+                "groups": data
+            }
+
+        return {
+            "quick_details": data,
+            "groups": data
         }
-        # remove empty sections
-        return self.get_specifications(result)
-    
+
+    def get_product_schema(self, request_url):
+        """
+        Generates Google-friendly JSON-LD Schema.
+        """
+        schema = {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": self.name,
+            "description": self.description,
+            "brand": {"@type": "Brand", "name": self.brand.name},
+            "category": self.category.name,
+            "url": request_url,
+            "sku": self.default_variant.sku if self.default_variant else None
+        }
+        
+        # Add images
+        if self.images:
+            schema["image"] = [img.image_url for img in self.images]
+            
+        # Add pricing from store links if available
+        if self.store_links:
+            offers = []
+            for link in self.store_links:
+                offers.append({
+                    "@type": "Offer",
+                    "price": float(link.price),
+                    "priceCurrency": link.currency,
+                    "availability": f"https://schema.org/{link.availability or 'InStock'}",
+                    "url": link.affiliate_url
+                })
+            schema["offers"] = offers
+            
+        return schema
+
     @property
     def quick_details(self):
-        return self._quick_details(self.details)
+        return self._quick_details(self.structured_details.get("quick_details", {}))
 
     def _quick_details(self, details=None, parent=""):
         items = []
         for key, value in details.items():
             label = key.replace("_", " ").title()
-            if parent:
-                label = f"{parent} {label}"
+            # if parent:
+            #     label = f"{parent} {label}"
+            current_group = parent or label
+
             if isinstance(value, dict):
-                items.extend(self._quick_details(value, label))
+                items.extend(self._quick_details(value, current_group))
             else:
                 items.append({
-                    "key": label,
+                    "group": parent,
+                    "label": label,
                     "value": value
                 })
         return items
@@ -426,8 +557,7 @@ class Item(db.Model):
         lazy="selectin"
     )
     __table_args__ = (
-        db.UniqueConstraint("brand_id", "slug", name="uq_items_brand_slug"),
-        db.Index("ix_items_brand_slug", "brand_id", "slug"),  # optional, speeds up queries
+        db.Index("ix_items_slug", "slug"),  # optional, speeds up queries
     )    
     def __repr__(self):
         return f"<Item {self.name}>"
@@ -440,6 +570,10 @@ class Item(db.Model):
     def add_topic(self, topic_obj):
         if topic_obj not in self.topics:
             self.topics.append(topic_obj)
+    def link_article(self, article_obj):
+        """Link a review article to this product."""
+        if article_obj not in self.linked_articles:
+            self.linked_articles.append(article_obj)
 
 
 class ItemVariant(db.Model):
@@ -456,9 +590,16 @@ class ItemVariant(db.Model):
     # example:
     # { "size": "100ml", "color": "Black" }
     is_default = db.Column(db.Boolean, default=False)
+    
+    # ── PRICING (Starting/Best Price) ──────────────────────────
+    price = db.Column(db.Numeric(10, 2))
+    old_price = db.Column(db.Numeric(10, 2))
+    currency = db.Column(db.String(3)) # e.g. SAR, AED
+    
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     # relationships
     item = db.relationship("Item", back_populates="variants")    
+    images = db.relationship("ItemImage", back_populates="variant", cascade="all, delete-orphan")
     store_links = db.relationship(
         "ItemStoreLink",
         back_populates="variant",
@@ -527,13 +668,14 @@ class ItemStoreLink(db.Model):
 class ItemImage(db.Model):
     __tablename__ = "item_images"
     id = db.Column(db.Integer, primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey("items.id"), nullable=False)
-    image_path = db.Column(db.Text, nullable=False)  # relative path, e.g. 'static/images/gal-f07_1.png'
-    alt_text = db.Column(db.String(200))  # optional for SEO/accessibility
+    item_id = db.Column(db.Integer, db.ForeignKey("items.id", ondelete="CASCADE"), nullable=False)
+    variant_id = db.Column(db.Integer, db.ForeignKey("item_variants.id", ondelete="CASCADE"), nullable=True)
+    image_url = db.Column(db.Text, nullable=False)  # relative path, e.g. 'static/images/gal-f07_1.png'
     position = db.Column(db.Integer, default=0)  # order of images
     item = db.relationship("Item", back_populates="images")
+    variant = db.relationship("ItemVariant", back_populates="images")
     def __repr__(self):
-        return f"<ItemImage {self.image_path}>"
+        return f"<ItemImage {self.image_url}>"
 class ItemSpecification(db.Model):
     __tablename__ = "item_specifications"
     id = db.Column(db.Integer, primary_key=True)

@@ -11,7 +11,7 @@ def filter_items_by_country(query):
 def get_search_items(query):
     p_query = Item.query.filter(Item.name.ilike(f'%{query}%'))
 
-    p_query = filter_items_by_country(p_query)
+    # p_query = filter_items_by_country(p_query)
 
     return p_query.order_by(Item.created_at.desc()).limit(50).all()
 

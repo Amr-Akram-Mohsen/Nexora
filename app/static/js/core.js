@@ -1,3 +1,18 @@
+const originalFetch = window.fetch;
+window.fetch = async function (...args) {
+    let [resource, config] = args;
+    if (config && config.method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method.toUpperCase())) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken) {
+            config.headers = {
+                ...(config.headers || {}),
+                'X-CSRFToken': csrfToken
+            };
+        }
+    }
+    return originalFetch(resource, config);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     initApp();
     initUserInteractions();
@@ -30,20 +45,20 @@ const generalMsg = 'please sign in to ';
 
 function filterContent(chip) {
     chip.classList.toggle("active");
-    
+
     const params = new URLSearchParams(window.location.search);
     const key = chip.dataset.filter;
     const value = chip.dataset.slug;
-    
+
     const values = params.getAll(key);
-    
+
     if (values.includes(value)) {
-      params.delete(key);
-      values.filter(v => v !== value).forEach(v => params.append(key, v));
+        params.delete(key);
+        values.filter(v => v !== value).forEach(v => params.append(key, v));
     } else {
-      params.append(key, value);
+        params.append(key, value);
     }
-    
+
     window.location.search = params.toString();
 }
 
@@ -78,9 +93,9 @@ function closeFlashMsg(btn) {
 
 async function handleCountryToggle(e) {
     if (!e.target.classList.contains("country-toggle")) return;
-    
+
     const country = e.target.value || "";
-    
+
     await fetch("/set-country", {
         method: "POST",
         headers: {
@@ -88,8 +103,17 @@ async function handleCountryToggle(e) {
         },
         body: JSON.stringify({ country })
     });
-    
+
     // Optional: reload page to apply country filtering
     window.location.reload();
-    
+
+}
+
+function setLoading(button, isLoading) {
+    if (!button) return;
+    if (isLoading) {
+        button.classList.add('is-loading');
+    } else {
+        button.classList.remove('is-loading');
+    }
 }

@@ -16,7 +16,7 @@ def get_item_analytics(item_id):
             func.coalesce(View.user_id, View.ip_address)
         ))
     ).filter(
-        View.target_type == TargetType.PRODUCT,
+        View.target_type == TargetType.ITEM,
         View.target_id == item_id,
         View.created_at >= last_24h
     ).scalar() or 0
@@ -26,7 +26,7 @@ def get_item_analytics(item_id):
             func.coalesce(View.user_id, View.ip_address)
         ))
     ).filter(
-        View.target_type == TargetType.PRODUCT,
+        View.target_type == TargetType.ITEM,
         View.target_id == item_id
     ).scalar() or 0
 
@@ -35,8 +35,10 @@ def get_item_analytics(item_id):
         func.count(distinct(
             func.coalesce(ItemClick.user_id, ItemClick.ip_address)
         ))
-    ).join(ItemStoreLink).filter(
-        ItemStoreLink.variant_id == item_id,
+    ).join(ItemStoreLink)\
+    .join(ItemVariant)\
+    .filter(
+        ItemVariant.item_id == item_id,
         ItemClick.created_at >= last_24h
     ).scalar() or 0
 
@@ -44,8 +46,10 @@ def get_item_analytics(item_id):
         func.count(distinct(
             func.coalesce(ItemClick.user_id, ItemClick.ip_address)
         ))
-    ).join(ItemStoreLink).filter(
-        ItemStoreLink.variant_id == item_id
+    ).join(ItemStoreLink)\
+    .join(ItemVariant)\
+    .filter(
+        ItemVariant.item_id == item_id
     ).scalar() or 0
 
     # ---- CTR ----

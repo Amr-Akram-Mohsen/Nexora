@@ -81,7 +81,7 @@ def handle_interaction_interest(user, target, action):
         return
 
     target_type = (
-        TargetType.PRODUCT if isinstance(target, Item)
+        TargetType.ITEM if isinstance(target, Item)
         else TargetType.ARTICLE
     )
 
@@ -117,7 +117,7 @@ def handle_comment_interaction(user, target, comment_sentiment):
         return
 
     # sentiment influence (NO interaction increment)
-    target_type = TargetType.PRODUCT if isinstance(target, Item) else TargetType.ARTICLE
+    target_type = TargetType.ITEM if isinstance(target, Item) else TargetType.ARTICLE
 
     for entity in extract_entities_from_target(target):
         update_user_interest(
