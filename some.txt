@@ -2,3 +2,7 @@ PyAutoGUI|PyGetWindow|PyScreeze|MouseInfo|PyRect|PyMsgBox|pytweening
 
 
 black|pylint|ipython|ipykernel|jupyter_client|jupyter_core|debugpy|asttokens|stack-data|pure_eval
+
+
+
+spacy|blis|cymem|preshed|thinc|srsly|catalogue|confection|weasel|langcodes|language_data
