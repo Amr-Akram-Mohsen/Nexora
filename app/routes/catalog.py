@@ -3,7 +3,7 @@ from flask import request, render_template, jsonify
 from flask_login import current_user
 from sqlalchemy import func
 
-from app.models import db, Article, Section, Category, Topic, Brand, Item, ItemVariant, ItemStoreLink
+from app.models import db, Article, Section, Category, Topic, Brand, Item, ItemVariant, ItemStoreLink, Store
 from app.services.item_service import get_search_items
 from app.services.article_service import get_search_articles, get_active_brands_for_section, get_active_topics_for_section, get_related_articles, get_trending_articles
 from app.services.interaction_service import record_view
@@ -149,6 +149,78 @@ def article_page(article_id):
         related_articles=related_articles,
         trending_articles=trending_articles
     )
+
+@bp.route("/deals")
+def deals():
+    # 1. Base Query with Eager Loading
+    query = Item.query.options(
+        db.joinedload(Item.brand),
+        db.joinedload(Item.category),
+        db.selectinload(Item.images),
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
+    )
+
+    # 2. Extract Filters from URL
+    active_filters = {
+        'category': request.args.getlist('category'),
+        'brand': request.args.getlist('brand'),
+        'store': request.args.getlist('store'),
+        'type': request.args.getlist('type'),
+        'min_price': request.args.get('min_price'),
+        'max_price': request.args.get('max_price'),
+        'sort': request.args.get('sort', 'newest')
+    }
+
+    # 3. Apply Filters
+    if active_filters['category']:
+        query = query.join(Item.category).filter(Category.slug.in_(active_filters['category']))
+    if active_filters['brand']:
+        query = query.join(Item.brand).filter(Brand.slug.in_(active_filters['brand']))
+    if active_filters['type']:
+        query = query.filter(Item.item_type.in_(active_filters['type']))
+    
+    # Store filtering requires a join through variants and store_links
+    if active_filters['store']:
+        query = query.join(Item.variants).join(ItemVariant.store_links).join(ItemStoreLink.store).filter(Store.slug.in_(active_filters['store']))
+
+    # Price filtering
+    if active_filters['min_price'] or active_filters['max_price']:
+        query = query.join(Item.variants)
+        if active_filters['min_price']:
+            query = query.filter(ItemVariant.price >= float(active_filters['min_price']))
+        if active_filters['max_price']:
+            query = query.filter(ItemVariant.price <= float(active_filters['max_price']))
+
+    # 4. Sorting
+    if active_filters['sort'] == 'price_low':
+        query = query.join(Item.variants).filter(ItemVariant.is_default == True).order_by(ItemVariant.price.asc())
+    elif active_filters['sort'] == 'price_high':
+        query = query.join(Item.variants).filter(ItemVariant.is_default == True).order_by(ItemVariant.price.desc())
+    elif active_filters['sort'] == 'popular':
+        query = query.order_by(Item.view_count.desc())
+    else: # newest
+        query = query.order_by(Item.created_at.desc())
+
+    # 5. Fetch Filter Options for Sidebar
+    # We want only active categories/brands that have items
+    categories = Category.query.join(Item).distinct().all()
+    brands = Brand.query.join(Item).distinct().all()
+    stores = Store.query.join(ItemStoreLink).join(ItemVariant).join(Item).distinct().all()
+    types = db.session.query(Item.item_type).distinct().all()
+    types = [t[0] for t in types if t[0]]
+
+    items = query.distinct().limit(40).all()
+
+    return render_template(
+        "deals-page.html",
+        items=items,
+        categories=categories,
+        brands=brands,
+        stores=stores,
+        types=types,
+        active_filters=active_filters
+    )
+
 
 @bp.route("/items/<int:item_id>")
 def item_page(item_id):

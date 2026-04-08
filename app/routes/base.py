@@ -24,27 +24,48 @@ def set_country():
 
 @bp.route('/')
 def home():
+    from app.models import ItemVariant
+
     hero_articles = get_articles(filter_values=('trends',), rows_count=3)
-    latest_reviews = get_articles(filter_values=('reviews',), rows_count=3)
-    tech_news = get_articles(filter_values=('news',), rows_count=3)
-    tutorials = get_articles(filter_values=('tutorials',), rows_count=3)
-    # --- DB-backed items ---
+    latest_reviews = get_articles(filter_values=('reviews',), rows_count=6)
+    tech_news = get_articles(filter_values=('news',), rows_count=6)
+    tutorials = get_articles(filter_values=('tutorials',), rows_count=6)
+    
+    # Base item query
     p_query = Item.query.options(
         db.joinedload(Item.brand),
         db.joinedload(Item.category),
-        db.joinedload(Item.images)
+        db.selectinload(Item.images),
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links)
     )
 
-    # random_items = filter_items_by_country(p_query).limit(10).all()
-    random_items = p_query.order_by(Item.id.asc()).limit(10).all()
+    # Top deals: items with a discount Note: you can also order by (ItemVariant.old_price - ItemVariant.price).desc() but simple filter works for now
+    top_deals = p_query.join(Item.variants).filter(ItemVariant.old_price > ItemVariant.price).limit(10).all()
+    if not top_deals:
+        top_deals = p_query.order_by(Item.id.desc()).limit(10).all()
+        
+    recently_added = p_query.order_by(Item.created_at.desc()).limit(10).all()
     
+    # Generic Items for interleaving
+    interleave_items = p_query.order_by(db.func.random()).limit(10).all()
+    interleave_pool = list(interleave_items)
+    
+    def interleave(articles, items_pool):
+        result = []
+        for i, article in enumerate(articles):
+            result.append(article)
+            if (i + 1) % 3 == 0 and items_pool:
+                result.append(items_pool.pop(0))
+        return result
+
     return render_template(
         "index.html",
         hero_sliders=hero_articles,
-        latest_reviews=latest_reviews,
-        tech_news=tech_news,
-        tutorials=tutorials,
-        items=random_items
+        latest_reviews=interleave(latest_reviews, interleave_pool),
+        tech_news=interleave(tech_news, interleave_pool),
+        tutorials=interleave(tutorials, interleave_pool),
+        top_deals=top_deals,
+        recently_added=recently_added
     )
 
 

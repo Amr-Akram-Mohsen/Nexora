@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Deals & Products | Nexora{% endblock %}
+
+{% block content %}
+{% from "components/grid.html" import grid %}
+{% from "components/ui/button.html" import button %}
+
+<div class="deals-page">
+  <div class="container flex flex-col md-flex-row">
+    
+    <!-- Sidebar Filters (Amazon Style) -->
+    <aside class="deals-sidebar">
+      {% include "components/deals-sidebar.html" %}
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="deals-content flex-grow">
+      
+      <!-- Top Bar: Sort & Summary -->
+      <div class="deals-top-bar flex items-center justify-between">
+        <div class="deals-summary">
+          <h1 class="deals-title">Tech Deals & Products</h1>
+          <p class="deals-count">{{ items|length }} products found</p>
+        </div>
+        
+        <div class="deals-sort flex items-center">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select" class="sort-select" onchange="window.location.href=this.value">
+            <option value="{{ url_for('main.deals', **dict(request.args, sort='newest')) }}" {{ 'selected' if active_filters.sort == 'newest' }}>Newest Arrivals</option>
+            <option value="{{ url_for('main.deals', **dict(request.args, sort='price_low')) }}" {{ 'selected' if active_filters.sort == 'price_low' }}>Price: Low to High</option>
+            <option value="{{ url_for('main.deals', **dict(request.args, sort='price_high')) }}" {{ 'selected' if active_filters.sort == 'price_high' }}>Price: High to Low</option>
+            <option value="{{ url_for('main.deals', **dict(request.args, sort='popular')) }}" {{ 'selected' if active_filters.sort == 'popular' }}>Most Popular</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Active Filter Chips -->
+      {% if active_filters.category or active_filters.brand or active_filters.store or active_filters.type %}
+      <div class="active-deals-filters flex flex-wrap items-center">
+        <span class="active-label">Active filters:</span>
+        {% set args = request.args.to_dict(flat=False) %}
+        {% for key in ['category', 'brand', 'store', 'type'] %}
+          {% for val in active_filters[key] %}
+            <div class="filter-tag flex items-center">
+              <span>{{ val | replace('-', ' ') | title }}</span>
+              <a href="{{ url_for('main.deals', **dict(request.args, **{key: [v for v in args[key] if v != val]} if args[key]|length > 1 else {key: none})) }}" class="remove-tag">&times;</a>
+            </div>
+          {% endfor %}
+        {% endfor %}
+        <a href="{{ url_for('main.deals') }}" class="clear-all-deals">Clear All</a>
+      </div>
+      {% endif %}
+
+      <!-- Product Grid -->
+      {% if items %}
+        {{ grid(items) }}
+      {% else %}
+        <div class="no-results flex flex-col items-center justify-center">
+          <i class="fas fa-search-minus icon-empty"></i>
+          <h3>No products found</h3>
+          <p>Try adjusting your search or filters to find what you're looking for.</p>
+          <a href="{{ url_for('main.deals') }}">
+            {{ button(text="Reset All Filters", variant="outline") }}
+          </a>
+        </div>
+      {% endif %}
+    </main>
+  </div>
+</div>
+
+{% endblock %}

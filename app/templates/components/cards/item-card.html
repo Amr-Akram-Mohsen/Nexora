@@ -39,16 +39,32 @@
       <span class="item-reviews-count">({{ item.review_count }}) reviews</span>
     </div>
 
-    <div class="item-actions flex items-center justify-between">
-      <div class="item-price-range">
-        {{ item.store_links[0].price if item.store_links else '' }}
+    <div class="item-actions flex flex-col">
+      {% set best_link = item.store_links[0] if item.store_links else None %}
+      
+      <div class="item-price-box flex items-center">
+        {% if best_link %}
+          <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
+          {% if best_link.old_price %}
+            <span class="item-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
+          {% endif %}
+        {% else %}
+          <span class="item-price-unavailable">Check current price</span>
+        {% endif %}
       </div>
-      <a href="{{ url_for('main.item_page', item_id=item.id) }}" class="item__view-link">
-        {{ button(
-        text="View", class="item__view-btn",
-        icon="fa-solid fa-cart-shopping"
-        ) }}
-      </a>
+      
+      <div class="item-store-box flex items-center justify-between">
+        <div class="item-store-badge flex items-center">
+          {% if best_link and best_link.store.logo_url %}
+            <img src="{{ best_link.store.logo_url }}" alt="{{ best_link.store.name }}">
+          {% endif %}
+          <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span>
+        </div>
+        
+        <a href="{{ url_for('main.item_page', item_id=item.id) }}" class="item__view-link">
+          {{ button(text="View Deal", class="item__view-btn") }}
+        </a>
+      </div>
     </div>
   </div>
 </article>

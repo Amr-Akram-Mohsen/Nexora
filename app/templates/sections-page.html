@@ -4,24 +4,36 @@
 {% endblock %}
 
 {% block content %}
-{% from"components/listing-page.html" import listing_page %}
-{% from"components/grid.html" import grid %}
-{% call(slot) listing_page("sections-page") %}
-{% if slot == 'title' %}
-<h1 class="page__title">{{ section.name|title }}</h1>
-{% endif %}
-{% if articles %}
-  {% if slot == 'found_content' %}
-    {% include"components/section-filters.html" %}
-    {{ grid(articles) }}
-  {% endif %}
-{% else %}
-  {% if slot == 'empty_content' %}
-    <div class="listing-page__empty">
-      <p>No articles found matching your filters.</p>
-    </div>
-  {% endif %}
-{% endif %}
+{% from "components/grid.html" import grid %}
 
-{% endcall %}
+<div class="deals-page section-page">
+  <div class="container flex flex-col md-flex-row">
+    
+    <!-- Sidebar Filters -->
+    <aside class="deals-sidebar">
+      {% include "components/section-filters.html" %}
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="deals-content flex-grow">
+      
+      <div class="deals-top-bar">
+        <h1 class="deals-title">{{ section.name|title }}</h1>
+        {% if articles %}
+        <p class="deals-count">{{ articles|length }} articles found</p>
+        {% endif %}
+      </div>
+
+      {% if articles %}
+        {{ grid(articles) }}
+      {% else %}
+        <div class="no-results flex flex-col items-center justify-center">
+          <i class="far fa-frown icon-empty"></i>
+          <h3>No articles found</h3>
+          <p>Try adjusting your filters to explore other content.</p>
+        </div>
+      {% endif %}
+    </main>
+  </div>
+</div>
 {% endblock %}

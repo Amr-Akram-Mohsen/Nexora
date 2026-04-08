@@ -38,7 +38,7 @@
             </div>
             <span class="meta-date inline-flex items-center">
                 <i class="far fa-calendar"></i>
-                {{ article.published_at.strftime('%b %d, %Y') }}
+                {{ article.published_at.strftime('%b %d, %Y') if article.published_at else 'Recent' }}
             </span>
         </div>
     </div>
