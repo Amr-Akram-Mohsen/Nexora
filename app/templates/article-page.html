@@ -4,6 +4,7 @@
 {% from"components/shared/image-utils.html" import render_image_url %}
 {% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
+{% from"components/features/inline-product-card.html" import inline_product_card %}
 {% block content %}
 {% macro header_block() %}
 <div class="detail-page__header-content flex flex-col">
@@ -48,6 +49,10 @@
 {% macro content_block() %}
 <!-- article body goes here -->
 <div class="article-content">
+  {% if article.linked_items %}
+  {% include "partials/affiliate-disclosure.html" %}
+  {% endif %}
+
   {% if article.content %}
     <div class="article-full-text">
         {{ article.content | safe }}
@@ -55,9 +60,18 @@
   {% else %}
     <p class="article-description">{{ article.description | safe }}</p>
   {% endif %}
+
+  {% if article.linked_items %}
+  <div class="article-linked-products">
+    <h3 class="article-linked-products__title">Products Mentioned In This Article</h3>
+    {% for item in article.linked_items %}
+      {{ inline_product_card(item) }}
+    {% endfor %}
+  </div>
+  {% endif %}
   
-  <div class="article-source-box flex flex-col items-start gap-4">
-    <p class="source-metadata text-muted">Original source: <strong>{{ article.source_name }}</strong></p>
+  <div class="article-source-box flex flex-col">
+    <p class="source-metadata">Original source: <strong>{{ article.source_name }}</strong></p>
     <a href="{{ article.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
       {{ button(text="Read Full Article On " ~ article.source_name, class="article__view-btn") }}
     </a>

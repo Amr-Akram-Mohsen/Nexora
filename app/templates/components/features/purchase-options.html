@@ -3,6 +3,9 @@
     <span class="item-buy-links__bar"></span>
     Where to Buy
   </h3>
+  <div class="item-buy-links__disclosure flex items-center">
+    <i class="fas fa-link mr-1"></i> <span class="disclosure-text">Affiliate links · We may earn a commission</span>
+  </div>
   <div class="item-buy-links__items flex flex-col">
     {% for link in store_links %}
     <a href="{{ link.affiliate_url }}" target="_blank" rel="noopener noreferrer"

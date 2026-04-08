@@ -123,7 +123,14 @@ def view_full_specs(item_id):
 
 @bp.route("/articles/<int:article_id>")
 def article_page(article_id):
-    article = Article.query.get_or_404(article_id)
+    article = Article.query.options(
+        db.selectinload(Article.linked_items)
+            .selectinload(Item.variants)
+            .selectinload(ItemVariant.store_links)
+            .selectinload(ItemStoreLink.store),
+        db.selectinload(Article.linked_items)
+            .selectinload(Item.images)
+    ).get_or_404(article_id)
     user = current_user if current_user.is_authenticated else None
     ip = None if user else get_client_ip()
     record_view(

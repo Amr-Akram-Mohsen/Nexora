@@ -31,6 +31,10 @@
 {% macro content_block() %}
 <!-- optional: description, highlights, etc. -->
 <div class="item-content">
+  {% if item.store_links %}
+  {% include "partials/affiliate-disclosure.html" %}
+  {% endif %}
+
   {{ item.description or '' }}
 
   {% if item.item_type == 'electronics' %}
