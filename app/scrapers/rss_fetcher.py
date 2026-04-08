@@ -22,6 +22,7 @@ RSS_FEEDS = {
             "https://www.notebookcheck.net/News.8.0.html?feed=rss",
             "https://www.techradar.com/rss",
             "https://www.slashgear.com/feed/",
+            "https://arstechnica.com/gadgets/feed/",
         ],
         "perfumes": [
             "https://www.fragrantica.com/news/feed/",
@@ -38,6 +39,8 @@ RSS_FEEDS = {
             "https://feeds.feedburner.com/TechCrunch/",
             "https://9to5google.com/feed/",
             "https://9to5mac.com/feed/",
+            "https://www.engadget.com/rss.xml",
+            "https://www.wired.com/feed/rss",
         ],
         "perfumes": [
             "https://perfumerflavorist.com/feed/",
@@ -50,7 +53,8 @@ RSS_FEEDS = {
     "tutorials": {
         "electronics": [
             "https://www.howtogeek.com/feed/",
-            "https://realpython.com/atom.xml",
+            "https://www.digitaltrends.com/feed/",
+            "https://www.androidauthority.com/feed/",
         ],
         "accessories": [
             "https://www.apetogentleman.com/feed/",
@@ -87,9 +91,20 @@ def _parse_entry(entry, section_slug: str, category_slug: str, source_name: str)
 
     description = getattr(entry, "summary", "") or getattr(entry, "description", "") or ""
 
+    # NEW: Extract content
+    content = ""
+    if hasattr(entry, "content") and isinstance(entry.content, list):
+        for c in entry.content:
+            if c.get("value"):
+                content += c["value"]
+    
+    if not content and len(description) > 500:
+        content = description
+
     return {
         "title": title,
         "description": description,
+        "content": content,
         "url": url,
         "image_url": image_url,
         "published_at": published_at,

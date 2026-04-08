@@ -1,6 +1,7 @@
 {% from"components/shared/image-utils.html" import render_image_url %}
 {% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
+{% from "components/features/rating.html" import render_stars %}
 <article class="card card--item" data-type="item" data-id="{{ item.id }}">
   <a href="{{ url_for('main.item_page', item_id=item.id) }}">
     <div class="card__img-wrapper">
@@ -32,10 +33,10 @@
 
     <div class="card__meta-bottom flex items-center">
       <div class="card__meta-item card__rating flex items-center">
-        <i class="fas fa-star"></i>
-        <span class="item-rating">4.7</span>
+        {{ render_stars(item.rating) }}
+        <span class="item-rating">({{ item.rating }})</span>
       </div>
-      <span class="item-reviews-count">982 reviews</span>
+      <span class="item-reviews-count">({{ item.review_count }}) reviews</span>
     </div>
 
     <div class="item-actions flex items-center justify-between">

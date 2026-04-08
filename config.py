@@ -53,9 +53,9 @@ class Config:
 
 # ================================================
 SOCIAL_LINKS = [
-  ("facebook", "https://facebook.com/newtechme"),
-  ("youtube", "https://youtube.com/newtechme"),
-  ("twitter", "https://twitter.com/newtechme"),
-  ("instagram", "https://instagram.com/newtechme"),
-  ("quora", "https://quora.com/newtechme")
+  ("facebook", "https://facebook.com/Nexora"),
+  ("youtube", "https://youtube.com/Nexora"),
+  ("twitter", "https://twitter.com/Nexora"),
+  ("instagram", "https://instagram.com/Nexora"),
+  ("quora", "https://quora.com/Nexora")
 ]

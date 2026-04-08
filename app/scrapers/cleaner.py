@@ -123,10 +123,15 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
     )
     source_name = sanitize_text(source_raw)
 
+    # ── Content ──────────────────────────────────────────────────
+    content = raw.get("content") or ""
+    # We leave HTML intact so it can be rendered by the template, but we could add BS4 later if we want to remove scripts.
+
     return {
         # ── Core fields ──────────────────────────────────────────
         "title":         title,
         "description":   description,
+        "content":       content,
         "url":           url,
         "image_url":     image_url,
         "published_at":  published_at,

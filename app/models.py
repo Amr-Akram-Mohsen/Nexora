@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
 db = SQLAlchemy()
 import secrets
 from functools import cached_property
@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False)
     google_id = db.Column(db.String(120), unique=True, nullable=True)
     provider = db.Column(db.String(50), nullable=True)  # 'google' or 'local'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     
     
@@ -61,7 +61,7 @@ class NewsletterSubscriber(db.Model):
         nullable=True
     )
     is_confirmed = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     unsubscribed_at = db.Column(db.DateTime, nullable=True)
     confirmation_token = db.Column(db.String(255), nullable=True)
     unsubscribe_token = db.Column(db.String(255), nullable=True)    
@@ -218,13 +218,17 @@ class Article(db.Model):
     source_id = db.Column(db.String(120))
     source_name = db.Column(db.String(200))
     published_at = db.Column(db.DateTime)
-    retrieved_at = db.Column(db.DateTime, default=datetime.utcnow)
+    retrieved_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     image_url = db.Column(db.Text)
-    image = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
     card_type = db.Column(db.TEXT, default="article")
+
+    @property
+    def read_time_minutes(self):
+        return max(1, len(self.content.split()) // 200)
+    
     # ---------- RELATIONSHIPS ----------
     topics = db.relationship(
         "Topic", secondary=article_topics, back_populates="articles")
@@ -268,6 +272,12 @@ class Article(db.Model):
         db.Index("idx_published_at", "published_at"),
         db.UniqueConstraint('source_name', 'title', name='uq_articles_source_title'),
     )
+    @property
+    def read_time_minutes(self):
+        text = (self.content or self.description or "")
+        words = len(text.split())
+        return max(1, words // 200)
+
     def __repr__(self):
         return f"<Article {self.title[:60]}>"
     # ---------------- Convenience helpers ----------------
@@ -311,6 +321,8 @@ class Item(db.Model):
     name = db.Column(db.String(200), nullable=False)
     slug = db.Column(db.String(220), nullable=False, unique=True)
     description = db.Column(db.Text)  # optional short description
+    rating = db.Column(db.Float)
+    review_count = db.Column(db.Integer)  # optional short description
     
     # 🔥 NEW
     item_type = db.Column(db.String(50), nullable=True)  
@@ -559,6 +571,14 @@ class Item(db.Model):
     __table_args__ = (
         db.Index("ix_items_slug", "slug"),  # optional, speeds up queries
     )    
+    @property
+    def rating(self):
+        return 4.7
+
+    @property
+    def review_count(self):
+        return 982
+
     def __repr__(self):
         return f"<Item {self.name}>"
     
@@ -697,7 +717,7 @@ class Reaction(db.Model):
     target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item'
     target_id = db.Column(db.Integer, nullable=False)       # ID of the target (polymorphic)
     type = db.Column(db.String(20), nullable=False)         # 'like', 'dislike', etc.
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     @property
     def target(self):
         return self.article or self.item or self.comment
@@ -747,7 +767,7 @@ class Comment(db.Model):
     target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item'
     target_id = db.Column(db.Integer, nullable=False)       # ID of the target (polymorphic)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     # Parent comment for replies
     parent_id = db.Column(db.Integer, db.ForeignKey("comments.id", ondelete="CASCADE"), nullable=True)
     sentiment = db.Column(db.String(20), nullable=True)
@@ -808,7 +828,7 @@ class View(db.Model):
     target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item'
     target_id = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(45), nullable=True)  # store IPv4 or IPv6
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     @property
     def target(self):
         return self.article or self.item
@@ -857,7 +877,7 @@ class Save(db.Model):
     )
     target_type = db.Column(db.String(50), nullable=False)  # article | item
     target_id = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     article = db.relationship(
         "Article",
         primaryjoin="and_(foreign(Save.target_id) == Article.id, Save.target_type == 'article')",
@@ -929,7 +949,7 @@ class UserInterest(db.Model):
     target_type = db.Column(db.String(50), nullable=False)  # 'item' or 'article'
     target_id = db.Column(db.Integer, nullable=False)
     interaction_count = db.Column(db.Integer, default=0)
-    last_interaction_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_interaction_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     user = db.relationship("User", back_populates="user_interests")
     entity_scores = db.relationship("UserEntityInterest", back_populates="user_interest", cascade="all, delete-orphan")
     __table_args__ = (
@@ -964,5 +984,5 @@ class ContactMessage(db.Model):
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.String(255))
     created_at = db.Column(
-        db.DateTime, default=datetime.utcnow, index=True
+        db.DateTime, default=lambda: datetime.now(timezone.utc), index=True
     )

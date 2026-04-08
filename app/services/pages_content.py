@@ -77,9 +77,9 @@ PAGES_CONTENT = {
     },
 
     'contact': [
-        {"card_type": "info", "icon": "fas fa-envelope", "title": "Email", "text": "contact@techmag.com"},
-        {"card_type": "info", "icon": "fas fa-phone", "title": "Phone", "text": "+1 (555) 123-4567"},
-        {"card_type": "info", "icon": "fas fa-map-marker-alt", "title": "Office", "text": "123 Tech Street<br>San Francisco, CA 94105<br>United States"}
+        {"card_type": "info", "icon": "fas fa-envelope", "title": "Email", "text": "contact@nexora.com"},
+        {"card_type": "info", "icon": "fas fa-phone", "title": "Phone", "text": "+966 50 123 4567"},
+        {"card_type": "info", "icon": "fas fa-map-marker-alt", "title": "Office", "text": "King Fahd Road<br>Riyadh 12214<br>Saudi Arabia"}
     ],
 
     'about': [

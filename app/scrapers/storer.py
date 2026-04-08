@@ -102,6 +102,7 @@ def store_article(data: dict) -> Article | None:
         article = Article(
             title=title,
             description=data.get("description") or None,
+            content=data.get("content") or None,
             url=url,
             image_url=data.get("image_url") or None,
             published_at=data.get("published_at"),

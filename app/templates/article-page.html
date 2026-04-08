@@ -29,7 +29,7 @@
       <div class="meta-icon-wrapper">
         <i class="far fa-clock"></i>
       </div>
-      <span>5 min</span>
+      <span>{{ article.read_time_minutes }} min</span>
     </div>
     <div class="meta-item meta-calendar flex items-center">
       <div class="meta-icon-wrapper">
@@ -48,12 +48,20 @@
 {% macro content_block() %}
 <!-- article body goes here -->
 <div class="article-content">
-  {{ article.description | safe }}
-  <a href="{{ article.url }}" class="article__view-link" target="_blank">
-    {{ button(text="Read Full Article", class="article__view-btn") }}
-  </a>
-
-
+  {% if article.content %}
+    <div class="article-full-text">
+        {{ article.content | safe }}
+    </div>
+  {% else %}
+    <p class="article-description">{{ article.description | safe }}</p>
+  {% endif %}
+  
+  <div class="article-source-box flex flex-col items-start gap-4">
+    <p class="source-metadata text-muted">Original source: <strong>{{ article.source_name }}</strong></p>
+    <a href="{{ article.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
+      {{ button(text="Read Full Article On " ~ article.source_name, class="article__view-btn") }}
+    </a>
+  </div>
 </div>
 {% endmacro %}
 

@@ -1,0 +1,19 @@
+{% macro render_stars(rating) %}
+{% set full = rating | int %}
+{% set half = (rating - full) >= 0.5 %}
+
+{# Full stars #}
+{% for _ in range(full) %}
+<i class="fas fa-star"></i>
+{% endfor %}
+
+{# Half star #}
+{% if half %}
+<i class="fas fa-star-half-alt"></i>
+{% endif %}
+
+{# Empty stars #}
+{% for _ in range(5 - full - (1 if half else 0)) %}
+<i class="far fa-star"></i>
+{% endfor %}
+{% endmacro %}

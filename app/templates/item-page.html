@@ -2,7 +2,7 @@
 {% from"components/features/media-gallery.html" import media_gallery %}
 {% from"components/render-details.html" import render_details %}
 {% from"components/ui/badge.html" import badge %}
-
+{% from "components/features/rating.html" import render_stars %}
 {% from"components/detail-page.html" import detail_page with context %}
 {% block content %}
 {% macro header_block() %}
@@ -16,10 +16,10 @@
 
   <div class="detail-page__meta flex items-center">
     <div class="meta-item flex items-center">
-      <i class="fas fa-star"></i>
+      {{ render_stars(item.rating) }}
     </div>
-    <span class="item-rating">4.7</span>
-    <span class="item-reviews-count">982 reviews</span>
+    <span class="item-rating">({{ item.rating }})</span>
+    <span class="item-reviews-count">({{ item.review_count }}) reviews</span>
   </div>
 </div>
 {% endmacro %}

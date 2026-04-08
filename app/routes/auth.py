@@ -42,7 +42,6 @@ def google_authorize():
     email = user_info.get('email')
     
     # Check if user exists
-    import secrets
     user = User.query.filter_by(email=email).first()
     
     if user:

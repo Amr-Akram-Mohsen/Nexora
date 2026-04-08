@@ -115,7 +115,7 @@ def view_full_specs(item_id):
     item = Item.query.get_or_404(item_id)
     html = render_template(
         "components/features/full-specs.html",
-        full_specs=item.full_specs
+        full_specs=item.full_details
     )
     return jsonify({
         "html": html
