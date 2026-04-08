@@ -11,4 +11,4 @@ def inject_global_context():
     return get_global_context()
 
 # 3. Import all the split files (must be at the bottom to avoid circular imports)
-from . import auth, base, catalog, interactions, temp_fetch
+from . import auth, base, catalog, interactions

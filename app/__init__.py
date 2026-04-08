@@ -99,11 +99,6 @@ def create_app():
 
     # ── Start background scheduler ───────────────────────────────
     from .jobs.scheduler import init_scheduler
-    # init_scheduler(app)
-
-    import os
-    if os.environ.get("RENDER") != "true":
-        init_scheduler(app)
-    
+    init_scheduler(app)
 
     return app

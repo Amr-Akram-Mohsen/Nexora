@@ -40,7 +40,7 @@ def search():
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):
     section = Section.query.filter(
-        func.lower(Section.name) == section_slug,
+        Section.slug==section_slug,
         Section.is_active == True
     ).first_or_404()
 
@@ -54,10 +54,11 @@ def sections(section_slug):
     query = (
         Article.query
         .join(Article.sections)
-        .join(Article.category)
-        .filter(Section.id == section.id,
-        Category.slug == category)
+        .filter(Section.id == section.id)
     )
+    
+    if category:
+        query = query.join(Article.category).filter(Category.slug == category)
     
     if topics and "topic" in allowed_filters:
         query = query.join(Article.topics).filter(Topic.slug.in_(topics))
@@ -75,6 +76,9 @@ def sections(section_slug):
     filter_options = {}
     active_filters = {}
 
+    if "category" in allowed_filters and category:
+        # filter_options["category"] = get_active_categories_for_section(section_slug)
+        active_filters['category'] = [category]
     if "brand" in allowed_filters:
         filter_options["brand"] = get_active_brands_for_section(section_slug)
         active_filters['brand'] = brands
