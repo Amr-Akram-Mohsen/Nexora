@@ -133,3 +133,61 @@ def run_amazon_discovery():
     # except Exception:
     #     logger.exception("[Runner] Amazon discovery failed")
     logger.info("[Runner] Skipping Amazon Discovery: Disabled per user request")
+
+
+def run_noon_discovery():
+    """
+    Discover new products from Noon via ArabClicks affiliate network.
+    Skipped gracefully if ARABCLICKS_PUBLISHER_ID is not configured.
+    """
+    if not current_app.config.get("ARABCLICKS_PUBLISHER_ID"):
+        logger.info("[Runner] Skipping Noon Discovery: ARABCLICKS_PUBLISHER_ID not set")
+        return
+
+    try:
+        from .noon_arabclicks import discover_noon_products, seed_arabclicks_stores
+        from .item_storer import store_amazon_item  # reuse same storage logic
+
+        # Ensure store rows exist in DB
+        new_stores = seed_arabclicks_stores()
+        if new_stores:
+            logger.info("[Runner] Seeded %d new ArabClicks stores", new_stores)
+
+        # Discovery searches — balanced across SA/AE and categories
+        NOON_SEARCHES = [
+            ("Samsung Galaxy", "noon-sa"),
+            ("iPhone 16",      "noon-sa"),
+            ("Dior Sauvage",   "noon-sa"),
+            ("Nike shoes men", "noon-ae"),
+            ("Sony headphones","noon-ae"),
+        ]
+
+        total_stored = 0
+        for keywords, store_slug in NOON_SEARCHES:
+            products = discover_noon_products(keywords, store_slug, max_results=10)
+            for raw in products:
+                item = store_amazon_item(raw)  # same format, compatible storer
+                if item:
+                    total_stored += 1
+
+        logger.info("[Runner] Noon Discovery done — %d new items stored", total_stored)
+    except Exception:
+        logger.exception("[Runner] Noon Discovery failed")
+
+
+def run_arabclicks_price_refresh():
+    """
+    Refresh prices for all ArabClicks store links.
+    Skipped gracefully if ARABCLICKS_PUBLISHER_ID is not configured.
+    """
+    if not current_app.config.get("ARABCLICKS_PUBLISHER_ID"):
+        logger.info("[Runner] Skipping ArabClicks Price Refresh: Publisher ID not set")
+        return
+
+    try:
+        from .noon_arabclicks import refresh_noon_prices
+        updated = refresh_noon_prices()
+        logger.info("[Runner] ArabClicks price refresh done — %d links updated", updated)
+    except Exception:
+        logger.exception("[Runner] ArabClicks price refresh failed")
+

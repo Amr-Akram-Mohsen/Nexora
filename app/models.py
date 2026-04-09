@@ -225,11 +225,7 @@ class Article(db.Model):
     view_count = db.Column(db.Integer, default=0)
     card_type = db.Column(db.TEXT, default="article")
 
-    @property
-    def read_time_minutes(self):
-        return max(1, len(self.content.split()) // 200)
-    
-    # ---------- RELATIONSHIPS ----------
+
     topics = db.relationship(
         "Topic", secondary=article_topics, back_populates="articles")
     sections = db.relationship(

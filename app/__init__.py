@@ -76,25 +76,28 @@ def create_app():
         count = match_articles_to_items()
         print(f"Matcher complete! Created {count} new links.")
 
+    @app.cli.command("seed-noon-stores")
+    def seed_noon_stores_command():
+        """Seed Noon/Namshi store records for ArabClicks affiliate network."""
+        from .scrapers.noon_arabclicks import seed_arabclicks_stores
+        created = seed_arabclicks_stores()
+        print(f"Done! {created} new ArabClicks stores seeded.")
+
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs active fetchers in one go."""
-        from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery
+        from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery, run_noon_discovery
         from .utils.matcher import match_articles_to_items
-        print("--- [1/3] Fetching Articles (RSS/NewsAPI/GNews) ---")
+        print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews) ---")
         run_article_fetch()
-        
-        # Reddit and Amazon are currently disabled in runner.py per user request,
-        # but we call them here - they will log that they are skipping.
-        print("--- [2/3] Fetching Reddit Communities ---")
+        print("--- [2/4] Fetching Reddit Communities ---")
         run_reddit_fetch()
-        print("--- [3/3] Discovering Amazon Products ---")
+        print("--- [3/4] Discovering Amazon Products ---")
         run_amazon_discovery()
-        
-        # Link newly fetched items to existing articles
+        print("--- [4/4] Discovering Noon Products (ArabClicks) ---")
+        run_noon_discovery()
         print("--- [Matcher] Linking Articles to Items ---")
         match_articles_to_items()
-        
         print("Done! All active ingestion jobs complete.")
 
     # ── Start background scheduler ───────────────────────────────
