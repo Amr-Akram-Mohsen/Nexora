@@ -393,6 +393,9 @@ class Item(db.Model):
     @property
     def price(self):
         return self.default_variant.price if self.default_variant else None
+    @property
+    def min_price(self):
+        return min(v.price for v in self.variants) if self.variants else None
     
     @property
     def has_variants(self):

@@ -11,7 +11,8 @@
 
 {% block og_type %}product{% endblock %}
 
-{% block og_image %}{{ item.images[0].url if item.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}
+{% block og_image %}{{ item.images[0].url if item.images else url_for('static', filename='img/og-preview.jpg',
+_external=True) }}{% endblock %}
 
 {% block structured_data %}
 <script type="application/ld+json">
@@ -32,7 +33,7 @@
   "offers": {
     "@type": "Offer",
     "priceCurrency": "SAR",
-    "price": "{{ item.get_min_price() }}",
+    "price": "{{ item.min_price }}",
     "availability": "https://schema.org/InStock",
     "url": "{{ request.url }}"
   }
