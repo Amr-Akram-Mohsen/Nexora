@@ -607,6 +607,7 @@ body.dark-mode .variant--destructive {
 .card {
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  box-shadow: var(--shadow-lg);
 }
 
 .card:hover {
@@ -3278,64 +3279,184 @@ body.dark-mode .newsletter-block {
   border-radius: var(--radius-full);
 }
 
-.grid-carousel > .card {
+.grid-carousel>.card {
   min-width: 280px;
   max-width: 320px;
   flex-shrink: 0;
   scroll-snap-align: start;
 }
+
 .section+.section {
   margin-top: 4rem;
 }
 
-/* Deals Page Layout (Amazon Style) */
+/* ===================================================
+   Deals Page & Section Pages — Sidebar Layout
+   =================================================== */
+
 .deals-page {
   padding-top: 2rem;
   padding-bottom: 4rem;
 }
 
+/* The flex container: sidebar + content side-by-side */
 .deals-page .container {
-  display: flex;
-  gap: 2.5rem;
   align-items: flex-start;
+  gap: 2.5rem;
+  flex-direction: row;
 }
 
+/* Sidebar */
 .deals-sidebar {
   width: 260px;
   flex-shrink: 0;
   position: sticky;
   top: 100px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
+/* Main content grows to fill remaining width */
 .deals-content {
   flex-grow: 1;
+  min-width: 0; /* prevent grid blowout */
 }
 
-/* Sidebar Sections */
+/* ---- Top bar: title left, sort right ---- */
+.deals-top-bar {
+  margin-bottom: 1.5rem;
+  justify-content: space-between;
+}
+
+.deals-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  margin: 0 0 0.25rem;
+}
+
+.deals-count {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+/* Sort select */
+.deals-sort {
+  gap: 0.75rem;
+}
+
+.deals-sort label {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.sort-select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+/* ---- Active filter chips bar ---- */
+.active-deals-filters {
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--secondary);
+  border-radius: var(--radius-md);
+}
+
+.active-label {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  margin-right: 0.25rem;
+  white-space: nowrap;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--primary);
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.remove-tag {
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.remove-tag:hover {
+  opacity: 1;
+}
+
+.clear-all-deals {
+  font-size: var(--text-sm);
+  color: var(--primary);
+  margin-left: auto;
+}
+
+/* ---- Sidebar filter sections ---- */
+.filter-sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
 .filter-section {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid var(--border);
 }
 
 .filter-section:last-child {
   border-bottom: none;
+  margin-bottom: 0;
 }
 
 .filter-section__title {
   font-weight: var(--weight-bold);
-  font-size: var(--text-base);
-  margin-bottom: 1rem;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.75rem;
   color: var(--foreground);
 }
 
+/* ---- Active filter section header ---- */
+.filter-section-header {
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.filter-section-header .filter-section__title {
+  margin-bottom: 0;
+}
+
+.filters-clear-link {
+  font-size: var(--text-xs);
+  color: var(--primary);
+}
+
+/* ---- Filter list ---- */
 .filter-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .filter-item {
@@ -3343,10 +3464,12 @@ body.dark-mode .newsletter-block {
 }
 
 .filter-item a {
-  color: var(--muted-foreground);
   display: flex;
   align-items: center;
-  transition: color 0.2s;
+  gap: 0.6rem;
+  color: var(--muted-foreground);
+  padding: 0.2rem 0;
+  transition: color 0.15s;
 }
 
 .filter-item a:hover,
@@ -3354,16 +3477,17 @@ body.dark-mode .newsletter-block {
   color: var(--primary);
 }
 
-/* Custom Checkbox Look */
+/* ---- Custom checkbox ---- */
 .checkbox-box {
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--border);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border);
   border-radius: 3px;
-  margin-right: 0.75rem;
-  display: inline-block;
-  position: relative;
-  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .checkbox-box.checked {
@@ -3375,82 +3499,109 @@ body.dark-mode .newsletter-block {
   content: '\f00c';
   font-family: 'Font Awesome 6 Free';
   font-weight: 900;
-  font-size: 10px;
-  color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  font-size: 9px;
+  color: #fff;
 }
 
-/* Price Range Form */
+/* Icon inside filter links */
+.filter-item a i {
+  width: 14px;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.filter-item.is-active a i {
+  color: var(--primary);
+}
+
+/* ---- Price range form ---- */
+.price-range-form {
+  gap: 0.75rem;
+}
+
 .price-inputs {
   gap: 0.5rem;
 }
 
-.sort-select {
-  padding: 0.5rem 1rem;
+.price-inputs span {
+  color: var(--muted-foreground);
+  padding: 0 0.25rem;
+}
+
+.input-sm {
+  width: 70px;
+  padding: 0.35rem 0.5rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card);
+  border-radius: var(--radius-sm);
+  background: var(--input);
   color: var(--foreground);
   font-size: var(--text-sm);
 }
 
-/* Active Filter Tags */
-.active-deals-filters {
-  margin-bottom: 2rem;
-  gap: 0.75rem;
+.price-range-form .btn--sm {
+  align-self: flex-start;
+}
+
+/* ---- Sidebar promo block ---- */
+.sidebar-promo {
   padding: 1rem;
   background: var(--secondary);
   border-radius: var(--radius-md);
+  margin-top: 0.5rem;
 }
 
-.active-label {
-  font-weight: var(--weight-semibold);
+.sidebar-promo h4 {
   font-size: var(--text-sm);
-}
-
-.filter-tag {
-  background: var(--primary);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-}
-
-.remove-tag {
-  color: white;
-  margin-left: 0.5rem;
-  font-weight: bold;
-}
-
-.deals-top-bar {
-  margin-bottom: 2rem;
-}
-
-.deals-title {
-  font-size: var(--text-2xl);
   font-weight: var(--weight-bold);
-  margin: 0;
+  margin: 0 0 0.35rem;
 }
 
-.deals-count {
+.sidebar-promo p {
+  font-size: var(--text-xs);
   color: var(--muted-foreground);
-  font-size: var(--text-sm);
+  margin: 0 0 0.75rem;
 }
 
-/* Responsive Sidebar */
-@media (max-width: 768px) {
+/* ---- No results state ---- */
+.no-results {
+  padding: 4rem 2rem;
+  gap: 0.75rem;
+  text-align: center;
+  justify-content: center;
+}
+
+.icon-empty {
+  font-size: 3rem;
+  color: var(--muted-foreground);
+  opacity: 0.4;
+}
+
+/* ---- Article grid inside deals/section layouts ---- */
+/* Ensures the card grid doesn't overflow the content area */
+.deals-content .article-grid,
+.deals-content .grid {
+  width: 100%;
+}
+
+/* ---- Responsive: stack sidebar above content on small screens ---- */
+@media (max-width: 900px) {
   .deals-page .container {
     flex-direction: column;
   }
+
   .deals-sidebar {
     width: 100%;
     position: static;
-    margin-bottom: 2rem;
+    max-height: none;
+  }
+
+  .deals-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 }
+
 
 /* End ChatGPT Styles */
 /* === START UI FEEDBACK / UTILITIES === */

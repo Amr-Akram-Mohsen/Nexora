@@ -22,21 +22,21 @@
       {% if 'electronics' in types %}
       <li class="filter-item {{ 'is-active' if 'electronics' in active_filters.type }}">
         <a href="{{ url_for('main.deals', **dict(request.args, type='electronics' if 'electronics' not in active_filters.type else None)) }}">
-          <i class="fas fa-microchip mr-2"></i> High-End Electronics
+          <i class="fas fa-microchip"></i> High-End Electronics
         </a>
       </li>
       {% endif %}
       {% if 'perfumes' in types %}
       <li class="filter-item {{ 'is-active' if 'perfumes' in active_filters.type }}">
         <a href="{{ url_for('main.deals', **dict(request.args, type='perfumes' if 'perfumes' not in active_filters.type else None)) }}">
-          <i class="fas fa-bottle-droplet mr-2"></i> Premium Fragrances
+          <i class="fas fa-bottle-droplet"></i> Premium Fragrances
         </a>
       </li>
       {% endif %}
       {% if 'accessories' in types %}
       <li class="filter-item {{ 'is-active' if 'accessories' in active_filters.type }}">
         <a href="{{ url_for('main.deals', **dict(request.args, type='accessories' if 'accessories' not in active_filters.type else None)) }}">
-          <i class="fas fa-watch mr-2"></i> Fashion Accessories
+          <i class="fas fa-watch"></i> Fashion Accessories
         </a>
       </li>
       {% endif %}
@@ -77,10 +77,10 @@
       
       <div class="price-inputs flex items-center">
         <input type="number" name="min_price" placeholder="Min" value="{{ active_filters.min_price }}" class="input-sm">
-        <span class="mx-2">-</span>
+        <span>-</span>
         <input type="number" name="max_price" placeholder="Max" value="{{ active_filters.max_price }}" class="input-sm">
       </div>
-      <button type="submit" class="btn btn--secondary btn--sm mt-2">Apply Price</button>
+      <button type="submit" class="btn btn--secondary btn--sm">Apply Price</button>
     </form>
   </div>
 

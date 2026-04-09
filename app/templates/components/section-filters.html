@@ -1,26 +1,29 @@
 {% from "components/filter_chip.html" import filter_chip %}
 {% from "components/ui/button.html" import button %}
 <div class="filter-sidebar section-filters-sidebar">
-  
+
   {# -------- Active Filters Summary -------- #}
   {% if active_filters %}
   <div class="filter-section active-filters-section">
-    <div class="flex items-center justify-between mb-2">
-      <h3 class="filter-section__title mb-0">Active Filters</h3>
-      <a href="{{ url_for('main.sections', section_slug=section.slug) }}" class="text-xs text-primary">Clear All</a>
+    <div class="filter-section-header flex items-center">
+      <h3 class="filter-section__title">Active Filters</h3>
+      <a href="{{ url_for('main.sections', section_slug=section.slug) }}" class="filters-clear-link">Clear All</a>
     </div>
     <div class="active-deals-filters flex flex-wrap">
       {% for filter_name, values in active_filters.items() %}
-        {% for value in values %}
-          {% for instance in filter_options[filter_name] %}
-            {% if instance.slug == value %}
-              <div class="filter-tag flex items-center">
-                <span>{{ instance.name }}</span>
-                <a href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{filter_name ~ '_slug': [v for v in active_filters[filter_name] if v != value]} if active_filters[filter_name]|length > 1 else {filter_name ~ '_slug': none})) }}" class="remove-tag">&times;</a>
-              </div>
-            {% endif %}
-          {% endfor %}
-        {% endfor %}
+      {% for value in values %}
+      {% for instance in filter_options[filter_name] %}
+      {% if instance.slug == value %}
+      <div class="filter-tag flex items-center">
+        <span>{{ instance.name }}</span>
+        {#
+        <a href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{filter_name ~ '_slug': [v for v in active_filters[filter_name] if v != value]} if active_filters[filter_name]|length > 1 else {filter_name ~ '_slug': none})) }}"
+          class="remove-tag">&times;</a>
+        #}
+      </div>
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
       {% endfor %}
     </div>
   </div>
@@ -34,7 +37,8 @@
       {% for instance in filter_options[allowed_filter] %}
       {% set is_active = instance.slug in active_filters[allowed_filter] %}
       <li class="filter-item {{ 'is-active' if is_active }}">
-        <a href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{allowed_filter ~ '_slug': instance.slug if not is_active else None})) }}">
+        <a
+          href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{allowed_filter ~ '_slug': instance.slug if not is_active else None})) }}">
           <span class="checkbox-box {{ 'checked' if is_active }}"></span>
           {{ instance.name }}
         </a>

@@ -7,7 +7,7 @@
 {% from "components/grid.html" import grid %}
 
 <div class="deals-page section-page">
-  <div class="container flex flex-col md-flex-row">
+  <div class="container flex">
     
     <!-- Sidebar Filters -->
     <aside class="deals-sidebar">
@@ -15,7 +15,7 @@
     </aside>
 
     <!-- Main Content Area -->
-    <main class="deals-content flex-grow">
+    <main class="deals-content">
       
       <div class="deals-top-bar">
         <h1 class="deals-title">{{ section.name|title }}</h1>
@@ -27,7 +27,7 @@
       {% if articles %}
         {{ grid(articles) }}
       {% else %}
-        <div class="no-results flex flex-col items-center justify-center">
+        <div class="no-results flex flex-col items-center">
           <i class="far fa-frown icon-empty"></i>
           <h3>No articles found</h3>
           <p>Try adjusting your filters to explore other content.</p>

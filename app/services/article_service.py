@@ -19,7 +19,6 @@ def get_articles(filter_by_columns: tuple = ('section',), filter_values: tuple =
             Article.title,
             Article.url,
             Article.description,
-            Article.image,
             Article.image_url,
             Article.published_at
         ),
