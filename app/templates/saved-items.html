@@ -43,4 +43,51 @@
 
 </div>
 {% endcall %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Listen for save button clicks globally (already handled by interactions.js but we add local behavior)
+    document.addEventListener('click', async (e) => {
+        const saveBtn = e.target.closest('.save-btn');
+        if (!saveBtn) return;
+
+        // The save button already has an event listener in interactions.js
+        // We wait a bit for the 'active' class to be toggled by interactions.js
+        setTimeout(() => {
+            if (!saveBtn.classList.contains('active')) {
+                // Item was unsaved, remove it from the page
+                const card = saveBtn.closest('.card, .article-card, .item-card');
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.9)';
+                    card.style.transition = 'all 0.3s ease';
+                    
+                    setTimeout(() => {
+                        const section = card.closest('.saved-section');
+                        const grid = card.closest('.grid');
+                        card.remove();
+                        
+                        // If grid is empty, remove the section
+                        if (grid && grid.children.length === 0) {
+                            section.remove();
+                        }
+                        
+                        // If no saved sections left, show empty state
+                        if (document.querySelectorAll('.saved-section').length === 0) {
+                            const container = document.querySelector('.saved-items-container');
+                            container.innerHTML = `
+                                <div class="empty-state flex flex-col items-center justify-center">
+                                    <i class="far fa-bookmark empty-icon"></i>
+                                    <h2 class="page__subtitle">Nothing saved yet</h2>
+                                    <p class="page__text">Items and articles you save will appear here.</p>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                }
+            }
+        }, 600); // Wait for the async call in interactions.js to finish
+    });
+});
+</script>
 {% endblock %}

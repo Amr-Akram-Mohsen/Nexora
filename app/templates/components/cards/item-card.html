@@ -17,6 +17,11 @@
       }}
       <div class="card__img-overlay"></div>
       {{ badge('Product', 'badge--card-type') }}
+      
+      <!-- Compare Toggle -->
+      <button class="compare-toggle-btn" data-id="{{ item.id }}" data-name="{{ item.name }}" title="Add to compare">
+        <i class="fas fa-balance-scale"></i>
+      </button>
     </div>
   </a>
   <div class="card__content">

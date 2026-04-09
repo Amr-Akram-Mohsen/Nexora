@@ -1,5 +1,5 @@
 from random import shuffle
-from flask import request, render_template, jsonify
+from flask import request, render_template, jsonify, redirect, url_for
 from flask_login import current_user
 from sqlalchemy import func
 
@@ -245,4 +245,39 @@ def item_page(item_id):
     return render_template(
         "item-page.html",
         item=item
+    )
+
+@bp.route('/compare')
+def compare():
+    """Side-by-side comparison of 2-4 products."""
+    ids_str = request.args.get('ids', '')
+    try:
+        item_ids = [int(id_strip) for id_strip in ids_str.split(',') if id_strip.strip()]
+    except ValueError:
+        item_ids = []
+    
+    if not item_ids:
+        # If no IDs, maybe show a "select items to compare" page or redirect
+        return redirect(url_for('main.deals'))
+        
+    # Limit to 4 items for layout sanity
+    item_ids = item_ids[:4]
+    
+    items = Item.query.options(
+        db.joinedload(Item.brand),
+        db.joinedload(Item.category),
+        db.selectinload(Item.images),
+        db.selectinload(Item.specifications),
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
+    ).filter(Item.id.in_(item_ids)).all()
+    
+    # Extract all possible specification categories from all items being compared
+    all_categories = set()
+    for item in items:
+        all_categories.update(item.full_details.keys())
+    
+    return render_template(
+        'compare-page.html',
+        items=items,
+        all_categories=sorted(list(all_categories))
     )

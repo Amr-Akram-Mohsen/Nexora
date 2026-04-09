@@ -348,3 +348,28 @@ def handle_interaction():
         db.session.rollback()
         current_app.logger.exception("Interaction failed")
         abort(500, "Interaction failed")
+
+@bp.route('/saved')
+@login_required
+def saved_items():
+    """Display all articles and items saved by the current user."""
+    # Query saves for current user, grouped by type
+    saved_articles = (
+        Save.query.options(db.selectinload(Save.article))
+        .filter_by(user_id=current_user.id, target_type=TargetType.ARTICLE)
+        .order_by(Save.created_at.desc())
+        .all()
+    )
+    
+    saved_items = (
+        Save.query.options(db.selectinload(Save.item))
+        .filter_by(user_id=current_user.id, target_type=TargetType.ITEM)
+        .order_by(Save.created_at.desc())
+        .all()
+    )
+    
+    return render_template(
+        'saved-items.html',
+        saved_articles=saved_articles,
+        saved_items=saved_items
+    )

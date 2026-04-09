@@ -43,6 +43,12 @@
         class=class ~ "mode-toggle",
         icon="far fa-sun") }}
 
+        {% if is_authenticated %}
+        <!-- Saved (Shortcut) -->
+        <a href="{{ url_for('main.saved_items') }}" class="btn btn--icon btn--ghost" title="Saved Items">
+          <i class="far fa-bookmark"></i>
+        </a>
+        {% endif %}
 
         <!-- User -->
         <div class="nav-user">
@@ -71,6 +77,12 @@
             <div class="user-info {{ item_class }}">
               <span class="user-email">{{ user_email }}</span>
             </div>
+            
+            <a href="{{ url_for('main.saved_items') }}" class="{{ item_class }}">
+              <i class="far fa-bookmark"></i>
+              Saved Items
+            </a>
+
             {% call form(variant="", form_action=url_for('main.logout'), class="logout-form") %}
             {{ button(
             text="Logout", variant="",
@@ -123,6 +135,11 @@
       <a href="{{ url_for('main.deals') }}" class="mobile-nav__link">
         <i class="fas fa-tag mr-1"></i> Deals
       </a>
+      {% if is_authenticated %}
+      <a href="{{ url_for('main.saved_items') }}" class="mobile-nav__link">
+        <i class="far fa-bookmark mr-1"></i> Saved Items
+      </a>
+      {% endif %}
     </nav>
 
   </div>

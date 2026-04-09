@@ -1,12 +1,12 @@
-{% extends"base.html" %} {% block title %}New Tech | About{% endblock %}
+{% extends"base.html" %} {% block title %}Nexora | About{% endblock %}
 {%
 block content %} {% from"components/page.html" import page %}
-{% call page("About <span>NewTech</span>","about-page") %}
+{% call page("About <span>Nexora</span>","about-page") %}
 
 <p class="text">
-  NewTech is a technology-focused
-platform dedicated to delivering the latest news, honest reviews, and
-easy-to-follow tutorials about the digital world around us.
+  Nexora is a technology-focused
+  platform dedicated to delivering the latest news, honest reviews, and
+  easy-to-follow tutorials about the digital world around us.
 </p>
 <h2 class="page__subtitle">Our Mission</h2>
 <p class="page__text">Our mission is to simplify technology. We break down complex topics
@@ -17,13 +17,13 @@ easy-to-follow tutorials about the digital world around us.
 <h2 class="page__subtitle">What We Cover</h2>
 <ul class="page__items">
   {% for card in cover_cards %}
-    <li class="page__item">
-      <strong>
+  <li class="page__item">
+    <strong>
       <i class="{{ card.icon }}"></i>
       {{ card.title }}
-      </strong>
-      {{ card.text }}
-    </li>
+    </strong>
+    {{ card.text }}
+  </li>
   {% endfor %}
 </ul>
 <h2 class="page__subtitle">Our Core Values</h2>
