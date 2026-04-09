@@ -20,7 +20,33 @@ Returns a normalised dict OR None (skipped article).
 import re
 import html
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.utils.sanitizer import sanitize_text
+
+# ── Safe HTML tags allowed in article content ──────────────────
+# Everything else is stripped. Script/style/iframe always removed.
+ALLOWED_TAGS = [
+    "p", "br", "b", "strong", "i", "em", "u", "s", "del",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "ul", "ol", "li",
+    "a", "img",
+    "blockquote", "pre", "code",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "figure", "figcaption",
+    "div", "span",
+]
+ALLOWED_ATTRS = {
+    "a":   ["href", "title", "target", "rel"],
+    "img": ["src", "alt", "width", "height", "loading"],
+    "*":   ["class"],
+}
+
+# Tracking query params to strip from article URLs for deduplication
+_TRACKING_PARAMS = {
+    "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+    "ref", "source", "mc_cid", "mc_eid", "fbclid", "gclid", "_ga",
+    "cmpid", "linkId", "WT.mc_id",
+}
 
 # ── Blocked domains (paywalled / very low quality) ─────────────
 BLOCKED_DOMAINS = [
@@ -42,6 +68,22 @@ def _is_blocked(url: str) -> bool:
     return any(domain in url for domain in BLOCKED_DOMAINS)
 
 
+def _normalize_url(url: str) -> str:
+    """
+    Strip tracking params and URL fragments so the same article from
+    different sources/campaigns is recognized as a duplicate.
+    """
+    try:
+        parsed = urlparse(url.strip())
+        qs = parse_qs(parsed.query, keep_blank_values=False)
+        clean_qs = {k: v for k, v in qs.items() if k.lower() not in _TRACKING_PARAMS}
+        clean_query = urlencode(clean_qs, doseq=True)
+        # Also strip URL fragment (#section) — doesn't affect content identity
+        return urlunparse(parsed._replace(query=clean_query, fragment=""))
+    except Exception:
+        return url
+
+
 def _parse_date(value) -> datetime | None:
     """Accept a datetime / struct_time / string and return a naive UTC datetime."""
     if isinstance(value, datetime):
@@ -55,6 +97,28 @@ def _parse_date(value) -> datetime | None:
         except ValueError:
             continue
     return None
+
+
+def _sanitize_content(html_str: str) -> str:
+    """
+    Sanitize HTML content: allow safe tags (p, h2, ul, img, a, etc.),
+    strip everything else including scripts, iframes, and style blocks.
+    Uses bleach if available; falls back to stripping all tags.
+    """
+    if not html_str:
+        return ""
+    try:
+        import bleach
+        return bleach.clean(
+            html_str,
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRS,
+            strip=True,
+            strip_comments=True,
+        )
+    except ImportError:
+        # bleach not installed: safely strip ALL tags as fallback
+        return re.sub(r"<[^>]+>", " ", html_str).strip()
 
 
 def _clean_description(text: str | None) -> str:
@@ -76,7 +140,8 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
     inside `raw` — these are passed through untouched.
     """
     # ── Mandatory fields ────────────────────────────────────────
-    url = (raw.get("url") or raw.get("link") or "").strip()
+    url_raw = (raw.get("url") or raw.get("link") or "").strip()
+    url = _normalize_url(url_raw)  # strip tracking params + fragments for dedup
     title = sanitize_text(raw.get("title") or "")
 
     if not url or not title:
@@ -124,8 +189,8 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
     source_name = sanitize_text(source_raw)
 
     # ── Content ──────────────────────────────────────────────────
-    content = raw.get("content") or ""
-    # We leave HTML intact so it can be rendered by the template, but we could add BS4 later if we want to remove scripts.
+    # Sanitize: allow safe tags (p, h2, ul, img, a…), strip scripts/iframes
+    content = _sanitize_content(raw.get("content") or "")
 
     return {
         # ── Core fields ──────────────────────────────────────────

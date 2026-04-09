@@ -224,6 +224,8 @@ class Article(db.Model):
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
     card_type = db.Column(db.TEXT, default="article")
+    # Tracker for matcher — set to utcnow() after each matching run
+    last_matched_at = db.Column(db.DateTime, nullable=True, index=True)
 
 
     topics = db.relationship(
