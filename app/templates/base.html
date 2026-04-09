@@ -6,8 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>{% block title %}{% endblock %}</title>
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
+    <meta name="description" content="{% block description %}Nexora is your premium source for tech news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{{ self.seo_title() }}">
+    <meta property="og:description" content="{{ self.description() }}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{{ self.seo_title() }}">
+    <meta property="twitter:description" content="{{ self.description() }}">
+    <meta property="twitter:image" content="{{ self.og_image() }}">
+
+    <!-- JSON-LD Structured Data -->
+    {% block structured_data %}{% endblock %}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"

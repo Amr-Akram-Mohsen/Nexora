@@ -1,6 +1,7 @@
-from flask import request, render_template, jsonify, current_app
+from flask import request, render_template, jsonify, current_app, make_response, url_for
+from datetime import datetime
 
-from app.models import db, ContactMessage, Item
+from app.models import db, ContactMessage, Item, Article
 from app.services.mailer import send_admin_email
 from app.services.pages_content import PAGES_CONTENT
 from app.services.article_service import get_articles
@@ -120,3 +121,30 @@ def terms():
 @bp.route('/affiliate')
 def affiliate():
     return render_template('affiliate.html', content=PAGES_CONTENT.get('affiliate'))
+
+@bp.route('/sitemap.xml')
+def sitemap():
+    """Generate a dynamic sitemap.xml"""
+    pages = []
+    
+    # Static pages
+    for rule in current_app.url_map.iter_rules():
+        if "GET" in rule.methods and len(rule.arguments) == 0:
+            pages.append([url_for(rule.endpoint, _external=True), datetime.now().date().isoformat()])
+
+    # Articles
+    articles = Article.query.all()
+    for article in articles:
+        pages.append([url_for('main.article_page', article_id=article.id, _external=True), 
+                      (article.published_at or datetime.now()).date().isoformat()])
+
+    # Items
+    items = Item.query.all()
+    for item in items:
+        pages.append([url_for('main.item_page', item_id=item.id, _external=True), 
+                      (item.created_at or datetime.now()).date().isoformat()])
+
+    sitemap_xml = render_template('sitemap_xml.html', pages=pages)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response

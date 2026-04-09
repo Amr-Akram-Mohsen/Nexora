@@ -184,3 +184,21 @@ function handleGlobalSubmits(e) {
     }
 }
 
+// Header scroll effect
+function initHeaderScroll() {
+    const header = document.querySelector('.site-header');
+    if (!header) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.add('site-header--scrolled');
+        } else {
+            header.classList.remove('site-header--scrolled');
+        }
+    });
+}
+
+// Initialize everything on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+    initHeaderScroll();
+});

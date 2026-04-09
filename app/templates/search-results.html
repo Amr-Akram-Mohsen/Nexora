@@ -21,6 +21,30 @@
   ) }}
   {{ button(type="submit", icon="fas fa-search search-icon") }}
 </div>
+{% if query %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const query = "{{ query }}".toLowerCase();
+    if (!query) return;
+
+    const cards = document.querySelectorAll('.card__title, .card__excerpt, .item-card__title, .item-card__description');
+    cards.forEach(card => {
+      const text = card.innerHTML;
+      const regex = new RegExp(`(${query})`, 'gi');
+      card.innerHTML = text.replace(regex, '<mark class="search-highlight">$1</mark>');
+    });
+  });
+</script>
+<style>
+  .search-highlight {
+    background: rgba(var(--brand-blue-rgb), 0.15);
+    color: var(--brand-blue);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+</style>
+{% endif %}
+
 {% endcall %}
 
 {% if query %}

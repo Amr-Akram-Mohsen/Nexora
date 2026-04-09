@@ -4,6 +4,41 @@
 {% from"components/ui/badge.html" import badge %}
 {% from "components/features/rating.html" import render_stars %}
 {% from"components/detail-page.html" import detail_page with context %}
+
+{% block title %}Nexora | {{ item.name }}{% endblock %}
+
+{% block description %}{{ item.description | truncate(160) }}{% endblock %}
+
+{% block og_type %}product{% endblock %}
+
+{% block og_image %}{{ item.images[0].url if item.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ item.name }}",
+  "image": [
+    {% for img in item.images[:3] %}
+    "{{ img.url }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "description": "{{ item.description }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ item.brand.name }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "SAR",
+    "price": "{{ item.get_min_price() }}",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ request.url }}"
+  }
+}
+</script>
+{% endblock %}
 {% block content %}
 {% macro header_block() %}
 <div class="detail-page__header-content">

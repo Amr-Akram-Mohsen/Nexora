@@ -4,7 +4,41 @@
 {% from"components/shared/image-utils.html" import render_image_url %}
 {% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
+{% from"components/ui/badge.html" import badge %}
 {% from"components/features/inline-product-card.html" import inline_product_card %}
+
+{% block title %}Nexora | {{ article.title }}{% endblock %}
+
+{% block description %}{{ article.description | truncate(160) }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+
+{% block og_image %}{{ article.image_url or url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ article.title }}",
+  "image": "{{ article.image_url }}",
+  "author": {
+    "@type": "Organization",
+    "name": "Nexora"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexora",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ url_for('static', filename='img/logo-full.png', _external=True) }}"
+    }
+  },
+  "datePublished": "{{ article.published_at.isoformat() if article.published_at }}",
+  "description": "{{ article.description }}"
+}
+</script>
+{% endblock %}
 {% block content %}
 {% macro header_block() %}
 <div class="detail-page__header-content flex flex-col">
