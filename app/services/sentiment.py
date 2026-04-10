@@ -6,8 +6,9 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # print("Using device:", device)
 
-# Path to your saved model
-MODEL_PATH = "app/sentiment_model"
+# Path to your saved model (updated to online model since local is missing)
+MODEL_PATH = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+print(f"DEBUG: Loading model from path: {MODEL_PATH}")
 
 # Load tokenizer and model once at startup
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)

@@ -74,7 +74,7 @@ Pygments==2.19.2
 pyparsing==3.2.5
 pyperclip==1.9.0
 PySocks==1.7.1
-python-3.11.9
+# python-3.11.9 (Metadata only, DO NOT INSTALL)
 python-bidi==0.6.6
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
@@ -113,7 +113,7 @@ trio==0.30.0
 trio-websocket==0.12.2
 typer==0.20.0
 typing-inspection==0.4.2
-typing_extensions==4.15.0
+typing-extensions>=4.14.1,<4.15.0
 tzdata==2025.2
 tzlocal==5.3.1
 urllib3==2.5.0
@@ -129,3 +129,5 @@ wikipedia==1.4.0
 wrapt==2.0.0
 wsproto==1.2.0
 WTForms==3.2.1
+torch
+transformers
