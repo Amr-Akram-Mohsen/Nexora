@@ -5,11 +5,14 @@
 {% from "components/ui/button.html" import button %}
 {% from "components/shared/catalog-utils.html" import sort_url, filter_url %}
 
-{% block title %}Tech Deals & Products | Nexora{% endblock %}
+{% set page_title = section.name|title if section else "Tech Deals & Products" %}
+{% set results = articles if target_type == 'articles' else items %}
+
+{% block title %}{{ page_title }} | Nexora{% endblock %}
 
 {% block content %}
 
-{% call(slot) listing_page(class_name="deals-page") %}
+{% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing") %}
   
   {% if slot == 'sidebar' %}
     {% include "components/catalog-sidebar.html" %}
@@ -17,16 +20,22 @@
 
   {% if slot == 'header' %}
     <div class="listing-summary">
-      <h1 class="listing-title">Tech Deals & Products</h1>
-      <p class="listing-count">{{ items|length }} products found</p>
+      <h1 class="listing-title">{{ page_title }}</h1>
+      <p class="listing-count">{{ results|length }} {{ target_type }} found</p>
     </div>
     
     <div class="listing-sort flex items-center">
       <label for="sort-select">Sort by:</label>
       <select id="sort-select" class="sort-select">
-        <option value="{{ sort_url('newest') }}" {{ 'selected' if active_filters.sort == 'newest' }}>Newest Arrivals</option>
-        <option value="{{ sort_url('price_low') }}" {{ 'selected' if active_filters.sort == 'price_low' }}>Price: Low to High</option>
-        <option value="{{ sort_url('price_high') }}" {{ 'selected' if active_filters.sort == 'price_high' }}>Price: High to Low</option>
+        <option value="{{ sort_url('newest') }}" {{ 'selected' if active_filters.sort == 'newest' }}>Newest</option>
+        
+        {% if target_type == 'products' %}
+          <option value="{{ sort_url('price_low') }}" {{ 'selected' if active_filters.sort == 'price_low' }}>Price: Low to High</option>
+          <option value="{{ sort_url('price_high') }}" {{ 'selected' if active_filters.sort == 'price_high' }}>Price: High to Low</option>
+        {% else %}
+          <option value="{{ sort_url('oldest') }}" {{ 'selected' if active_filters.sort == 'oldest' }}>Oldest</option>
+        {% endif %}
+        
         <option value="{{ sort_url('popular') }}" {{ 'selected' if active_filters.sort == 'popular' }}>Most Popular</option>
       </select>
     </div>
@@ -40,23 +49,23 @@
         {% for val in vals %}
           <div class="filter-tag flex items-center">
             <span>{{ val | replace('-', ' ') | title }}</span>
-            <a href="{{ filter_url(filter_name, val) }}" class="remove-tag">&times;</a>
+            <a href="{{ filter_url(filter_name, val, multi=(target_type == 'products' or filter_name != 'category')) }}" class="remove-tag">&times;</a>
           </div>
         {% endfor %}
       {% endif %}
     {% endfor %}
-    <a href="{{ url_for(request.endpoint) }}" class="clear-all-link">Clear All</a>
+    <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="clear-all-link">Clear All</a>
   {% endif %}
 
   {% if slot == 'content' %}
-    {% if items %}
-      {{ grid(items) }}
+    {% if results %}
+      {{ grid(results) }}
     {% else %}
       <div class="no-results flex flex-col items-center">
         <i class="fas fa-search-minus icon-empty"></i>
-        <h3>No products found</h3>
-        <p>Try adjusting your filters to find what you're looking for.</p>
-        <a href="{{ url_for(request.endpoint) }}">
+        <h3>No {{ target_type }} found</h3>
+        <p>Try adjusting your search or filters to find what you're looking for.</p>
+        <a href="{{ url_for(request.endpoint, **request.view_args) }}">
           {{ button(text="Reset All Filters", variant="outline") }}
         </a>
       </div>

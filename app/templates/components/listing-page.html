@@ -1,10 +1,39 @@
 {% macro listing_page(class_name="") %}
 <section class="listing-page {{ class_name }}">
-  <div class="container">
-    {{ caller('title') }}
-    {{ caller('search') }}
-    {{ caller('found_content') }}
-    {{ caller('empty_content') }}
+  <div class="container flex">
+    
+    <!-- Adaptive Sidebar Slot -->
+    <aside class="listing-sidebar">
+      {{ caller('sidebar') }}
+    </aside>
+
+    <!-- Main Results Area -->
+    <main class="listing-content flex flex-col">
+      
+      <!-- Header / Sorting / Meta Slot -->
+      <header class="listing-header flex justify-between items-center">
+        {{ caller('header') }}
+      </header>
+
+      <!-- Active Filters / Chips Slot -->
+      {% if caller('active_filters') %}
+      <div class="listing-filters-active flex flex-wrap items-center">
+        {{ caller('active_filters') }}
+      </div>
+      {% endif %}
+
+      <!-- Results Grid / Content Slot -->
+      <div class="listing-results">
+        {{ caller('content') }}
+      </div>
+
+      <!-- Pagination / Footer Slot -->
+      <footer class="listing-footer">
+        {{ caller('footer') }}
+      </footer>
+
+    </main>
+
   </div>
 </section>
 {% endmacro %}

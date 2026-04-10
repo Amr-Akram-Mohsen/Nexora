@@ -1,0 +1,78 @@
+{# catalog-sidebar.html #}
+{% from "components/shared/catalog-utils.html" import filter_url %}
+{% from "components/ui/button.html" import button %}
+
+<div class="filter-sidebar">
+
+  {# 1. Brand / Category / Store / Topic Sections #}
+  {% for filter_name in allowed_filters %}
+  {% set options = filter_options.get(filter_name, []) %}
+  {% if options %}
+  <div class="filter-section">
+    <h3 class="filter-section__title">
+      {% if filter_name == 'brand' %}Brands
+      {% elif filter_name == 'category' %}Categories
+      {% elif filter_name == 'topic' %}Topics
+      {% elif filter_name == 'store' %}Stores
+      {% else %}{{ filter_name | title }}
+      {% endif %}
+    </h3>
+    
+    <ul class="filter-list">
+      {% for opt in options %}
+      {% set slug = opt.slug if opt.slug is defined else opt %}
+      {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
+      {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
+      
+      <li class="filter-item {{ 'is-active' if is_active }}">
+        <a href="{{ filter_url(filter_name, slug, multi=(target_type == 'products' or filter_name != 'category')) }}">
+          <span class="checkbox-box {{ 'checked' if is_active }}"></span>
+          {{ name }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endfor %}
+
+  {# 2. Product-Specific: Price Range #}
+  {% if target_type == 'products' %}
+  <div class="filter-section">
+    <h3 class="filter-section__title">Price Range</h3>
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="get" class="price-range-form flex flex-col">
+      <!-- Persist other filters as hidden inputs -->
+      {% for key, vals in request.args.to_dict(flat=False).items() %}
+        {% if key not in ['min_price', 'max_price'] %}
+          {% for v in vals %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}
+        {% endif %}
+      {% endfor %}
+      
+      <div class="price-inputs flex items-center">
+        <input type="number" name="min_price" placeholder="Min" value="{{ active_filters.min_price or '' }}" class="input-sm">
+        <span class="price-divider">-</span>
+        <input type="number" name="max_price" placeholder="Max" value="{{ active_filters.max_price or '' }}" class="input-sm">
+      </div>
+      {{ button(text="Apply Range", variant="secondary", class="btn--sm", type="submit") }}
+    </form>
+  </div>
+  {% endif %}
+
+  {# 3. Adaptive CTA / Promo #}
+  <div class="sidebar-promo">
+    <h4>
+      {% if target_type == 'products' %}User Favorites
+      {% else %}Trending Topics
+      {% endif %}
+    </h4>
+    <p>
+      {% if target_type == 'products' %}Discover what others are buying this week.
+      {% else %}Stay ahead with the most discussed tech news.
+      {% endif %}
+    </p>
+    <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}" class="btn btn--ghost btn--sm">
+      View Most Popular
+    </a>
+  </div>
+
+</div>

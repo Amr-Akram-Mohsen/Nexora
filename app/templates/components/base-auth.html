@@ -9,6 +9,7 @@
     {% from "components/ui/input.html" import input %}
     {% from "components/ui/button.html" import button %}
     {% from "components/ui/field.html" import field %}
+    {% from "components/ui/label.html" import label %}
 
 
     {% set auth_url = url_for('main.google_login') %}
@@ -17,7 +18,7 @@
     type="button",
     class="google-auth-btn",
     icon="fa-brands fa-google",
-    attrs={"onclick": "window.location.href='" ~ auth_url ~ "'"}
+    attrs={"data-url": auth_url}
     ) }}
 
     {% call form("auth-form") %}
@@ -42,25 +43,19 @@
     %}
     {% if not is_new_user %}
     <div class="flex items-center justify-between">
-      {% call field(
-      label_text=label_text,
-      for_id=label_name,
-      class="checkbox-wrapper flex items-center",
-      label_class=label_name ~ "-label")
-      %}
-      {{ input(id=label_name, type="checkbox", required=False) }}
-      {% endcall %}
+      <div class="field-wrapper flex items-center checkbox-wrapper">
+        {% call label(label_text, label_name, label_name ~ "-label") %}
+        {{ input(name=label_name, id=label_name, type="checkbox", required=False) }}
+        {% endcall %}
+      </div>
       <a href="" class="redirect-link">Forgot password?</a>
     </div>
     {% else %}
-    {% call field(
-    label_text=label_text,
-    for_id=label_name,
-    class="checkbox-wrapper flex items-center",
-    label_class=label_name ~ "-label")
-    %}
-    {{ input(name=label_name, type="checkbox", value="1", required=False) }}
-    {% endcall %}
+    <div class="field-wrapper flex items-center checkbox-wrapper">
+      {% call label(label_text, label_name, label_name ~ "-label") %}
+      {{ input(name=label_name, id=label_name, type="checkbox", required=False) }}
+      {% endcall %}
+    </div>
     {% endif %}
     {{ button(text=title, type="submit", class="auth-btn") }}
     {% endcall %}

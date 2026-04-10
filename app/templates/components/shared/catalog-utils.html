@@ -1,0 +1,28 @@
+{# catalog-utils.html #}
+
+{% macro filter_url(name, value, multi=True) %}
+{#
+Builds a URL with the given filter added/removed.
+Includes request.view_args to handle dynamic segments like section_slug.
+#}
+{% set args = request.args.to_dict(flat=False) %}
+
+{% if multi %}
+{% set current_vals = args.get(name, []) %}
+{% if value in current_vals %}
+{% set new_vals = [] %}
+{% for v in current_vals if v != value %}{% set _ = new_vals.append(v) %}{% endfor %}
+{% set extra = {name: new_vals if new_vals else None} %}
+{% else %}
+{% set extra = {name: current_vals + [value]} %}
+{% endif %}
+{% else %}
+{% set extra = {name: value if request.args.get(name) != value else None} %}
+{% endif %}
+
+{{ url_for(request.endpoint, **dict(request.view_args, **dict(request.args, **extra))) }}
+{% endmacro %}
+
+{% macro sort_url(sort_val) %}
+{{ url_for(request.endpoint, **dict(request.view_args, **dict(request.args, sort=sort_val))) }}
+{% endmacro %}

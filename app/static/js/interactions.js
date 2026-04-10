@@ -162,7 +162,24 @@ async function submitUserInteraction(
         if (interactionType === 'react') {
             updateReactionUI(targetItem, reactionType, result.status);
         } else if (interactionType === 'save') {
-            targetBtn.classList.toggle('active', result.status == 'saved')
+            targetBtn.classList.toggle('active', result.status == 'saved');
+            
+            // Special behavior for Saved Items page: remove card if unsaved
+            if (result.status === 'removed' && window.location.pathname.includes('/saved')) {
+                const card = targetItem.closest('.card, .article-card, .item-card');
+                if (card) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'scale(0.95)';
+                    card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    setTimeout(() => {
+                        const grid = card.closest('.grid');
+                        const section = card.closest('.saved-collection');
+                        card.remove();
+                        if (grid && !grid.children.length && section) section.remove();
+                        if (!document.querySelectorAll('.saved-collection').length) window.location.reload();
+                    }, 400);
+                }
+            }
         }
         else if (interactionType === "comment" && result?.success) {
             const list = context.formType === "reply"

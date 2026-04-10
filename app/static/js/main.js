@@ -26,7 +26,7 @@ function handleGlobalClicks(e) {
         return;
     }
 
-    const imageControl = e.target.closest(".item-gallery__nav");
+    const imageControl = e.target.closest(".item-gallery__nav, .item-gallery__thumb");
     if (imageControl) {
         handleImageControls(imageControl);
         return;
@@ -147,6 +147,30 @@ function handleGlobalClicks(e) {
         }
 
     }
+
+    const googleAuth = e.target.closest('.google-auth-btn');
+    if (googleAuth) {
+        const url = googleAuth.dataset.url;
+        if (url) window.location.href = url;
+    }
+
+    const mobileMenuToggle = e.target.closest('.mobile-menu-toggle');
+    if (mobileMenuToggle) {
+        const mobileNav = document.querySelector('.mobile-nav');
+        mobileNav.classList.toggle('active');
+        mobileMenuToggle.querySelector('i').classList.toggle('fa-bars');
+        mobileMenuToggle.querySelector('i').classList.toggle('fa-times');
+    }
+
+    // Gallery Overlay Navigation
+    const galleryPrev = e.target.closest('[data-gallery-prev]');
+    if (galleryPrev) {
+        navigateGallery(-1);
+    }
+    const galleryNext = e.target.closest('[data-gallery-next]');
+    if (galleryNext) {
+        navigateGallery(1);
+    }
 }
 
 
@@ -184,6 +208,14 @@ function handleGlobalSubmits(e) {
     }
 }
 
+function handleGlobalChanges(e) {
+    const sortSelect = e.target.closest('.sort-select');
+    if (sortSelect) {
+        window.location.href = sortSelect.value;
+        return;
+    }
+}
+
 // Header scroll effect
 function initHeaderScroll() {
     const header = document.querySelector('.site-header');
@@ -201,4 +233,18 @@ function initHeaderScroll() {
 // Initialize everything on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     initHeaderScroll();
+
+    // Event Delegation listeners
+    document.addEventListener('click', handleGlobalClicks);
+    document.addEventListener('submit', handleGlobalSubmits);
+    document.addEventListener('change', handleGlobalChanges);
+
+    // Initial Search Highlighting
+    if (window.SEARCH_QUERY) {
+        const cards = document.querySelectorAll('.card__title, .card__excerpt, .item-card__name, .item-card__description');
+        const regex = new RegExp(`(${window.SEARCH_QUERY})`, 'gi');
+        cards.forEach(card => {
+            card.innerHTML = card.innerHTML.replace(regex, '<mark class="search-highlight">$1</mark>');
+        });
+    }
 });

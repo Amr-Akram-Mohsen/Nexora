@@ -138,65 +138,106 @@ function handleReviewsToggle() {
   const isShown = !dropdownMenu.classList.contains('is-hidden');
   dropdownMenu.classList.toggle('is-hidden', isShown);
 }
+
+function closeOverlay() {
+  const specs = document.querySelector(".item-details-dialog");
+  if (specs) specs.classList.remove("is-open");
+
+  const gallery = document.querySelector("[data-gallery-overlay]");
+  if (gallery) gallery.hidden = true;
+}
+
+function handleImageControls(control) {
+  const gallery = control.closest(".item-gallery");
+  if (!gallery) return;
+
+  const displayImg = gallery.querySelector(".item-gallery__img");
+  const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
+  const galleryLength = thumbnails.length;
+  
+  let currentIndex = parseInt(displayImg.dataset.galleryMain || "1");
+  let newIndex = parseInt(control.dataset.galleryNewImage || control.dataset.galleryThumb);
+
+  if (!newIndex || newIndex < 1 || newIndex > galleryLength) return;
+
+  // Find the thumbnail for the new index
+  const newThumb = gallery.querySelector(`[data-gallery-thumb="${newIndex}"] img`);
+  if (!newThumb) return;
+
+  // 1. Update Main Display
+  displayImg.src = newThumb.src;
+  displayImg.alt = newThumb.alt;
+  displayImg.dataset.galleryMain = newIndex;
+
+  // 2. Update Index Counter
+  const indexEl = gallery.querySelector(`[data-gallery-index]`);
+  if (indexEl) indexEl.textContent = newIndex;
+
+  // 3. Update Sync Arrows
+  const prevBtn = gallery.querySelector(".item-gallery__nav--prev");
+  const nextBtn = gallery.querySelector(".item-gallery__nav--next");
+
+  if (prevBtn) {
+    prevBtn.dataset.galleryNewImage = newIndex - 1;
+    prevBtn.classList.toggle("disabled", newIndex === 1);
+  }
+  if (nextBtn) {
+    nextBtn.dataset.galleryNewImage = newIndex + 1;
+    nextBtn.classList.toggle("disabled", newIndex === galleryLength);
+  }
+}
+function navigateGallery(direction) {
+  const overlay = document.querySelector("[data-gallery-overlay]");
+  if (!overlay || overlay.hidden) return;
+
+  const images = JSON.parse(overlay.dataset.images || "[]");
+  if (!images.length) return;
+
+  let currentIndex = parseInt(overlay.dataset.index || "0");
+  let nextIndex = currentIndex + direction;
+
+  // Cycle around
+  if (nextIndex < 0) nextIndex = images.length - 1;
+  if (nextIndex >= images.length) nextIndex = 0;
+
+  overlay.dataset.index = nextIndex;
+  
+  const displayImg = overlay.querySelector(".displayed-img");
+  displayImg.src = images[nextIndex];
+
+  const currentEl = overlay.querySelector(".current");
+  if (currentEl) currentEl.textContent = nextIndex + 1;
+
+  const totalEl = overlay.querySelector(".total");
+  if (totalEl) totalEl.textContent = images.length;
+}
+
 function initGallery(e) {
   const gallery = e.target.closest(".item-gallery");
   if (!gallery) return;
 
-  const thumbs = [...gallery.querySelectorAll(".item-gallery__thumb img")];
+  // Use the larger images list from data-gallery-thumbs or similar, but for now thumbnails
+  const thumbs = [...gallery.querySelectorAll("[data-gallery-thumb] img")];
   if (!thumbs.length) return;
 
   const overlay = document.querySelector("[data-gallery-overlay]");
   if (!overlay) return;
 
-  const displayImg = overlay.querySelector(".displayed-img");
-
-  // collect image sources
   const images = thumbs.map(img => img.src);
-
-  // store them on overlay
   overlay.dataset.images = JSON.stringify(images);
   overlay.dataset.index = "0";
 
-  // show first image
+  const displayImg = overlay.querySelector(".displayed-img");
   displayImg.src = images[0];
 
-  // show overlay
+  const currentEl = overlay.querySelector(".current");
+  if (currentEl) currentEl.textContent = "1";
+  const totalEl = overlay.querySelector(".total");
+  if (totalEl) totalEl.textContent = images.length;
+
   overlay.hidden = false;
-}
-
-function handleImageControls(control) {
-  const overlay = document.querySelector(".item-gallery");
-  if (!overlay) return;
-
-  const displayImg = overlay.querySelector(".item-gallery__img");
-  const currentImageIndex = displayImg.dataset.galleryMain;
-
-  const newImageIndex = Number(control.dataset.galleryNewImage);
-
-  const newImage = overlay.querySelector(`[data-gallery-thumb="${newImageIndex}"] img`);
-
-  displayImg.src = newImage.src;
-  displayImg.alt = newImage.alt;
-  displayImg.dataset.galleryMain = newImageIndex;
-
-  overlay.querySelector(`[data-gallery-index]`).textContent = newImageIndex;
-  const galleryLength = overlay.querySelector(`[data-gallery-length]`).textContent;
-
-  const navigationArrows = overlay.querySelectorAll('[data-gallery-new-image]');
-  //   navigationArrows[0].dataset.galleryNewImage = 
-  if (newImageIndex > currentImageIndex) {
-    if (newImageIndex == galleryLength) control.classList.add('disabled');
-    else control.dataset.galleryNewImage = newImageIndex + 1;
-    navigationArrows[0].dataset.galleryNewImage = currentImageIndex;
-    if (currentImageIndex == 1) navigationArrows[0].classList.remove('disabled');
-  } else {
-    if (newImageIndex == 1) control.classList.add('disabled');
-    else control.dataset.galleryNewImage = newImageIndex - 1;
-    navigationArrows[1].dataset.galleryNewImage = currentImageIndex;
-    if (currentImageIndex == galleryLength) navigationArrows[1].classList.remove('disabled');
-  }
 }
 
 function toggleActive(el) {
   el.classList.toggle("active", !el.classList.contains('active'));
-}
+}

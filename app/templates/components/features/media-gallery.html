@@ -53,7 +53,7 @@
   {% if item.images|length > 1 %}
 
   <!-- thumbnails -->
-  <div class="item-gallery__thumbs is-hidden">
+  <div class="item-gallery__thumbs">
 
     {% for image in item.images %}
     {% call button(class='item-gallery__thumb', attrs={'data-gallery-thumb': loop.index}) %}
