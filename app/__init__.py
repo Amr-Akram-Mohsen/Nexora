@@ -1,5 +1,6 @@
 # app/__init__.py
 from flask import Flask
+from flask_migrate import Migrate
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from .models import db, User
@@ -13,6 +14,8 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+
+    migrate = Migrate(app, db)
 
     # Initialize Flask-Login
     login_manager = LoginManager()

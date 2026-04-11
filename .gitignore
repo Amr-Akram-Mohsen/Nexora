@@ -11,15 +11,12 @@ venv/
 # Flask instance (db, secrets)
 instance/
 
+*.db
 # VS Code
 .vscode/
 
-# Static generated images (your existing ones)
-app/static/article_images
-app/static/images
-
 tmp/
-app/sentiment_model
+app/sentiment_model/
 
 # OS junk
 .DS_Store
