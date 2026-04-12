@@ -52,6 +52,8 @@ def create_app():
     from .api_models import LastAPIFetch, APIUsage  # noqa: F401
 
     with app.app_context():
+        import os
+        os.makedirs(os.path.join(app.root_path, '..', 'instance'), exist_ok=True)
         db.create_all()
 
     # ── CLI Commands ─────────────────────────────────────────────
