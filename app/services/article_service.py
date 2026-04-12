@@ -154,7 +154,7 @@ def get_popular_brands(limit=5):
 def get_active_sections():
     return (
         db.session.query(Section.slug, Section.name)
-        .filter_by(is_active=1)
+        .filter_by(is_active=True)
         .order_by(Section.sort_order)
         .all()
     )
