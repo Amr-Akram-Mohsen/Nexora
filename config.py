@@ -5,7 +5,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "new-tech-2025-static-key")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL",
         "sqlite:///" + os.path.join(BASE_DIR, "instance", "nexora.db")
@@ -35,6 +35,9 @@ class Config:
     # Create an app at: https://www.reddit.com/prefs/apps  (type: "script")
     REDDIT_CLIENT_ID     = os.environ.get("REDDIT_CLIENT_ID")
     REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
+
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = "None"
 
     # ── Amazon PA-API 5.0 ─────────────────────────────────────────
     # Requires two Amazon Associates accounts:
