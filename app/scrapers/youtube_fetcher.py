@@ -22,6 +22,9 @@ YOUTUBE_QUERIES = {
             "laptop review 2025",
             "مراجعة لابتوب",
             "TWS earbuds review",
+            "smartwatch review 2025",
+            "مراجعة ساعة ذكية",
+            "camera test and review",
         ],
         "perfumes": [
             "best perfume review 2025",
@@ -29,12 +32,17 @@ YOUTUBE_QUERIES = {
             "oud fragrance review",
             "top perfumes men 2025",
             "أفضل عطر 2025",
+            "niche fragrance review",
+            "مراجعة عطور نسائية",
+            "summer cologne review",
         ],
         "accessories": [
             "luxury watch review 2025",
             "مراجعة ساعة فاخرة",
             "best sunglasses 2025",
             "designer bag review",
+            "أفضل نظارات شمسية",
+            "mens fashion accessories style",
         ],
     }
 }

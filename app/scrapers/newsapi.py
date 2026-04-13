@@ -20,23 +20,56 @@ logger = logging.getLogger(__name__)
 # Mapped by [Section] -> [Category] -> [List of Queries]
 SECTION_QUERIES = {
     "news": {
-        "electronics": ["tech news", "AI news", "smartphone news"],
-        "perfumes":    ["perfume launch", "fragrance news", "perfume brand"],
-        "accessories": ["luxury watch news", "fashion accessories", "designer brand"],
+        "electronics": [
+            "tech news", "AI news", "smartphone news", "gadget release",
+            "semiconductor news", "wearable tech", "consumer electronics"
+        ],
+        "perfumes": [
+            "perfume launch", "fragrance news", "perfume brand",
+            "niche fragrance", "cologne release", "designer perfume"
+        ],
+        "accessories": [
+            "luxury watch news", "fashion accessories", "designer brand",
+            "jewelry trends", "smartwatch features", "sunglasses fashion"
+        ],
     },
     "reviews": {
-        "electronics": ["smartphone review", "laptop review", "tablet review"],
-        "perfumes":    ["perfume review", "fragrance review", "cologne review"],
-        "accessories": ["watch review", "sunglasses review", "luxury accessories review"],
+        "electronics": [
+            "smartphone review", "laptop review", "tablet review",
+            "smartwatch review", "headphones review", "camera review"
+        ],
+        "perfumes": [
+            "perfume review", "fragrance review", "cologne review",
+            "scent review", "best perfumes"
+        ],
+        "accessories": [
+            "watch review", "sunglasses review", "luxury accessories review",
+            "handbag review", "wallet review"
+        ],
     },
     "tutorials": {
-        "electronics": ["tech tutorial", "how to programming"],
-        "accessories": ["how to style accessories", "fashion tips"],
+        "electronics": [
+            "tech tutorial", "how to programming", "smartphone tips",
+            "laptop setup guide", "software tutorial"
+        ],
+        "accessories": [
+            "how to style accessories", "fashion tips", "watch maintenance",
+            "jewelry care"
+        ],
     },
     "trends": {
-        "electronics": ["technology trends 2025"],
-        "perfumes":    ["fragrance trends 2025", "best perfumes 2025"],
-        "accessories": ["fashion trends 2025", "luxury trends"],
+        "electronics": [
+            "technology trends 2025", "future of smartphones", "AI trends",
+            "smart home trends"
+        ],
+        "perfumes": [
+            "fragrance trends 2025", "best perfumes 2025", "perfume ingredients",
+            "sustainable fragrances"
+        ],
+        "accessories": [
+            "fashion trends 2025", "luxury trends", "watch trends 2025",
+            "jewelry trends 2025"
+        ],
     },
 }
 

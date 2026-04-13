@@ -58,17 +58,6 @@ def create_app():
         seed_db()
         print("Database seeded successfully!")
 
-    @app.cli.command("seed-test-data")
-    def seed_test_data_command():
-        from tmp.test_data_generator import generate_mock_data
-        from .utils.matcher import match_articles_to_items
-        print("Generating mock products and variants...")
-        generate_mock_data()
-        print("Mock data generation complete!")
-        print("Running matcher to link items with existing articles...")
-        match_articles_to_items()
-        print("Done!")
-
     @app.cli.command("link-articles")
     def link_articles_command():
         from .utils.matcher import match_articles_to_items
@@ -83,23 +72,30 @@ def create_app():
         created = seed_arabclicks_stores()
         print(f"Done! {created} new ArabClicks stores seeded.")
 
+    # @app.cli.command("fetch-all")
+    # def fetch_all_command():
+    #     """Runs active fetchers in one go."""
+    #     from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery, run_noon_discovery
+    #     from .utils.matcher import match_articles_to_items
+    #     print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews) ---")
+    #     run_article_fetch()
+    #     print("--- [2/4] Fetching Reddit Communities ---")
+    #     run_reddit_fetch()
+    #     print("--- [3/4] Discovering Amazon Products ---")
+    #     run_amazon_discovery()
+    #     print("--- [4/4] Discovering Noon Products (ArabClicks) ---")
+    #     run_noon_discovery()
+    #     print("--- [Matcher] Linking Articles to Items ---")
+    #     match_articles_to_items()
+    #     print("Done! All active ingestion jobs complete.")
+
+
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs active fetchers in one go."""
-        from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery, run_noon_discovery
-        from .utils.matcher import match_articles_to_items
+        from .scrapers.runner import run_article_fetch
         print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews) ---")
         run_article_fetch()
-        print("--- [2/4] Fetching Reddit Communities ---")
-        run_reddit_fetch()
-        print("--- [3/4] Discovering Amazon Products ---")
-        run_amazon_discovery()
-        print("--- [4/4] Discovering Noon Products (ArabClicks) ---")
-        run_noon_discovery()
-        print("--- [Matcher] Linking Articles to Items ---")
-        match_articles_to_items()
-        print("Done! All active ingestion jobs complete.")
-
     # ── Start background scheduler ───────────────────────────────
     from .jobs.scheduler import init_scheduler
     init_scheduler(app)

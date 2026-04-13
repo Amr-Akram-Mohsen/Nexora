@@ -36,14 +36,12 @@ RSS_FEEDS = {
             "https://www.gsmarena.com/rss-news-reviews.php3",
             "https://www.notebookcheck.net/News.8.0.html?feed=rss",
             "https://www.techradar.com/rss",
-            "https://www.slashgear.com/feed/",
             "https://arstechnica.com/gadgets/feed/",
             # Dev.to tech articles (full content, free, no key)
             "https://dev.to/feed/tag/programming",
             "https://dev.to/feed/tag/webdev",
         ],
         "perfumes": [
-            "https://www.fragrantica.com/news/feed/",
             "https://cafleurebon.com/feed/",
         ],
         "accessories": [
@@ -54,14 +52,10 @@ RSS_FEEDS = {
     "news": {
         "electronics": [
             "https://www.theverge.com/rss/index.xml",
-            "https://feeds.feedburner.com/TechCrunch/",
             "https://9to5google.com/feed/",
             "https://9to5mac.com/feed/",
             "https://www.engadget.com/rss.xml",
             "https://www.wired.com/feed/rss",
-            # Hacker News top stories (discussion links, free, no key)
-            "https://hnrss.org/frontpage",
-            "https://hnrss.org/best",
         ],
         "perfumes": [
             "https://perfumerflavorist.com/feed/",
@@ -69,8 +63,6 @@ RSS_FEEDS = {
         "accessories": [
             "https://hypebeast.com/feed",
             "https://www.highsnobiety.com/feed/",
-            # Product Hunt daily (new product launches)
-            "https://www.producthunt.com/feed",
         ],
     },
     "tutorials": {

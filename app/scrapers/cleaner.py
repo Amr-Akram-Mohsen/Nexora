@@ -22,6 +22,7 @@ import html
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.utils.sanitizer import sanitize_text
+from app.utils.article_extractor import scrape_article_content, enhance_article_html
 
 # ── Safe HTML tags allowed in article content ──────────────────
 # Everything else is stripped. Script/style/iframe always removed.
@@ -189,8 +190,15 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
     source_name = sanitize_text(source_raw)
 
     # ── Content ──────────────────────────────────────────────────
-    # Sanitize: allow safe tags (p, h2, ul, img, a…), strip scripts/iframes
-    content = _sanitize_content(raw.get("content") or "")
+    # If the source isn't YouTube, we actively try to scrape the full article body.
+    # We strictly enforce that if we fail to scrape the full content, we leave it as None.
+    # This prevents storing partial/snippet data so you can easily detect missing content.
+    content = None
+    if url and "youtube.com" not in url.lower():
+        full_content = scrape_article_content(url)
+        if full_content:
+            enhanced_html = enhance_article_html(full_content)
+            content = _sanitize_content(enhanced_html)
 
     return {
         # ── Core fields ──────────────────────────────────────────

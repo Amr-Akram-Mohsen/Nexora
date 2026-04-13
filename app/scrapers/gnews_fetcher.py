@@ -19,14 +19,32 @@ logger = logging.getLogger(__name__)
 # Mapped by [Section] -> [Category] -> [List of Queries]
 SECTION_QUERIES = {
     "news": {
-        "electronics": ["technology", "smartphones", "artificial intelligence", "tech news"],
-        "perfumes":    ["عطر رجالي", "عطر نسائي", "oud perfume", "perfume news"],
-        "accessories": ["luxury watch news", "fashion accessories", "designer brand"],
+        "electronics": [
+            "technology", "smartphones", "artificial intelligence", "tech news",
+            "أخبار التقنية", "هواتف ذكية", "الذكاء الاصطناعي", "أجهزة ذكية"
+        ],
+        "perfumes": [
+            "عطر رجالي", "عطر نسائي", "oud perfume", "perfume news",
+            "عطور فخمة", "أخبار العطور", "أفضل عطر", "fragrance release"
+        ],
+        "accessories": [
+            "luxury watch news", "fashion accessories", "designer brand",
+            "ساعات فاخرة", "مجوهرات", "نظارات شمسية", "إكسسوارات الموضة"
+        ],
     },
     "reviews": {
-        "electronics": ["smartphone review", "laptop review", "tablet review"],
-        "perfumes":    ["perfume review", "fragrance review", "مراجعة عطر"],
-        "accessories": ["watch review", "sunglasses review", "luxury accessories review"],
+        "electronics": [
+            "smartphone review", "laptop review", "tablet review",
+            "مراجعة هاتف", "مراجعة لابتوب", "تقييم أجهزة", "headphones review"
+        ],
+        "perfumes": [
+            "perfume review", "fragrance review", "مراجعة عطر",
+            "تقييم عطور", "best colognes", "عطور الصيف"
+        ],
+        "accessories": [
+            "watch review", "sunglasses review", "luxury accessories review",
+            "مراجعة ساعة", "أفضل الإكسسوارات"
+        ],
     },
 }
 
