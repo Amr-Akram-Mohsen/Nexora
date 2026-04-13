@@ -800,7 +800,7 @@ class Comment(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    reactions  = db.relationship(
+    reactions = db.relationship(
         "Reaction",
         primaryjoin="and_(foreign(Reaction.target_id) == Comment.id, Reaction.target_type == 'comment')",
         back_populates="comment",

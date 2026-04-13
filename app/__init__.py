@@ -6,11 +6,17 @@ from authlib.integrations.flask_client import OAuth
 from .models import db, User
 from config import Config
 from .extensions import mail, csrf, limiter
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 load_dotenv()
 
+
 def create_app():
     app = Flask(__name__)
+
+    if not app.debug:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
     app.config.from_object(Config)
 
     db.init_app(app)
