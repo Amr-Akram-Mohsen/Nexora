@@ -3,8 +3,11 @@ import requests, os
 HF_API_URL = os.getenv("HF_API_URL")
 
 def analyze_sentiment(text: str):
+    if not HF_API_URL:
+        return "neutral", 0
+
     if not text.strip():
-        return "neutral", 1.0
+        return "neutral", 0
 
     try:
         response = requests.post(
@@ -23,4 +26,4 @@ def analyze_sentiment(text: str):
         print("Sentiment API error:", e)  # optional logging
 
         # fallback (important for stability)
-        return "neutral", 0.5
+        return "neutral", 0

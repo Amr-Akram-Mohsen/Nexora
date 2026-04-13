@@ -51,11 +51,6 @@ def create_app():
     # ── Ensure api_models tables are created ─────────────────────
     from .api_models import LastAPIFetch, APIUsage  # noqa: F401
 
-    with app.app_context():
-        import os
-        os.makedirs(os.path.join(app.root_path, '..', 'instance'), exist_ok=True)
-        db.create_all()
-
     # ── CLI Commands ─────────────────────────────────────────────
     @app.cli.command("seed-db")
     def seed_db_command():
