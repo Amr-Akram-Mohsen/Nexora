@@ -40,7 +40,10 @@ def google_authorize():
         return redirect(url_for("main.login"))
 
     email = user_info.get('email')
-    
+    if not email:
+        flash("Google did not return email", "error")
+        return redirect(url_for("main.login"))
+
     # Check if user exists
     user = User.query.filter_by(email=email).first()
     

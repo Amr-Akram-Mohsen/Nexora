@@ -12,15 +12,6 @@ logger = logging.getLogger(__name__)
 
 def run_article_fetch():
     """Fetch all free sources + YouTube with a diverse set of tech/fragrance/fashion queries."""
-    # ── RSS (Always Runs) ──────────────────────────────────────────
-    try:
-        from .rss_fetcher import fetch_all_rss
-        logger.info("[Runner] RSS feeds...")
-        count = fetch_all_rss()
-        logger.info("[Runner] RSS done — %d articles stored", count)
-    except Exception:
-        logger.exception("[Runner] RSS fetch failed")
-
     # ── NewsAPI (Requires Key) ───────────────────────────────────
     if current_app.config.get("NEWS_API_KEY"):
         try:
@@ -53,6 +44,16 @@ def run_article_fetch():
             logger.exception("[Runner] YouTube fetch failed")
     else:
         logger.info("[Runner] Skipping YouTube: Key missing")
+
+    # ── RSS (Always Runs) ──────────────────────────────────────────
+    try:
+        from .rss_fetcher import fetch_all_rss
+        logger.info("[Runner] RSS feeds...")
+        count = fetch_all_rss()
+        logger.info("[Runner] RSS done — %d articles stored", count)
+    except Exception:
+        logger.exception("[Runner] RSS fetch failed")
+
 
 
 def run_reddit_fetch():

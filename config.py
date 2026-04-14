@@ -24,7 +24,7 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER= os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "support@yoursite.com")
-    MAIL_ENABLED = True
+    MAIL_ENABLED = False # this was previously True and I changed it for some reason after I deployed it in Render
 
     # ── Article / News APIs ───────────────────────────────────────
     NEWS_API_KEY = os.environ.get("NEWS_API_KEY")

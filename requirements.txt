@@ -32,3 +32,4 @@ limits==5.8.0
 
 trafilatura==1.12.2
 markdown==3.7
+bleach==6.2.0
