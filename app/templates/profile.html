@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}My Profile | Nexora{% endblock %}
+{% block content %}
+<section class="profile-section">
+  <div class="container">
+    <div class="profile-wrapper">
+
+      <!-- Header -->
+      <div class="profile-header flex items-center">
+        <div class="profile-avatar flex items-center justify-center">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name">{{ current_user.name or current_user.email.split('@')[0]|title }}</h1>
+          <p class="profile-email">{{ current_user.email }}</p>
+          <div class="profile-badges flex items-center">
+            {% if current_user.is_verified %}
+            <span class="profile-badge profile-badge--verified"><i class="fas fa-check-circle"></i> Verified</span>
+            {% else %}
+            <span class="profile-badge profile-badge--unverified"><i class="fas fa-exclamation-circle"></i> Unverified</span>
+            {% endif %}
+            {% if current_user.provider == 'google' %}
+            <span class="profile-badge profile-badge--google"><i class="fab fa-google"></i> Google</span>
+            {% endif %}
+            <span class="profile-badge profile-badge--member">Member since {{ current_user.created_at.strftime('%b %Y') }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% if not current_user.is_verified and current_user.provider != 'google' %}
+      <div class="profile-alert profile-alert--warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Your email is not verified. <strong>Some features may be restricted.</strong></span>
+        <form action="{{ url_for('main.resend_verification') }}" method="POST" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="email" value="{{ current_user.email }}">
+          <button type="submit" class="btn btn--link">Resend verification email →</button>
+        </form>
+      </div>
+      {% endif %}
+
+      <div class="profile-grid">
+
+        <!-- Update Name -->
+        <div class="profile-card">
+          <h2 class="profile-card__title"><i class="fas fa-user-edit"></i> Update Name</h2>
+          <form action="{{ url_for('main.update_profile') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="name">
+            <div class="field-wrapper">
+              <label class="label" for="name">Display Name</label>
+              <input class="input" type="text" id="name" name="name"
+                value="{{ current_user.name or '' }}" placeholder="Your name" maxlength="120">
+            </div>
+            <button type="submit" class="btn variant--primary profile-card__btn">Save Name</button>
+          </form>
+        </div>
+
+        <!-- Change Password (only for local accounts) -->
+        {% if current_user.provider != 'google' %}
+        <div class="profile-card">
+          <h2 class="profile-card__title"><i class="fas fa-lock"></i> Change Password</h2>
+          <form action="{{ url_for('main.update_profile') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="password">
+            <div class="field-wrapper">
+              <label class="label" for="current_password">Current Password</label>
+              <input class="input" type="password" id="current_password" name="current_password" placeholder="••••••••">
+            </div>
+            <div class="field-wrapper">
+              <label class="label" for="new_password">New Password</label>
+              <input class="input" type="password" id="new_password" name="new_password"
+                placeholder="••••••••" minlength="8">
+            </div>
+            <div class="field-wrapper">
+              <label class="label" for="confirm_new_password">Confirm New Password</label>
+              <input class="input" type="password" id="confirm_new_password" name="confirm_new_password"
+                placeholder="••••••••" minlength="8">
+            </div>
+            <button type="submit" class="btn variant--primary profile-card__btn">Update Password</button>
+          </form>
+        </div>
+        {% endif %}
+
+        <!-- Newsletter Status -->
+        <div class="profile-card">
+          <h2 class="profile-card__title"><i class="fas fa-envelope"></i> Newsletter</h2>
+          {% if subscriber %}
+          <p class="profile-card__desc">
+            {% if subscriber.is_confirmed %}
+            <span class="text-success"><i class="fas fa-check"></i> Subscribed & confirmed</span>
+            {% elif subscriber.unsubscribed_at %}
+            <span class="text-muted"><i class="fas fa-times"></i> You are unsubscribed</span>
+            {% else %}
+            <span class="text-warning"><i class="fas fa-clock"></i> Pending email confirmation</span>
+            {% endif %}
+          </p>
+          {% else %}
+          <p class="profile-card__desc text-muted">You are not subscribed to the Nexora newsletter.</p>
+          <div data-newsletter>
+            {% include "partials/newsletter.html" %}
+          </div>
+          {% endif %}
+        </div>
+
+      </div><!-- /.profile-grid -->
+    </div><!-- /.profile-wrapper -->
+  </div><!-- /.container -->
+</section>
+{% endblock %}

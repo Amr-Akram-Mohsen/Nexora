@@ -1,7 +1,7 @@
 from flask import request, render_template, jsonify, current_app, make_response, url_for
 from datetime import datetime
 
-from app.models import db, ContactMessage, Item, Article
+from app.models import db, ContactMessage, Item, Article, User, NewsletterSubscriber
 from app.services.mailer import send_admin_email
 from app.services.pages_content import PAGES_CONTENT
 from app.services.article_service import get_articles
@@ -148,3 +148,38 @@ def sitemap():
     response = make_response(sitemap_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
+
+@bp.route('/profile')
+@login_required
+def profile():
+    subscriber = NewsletterSubscriber.query.filter_by(user_id=current_user.id).first()
+    return render_template('profile.html', subscriber=subscriber)
+
+@bp.route('/update-profile', methods=['POST'])
+@login_required
+def update_profile():
+    action = request.form.get('action')
+    if action == 'name':
+        current_user.name = request.form.get('name', '').strip()[:120]
+        db.session.commit()
+        flash('Display name updated successfully.', 'success')
+    elif action == 'password':
+        if current_user.provider == 'google':
+            flash('Google accounts cannot change password here.', 'error')
+            return redirect(url_for('main.profile'))
+        
+        current_pwd_input = request.form.get('current_password', '')
+        new_pwd = request.form.get('new_password', '')
+        confirm_pwd = request.form.get('confirm_new_password', '')
+        
+        if not current_user.check_password(current_pwd_input):
+            flash('Incorrect current password.', 'error')
+        elif len(new_pwd) < 8:
+            flash('New password must be at least 8 characters.', 'error')
+        elif new_pwd != confirm_pwd:
+            flash('New passwords do not match.', 'error')
+        else:
+            current_user.set_password(new_pwd)
+            db.session.commit()
+            flash('Password changed successfully!', 'success')
+    return redirect(url_for('main.profile'))

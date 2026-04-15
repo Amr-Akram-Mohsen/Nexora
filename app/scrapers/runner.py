@@ -58,16 +58,8 @@ def run_article_fetch():
 
 def run_reddit_fetch():
     """Fetch community posts from diverse subreddits."""
-    # ── Reddit (Disabled for now as per user request) ────────────────
-    # if current_app.config.get("REDDIT_CLIENT_ID"):
-    #     try:
-    #         from .reddit_fetcher import fetch_all_reddit
-    #         count = fetch_all_reddit()
-    #         logger.info("[Runner] Reddit done — %d posts stored", count)
-    #     except Exception:
-    #         logger.exception("[Runner] Reddit fetch failed")
-    # else:
     logger.info("[Runner] Skipping Reddit: Disabled per user request")
+    pass
 
 
 def run_price_refresh():
@@ -110,30 +102,8 @@ def run_price_refresh():
 
 def run_amazon_discovery():
     """Discover new products from Amazon."""
-    # ── Amazon Discovery (Disabled for now as per user request) ──────
-    # if not current_app.config.get("AMAZON_SECRET_KEY"):
-    #     logger.info("[Runner] Skipping Amazon Discovery: Amazon Keys missing")
-    #     return
-    #
-    # try:
-    #     from .amazon_pa import search_products
-    #     from .item_storer import store_amazon_item
-    #     SEARCHES = [
-    #         ("Samsung Galaxy S25", "sa", "electronics"), ("iPhone 16 pro", "sa", "electronics"),
-    #         ("Dior Sauvage parfum", "sa", "perfumes"), ("Versace Eros men", "sa", "perfumes"),
-    #         ("Seiko watch automatic", "sa", "accessories"), ("Ray Ban sunglasses", "sa", "accessories"),
-    #         ("Samsung Galaxy S25", "ae", "electronics"), ("iPhone 16 pro", "ae", "electronics"),
-    #     ]
-    #     total_stored = 0
-    #     for keywords, marketplace, category_slug in SEARCHES:
-    #         products = search_products(keywords, marketplace, category_slug, max_results=10)
-    #         for raw in products:
-    #             item = store_amazon_item(raw)
-    #             if item: total_stored += 1
-    #     logger.info("[Runner] Discovery done — %d new items stored", total_stored)
-    # except Exception:
-    #     logger.exception("[Runner] Amazon discovery failed")
     logger.info("[Runner] Skipping Amazon Discovery: Disabled per user request")
+    pass
 
 
 def run_noon_discovery():

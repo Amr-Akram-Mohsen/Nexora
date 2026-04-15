@@ -6,8 +6,8 @@
     <h2 class="title">{{ title }}</h2>
     {% if section_slug %}
     {% set href = (
-    url_for('main.items')
-    if section_slug == 'deals'
+    url_for('main.deals')
+    if section_slug in ('deals', 'recent')
     else url_for('main.sections', section_slug=section_slug)
     ) %}
     <a href="{{ href }}" class="view-all">

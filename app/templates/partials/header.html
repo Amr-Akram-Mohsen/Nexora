@@ -78,6 +78,11 @@
               <span class="user-email">{{ user_email }}</span>
             </div>
             
+            <a href="{{ url_for('main.profile') }}" class="{{ item_class }}">
+              <i class="fas fa-id-card"></i>
+              Profile
+            </a>
+            
             <a href="{{ url_for('main.saved_items') }}" class="{{ item_class }}">
               <i class="far fa-bookmark"></i>
               Saved Items

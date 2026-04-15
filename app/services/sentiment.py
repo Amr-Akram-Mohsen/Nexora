@@ -1,4 +1,6 @@
-import requests, os
+import requests, os, logging
+
+logger = logging.getLogger(__name__)
 
 HF_API_URL = os.getenv("HF_API_URL")
 
@@ -23,7 +25,7 @@ def analyze_sentiment(text: str):
         return data.get("sentiment", "neutral"), data.get("confidence", 0.5)
 
     except Exception as e:
-        print("Sentiment API error:", e)  # optional logging
+        logger.warning("Sentiment API error: %s", e)
 
         # fallback (important for stability)
         return "neutral", 0

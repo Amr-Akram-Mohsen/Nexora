@@ -132,7 +132,7 @@ def scrape_article_content(url: str) -> str | None:
             url=url
         )
 
-        if not extracted_md or len(extracted_md) < 400:
+        if not extracted_md or len(extracted_md) < 150:
             logger.debug(f"[Extractor] Trafilatura failed to extract full content from {url} or content is too short (maybe JS wall).")
             return None
 

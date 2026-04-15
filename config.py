@@ -24,7 +24,7 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER= os.environ.get("MAIL_DEFAULT_SENDER", MAIL_USERNAME)
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "support@yoursite.com")
-    MAIL_ENABLED = False # this was previously True and I changed it for some reason after I deployed it in Render
+    MAIL_ENABLED = os.environ.get("MAIL_ENABLED", "False").lower() == "true"
 
     # ── Article / News APIs ───────────────────────────────────────
     NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
@@ -36,8 +36,10 @@ class Config:
     REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID")
     REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
 
-    SESSION_COOKIE_SECURE = True
-    SESSION_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() == "true"
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_HTTPONLY = True
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30  # 30 days (for remember-me)
 
     # ── Amazon PA-API 5.0 ─────────────────────────────────────────
     # Requires two Amazon Associates accounts:

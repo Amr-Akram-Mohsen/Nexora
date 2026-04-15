@@ -11,11 +11,18 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
+    name = db.Column(db.String(120), nullable=True)
     password_hash = db.Column(db.Text, nullable=False)
     google_id = db.Column(db.Text, unique=True, nullable=True)
     provider = db.Column(db.Text, nullable=True)  # 'google' or 'local'
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    # Email verification
+    is_verified = db.Column(db.Boolean, default=False, nullable=False)
+    verification_token = db.Column(db.String(255), nullable=True)
+    # Password reset
+    reset_token = db.Column(db.String(255), nullable=True)
+    reset_token_expires_at = db.Column(db.DateTime, nullable=True)
     
     
     # Relationships
@@ -571,14 +578,7 @@ class Item(db.Model):
     )
     __table_args__ = (
         db.Index("ix_items_slug", "slug"),  # optional, speeds up queries
-    )    
-    @property
-    def rating(self):
-        return 4.7
-
-    @property
-    def review_count(self):
-        return 982
+    )
 
     def __repr__(self):
         return f"<Item {self.name}>"
@@ -977,6 +977,7 @@ class UserEntityInterest(db.Model):
     )
 # ==================================================================
 class ContactMessage(db.Model):
+    __tablename__ = 'contact_messages'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False)

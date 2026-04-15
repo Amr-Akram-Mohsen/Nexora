@@ -113,7 +113,7 @@ def unsubscribe_auth():
             'error': 'You are not subscribed.'
         })
 
-    subscriber.unsubscribed_at = datetime.utcnow()
+    subscriber.unsubscribed_at = datetime.now(timezone.utc)
     db.session.commit()
 
     return jsonify({
@@ -135,7 +135,7 @@ def unsubscribe_token(token):
         flash("Invalid unsubscribe link.", "error")
         return redirect(url_for('main.home'))
 
-    subscriber.unsubscribed_at = datetime.utcnow()
+    subscriber.unsubscribed_at = datetime.now(timezone.utc)
     db.session.commit()
 
     flash("You have been unsubscribed successfully.", "success")
@@ -240,7 +240,7 @@ def item_click(link_id):
     link = ItemStoreLink.query.get_or_404(link_id)
     user_id = current_user.id if current_user.is_authenticated else None
     ip_address = request.remote_addr if not user_id else None
-    last_24h = datetime.utcnow() - timedelta(hours=24)
+    last_24h = datetime.now(timezone.utc) - timedelta(hours=24)
     # 🔒 Deduplicate click
     existing = ItemClick.query.filter(
         ItemClick.item_store_link_id == link.id,
@@ -290,12 +290,20 @@ def add_view():
         target_id = int(request.form.get("id"))
     except (TypeError, ValueError):
         abort(400, "Invalid target id")
+    user = current_user if current_user.is_authenticated else None
+    ip = None if user else get_client_ip()
     if target_type == TargetType.ARTICLE:
-        _ = Article.query.get_or_404(target_id)
+        target = Article.query.get_or_404(target_id)
     else:
-        _ = Item.query.get_or_404(target_id)
-    result = record_view(target_type, target_id)
+        target = Item.query.get_or_404(target_id)
+    result = record_view(
+        target=target,
+        target_type=target_type,
+        user=user,
+        ip_address=ip,
+    )
     return jsonify(result)
+
 
 @bp.route("/handle-interaction", methods=["POST"])
 @login_required

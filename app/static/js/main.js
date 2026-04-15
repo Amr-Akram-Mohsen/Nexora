@@ -216,18 +216,32 @@ function handleGlobalChanges(e) {
     }
 }
 
-// Header scroll effect
+// Header scroll effect & Back to Top
 function initHeaderScroll() {
     const header = document.querySelector('.site-header');
-    if (!header) return;
-
+    const backToTopBtn = document.getElementById('back-to-top');
+    
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.classList.add('site-header--scrolled');
+            if (header) header.classList.add('site-header--scrolled');
         } else {
-            header.classList.remove('site-header--scrolled');
+            if (header) header.classList.remove('site-header--scrolled');
+        }
+        
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('is-hidden');
+            } else {
+                backToTopBtn.classList.add('is-hidden');
+            }
         }
     });
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 }
 
 // Initialize everything on DOM load

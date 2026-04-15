@@ -11,7 +11,7 @@
 
 {% block og_type %}product{% endblock %}
 
-{% block og_image %}{{ item.images[0].url if item.images else url_for('static', filename='img/og-preview.jpg',
+{% block og_image %}{{ item.images[0].image_url if item.images else url_for('static', filename='img/og-preview.jpg',
 _external=True) }}{% endblock %}
 
 {% block structured_data %}
@@ -22,7 +22,7 @@ _external=True) }}{% endblock %}
   "name": "{{ item.name }}",
   "image": [
     {% for img in item.images[:3] %}
-    "{{ img.url }}"{% if not loop.last %},{% endif %}
+    "{{ img.image_url }}"{% if not loop.last %},{% endif %}
     {% endfor %}
   ],
   "description": "{{ item.description }}",

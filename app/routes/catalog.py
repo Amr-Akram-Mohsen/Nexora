@@ -9,6 +9,7 @@ from app.services.article_service import get_search_articles, get_active_brands_
 from app.services.interaction_service import record_view
 from app.constants import TargetType
 from app.utils.request import get_client_ip, get_country
+from app.utils.parsing import safe_float
 from . import bp
 
 # ============== SEARCH LOGIC ================
@@ -44,7 +45,6 @@ def sections(section_slug):
         Section.is_active == True
     ).first_or_404()
 
-    # Standardize filters: all use base names (brand, category, topic)
     active_filters = {
         'category': request.args.get('category'),
         'topic': request.args.getlist('topic'),
@@ -53,40 +53,40 @@ def sections(section_slug):
     }
 
     allowed_filters = set(section.allowed_filters or [])
+    page = request.args.get('page', 1, type=int)
 
     query = (
         Article.query
         .join(Article.sections)
         .filter(Section.id == section.id)
     )
-    
+
     if active_filters['category']:
         query = query.join(Article.category).filter(Category.slug == active_filters['category'])
     if active_filters['topic'] and "topic" in allowed_filters:
         query = query.join(Article.topics).filter(Topic.slug.in_(active_filters['topic']))
     if active_filters['brand'] and "brand" in allowed_filters:
         query = query.join(Article.brands).filter(Brand.slug.in_(active_filters['brand']))
-    
-    # Sorting logic
+
     if active_filters['sort'] == 'oldest':
         query = query.order_by(Article.published_at.asc())
-    else: # newest
+    else:
         query = query.order_by(Article.published_at.desc())
 
-    articles = query.distinct().limit(50).all()
+    pagination = query.distinct().paginate(page=page, per_page=24, error_out=False)
+    articles = pagination.items
 
-    # Standardized filter_options for the sidebar
     filter_options = {}
     if "brand" in allowed_filters:
         filter_options["brand"] = get_active_brands_for_section(section_slug)
     if "topic" in allowed_filters:
         filter_options["topic"] = get_active_topics_for_section(section_slug)
-    
-    # We pass target_type to help the sidebar know what to render
+
     return render_template(
         "catalog-page.html",
         section=section,
         articles=articles,
+        pagination=pagination,
         target_type="articles",
         allowed_filters=allowed_filters,
         filter_options=filter_options,
@@ -162,7 +162,6 @@ def article_page(article_id):
 
 @bp.route("/deals")
 def deals():
-    # 1. Base Query with Eager Loading
     query = Item.query.options(
         db.joinedload(Item.brand),
         db.joinedload(Item.category),
@@ -170,7 +169,6 @@ def deals():
         db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
     )
 
-    # 2. Standardize Extract Filters from URL
     active_filters = {
         'category': request.args.getlist('category'),
         'brand': request.args.getlist('brand'),
@@ -180,37 +178,48 @@ def deals():
         'max_price': request.args.get('max_price'),
         'sort': request.args.get('sort', 'newest')
     }
+    page = request.args.get('page', 1, type=int)
 
-    # 3. Apply Filters
     if active_filters['category']:
         query = query.join(Item.category).filter(Category.slug.in_(active_filters['category']))
     if active_filters['brand']:
         query = query.join(Item.brand).filter(Brand.slug.in_(active_filters['brand']))
     if active_filters['type']:
         query = query.filter(Item.item_type.in_(active_filters['type']))
-    
     if active_filters['store']:
-        query = query.join(Item.variants).join(ItemVariant.store_links).join(ItemStoreLink.store).filter(Store.slug.in_(active_filters['store']))
+        query = (
+            query
+            .join(Item.variants)
+            .join(ItemVariant.store_links)
+            .join(ItemStoreLink.store)
+            .filter(Store.slug.in_(active_filters['store']))
+        )
 
-    if active_filters['min_price'] or active_filters['max_price']:
-        query = query.join(Item.variants)
-        if active_filters['min_price']:
-            query = query.filter(ItemVariant.price >= float(active_filters['min_price']))
-        if active_filters['max_price']:
-            query = query.filter(ItemVariant.price <= float(active_filters['max_price']))
+    min_p = safe_float(active_filters['min_price'])
+    max_p = safe_float(active_filters['max_price'])
+    if min_p is not None or max_p is not None:
+        # Only join variants once if not already joined by store filter
+        if not active_filters['store']:
+            query = query.join(Item.variants)
+        if min_p is not None:
+            query = query.filter(ItemVariant.price >= min_p)
+        if max_p is not None:
+            query = query.filter(ItemVariant.price <= max_p)
 
-    # 4. Sorting
+    # Sorting — avoid double-joining variants
     if active_filters['sort'] == 'price_low':
-        query = query.join(Item.variants).filter(ItemVariant.is_default == True).order_by(ItemVariant.price.asc())
+        if not active_filters['store'] and min_p is None and max_p is None:
+            query = query.join(Item.variants)
+        query = query.filter(ItemVariant.is_default == True).order_by(ItemVariant.price.asc())
     elif active_filters['sort'] == 'price_high':
-        query = query.join(Item.variants).filter(ItemVariant.is_default == True).order_by(ItemVariant.price.desc())
+        if not active_filters['store'] and min_p is None and max_p is None:
+            query = query.join(Item.variants)
+        query = query.filter(ItemVariant.is_default == True).order_by(ItemVariant.price.desc())
     elif active_filters['sort'] == 'popular':
         query = query.order_by(Item.view_count.desc())
-    else: # newest
+    else:
         query = query.order_by(Item.created_at.desc())
 
-    # 5. Optimized Fetch for Sidebar
-    # We pass these as filter_options to standardize with sections
     filter_options = {
         "category": Category.query.join(Item).distinct().all(),
         "brand": Brand.query.join(Item).distinct().all(),
@@ -218,11 +227,13 @@ def deals():
         "type": [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
     }
 
-    items = query.distinct().limit(40).all()
+    pagination = query.distinct().paginate(page=page, per_page=24, error_out=False)
+    items = pagination.items
 
     return render_template(
         "catalog-page.html",
         items=items,
+        pagination=pagination,
         target_type="products",
         allowed_filters=["category", "brand", "store", "type"],
         filter_options=filter_options,

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.models import View, Reaction, Comment, Save, db
 from sqlalchemy import func
 from app.services.interest_service import handle_interaction_interest
@@ -26,7 +26,7 @@ def record_view(
             'error' : "couldn't detect user"
         }
     
-    cutoff = datetime.utcnow() - timedelta(hours=24)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
 
     query = View.query.filter(
         View.target_type == target_type,
@@ -159,7 +159,7 @@ def post_comment(
     #     return {"success": False, "error": "Empty comment"}
 
     sentiment, confidence = analyze_sentiment(content)
-    created_at = datetime.utcnow()
+    created_at = datetime.now(timezone.utc)
         
     comment = Comment(
         user_id=user.id,

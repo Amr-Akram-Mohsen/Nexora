@@ -4,6 +4,25 @@
 <section class="detail-page detail-page--{{ item.card_type }}">
   <div class="container">
 
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ul class="flex items-center">
+        <li><a href="/" class="breadcrumb-link"><i class="fas fa-home"></i></a></li>
+        <li class="separator"><i class="fas fa-chevron-right"></i></li>
+        {% if item.card_type == 'article' %}
+          {% if item.sections %}
+          <li><a href="{{ url_for('main.sections', section_slug=item.sections[0].slug) }}" class="breadcrumb-link">{{ item.sections[0].name }}</a></li>
+          <li class="separator"><i class="fas fa-chevron-right"></i></li>
+          {% endif %}
+        {% else %}
+          <li><a href="{{ url_for('main.deals') }}" class="breadcrumb-link">Deals</a></li>
+          <li class="separator"><i class="fas fa-chevron-right"></i></li>
+        {% endif %}
+        <li><span class="breadcrumb-current">{{ item.name or item.title | truncate(35) }}</span></li>
+      </ul>
+    </nav>
+    <br>
+
     <!-- Top -->
     <div class="detail-page__top flex items-center justify-between">
       <a href="/">

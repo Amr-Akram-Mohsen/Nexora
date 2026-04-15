@@ -60,6 +60,28 @@
   {% if slot == 'content' %}
     {% if results %}
       {{ grid(results) }}
+      
+      {% if pagination and pagination.pages > 1 %}
+      <div class="pagination flex items-center justify-center">
+        {% set args = request.args.to_dict(flat=False) %}
+        {% if pagination.has_prev %}
+          {% set _ = args.update({'page': pagination.prev_num}) %}
+          <a href="{{ url_for(request.endpoint, **request.view_args, **args) }}" class="btn variant--outline">&laquo; Previous</a>
+        {% else %}
+          <span class="btn variant--outline disabled" aria-disabled="true">&laquo; Previous</span>
+        {% endif %}
+        
+        <span class="pagination-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        
+        {% if pagination.has_next %}
+          {% set _ = args.update({'page': pagination.next_num}) %}
+          <a href="{{ url_for(request.endpoint, **request.view_args, **args) }}" class="btn variant--outline">Next &raquo;</a>
+        {% else %}
+          <span class="btn variant--outline disabled" aria-disabled="true">Next &raquo;</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
     {% else %}
       <div class="no-results flex flex-col items-center">
         <i class="fas fa-search-minus icon-empty"></i>

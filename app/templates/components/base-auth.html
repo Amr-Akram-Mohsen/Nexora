@@ -37,6 +37,11 @@
     <p class="field-hint">Must be at least 8 characters</p>
     {% endif %}
     {% endcall %}
+    {% if is_new_user %}
+    {% call field(label_text="Confirm Password", for_id="confirm_password") %}
+    {{ input(name="confirm_password", id="confirm_password", type="password", placeholder="••••••••", attrs={"minlength": "8"}) }}
+    {% endcall %}
+    {% endif %}
     {% set label_name = "newsletter" if is_new_user else "remember" %}
     {% set label_text = "Subscribe to newsletter" if is_new_user
     else "Remember me"
@@ -48,7 +53,7 @@
         {{ input(name=label_name, id=label_name, type="checkbox", required=False) }}
         {% endcall %}
       </div>
-      <a href="" class="redirect-link">Forgot password?</a>
+      <a href="{{ url_for('main.forgot_password') }}" class="redirect-link">Forgot password?</a>
     </div>
     {% else %}
     <div class="field-wrapper flex items-center checkbox-wrapper">

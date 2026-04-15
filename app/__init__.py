@@ -49,7 +49,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     from .routes import bp
     app.register_blueprint(bp)
@@ -98,12 +98,29 @@ def create_app():
 
     @app.cli.command("fetch-all")
     def fetch_all_command():
-        """Runs active fetchers in one go."""
-        from .scrapers.runner import run_article_fetch
-        print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews) ---")
+        """Runs all active fetchers in one go."""
+        from .scrapers.runner import (
+            run_article_fetch, run_reddit_fetch,
+            run_price_refresh, run_amazon_discovery,
+        )
+        from .utils.matcher import match_articles_to_items
+        print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
         run_article_fetch()
+        print("--- [2/4] Fetching Reddit Communities ---")
+        run_reddit_fetch()
+        print("--- [3/4] Refreshing Amazon Prices ---")
+        run_price_refresh()
+        print("--- [4/4] Discovering Amazon Products ---")
+        run_amazon_discovery()
+        print("--- [Matcher] Linking Articles to Items ---")
+        match_articles_to_items()
+        print("Done! All active ingestion jobs complete.")
     # ── Start background scheduler ───────────────────────────────
     from .jobs.scheduler import init_scheduler
     init_scheduler(app)
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return f"Too many requests. Please slow down and try again later.", 429
 
     return app
