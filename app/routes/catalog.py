@@ -46,7 +46,7 @@ def sections(section_slug):
     ).first_or_404()
 
     active_filters = {
-        'category': request.args.get('category'),
+        'category': request.args.getlist('category'),
         'topic': request.args.getlist('topic'),
         'brand': request.args.getlist('brand'),
         'sort': request.args.get('sort', 'newest')
@@ -62,7 +62,7 @@ def sections(section_slug):
     )
 
     if active_filters['category']:
-        query = query.join(Article.category).filter(Category.slug == active_filters['category'])
+        query = query.join(Article.category).filter(Category.slug.in_(active_filters['category']))
     if active_filters['topic'] and "topic" in allowed_filters:
         query = query.join(Article.topics).filter(Topic.slug.in_(active_filters['topic']))
     if active_filters['brand'] and "brand" in allowed_filters:

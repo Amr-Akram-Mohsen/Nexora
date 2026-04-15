@@ -4,20 +4,8 @@
 
 {% set is_active = instance.slug in active_values %}
 
-{% set params = request.args.to_dict(flat=False) %}
-
-{% if is_active %}
-  {% set _ = params[filter_name].remove(instance.slug) %}
-  {% if not params[filter_name] %}
-    {% set _ = params.pop(filter_name) %}
-  {% endif %}
-{% else %}
-  {% set _ = params.setdefault(filter_name, []).append(instance.slug) %}
-{% endif %}
-
-
 <a
-  href="{{ url_for('main.sections', section_slug=section_name, **params) }}"
+  href="{{ get_filter_url(filter_name, instance.slug, multi=True) }}"
   class="filter-item">
   {{ badge(instance.name, "filter-chip",
     "secondary" if removable

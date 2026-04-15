@@ -10,16 +10,13 @@
       <a href="{{ url_for('main.sections', section_slug=section.slug) }}" class="filters-clear-link">Clear All</a>
     </div>
     <div class="active-deals-filters flex flex-wrap">
-      {% for filter_name, values in active_filters.items() %}
-      {% for value in values %}
-      {% for instance in filter_options[filter_name] %}
+      {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+      {% set vals = values if values is iterable and values is not string else [values] %}
+      {% for value in vals if value %}
+      {% for instance in filter_options.get(filter_name, []) %}
       {% if instance.slug == value %}
       <div class="filter-tag flex items-center">
         <span>{{ instance.name }}</span>
-        {#
-        <a href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{filter_name ~ '_slug': [v for v in active_filters[filter_name] if v != value]} if active_filters[filter_name]|length > 1 else {filter_name ~ '_slug': none})) }}"
-          class="remove-tag">&times;</a>
-        #}
       </div>
       {% endif %}
       {% endfor %}
@@ -38,7 +35,7 @@
       {% set is_active = instance.slug in active_filters[allowed_filter] %}
       <li class="filter-item {{ 'is-active' if is_active }}">
         <a
-          href="{{ url_for('main.sections', section_slug=section.slug, **dict(request.args, **{allowed_filter ~ '_slug': instance.slug if not is_active else None})) }}">
+          href="{{ get_filter_url(allowed_filter, instance.slug, multi=True) }}">
           <span class="checkbox-box {{ 'checked' if is_active }}"></span>
           {{ instance.name }}
         </a>

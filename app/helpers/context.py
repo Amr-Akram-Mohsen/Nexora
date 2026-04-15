@@ -1,4 +1,5 @@
 from flask_login import current_user
+from flask import request, url_for
 from app.services.article_service import (
     get_popular_general_topics,
     get_popular_brands,
@@ -57,9 +58,56 @@ def get_global_context():
     """
     Single entry point for ALL shared template context
     """
+    
+    def get_filter_url(name, value, multi=True):
+        args = request.args.to_dict(flat=False)
+        if multi:
+            current_vals = args.get(name, [])
+            if value in current_vals:
+                current_vals.remove(value)
+                if not current_vals:
+                    args.pop(name, None)
+                else:
+                    args[name] = current_vals
+            else:
+                args[name] = current_vals + [value]
+        else:
+            if request.args.get(name) == value:
+                args.pop(name, None)
+            else:
+                args[name] = [value]
+                
+        # ensure page resets to 1 on filter change
+        args.pop('page', None) 
+        
+        # Merge view args (e.g. section_slug)
+        if request.view_args:
+            for k, v in request.view_args.items():
+                args[k] = v
+        return url_for(request.endpoint, **args)
+
+    def get_sort_url(sort_val):
+        args = request.args.to_dict(flat=False)
+        args['sort'] = [sort_val]
+        if request.view_args:
+            for k, v in request.view_args.items():
+                args[k] = v
+        return url_for(request.endpoint, **args)
+
+    def get_page_url(page_num):
+        args = request.args.to_dict(flat=False)
+        args['page'] = [str(page_num)]
+        if request.view_args:
+            for k, v in request.view_args.items():
+                args[k] = v
+        return url_for(request.endpoint, **args)
+
     return {
         **get_user_context(),
         **get_layout_context(),
+        "get_filter_url": get_filter_url,
+        "get_sort_url": get_sort_url,
+        "get_page_url": get_page_url,
     }
 
 def get_newsletter_context():
