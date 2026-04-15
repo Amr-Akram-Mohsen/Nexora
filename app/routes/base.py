@@ -1,5 +1,7 @@
-from flask import request, render_template, jsonify, current_app, make_response, url_for
+from flask import request, render_template, jsonify, current_app, make_response, url_for, redirect, flash
 from datetime import datetime
+from flask_login import login_required, current_user
+
 
 from app.models import db, ContactMessage, Item, Article, User, NewsletterSubscriber
 from app.services.mailer import send_admin_email
