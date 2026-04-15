@@ -1,4 +1,6 @@
 import logging
+import time
+import random
 import cloudscraper
 import trafilatura
 import markdown
@@ -82,14 +84,44 @@ def scrape_article_content(url: str) -> str | None:
     Given a URL, uses cloudscraper to download the HTML and trafilatura
     to extract the main article content (preserving headings, lists, and images).
     Converts the output from Markdown to semantic HTML.
+
+    Includes a delay and extended timeout to handle slower pages and lazy-loaded assets.
     
     Returns the HTML content or None if extraction fails.
     """
+    # ── Wait/Delay ─────────────────────────────────────────────
+    # A small randomized delay before scraping helps avoid bot detection 
+    # and allows some breathing room between requests.
+    time.sleep(random.uniform(1.0, 3.0))
+
     try:
-        response = scraper.get(url, timeout=15)
+        # ── Request with Timeout ────────────────────────────────
+        # Increased timeout to 30s to allow slower pages to respond fully.
+        response = scraper.get(url, timeout=30)
         response.raise_for_status()
 
         html_source = response.text
+
+        # ── Pre-process for Lazy Images ─────────────────────────
+        # Many modern sites use 'data-src' or similar for lazy loading.
+        # Since we are not using a headless browser to execute JS, we manually 
+        # swap these attributes into 'src' so trafilatura can see them.
+        try:
+            soup = BeautifulSoup(html_source, "html.parser")
+            fixed_images = 0
+            for img in soup.find_all("img"):
+                # Common lazy-load attributes
+                for attr in ["data-src", "data-lazy-src", "data-original", "data-actualsrc"]:
+                    if img.has_attr(attr):
+                        val = img.get(attr)
+                        if val and val.startswith("http"):
+                            img["src"] = val
+                            fixed_images += 1
+                            break
+            if fixed_images > 0:
+                html_source = str(soup)
+        except Exception as e:
+            logger.debug(f"[Extractor] Pre-processing failed for {url}: {e}")
         
         # Extract markdown, preserving images and structural links
         extracted_md = trafilatura.extract(
