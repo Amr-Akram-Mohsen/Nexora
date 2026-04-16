@@ -40,6 +40,7 @@ def search():
 
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):
+    from app.services.article_service import get_filtered_articles
     section = Section.query.filter(
         Section.slug == section_slug,
         Section.is_active == True
@@ -55,25 +56,7 @@ def sections(section_slug):
     allowed_filters = set(section.allowed_filters or [])
     page = request.args.get('page', 1, type=int)
 
-    query = (
-        Article.query
-        .join(Article.sections)
-        .filter(Section.id == section.id)
-    )
-
-    if active_filters['category']:
-        query = query.join(Article.category).filter(Category.slug.in_(active_filters['category']))
-    if active_filters['topic'] and "topic" in allowed_filters:
-        query = query.join(Article.topics).filter(Topic.slug.in_(active_filters['topic']))
-    if active_filters['brand'] and "brand" in allowed_filters:
-        query = query.join(Article.brands).filter(Brand.slug.in_(active_filters['brand']))
-
-    if active_filters['sort'] == 'oldest':
-        query = query.order_by(Article.published_at.asc())
-    else:
-        query = query.order_by(Article.published_at.desc())
-
-    pagination = query.distinct().paginate(page=page, per_page=24, error_out=False)
+    pagination = get_filtered_articles(section, active_filters, allowed_filters, page=page)
     articles = pagination.items
 
     filter_options = {}
@@ -95,18 +78,17 @@ def sections(section_slug):
 
 @bp.route("/items")
 def items():
-    query = Item.query.options(
-        db.joinedload(Item.brand),
-        db.joinedload(Item.category),
-        db.selectinload(Item.images),
-        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
-    )
-
-    items = query.limit(20).all()
+    from app.services.item_service import get_filtered_items
+    page = request.args.get('page', 1, type=int)
+    active_filters = {'sort': 'newest'}
+    
+    pagination = get_filtered_items(active_filters, page=page)
+    items = pagination.items
 
     return render_template(
         "catalog-page.html",
         items=items,
+        pagination=pagination,
         target_type="products",
         allowed_filters=["category", "brand", "type"],
         filter_options={
@@ -114,10 +96,9 @@ def items():
             "brand": Brand.query.join(Item).distinct().all(),
             "type": [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
         },
-        active_filters={
-            'sort': 'newest'
-        }
+        active_filters=active_filters
     )
+
 
 
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])
@@ -162,13 +143,7 @@ def article_page(article_id):
 
 @bp.route("/deals")
 def deals():
-    query = Item.query.options(
-        db.joinedload(Item.brand),
-        db.joinedload(Item.category),
-        db.selectinload(Item.images),
-        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
-    )
-
+    from app.services.item_service import get_filtered_items
     active_filters = {
         'category': request.args.getlist('category'),
         'brand': request.args.getlist('brand'),
@@ -180,45 +155,8 @@ def deals():
     }
     page = request.args.get('page', 1, type=int)
 
-    if active_filters['category']:
-        query = query.join(Item.category).filter(Category.slug.in_(active_filters['category']))
-    if active_filters['brand']:
-        query = query.join(Item.brand).filter(Brand.slug.in_(active_filters['brand']))
-    if active_filters['type']:
-        query = query.filter(Item.item_type.in_(active_filters['type']))
-    if active_filters['store']:
-        query = (
-            query
-            .join(Item.variants)
-            .join(ItemVariant.store_links)
-            .join(ItemStoreLink.store)
-            .filter(Store.slug.in_(active_filters['store']))
-        )
-
-    min_p = safe_float(active_filters['min_price'])
-    max_p = safe_float(active_filters['max_price'])
-    if min_p is not None or max_p is not None:
-        # Only join variants once if not already joined by store filter
-        if not active_filters['store']:
-            query = query.join(Item.variants)
-        if min_p is not None:
-            query = query.filter(ItemVariant.price >= min_p)
-        if max_p is not None:
-            query = query.filter(ItemVariant.price <= max_p)
-
-    # Sorting — avoid double-joining variants
-    if active_filters['sort'] == 'price_low':
-        if not active_filters['store'] and min_p is None and max_p is None:
-            query = query.join(Item.variants)
-        query = query.filter(ItemVariant.is_default == True).order_by(ItemVariant.price.asc())
-    elif active_filters['sort'] == 'price_high':
-        if not active_filters['store'] and min_p is None and max_p is None:
-            query = query.join(Item.variants)
-        query = query.filter(ItemVariant.is_default == True).order_by(ItemVariant.price.desc())
-    elif active_filters['sort'] == 'popular':
-        query = query.order_by(Item.view_count.desc())
-    else:
-        query = query.order_by(Item.created_at.desc())
+    pagination = get_filtered_items(active_filters, page=page)
+    items = pagination.items
 
     filter_options = {
         "category": Category.query.join(Item).distinct().all(),
@@ -226,9 +164,6 @@ def deals():
         "store": Store.query.join(ItemStoreLink).join(ItemVariant).join(Item).distinct().all(),
         "type": [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
     }
-
-    pagination = query.distinct().paginate(page=page, per_page=24, error_out=False)
-    items = pagination.items
 
     return render_template(
         "catalog-page.html",
@@ -239,6 +174,7 @@ def deals():
         filter_options=filter_options,
         active_filters=active_filters
     )
+
 
 
 @bp.route("/items/<int:item_id>")

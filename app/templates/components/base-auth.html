@@ -1,81 +1,152 @@
 {% extends"base.html" %}
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} | Nexora{% endblock %}
 {% block content %}
 <section class="auth-section flex items-center justify-center">
-  <div class="auth-wrapper">
-    <h1 class="auth-title">{{ auth_title }}</h1>
-    <p class="auth-text">{{ auth_text }}</p>
+  <div class="auth-wrapper glass animate-fade-in">
+    <div class="auth-header text-center">
+      <h1 class="auth-title">{{ auth_title or "Welcome Back" }}</h1>
+      <p class="auth-text">{{ auth_text or "Please enter your details to continue" }}</p>
+    </div>
+
     {% from "components/ui/form.html" import form %}
     {% from "components/ui/input.html" import input %}
     {% from "components/ui/button.html" import button %}
     {% from "components/ui/field.html" import field %}
     {% from "components/ui/label.html" import label %}
 
+    <div class="auth-methods">
+      {% set google_url = url_for('main.google_login') %}
+      {{ button(
+        text="Continue with Google",
+        type="button",
+        variant="outline",
+        class="google-auth-btn w-full",
+        icon="fa-brands fa-google",
+        attrs={"onclick": "window.location.href='" ~ google_url ~ "'"}
+      ) }}
 
-    {% set auth_url = url_for('main.google_login') %}
-    {{ button(
-    text="Continue with Google",
-    type="button",
-    class="google-auth-btn",
-    icon="fa-brands fa-google",
-    attrs={"data-url": auth_url}
-    ) }}
-
-    {% call form("auth-form") %}
-    {% if is_new_user %}
-    {% call field(label_text="Full Name", for_id="name") %}
-    {{ input(name="name", placeholder="Your name i.e. John Doe") }}
-    {% endcall %}
-    {% endif %}
-    {% call field(label_text="Email", for_id="email") %}
-    {{ input(name="email", type="email", placeholder="you@example.com") }}
-    {% endcall %}
-    {% call field(label_text="Password", for_id="password") %}
-    {{ input(name="password", type="password", placeholder="••••••••", attrs={"minlength": "8"} if is_new_user else {})
-    }}
-    {% if is_new_user %}
-    <p class="field-hint">Must be at least 8 characters</p>
-    {% endif %}
-    {% endcall %}
-    {% if is_new_user %}
-    {% call field(label_text="Confirm Password", for_id="confirm_password") %}
-    {{ input(name="confirm_password", id="confirm_password", type="password", placeholder="••••••••", attrs={"minlength": "8"}) }}
-    {% endcall %}
-    {% endif %}
-    {% set label_name = "newsletter" if is_new_user else "remember" %}
-    {% set label_text = "Subscribe to newsletter" if is_new_user
-    else "Remember me"
-    %}
-    {% if not is_new_user %}
-    <div class="flex items-center justify-between">
-      <div class="field-wrapper flex items-center checkbox-wrapper">
-        {% call label(label_text, label_name, label_name ~ "-label") %}
-        {{ input(name=label_name, id=label_name, type="checkbox", required=False) }}
-        {% endcall %}
+      <div class="auth-divider">
+        <span>or</span>
       </div>
-      <a href="{{ url_for('main.forgot_password') }}" class="redirect-link">Forgot password?</a>
-    </div>
-    {% else %}
-    <div class="field-wrapper flex items-center checkbox-wrapper">
-      {% call label(label_text, label_name, label_name ~ "-label") %}
-      {{ input(name=label_name, id=label_name, type="checkbox", required=False) }}
+
+      {% call form("auth-form") %}
+        {% if is_new_user %}
+          {% call field(label_text="Full Name", for_id="name") %}
+            {{ input(name="name", id="name", placeholder="e.g. John Doe", required=True) }}
+          {% endcall %}
+        {% endif %}
+
+        {% call field(label_text="Email Address", for_id="email") %}
+          {{ input(name="email", id="email", type="email", placeholder="you@example.com", required=True) }}
+        {% endcall %}
+
+        {% call field(label_text="Password", for_id="password") %}
+          {{ input(name="password", id="password", type="password", placeholder="••••••••", attrs={"minlength": "8"} if is_new_user else {}, required=True) }}
+          {% if is_new_user %}
+            <p class="field-hint">Minimum 8 characters</p>
+          {% endif %}
+        {% endcall %}
+
+        {% if is_new_user %}
+          {% call field(label_text="Confirm Password", for_id="confirm_password") %}
+            {{ input(name="confirm_password", id="confirm_password", type="password", placeholder="••••••••", required=True) }}
+          {% endcall %}
+        {% endif %}
+
+        <div class="auth-extras flex items-center justify-between">
+          {% set check_name = "newsletter" if is_new_user else "remember" %}
+          {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
+          
+          <div class="checkbox-group flex items-center gap-2">
+            {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
+            {{ label(check_text, check_name, class="text-sm cursor-pointer") }}
+          </div>
+
+          {% if not is_new_user %}
+            <a href="{{ url_for('main.forgot_password') }}" class="redirect-link text-sm">Forgot password?</a>
+          {% endif %}
+        </div>
+        
+        {% if show_resend and email %}
+        <div class="resend-alert mt-4 p-4 border border-yellow-500/20 bg-yellow-500/5 rounded-xl text-center">
+            <p class="text-xs text-yellow-600 mb-2">Haven't received the link?</p>
+            <form action="{{ url_for('main.resend_verification') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="email" value="{{ email }}">
+                <button type="submit" class="btn variant--outline text-xs">Resend Verification Email</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {{ button(text=title, type="submit", variant="primary", class="auth-btn w-full mt-4") }}
+
       {% endcall %}
     </div>
-    {% endif %}
-    {{ button(text=title, type="submit", class="auth-btn") }}
-    {% endcall %}
-    <div class="user-status-wrapper">
-      {% set link_text =
-      "Login" if is_new_user
-      else "Sign Up"
-      %}
+
+    <div class="auth-footer text-center mt-8">
       <span class="auth-status-text">
-        {{ "Already have an account?" if is_new_user else "Don't have an account?" }}
+        {{ "Already have an account?" if is_new_user else "New to Nexora?" }}
       </span>
-      <a href="{{ url_for('main.login') if is_new_user else url_for('main.register') }}" class="redirect-link">
-        {{ link_text }}
+      <a href="{{ url_for('main.login') if is_new_user else url_for('main.register') }}" class="redirect-link font-bold">
+        {{ "Login" if is_new_user else "Join now" }}
       </a>
     </div>
   </div>
 </section>
-{% endblock %}
+
+<style>
+.auth-section {
+  min-height: calc(100vh - var(--header-height));
+  padding: 4rem 1rem;
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+              radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 440px;
+  padding: 2.5rem;
+  border-radius: var(--radius-2xl);
+}
+
+.auth-header { margin-bottom: 2rem; }
+.auth-title { font-size: var(--text-3xl); margin-bottom: 0.5rem; }
+.auth-text { color: var(--muted-foreground); }
+
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+.auth-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+  z-index: 0;
+}
+.auth-divider span {
+  position: relative;
+  background: var(--card);
+  padding: 0 1rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  z-index: 1;
+}
+
+.field-hint {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+
+.redirect-link {
+  color: var(--brand-blue);
+  transition: opacity 0.2s;
+}
+.redirect-link:hover { opacity: 0.8; }
+</style>
+{% endblock %}

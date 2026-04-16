@@ -26,20 +26,37 @@ def _generate_token():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
+    
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         remember = request.form.get('remember') == 'on'
+        
         user = User.query.filter_by(email=email).first()
+        
         if user and user.check_password(password):
             if not user.is_verified and user.provider != 'google':
-                flash('Please verify your email before logging in. Check your inbox.', 'warning')
-                return render_template('login.html')
+                flash('Your account is not verified yet. 📧 Check your inbox for a verification link.', 'warning')
+                return render_template('login.html', show_resend=True, email=email)
+            
+            # 🔐 Safe login
             login_user(user, remember=remember)
+            if remember:
+                from flask import session
+                session.permanent = True
+            
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.home'))
-        flash('Invalid email or password.', 'error')
+            # 🛡️ Prevent Open Redirect vulnerability
+            if not next_page or not next_page.startswith('/') or next_page.startswith('//'):
+                next_page = url_for('main.home')
+                
+            flash(f'Welcome back, {user.name or "Nexora Member"}! 👋', 'success')
+            return redirect(next_page)
+            
+        flash('Invalid email or password. Please try again.', 'error')
+    
     return render_template('login.html')
+
 
 
 # ────────────────────────────────────────────────────────────────────
@@ -106,17 +123,20 @@ def register():
 
         # ── Validation ──────────────────────────────────────────────
         if not name:
-            flash('Please enter your name.', 'error')
-            return redirect(url_for('main.register'))
+            flash('Please enter your full name.', 'error')
+            return render_template('register.html')
+        if not email or '@' not in email:
+            flash('Please enter a valid email address.', 'error')
+            return render_template('register.html')
         if len(password) < 8:
             flash('Password must be at least 8 characters long.', 'error')
-            return redirect(url_for('main.register'))
+            return render_template('register.html')
         if password != confirm:
             flash('Passwords do not match.', 'error')
-            return redirect(url_for('main.register'))
+            return render_template('register.html')
         if User.query.filter_by(email=email).first():
             flash('An account with this email already exists.', 'error')
-            return redirect(url_for('main.register'))
+            return render_template('register.html')
 
         # ── Create user (unverified) ─────────────────────────────────
         verification_token = _generate_token()
@@ -131,17 +151,20 @@ def register():
         db.session.flush()   # get user.id
 
         # ── Newsletter opt-in ────────────────────────────────────────
-        wants_newsletter = request.form.get('subscribe') == 'on'
+        # Match 'newsletter' from base-auth.html
+        wants_newsletter = request.form.get('newsletter') == 'on'
         newsletter_msg = None
         subscriber = NewsletterSubscriber.query.filter_by(email=email).first()
+        
         if subscriber:
             subscriber.user_id = user.id
-            if wants_newsletter:
+            if wants_newsletter and not subscriber.is_confirmed:
                 newsletter_msg = 'Your existing newsletter subscription was linked 🎯'
-        if wants_newsletter and not subscriber:
+        elif wants_newsletter:
             subscriber = NewsletterSubscriber(email=email, user_id=user.id)
             subscriber.generate_tokens()
             db.session.add(subscriber)
+            send_confirmation_email(subscriber.email, subscriber.confirmation_token, subscriber.unsubscribe_token)
             newsletter_msg = 'Newsletter confirmation sent to your email 📬'
 
         db.session.commit()
@@ -154,6 +177,7 @@ def register():
         flash('Account created! Please check your email to verify your account before logging in. 📧', 'success')
         return redirect(url_for('main.login'))
     return render_template('register.html')
+
 
 
 # ────────────────────────────────────────────────────────────────────

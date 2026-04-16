@@ -30,15 +30,18 @@
     <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
 
     {% if target_type == 'products' %}
-    <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price: Low to High
+    <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price: Low to
+      High
     </option>
-    <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price: High to
+    <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price: High
+      to
       Low</option>
     {% else %}
     <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
     {% endif %}
 
-    <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular</option>
+    <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular
+    </option>
   </select>
 </div>
 {% endif %}
@@ -60,7 +63,8 @@
 <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="clear-all-link">Clear All</a>
 {% endif %}
 
-{% if slot == 'content' %}
+{% from "components/empty-state.html" import empty_state %}
+
 {% if results %}
 {{ grid(results) }}
 
@@ -83,15 +87,12 @@
 {% endif %}
 
 {% else %}
-<div class="no-results flex flex-col items-center">
-  <i class="fas fa-search-minus icon-empty"></i>
-  <h3>No {{ target_type }} found</h3>
-  <p>Try adjusting your search or filters to find what you're looking for.</p>
-  <a href="{{ url_for(request.endpoint, **request.view_args) }}">
-    {{ button(text="Reset All Filters", variant="outline") }}
-  </a>
-</div>
-{% endif %}
+{{ empty_state(
+title="No " ~ target_type | title ~ " Found",
+message="We couldn't find any match for your current filters or search query. Try clearing filters to see more.",
+action_text="Reset All Filters",
+action_url=url_for(request.endpoint, **request.view_args)
+) }}
 {% endif %}
 
 {% endcall %}

@@ -1,7 +1,7 @@
 from app.models import Article, Category, Section, Brand, View, Topic, db
 from sqlalchemy.orm import load_only, joinedload
 from sqlalchemy import func, case, or_
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import load_only, joinedload, selectinload, defer
 
@@ -89,7 +89,7 @@ def get_related_articles(article, limit=6):
 # Trending Articles
 # -------------------------
 def get_trending_articles(limit=6, days=7, section_ids=None):
-    cutoff = datetime.utcnow() - timedelta(days=days)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
 
     query = (
         db.session.query(
@@ -110,6 +110,33 @@ def get_trending_articles(limit=6, days=7, section_ids=None):
     )
 
     return [row.Article for row in query.all()]
+
+def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_page=24):
+    """
+    Handles complex filtering and pagination for section articles.
+    """
+    query = (
+        Article.query
+        .join(Article.sections)
+        .filter(Section.id == section.id)
+    )
+
+    if active_filters.get('category'):
+        query = query.join(Article.category).filter(Category.slug.in_(active_filters['category']))
+    
+    if active_filters.get('topic') and "topic" in allowed_filters:
+        query = query.join(Article.topics).filter(Topic.slug.in_(active_filters['topic']))
+    
+    if active_filters.get('brand') and "brand" in allowed_filters:
+        query = query.join(Article.brands).filter(Brand.slug.in_(active_filters['brand']))
+
+    if active_filters.get('sort') == 'oldest':
+        query = query.order_by(Article.published_at.asc())
+    else:
+        query = query.order_by(Article.published_at.desc())
+
+    return query.distinct().paginate(page=page, per_page=per_page, error_out=False)
+
 
 def get_active_brands_for_section(section, limit=5):
     return (
@@ -162,3 +189,4 @@ def get_search_articles(query):
         or_(Article.title.ilike(f'%{query}%'), Article.description.ilike(f'%{query}%'))
     )
     return a_query.order_by(Article.published_at.desc()).limit(50).all()
+

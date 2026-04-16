@@ -58,8 +58,17 @@ def run_article_fetch():
 
 def run_reddit_fetch():
     """Fetch community posts from diverse subreddits."""
-    logger.info("[Runner] Skipping Reddit: Disabled per user request")
-    pass
+    if not current_app.config.get("REDDIT_CLIENT_ID"):
+        logger.info("[Runner] Skipping Reddit: API Keys missing")
+        return
+
+    try:
+        from .reddit_fetcher import fetch_all_reddit
+        logger.info("[Runner] Reddit communities...")
+        count = fetch_all_reddit()
+        logger.info("[Runner] Reddit done — %d posts stored", count)
+    except Exception:
+        logger.exception("[Runner] Reddit fetch failed")
 
 
 def run_price_refresh():
@@ -71,7 +80,7 @@ def run_price_refresh():
     try:
         from .amazon_pa import get_product_by_asin
         from app.models import db, ItemStoreLink, Store
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         links = (
             ItemStoreLink.query
@@ -92,7 +101,7 @@ def run_price_refresh():
             if data.get("price"): link.price = data["price"]
             if data.get("old_price"): link.old_price = data["old_price"]
             if data.get("availability"): link.availability = data["availability"]
-            link.last_checked_at = datetime.utcnow()
+            link.last_checked_at = datetime.now(timezone.utc)
             updated += 1
         db.session.commit()
         logger.info("[Runner] Price refresh done — %d links updated", updated)
@@ -102,8 +111,36 @@ def run_price_refresh():
 
 def run_amazon_discovery():
     """Discover new products from Amazon."""
-    logger.info("[Runner] Skipping Amazon Discovery: Disabled per user request")
-    pass
+    if not current_app.config.get("AMAZON_SECRET_KEY"):
+        logger.info("[Runner] Skipping Amazon Discovery: Keys missing")
+        return
+
+    try:
+        from .amazon_pa import search_products
+        from .item_storer import store_amazon_item
+        
+        # Balanced discovery searches across SA/AE and categories
+        AMAZON_SEARCHES = [
+            ("iPhone 16", "sa", "electronics"),
+            ("Samsung Galaxy S24", "ae", "electronics"),
+            ("Dior Sauvage", "sa", "perfumes"),
+            ("Chanel Blue", "ae", "perfumes"),
+            ("Rolex Submariner", "sa", "accessories"),
+            ("Sony WH-1000XM5", "ae", "electronics"),
+        ]
+
+        total_stored = 0
+        for keywords, marketplace, category in AMAZON_SEARCHES:
+            logger.info(f"[Runner] Amazon Search: {keywords} ({marketplace.upper()})...")
+            products = search_products(keywords, marketplace, category, max_results=10)
+            for raw in products:
+                item = store_amazon_item(raw)
+                if item:
+                    total_stored += 1
+
+        logger.info("[Runner] Amazon Discovery done — %d new items stored", total_stored)
+    except Exception:
+        logger.exception("[Runner] Amazon Discovery failed")
 
 
 def run_noon_discovery():
@@ -172,3 +209,4 @@ def run_sitemap_gen():
         logger.info("[Runner] Sitemap generated with %d URLs", count)
     except Exception:
         logger.exception("[Runner] Sitemap generation failed")
+
