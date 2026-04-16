@@ -128,7 +128,7 @@ class Section(db.Model):
     __tablename__ = "sections"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    slug = db.Column(db.String(120), unique=True, nullable=False)
+    slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
     description = db.Column(db.Text, nullable=True)
     allowed_filters = db.Column(db.JSON, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
@@ -150,7 +150,7 @@ class Topic(db.Model):
     __tablename__ = "topics"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
-    slug = db.Column(db.String(120), unique=True, nullable=False)
+    slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
     type = db.Column(db.String(50), nullable=True)
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
@@ -171,7 +171,7 @@ class Brand(db.Model):
     __tablename__ = "brands"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
-    slug = db.Column(db.String(150), unique=True, nullable=False)
+    slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     sort_order = db.Column(db.Integer, default=0)
@@ -190,7 +190,7 @@ class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    slug = db.Column(db.String(120), unique=True, nullable=False)
+    slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
     parent_id = db.Column(
         db.Integer,
         db.ForeignKey("categories.id", ondelete="CASCADE"),
@@ -613,7 +613,7 @@ class ItemVariant(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     
     # ── PRICING (Starting/Best Price) ──────────────────────────
-    price = db.Column(db.Numeric(10, 2))
+    price = db.Column(db.Numeric(10, 2), index=True)
     old_price = db.Column(db.Numeric(10, 2))
     currency = db.Column(db.String(3)) # e.g. SAR, AED
     

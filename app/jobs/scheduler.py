@@ -28,12 +28,14 @@ def _run_in_context(app, job_type: str):
                 run_reddit_fetch,
                 run_price_refresh,
                 run_amazon_discovery,
+                run_sitemap_gen,
             )
             jobs = {
                 "articles": run_article_fetch,
                 "reddit":   run_reddit_fetch,
                 "prices":   run_price_refresh,
                 "amazon":   run_amazon_discovery,
+                "sitemap":  run_sitemap_gen,
             }
             fn = jobs.get(job_type)
             if fn:
@@ -87,6 +89,14 @@ def init_scheduler(app):
         func=lambda: _run_in_context(app, "amazon"),
         trigger=IntervalTrigger(hours=24),
         id="discover_amazon",
+        replace_existing=True,
+    )
+
+    # ── Sitemap generation: once a day ───────────────────────────
+    _scheduler.add_job(
+        func=lambda: _run_in_context(app, "sitemap"),
+        trigger=IntervalTrigger(hours=24),
+        id="generate_sitemap",
         replace_existing=True,
     )
 

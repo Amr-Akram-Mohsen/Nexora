@@ -162,3 +162,13 @@ def run_arabclicks_price_refresh():
     except Exception:
         logger.exception("[Runner] ArabClicks price refresh failed")
 
+
+def run_sitemap_gen():
+    """Generates the static sitemap file."""
+    try:
+        from app.utils.sitemap_generator import generate_static_sitemap
+        from flask import current_app
+        count = generate_static_sitemap(current_app)
+        logger.info("[Runner] Sitemap generated with %d URLs", count)
+    except Exception:
+        logger.exception("[Runner] Sitemap generation failed")

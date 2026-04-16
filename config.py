@@ -55,6 +55,10 @@ class Config:
     # Sign up at: https://www.arabclicks.com
     ARABCLICKS_PUBLISHER_ID = os.environ.get("ARABCLICKS_PUBLISHER_ID")
 
+    # ── Cache Configuration ───────────────────────────────────────
+    CACHE_TYPE = os.environ.get("CACHE_TYPE", "SimpleCache")
+    CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT", 3600))
+
 
 # ================================================
 SOCIAL_LINKS = [

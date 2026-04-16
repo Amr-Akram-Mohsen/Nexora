@@ -5,7 +5,7 @@ from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from .models import db, User
 from config import Config
-from .extensions import mail, csrf, limiter
+from .extensions import mail, csrf, limiter, cache
 from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,6 +33,9 @@ def create_app():
 
     # Initialize CSRF Protection
     csrf.init_app(app)
+
+    # Initialize Cache
+    cache.init_app(app)
 
     limiter.init_app(app)
 
@@ -78,24 +81,6 @@ def create_app():
         created = seed_arabclicks_stores()
         print(f"Done! {created} new ArabClicks stores seeded.")
 
-    # @app.cli.command("fetch-all")
-    # def fetch_all_command():
-    #     """Runs active fetchers in one go."""
-    #     from .scrapers.runner import run_article_fetch, run_reddit_fetch, run_amazon_discovery, run_noon_discovery
-    #     from .utils.matcher import match_articles_to_items
-    #     print("--- [1/4] Fetching Articles (RSS/NewsAPI/GNews) ---")
-    #     run_article_fetch()
-    #     print("--- [2/4] Fetching Reddit Communities ---")
-    #     run_reddit_fetch()
-    #     print("--- [3/4] Discovering Amazon Products ---")
-    #     run_amazon_discovery()
-    #     print("--- [4/4] Discovering Noon Products (ArabClicks) ---")
-    #     run_noon_discovery()
-    #     print("--- [Matcher] Linking Articles to Items ---")
-    #     match_articles_to_items()
-    #     print("Done! All active ingestion jobs complete.")
-
-
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs all active fetchers in one go."""
@@ -114,10 +99,27 @@ def create_app():
         run_amazon_discovery()
         print("--- [Matcher] Linking Articles to Items ---")
         match_articles_to_items()
-        print("Done! All active ingestion jobs complete.")
-    # ── Start background scheduler ───────────────────────────────
-    from .jobs.scheduler import init_scheduler
-    init_scheduler(app)
+    @app.cli.command("generate-sitemap")
+    def generate_sitemap_command():
+        """Generate a static sitemap.xml file."""
+        from .utils.sitemap_generator import generate_static_sitemap
+        print("Generating sitemap...")
+        count = generate_static_sitemap(app)
+        print(f"Done! Sitemap generated with {count} URLs.")
+
+    # ── CLI Commands: Scheduler ──────────────────────────────────
+    @app.cli.command("run-scheduler")
+    def run_scheduler_command():
+        """Run the background scheduler in a standalone process."""
+        from .jobs.scheduler import init_scheduler
+        import time
+        print("Starting Nexora Background Scheduler...")
+        init_scheduler(app)
+        try:
+            while True:
+                time.sleep(60)
+        except (KeyboardInterrupt, SystemExit):
+            print("Scheduler stopping...")
 
     @app.errorhandler(429)
     def ratelimit_handler(e):

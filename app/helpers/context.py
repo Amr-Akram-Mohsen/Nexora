@@ -5,17 +5,22 @@ from app.services.article_service import (
     get_popular_brands,
     get_active_sections,
 )
+from app.extensions import cache
 from config import SOCIAL_LINKS
 
-def get_user_context():
-    is_authenticated = current_user.is_authenticated
+@cache.memoize(timeout=60)
+def get_user_context(user_id=None):
+    from app.models import User, db
+    user = db.session.get(User, user_id) if user_id else current_user
+    
+    is_authenticated = user.is_authenticated
     user_email = None
     is_subscribed = False
 
     if is_authenticated:
-        user_email = current_user.email
+        user_email = user.email
 
-        sub = getattr(current_user, "newsletter_subscription", None)
+        sub = getattr(user, "newsletter_subscription", None)
         if sub and not sub.unsubscribed_at:
             is_subscribed = True
 
@@ -26,6 +31,7 @@ def get_user_context():
     }
 
 
+@cache.cached(timeout=3600, key_prefix='layout_context')
 def get_layout_context():
     """
     Header + footer + shared UI data
@@ -103,7 +109,7 @@ def get_global_context():
         return url_for(request.endpoint, **args)
 
     return {
-        **get_user_context(),
+        **get_user_context(current_user.id if current_user.is_authenticated else None),
         **get_layout_context(),
         "get_filter_url": get_filter_url,
         "get_sort_url": get_sort_url,

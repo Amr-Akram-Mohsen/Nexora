@@ -3,6 +3,8 @@ from sqlalchemy.orm import load_only, joinedload
 from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta
 
+from sqlalchemy.orm import load_only, joinedload, selectinload, defer
+
 def my_zip(*iterables):
     my_list = []
     for i, val in enumerate(iterables[0]):
@@ -14,14 +16,9 @@ def my_zip(*iterables):
 
 def get_articles(filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
     query = Article.query.options(
-        load_only(
-            Article.id,
-            Article.title,
-            Article.url,
-            Article.description,
-            Article.image_url,
-            Article.published_at
-        ),
+        defer(Article.content),
+        selectinload(Article.topics),
+        selectinload(Article.brands)
     )
 
     if filter_by_columns and filter_values:
