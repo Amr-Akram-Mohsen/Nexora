@@ -65,7 +65,13 @@ class Article(db.Model):
 
     @property
     def read_time_minutes(self):
-        text = (self.content or self.description or "")
+        from sqlalchemy.orm.attributes import instance_state
+        state = instance_state(self)
+        if 'content' not in state.unloaded and self.content:
+            text = self.content
+        else:
+            text = self.description or ""
+            
         words = len(text.split())
         return max(1, words // 200)
 

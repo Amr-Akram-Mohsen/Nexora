@@ -52,6 +52,8 @@ def sections(section_slug):
         active_filters=active_filters
     )
 
+
+
 @bp.route("/articles/<int:article_id>")
 def article_page(article_id):
     article = Article.query.options(

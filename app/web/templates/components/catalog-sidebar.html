@@ -2,77 +2,132 @@
 {% from "components/shared/catalog-utils.html" import filter_url %}
 {% from "components/ui/button.html" import button %}
 
-<div class="filter-sidebar">
+<div class="filter-sidebar flex flex-col">
 
-  {# 1. Brand / Category / Store / Topic Sections #}
+  {# ── Sidebar brand accent strip ── #}
+  <div class="sidebar-accent {{ 'sidebar-accent--articles' if target_type == 'articles' else 'sidebar-accent--products' }}"></div>
+
+  {# ── Reset link (top-right, shown only when filters active) ── #}
+  {% set has_active = namespace(value=false) %}
+  {% for k, v in active_filters.items() if k not in ['sort'] %}
+    {% if v %}{% set has_active.value = true %}{% endif %}
+  {% endfor %}
+  {% if has_active.value %}
+  <div class="sidebar-reset-row flex items-center justify-between">
+    <span class="sidebar-reset-label">
+      <i class="fas fa-filter"></i> Filters applied
+    </span>
+    <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="sidebar-reset-link">
+      Reset all
+    </a>
+  </div>
+  {% endif %}
+
+  {# ── 1. Brand / Category / Store / Topic filter groups ── #}
   {% for filter_name in allowed_filters %}
   {% set options = filter_options.get(filter_name, []) %}
   {% if options %}
-  <div class="filter-section">
-    <h3 class="filter-section__title">
-      {% if filter_name == 'brand' %}Brands
-      {% elif filter_name == 'category' %}Categories
-      {% elif filter_name == 'topic' %}Topics
-      {% elif filter_name == 'store' %}Stores
-      {% else %}{{ filter_name | title }}
-      {% endif %}
-    </h3>
-    
-    <ul class="filter-list">
+  <details class="filter-section" open>
+    <summary class="filter-section__summary flex items-center justify-between">
+      <span class="filter-section__title">
+        {% if filter_name == 'brand' %}<i class="fas fa-tag"></i> Brands
+        {% elif filter_name == 'category' %}<i class="fas fa-th-large"></i> Categories
+        {% elif filter_name == 'topic' %}<i class="fas fa-hashtag"></i> Topics
+        {% elif filter_name == 'store' %}<i class="fas fa-store"></i> Stores
+        {% else %}<i class="fas fa-filter"></i> {{ filter_name | title }}
+        {% endif %}
+      </span>
+      <i class="fas fa-chevron-down filter-section__chevron"></i>
+    </summary>
+
+    <ul class="filter-list flex flex-col">
       {% for opt in options %}
       {% set slug = opt.slug if opt.slug is defined else opt %}
       {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
       {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
-      
+
       <li class="filter-item {{ 'is-active' if is_active }}">
-        <a href="{{ filter_url(filter_name, slug, multi=(target_type == 'products' or filter_name != 'category')) }}">
-          <span class="checkbox-box {{ 'checked' if is_active }}"></span>
-          {{ name }}
+        <a href="{{ filter_url(filter_name, slug, multi=(target_type == 'products' or filter_name != 'category')) }}"
+           class="filter-item__link flex items-center">
+          <span class="checkbox-box {{ 'checked' if is_active }}" aria-hidden="true"></span>
+          <span class="filter-item__name truncate">{{ name }}</span>
+          {% if is_active %}
+          <i class="fas fa-check filter-item__check" aria-hidden="true"></i>
+          {% endif %}
         </a>
       </li>
       {% endfor %}
     </ul>
-  </div>
+  </details>
   {% endif %}
   {% endfor %}
 
-  {# 2. Product-Specific: Price Range #}
+  {# ── 2. Price Range (products only) ── #}
   {% if target_type == 'products' %}
-  <div class="filter-section">
-    <h3 class="filter-section__title">Price Range</h3>
-    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="get" class="price-range-form flex flex-col">
-      <!-- Persist other filters as hidden inputs -->
+  <details class="filter-section" open>
+    <summary class="filter-section__summary flex items-center justify-between">
+      <span class="filter-section__title">
+        <i class="fas fa-dollar-sign"></i> Price Range
+      </span>
+      <i class="fas fa-chevron-down filter-section__chevron"></i>
+    </summary>
+
+    <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="get"
+          class="price-range-form flex flex-col">
+      {# Persist existing filters #}
       {% for key, vals in request.args.to_dict(flat=False).items() %}
-        {% if key not in ['min_price', 'max_price'] %}
-          {% for v in vals %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}
-        {% endif %}
+      {% if key not in ['min_price', 'max_price'] %}
+      {% for v in vals %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}
+      {% endif %}
       {% endfor %}
-      
-      <div class="price-inputs flex items-center">
-        <input type="number" name="min_price" placeholder="Min" value="{{ active_filters.min_price or '' }}" class="input-sm">
-        <span class="price-divider">-</span>
-        <input type="number" name="max_price" placeholder="Max" value="{{ active_filters.max_price or '' }}" class="input-sm">
+
+      <div class="price-range-inputs">
+        <div class="price-input-group">
+          <label for="min_price" class="price-input-label">Min</label>
+          <div class="price-input-wrapper">
+            <span class="price-currency">$</span>
+            <input type="number" id="min_price" name="min_price" placeholder="0"
+                   value="{{ active_filters.min_price or '' }}"
+                   class="price-input" min="0" step="1">
+          </div>
+        </div>
+        <div class="price-range-divider">
+          <span></span>
+        </div>
+        <div class="price-input-group">
+          <label for="max_price" class="price-input-label">Max</label>
+          <div class="price-input-wrapper">
+            <span class="price-currency">$</span>
+            <input type="number" id="max_price" name="max_price" placeholder="∞"
+                   value="{{ active_filters.max_price or '' }}"
+                   class="price-input" min="0" step="1">
+          </div>
+        </div>
       </div>
-      {{ button(text="Apply Range", variant="secondary", class="btn--sm", type="submit") }}
+
+      <button type="submit" class="price-apply-btn">
+        <i class="fas fa-check"></i> Apply Range
+      </button>
     </form>
-  </div>
+  </details>
   {% endif %}
 
-  {# 3. Adaptive CTA / Promo #}
-  <div class="sidebar-promo">
-    <h4>
-      {% if target_type == 'products' %}User Favorites
-      {% else %}Trending Topics
-      {% endif %}
+  {# ── 3. Adaptive Promo / CTA block ── #}
+  <div class="sidebar-promo {{ 'sidebar-promo--articles' if target_type == 'articles' else 'sidebar-promo--products' }}">
+    <div class="sidebar-promo__icon">
+      <i class="{{ 'fas fa-fire-flame-curved' if target_type == 'articles' else 'fas fa-bolt' }}"></i>
+    </div>
+    <h4 class="sidebar-promo__title">
+      {{ 'Trending Topics' if target_type == 'articles' else 'User Favorites' }}
     </h4>
-    <p>
-      {% if target_type == 'products' %}Discover what others are buying this week.
-      {% else %}Stay ahead with the most discussed tech news.
-      {% endif %}
+    <p class="sidebar-promo__text">
+      {{ 'Stay ahead with the most discussed tech news.' if target_type == 'articles' else 'Discover what others are buying this week.' }}
     </p>
-    <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}" class="btn btn--ghost btn--sm">
+    <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}"
+       class="sidebar-promo__link flex items-center">
       View Most Popular
+      <i class="fas fa-arrow-right"></i>
     </a>
   </div>
 
-</div>
+</div>{# end .filter-sidebar #}

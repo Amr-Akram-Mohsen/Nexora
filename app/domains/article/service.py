@@ -122,6 +122,11 @@ def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_
         Article.query
         .join(Article.sections)
         .filter(Section.id == section.id)
+        .options(
+            db.defer(Article.content),
+            db.selectinload(Article.topics),
+            db.selectinload(Article.brands)
+        )
     )
 
     if active_filters.get('category'):

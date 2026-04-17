@@ -15,31 +15,6 @@ from app.shared.request import get_client_ip, get_country
 from app.shared.parsing import safe_float
 bp = Blueprint('item', __name__)
 
-@bp.route("/items")
-def items():
-    from .service import get_filtered_items
-    page = request.args.get('page', 1, type=int)
-    active_filters = {'sort': 'newest'}
-    
-    pagination = get_filtered_items(active_filters, page=page)
-    items = pagination.items
-
-    return render_template(
-        "catalog-page.html",
-        items=items,
-        pagination=pagination,
-        target_type="products",
-        allowed_filters=["category", "brand", "type"],
-        filter_options={
-            "category": Category.query.join(Item).distinct().all(),
-            "brand": Brand.query.join(Item).distinct().all(),
-            "type": [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
-        },
-        active_filters=active_filters
-    )
-
-
-
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])
 def view_full_specs(item_id):
     item = Item.query.get_or_404(item_id)

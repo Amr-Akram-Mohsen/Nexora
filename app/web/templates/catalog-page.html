@@ -3,7 +3,7 @@
 {% from "components/listing-page.html" import listing_page %}
 {% from "components/grid.html" import grid %}
 {% from "components/ui/button.html" import button %}
-
+{% from "components/empty-state.html" import empty_state %}
 
 {% set page_title = section.name|title if section else "Tech Deals & Products" %}
 {% set results = articles if target_type == 'articles' else items %}
@@ -14,87 +14,193 @@
 
 {% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing") %}
 
-{% if slot == 'sidebar' %}
-{% include "components/catalog-sidebar.html" %}
-{% endif %}
+  {# ═══════════════════════════════════════
+     SLOT: sidebar
+  ═══════════════════════════════════════ #}
+  {% if slot == 'sidebar' %}
+    {% include "components/catalog-sidebar.html" %}
+  {% endif %}
 
-{% if slot == 'header' %}
-<div class="listing-summary">
-  <h1 class="listing-title">{{ page_title }}</h1>
-  <p class="listing-count">{{ results|length }} {{ target_type }} found</p>
-</div>
+  {# ═══════════════════════════════════════
+     SLOT: header
+  ═══════════════════════════════════════ #}
+  {% if slot == 'header' %}
 
-<div class="listing-sort flex items-center">
-  <label for="sort-select">Sort by:</label>
-  <select id="sort-select" class="sort-select">
-    <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
+  {# Mobile filter toggle button #}
+  <div class="listing-mobile-bar flex items-center justify-between">
+    <button class="filter-toggle-btn flex items-center" id="filterToggleBtn" aria-label="Open filters">
+      <i class="fas fa-sliders-h"></i>
+      <span>Filters</span>
+      {% set active_count = namespace(n=0) %}
+      {% for k, v in active_filters.items() if k not in ['sort'] %}
+        {% if v %}{% set active_count.n = active_count.n + 1 %}{% endif %}
+      {% endfor %}
+      {% if active_count.n > 0 %}
+      <span class="filter-toggle-badge">{{ active_count.n }}</span>
+      {% endif %}
+    </button>
 
-    {% if target_type == 'products' %}
-    <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price: Low to
-      High
-    </option>
-    <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price: High
-      to
-      Low</option>
-    {% else %}
-    <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
+    {# Inline sort (mobile) #}
+    <div class="listing-sort-compact flex items-center">
+      <select id="sort-select-mobile" class="sort-select sort-select--compact" aria-label="Sort results">
+        <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
+        {% if target_type == 'products' %}
+        <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price ↑</option>
+        <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price ↓</option>
+        {% else %}
+        <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
+        {% endif %}
+        <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Popular</option>
+      </select>
+    </div>
+  </div>
+
+  {# Desktop header row #}
+  <div class="listing-header__inner flex items-center justify-between">
+    <div class="listing-summary">
+      <h1 class="listing-title">{{ page_title }}</h1>
+      <p class="listing-count">
+        <span class="listing-count__num">{{ results|length }}</span>
+        {{ target_type }} found
+      </p>
+    </div>
+
+    <div class="listing-sort flex items-center">
+      <label for="sort-select" class="sort-label">Sort by</label>
+      <div class="sort-select-wrapper">
+        <i class="fas fa-sort sort-select-icon"></i>
+        <select id="sort-select" class="sort-select" aria-label="Sort results">
+          <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First</option>
+          {% if target_type == 'products' %}
+          <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price: Low to High</option>
+          <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price: High to Low</option>
+          {% else %}
+          <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest First</option>
+          {% endif %}
+          <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}{# end slot == 'header' #}
+
+  {# ═══════════════════════════════════════
+     SLOT: active_filters
+  ═══════════════════════════════════════ #}
+  {% if slot == 'active_filters' %}
+  {% set has_filters = namespace(value=false) %}
+  {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+    {% if values %}{% set has_filters.value = true %}{% endif %}
+  {% endfor %}
+
+  {% if has_filters.value %}
+  <span class="active-label">
+    <i class="fas fa-filter"></i> Active:
+  </span>
+  {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+    {% if values %}
+    {% set vals = values if values is iterable and values is not string else [values] %}
+    {% for val in vals %}
+    <div class="filter-tag flex items-center">
+      <span>{{ val | replace('-', ' ') | title }}</span>
+      <a href="{{ get_filter_url(filter_name, val, multi=(target_type == 'products' or filter_name != 'category')) }}"
+         class="remove-tag" aria-label="Remove {{ val }} filter">&times;</a>
+    </div>
+    {% endfor %}
+    {% endif %}
+  {% endfor %}
+  <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="clear-all-link" aria-label="Clear all filters">
+    <i class="fas fa-times-circle"></i> Clear All
+  </a>
+  {% endif %}
+  {% endif %}{# end slot == 'active_filters' #}
+
+  {# ═══════════════════════════════════════
+     SLOT: results
+  ═══════════════════════════════════════ #}
+  {% if results %}
+    {% if slot == 'results' %}
+      {{ grid(results) }}
     {% endif %}
 
-    <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular
-    </option>
-  </select>
-</div>
-{% endif %}
+    {# ═══════════════════════════════════════
+       SLOT: footer (pagination)
+    ═══════════════════════════════════════ #}
+    {% if slot == 'footer' %}
+    {% if pagination and pagination.pages > 1 %}
+    <nav class="pagination flex items-center justify-center" aria-label="Pagination">
 
-{% if slot == 'active_filters' %}
-<span class="active-label">Active filters:</span>
-{% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
-{% if values %}
-{% set vals = values if values is iterable and values is not string else [values] %}
-{% for val in vals %}
-<div class="filter-tag flex items-center">
-  <span>{{ val | replace('-', ' ') | title }}</span>
-  <a href="{{ get_filter_url(filter_name, val, multi=(target_type == 'products' or filter_name != 'category')) }}"
-    class="remove-tag">&times;</a>
-</div>
-{% endfor %}
-{% endif %}
-{% endfor %}
-<a href="{{ url_for(request.endpoint, **request.view_args) }}" class="clear-all-link">Clear All</a>
-{% endif %}
+      {# Previous #}
+      {% if pagination.has_prev %}
+      <a href="{{ get_page_url(pagination.prev_num) }}" class="pagination__btn pagination__btn--prev" aria-label="Previous page">
+        <i class="fas fa-chevron-left"></i>
+      </a>
+      {% else %}
+      <span class="pagination__btn pagination__btn--prev is-disabled" aria-disabled="true">
+        <i class="fas fa-chevron-left"></i>
+      </span>
+      {% endif %}
 
-{% from "components/empty-state.html" import empty_state %}
+      {# Page numbers #}
+      <div class="pagination__pages flex items-center">
+        {% for p in range(1, pagination.pages + 1) %}
+          {% if p == pagination.page %}
+          <span class="pagination__page is-active" aria-current="page">{{ p }}</span>
+          {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
+          <a href="{{ get_page_url(p) }}" class="pagination__page">{{ p }}</a>
+          {% elif p == pagination.page - 3 or p == pagination.page + 3 %}
+          <span class="pagination__ellipsis">…</span>
+          {% endif %}
+        {% endfor %}
+      </div>
 
-{% if results %}
-{{ grid(results) }}
+      {# Next #}
+      {% if pagination.has_next %}
+      <a href="{{ get_page_url(pagination.next_num) }}" class="pagination__btn pagination__btn--next" aria-label="Next page">
+        <i class="fas fa-chevron-right"></i>
+      </a>
+      {% else %}
+      <span class="pagination__btn pagination__btn--next is-disabled" aria-disabled="true">
+        <i class="fas fa-chevron-right"></i>
+      </span>
+      {% endif %}
 
-{% if pagination and pagination.pages > 1 %}
-<div class="pagination flex items-center justify-center">
-  {% if pagination.has_prev %}
-  <a href="{{ get_page_url(pagination.prev_num) }}" class="btn variant--outline">&laquo; Previous</a>
+    </nav>
+    {% endif %}
+    {% endif %}
+
   {% else %}
-  <span class="btn variant--outline disabled" aria-disabled="true">&laquo; Previous</span>
+    {# Empty state (show in results slot) #}
+    {% if slot == 'results' %}
+    {{ empty_state(
+      title="No " ~ target_type | title ~ " Found",
+      message="We couldn't find any match for your current filters or search query. Try clearing filters to see more.",
+      action_text="Reset All Filters",
+      action_url=url_for(request.endpoint, **request.view_args)
+    ) }}
+    {% endif %}
   {% endif %}
-
-  <span class="pagination-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
-
-  {% if pagination.has_next %}
-  <a href="{{ get_page_url(pagination.next_num) }}" class="btn variant--outline">Next &raquo;</a>
-  {% else %}
-  <span class="btn variant--outline disabled" aria-disabled="true">Next &raquo;</span>
-  {% endif %}
-</div>
-{% endif %}
-
-{% else %}
-{{ empty_state(
-title="No " ~ target_type | title ~ " Found",
-message="We couldn't find any match for your current filters or search query. Try clearing filters to see more.",
-action_text="Reset All Filters",
-action_url=url_for(request.endpoint, **request.view_args)
-) }}
-{% endif %}
 
 {% endcall %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Desktop sort
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function () {
+        window.location.href = this.value;
+      });
+    }
+    // Mobile sort
+    const sortSelectMobile = document.getElementById('sort-select-mobile');
+    if (sortSelectMobile) {
+      sortSelectMobile.addEventListener('change', function () {
+        window.location.href = this.value;
+      });
+    }
+  });
+</script>
 
 {% endblock %}

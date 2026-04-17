@@ -1,7 +1,7 @@
 {% macro grid(items, carousel=false) %}
 <div class="{{ 'grid-carousel' if carousel else 'grid-auto' }}">
   {% for item in items %}
-  {% include"components/cards/" ~ item.card_type ~ "-card.html" %}
+  {% include "components/cards/" ~ item.card_type ~ "-card.html" %}
   {% endfor %}
 </div>
 {% endmacro %}
