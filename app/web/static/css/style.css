@@ -4747,4 +4747,351 @@ details[open] .filter-list {
   .grid-auto {
     grid-template-columns: 1fr;
   }
-}
+}
+
+/* ============================================================
+   CATALOG REFINEMENTS — Targeted additions
+   Extends the catalog redesign block above
+   ============================================================ */
+
+/* ── Sidebar heading row (replaces old "sidebar-reset-row") ── */
+.sidebar-heading {
+  padding: 0 0 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.sidebar-heading__label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sidebar-heading__label i {
+  font-size: var(--text-xs);
+}
+
+/* ── Filter section: active-count badge on summary ── */
+.filter-section__meta {
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.filter-section__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  background: rgb(var(--brand-blue-rgb));
+  color: #fff;
+}
+
+.products-listing .filter-section__badge {
+  background: rgb(var(--brand-green-rgb));
+}
+
+/* Active section gets a subtle left accent */
+.filter-section--has-active > .filter-section__summary .filter-section__title {
+  color: var(--foreground);
+}
+
+/* ── Price active badge pill ── */
+.filter-section--price .filter-section__badge {
+  background: rgb(var(--brand-green-rgb));
+  font-size: var(--text-xs);
+  padding: 0 0.45rem;
+}
+
+/* ── Price active indicator strip ── */
+.sidebar-price-active {
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(var(--brand-green-rgb), 0.08);
+  border: 1px solid rgba(var(--brand-green-rgb), 0.2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: rgb(var(--brand-green-rgb));
+  margin-bottom: 0.75rem;
+  font-weight: var(--weight-md);
+}
+
+.sidebar-price-active i {
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+.sidebar-price-active__remove {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: var(--weight-bold);
+  color: rgb(var(--brand-green-rgb));
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sidebar-price-active__remove:hover { opacity: 1; }
+
+/* ── Filter "show more" hint ── */
+.filter-item--more {
+  pointer-events: none;
+}
+
+.filter-item__more-hint {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.2rem;
+}
+
+/* ── Sidebar Trending (articles) ── */
+.sidebar-trending {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.sidebar-trending__header {
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-trending__header i {
+  color: rgb(var(--brand-blue-rgb));
+  font-size: var(--text-sm);
+}
+
+.sidebar-trending__title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+}
+
+.sidebar-trending__links {
+  gap: 0.15rem;
+}
+
+.sidebar-trending__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  transition: background 0.15s, color 0.15s;
+  text-transform: none;
+}
+
+.sidebar-trending__link i {
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+}
+
+.sidebar-trending__link:hover,
+.sidebar-trending__link.is-active {
+  background: rgba(var(--brand-blue-rgb), 0.06);
+  color: rgb(var(--brand-blue-rgb));
+}
+
+.sidebar-trending__link.is-active {
+  font-weight: var(--weight-md);
+}
+
+.sidebar-trending__view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-md);
+  color: rgb(var(--brand-blue-rgb));
+  border-radius: var(--radius-md);
+  transition: gap 0.2s, background 0.15s;
+  text-transform: none;
+}
+
+.sidebar-trending__view-all:hover {
+  gap: 0.6rem;
+  background: rgba(var(--brand-blue-rgb), 0.06);
+}
+
+.sidebar-trending__view-all i {
+  font-size: var(--text-xs);
+}
+
+/* ── Compact Article Card ── */
+.card--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  padding: 0.75rem;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+  height: auto; /* override full-height from .card */
+}
+
+/* Override the full card hover — compact just lifts slightly */
+.card--compact:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(var(--brand-blue-rgb), 0.25);
+}
+
+.card--compact:hover .card__title { margin-bottom: 0; } /* disable full-card margin shift */
+
+.card-compact__img-link {
+  flex-shrink: 0;
+  display: block;
+}
+
+.card-compact__img-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--secondary);
+  flex-shrink: 0;
+}
+
+.card-compact__img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.card--compact:hover .card-compact__img-wrapper img {
+  transform: scale(1.08);
+}
+
+.card-compact__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.card-compact__title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  line-height: 1.35;
+  color: var(--foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.2s;
+  margin: 0;
+}
+
+.card--compact:hover .card-compact__title {
+  color: rgb(var(--brand-blue-rgb));
+}
+
+.card-compact__meta {
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.2rem;
+}
+
+.card-compact__read-time,
+.card-compact__date {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.card-compact__read-time i,
+.card-compact__date i {
+  font-size: 10px;
+}
+
+/* xs badge variant on compact cards */
+.badge--xs {
+  font-size: 10px;
+  padding: 0.1rem 0.35rem;
+}
+
+/* ── No-filter state: when no filters come from backend for a type ── */
+.sidebar-no-filters {
+  padding: 1.25rem;
+  text-align: center;
+  background: var(--secondary);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  margin-bottom: 1rem;
+}
+
+.sidebar-no-filters p {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* ── Price filter chip variant (always green regardless of listing type) ── */
+.filter-tag--price {
+  background: rgba(var(--brand-green-rgb), 0.12);
+  color: rgb(var(--brand-green-rgb));
+  border-color: rgba(var(--brand-green-rgb), 0.2);
+  gap: 0.4rem;
+}
+
+.filter-tag--price .remove-tag {
+  background: rgba(var(--brand-green-rgb), 0.12);
+  color: rgb(var(--brand-green-rgb));
+}
+
+/* ── sidebar-heading display fix (it uses flex via .flex utility) ── */
+.sidebar-heading {
+  display: flex;
+}
+
+/* ── sidebar-price-active display fix ── */
+.sidebar-price-active {
+  display: flex;
+}
+
+/* ── sidebar-trending__header display fix ── */
+.sidebar-trending__header {
+  display: flex;
+}
+
+/* ── sidebar-trending__links display fix ── */
+.sidebar-trending__links {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── filter-section__meta display fix ── */
+.filter-section__meta {
+  display: flex;
+}
+
+

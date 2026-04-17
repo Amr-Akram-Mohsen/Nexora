@@ -93,11 +93,17 @@
   {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
     {% if values %}{% set has_filters.value = true %}{% endif %}
   {% endfor %}
+  {# Also count price as active #}
+  {% if active_filters.min_price or active_filters.max_price %}
+    {% set has_filters.value = true %}
+  {% endif %}
 
   {% if has_filters.value %}
   <span class="active-label">
     <i class="fas fa-filter"></i> Active:
   </span>
+
+  {# Regular filter chips #}
   {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
     {% if values %}
     {% set vals = values if values is iterable and values is not string else [values] %}
@@ -110,11 +116,31 @@
     {% endfor %}
     {% endif %}
   {% endfor %}
+
+  {# Price range chip #}
+  {% if active_filters.min_price or active_filters.max_price %}
+  <div class="filter-tag filter-tag--price flex items-center">
+    <i class="fas fa-dollar-sign" style="font-size:9px;opacity:.8;"></i>
+    <span>
+      {%- if active_filters.min_price and active_filters.max_price -%}
+        {{ active_filters.min_price }}–{{ active_filters.max_price }}
+      {%- elif active_filters.min_price -%}
+        From {{ active_filters.min_price }}
+      {%- else -%}
+        Up to {{ active_filters.max_price }}
+      {%- endif -%}
+    </span>
+    <a href="{{ url_for(request.endpoint, **request.view_args) }}"
+       class="remove-tag" aria-label="Remove price filter">&times;</a>
+  </div>
+  {% endif %}
+
   <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="clear-all-link" aria-label="Clear all filters">
     <i class="fas fa-times-circle"></i> Clear All
   </a>
   {% endif %}
   {% endif %}{# end slot == 'active_filters' #}
+
 
   {# ═══════════════════════════════════════
      SLOT: results
