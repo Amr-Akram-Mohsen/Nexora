@@ -1,5 +1,5 @@
 # main.py
-from app import create_app, db
+from app.core import create_app
 
 app = create_app()
 

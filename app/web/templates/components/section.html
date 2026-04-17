@@ -1,0 +1,21 @@
+{% macro section(title, section_slug=None) %}
+{% from "components/ui/button.html" import button %}
+{% set header_classes = ' flex items-center justify-between' %}
+<section class="section">
+  <div class="section__header{{ header_classes }}">
+    <h2 class="title">{{ title }}</h2>
+    {% if section_slug %}
+    {% set href = (
+    url_for('item.deals')
+    if section_slug in ('deals', 'recent')
+    else url_for('article.sections', section_slug=section_slug)
+    ) %}
+    <a href="{{ href }}" class="view-all">
+      {{ button(text="View All", variant="ghost", icon="fas fa-arrow-right") }}
+    </a>
+    {% endif %}
+  </div>
+
+  {{ caller() }}
+</section>
+{% endmacro %}

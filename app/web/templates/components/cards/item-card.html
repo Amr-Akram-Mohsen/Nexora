@@ -1,0 +1,75 @@
+{% from"components/shared/image-utils.html" import render_image_url %}
+{% from"components/ui/button.html" import button %}
+{% from"components/ui/badge.html" import badge %}
+{% from "components/features/rating.html" import render_stars %}
+<article class="card card--item" data-type="item" data-id="{{ item.id }}">
+  <a href="{{ url_for('item.item_page', item_id=item.id) }}">
+    <div class="card__img-wrapper">
+      {% if item.item_type %}
+      <div class="card__tag card__tag--{{ item.item_type }}">
+        {{ item.item_type }}
+      </div>
+      {% endif %}
+
+      {{ render_image_url(
+      item.image_url,
+      item.name)
+      }}
+      <div class="card__img-overlay"></div>
+      {{ badge('Product', 'badge--card-type') }}
+      
+      <!-- Compare Toggle -->
+      <button class="compare-toggle-btn" data-id="{{ item.id }}" data-name="{{ item.name }}" title="Add to compare">
+        <i class="fas fa-balance-scale"></i>
+      </button>
+    </div>
+  </a>
+  <div class="card__content">
+    <div class="card__meta-top flex items-center">
+      {{ badge(item.category.name, 'badge--category', 'secondary') }}
+      {{ badge(item.brand.name, 'badge--brand', 'secondary') }}
+    </div>
+
+    <a href="{{ url_for('item.item_page', item_id=item.id) }}">
+      <h3 class="card__title item-name">
+        {{ item.name }}
+      </h3>
+    </a>
+
+    <div class="card__meta-bottom flex items-center">
+      <div class="card__meta-item card__rating flex items-center">
+        {{ render_stars(item.rating) }}
+        <span class="item-rating">({{ item.rating }})</span>
+      </div>
+      <span class="item-reviews-count">({{ item.review_count }}) reviews</span>
+    </div>
+
+    <div class="item-actions flex flex-col">
+      {% set best_link = item.store_links[0] if item.store_links else None %}
+      
+      <div class="item-price-box flex items-center">
+        {% if best_link %}
+          <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
+          {% if best_link.old_price %}
+            <span class="item-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
+          {% endif %}
+        {% else %}
+          <span class="item-price-unavailable">Check current price</span>
+        {% endif %}
+      </div>
+      
+      <div class="item-store-box flex items-center justify-between">
+        <div class="item-store-badge flex items-center">
+          {% if best_link and best_link.store.logo_url %}
+            <img src="{{ best_link.store.logo_url }}" alt="{{ best_link.store.name }}">
+          {% endif %}
+          <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span>
+        </div>
+        
+        <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item__view-link">
+          {{ button(text="View Deal", class="item__view-btn") }}
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

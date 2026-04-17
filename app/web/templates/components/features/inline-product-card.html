@@ -1,0 +1,27 @@
+{% macro inline_product_card(item) %}
+<div class="inline-product-card flex items-center">
+  <div class="inline-product__image">
+    {% if item.image_url %}
+    <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
+    {% else %}
+    <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="Placeholder" loading="lazy">
+    {% endif %}
+  </div>
+  
+  <div class="inline-product__info flex flex-col justify-center">
+    <div class="inline-product__badge">Featured Product</div>
+    <div class="inline-product__title">{{ item.name }}</div>
+    {% if item.price %}
+    <div class="inline-product__price">
+      From {{ item.price }} {{ item.default_variant.currency if item.default_variant else '' }}
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="inline-product__action">
+    <a href="{{ url_for('item.item_page', item_id=item.id) }}">
+      <button class="btn btn--primary btn--sm">View Deal</button>
+    </a>
+  </div>
+</div>
+{% endmacro %}
