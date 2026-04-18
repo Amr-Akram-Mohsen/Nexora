@@ -146,29 +146,64 @@ def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_
     return query.distinct().paginate(page=page, per_page=per_page, error_out=False)
 
 
-def get_active_brands_for_section(section, limit=5):
+def get_active_brands_for_section(section_slug, limit=20):
+    """
+    Returns brands that have at least one article in the given section.
+    Uses explicit join with the association table to avoid SQLAlchemy
+    relationship chain ambiguity.
+    """
+    from app.domains.core.relationships import article_brands, article_sections
     return (
         db.session.query(Brand)
-        .join(Brand.articles)
-        .join(Article.sections)
-        .filter(func.lower(Section.slug) == section)
+        .join(article_brands, Brand.id == article_brands.c.brand_id)
+        .join(Article, Article.id == article_brands.c.article_id)
+        .join(article_sections, Article.id == article_sections.c.article_id)
+        .join(Section, Section.id == article_sections.c.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
         .group_by(Brand.id)
         .order_by(func.count(Article.id).desc())
         .limit(limit)
         .all()
     )
 
-def get_active_topics_for_section(section, limit=5):
+def get_active_topics_for_section(section_slug, limit=20):
+    """
+    Returns topics that have at least one article in the given section.
+    Uses explicit join with the association table for reliability.
+    """
+    from app.domains.core.relationships import article_topics, article_sections
     return (
         db.session.query(Topic)
-        .join(Topic.articles)
-        .join(Article.sections)
-        .filter(func.lower(Section.slug) == section)
+        .join(article_topics, Topic.id == article_topics.c.topic_id)
+        .join(Article, Article.id == article_topics.c.article_id)
+        .join(article_sections, Article.id == article_sections.c.article_id)
+        .join(Section, Section.id == article_sections.c.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
         .group_by(Topic.id)
         .order_by(func.count(Article.id).desc())
         .limit(limit)
         .all()
     )
+
+def get_active_categories_for_section(section_slug, limit=20):
+    """
+    Returns categories that have at least one article in the given section.
+    Articles have a direct many-to-one category_id column.
+    """
+    from app.domains.core.relationships import article_sections
+    from app.domains.core.models import Category
+    return (
+        db.session.query(Category)
+        .join(Article, Article.category_id == Category.id)
+        .join(article_sections, Article.id == article_sections.c.article_id)
+        .join(Section, Section.id == article_sections.c.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
+        .group_by(Category.id)
+        .order_by(func.count(Article.id).desc())
+        .limit(limit)
+        .all()
+    )
+
 
 def get_popular_general_topics():
     return (

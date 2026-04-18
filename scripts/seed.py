@@ -3,7 +3,7 @@
 Seeding script for Sections, Categories, and Topics.
 Ensures the database is ready for the scrapers to work.
 """
-from app.models import db, Section, Category, Topic
+from app.domains.core.models import db, Section, Category, Topic
 import logging
 
 logger = logging.getLogger(__name__)

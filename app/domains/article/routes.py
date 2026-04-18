@@ -7,7 +7,7 @@ from app.domains.core.models import Section
 from .models import Article
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink
 from app.domains.item.service import get_search_items
-from .service import get_search_articles, get_active_brands_for_section, get_active_topics_for_section, get_related_articles, get_trending_articles
+from .service import get_search_articles, get_active_brands_for_section, get_active_topics_for_section, get_active_categories_for_section, get_related_articles, get_trending_articles
 from app.domains.interaction.service import record_view
 from app.core.constants import TargetType
 from app.shared.request import get_client_ip, get_country
@@ -36,6 +36,8 @@ def sections(section_slug):
     articles = pagination.items
 
     filter_options = {}
+    if "category" in allowed_filters:
+        filter_options["category"] = get_active_categories_for_section(section_slug)
     if "brand" in allowed_filters:
         filter_options["brand"] = get_active_brands_for_section(section_slug)
     if "topic" in allowed_filters:
