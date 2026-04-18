@@ -1,135 +1,106 @@
 # app/utils/seeder.py
 """
-Seeding script for Sections, Categories, and Topics.
-Ensures the database is ready for the scrapers to work.
+Seeding script for Sections, Categories, Topics, and Brands.
+Ensures the database is ready for the ingestion engine to work.
+Uses taxonomy_v2.json as the source of truth.
+PERFORMS A NUCLEAR RESET: Wipes all tables and resets auto-increment counters to 1.
 """
-from app.domains.core.models import db, Section, Category, Topic
+import json
+import os
 import logging
+from app.core.extensions import db
+from app.shared.utils.slug import generate_slug, normalize_name
+
+# Import ALL models to ensure db.drop_all() covers every table
+from app.domains.user.models import User
+from app.domains.article.models import Article
+from app.domains.item.models import Item, Store, ItemStoreLink
+from app.domains.core.models import Section, Category, Topic, Brand
+from app.domains.interaction.models import Comment, Reaction, View, Save, ItemClick
+from app.domains.external.models import LastAPIFetch, APIUsage
 
 logger = logging.getLogger(__name__)
 
-# Predefined Sections
-SECTIONS = [
-    {"name": "News",           "slug": "news",        "desc": "Latest technology, perfume, and fashion updates."},
-    {"name": "Reviews",        "slug": "reviews",     "desc": "Hands-on testing and expert opinions on new products."},
-    {"name": "Tutorials",      "slug": "tutorials",   "desc": "How-to guides, programming tips, and fashion advice."},
-    {"name": "Trends",         "slug": "trends",      "desc": "Market movements and what's hot right now."},
-    {"name": "Community",      "slug": "community",   "desc": "The voice of the users: feedback from Reddit and social media."},
-]
+TAXONOMY_PATH = os.path.join("app", "shared", "constants", "taxonomy_v2.json")
 
-# Predefined Categories (With Parent Support)
-CATEGORIES = [
-    # Top Level
-    {"name": "Electronics",    "slug": "electronics", "parent": None},
-    {"name": "Perfumes",       "slug": "perfumes",    "parent": None},
-    {"name": "Accessories",    "slug": "accessories", "parent": None},
-    {"name": "General",        "slug": "general",     "parent": None},
-    
-    # Sub-categories (Electronics)
-    {"name": "Smartphones",    "slug": "smartphones", "parent": "electronics"},
-    {"name": "Laptops",        "slug": "laptops",     "parent": "electronics"},
-    {"name": "Smartwatches",   "slug": "smartwatches","parent": "electronics"},
-    {"name": "Cameras",        "slug": "cameras",     "parent": "electronics"},
-
-    # Sub-categories (Perfumes)
-    {"name": "Men's Perfumes", "slug": "mens-perfume", "parent": "perfumes"},
-    {"name": "Women's Perfumes", "slug": "womens-perfume", "parent": "perfumes"},
-    {"name": "Niche & Artisanal", "slug": "niche-perfume", "parent": "perfumes"},
-    {"name": "Oud & Oriental", "slug": "oud-perfume", "parent": "perfumes"},
-
-    # Sub-categories (Accessories)
-    {"name": "Luxury Watches", "slug": "luxury-watches", "parent": "accessories"},
-    {"name": "Sunglasses", "slug": "sunglasses", "parent": "accessories"},
-    {"name": "Jewelry", "slug": "jewelry", "parent": "accessories"},
-    {"name": "Bags", "slug": "bags", "parent": "accessories"},
-]
-
-# Topics grouped by 'type'
-TOPICS = [
-    # Intent & Use-Case (The 'Why')
-    {"name": "Gaming",         "slug": "gaming",        "type": "intent",    "featured": True},
-    {"name": "Home Office",    "slug": "home-office",   "type": "intent",    "featured": True},
-    {"name": "Photography",    "slug": "photography",   "type": "intent",    "featured": False},
-    {"name": "Fitness",        "slug": "fitness",       "type": "intent",    "featured": False},
-    {"name": "Travel Gear",    "slug": "travel-gear",        "type": "intent",    "featured": False},
-    
-    # Price-Point (The 'How Much')
-    {"name": "Budget Picks",   "slug": "budget-picks",        "type": "price",     "featured": True},
-    {"name": "Mid-Range",      "slug": "mid-range",     "type": "price",     "featured": False},
-    {"name": "Premium Luxury", "slug": "premium-luxury",        "type": "price",     "featured": False},
-    {"name": "Best Value",     "slug": "best-value",         "type": "price",     "featured": True},
-    
-    # Editorial (The 'Curation')
-    {"name": "Buying Guides",  "slug": "buying-guides", "type": "editorial", "featured": True},
-    {"name": "Gift Ideas",     "slug": "gift-ideas",    "type": "editorial", "featured": True},
-    {"name": "Editor's Choice","slug": "editors-choice","type": "editorial", "featured": True},
-    {"name": "Top 10 Lists",   "slug": "top-10",        "type": "editorial", "featured": False},
-    
-    # Perfume Specific (Cross-Category Intent)
-    {"name": "Summer Scents",  "slug": "summer-scents",        "type": "perfume",   "featured": False},
-    {"name": "Long-Lasting",   "slug": "long-lasting",  "type": "perfume",   "featured": False},
-    {"name": "Date Night",     "slug": "date-night",    "type": "perfume",   "featured": False},
-]
-
+def load_taxonomy():
+    if not os.path.exists(TAXONOMY_PATH):
+        logger.error(f"[Seeder] Taxonomy file not found at {TAXONOMY_PATH}")
+        return None
+    with open(TAXONOMY_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def seed_db():
-    """Seed the database with initial metadata."""
-    logger.info("[Seeder] Starting DB seed...")
+    """Seed the database with initial metadata from taxonomy_v2.json after a NUCLEAR RESET."""
+    logger.info("[Seeder] !!! NUCLEAR RESET INITIATED !!!")
+    
+    taxonomy = load_taxonomy()
+    if not taxonomy:
+        return
 
-    # 1. Seed Sections
-    for s_data in SECTIONS:
-        section = Section.query.filter_by(slug=s_data["slug"]).first()
-        if not section:
+    try:
+        # 1. Nuclear Reset: Drop and Create all tables
+        # This is the most reliable way to reset auto-increment to 1 in SQLite/Postgres
+        db.drop_all()
+        db.create_all()
+        logger.info("[Seeder] All tables dropped and recreated. Counters reset to 1.")
+
+        # 2. Seed Sections
+        for s_data in taxonomy.get("sections", []):
+            slug = generate_slug(s_data["name"])
             section = Section(
                 name=s_data["name"],
-                slug=s_data["slug"],
-                description=s_data["desc"],
+                slug=slug,
+                description=s_data["description"],
                 allowed_filters=["brand", "topic", "category"]
             )
             db.session.add(section)
             logger.info(f"[Seeder]   + Section: {s_data['name']}")
-    db.session.flush()
+        db.session.flush()
 
-    # 2. Seed Categories (Hierarchical)
-    # First pass: Create all categories
-    for c_data in CATEGORIES:
-        category = Category.query.filter_by(slug=c_data["slug"]).first()
-        if not category:
-            category = Category(
+        # 3. Seed Categories (Hierarchical)
+        for c_data in taxonomy.get("categories", []):
+            parent_slug = generate_slug(c_data["name"])
+            parent = Category(
                 name=c_data["name"],
-                slug=c_data["slug"],
+                slug=parent_slug,
+                is_leaf=c_data.get("is_leaf", False),
+                normalized_name=normalize_name(c_data["name"]),
                 is_active=True
             )
-            db.session.add(category)
-            logger.info(f"[Seeder]   + Category: {c_data['name']}")
-    db.session.flush()
+            db.session.add(parent)
+            db.session.flush() 
+            logger.info(f"[Seeder]   + Category Cluster: {c_data['name']}")
 
-    # Second pass: Associate parents
-    for c_data in CATEGORIES:
-        if c_data["parent"]:
-            cat = Category.query.filter_by(slug=c_data["slug"]).first()
-            parent = Category.query.filter_by(slug=c_data["parent"]).first()
-            if cat and parent:
-                cat.parent_id = parent.id
-                logger.info(f"[Seeder]   Linked {cat.name} -> {parent.name}")
+            # Seed children
+            for child_data in c_data.get("children", []):
+                child_slug = generate_slug(child_data["name"])
+                child = Category(
+                    name=child_data["name"],
+                    slug=child_slug,
+                    parent_id=parent.id,
+                    is_leaf=child_data.get("is_leaf", True),
+                    normalized_name=normalize_name(child_data["name"]),
+                    is_active=True
+                )
+                db.session.add(child)
+                logger.info(f"[Seeder]     -> Leaf: {child_data['name']}")
 
-    # 3. Seed Topics
-    for t_data in TOPICS:
-        topic = Topic.query.filter_by(slug=t_data["slug"]).first()
-        if not topic:
+        # 4. Seed Topics
+        for t_data in taxonomy.get("topics", []):
+            slug = generate_slug(t_data["name"])
             topic = Topic(
                 name=t_data["name"],
-                slug=t_data["slug"],
-                type=t_data["type"],
-                is_featured=t_data["featured"],
+                slug=slug,
+                type=t_data.get("type", "intent"),
+                normalized_name=normalize_name(t_data["name"]),
                 is_active=True
             )
             db.session.add(topic)
-            logger.info(f"[Seeder]   + Topic: [{t_data['type']}] {t_data['name']}")
+            logger.info(f"[Seeder]   + Topic: {t_data['name']}")
 
-    try:
         db.session.commit()
-        logger.info("[Seeder] Seed complete!")
+        logger.info("[Seeder] Seed complete! Database is now clean and taxonomy is active.")
     except Exception:
         db.session.rollback()
-        logger.exception("[Seeder] Seed failed")
+        logger.exception("[Seeder] Nuclear seed failed")

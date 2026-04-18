@@ -1,144 +1,91 @@
 # app/scrapers/storer.py
 """
 Stores a cleaned article dict into the Article model.
-Full data flow: section_slug → Section (M2M)
-               category_slug → Category (FK)
-               brand_slugs   → Brand(s) (M2M via article_brands)
-               topic_slugs   → Topic(s) (M2M via article_topics)
-
-All lookups use get-or-create so the DB is self-healing:
-missing Sections/Categories will be created on first encounter.
+Orchestrates enrichment via EnrichmentEngine before insertion.
 """
 import logging
-from slugify import slugify
 from sqlalchemy.exc import IntegrityError
 from app.core.extensions import db
 from .models import Article
 from app.domains.core.models import Section, Category, Brand, Topic
+from app.integrations.enrichment.engine import EnrichmentEngine
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CATEGORY_SLUG = "general"
-
-
-# ── Lookup / auto-create helpers ─────────────────────────────────
-
-def _get_section(slug: str) -> Section | None:
-    if not slug:
-        return None
-    return Section.query.filter_by(slug=slug, is_active=True).first()
-
-
-def _get_or_create_category(slug: str) -> Category:
-    slug = slug or DEFAULT_CATEGORY_SLUG
-    cat = Category.query.filter_by(slug=slug).first()
-    if not cat:
-        name = slug.replace("-", " ").title()
-        cat = Category(name=name, slug=slug)
-        db.session.add(cat)
-        db.session.flush()
-    return cat
-
-
-def _get_or_create_brand(slug: str) -> Brand:
-    brand = Brand.query.filter_by(slug=slug).first()
-    if not brand:
-        name = slug.replace("-", " ").title()
-        brand = Brand(name=name, slug=slug)
-        db.session.add(brand)
-        db.session.flush()
-    return brand
-
-
-def _get_or_create_topic(slug: str) -> Topic:
-    topic = Topic.query.filter_by(slug=slug).first()
-    if not topic:
-        name = slug.replace("-", " ").title()
-        topic = Topic(name=name, slug=slug)
-        db.session.add(topic)
-        db.session.flush()
-    return topic
-
-
-# ── Public entry point ────────────────────────────────────────────
-
-def store_article(data: dict) -> Article | None:
+def store_article(cleaned_data: dict) -> Article | None:
     """
     Store one cleaned article.
-
-    Expected data dict keys:
-      title         (required)
-      url           (required, used for dedup)
-      description   (optional)
-      image_url     (optional)
-      published_at  (optional datetime)
-      source_name   (optional str)
-      section_slug  (optional str)  → linked via article_sections M2M
-      category_slug (optional str)  → sets Article.category_id FK
-      brand_slugs   (optional list) → linked via article_brands M2M
-      topic_slugs   (optional list) → linked via article_topics M2M
-
-    Returns the new Article or None if skipped/error.
+    Flow: Cleaned Data -> Enrichment Engine -> Article Object -> Database.
     """
-    url = (data.get("url") or "").strip()
-    title = (data.get("title") or "").strip()
-    source_name = (data.get("source_name") or "").strip()
+    url = (cleaned_data.get("url") or "").strip()
+    title = (cleaned_data.get("title") or "").strip()
+    source_name = (cleaned_data.get("source_name") or "").strip()
 
     if not url or not title:
         return None
 
     try:
-        # ── Fast dedup check (by URL and by Source+Title) ─────────────
+        # 1. Deduplication check
         if Article.query.filter_by(url=url).first():
             return None
             
         if source_name and Article.query.filter_by(source_name=source_name, title=title).first():
-            logger.debug("[Storer] Skipping duplicate (Source+Title): %s | %s", source_name, title)
             return None
 
-        # ── Resolve FK: Category ─────────────────────────────────────
-        category_slug = data.get("category_slug") or DEFAULT_CATEGORY_SLUG
-        category = _get_or_create_category(category_slug)
+        # 2. Enrichment
+        engine = EnrichmentEngine(db.session)
+        enriched = engine.process_article(cleaned_data)
 
-        # ── Build Article record ─────────────────────────────────────
+        # 3. Resolve Category (Leaf only ensured by engine)
+        category_slug = enriched["category"]
+        category = Category.query.filter_by(slug=category_slug).first()
+        if not category:
+            # Fallback to Uncategorized if seed is missing
+            category = Category.query.filter_by(slug="uncategorized").first()
+
+        # 4. Create Article
         article = Article(
             title=title,
-            description=data.get("description") or None,
-            content=data.get("content") or None,
+            description=cleaned_data.get("description"),
+            content=cleaned_data.get("content"),
             url=url,
-            image_url=data.get("image_url") or None,
-            published_at=data.get("published_at"),
-            source_name=source_name or None,
-            category_id=category.id,
+            image_url=cleaned_data.get("image_url"),
+            published_at=cleaned_data.get("published_at"),
+            source_name=source_name,
+            category_id=category.id if category else None,
+            importance_score=enriched["importance_score"],
+            enhanced_query=enriched["enhanced_query"],
             is_active=True,
         )
         db.session.add(article)
 
-        # ── Resolve M2M: Section ─────────────────────────────────────
-        section_slug = data.get("section_slug", "")
-        if section_slug:
-            section = _get_section(section_slug)
+        # 4. Resolve M2M: Sections
+        for sec_slug in enriched["sections"]:
+            section = Section.query.filter_by(slug=sec_slug).first()
             if section:
                 article.sections.append(section)
 
-        # ── Resolve M2M: Brands ──────────────────────────────────────
-        for slug in (data.get("brand_slugs") or []):
-            slug = slugify(slug)
-            if slug:
-                article.brands.append(_get_or_create_brand(slug))
+        # 5. Resolve M2M: Brands (Deterministic lookup)
+        for brand_info in enriched["brands"]:
+            # Use Brand.get_or_create which handles normalization
+            brand = Brand.get_or_create(brand_info["name"], db.session)
+            if brand:
+                # Update industry if it was 'general' and we have better context now
+                if (not brand.industry or brand.industry == "general") and brand_info["industry"] != "general":
+                    brand.industry = brand_info["industry"]
+                article.brands.append(brand)
 
-        # ── Resolve M2M: Topics ──────────────────────────────────────
-        for slug in (data.get("topic_slugs") or []):
-            slug = slugify(slug)
-            if slug:
-                article.topics.append(_get_or_create_topic(slug))
+        # 6. Resolve M2M: Topics
+        for topic_slug in enriched["topics"]:
+            topic = Topic.query.filter_by(slug=topic_slug).first()
+            if topic:
+                article.topics.append(topic)
 
         db.session.commit()
         return article
 
     except IntegrityError:
         db.session.rollback()
-        logger.debug("[Storer] Integrity error (race condition?): %s", url)
         return None
     except Exception:
         db.session.rollback()

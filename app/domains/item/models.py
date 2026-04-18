@@ -193,7 +193,17 @@ class Item(db.Model):
             else: items.append({"group": parent, "label": label, "value": value})
         return items
 
-    __table_args__ = (db.Index("ix_items_slug", "slug"),)
+    __table_args__ = (
+        db.Index("ix_items_slug", "slug"),
+        db.Index("ix_items_brand_category",
+                "brand_id", "category_id"),
+
+        db.Index("ix_items_type_created",
+                "item_type", "created_at"),
+
+        db.Index("ix_items_category_created",
+                "category_id", "created_at")
+    )
 
     def __repr__(self):
         return f"<Item {self.name}>"

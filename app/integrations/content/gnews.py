@@ -13,40 +13,9 @@ from app.integrations.external.api import (
     should_refetch, mark_fetched,
 )
 
-logger = logging.getLogger(__name__)
+from app.integrations.discovery import DiscoveryManager
 
-# ── Query Registry ────────────────────────────────────────────────
-# Mapped by [Section] -> [Category] -> [List of Queries]
-SECTION_QUERIES = {
-    "news": {
-        "electronics": [
-            "technology", "smartphones", "artificial intelligence", "tech news",
-            "أخبار التقنية", "هواتف ذكية", "الذكاء الاصطناعي", "أجهزة ذكية"
-        ],
-        "perfumes": [
-            "عطر رجالي", "عطر نسائي", "oud perfume", "perfume news",
-            "عطور فخمة", "أخبار العطور", "أفضل عطر", "fragrance release"
-        ],
-        "accessories": [
-            "luxury watch news", "fashion accessories", "designer brand",
-            "ساعات فاخرة", "مجوهرات", "نظارات شمسية", "إكسسوارات الموضة"
-        ],
-    },
-    "reviews": {
-        "electronics": [
-            "smartphone review", "laptop review", "tablet review",
-            "مراجعة هاتف", "مراجعة لابتوب", "تقييم أجهزة", "headphones review"
-        ],
-        "perfumes": [
-            "perfume review", "fragrance review", "مراجعة عطر",
-            "تقييم عطور", "best colognes", "عطور الصيف"
-        ],
-        "accessories": [
-            "watch review", "sunglasses review", "luxury accessories review",
-            "مراجعة ساعة", "أفضل الإكسسوارات"
-        ],
-    },
-}
+logger = logging.getLogger(__name__)
 
 TARGET_COUNTRIES = ["sa", "ae"]
 
@@ -87,7 +56,7 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, queries:
                 raw["image_url"] = raw.get("image")
                 raw["section_slug"] = section_slug
                 raw["category_slug"] = category_slug
-                cleaned = clean_article_data(raw, section_slug)
+                cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1
 
@@ -99,7 +68,15 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, queries:
 
 def fetch_all_gnews() -> int:
     total = 0
-    for section_slug, categories in SECTION_QUERIES.items():
+    discovery = DiscoveryManager()
+    queries_registry = discovery.get_queries_by_section()
+    
+    # GNews is mainly for news and reviews
+    for section_slug in ["news", "reviews"]:
+        if section_slug not in queries_registry:
+            continue
+            
+        categories = queries_registry[section_slug]
         logger.info("[GNews] Fetching Section: %s", section_slug)
         for category_slug, queries in categories.items():
             for country in TARGET_COUNTRIES:

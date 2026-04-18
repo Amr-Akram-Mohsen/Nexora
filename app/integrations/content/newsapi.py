@@ -14,65 +14,9 @@ from app.integrations.external.api import (
     should_refetch, mark_fetched,
 )
 
+from app.integrations.discovery import DiscoveryManager
+
 logger = logging.getLogger(__name__)
-
-# ── Query Registry ────────────────────────────────────────────────
-# Mapped by [Section] -> [Category] -> [List of Queries]
-SECTION_QUERIES = {
-    "news": {
-        "electronics": [
-            "tech news", "AI news", "smartphone news", "gadget release",
-            "semiconductor news", "wearable tech", "consumer electronics"
-        ],
-        "perfumes": [
-            "perfume launch", "fragrance news", "perfume brand",
-            "niche fragrance", "cologne release", "designer perfume"
-        ],
-        "accessories": [
-            "luxury watch news", "fashion accessories", "designer brand",
-            "jewelry trends", "smartwatch features", "sunglasses fashion"
-        ],
-    },
-    "reviews": {
-        "electronics": [
-            "smartphone review", "laptop review", "tablet review",
-            "smartwatch review", "headphones review", "camera review"
-        ],
-        "perfumes": [
-            "perfume review", "fragrance review", "cologne review",
-            "scent review", "best perfumes"
-        ],
-        "accessories": [
-            "watch review", "sunglasses review", "luxury accessories review",
-            "handbag review", "wallet review"
-        ],
-    },
-    "tutorials": {
-        "electronics": [
-            "tech tutorial", "how to programming", "smartphone tips",
-            "laptop setup guide", "software tutorial"
-        ],
-        "accessories": [
-            "how to style accessories", "fashion tips", "watch maintenance",
-            "jewelry care"
-        ],
-    },
-    "trends": {
-        "electronics": [
-            "technology trends 2025", "future of smartphones", "AI trends",
-            "smart home trends"
-        ],
-        "perfumes": [
-            "fragrance trends 2025", "best perfumes 2025", "perfume ingredients",
-            "sustainable fragrances"
-        ],
-        "accessories": [
-            "fashion trends 2025", "luxury trends", "watch trends 2025",
-            "jewelry trends 2025"
-        ],
-    },
-}
-
 
 def fetch_section_category_newsapi(section_slug: str, category_slug: str, queries: list[str]) -> int:
     api_key = current_app.config.get("NEWS_API_KEY")
@@ -107,9 +51,10 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, querie
             mark_fetched(section_slug, f"newsapi:{category_slug}:{q}")
 
             for raw in resp.json().get("articles", []):
+                # Pass hints to cleaner/storer
                 raw["section_slug"] = section_slug
                 raw["category_slug"] = category_slug
-                cleaned = clean_article_data(raw, section_slug)
+                cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1
 
@@ -121,7 +66,10 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, querie
 
 def fetch_all_sections() -> int:
     total = 0
-    for section_slug, categories in SECTION_QUERIES.items():
+    discovery = DiscoveryManager()
+    queries_registry = discovery.get_queries_by_section()
+    
+    for section_slug, categories in queries_registry.items():
         logger.info("[NewsAPI] Fetching Section: %s", section_slug)
         for category_slug, queries in categories.items():
             logger.info("[NewsAPI]   Category: %s (%d queries)", category_slug, len(queries))

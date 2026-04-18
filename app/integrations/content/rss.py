@@ -197,7 +197,7 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
                 if not raw:
                     continue
-                cleaned = clean_article_data(raw, section_slug)
+                cleaned = clean_article_data(raw)
                 if cleaned:
                     if store_article(cleaned):
                         stored += 1

@@ -1,0 +1,66 @@
+{
+  "sections": [
+    {"name": "News", "description": "Latest updates and announcements."},
+    {"name": "Reviews", "description": "Hands-on product testing and expert opinions."},
+    {"name": "Tutorials", "description": "Guides, tips, and how-to articles."},
+    {"name": "Trends", "description": "Market insights and hot upcoming products."},
+    {"name": "Community", "description": "Discussions and feedback from the community."}
+  ],
+  "categories": [
+    {
+      "name": "Electronics",
+      "is_leaf": false,
+      "children": [
+        {"name": "Smartphones", "is_leaf": true},
+        {"name": "Laptops", "is_leaf": true},
+        {"name": "Tablets", "is_leaf": true},
+        {"name": "Smartwatches", "is_leaf": true},
+        {"name": "Earbuds", "is_leaf": true},
+        {"name": "Headphones", "is_leaf": true},
+        {"name": "Cameras", "is_leaf": true}
+      ]
+    },
+    {
+      "name": "Perfumes",
+      "is_leaf": false,
+      "children": [
+        {"name": "Men’s Perfumes", "is_leaf": true},
+        {"name": "Women’s Perfumes", "is_leaf": true},
+        {"name": "Niche & Artisanal", "is_leaf": true},
+        {"name": "Oud & Oriental", "is_leaf": true}
+      ]
+    },
+    {
+      "name": "Accessories",
+      "is_leaf": false,
+      "children": [
+        {"name": "Watches", "is_leaf": true},
+        {"name": "Bags", "is_leaf": true},
+        {"name": "Sunglasses", "is_leaf": true},
+        {"name": "Jewelry", "is_leaf": true}
+      ]
+    },
+    {
+      "name": "General",
+      "is_leaf": false,
+      "children": [
+        {"name": "Uncategorized", "is_leaf": true}
+      ]
+    }
+  ],
+  "topics": [
+    {"name": "Gaming", "type": "intent"},
+    {"name": "Home Office", "type": "intent"},
+    {"name": "Photography", "type": "intent"},
+    {"name": "Fitness", "type": "intent"},
+    {"name": "Travel Gear", "type": "intent"},
+    {"name": "Budget Picks", "type": "intent"},
+    {"name": "Mid-Range", "type": "intent"},
+    {"name": "Premium Luxury", "type": "intent"},
+    {"name": "Buying Guides", "type": "intent"},
+    {"name": "Gift Ideas", "type": "intent"},
+    {"name": "Top 10 Lists", "type": "intent"},
+    {"name": "Summer Scents", "type": "intent"},
+    {"name": "Long-Lasting", "type": "intent"}
+  ]
+}

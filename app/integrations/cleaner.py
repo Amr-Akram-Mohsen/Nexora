@@ -131,14 +131,12 @@ def _clean_description(text: str | None) -> str:
     return sanitize_text(text)
 
 
-def clean_article_data(raw: dict, section_slug: str) -> dict | None:
+def clean_article_data(raw: dict) -> dict | None:
     """
     Normalise a raw article dict from any source.
     Returns None if the article fails quality checks.
-
-    The caller (scraper) supplies section_slug as a positional arg,
-    and may also include category_slug / brand_slugs / topic_slugs
-    inside `raw` — these are passed through untouched.
+    
+    Responsibility: Normalization, sanitization, formatting, basic validation ONLY.
     """
     # ── Mandatory fields ────────────────────────────────────────
     url_raw = (raw.get("url") or raw.get("link") or "").strip()
@@ -190,9 +188,6 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
     source_name = sanitize_text(source_raw)
 
     # ── Content ──────────────────────────────────────────────────
-    # If the source isn't YouTube, we actively try to scrape the full article body.
-    # We strictly enforce that if we fail to scrape the full content, we leave it as None.
-    # This prevents storing partial/snippet data so you can easily detect missing content.
     content = None
     if url and "youtube.com" not in url.lower():
         full_content = scrape_article_content(url)
@@ -201,7 +196,6 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
             content = _sanitize_content(enhanced_html)
 
     return {
-        # ── Core fields ──────────────────────────────────────────
         "title":         title,
         "description":   description,
         "content":       content,
@@ -209,9 +203,6 @@ def clean_article_data(raw: dict, section_slug: str) -> dict | None:
         "image_url":     image_url,
         "published_at":  published_at,
         "source_name":   source_name,
-        # ── Taxonomy (set by scraper, passed through as-is) ──────
-        "section_slug":  section_slug,
+        # Hints from scraper (optional)
         "category_slug": raw.get("category_slug") or "",
-        "brand_slugs":   raw.get("brand_slugs") or [],
-        "topic_slugs":   raw.get("topic_slugs") or [],
     }

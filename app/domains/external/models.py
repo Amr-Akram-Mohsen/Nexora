@@ -13,7 +13,15 @@ class LastAPIFetch(db.Model):
     id           = db.Column(db.Integer, primary_key=True, autoincrement=True)
     section      = db.Column(db.String(100), nullable=False)
     query_text   = db.Column(db.Text, nullable=False)
+    normalized_query = db.Column(db.String(255), index=True)
     last_fetched_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    category = db.Column(db.String(100), index=True)
+    source = db.Column(db.String(50), index=True)  # newsapi / gnews / rss
+
+    failure_count = db.Column(db.Integer, default=0)
+    last_failed_at = db.Column(db.DateTime)
+
 
     __table_args__ = (
         db.UniqueConstraint(

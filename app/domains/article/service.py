@@ -5,7 +5,7 @@ from app.domains.interaction.models import View
 from sqlalchemy.orm import load_only, joinedload
 from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta, timezone
-
+from app.core.extensions import cache
 from sqlalchemy.orm import load_only, joinedload, selectinload, defer
 
 def my_zip(*iterables):
@@ -91,6 +91,7 @@ def get_related_articles(article, limit=6):
 # -------------------------
 # Trending Articles
 # -------------------------
+@cache.cached(timeout=300)
 def get_trending_articles(limit=6, days=7, section_ids=None):
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
 
@@ -204,20 +205,20 @@ def get_active_categories_for_section(section_slug, limit=20):
         .all()
     )
 
-
+@cache.cached(timeout=3600)
 def get_popular_general_topics():
     return (
         db.session.query(Topic.slug, Topic.name)
         .all()
     )
-
+@cache.cached(timeout=3600)
 def get_popular_brands(limit=5):
     return (
         db.session.query(Brand.slug, Brand.name)
         .limit(limit)
         .all()
     )
-
+@cache.cached(timeout=3600)
 def get_active_sections():
     return (
         db.session.query(Section.slug, Section.name)

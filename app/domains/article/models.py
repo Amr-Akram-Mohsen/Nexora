@@ -20,6 +20,8 @@ class Article(db.Model):
     card_type = db.Column(db.TEXT, default="article")
     # Tracker for matcher — set to utcnow() after each matching run
     last_matched_at = db.Column(db.DateTime, nullable=True, index=True)
+    importance_score = db.Column(db.Float, default=0, index=True)
+    enhanced_query = db.Column(db.Text)
 
     topics = db.relationship("Topic", secondary=article_topics, back_populates="articles")
     sections = db.relationship("Section", secondary=article_sections, back_populates="articles")
@@ -60,6 +62,16 @@ class Article(db.Model):
 
     __table_args__ = (
         db.Index("idx_published_at", "published_at"),
+        db.Index("idx_article_category_published", "category_id", "published_at"),
+        db.Index("idx_article_active", "is_active"),
+        db.Index("idx_article_views", "view_count"),
+        db.Index("idx_article_active_published", "is_active", "published_at"),
+
+        db.Index("ix_article_category_active_published",
+                "category_id", "is_active", "published_at"),
+
+        db.Index("ix_article_brand_lookup",
+                "id", "is_active", "importance_score"),
         db.UniqueConstraint('source_name', 'title', name='uq_articles_source_title'),
     )
 
@@ -91,3 +103,5 @@ class Article(db.Model):
     def link_item(self, item_obj):
         if item_obj not in self.linked_items:
             self.linked_items.append(item_obj)
+
+

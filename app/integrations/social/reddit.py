@@ -6,8 +6,8 @@ Structure: { section_slug: { category_slug: [subreddits] } }
 import logging
 from datetime import datetime
 from flask import current_app
-from .cleaner import clean_article_data
-from .storer import store_article
+from app.integrations.cleaner import clean_article_data
+from app.domains.article.storage import store_article
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
                 "section_slug": section_slug,
                 "category_slug": category_slug if category_slug != "regional" else "general",
             }
-            cleaned = clean_article_data(raw, section_slug)
+            cleaned = clean_article_data(raw)
             if cleaned and store_article(cleaned):
                 stored += 1
         return stored

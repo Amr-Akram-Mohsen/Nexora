@@ -10,42 +10,9 @@ from app.integrations.cleaner import clean_article_data
 from app.domains.article.storage import store_article
 from app.integrations.external.api import can_call_youtube, record_youtube_call
 
-logger = logging.getLogger(__name__)
+from app.integrations.discovery import DiscoveryManager
 
-# ── Query Registry ────────────────────────────────────────────────
-# YouTube is only for the "reviews" section
-YOUTUBE_QUERIES = {
-    "reviews": {
-        "electronics": [
-            "smartphone review 2025",
-            "مراجعة هاتف 2025",
-            "laptop review 2025",
-            "مراجعة لابتوب",
-            "TWS earbuds review",
-            "smartwatch review 2025",
-            "مراجعة ساعة ذكية",
-            "camera test and review",
-        ],
-        "perfumes": [
-            "best perfume review 2025",
-            "مراجعة عطر رجالي",
-            "oud fragrance review",
-            "top perfumes men 2025",
-            "أفضل عطر 2025",
-            "niche fragrance review",
-            "مراجعة عطور نسائية",
-            "summer cologne review",
-        ],
-        "accessories": [
-            "luxury watch review 2025",
-            "مراجعة ساعة فاخرة",
-            "best sunglasses 2025",
-            "designer bag review",
-            "أفضل نظارات شمسية",
-            "mens fashion accessories style",
-        ],
-    }
-}
+logger = logging.getLogger(__name__)
 
 
 def fetch_youtube_section_category(section_slug: str, category_slug: str, queries: list[str], results_per_query: int = 5) -> int:
@@ -96,7 +63,7 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, querie
                     "section_slug": section_slug,
                     "category_slug": category_slug,
                 }
-                cleaned = clean_article_data(raw, section_slug)
+                cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1
 
@@ -109,7 +76,10 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, querie
 def fetch_youtube_reviews() -> int:
     total = 0
     section_slug = "reviews"
-    categories = YOUTUBE_QUERIES.get(section_slug, {})
+    discovery = DiscoveryManager()
+    queries_registry = discovery.get_queries_by_section()
+    
+    categories = queries_registry.get(section_slug, {})
     
     for category_slug, queries in categories.items():
         logger.info("[YouTube] Fetching Section: %s, Category: %s (%d queries)", section_slug, category_slug, len(queries))
