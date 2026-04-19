@@ -110,18 +110,18 @@ def _scrape_with_playwright(url: str) -> str | None:
             )
             page = context.new_page()
             
-            # Navigate and wait for network to be idle
-            page.goto(url, timeout=45000, wait_until="networkidle")
+            # Navigate and wait for basic load (much faster than networkidle)
+            page.goto(url, timeout=25000, wait_until="load")
             
             # Simple scroll to trigger lazy elements
             page.evaluate("window.scrollTo(0, document.body.scrollHeight/3)")
-            time.sleep(1.5)
+            time.sleep(1.0)
             
             html = page.content()
             browser.close()
             return html
     except Exception as e:
-        logger.warning(f"[Extractor] Playwright rendering failed for {url}: {e}")
+        logger.warning(f"[Extractor] Playwright rendering failed/timed out for {url}: {e}")
         return None
 
 def _extract_from_json_ld(html: str) -> str | None:
@@ -159,20 +159,21 @@ def scrape_article_content(url: str) -> str | None:
     3. Clean with Trafilatura.
     4. Fallback to JSON-LD metadata if all else fails.
     """
-    time.sleep(random.uniform(0.5, 1.5))
+    # Reduced delay for better throughput
+    time.sleep(random.uniform(0.3, 0.8))
     html_source = None
     
     # --- Try CloudScraper first (The "Fast" route) ---
     try:
-        response = scraper.get(url, timeout=15)
+        response = scraper.get(url, timeout=12)
         if response.status_code == 200:
             html_source = response.text
     except Exception as e:
         logger.debug(f"[Extractor] CloudScraper failed for {url}: {e}")
 
-    # --- Intelligent Fallback: Check if we need Playwright ---
+    # --- Intelligent Fallback: Only use Playwright if truly needed ---
     needs_playwright = False
-    if not html_source or len(html_source) < 5000:
+    if not html_source or len(html_source) < 3000:
         needs_playwright = True
     elif "javascript" in html_source.lower() and ("enable" in html_source.lower() or "browser" in html_source.lower()):
         needs_playwright = True

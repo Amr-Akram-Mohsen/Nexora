@@ -91,7 +91,7 @@ def get_related_articles(article, limit=6):
 # -------------------------
 # Trending Articles
 # -------------------------
-@cache.cached(timeout=300)
+@cache.memoize(timeout=300)
 def get_trending_articles(limit=6, days=7, section_ids=None):
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
 
@@ -146,7 +146,7 @@ def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_
 
     return query.distinct().paginate(page=page, per_page=per_page, error_out=False)
 
-
+@cache.memoize(timeout=3600)
 def get_active_brands_for_section(section_slug, limit=20):
     """
     Returns brands that have at least one article in the given section.
@@ -167,6 +167,7 @@ def get_active_brands_for_section(section_slug, limit=20):
         .all()
     )
 
+@cache.memoize(timeout=3600)
 def get_active_topics_for_section(section_slug, limit=20):
     """
     Returns topics that have at least one article in the given section.
@@ -185,7 +186,7 @@ def get_active_topics_for_section(section_slug, limit=20):
         .limit(limit)
         .all()
     )
-
+@cache.memoize(timeout=3600)
 def get_active_categories_for_section(section_slug, limit=20):
     """
     Returns categories that have at least one article in the given section.
@@ -205,25 +206,26 @@ def get_active_categories_for_section(section_slug, limit=20):
         .all()
     )
 
-@cache.cached(timeout=3600)
+@cache.memoize(timeout=3600)
 def get_popular_general_topics():
     return (
         db.session.query(Topic.slug, Topic.name)
         .all()
     )
-@cache.cached(timeout=3600)
+@cache.memoize(timeout=3600)
 def get_popular_brands(limit=5):
     return (
         db.session.query(Brand.slug, Brand.name)
         .limit(limit)
         .all()
     )
-@cache.cached(timeout=3600)
+
+@cache.memoize(timeout=3600)
 def get_active_sections():
     return (
         db.session.query(Section.slug, Section.name)
         .filter_by(is_active=True)
-        .order_by(Section.sort_order)
+        # .order_by(Section.sort_order)
         .all()
     )
 

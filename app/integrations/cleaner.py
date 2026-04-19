@@ -23,7 +23,8 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.shared.sanitizer import sanitize_text
 from app.integrations.content.extract_article_content import scrape_article_content, enhance_article_html
-
+import logging
+logger = logging.getLogger(__name__)
 # ── Safe HTML tags allowed in article content ──────────────────
 # Everything else is stripped. Script/style/iframe always removed.
 ALLOWED_TAGS = [
@@ -191,9 +192,18 @@ def clean_article_data(raw: dict) -> dict | None:
     content = None
     if url and "youtube.com" not in url.lower():
         full_content = scrape_article_content(url)
-        if full_content:
-            enhanced_html = enhance_article_html(full_content)
-            content = _sanitize_content(enhanced_html)
+        if not full_content:
+            # SKIP: Article extraction failed or timed out
+            logger.info(f"[Cleaner] Skipping article (extraction failed): {title[:50]}...")
+            return None
+        
+        enhanced_html = enhance_article_html(full_content)
+        content = _sanitize_content(enhanced_html)
+        
+        # Verify sanitized content isn't just whitespace or too tiny
+        if not content or len(content) < 200:
+            logger.info(f"[Cleaner] Skipping article (insufficient content after sanitization): {title[:50]}...")
+            return None
 
     return {
         "title":         title,
