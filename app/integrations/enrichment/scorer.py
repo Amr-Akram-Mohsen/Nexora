@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from app.domains.core.models import Brand
+from app.domains.system.models import Brand
 
 class ScoringLayer:
     def calculate_importance(self, source_name: str, brands: List[Brand], text: str, published_at: datetime = None) -> float:

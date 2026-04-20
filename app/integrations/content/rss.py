@@ -17,7 +17,7 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import feedparser
 from app.integrations.cleaner import clean_article_data
-from app.domains.article.storage import store_article
+from app.domains.article.ingestion import store_article
 
 logger = logging.getLogger(__name__)
 
@@ -169,8 +169,28 @@ def _parse_entry(entry, section_slug: str, category_slug: str, source_name: str)
     }
 
 
+# Mapping for deterministic RSS classification (No magic)
+# Maps category_slug -> {topics, brands}
+SUBJECT_MAPPING = {
+    "smartphones":  {"topics": ["mobile-tech"], "brands": []},
+    "laptops":      {"topics": ["computing"], "brands": []},
+    "tablets":      {"topics": ["computing", "mobile-tech"], "brands": []},
+    "smartwatches": {"topics": ["wearables"], "brands": []},
+    "earbuds":      {"topics": ["audio"], "brands": []},
+    "headphones":   {"topics": ["audio"], "brands": []},
+    "cameras":      {"topics": ["photography"], "brands": []},
+    "perfumes":     {"topics": ["fragrances"], "brands": []},
+    "mens-perfumes": {"topics": ["fragrances"], "brands": []},
+    "womens-perfumes": {"topics": ["fragrances"], "brands": []},
+    "watches":      {"topics": ["luxury-watches"], "brands": []},
+    "bags":         {"topics": ["fashion-accessories"], "brands": []},
+}
+
 def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls: list[str]) -> int:
     stored = 0
+    # Determine deterministic classification for this feed set
+    mapping = SUBJECT_MAPPING.get(category_slug, {"topics": [], "brands": []})
+    
     for feed_url in feed_urls:
         try:
             feed = feedparser.parse(
@@ -178,7 +198,6 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             )
 
-            # Dead-feed detection: skip if feedparser got no entries and reported an error
             if feed.bozo and not feed.entries:
                 logger.warning(
                     "[RSS] Dead/unreachable feed (bozo=%r): %s — skipping",
@@ -197,6 +216,11 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
                 if not raw:
                     continue
+                
+                # Pass deterministic classification
+                raw["topic_slugs"] = mapping["topics"]
+                raw["brand_names"] = mapping["brands"]
+                
                 cleaned = clean_article_data(raw)
                 if cleaned:
                     if store_article(cleaned):

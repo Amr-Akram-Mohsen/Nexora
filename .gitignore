@@ -16,7 +16,6 @@ instance/
 .vscode/
 
 tmp/
-app/sentiment_model/
 
 # OS junk
 .DS_Store

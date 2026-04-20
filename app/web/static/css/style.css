@@ -5094,4 +5094,250 @@ details[open] .filter-list {
   display: flex;
 }
 
+/* -------------- ARTICLE & ITEM DETAIL PAGE THEMES -------------- */
+
+/* 1. Theme Configuration & Tokens Setup */
+.detail-page--article {
+  --theme-primary-rgb: var(--brand-blue-rgb);
+  --theme-primary: rgb(var(--theme-primary-rgb));
+  --theme-secondary-rgb: var(--brand-purple-rgb);
+  --theme-secondary: rgb(var(--theme-secondary-rgb));
+  --theme-accent: rgba(var(--theme-secondary-rgb), 0.7);
+  --theme-bg: #f8fafc; /* Light neutral */
+  --theme-text: var(--foreground);
+  --theme-muted: var(--muted-foreground);
+  --theme-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+body.dark-mode .detail-page--article,
+[data-theme="dark"] .detail-page--article {
+  --theme-bg: #0b1120; /* Deep blue/black */
+  --theme-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.detail-page--item {
+  --theme-primary-rgb: var(--brand-green-rgb);
+  --theme-primary: rgb(var(--theme-primary-rgb));
+  --theme-secondary-rgb: var(--brand-teal-rgb);
+  --theme-secondary: rgb(var(--theme-secondary-rgb));
+  --theme-accent: rgba(var(--theme-secondary-rgb), 0.7);
+  --theme-bg: #f6f8f6; /* Warmer neutral */
+  --theme-text: var(--foreground);
+  --theme-muted: var(--muted-foreground);
+  --theme-shadow: 0 4px 12px rgba(var(--theme-primary-rgb), 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+body.dark-mode .detail-page--item,
+[data-theme="dark"] .detail-page--item {
+  --theme-bg: #063125; /* Deep emerald tint */
+  --theme-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* 2. Container Background Scoping */
+.detail-page--article,
+.detail-page--item {
+  background-color: var(--theme-bg);
+  transition: background-color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* 3. Header Improvements */
+.detail-page--article .detail-page__title,
+.detail-page--item .detail-page__title {
+  /* Fluid responsive scaling */
+  font-size: clamp(2rem, 4vw + 1rem, 3.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--theme-text);
+  margin-bottom: 1.25rem;
+}
+
+.detail-page--article .detail-page__meta,
+.detail-page--item .detail-page__meta {
+  gap: 1.5rem;
+  color: var(--theme-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.detail-page--article .meta-item,
+.detail-page--item .meta-item {
+  gap: 0.5rem;
+}
+
+/* 4. Badges Contextualization */
+.detail-page--article .badge--category,
+.detail-page--item .badge--category {
+  /* Subtle pills */
+  background-color: rgba(var(--theme-primary-rgb), 0.08);
+  color: var(--theme-primary);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.15);
+}
+
+.detail-page--article .badge--brand,
+.detail-page--item .badge--brand {
+  /* Stronger contrast */
+  background-color: transparent;
+  color: var(--theme-secondary);
+  border: 1px solid var(--theme-secondary);
+}
+
+/* 5. Content Area Refinements */
+.detail-page--article .article-full-text,
+.detail-page--article .article-content {
+  max-width: 75ch; /* Optimal reading width */
+  margin: 0 auto;
+}
+
+.detail-page--article .article-full-text p {
+  line-height: 1.8;
+  margin-bottom: 1.75rem;
+  font-size: 1.125rem;
+  color: var(--theme-text);
+}
+
+/* Source Box styling */
+.detail-page--article .article-source-box {
+  background-color: rgba(var(--theme-primary-rgb), 0.03);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.1);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  margin-top: 3rem;
+  box-shadow: var(--theme-shadow);
+  align-items: center;
+  text-align: center;
+}
+
+/* Item Content & Price Emphasis */
+.detail-page--item .item-content {
+  line-height: 1.7;
+}
+
+/* 6. Sidebar UI Upgrade */
+.detail-page--article .detail-page__sidebar,
+.detail-page--item .detail-page__sidebar {
+  background-color: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--theme-shadow);
+  border: 1px solid var(--border);
+  margin-top: 1.5rem;
+}
+
+/* 7. Image / Media Styling & Radii */
+.detail-page--article .detail-page__image img,
+.detail-page--item .detail-page__image img,
+.detail-page--article .media-gallery__main img,
+.detail-page--item .media-gallery__main img {
+  border-radius: var(--radius-xl);
+  box-shadow: var(--theme-shadow);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  object-fit: cover;
+  width: 100%;
+}
+
+.detail-page--article .detail-page__image:hover img,
+.detail-page--item .detail-page__image:hover img {
+  transform: scale(1.01);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06); /* Soft interactive lift */
+}
+
+/* 8. Linked Products inside Article */
+.detail-page--article .article-linked-products {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.detail-page--article .inline-product-card {
+  background-color: rgba(var(--theme-secondary-rgb), 0.02);
+  border: 1px solid rgba(var(--theme-secondary-rgb), 0.15);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+  box-shadow: var(--theme-shadow);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.detail-page--article .inline-product-card:hover {
+  background-color: rgba(var(--theme-secondary-rgb), 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(var(--theme-secondary-rgb), 0.06); /* Premium soft depth */
+}
+
+/* 9. Buttons Contextualization */
+/* Article buttons: subtle, editorial style */
+.detail-page--article .btn-back:hover {
+  --variant-hover-bg: rgba(var(--theme-primary-rgb), 0.08);
+}
+
+.detail-page--article .article__view-btn {
+  --variant-bg: transparent;
+  --variant-border: rgba(var(--theme-primary-rgb), 0.3);
+  --variant-color: var(--theme-primary);
+  --variant-hover-bg: rgba(var(--theme-primary-rgb), 0.05);
+  box-shadow: none;
+}
+
+/* Item CTA buttons: High contrast, solid and visually dominant */
+.detail-page--item .item-buy-link {
+  background-color: var(--theme-primary);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 14px rgba(var(--theme-primary-rgb), 0.25);
+  transform: translateY(0);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+}
+
+.detail-page--item .item-buy-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.35);
+  background-color: rgba(var(--theme-primary-rgb), 0.95);
+  color: #fff;
+}
+
+.detail-page--item .item-buy-link__price {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.detail-page--item .item-buy-link__icon {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.detail-page--item .item-details-dialog__open {
+  background-color: var(--theme-primary);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0.875rem;
+  box-shadow: 0 4px 14px rgba(var(--theme-primary-rgb), 0.25);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.detail-page--item .item-details-dialog__open:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--theme-primary-rgb), 0.35);
+  background-color: rgba(var(--theme-primary-rgb), 0.95);
+}
+
+.detail-page--item .item-buy-links__disclosure {
+  font-size: var(--text-sm);
+  color: var(--theme-muted);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
 

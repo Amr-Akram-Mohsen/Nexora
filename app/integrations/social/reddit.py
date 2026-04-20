@@ -7,7 +7,8 @@ import logging
 from datetime import datetime
 from flask import current_app
 from app.integrations.cleaner import clean_article_data
-from app.domains.article.storage import store_article
+from app.integrations.external.api import should_refetch, mark_fetched
+from app.domains.article.ingestion import store_article
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,11 @@ MIN_LENGTH = 80   # Skip short posts (chars)
 
 def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int = 20) -> int:
     """Fetch hot posts from a subreddit and store as articles."""
+    # 1. Check Cooldown
+    cache_key = f"reddit:{name}"
+    if not should_refetch(section_slug, cache_key, hours=24):
+        return 0
+
     try:
         import praw
     except ImportError:
@@ -46,6 +52,15 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
         )
         subreddit = reddit.subreddit(name)
         stored = 0
+
+        # 2. Mark Fetched
+        mark_fetched(
+            section_slug, 
+            cache_key, 
+            category=category_slug, 
+            source="reddit", 
+            normalized_query=f"r/{name}"
+        )
 
         for submission in subreddit.hot(limit=limit):
             if submission.score < MIN_SCORE:

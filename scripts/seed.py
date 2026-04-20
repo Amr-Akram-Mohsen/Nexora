@@ -15,7 +15,7 @@ from app.shared.utils.slug import generate_slug, normalize_name
 from app.domains.user.models import User
 from app.domains.article.models import Article
 from app.domains.item.models import Item, Store, ItemStoreLink
-from app.domains.core.models import Section, Category, Topic, Brand
+from app.domains.system.models import Section, Category, Topic, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, ItemClick
 from app.domains.external.models import LastAPIFetch, APIUsage
 

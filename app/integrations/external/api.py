@@ -73,16 +73,30 @@ def should_refetch(section: str, query_text: str, hours: int = 6) -> bool:
     return datetime.utcnow() - rec.last_fetched_at > timedelta(hours=hours)
 
 
-def mark_fetched(section: str, query_text: str):
+def mark_fetched(section: str, query_text: str, category: str = None, source: str = None, normalized_query: str = None):
+    """
+    Updates or creates a record of the last time a specific query was executed.
+    Populates metadata columns for better debugging and analysis.
+    """
     rec = LastAPIFetch.query.filter_by(
         section=section, query_text=query_text
     ).first()
+    
+    now = datetime.utcnow()
+    
     if rec:
-        rec.last_fetched_at = datetime.utcnow()
+        rec.last_fetched_at = now
+        # Update metadata if provided and currently null
+        if category and not rec.category: rec.category = category
+        if source and not rec.source: rec.source = source
+        if normalized_query and not rec.normalized_query: rec.normalized_query = normalized_query
     else:
         db.session.add(LastAPIFetch(
             section=section,
             query_text=query_text,
-            last_fetched_at=datetime.utcnow(),
+            category=category,
+            source=source,
+            normalized_query=normalized_query,
+            last_fetched_at=now,
         ))
     db.session.commit()

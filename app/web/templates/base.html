@@ -1,107 +1,92 @@
 <!-- base.html -->
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <title>{% block title %}{% endblock %}</title>
-    
-    <!-- Primary Meta Tags -->
-    <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
-    <meta name="description" content="{% block description %}Nexora is your premium source for tech news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:title" content="{{ self.seo_title() }}">
-    <meta property="og:description" content="{{ self.description() }}">
-    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ request.url }}">
-    <meta property="twitter:title" content="{{ self.seo_title() }}">
-    <meta property="twitter:description" content="{{ self.description() }}">
-    <meta property="twitter:image" content="{{ self.og_image() }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
+  <title>{% block title %}{% endblock %}</title>
 
-    <!-- JSON-LD Structured Data -->
-    {% block structured_data %}{% endblock %}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">  <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}"> -->
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-    <script>
-      window.APP = JSON.parse('{{ {"isAuthenticated": is_authenticated, "userEmail": user_email} | tojson | safe }}');
-    </script>
-    <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
-    <script
-      src="{{ url_for('static', filename='js/forms.js') }}"
-      defer
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/comments.js') }}"
-      defer
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/interactions.js') }}"
-      defer
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/affiliates.js') }}"
-      defer
-    ></script>
-    <script
-      src="{{ url_for('static', filename='js/tracking.js') }}"
-      defer
-    ></script>
-    <script src="{{ url_for('static', filename='js/compare.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-    <script>
-      (function () {
-        if (localStorage.getItem("theme") ==="dark") {
-          document.documentElement.classList.add("dark-mode");
-        }
-      })();
-    </script>
-    <meta
-      name="description"
-      content="Your source for the latest tech news, reviews, tutorials, and deals in Saudi Arabia and UAE"
-    />
-  </head>
-  <body class="light-mode">
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %}
-    <div class="flash-messages flex flex-col">
-      {% for category, message in messages %}
-      <div class="alert flex items-center justify-between alert-{{ category }}">
-        {{ message }} <button class="alert-close">&times;</button>
-      </div>
-      {% endfor %}
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
+  <meta name="description"
+    content="{% block description %}Nexora is your premium source for tech news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:title" content="{{ self.seo_title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta property="og:image"
+    content="{% block og_image %}{{ url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ request.url }}">
+  <meta property="twitter:title" content="{{ self.seo_title() }}">
+  <meta property="twitter:description" content="{{ self.description() }}">
+  <meta property="twitter:image" content="{{ self.og_image() }}">
+
+  <!-- JSON-LD Structured Data -->
+  {% block structured_data %}{% endblock %}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">  <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}"> -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <script>
+    window.APP = JSON.parse('{{ {"isAuthenticated": is_authenticated, "userEmail": user_email} | tojson | safe }}');
+  </script>
+  <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/forms.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/comments.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/interactions.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/affiliates.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/tracking.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/compare.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  <script>
+    (function () {
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.classList.add("dark-mode");
+      }
+    })();
+  </script>
+  <meta name="description"
+    content="Your source for the latest tech news, reviews, tutorials, and deals in Saudi Arabia and UAE" />
+</head>
+
+<body class="light-mode">
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="flash-messages flex flex-col">
+    {% for category, message in messages %}
+    <div class="alert flex items-center justify-between alert-{{ category }}">
+      {{ message }} <button class="alert-close">&times;</button>
     </div>
-    {% endif %} {% endwith %}
-    {% set selected_country = request.cookies.get("country","") %}
-    {% include 'partials/header.html' %}
-    <main id="main-content">{% block content %}{% endblock %}</main>
-    <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
-    {% include 'partials/footer.html' %}
-    {% include 'partials/gallery-overlay.html' %}
-    
-    <!-- Back to Top Button -->
-    <button id="back-to-top" class="back-to-top is-hidden" aria-label="Go to top">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-    
-    {% block scripts %}{% endblock %}
-  </body>
+    {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
+  {% set selected_country = request.cookies.get("country","") %}
+  {% include 'partials/header.html' %}
+  <main id="main-content">{% block content %}{% endblock %}</main>
+  <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
+  {% include 'partials/footer.html' %}
+  {% include 'partials/gallery-overlay.html' %}
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top is-hidden" aria-label="Go to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  {% block scripts %}{% endblock %}
+</body>
+
 </html>

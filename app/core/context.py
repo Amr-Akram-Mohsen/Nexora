@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask import request, url_for
-from app.domains.article.service import (
+from app.domains.system.service import (
     get_popular_general_topics,
     get_popular_brands,
     get_active_sections,

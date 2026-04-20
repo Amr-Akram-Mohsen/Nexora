@@ -1,7 +1,7 @@
 from app.shared.utils.slug import generate_slug
 import os, json
 from typing import List
-from app.domains.core.models import Brand, Category, Topic
+from app.domains.system.models import Brand, Category, Topic
 
 class QueryBuilderLayer:
     def __init__(self):

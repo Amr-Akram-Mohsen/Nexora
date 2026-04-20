@@ -69,7 +69,7 @@
           {% for slug, name in col['items'] %}
           {% set url = url_for('article.sections', section_slug=slug) if col['title'] == 'Sections'
           else url_for('article.sections', section_slug='reviews', topic_slug=slug) if col['title'] == 'Topics'
-          else url_for('core.' ~ slug)
+          else url_for('system.' ~ slug)
           %}
 
           <li class="footer-item">

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from app.core.extensions import db
-from app.domains.core.relationships import (article_sections, article_topics, article_brands, article_items)
+from .relationships import (article_sections, article_topics, article_brands, article_items)
 
 class Article(db.Model):
     __tablename__ = "articles"

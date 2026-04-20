@@ -12,12 +12,21 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 load_dotenv()
 
+from app.api.article import bp as api_article_bp
+from app.api.item import bp as api_item_bp
+from app.api.user import bp as api_user_bp
+from app.api.interaction import bp as api_interaction_bp
+
+from app.domains.dashboard.routes import bp as dashboard_bp
+
+import app.domains.system
+
 from app.domains.user.routes import bp as user_bp
 from app.domains.article.routes import bp as article_bp
 from app.domains.item.routes import bp as item_bp
 from app.domains.interaction.routes import bp as interaction_bp
 from app.domains.recommendation.routes import bp as recommendation_bp
-from app.domains.core.routes import bp as core_bp
+from app.domains.system.routes import bp as system_bp
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -68,12 +77,23 @@ def create_app():
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    app.register_blueprint(core_bp)
+    app.register_blueprint(system_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(article_bp)
     app.register_blueprint(item_bp)
     app.register_blueprint(interaction_bp)
     app.register_blueprint(recommendation_bp)
+
+    app.register_blueprint(api_article_bp)
+    app.register_blueprint(api_item_bp)
+    app.register_blueprint(api_user_bp)
+    app.register_blueprint(api_interaction_bp)
+
+    app.register_blueprint(dashboard_bp)
+
+    print('\n' * 2)
+    print(app.url_map)
+    print('\n' * 2)
 
     # ── Ensure api_models tables are created ─────────────────────
     from app.domains.external.models import LastAPIFetch, APIUsage  # noqa: F401
@@ -101,9 +121,12 @@ def create_app():
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs all active fetchers in one go."""
-        from app.jobs.tasks.fetch_content import (
+        from app.jobs.tasks.content.fetch_articles import (
             run_article_fetch, run_reddit_fetch
         )
+        # from app.jobs.tasks.content.fetch_items import (
+        #     run_price_refresh, run_amazon_discovery, run_noon_discovery, run_arabclicks_price_refresh
+        # )
         from app.domains.recommendation.matcher import match_articles_to_items
         # Note: run_price_refresh and run_amazon_discovery might be in another task
         print("--- [1/2] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
@@ -115,7 +138,7 @@ def create_app():
     @app.cli.command("generate-sitemap")
     def generate_sitemap_command():
         """Generate a static sitemap.xml file."""
-        from app.domains.core.sitemap import generate_static_sitemap
+        from app.domains.system.sitemap import generate_static_sitemap
         print("Generating sitemap...")
         count = generate_static_sitemap(app)
         print(f"Done! Sitemap generated with {count} URLs.")

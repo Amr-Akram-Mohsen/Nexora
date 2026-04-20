@@ -7,15 +7,18 @@ import logging
 import requests
 from flask import current_app
 from app.integrations.cleaner import clean_article_data
-from app.domains.article.storage import store_article
-from app.integrations.external.api import can_call_youtube, record_youtube_call
+from app.domains.article.ingestion import store_article
+from app.integrations.external.api import (
+    can_call_youtube, record_youtube_call,
+    should_refetch, mark_fetched
+)
 
 from app.integrations.discovery import DiscoveryManager
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_youtube_section_category(section_slug: str, category_slug: str, queries: list[str], results_per_query: int = 5) -> int:
+def fetch_youtube_section_category(section_slug: str, category_slug: str, query_data: list[dict], results_per_query: int = 5) -> int:
     api_key = current_app.config.get("YOUTUBE_API_KEY")
     if not api_key:
         logger.warning("[YouTube] YOUTUBE_API_KEY not set — skipping")
@@ -24,7 +27,14 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, querie
     stored = 0
     units_per_search = 100
 
-    for query in queries:
+    for q_obj in query_data:
+        query = q_obj["query"]
+        cache_key = f"youtube:{category_slug}:{query}"
+        
+        if not should_refetch(section_slug, cache_key, hours=12):
+            logger.debug("[YouTube] Skipping '%s' — fetched recently", query)
+            continue
+
         if not can_call_youtube(units=units_per_search):
             logger.warning("[YouTube] Daily quota reached — stopping")
             break
@@ -47,6 +57,13 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, querie
             )
             resp.raise_for_status()
             record_youtube_call(units=units_per_search)
+            mark_fetched(
+                section_slug, 
+                cache_key, 
+                category=category_slug, 
+                source="youtube", 
+                normalized_query=query
+            )
 
             for item in resp.json().get("items", []):
                 video_id = item.get("id", {}).get("videoId")
@@ -62,6 +79,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, querie
                     "source_name":  snippet.get("channelTitle", ""),
                     "section_slug": section_slug,
                     "category_slug": category_slug,
+                    "topic_slugs":  q_obj.get("topics", []),
+                    "brand_names":  q_obj.get("brands", []),
                 }
                 cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
