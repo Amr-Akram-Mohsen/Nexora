@@ -20,6 +20,7 @@ def list_comments():
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+# TODO: Add authentication/authorization decorator (e.g., @admin_required)
 def delete_comment(id):
     from app.core.extensions import db
     from app.domains.interaction.models import Comment

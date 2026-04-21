@@ -3,9 +3,11 @@
 {% block title %}{{ title }} Dashboard{% endblock %}
 
 {% block content %}
-<h1>{{ title }} Dashboard</h1>
+<div class="dashboard-wrapper">
+  <h1>{{ title }} Dashboard</h1>
 
-<div id="{{ domain }}-container"></div>
+  <div id="{{ domain }}-container"></div>
+</div>
 
 <script src="{{ url_for('static', filename='js/dashboard/core.js') }}"></script>
 

@@ -1,38 +1,121 @@
+/* Scoped entirely to dashboard-container inside the dashboard page */
+.dashboard-wrapper {
+  max-width: var(--container-max-width, 1000px);
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
 .dashboard-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--card-gap, 1rem);
+  width: 100%;
 }
 
 .dashboard-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  margin-bottom: 10px;
+  padding: 1.25rem 1.5rem;
+  background: rgb(var(--card-rgb, 255, 255, 255));
+  border: 1px solid rgba(var(--border-rgb, 0, 0, 0), 0.1);
+  border-radius: var(--radius-lg, 0.5rem);
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+  flex-wrap: wrap; /* for mobile responsiveness */
+}
+
+.dashboard-item:hover {
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border-color: rgba(var(--brand-blue-rgb, 59, 130, 246), 0.3);
+  transform: translateY(-1px);
+}
+
+.dashboard-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
 }
 
 .dashboard-title {
   margin: 0;
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: var(--weight-bold, 600);
+  color: rgb(var(--foreground-rgb, 0, 0, 0));
+}
+
+.dashboard-meta-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.25rem;
 }
 
 .dashboard-meta {
-  font-size: 12px;
-  color: gray;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--muted-foreground, #717182);
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.dashboard-meta strong {
+  font-weight: var(--weight-md, 500);
+  margin-right: 0.25rem;
+  color: rgb(var(--foreground-rgb, 0, 0, 0)); /* Slightly darker labels */
+}
+
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
 }
 
 .dashboard-delete-btn {
-  background: red;
-  color: white;
-  border: none;
-  padding: 5px 10px;
+  background: transparent;
+  color: var(--brand-red, #ef4444);
+  border: 1px solid rgba(var(--destructive-rgb, 212, 24, 61), 0.3);
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-md, 0.375rem);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: var(--weight-md, 500);
+  transition: all 0.2s;
 }
 
 .dashboard-delete-btn:hover {
-  opacity: 0.85;
+  background: var(--brand-red, #ef4444);
+  color: white;
+  border-color: var(--brand-red, #ef4444);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+/* States */
+.dashboard-loading,
+.dashboard-empty,
+.dashboard-error {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: rgb(var(--card-rgb, 255, 255, 255));
+  border: 1px dashed rgba(var(--border-rgb, 0, 0, 0), 0.2);
+  border-radius: var(--radius-lg, 0.5rem);
+  color: var(--muted-foreground);
+  font-size: var(--text-base, 1rem);
+}
+
+.dashboard-error {
+  color: var(--brand-red, #ef4444);
+  border-color: rgba(var(--destructive-rgb, 212, 24, 61), 0.3);
+}
+
+.dashboard-loading::after {
+  content: "...";
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
 }

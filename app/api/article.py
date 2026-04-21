@@ -13,13 +13,14 @@ def list_articles():
         {
             "id": a.id,
             "title": a.title,
-            "published_at": a.published_at,
+            "published_at": str(a.published_at) if a.published_at else None,
             "view_count": a.view_count,
         }
         for a in articles
     ])
 
-@bp.route("/<id>", methods=["DELETE"])
+@bp.route("/<int:id>", methods=["DELETE"])
+# TODO: Add authentication/authorization decorator (e.g., @admin_required)
 def delete_article(id):
     from app.core.extensions import db
     from app.domains.article.models import Article

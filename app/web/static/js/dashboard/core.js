@@ -3,42 +3,69 @@ function renderList(containerId, items, config) {
   container.className = "dashboard-list";
   container.innerHTML = "";
 
+  if (!items || items.length === 0) {
+    container.innerHTML = `
+      <div class="dashboard-empty">
+        <p>No ${config.domain} found.</p>
+      </div>
+    `;
+    return;
+  }
+
   items.forEach(item => {
     const div = document.createElement("div");
     div.className = "dashboard-item";
 
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "dashboard-item-content";
+
     const title = document.createElement("p");
     title.className = "dashboard-title";
-    title.textContent = item[config.titleField] || "_";
+    title.textContent = item[config.titleField] || "Unnamed";
 
-    div.appendChild(title);
+    contentDiv.appendChild(title);
 
-    // 🔹 EXTRA FIELDS (THIS IS THE NEW PART)
+    const metaContainer = document.createElement("div");
+    metaContainer.className = "dashboard-meta-container";
+
+    // Format field name helper
+    const formatFieldName = (str) => {
+      return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     config.fields.forEach(field => {
       const meta = document.createElement("p");
       meta.className = "dashboard-meta";
 
       let value = item[field];
 
-      // simple formatting
-      if (value === null || value === undefined) {
+      if (value === null || value === undefined || value === "") {
         value = "—";
       }
 
-      meta.textContent = `${field}: ${value}`;
-      div.appendChild(meta);
+      meta.innerHTML = `<strong>${formatFieldName(field)}:</strong> ${value}`;
+      metaContainer.appendChild(meta);
     });
+    
+    contentDiv.appendChild(metaContainer);
+    div.appendChild(contentDiv);
 
     if (config.enableDelete) {
+      const actionsDiv = document.createElement("div");
+      actionsDiv.className = "dashboard-actions";
+      
       const btn = document.createElement("button");
       btn.className = "dashboard-delete-btn";
       btn.textContent = "Delete";
 
       btn.addEventListener("click", () => {
-        renderDelete(config.domain, item.id);
+        if (confirm(`Are you sure you want to delete this item?`)) {
+          renderDelete(config.domain, item.id);
+        }
       });
 
-      div.appendChild(btn);
+      actionsDiv.appendChild(btn);
+      div.appendChild(actionsDiv);
     }
 
     container.appendChild(div);
@@ -47,32 +74,32 @@ function renderList(containerId, items, config) {
 
 function renderDelete(domain, id) {
   fetch(`/api/${domain}/${id}`, { method: "DELETE" })
-    .then(() => renderLoad(domain));
-}
-
-const domainTitleField = {
-  "articles": "title",
-  "items": "name",
-  "users": "name",
-  "interactions": "type",
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to delete");
+      renderLoad(domain);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error deleting item.");
+    });
 }
 
 const domainConfig = {
   articles: {
     titleField: "title",
-    fields: ["published_at", "view_count"]
+    fields: ["id", "published_at", "view_count"]
   },
   items: {
     titleField: "name",
-    fields: ["rating", "created_at"]
+    fields: ["id", "rating", "created_at"]
   },
   users: {
     titleField: "name",
-    fields: ["email", "created_at"]
+    fields: ["id", "email", "created_at"]
   },
   interactions: {
     titleField: "content",
-    fields: ["created_at"]
+    fields: ["id", "user_id", "created_at"]
   }
 };
 
@@ -80,7 +107,7 @@ function renderLoad(domain) {
   const container = document.getElementById(`${domain}-container`);
 
   container.className = "dashboard-list";
-  container.innerHTML = "<p class='loading'>Loading...</p>";
+  container.innerHTML = "<div class='dashboard-loading'>Loading</div>";
 
   fetch(`/api/${domain}/`)
     .then(res => {
@@ -96,14 +123,10 @@ function renderLoad(domain) {
     })
     .catch(err => {
       console.error(err);
-
-      // ❌ ERROR STATE (ADD HERE)
       container.innerHTML = `
-        <p class="error">
-          Failed to load ${domain}. Please try again.
-        </p>
+        <div class="dashboard-error">
+          <p>Failed to load ${domain}. Please try again.</p>
+        </div>
       `;
     });
 }
-
-// renderLoad();

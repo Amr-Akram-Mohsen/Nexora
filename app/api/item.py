@@ -20,6 +20,7 @@ def list_items():
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
+# TODO: Add authentication/authorization decorator (e.g., @admin_required)
 def delete_item(id):
     from app.core.extensions import db
     from app.domains.item.models import Item
