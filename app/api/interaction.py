@@ -1,10 +1,9 @@
 from flask import Blueprint, jsonify
-from app.domains.interaction.service.query import get_comments
+from app.domains.interaction.service.query import get_comments, count_interactions
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/api/interactions")
 
-
-@bp.route("/", methods=["GET"])
+@bp.route("/comments", methods=["GET"])
 def list_comments():
     comments = get_comments()
 
@@ -18,8 +17,12 @@ def list_comments():
         for c in comments
     ])
 
+@bp.route("/stats", methods=["GET"])
+def interactions_stats():
+    return jsonify(count_interactions())
 
-@bp.route("/<int:id>", methods=["DELETE"])
+
+@bp.route("/comments/<int:id>", methods=["DELETE"])
 # TODO: Add authentication/authorization decorator (e.g., @admin_required)
 def delete_comment(id):
     from app.core.extensions import db

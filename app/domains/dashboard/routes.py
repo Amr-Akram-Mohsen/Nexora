@@ -23,4 +23,4 @@ def dashboard_users():
 
 @bp.route("/interactions")
 def dashboard_interactions():
-    return render_template("dashboard/core.html", title="Interactions", domain="interactions")
+    return render_template("dashboard/core.html", title="Interactions Analytics", domain="interactions")

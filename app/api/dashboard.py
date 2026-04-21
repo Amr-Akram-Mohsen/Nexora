@@ -12,5 +12,5 @@ def dashboard_stats():
         "articles_count": count_articles(),
         "items_count": count_items(),
         "users_count": count_users(),
-        "interactions_count": count_interactions()
+        "interactions": count_interactions()
     })

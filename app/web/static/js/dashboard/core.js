@@ -109,6 +109,12 @@ const domainConfig = {
 
 function renderLoad(domain) {
   const container = document.getElementById(`${domain}-container`);
+  if (!container) return;
+
+  if (domain === "interactions") {
+    renderInteractionAnalytics(`${domain}-container`);
+    return;
+  }
 
   container.className = "dashboard-list";
   container.innerHTML = "<div class='dashboard-loading'>Loading</div>";
@@ -121,7 +127,7 @@ function renderLoad(domain) {
     .then(data => {
       renderList(`${domain}-container`, data, {
         ...domainConfig[domain],
-        enableDelete: domain !== "interactions",
+        enableDelete: true,
         domain: domain
       });
     })
@@ -130,6 +136,74 @@ function renderLoad(domain) {
       container.innerHTML = `
         <div class="dashboard-error">
           <p>Failed to load ${domain}. Please try again.</p>
+        </div>
+      `;
+    });
+}
+
+function renderInteractionAnalytics(containerId) {
+  const container = document.getElementById(containerId);
+  container.className = "dashboard-analytics";
+  container.innerHTML = "<div class='dashboard-loading'>Loading analytics...</div>";
+
+  fetch('/api/interactions/stats')
+    .then(res => {
+      if (!res.ok) throw new Error("Network error");
+      return res.json();
+    })
+    .then(data => {
+      container.innerHTML = "";
+      
+      const total = data.total || 0;
+      
+      // Hero Card
+      const hero = document.createElement("div");
+      hero.className = "dashboard-analytics-hero";
+      hero.innerHTML = `
+         <h2 class="dashboard-hero-title">Total Interactions</h2>
+         <div class="dashboard-hero-value">${total}</div>
+         <p class="dashboard-hero-meta">Comprehensive engagement across all sources</p>
+      `;
+      container.appendChild(hero);
+
+      // Grid for breakdown
+      const grid = document.createElement("div");
+      grid.className = "dashboard-stats-grid";
+
+      const breakdowns = [
+        { label: "Views", key: "views" },
+        { label: "Comments", key: "comments" },
+        { label: "Likes", key: "likes" },
+        { label: "Dislikes", key: "dislikes" },
+        { label: "Saves", key: "saves" },
+        { label: "Item Clicks", key: "item_clicks" }
+      ];
+
+      breakdowns.forEach(item => {
+        const val = data[item.key] || 0;
+        const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+        
+        const card = document.createElement("div");
+        card.className = "dashboard-stat-card";
+        
+        card.innerHTML = `
+           <h3 class="dashboard-stat-value">${val}</h3>
+           <p class="dashboard-stat-label">${item.label}</p>
+           <div class="dashboard-stat-progress">
+              <div class="dashboard-stat-bar" style="width: ${pct}%"></div>
+           </div>
+           <p class="dashboard-stat-meta">${pct}% of total</p>
+        `;
+        grid.appendChild(card);
+      });
+
+      container.appendChild(grid);
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = `
+        <div class="dashboard-error">
+          <p>Failed to load interaction analytics. Please try again.</p>
         </div>
       `;
     });
@@ -195,19 +269,35 @@ function renderStatsGrid(containerId, stats) {
   container.innerHTML = "";
 
   const statConfig = [
-    { label: "Total Articles", key: "articles_count" },
-    { label: "Total Items", key: "items_count" },
-    { label: "Total Users", key: "users_count" },
-    { label: "Total Interactions", key: "interactions_count" },
+    { label: "Total Articles", key: "articles_count", link: "/dashboard/articles" },
+    { label: "Total Items", key: "items_count", link: "/dashboard/items" },
+    { label: "Total Users", key: "users_count", link: "/dashboard/users" },
+    { label: "Total Interactions", key: "interactions", subKey: "total", link: "/dashboard/interactions" },
+    { label: "Total Views", key: "interactions", subKey: "views" },
+    { label: "Total Comments", key: "interactions", subKey: "comments" },
   ];
 
   statConfig.forEach(stat => {
-    const card = document.createElement("div");
-    card.className = "dashboard-stat-card";
+    let card;
+    if (stat.link) {
+      card = document.createElement("a");
+      card.href = stat.link;
+      card.className = "dashboard-stat-card clickable-card";
+    } else {
+      card = document.createElement("div");
+      card.className = "dashboard-stat-card";
+    }
 
     const value = document.createElement("h3");
     value.className = "dashboard-stat-value";
-    value.textContent = stats[stat.key] !== undefined ? stats[stat.key] : "—";
+    
+    let val;
+    if (stat.subKey && stats[stat.key] !== undefined) {
+      val = stats[stat.key][stat.subKey];
+    } else {
+      val = stats[stat.key];
+    }
+    value.textContent = val !== undefined ? val : "—";
 
     const label = document.createElement("p");
     label.className = "dashboard-stat-label";
@@ -215,6 +305,15 @@ function renderStatsGrid(containerId, stats) {
 
     card.appendChild(value);
     card.appendChild(label);
+    
+    // Add optional small label for reactions and saves
+    if (stat.label === "Total Interactions" && stats.interactions) {
+       const meta = document.createElement("p");
+       meta.className = "dashboard-stat-meta";
+       meta.textContent = `${stats.interactions.reactions} reactions, ${stats.interactions.saves} saves`;
+       card.appendChild(meta);
+    }
+
     container.appendChild(card);
   });
 }

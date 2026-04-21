@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from app.core.extensions import db
-from ..models import View, Reaction, Comment, Save
+from ..models import View, Reaction, Comment, Save, ItemClick
 from sqlalchemy import func
 from app.domains.recommendation.interest_service import handle_interaction_interest
 from app.domains.recommendation.sentiment import analyze_sentiment
@@ -181,12 +181,41 @@ def post_comment(
     }
 
 
+def count_likes():
+    return db.session.query(Reaction.id).filter_by(type="like").count()
+
+def count_dislikes():
+    return db.session.query(Reaction.id).filter_by(type="dislike").count()
+
+def count_views():
+    return db.session.query(View.id).count()
+
+def count_comments():
+    return db.session.query(Comment.id).count()
+
+def count_saves():
+    return db.session.query(Save.id).count()
+
+def count_item_clicks():
+    return db.session.query(ItemClick.id).count()
+
 def count_interactions():
-    views = db.session.query(View.id).count()
-    reactions = db.session.query(Reaction.id).count()
-    comments = db.session.query(Comment.id).count()
-    saves = db.session.query(Save.id).count()
-    return views + reactions + comments + saves
+    likes = count_likes()
+    dislikes = count_dislikes()
+    views = count_views()
+    comments = count_comments()
+    saves = count_saves()
+    item_clicks = count_item_clicks()
+    
+    return {
+        "total": likes + dislikes + views + comments + saves + item_clicks,
+        "likes": likes,
+        "dislikes": dislikes,
+        "comments": comments,
+        "views": views,
+        "saves": saves,
+        "item_clicks": item_clicks
+    }
 
 def get_comments(rows_count=10):
     query = Comment.query.order_by(Comment.created_at.desc())
