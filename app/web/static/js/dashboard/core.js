@@ -1,134 +1,177 @@
-function renderList(containerId, items, config) {
-  const container = document.getElementById(containerId);
-  container.className = "dashboard-list";
-  container.innerHTML = "";
+// ==============================
+// STATE MANAGEMENT
+// ==============================
+let currentFilters = {};
+let currentDomain = null;
+let searchDebounce = null;
 
-  if (!items || items.length === 0) {
-    container.innerHTML = `
-      <div class="dashboard-empty">
-        <p>No ${config.domain} found.</p>
-      </div>
-    `;
-    return;
-  }
 
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "dashboard-item";
-
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "dashboard-item-content";
-
-    const title = document.createElement("p");
-    title.className = "dashboard-title";
-    title.textContent = item[config.titleField] || "Unnamed";
-
-    contentDiv.appendChild(title);
-
-    const metaContainer = document.createElement("div");
-    metaContainer.className = "dashboard-meta-container";
-
-    // Format field name helper
-    const formatFieldName = (str) => {
-      return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    };
-
-    config.fields.forEach(field => {
-      const meta = document.createElement("p");
-      meta.className = "dashboard-meta";
-
-      let value = item[field];
-
-      if (value === null || value === undefined || value === "") {
-        value = "—";
-      }
-
-      meta.innerHTML = `<strong>${formatFieldName(field)}:</strong> ${value}`;
-      metaContainer.appendChild(meta);
-    });
-    
-    contentDiv.appendChild(metaContainer);
-    div.appendChild(contentDiv);
-
-    if (config.enableDelete) {
-      const actionsDiv = document.createElement("div");
-      actionsDiv.className = "dashboard-actions";
-      
-      const btn = document.createElement("button");
-      btn.className = "dashboard-delete-btn";
-      btn.textContent = "Delete";
-
-      btn.addEventListener("click", () => {
-        showModal(
-          "Confirm Deletion",
-          `Are you sure you want to delete this item? This action cannot be undone.`,
-          () => {
-            renderDelete(config.domain, item.id);
-          }
-        );
-      });
-
-      actionsDiv.appendChild(btn);
-      div.appendChild(actionsDiv);
-    }
-
-    container.appendChild(div);
-  });
-}
-
-function renderDelete(domain, id) {
-  fetch(`/api/${domain}/${id}`, { method: "DELETE" })
-    .then(res => {
-      if (!res.ok) throw new Error("Failed to delete");
-      renderLoad(domain);
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Error deleting item.");
-    });
-}
-
+// ==============================
+// DOMAIN CONFIG
+// ==============================
 const domainConfig = {
   articles: {
     titleField: "title",
-    fields: ["id", "published_at", "view_count"]
+    fields: ["id", "published_at", "view_count"],
+    enableDelete: true,
+    filters: [
+      { key: "source", type: "text", placeholder: "Exact Source Name..." }
+    ]
   },
   items: {
     titleField: "name",
-    fields: ["id", "rating", "created_at"]
+    fields: ["id", "rating", "created_at"],
+    enableDelete: true,
+    filters: [
+      { key: "brand", type: "text", placeholder: "Brand slug (e.g. apple)" }
+    ]
   },
   users: {
     titleField: "name",
-    fields: ["id", "email", "created_at"]
+    fields: ["id", "email", "created_at"],
+    enableDelete: false,
+    filters: [
+      {
+        key: "role",
+        type: "select",
+        options: [
+          { value: "", label: "All Roles" },
+          { value: "admin", label: "Admin" },
+          { value: "user", label: "User" }
+        ]
+      }
+    ]
   },
-  interactions: {
-    titleField: "content",
-    fields: ["id", "user_id", "created_at"]
-  }
+  interactions: {}
 };
 
-function renderLoad(domain) {
-  const container = document.getElementById(`${domain}-container`);
-  if (!container) return;
 
-  if (domain === "interactions") {
-    renderInteractionAnalytics(`${domain}-container`);
-    return;
+// ==============================
+// UTILITIES
+// ==============================
+function formatFieldName(str) {
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+
+// ==============================
+// FILTER UI
+// ==============================
+function renderFilters(domain, containerId) {
+  const container = document.getElementById(containerId);
+  const config = domainConfig[domain];
+  if (!config) return;
+
+  // remove existing filter bar (scoped)
+  const existingBar = container.parentNode.querySelector(".dashboard-filter-bar");
+  if (existingBar) existingBar.remove();
+
+  const bar = document.createElement("div");
+  bar.className = "dashboard-filter-bar";
+
+  // SEARCH INPUT
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.placeholder = "Search...";
+  searchInput.className = "dashboard-filter-input";
+  searchInput.value = currentFilters.search || "";
+
+  searchInput.addEventListener("input", (e) => {
+    currentFilters.search = e.target.value;
+
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      if (currentFilters.search && currentFilters.search.length < 2) return;
+      fetchList(domain, containerId);
+    }, 400);
+  });
+
+  bar.appendChild(searchInput);
+
+  // DOMAIN FILTERS
+  if (config.filters) {
+    config.filters.forEach(f => {
+      if (f.type === "select") {
+        const select = document.createElement("select");
+        select.className = "dashboard-filter-select";
+
+        f.options.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt.value;
+          option.textContent = opt.label;
+          select.appendChild(option);
+        });
+
+        select.value = currentFilters[f.key] || "";
+
+        select.addEventListener("change", (e) => {
+          currentFilters[f.key] = e.target.value;
+          fetchList(domain, containerId);
+        });
+
+        bar.appendChild(select);
+      }
+
+      if (f.type === "text") {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "dashboard-filter-input";
+        input.placeholder = f.placeholder;
+        input.value = currentFilters[f.key] || "";
+
+        input.addEventListener("input", (e) => {
+          currentFilters[f.key] = e.target.value;
+
+          clearTimeout(searchDebounce);
+          searchDebounce = setTimeout(() => {
+            fetchList(domain, containerId);
+          }, 400);
+        });
+
+        bar.appendChild(input);
+      }
+    });
   }
 
-  container.className = "dashboard-list";
-  container.innerHTML = "<div class='dashboard-loading'>Loading</div>";
+  container.parentNode.insertBefore(bar, container);
+}
 
-  fetch(`/api/${domain}/`)
+
+// ==============================
+// FETCH LIST
+// ==============================
+function fetchList(domain, containerId) {
+  const container = document.getElementById(containerId);
+
+  container.className = "dashboard-list";
+  container.innerHTML = `
+    <div class="dashboard-loading">
+      <p>Loading ${domain}...</p>
+    </div>
+  `;
+
+  const params = new URLSearchParams();
+
+  for (const [key, val] of Object.entries(currentFilters)) {
+    if (val && val.trim() !== "") {
+      params.append(key, val.trim());
+    }
+  }
+
+  const qs = params.toString() ? `?${params.toString()}` : "";
+
+  fetch(`/api/${domain}/${qs}`)
     .then(res => {
       if (!res.ok) throw new Error("Network error");
       return res.json();
     })
     .then(data => {
-      renderList(`${domain}-container`, data, {
+      renderList(containerId, data, {
         ...domainConfig[domain],
-        enableDelete: true,
-        domain: domain
+        domain
       });
     })
     .catch(err => {
@@ -141,6 +184,96 @@ function renderLoad(domain) {
     });
 }
 
+
+// ==============================
+// RENDER LIST
+// ==============================
+function renderList(containerId, items, config) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `
+      <div class="dashboard-empty">
+        <p>No ${config.domain} found.</p>
+      </div>
+    `;
+    return;
+  }
+
+  items.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "dashboard-item";
+
+    const content = document.createElement("div");
+    content.className = "dashboard-item-content";
+
+    const title = document.createElement("p");
+    title.className = "dashboard-title";
+    title.textContent = item[config.titleField] || "Unnamed";
+
+    content.appendChild(title);
+
+    const metaContainer = document.createElement("div");
+    metaContainer.className = "dashboard-meta-container";
+
+    config.fields.forEach(field => {
+      const meta = document.createElement("p");
+      meta.className = "dashboard-meta";
+
+      let value = item[field];
+      if (!value) value = "—";
+
+      meta.innerHTML = `<strong>${formatFieldName(field)}:</strong> ${value}`;
+      metaContainer.appendChild(meta);
+    });
+
+    content.appendChild(metaContainer);
+    row.appendChild(content);
+
+    if (config.enableDelete) {
+      const actions = document.createElement("div");
+      actions.className = "dashboard-actions";
+
+      const btn = document.createElement("button");
+      btn.className = "dashboard-delete-btn";
+      btn.textContent = "Delete";
+
+      btn.addEventListener("click", () => {
+        showModal(
+          "Confirm Deletion",
+          "Are you sure you want to delete this item?",
+          () => renderDelete(config.domain, item.id)
+        );
+      });
+
+      actions.appendChild(btn);
+      row.appendChild(actions);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+
+// ==============================
+// DELETE
+// ==============================
+function renderDelete(domain, id) {
+  fetch(`/api/${domain}/${id}`, { method: "DELETE" })
+    .then(res => {
+      if (!res.ok) throw new Error("Delete failed");
+      fetchList(domain, `${domain}-container`);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+
+// ==============================
+// INTERACTIONS ANALYTICS
+// ==============================
 function renderInteractionAnalytics(containerId) {
   const container = document.getElementById(containerId);
   container.className = "dashboard-analytics";
@@ -153,9 +286,9 @@ function renderInteractionAnalytics(containerId) {
     })
     .then(data => {
       container.innerHTML = "";
-      
+
       const total = data.total || 0;
-      
+
       // Hero Card
       const hero = document.createElement("div");
       hero.className = "dashboard-analytics-hero";
@@ -182,10 +315,10 @@ function renderInteractionAnalytics(containerId) {
       breakdowns.forEach(item => {
         const val = data[item.key] || 0;
         const pct = total > 0 ? Math.round((val / total) * 100) : 0;
-        
+
         const card = document.createElement("div");
         card.className = "dashboard-stat-card";
-        
+
         card.innerHTML = `
            <h3 class="dashboard-stat-value">${val}</h3>
            <p class="dashboard-stat-label">${item.label}</p>
@@ -209,7 +342,9 @@ function renderInteractionAnalytics(containerId) {
     });
 }
 
-// --- Component Reusability UI ---
+// ==============================
+// MODAL SYSTEM
+// ==============================
 let activeModalCallback = null;
 
 function createModalSystem() {
@@ -219,47 +354,65 @@ function createModalSystem() {
   overlay.id = "dashboard-modal-overlay";
   overlay.className = "dashboard-modal-overlay";
 
-  const content = document.createElement("div");
-  content.className = "dashboard-modal-content";
-
-  content.innerHTML = `
-    <h3 class="dashboard-modal-title" id="dashboard-modal-title">Confirm</h3>
-    <p class="dashboard-modal-body" id="dashboard-modal-body">Are you sure?</p>
-    <div class="dashboard-modal-actions">
-      <button class="dashboard-btn dashboard-btn-secondary" id="dashboard-modal-cancel">Cancel</button>
-      <button class="dashboard-btn dashboard-btn-danger" id="dashboard-modal-confirm">Confirm</button>
+  overlay.innerHTML = `
+    <div class="dashboard-modal-content">
+      <h3 id="modal-title">Confirm</h3>
+      <p id="modal-body"></p>
+      <div>
+        <button id="modal-cancel">Cancel</button>
+        <button id="modal-confirm">Confirm</button>
+      </div>
     </div>
   `;
 
-  overlay.appendChild(content);
   document.body.appendChild(overlay);
 
-  document.getElementById("dashboard-modal-cancel").addEventListener("click", closeModal);
-  document.getElementById("dashboard-modal-confirm").addEventListener("click", () => {
+  document.getElementById("modal-cancel").onclick = closeModal;
+  document.getElementById("modal-confirm").onclick = () => {
     if (activeModalCallback) activeModalCallback();
     closeModal();
-  });
+  };
 
-  overlay.addEventListener("click", (e) => {
+  overlay.onclick = (e) => {
     if (e.target === overlay) closeModal();
-  });
+  };
 }
 
-function showModal(title, body, onConfirm) {
+function showModal(title, body, callback) {
   createModalSystem();
-  document.getElementById("dashboard-modal-title").textContent = title;
-  document.getElementById("dashboard-modal-body").textContent = body;
-  activeModalCallback = onConfirm;
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-body").textContent = body;
+  activeModalCallback = callback;
 
-  const overlay = document.getElementById("dashboard-modal-overlay");
-  void overlay.offsetWidth; // Reflow
-  overlay.classList.add("active");
+  document.getElementById("dashboard-modal-overlay").classList.add("active");
 }
 
 function closeModal() {
-  const overlay = document.getElementById("dashboard-modal-overlay");
-  if (overlay) overlay.classList.remove("active");
+  document.getElementById("dashboard-modal-overlay").classList.remove("active");
   activeModalCallback = null;
+}
+
+
+// ==============================
+// MAIN ENTRY
+// ==============================
+function renderLoad(domain) {
+  const container = document.getElementById(`${domain}-container`);
+  if (!container) return;
+
+  // reset state when switching domains
+  if (currentDomain !== domain) {
+    currentFilters = {};
+    currentDomain = domain;
+  }
+
+  if (domain === "interactions") {
+    renderInteractionAnalytics(`${domain}-container`);
+    return;
+  }
+
+  renderFilters(domain, `${domain}-container`);
+  fetchList(domain, `${domain}-container`);
 }
 
 // --- Dashboard Home Stats Renderer ---
@@ -290,7 +443,7 @@ function renderStatsGrid(containerId, stats) {
 
     const value = document.createElement("h3");
     value.className = "dashboard-stat-value";
-    
+
     let val;
     if (stat.subKey && stats[stat.key] !== undefined) {
       val = stats[stat.key][stat.subKey];
@@ -305,18 +458,19 @@ function renderStatsGrid(containerId, stats) {
 
     card.appendChild(value);
     card.appendChild(label);
-    
+
     // Add optional small label for reactions and saves
     if (stat.label === "Total Interactions" && stats.interactions) {
-       const meta = document.createElement("p");
-       meta.className = "dashboard-stat-meta";
-       meta.textContent = `${stats.interactions.reactions} reactions, ${stats.interactions.saves} saves`;
-       card.appendChild(meta);
+      const meta = document.createElement("p");
+      meta.className = "dashboard-stat-meta";
+      meta.textContent = `${stats.interactions.reactions} reactions, ${stats.interactions.saves} saves`;
+      card.appendChild(meta);
     }
 
     container.appendChild(card);
   });
 }
+
 
 function renderDashboardHome(containerId) {
   const container = document.getElementById(containerId);
@@ -339,3 +493,4 @@ function renderDashboardHome(containerId) {
       `;
     });
 }
+

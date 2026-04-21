@@ -6,7 +6,9 @@ bp = Blueprint("api_article", __name__, url_prefix="/api/articles")
 
 @bp.route("/", methods=["GET"])
 def list_articles():
-    articles = get_articles()  # your query function
+    search = request.args.get('search')
+    source = request.args.get('source')
+    articles = get_articles(search=search, source=source)  # your query function
 
     # TEMP FIX: convert to simple JSON
     return jsonify([

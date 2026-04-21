@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.domains.item.service.query import get_items
 
 bp = Blueprint("api_item", __name__, url_prefix="/api/items")
@@ -6,7 +6,9 @@ bp = Blueprint("api_item", __name__, url_prefix="/api/items")
 
 @bp.route("/", methods=["GET"])
 def list_items():
-    items = get_items()
+    search = request.args.get('search')
+    brand = request.args.get('brand')
+    items = get_items(search=search, brand=brand)
 
     return jsonify([
         {

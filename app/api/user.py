@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.domains.user.service.query import get_users
 
 bp = Blueprint("api_user", __name__, url_prefix="/api/users")
@@ -6,7 +6,9 @@ bp = Blueprint("api_user", __name__, url_prefix="/api/users")
 
 @bp.route("/", methods=["GET"])
 def list_users():
-    users = get_users()
+    search = request.args.get('search')
+    role = request.args.get('role')
+    users = get_users(search=search, role=role)
 
     return jsonify([
         {

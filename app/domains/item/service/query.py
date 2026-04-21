@@ -105,8 +105,16 @@ def count_items():
     return db.session.query(Item.id).count()
 
 
-def get_items(rows_count=10):
+def get_items(search=None, brand=None, rows_count=10):
     query = Item.query.order_by(Item.created_at.desc())
+
+    if search and search.strip():
+        from sqlalchemy import or_
+        query = query.filter(or_(Item.name.ilike(f'%{search}%'), Item.description.ilike(f'%{search}%')))
+
+    if brand:
+        from app.domains.system.models import Brand
+        query = query.join(Item.brand).filter(Brand.slug == brand)
 
     if rows_count:
         query = query.limit(rows_count)

@@ -160,8 +160,15 @@ def get_search_articles(query):
 def count_articles():
     return db.session.query(Article.id).count()
 
-def get_articles(rows_count=10):
+def get_articles(search=None, source=None, rows_count=10):
     query = Article.query.order_by(Article.published_at.desc())
+
+    if search and search.strip():
+        from sqlalchemy import or_
+        query = query.filter(or_(Article.title.ilike(f'%{search}%'), Article.description.ilike(f'%{search}%')))
+
+    if source:
+        query = query.filter(Article.source_name == source)
 
     if rows_count:
         query = query.limit(rows_count)
