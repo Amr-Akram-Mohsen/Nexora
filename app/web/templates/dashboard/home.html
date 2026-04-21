@@ -1,20 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }} Dashboard{% endblock %}
+{% block title %}Dashboard Overview{% endblock %}
 
 {% block content %}
 <div class="dashboard-wrapper">
   {% include "dashboard/_nav.html" %}
 
-  <h1>{{ title }} Dashboard</h1>
+  <h1>{{ title }}</h1>
 
-  <div id="{{ domain }}-container"></div>
+  <div id="dashboard-home-container"></div>
 </div>
 
 <script src="{{ url_for('static', filename='js/dashboard/core.js') }}"></script>
 
 <script>
-  renderLoad("{{ domain }}");
+  renderDashboardHome("dashboard-home-container");
 </script>
-
 {% endblock %}

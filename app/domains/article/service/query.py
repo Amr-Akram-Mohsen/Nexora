@@ -157,6 +157,9 @@ def get_search_articles(query):
     )
     return a_query.order_by(Article.published_at.desc()).limit(50).all()
 
+def count_articles():
+    return db.session.query(Article.id).count()
+
 def get_articles(rows_count=10):
     query = Article.query.order_by(Article.published_at.desc())
 

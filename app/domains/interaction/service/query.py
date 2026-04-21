@@ -181,6 +181,13 @@ def post_comment(
     }
 
 
+def count_interactions():
+    views = db.session.query(View.id).count()
+    reactions = db.session.query(Reaction.id).count()
+    comments = db.session.query(Comment.id).count()
+    saves = db.session.query(Save.id).count()
+    return views + reactions + comments + saves
+
 def get_comments(rows_count=10):
     query = Comment.query.order_by(Comment.created_at.desc())
 

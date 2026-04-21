@@ -101,6 +101,9 @@ def get_active_store_links(item):
 
 from app.domains.item.models import Item
 
+def count_items():
+    return db.session.query(Item.id).count()
+
 
 def get_items(rows_count=10):
     query = Item.query.order_by(Item.created_at.desc())

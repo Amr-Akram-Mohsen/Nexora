@@ -16,6 +16,7 @@ from app.api.article import bp as api_article_bp
 from app.api.item import bp as api_item_bp
 from app.api.user import bp as api_user_bp
 from app.api.interaction import bp as api_interaction_bp
+from app.api.dashboard import bp as api_dashboard_bp
 
 from app.domains.dashboard.routes import bp as dashboard_bp
 
@@ -88,12 +89,9 @@ def create_app():
     app.register_blueprint(api_item_bp)
     app.register_blueprint(api_user_bp)
     app.register_blueprint(api_interaction_bp)
+    app.register_blueprint(api_dashboard_bp)
 
     app.register_blueprint(dashboard_bp)
-
-    print('\n' * 2)
-    print(app.url_map)
-    print('\n' * 2)
 
     # ── Ensure api_models tables are created ─────────────────────
     from app.domains.external.models import LastAPIFetch, APIUsage  # noqa: F401

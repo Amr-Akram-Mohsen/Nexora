@@ -2,6 +2,10 @@ from flask import Blueprint, render_template
 
 bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
+@bp.route("/")
+def dashboard_home():
+    return render_template("dashboard/home.html", title="Overview", domain="home")
+
 @bp.route("/articles")
 def dashboard_articles():
     return render_template("dashboard/core.html", title="Articles", domain="articles")
