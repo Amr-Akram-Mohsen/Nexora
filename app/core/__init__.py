@@ -12,13 +12,15 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 load_dotenv()
 
-from app.api.article import bp as api_article_bp
-from app.api.item import bp as api_item_bp
-from app.api.user import bp as api_user_bp
-from app.api.interaction import bp as api_interaction_bp
-from app.api.dashboard import bp as api_dashboard_bp
+from app.api.articles import bp as api_article_bp
+from app.api.items import bp as api_item_bp
+from app.api.users import bp as api_user_bp
+from app.api.interactions import bp as api_interaction_bp
+from app.api.stats import bp as api_dashboard_bp
 
-from app.domains.dashboard.routes import bp as dashboard_bp
+from app.domains.admin import admin_bp
+
+# from app.domains.dashboard.routes import bp as dashboard_bp
 
 import app.domains.system
 
@@ -28,6 +30,8 @@ from app.domains.item.routes import bp as item_bp
 from app.domains.interaction.routes import bp as interaction_bp
 from app.domains.recommendation.routes import bp as recommendation_bp
 from app.domains.system.routes import bp as system_bp
+
+
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -91,7 +95,8 @@ def create_app():
     app.register_blueprint(api_interaction_bp)
     app.register_blueprint(api_dashboard_bp)
 
-    app.register_blueprint(dashboard_bp)
+    # app.register_blueprint(dashboard_bp)
+    app.register_blueprint(admin_bp)
 
     # ── Ensure api_models tables are created ─────────────────────
     from app.domains.external.models import LastAPIFetch, APIUsage  # noqa: F401

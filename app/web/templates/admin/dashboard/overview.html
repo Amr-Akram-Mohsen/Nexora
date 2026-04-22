@@ -1,0 +1,14 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Dashboard Overview{% endblock %}
+
+{% block admin_content %}
+<div id="dashboard-overview-container"></div>
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script>
+  renderDashboardOverview("dashboard-overview-container");
+</script>
+{% endblock %}

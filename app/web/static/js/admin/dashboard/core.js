@@ -472,7 +472,7 @@ function renderStatsGrid(containerId, stats) {
 }
 
 
-function renderDashboardHome(containerId) {
+function renderDashboardOverview(containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "<div class='dashboard-loading'>Loading statistics...</div>";
 

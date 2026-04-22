@@ -115,6 +115,7 @@ def get_global_context():
         "get_filter_url": get_filter_url,
         "get_sort_url": get_sort_url,
         "get_page_url": get_page_url,
+        "selected_country": request.cookies.get("country", ""),
     }
 
 def get_newsletter_context():

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
-from app.domains.article.service import get_articles  # adjust if needed
+from app.domains.article.service import get_articles, delete_article as delete_article_service
+from app.core.decorators import admin_required
 
 bp = Blueprint("api_article", __name__, url_prefix="/api/articles")
 
@@ -8,9 +9,8 @@ bp = Blueprint("api_article", __name__, url_prefix="/api/articles")
 def list_articles():
     search = request.args.get('search')
     source = request.args.get('source')
-    articles = get_articles(search=search, source=source)  # your query function
+    articles = get_articles(search=search, source=source)
 
-    # TEMP FIX: convert to simple JSON
     return jsonify([
         {
             "id": a.id,
@@ -22,14 +22,11 @@ def list_articles():
     ])
 
 @bp.route("/<int:id>", methods=["DELETE"])
-# TODO: Add authentication/authorization decorator (e.g., @admin_required)
+@admin_required
 def delete_article(id):
-    from app.core.extensions import db
-    from app.domains.article.models import Article
-    article = db.session.get(Article, id)
-    if not article:
+    success = delete_article_service(id)
+
+    if not success:
         return jsonify({"error": "Article not found"}), 404
     
-    db.session.delete(article)
-    db.session.commit()
     return jsonify({"success": True}), 200

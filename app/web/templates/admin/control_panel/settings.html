@@ -1,0 +1,51 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <h1>Settings</h1>
+  <p>System configuration and controls</p>
+</div>
+
+<div class="settings-grid">
+
+  <!-- System Info -->
+  <div class="settings-card">
+    <h3>System Info</h3>
+    <div id="system-info">
+      <!-- JS injected -->
+    </div>
+  </div>
+
+  <!-- Cache Controls -->
+  <div class="settings-card">
+    <h3>Cache</h3>
+    <button id="clear-cache-btn">Clear Cache</button>
+    <p class="hint">Clears server cache (may slow first load after)</p>
+  </div>
+
+  <!-- Maintenance Mode -->
+  <div class="settings-card">
+    <h3>Maintenance Mode</h3>
+    <label>
+      <input type="checkbox" id="maintenance-toggle">
+      Enable maintenance mode
+    </label>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="settings-card danger">
+    <h3>Danger Zone</h3>
+    <button id="reset-system-btn">Reset System</button>
+    <p class="hint">This action is irreversible</p>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/control_panel/settings.js') }}"></script>
+{% endblock %}

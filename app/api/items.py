@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from app.domains.item.service.query import get_items
-
+from app.domains.item.service import get_items, delete_item as delete_item_service
+from app.core.decorators import admin_required
 bp = Blueprint("api_item", __name__, url_prefix="/api/items")
 
 
@@ -22,16 +22,11 @@ def list_items():
 
 
 @bp.route("/<int:id>", methods=["DELETE"])
-# TODO: Add authentication/authorization decorator (e.g., @admin_required)
+@admin_required
 def delete_item(id):
-    from app.core.extensions import db
-    from app.domains.item.models import Item
+    success = delete_item_service(id)
 
-    item = db.session.get(Item, id)
-    if not item:
+    if not success:
         return jsonify({"error": "Item not found"}), 404
-
-    db.session.delete(item)
-    db.session.commit()
 
     return jsonify({"success": True})

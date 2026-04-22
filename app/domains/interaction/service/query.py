@@ -199,23 +199,60 @@ def count_saves():
 def count_item_clicks():
     return db.session.query(ItemClick.id).count()
 
-def count_interactions():
-    likes = count_likes()
-    dislikes = count_dislikes()
-    views = count_views()
-    comments = count_comments()
-    saves = count_saves()
-    item_clicks = count_item_clicks()
-    
+
+def get_reaction_stats():
+    result = db.session.query(
+        Reaction.type,
+        func.count(Reaction.id)
+    ).group_by(Reaction.type).all()
+
+    stats = {r[0]: r[1] for r in result}
+
     return {
-        "total": likes + dislikes + views + comments + saves + item_clicks,
-        "likes": likes,
-        "dislikes": dislikes,
-        "comments": comments,
-        "views": views,
-        "saves": saves,
-        "item_clicks": item_clicks
+        "likes": stats.get("like", 0),
+        "dislikes": stats.get("dislike", 0)
     }
+
+def get_view_stats():
+    total = db.session.query(func.count(View.id)).scalar()
+
+    return {
+        "total_views": total or 0
+    }
+
+def get_save_stats():
+    total = db.session.query(func.count(Save.id)).scalar()
+
+    return {
+        "total_saves": total or 0
+    }
+
+def get_click_stats():
+    total = db.session.query(func.count(ItemClick.id)).scalar()
+
+    return {
+        "total_clicks": total or 0
+    }
+
+
+def get_interactions_breakdown():
+    return {
+        "comments": db.session.query(Comment.id).count(),
+        "reactions": db.session.query(Reaction.id).count(),
+        "views": db.session.query(View.id).count(),
+        "saves": db.session.query(Save.id).count(),
+        "clicks": db.session.query(ItemClick.id).count(),
+    }
+
+
+def count_interactions():
+    return (
+        db.session.query(Comment.id).count()
+        + db.session.query(Reaction.id).count()
+        + db.session.query(View.id).count()
+        + db.session.query(Save.id).count()
+        + db.session.query(ItemClick.id).count()
+    )
 
 def get_comments(rows_count=10):
     query = Comment.query.order_by(Comment.created_at.desc())
@@ -224,3 +261,5 @@ def get_comments(rows_count=10):
         query = query.limit(rows_count)
 
     return query.all()
+
+

@@ -1,0 +1,43 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <h1>Users</h1>
+  <p>Manage registered users and their access</p>
+</div>
+
+<div class="admin-toolbar">
+  <input type="text" id="user-search" placeholder="Search users..." />
+  <button id="refresh-users-btn">Refresh</button>
+</div>
+
+<div class="admin-table-wrapper">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Joined</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody id="users-table-body">
+      <!-- Filled by JS -->
+    </tbody>
+  </table>
+</div>
+
+<div id="users-loading" class="admin-loading">
+  Loading users...
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/control_panel/users.js') }}"></script>
+{% endblock %}

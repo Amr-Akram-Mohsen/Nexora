@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     provider = db.Column(db.Text, nullable=True)  # 'google' or 'local'
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     # Email verification
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     verification_token = db.Column(db.String(255), nullable=True)

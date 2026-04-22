@@ -11,8 +11,9 @@
   <!-- Primary Meta Tags -->
   <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
   <meta name="description"
-    content="{% block description %}Nexora is your premium source for tech news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
+    content="{% block description %}Nexora is your premium source for technology, perfumes, accessories and fasion  news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
 
+  {% block meta %}
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:url" content="{{ request.url }}">
@@ -28,20 +29,67 @@
   <meta property="twitter:description" content="{{ self.description() }}">
   <meta property="twitter:image" content="{{ self.og_image() }}">
 
+  {% endblock %}
   <!-- JSON-LD Structured Data -->
   {% block structured_data %}{% endblock %}
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">  <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}"> -->
+
+  <!-- Core CSS file -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  {% block css %}{% endblock %}
+
+  {% block app_data %}
   <script>
     window.APP = JSON.parse('{{ {"isAuthenticated": is_authenticated, "userEmail": user_email} | tojson | safe }}');
   </script>
+  {% endblock %}
+  <!-- Core JavaScript files -->
+  <script>
+    (function () {
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.classList.add("dark-mode");
+      }
+    })();
+  </script>
+</head>
+
+<body class="light-mode">
+  {% block flash_messages %}
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %}
+  <div class="flash-messages flex flex-col">
+    {% for category, message in messages %}
+    <div class="alert flex items-center justify-between alert-{{ category }}">
+      {{ message }} <button class="alert-close">&times;</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+  {% endblock %}
+
+  {% block header %}
+  {% include 'partials/header.html' %}
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+
+  {% block footer %}
+  {% include 'partials/footer.html' %}
+  {% endblock %}
+
+  {% block overlays %}
+  {% include 'partials/gallery-overlay.html' %}
+  {% endblock %}
+
+  {% block scripts %}
   <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
@@ -52,41 +100,16 @@
   <script src="{{ url_for('static', filename='js/tracking.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/compare.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
-  <script>
-    (function () {
-      if (localStorage.getItem("theme") === "dark") {
-        document.documentElement.classList.add("dark-mode");
-      }
-    })();
-  </script>
-  <meta name="description"
-    content="Your source for the latest tech news, reviews, tutorials, and deals in Saudi Arabia and UAE" />
-</head>
+  {% endblock %}
 
-<body class="light-mode">
-  {% with messages = get_flashed_messages(with_categories=true) %} {% if
-  messages %}
-  <div class="flash-messages flex flex-col">
-    {% for category, message in messages %}
-    <div class="alert flex items-center justify-between alert-{{ category }}">
-      {{ message }} <button class="alert-close">&times;</button>
-    </div>
-    {% endfor %}
-  </div>
-  {% endif %} {% endwith %}
-  {% set selected_country = request.cookies.get("country","") %}
-  {% include 'partials/header.html' %}
-  <main id="main-content">{% block content %}{% endblock %}</main>
-  <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
-  {% include 'partials/footer.html' %}
-  {% include 'partials/gallery-overlay.html' %}
-
+  {% block additional_content %}
   <!-- Back to Top Button -->
+  <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
   <button id="back-to-top" class="back-to-top is-hidden" aria-label="Go to top">
     <i class="fas fa-chevron-up"></i>
   </button>
+  {% endblock %}
 
-  {% block scripts %}{% endblock %}
 </body>
 
 </html>
