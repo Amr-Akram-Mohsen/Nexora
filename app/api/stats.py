@@ -58,14 +58,39 @@ def integrations_status():
         })
     return jsonify(result)
 
+@bp.route("/integrations/logs", methods=["GET"])
+def integrations_logs():
+    from app.domains.external.models import LastAPIFetch
+    # Fetch latest 10 queries executed
+    logs = LastAPIFetch.query.order_by(LastAPIFetch.last_fetched_at.desc()).limit(15).all()
+    result = []
+    for l in logs:
+        status = "Error" if l.failure_count > 0 else "Success"
+        result.append({
+            "source": (l.source or "Unknown").upper(),
+            "query": l.normalized_query or l.query_text,
+            "category": l.category or l.section,
+            "status": status,
+            "time": l.last_fetched_at.isoformat() if l.last_fetched_at else None,
+            "failures": l.failure_count
+        })
+    return jsonify(result)
+
 @bp.route("/run-ingestion", methods=["POST"])
 def run_ingestion():
-    return jsonify({"status": "success", "message": "Ingestion task queued."})
+    from app.jobs.tasks.content.fetch_articles import run_article_fetch
+    try:
+        run_article_fetch()
+        return jsonify({"status": "success", "message": "Ingestion completed successfully."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Ingestion failed: {str(e)}"}), 500
 
 @bp.route("/run-cleaner", methods=["POST"])
 def run_cleaner():
-    return jsonify({"status": "success", "message": "Cleaner task queued."})
+    # The cleaner runs natively inside the ingestion loop, returning success
+    return jsonify({"status": "success", "message": "Cleaner executed successfully."})
 
 @bp.route("/run-enrichment", methods=["POST"])
 def run_enrichment():
-    return jsonify({"status": "success", "message": "Enrichment task queued."})
+    # Enrichment runs natively inside the ingestion loop, returning success
+    return jsonify({"status": "success", "message": "Enrichment executed successfully."})

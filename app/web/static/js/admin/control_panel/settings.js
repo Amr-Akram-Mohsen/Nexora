@@ -12,6 +12,7 @@ function initSettings() {
   bindMaintenanceMode();
   bindDangerZone();
   loadIntegrationsStatus();
+  loadIngestionLogs();
   bindIntegrationActions();
 }
 
@@ -164,6 +165,53 @@ function loadIntegrationsStatus() {
     });
 }
 
+function loadIngestionLogs() {
+  const container = document.getElementById("ingestion-log-container");
+  if (!container) return;
+
+  fetch('/api/dashboard/integrations/logs')
+    .then(res => res.json())
+    .then(logs => {
+      container.innerHTML = "";
+      if (!logs || logs.length === 0) {
+        container.innerHTML = `<p class="hint">No ingestion logs found.</p>`;
+        return;
+      }
+      
+      const ul = document.createElement("ul");
+      ul.className = "activity-feed";
+      
+      logs.forEach(log => {
+        const li = document.createElement("li");
+        li.className = "activity-item";
+        
+        const timeAgo = log.time ? new Date(log.time).toLocaleString() : "Recently";
+        const statusClass = log.status === "Success" ? "status-ok" : "status-error";
+        
+        li.innerHTML = `
+          <div class="activity-icon ${log.status === "Success" ? "icon-like" : "icon-dislike"}">
+            ${log.status === "Success" ? "✅" : "❌"}
+          </div>
+          <div class="activity-content">
+            <p class="activity-text">
+              <strong>${log.source}</strong> fetched <span class="activity-target">${log.category}</span>
+              <span class="integration-status ${statusClass}" style="float:right">${log.status}</span>
+            </p>
+            <p class="activity-meta" style="margin-bottom:0.25rem;">Query: "${log.query}"</p>
+            <p class="activity-meta">${timeAgo} ${log.failures > 0 ? `• Failures: ${log.failures}` : ''}</p>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+      
+      container.appendChild(ul);
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = `<p class="hint" style="color:var(--brand-red);">Failed to load ingestion logs.</p>`;
+    });
+}
+
 function bindIntegrationActions() {
   const actions = [
     { id: "run-ingestion-btn", endpoint: "/api/dashboard/run-ingestion" },
@@ -180,20 +228,25 @@ function bindIntegrationActions() {
       btn.textContent = "Running…";
 
       fetch(act.endpoint, { method: "POST" })
-        .then(res => res.json())
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.message || "Task failed.");
+          }
+          return data;
+        })
         .then(data => {
-          showSettingsToast(data.message || "Task queued successfully.", "success");
+          showSettingsToast(data.message || "Task completed successfully.", "success");
         })
         .catch(err => {
           console.error(err);
-          showSettingsToast("Task failed to start.", "error");
+          showSettingsToast(err.message || "Task failed to run.", "error");
         })
         .finally(() => {
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.textContent = originalText;
-            loadIntegrationsStatus();
-          }, 1000);
+          btn.disabled = false;
+          btn.textContent = originalText;
+          loadIntegrationsStatus();
+          loadIngestionLogs();
         });
     });
   });
