@@ -149,6 +149,7 @@ function fetchList(domain, containerId) {
   container.className = "dashboard-list";
   container.innerHTML = `
     <div class="dashboard-loading">
+      <div class="spinner"></div>
       <p>Loading ${domain}...</p>
     </div>
   `;
@@ -277,7 +278,12 @@ function renderDelete(domain, id) {
 function renderInteractionAnalytics(containerId) {
   const container = document.getElementById(containerId);
   container.className = "dashboard-analytics";
-  container.innerHTML = "<div class='dashboard-loading'>Loading analytics...</div>";
+  container.innerHTML = `
+    <div class="dashboard-loading">
+      <div class="spinner"></div>
+      <p>Loading analytics...</p>
+    </div>
+  `;
 
   fetch('/api/interactions/stats')
     .then(res => {
@@ -415,6 +421,16 @@ function renderLoad(domain) {
   fetchList(domain, `${domain}-container`);
 }
 
+function refreshCurrentView() {
+  if (currentDomain) {
+    renderLoad(currentDomain);
+  } else {
+    // If on overview, just reload the page or re-render if possible
+    const overviewContainer = document.getElementById("overview-stats-container");
+    if (overviewContainer) renderDashboardOverview("overview-stats-container");
+  }
+}
+
 // --- Dashboard Home Stats Renderer ---
 function renderStatsGrid(containerId, stats) {
   const container = document.getElementById(containerId);
@@ -474,7 +490,12 @@ function renderStatsGrid(containerId, stats) {
 
 function renderDashboardOverview(containerId) {
   const container = document.getElementById(containerId);
-  container.innerHTML = "<div class='dashboard-loading'>Loading statistics...</div>";
+  container.innerHTML = `
+    <div class="dashboard-loading">
+      <div class="spinner"></div>
+      <p>Loading statistics...</p>
+    </div>
+  `;
 
   fetch('/api/dashboard/stats')
     .then(res => {
