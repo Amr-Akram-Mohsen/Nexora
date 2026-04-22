@@ -2,7 +2,7 @@ from flask import render_template
 from app.domains.admin import admin_bp as bp
 
 @bp.route("/")
-def dashboard_overview():
+def home():
     return render_template("admin/dashboard/overview.html", title="Overview", domain="home")
 
 @bp.route("/articles")

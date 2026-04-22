@@ -1,20 +1,51 @@
 <nav class="dashboard-nav">
+
+  <div class="nav-brand">
+    <span class="nav-brand-icon">⚡</span>
+    <span class="nav-brand-name">Nexora</span>
+    <span class="nav-brand-badge">Admin</span>
+  </div>
+
   <div class="nav-section">
-    <p class="nav-title">Nexora Dashboard</p>
-    <a href="{{ url_for('admin.dashboard_overview') }}" class="{% if domain == 'home' %}active{% endif %}">Overview</a>
-    <a href="{{ url_for('admin.dashboard_articles') }}"
-      class="{% if domain == 'articles' %}active{% endif %}">Articles</a>
-    <a href="{{ url_for('admin.dashboard_items') }}" class="{% if domain == 'items' %}active{% endif %}">Items</a>
-    <a href="{{ url_for('admin.dashboard_users') }}" class="{% if domain == 'users' %}active{% endif %}">Users</a>
-    <a href="{{ url_for('admin.dashboard_interactions') }}"
-      class="{% if domain == 'interactions' %}active{% endif %}">Analytics</a>
+    <p class="nav-title">Dashboard</p>
+    <a href="{{ url_for('admin.home') }}" class="nav-link {% if (domain|default('')) == 'home' %}active{% endif %}">
+      <span class="nav-icon">📊</span> Overview
+    </a>
+    <a href="{{ url_for('admin.dashboard_articles') }}" class="nav-link {% if (domain|default('')) == 'articles' %}active{% endif %}">
+      <span class="nav-icon">📰</span> Articles
+    </a>
+    <a href="{{ url_for('admin.dashboard_items') }}" class="nav-link {% if (domain|default('')) == 'items' %}active{% endif %}">
+      <span class="nav-icon">🛍️</span> Items
+    </a>
+    <a href="{{ url_for('admin.dashboard_users') }}" class="nav-link {% if (domain|default('')) == 'users' %}active{% endif %}">
+      <span class="nav-icon">👥</span> Users
+    </a>
+    <a href="{{ url_for('admin.dashboard_interactions') }}" class="nav-link {% if (domain|default('')) == 'interactions' %}active{% endif %}">
+      <span class="nav-icon">📈</span> Analytics
+    </a>
   </div>
 
   <div class="nav-section">
     <p class="nav-title">Control Panel</p>
+    <a href="{{ url_for('admin.control_users') }}" class="nav-link {% if (domain|default('')) == 'control_users' %}active{% endif %}">
+      <span class="nav-icon">🔧</span> Users
+    </a>
+    <a href="{{ url_for('admin.control_settings') }}" class="nav-link {% if (domain|default('')) == 'control_settings' %}active{% endif %}">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </div>
 
-    <a href="{{ url_for('admin.control_users') }}">Users</a>
-    <a href="{{ url_for('admin.control_settings') }}">Settings</a>
+  <div class="nav-section">
+    <p class="nav-title">
+      Integrations
+      <span class="nav-badge-soon">soon</span>
+    </p>
+    <a href="#" class="nav-link nav-link-disabled" title="Coming soon">
+      <span class="nav-icon">🔌</span> API Sources
+    </a>
+    <a href="#" class="nav-link nav-link-disabled" title="Coming soon">
+      <span class="nav-icon">🕒</span> Ingestion Log
+    </a>
   </div>
 
 </nav>

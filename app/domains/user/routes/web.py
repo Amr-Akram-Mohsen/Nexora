@@ -25,6 +25,8 @@ def _generate_token():
 @limiter.limit("10 per minute")
 def login():
     if current_user.is_authenticated:
+        if current_user.is_admin:
+            return redirect(url_for('admin.home'))
         return redirect(url_for('system.home'))
     
     if request.method == 'POST':
@@ -32,7 +34,7 @@ def login():
         password = request.form.get('password', '')
         remember = request.form.get('remember') == 'on'
         
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(User.email == email, User.is_active == True).first()
         
         if user and user.check_password(password):
             if not user.is_verified and user.provider != 'google':
@@ -44,6 +46,9 @@ def login():
             if remember:
                 from flask import session
                 session.permanent = True
+            
+            if user.is_admin:
+                return redirect(url_for('admin.home'))
             
             next_page = request.args.get('next')
             # 🛡️ Prevent Open Redirect vulnerability

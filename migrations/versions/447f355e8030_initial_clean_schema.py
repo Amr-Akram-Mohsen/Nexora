@@ -114,7 +114,7 @@ def upgrade():
     sa.Column('provider', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
     sa.CheckConstraint('(google_id IS NULL AND provider IS NULL) OR (google_id IS NOT NULL AND provider IS NOT NULL)', name='ck_google_user'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),

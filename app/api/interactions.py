@@ -30,6 +30,10 @@ def list_comments():
             "id": c.id,
             "content": c.content[:100],
             "user_id": c.user_id,
+            "parent_id": c.parent_id,
+            "sentiment": c.sentiment,
+            "target_type": c.target_type,
+            "target_id": c.target_id,
             "created_at": str(c.created_at)
         }
         for c in comments
@@ -53,7 +57,25 @@ def delete_comment(id):
 
 @bp.route("/stats", methods=["GET"])
 def interactions_stats():
-    return jsonify(get_interactions_breakdown())
+    """Unified stats endpoint — returns breakdown + total + reaction split."""
+    breakdown = get_interactions_breakdown()   # {comments, reactions, views, saves, clicks}
+    reaction_stats = get_reaction_stats()      # {likes, dislikes}
+
+    total = sum(breakdown.values())
+
+    return jsonify({
+        # Raw breakdown
+        "comments":   breakdown.get("comments", 0),
+        "reactions":  breakdown.get("reactions", 0),
+        "views":      breakdown.get("views", 0),
+        "saves":      breakdown.get("saves", 0),
+        "item_clicks": breakdown.get("clicks", 0),
+        # Reaction split
+        "likes":      reaction_stats.get("likes", 0),
+        "dislikes":   reaction_stats.get("dislikes", 0),
+        # Grand total
+        "total": total,
+    })
 
 
 @bp.route("/reactions/stats", methods=["GET"])

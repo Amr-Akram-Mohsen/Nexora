@@ -1,45 +1,129 @@
 {% extends "admin/layout/admin_base.html" %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Settings — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 <div class="admin-page-header">
   <h1>Settings</h1>
-  <p>System configuration and controls</p>
+  <p>System configuration and administrative controls</p>
 </div>
+
+<!-- Toast notification -->
+<div id="settings-toast" class="settings-toast" role="alert" aria-live="polite"></div>
 
 <div class="settings-grid">
 
   <!-- System Info -->
   <div class="settings-card">
-    <h3>System Info</h3>
-    <div id="system-info">
-      <!-- JS injected -->
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🖥️</span>
+      <div>
+        <h3>System Info</h3>
+        <p class="settings-card-desc">Live system status and version</p>
+      </div>
+    </div>
+    <div id="system-info" class="settings-card-body">
+      <div class="dashboard-loading" style="min-height:80px;padding:1.5rem;">
+        <div class="spinner"></div><p>Loading…</p>
+      </div>
     </div>
   </div>
 
   <!-- Cache Controls -->
   <div class="settings-card">
-    <h3>Cache</h3>
-    <button id="clear-cache-btn">Clear Cache</button>
-    <p class="hint">Clears server cache (may slow first load after)</p>
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🗄️</span>
+      <div>
+        <h3>Cache</h3>
+        <p class="settings-card-desc">Invalidate server-side cache</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <button id="clear-cache-btn" class="admin-btn-primary settings-action-btn">
+        Clear Cache
+      </button>
+      <p class="hint">Clears server cache. First request after clearing may be slower.</p>
+    </div>
   </div>
 
   <!-- Maintenance Mode -->
   <div class="settings-card">
-    <h3>Maintenance Mode</h3>
-    <label>
-      <input type="checkbox" id="maintenance-toggle">
-      Enable maintenance mode
-    </label>
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🔧</span>
+      <div>
+        <h3>Maintenance Mode</h3>
+        <p class="settings-card-desc">Take the site offline for maintenance</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <label class="settings-toggle-row">
+        <span class="settings-toggle-label">Enable maintenance mode</span>
+        <span class="settings-toggle-wrapper">
+          <input type="checkbox" id="maintenance-toggle" class="settings-toggle-input" />
+          <span class="settings-toggle-track"></span>
+        </span>
+      </label>
+      <p class="hint" id="maintenance-status-hint">Maintenance mode is currently <strong>disabled</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Ingestion Monitor (Future-ready stub) -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🔌</span>
+      <div>
+        <h3>Integrations</h3>
+        <p class="settings-card-desc">External API source health</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div id="integrations-monitor">
+        <div class="integration-row">
+          <span class="integration-name">NewsAPI</span>
+          <span class="integration-status status-pending">Pending</span>
+          <span class="integration-meta">No data yet</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-name">GNews</span>
+          <span class="integration-status status-pending">Pending</span>
+          <span class="integration-meta">No data yet</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-name">YouTube</span>
+          <span class="integration-status status-pending">Pending</span>
+          <span class="integration-meta">No data yet</span>
+        </div>
+        <div class="integration-row">
+          <span class="integration-name">Reddit</span>
+          <span class="integration-status status-pending">Pending</span>
+          <span class="integration-meta">No data yet</span>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:1rem;">Full monitoring backend is in development.</p>
+    </div>
   </div>
 
   <!-- Danger Zone -->
-  <div class="settings-card danger">
-    <h3>Danger Zone</h3>
-    <button id="reset-system-btn">Reset System</button>
-    <p class="hint">This action is irreversible</p>
+  <div class="settings-card danger" style="grid-column: 1 / -1;">
+    <div class="settings-card-header">
+      <span class="settings-card-icon">⚠️</span>
+      <div>
+        <h3>Danger Zone</h3>
+        <p class="settings-card-desc">Irreversible destructive operations</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-danger-row">
+        <div>
+          <strong>Reset System</strong>
+          <p class="hint" style="margin-top:0.25rem;">Wipes all system configuration. This action cannot be undone.</p>
+        </div>
+        <button id="reset-system-btn" class="admin-btn-danger settings-action-btn">
+          Reset System
+        </button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -47,5 +131,6 @@
 {% endblock %}
 
 {% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/control_panel/settings.js') }}"></script>
 {% endblock %}
