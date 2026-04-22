@@ -77,30 +77,15 @@
         <p class="settings-card-desc">External API source health</p>
       </div>
     </div>
-    <div class="settings-card-body">
-      <div id="integrations-monitor">
-        <div class="integration-row">
-          <span class="integration-name">NewsAPI</span>
-          <span class="integration-status status-pending">Pending</span>
-          <span class="integration-meta">No data yet</span>
-        </div>
-        <div class="integration-row">
-          <span class="integration-name">GNews</span>
-          <span class="integration-status status-pending">Pending</span>
-          <span class="integration-meta">No data yet</span>
-        </div>
-        <div class="integration-row">
-          <span class="integration-name">YouTube</span>
-          <span class="integration-status status-pending">Pending</span>
-          <span class="integration-meta">No data yet</span>
-        </div>
-        <div class="integration-row">
-          <span class="integration-name">Reddit</span>
-          <span class="integration-status status-pending">Pending</span>
-          <span class="integration-meta">No data yet</span>
-        </div>
+    <div class="settings-card-body" id="integrations">
+      <div class="admin-page-header-actions" style="margin-bottom: 1rem;">
+        <button id="run-ingestion-btn" class="admin-btn-primary">Run Ingestion</button>
+        <button id="run-cleaner-btn" class="admin-btn-secondary">Run Cleaner</button>
+        <button id="run-enrichment-btn" class="admin-btn-secondary">Run Enrichment</button>
       </div>
-      <p class="hint" style="margin-top:1rem;">Full monitoring backend is in development.</p>
+      <div id="integrations-monitor">
+        <div class="dashboard-loading"><div class="spinner"></div><p>Loading status...</p></div>
+      </div>
     </div>
   </div>
 

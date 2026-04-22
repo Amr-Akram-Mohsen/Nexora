@@ -1418,4 +1418,94 @@ a.clickable-card:hover .dashboard-stat-value {
     left: 1rem;
     max-width: none;
   }
+}
+
+/* ==============================
+   VISUAL REFINEMENTS & RECENT ACTIVITY
+   ============================== */
+
+/* Card Refinements */
+.dashboard-stat-card, .overview-panel, .settings-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Readability */
+.admin-table th {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  padding: 1rem 1.5rem;
+  background: var(--secondary);
+}
+
+.admin-table tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Recent Activity Feed */
+.activity-feed {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.icon-comment { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+.icon-like { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+.icon-dislike { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.icon-save { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-text {
+  font-size: var(--text-sm);
+  color: var(--foreground);
+  margin: 0 0 0.25rem 0;
+}
+
+.activity-meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.activity-target {
+  font-weight: var(--weight-bold);
+  color: var(--brand-blue);
 }

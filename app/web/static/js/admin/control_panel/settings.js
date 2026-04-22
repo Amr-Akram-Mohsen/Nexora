@@ -11,6 +11,8 @@ function initSettings() {
   bindCacheControls();
   bindMaintenanceMode();
   bindDangerZone();
+  loadIntegrationsStatus();
+  bindIntegrationActions();
 }
 
 
@@ -112,6 +114,90 @@ function bindDangerZone() {
   });
 }
 
+
+// ==============================
+// INTEGRATIONS
+// ==============================
+function loadIntegrationsStatus() {
+  const container = document.getElementById("integrations-monitor");
+  if (!container) return;
+
+  fetch('/api/dashboard/integrations/status')
+    .then(res => res.json())
+    .then(data => {
+      container.innerHTML = "";
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p class="hint">No integrations found.</p>`;
+        return;
+      }
+      
+      data.forEach(intg => {
+        let statusClass = "status-ok";
+        let statusText = "Active";
+        if (intg.errors > 0) {
+          statusClass = "status-error";
+          statusText = "Error";
+        } else if (intg.requests_today === 0 && !intg.last_fetch) {
+          statusClass = "status-pending";
+          statusText = "Pending";
+        }
+
+        const lastFetchStr = intg.last_fetch ? new Date(intg.last_fetch).toLocaleString() : "Never";
+
+        const row = document.createElement("div");
+        row.className = "integration-row";
+        row.innerHTML = `
+          <span class="integration-name">${intg.name.toUpperCase()}</span>
+          <span class="integration-status ${statusClass}">${statusText}</span>
+          <span class="integration-meta" style="flex:1; text-align:right;">
+            Reqs Today: <strong>${intg.requests_today}</strong>
+            <span style="margin:0 0.5rem;color:var(--border);">|</span>
+            Last Fetch: ${lastFetchStr}
+          </span>
+        `;
+        container.appendChild(row);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = `<p class="hint" style="color:var(--brand-red);">Failed to load integration status.</p>`;
+    });
+}
+
+function bindIntegrationActions() {
+  const actions = [
+    { id: "run-ingestion-btn", endpoint: "/api/dashboard/run-ingestion" },
+    { id: "run-cleaner-btn", endpoint: "/api/dashboard/run-cleaner" },
+    { id: "run-enrichment-btn", endpoint: "/api/dashboard/run-enrichment" }
+  ];
+
+  actions.forEach(act => {
+    const btn = document.getElementById(act.id);
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "Running…";
+
+      fetch(act.endpoint, { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+          showSettingsToast(data.message || "Task queued successfully.", "success");
+        })
+        .catch(err => {
+          console.error(err);
+          showSettingsToast("Task failed to start.", "error");
+        })
+        .finally(() => {
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            loadIntegrationsStatus();
+          }, 1000);
+        });
+    });
+  });
+}
 
 // ==============================
 // TOAST

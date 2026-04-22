@@ -370,6 +370,67 @@ function renderInteractionAnalytics(containerId) {
       });
 
       container.appendChild(grid);
+
+      // Add Recent Activity Feed Header
+      const activityHeader = document.createElement("div");
+      activityHeader.className = "overview-panel-header";
+      activityHeader.style.marginTop = "2rem";
+      activityHeader.style.borderRadius = "var(--radius-lg) var(--radius-lg) 0 0";
+      activityHeader.style.border = "1px solid var(--border)";
+      activityHeader.style.borderBottom = "none";
+      activityHeader.innerHTML = `
+        <h3 class="overview-panel-title">💬 Recent Comments Activity</h3>
+      `;
+      container.appendChild(activityHeader);
+
+      // Activity Feed Container
+      const activityContainer = document.createElement("div");
+      activityContainer.className = "overview-panel";
+      activityContainer.style.borderRadius = "0 0 var(--radius-lg) var(--radius-lg)";
+      activityContainer.style.borderTop = "none";
+      activityContainer.innerHTML = `<div class="dashboard-loading"><div class="spinner"></div><p>Loading activity…</p></div>`;
+      container.appendChild(activityContainer);
+
+      // Fetch comments for recent activity
+      fetch('/api/interactions/comments')
+        .then(res => res.json())
+        .then(comments => {
+          activityContainer.innerHTML = "";
+          if (!comments || comments.length === 0) {
+            activityContainer.innerHTML = `<div class="dashboard-empty"><p>No recent activity.</p></div>`;
+            return;
+          }
+          
+          const ul = document.createElement("ul");
+          ul.className = "activity-feed";
+          
+          // Show top 5 comments
+          comments.slice(0, 5).forEach(c => {
+            const li = document.createElement("li");
+            li.className = "activity-item";
+            
+            const timeAgo = c.created_at ? new Date(c.created_at).toLocaleDateString() : "Recently";
+            const targetName = c.target_type ? c.target_type.toUpperCase() : "Content";
+            
+            li.innerHTML = `
+              <div class="activity-icon icon-comment">💬</div>
+              <div class="activity-content">
+                <p class="activity-text">
+                  User commented on <span class="activity-target">${targetName} #${c.target_id || ''}</span>
+                </p>
+                <p class="activity-meta" style="margin-bottom:0.25rem;">"${c.content}"</p>
+                <p class="activity-meta">${timeAgo} • Sentiment: ${c.sentiment || 'neutral'}</p>
+              </div>
+            `;
+            ul.appendChild(li);
+          });
+          
+          activityContainer.appendChild(ul);
+        })
+        .catch(() => {
+          activityContainer.innerHTML = `<p class="hint" style="padding:1rem;">Could not load recent activity.</p>`;
+        });
+
     })
     .catch(err => {
       console.error(err);
