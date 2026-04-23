@@ -11,7 +11,6 @@ Phase 6A improvements:
 
 Structure: { section_slug: { category_slug: [urls] } }
 """
-import re
 import logging
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse

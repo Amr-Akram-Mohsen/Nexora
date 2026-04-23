@@ -57,30 +57,3 @@ def integrations_logs():
         })
     return jsonify(result)
 
-@bp.route("/run-articles", methods=["POST"])
-def run_ingestion():
-    from app.jobs.tasks.content.fetch_articles import run_article_fetch
-    try:
-        run_article_fetch()
-        return jsonify({"status": "success", "message": "Article ingestion completed successfully."})
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Article Ingestion failed: {str(e)}"}), 500
-
-@bp.route("/run-items", methods=["POST"])
-def run_item_ingestion():
-    from app.jobs.tasks.content.fetch_items import run_item_fetch
-    try:
-        run_item_fetch()
-        return jsonify({"status": "success", "message": "Item ingestion completed successfully."})
-    except Exception as e:
-        return jsonify({"status": "error", "message": f"Item Ingestion failed: {str(e)}"}), 500
-
-@bp.route("/run-cleaner", methods=["POST"])
-def run_cleaner():
-    # The cleaner runs natively inside the ingestion loop, returning success
-    return jsonify({"status": "success", "message": "Cleaner executed successfully."})
-
-@bp.route("/run-enrichment", methods=["POST"])
-def run_enrichment():
-    # Enrichment runs natively inside the ingestion loop, returning success
-    return jsonify({"status": "success", "message": "Enrichment executed successfully."})

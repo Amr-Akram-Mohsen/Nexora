@@ -8,7 +8,7 @@ import logging
 from slugify import slugify
 from app.core.extensions import db
 from .models import Item, ItemVariant, ItemImage, ItemStoreLink, Store, ItemSpecification
-from app.domains.core.models import Brand, Category, Section
+from app.domains.system.models import Brand, Category
 
 logger = logging.getLogger(__name__)
 

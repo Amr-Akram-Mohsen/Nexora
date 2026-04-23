@@ -13,7 +13,6 @@ function initSettings() {
   bindDangerZone();
   loadIntegrationsStatus();
   loadIngestionLogs();
-  bindIntegrationActions();
 }
 
 
@@ -26,7 +25,7 @@ function loadSystemInfo() {
 
   // Simulated — replace with real /api/system/info when available
   const info = [
-    { label: "Backend Status", value: `<span style="color:var(--success,#22c55e)">● Online</span>` },
+    { label: "Backend Status", value: `<span class="status-dot online">● Online</span>` },
     { label: "Version", value: "1.3.0" },
     { label: "Environment", value: "Development" },
     { label: "Python", value: "3.x / Flask" },
@@ -121,14 +120,15 @@ function bindDangerZone() {
 // ==============================
 function loadIntegrationsStatus() {
   const container = document.getElementById("integrations-monitor");
-  if (!container) return;
+  const template = document.getElementById("integration-row-template");
+  if (!container || !template) return;
 
   fetch('/api/ingestions/status')
     .then(res => res.json())
     .then(data => {
       container.innerHTML = "";
       if (!data || data.length === 0) {
-        container.innerHTML = `<p class="hint">No integrations found.</p>`;
+        container.innerHTML = `<p class="hint">No integration activity yet. Run a fetch job to populate data.</p>`;
         return;
       }
 
@@ -145,23 +145,24 @@ function loadIntegrationsStatus() {
 
         const lastFetchStr = intg.last_fetch ? new Date(intg.last_fetch).toLocaleString() : "Never";
 
-        const row = document.createElement("div");
-        row.className = "integration-row";
-        row.innerHTML = `
-          <span class="integration-name">${intg.name.toUpperCase()}</span>
-          <span class="integration-status ${statusClass}">${statusText}</span>
-          <span class="integration-meta" style="flex:1; text-align:right;">
-            Reqs Today: <strong>${intg.requests_today}</strong>
-            <span style="margin:0 0.5rem;color:var(--border);">|</span>
-            Last Fetch: ${lastFetchStr}
-          </span>
-        `;
-        container.appendChild(row);
+        const node = template.content.cloneNode(true);
+
+
+        node.querySelector(".integration-name").textContent = intg.name.toUpperCase();
+
+        const statusEl = node.querySelector(".integration-status");
+        statusEl.textContent = statusText;
+        statusEl.classList.add(statusClass);
+
+        node.querySelector(".meta-requests").textContent = `Reqs Today: ${intg.requests_today}`;
+        node.querySelector(".meta-last-fetch").textContent = `Last Fetch: ${lastFetchStr}`;
+
+        container.appendChild(node);
       });
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `<p class="hint" style="color:var(--brand-red);">Failed to load integration status.</p>`;
+      container.innerHTML = `<p class="hint error-text">Failed to load integration status.</p>`;
     });
 }
 
@@ -181,13 +182,62 @@ function loadIngestionLogs() {
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `<p class="hint" style="color:var(--brand-red);">Failed to load ingestion logs.</p>`;
+      container.innerHTML = `<p class="hint error-text">Failed to load ingestion logs.</p>`;
     });
 }
 
+// function renderIngestionLogs() {
+//   const container = document.getElementById("ingestion-log-container");
+//   const template = document.getElementById("ingestion-log-template");
+
+//   if (!container || !template) return;
+
+//   container.innerHTML = "";
+
+//   const filteredLogs = allIngestionLogs.filter(log => {
+//     if (currentLogFilter === 'all') return true;
+//     return log.type === currentLogFilter;
+//   });
+
+//   if (filteredLogs.length === 0) {
+//     container.innerHTML = `<p class="hint">No ingestion logs found for this filter.</p>`;
+//     return;
+//   }
+
+//   const ul = document.createElement("ul");
+//   ul.className = "activity-feed";
+
+//   filteredLogs.forEach(log => {
+//     const li = document.createElement("li");
+//     li.className = "activity-item";
+
+//     const timeAgo = log.time ? new Date(log.time).toLocaleString() : "Recently";
+//     const statusClass = log.status === "Success" ? "status-ok" : "status-error";
+
+//     li.innerHTML = `
+//       <div class="activity-icon ${log.status === "Success" ? "icon-like" : "icon-dislike"}">
+//         ${log.status === "Success" ? "✅" : "❌"}
+//       </div>
+//       <div class="activity-content">
+//         <p class="activity-text">
+//           <strong>${log.source}</strong> fetched <span class="activity-target">${log.category}</span>
+//           <span class="integration-status ${statusClass}" style="float:right">${log.status}</span>
+//           <span class="integration-status status-badge admin" style="float:right; margin-right: 0.5rem;">${log.type.toUpperCase()}</span>
+//         </p>
+//         <p class="activity-meta" style="margin-bottom:0.25rem;">Query: "${log.query}"</p>
+//         <p class="activity-meta">${timeAgo} ${log.failures > 0 ? `• Failures: ${log.failures}` : ''}</p>
+//       </div>
+//     `;
+//     ul.appendChild(li);
+//   });
+
+//   container.appendChild(ul);
+// }
+
 function renderIngestionLogs() {
   const container = document.getElementById("ingestion-log-container");
-  if (!container) return;
+  const template = document.getElementById("log-item-template");
+  if (!container || !template) return;
 
   container.innerHTML = "";
 
@@ -197,7 +247,7 @@ function renderIngestionLogs() {
   });
 
   if (filteredLogs.length === 0) {
-    container.innerHTML = `<p class="hint">No ingestion logs found for this filter.</p>`;
+    container.innerHTML = `<p class="hint">No ingestion logs found.</p>`;
     return;
   }
 
@@ -205,27 +255,29 @@ function renderIngestionLogs() {
   ul.className = "activity-feed";
 
   filteredLogs.forEach(log => {
-    const li = document.createElement("li");
-    li.className = "activity-item";
+    const node = template.content.cloneNode(true);
 
     const timeAgo = log.time ? new Date(log.time).toLocaleString() : "Recently";
-    const statusClass = log.status === "Success" ? "status-ok" : "status-error";
+    const isSuccess = log.status === "Success";
 
-    li.innerHTML = `
-      <div class="activity-icon ${log.status === "Success" ? "icon-like" : "icon-dislike"}">
-        ${log.status === "Success" ? "✅" : "❌"}
-      </div>
-      <div class="activity-content">
-        <p class="activity-text">
-          <strong>${log.source}</strong> fetched <span class="activity-target">${log.category}</span>
-          <span class="integration-status ${statusClass}" style="float:right">${log.status}</span>
-          <span class="integration-status status-badge admin" style="float:right; margin-right: 0.5rem;">${log.type.toUpperCase()}</span>
-        </p>
-        <p class="activity-meta" style="margin-bottom:0.25rem;">Query: "${log.query}"</p>
-        <p class="activity-meta">${timeAgo} ${log.failures > 0 ? `• Failures: ${log.failures}` : ''}</p>
-      </div>
-    `;
-    ul.appendChild(li);
+    const icon = node.querySelector(".activity-icon");
+    icon.textContent = isSuccess ? "✅" : "❌";
+    icon.classList.add(isSuccess ? "icon-like" : "icon-dislike");
+
+    node.querySelector(".log-source").textContent = log.source;
+    node.querySelector(".log-category").textContent = log.category;
+
+    const statusEl = node.querySelector(".log-status");
+    statusEl.textContent = log.status;
+    statusEl.classList.add(isSuccess ? "status-ok" : "status-error");
+
+    node.querySelector(".log-type").textContent = log.type.toUpperCase();
+
+    node.querySelector(".log-query").textContent = `Query: "${log.query}"`;
+    node.querySelector(".log-time").textContent =
+      `${timeAgo}${log.failures > 0 ? ` • Failures: ${log.failures}` : ''}`;
+
+    ul.appendChild(node);
   });
 
   container.appendChild(ul);
@@ -251,57 +303,6 @@ function updateActiveTab(btns, activeBtn) {
   });
   activeBtn.style.borderColor = "rgba(var(--brand-blue-rgb), 0.3)";
   activeBtn.style.color = "var(--brand-blue)";
-}
-
-function bindIntegrationActions() {
-  const actions = [
-    { id: "run-ingestion-btn", endpoint: "/api/ingestions/run-articles" },
-    { id: "run-item-ingestion-btn", endpoint: "/api/ingestions/run-items" },
-    { id: "run-cleaner-btn", endpoint: "/api/ingestions/run-cleaner" },
-    { id: "run-enrichment-btn", endpoint: "/api/ingestions/run-enrichment" }
-  ];
-
-  actions.forEach(act => {
-    const btn = document.getElementById(act.id);
-    if (!btn) return;
-    btn.addEventListener("click", () => {
-      btn.disabled = true;
-      const originalText = btn.textContent;
-      btn.textContent = "Running…";
-
-      // CSRF token retrieval
-      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-      const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
-
-      fetch(act.endpoint, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrfToken,
-          "Content-Type": "application/json"
-        }
-      })
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.message || "Task failed.");
-          }
-          return data;
-        })
-        .then(data => {
-          showSettingsToast(data.message || "Task completed successfully.", "success");
-        })
-        .catch(err => {
-          console.error(err);
-          showSettingsToast(err.message || "Task failed to run.", "error");
-        })
-        .finally(() => {
-          btn.disabled = false;
-          btn.textContent = originalText;
-          loadIntegrationsStatus();
-          loadIngestionLogs();
-        });
-    });
-  });
 }
 
 // ==============================

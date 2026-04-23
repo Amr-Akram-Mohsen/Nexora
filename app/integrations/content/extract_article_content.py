@@ -5,7 +5,7 @@ import cloudscraper
 import trafilatura
 import markdown
 from bs4 import BeautifulSoup
-
+import json
 logger = logging.getLogger(__name__)
 
 # Shared scraper to reuse connections and bypass protections

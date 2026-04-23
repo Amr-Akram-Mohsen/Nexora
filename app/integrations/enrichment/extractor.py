@@ -1,10 +1,5 @@
 import json
 import os
-import re
-from typing import List, Dict, Optional
-from app.domains.core.models import Brand, Topic, Category
-from app.shared.utils.slug import normalize_name, generate_slug
-from app.core.extensions import db
 
 class ExtractorLayer:
     # Class-level cache (Singleton-like behavior)

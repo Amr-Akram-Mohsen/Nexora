@@ -1087,11 +1087,11 @@ a.clickable-card:hover .dashboard-stat-value {
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.settings-toggle-input:checked ~ .settings-toggle-track {
+.settings-toggle-input:checked~.settings-toggle-track {
   background: var(--brand-blue);
 }
 
-.settings-toggle-input:checked ~ .settings-toggle-track::after {
+.settings-toggle-input:checked~.settings-toggle-track::after {
   transform: translateX(20px);
 }
 
@@ -1396,9 +1396,10 @@ a.clickable-card:hover .dashboard-stat-value {
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Hide scrollbar for cleaner look */
+    scrollbar-width: none;
+    /* Hide scrollbar for cleaner look */
   }
-  
+
   .admin-sidebar::-webkit-scrollbar {
     display: none;
   }
@@ -1418,7 +1419,7 @@ a.clickable-card:hover .dashboard-stat-value {
     padding: 0;
     gap: 0.5rem;
   }
-  
+
   .nav-section::after {
     content: "";
     width: 1px;
@@ -1426,7 +1427,7 @@ a.clickable-card:hover .dashboard-stat-value {
     background: var(--border);
     margin: 0 0.5rem;
   }
-  
+
   .nav-section:last-child::after {
     display: none;
   }
@@ -1466,13 +1467,13 @@ a.clickable-card:hover .dashboard-stat-value {
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-  
+
   .admin-page-header-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  
+
   .admin-page-header-actions button {
     flex: 1 1 calc(50% - 0.5rem);
     text-align: center;
@@ -1483,7 +1484,7 @@ a.clickable-card:hover .dashboard-stat-value {
     align-items: flex-start;
     width: 100%;
   }
-  
+
   .user-actions-group button {
     width: 100%;
   }
@@ -1496,7 +1497,7 @@ a.clickable-card:hover .dashboard-stat-value {
   .overview-top-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .dashboard-stats-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1514,7 +1515,9 @@ a.clickable-card:hover .dashboard-stat-value {
    ============================== */
 
 /* Card Refinements */
-.dashboard-stat-card, .overview-panel, .settings-card {
+.dashboard-stat-card,
+.overview-panel,
+.settings-card {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1572,10 +1575,25 @@ a.clickable-card:hover .dashboard-stat-value {
   flex-shrink: 0;
 }
 
-.icon-comment { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
-.icon-like { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
-.icon-dislike { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.icon-save { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.icon-comment {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+}
+
+.icon-like {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.icon-dislike {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.icon-save {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
 
 .activity-content {
   flex: 1;
@@ -1638,51 +1656,6 @@ a.clickable-card:hover .dashboard-stat-value {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* Integrations Actions Panel */
-.integration-actions-panel {
-  background: var(--background);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  border: 1px dashed var(--border);
-}
-
-.integration-actions-title {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: var(--weight-bold);
-  color: var(--muted-foreground);
-  margin: 0 0 1rem 0;
-}
-
-.integration-actions-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.integration-actions-grid button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-md);
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.integration-actions-grid button svg {
-  opacity: 0.7;
-}
-
-.integration-actions-grid button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 /* Integration List */
 .integrations-monitor-list .integration-row {
   background: var(--background);
@@ -1736,6 +1709,64 @@ a.clickable-card:hover .dashboard-stat-value {
   background: linear-gradient(to top, rgba(var(--brand-blue-rgb), 0.05), transparent);
 }
 
+/* added styles by me after removing inline styles from settings.html and settings.js */
+/* =========================
+   SYSTEM
+========================= */
+.system-loading {
+  min-height: 80px;
+  padding: 1.5rem;
+}
+
+.settings-hint {
+  margin-bottom: 1rem;
+}
+
+.settings-card-body.no-padding-top {
+  padding-top: 0;
+}
+
+.full-width-card {
+  grid-column: 1 / -1;
+}
+
+.icon-inline {
+  margin-right: 0.5rem;
+}
+
+/* =========================
+   INTEGRATIONS
+========================= */
+.integration-meta {
+  flex: 1;
+  text-align: right;
+}
+
+.integration-separator {
+  margin: 0 0.5rem;
+  color: var(--border);
+}
+
+/* =========================
+   LOGS
+========================= */
+.log-badges {
+  float: right;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.error-text {
+  color: var(--brand-red);
+}
+
+/* =========================
+   STATUS
+========================= */
+.status-dot.online {
+  color: var(--success, #22c55e);
+}
+
 /* Danger Zone */
 .danger-zone-card {
   border: 1px solid rgba(239, 68, 68, 0.3);
@@ -1759,4 +1790,4 @@ a.clickable-card:hover .dashboard-stat-value {
   font-size: var(--text-sm);
   margin: 0;
   max-width: 480px;
-}
+}

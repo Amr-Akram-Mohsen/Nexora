@@ -45,14 +45,14 @@ def run_article_fetch():
     else:
         logger.info("[Runner] Skipping YouTube: Key missing")
 
-    # # ── RSS (Always Runs) ──────────────────────────────────────────
-    # try:
-    #     from app.integrations.content.rss import fetch_all_rss
-    #     logger.info("[Runner] RSS feeds...")
-    #     count = fetch_all_rss()
-    #     logger.info("[Runner] RSS done — %d articles stored", count)
-    # except Exception:
-    #     logger.exception("[Runner] RSS fetch failed")
+    # ── RSS (Always Runs) ──────────────────────────────────────────
+    try:
+        from app.integrations.content.rss import fetch_all_rss
+        logger.info("[Runner] RSS feeds...")
+        count = fetch_all_rss()
+        logger.info("[Runner] RSS done — %d articles stored", count)
+    except Exception:
+        logger.exception("[Runner] RSS fetch failed")
 
 
 

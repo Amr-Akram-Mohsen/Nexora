@@ -24,8 +24,9 @@
       </div>
     </div>
     <div id="system-info" class="settings-card-body">
-      <div class="dashboard-loading" style="min-height:80px;padding:1.5rem;">
-        <div class="spinner"></div><p>Loading…</p>
+      <div class="dashboard-loading">
+        <div class="spinner"></div>
+        <p>Loading…</p>
       </div>
     </div>
   </div>
@@ -72,38 +73,30 @@
   <div class="settings-card" id="integrations">
     <div class="settings-card-header">
       <div class="settings-card-icon-wrapper blue">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"/><path d="M12 14v7"/><path d="M12 3v7"/><path d="M4 12h3"/><path d="M17 12h3"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m8 10 4 4 4-4" />
+          <path d="M12 14v7" />
+          <path d="M12 3v7" />
+          <path d="M4 12h3" />
+          <path d="M17 12h3" />
+        </svg>
       </div>
       <div>
         <h3>Integrations</h3>
-        <p class="settings-card-desc">External API source health & triggers</p>
+        <p class="settings-card-desc">External API source health & activity</p>
       </div>
     </div>
     <div class="settings-card-body">
-      <div class="integration-actions-panel">
-        <p class="integration-actions-title">Manual Execution</p>
-        <div class="integration-actions-grid">
-          <button id="run-ingestion-btn" class="admin-btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            Articles
-          </button>
-          <button id="run-item-ingestion-btn" class="admin-btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            Items
-          </button>
-          <button id="run-cleaner-btn" class="admin-btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            Cleaner
-          </button>
-          <button id="run-enrichment-btn" class="admin-btn-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Enrich
-          </button>
+      <div id="integrations-monitor" class="integrations-monitor-list">
+        <div class="dashboard-loading">
+          <div class="spinner"></div>
+          <p>Loading status...</p>
         </div>
       </div>
-      <div id="integrations-monitor" class="integrations-monitor-list">
-        <div class="dashboard-loading"><div class="spinner"></div><p>Loading status...</p></div>
-      </div>
+      <p class="hint">
+        Data ingestion is handled via scheduled jobs or CLI commands.
+      </p>
     </div>
   </div>
 
@@ -111,30 +104,42 @@
   <div class="settings-card" id="ingestion-log-card">
     <div class="settings-card-header">
       <div class="settings-card-icon-wrapper purple">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
       </div>
       <div>
         <h3>Ingestion Log</h3>
         <p class="settings-card-desc">Recent API fetch events</p>
       </div>
     </div>
-    <div class="settings-card-body" style="padding-top: 0;">
+    <div class="settings-card-body">
       <div class="settings-tabs-wrapper">
         <button class="settings-tab active" id="filter-all-logs">All Events</button>
         <button class="settings-tab" id="filter-article-logs">Articles</button>
         <button class="settings-tab" id="filter-item-logs">Items</button>
       </div>
       <div id="ingestion-log-container" class="settings-log-container">
-        <div class="dashboard-loading"><div class="spinner"></div><p>Loading logs...</p></div>
+        <div class="dashboard-loading">
+          <div class="spinner"></div>
+          <p>Loading logs...</p>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Danger Zone -->
-  <div class="settings-card danger-zone-card" style="grid-column: 1 / -1;">
+  <div class="settings-card danger-zone-card">
     <div class="settings-card-header">
       <div class="settings-card-icon-wrapper red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </svg>
       </div>
       <div>
         <h3 class="danger-title">Danger Zone</h3>
@@ -145,10 +150,18 @@
       <div class="settings-danger-row">
         <div class="danger-info">
           <strong>Reset System</strong>
-          <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action cannot be undone.</p>
+          <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action
+            cannot be undone.</p>
         </div>
         <button id="reset-system-btn" class="admin-btn-danger settings-action-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" x2="10" y1="11" y2="17" />
+            <line x1="14" x2="14" y1="11" y2="17" />
+          </svg>
           Reset System
         </button>
       </div>
@@ -156,6 +169,40 @@
   </div>
 
 </div>
+<template id="integration-row-template">
+  <div class="integration-row">
+    <span class="integration-name"></span>
+    <span class="integration-status"></span>
+    <span class="integration-meta">
+      <span class="meta-requests"></span>
+      <span class="integration-separator">|</span>
+      <span class="meta-last-fetch"></span>
+    </span>
+  </div>
+</template>
+
+
+<template id="log-item-template">
+  <li class="activity-item">
+    <div class="activity-icon"></div>
+
+    <div class="activity-content">
+      <p class="activity-text">
+        <strong class="log-source"></strong>
+        <span>fetched</span>
+        <span class="activity-target log-category"></span>
+
+        <span class="log-badges">
+          <span class="integration-status log-status"></span>
+          <span class="integration-status status-badge admin log-type"></span>
+        </span>
+      </p>
+
+      <p class="activity-meta log-query"></p>
+      <p class="activity-meta log-time"></p>
+    </div>
+  </li>
+</template>
 
 {% endblock %}
 
