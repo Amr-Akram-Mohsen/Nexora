@@ -68,22 +68,40 @@
     </div>
   </div>
 
-  <!-- Ingestion Monitor (Future-ready stub) -->
-  <div class="settings-card">
+  <!-- Integrations Monitor -->
+  <div class="settings-card" id="integrations">
     <div class="settings-card-header">
-      <span class="settings-card-icon">🔌</span>
+      <div class="settings-card-icon-wrapper blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"/><path d="M12 14v7"/><path d="M12 3v7"/><path d="M4 12h3"/><path d="M17 12h3"/></svg>
+      </div>
       <div>
         <h3>Integrations</h3>
-        <p class="settings-card-desc">External API source health</p>
+        <p class="settings-card-desc">External API source health & triggers</p>
       </div>
     </div>
-    <div class="settings-card-body" id="integrations">
-      <div class="admin-page-header-actions" style="margin-bottom: 1rem;">
-        <button id="run-ingestion-btn" class="admin-btn-primary">Run Ingestion</button>
-        <button id="run-cleaner-btn" class="admin-btn-secondary">Run Cleaner</button>
-        <button id="run-enrichment-btn" class="admin-btn-secondary">Run Enrichment</button>
+    <div class="settings-card-body">
+      <div class="integration-actions-panel">
+        <p class="integration-actions-title">Manual Execution</p>
+        <div class="integration-actions-grid">
+          <button id="run-ingestion-btn" class="admin-btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            Articles
+          </button>
+          <button id="run-item-ingestion-btn" class="admin-btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Items
+          </button>
+          <button id="run-cleaner-btn" class="admin-btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Cleaner
+          </button>
+          <button id="run-enrichment-btn" class="admin-btn-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Enrich
+          </button>
+        </div>
       </div>
-      <div id="integrations-monitor">
+      <div id="integrations-monitor" class="integrations-monitor-list">
         <div class="dashboard-loading"><div class="spinner"></div><p>Loading status...</p></div>
       </div>
     </div>
@@ -92,35 +110,45 @@
   <!-- Ingestion Log -->
   <div class="settings-card" id="ingestion-log-card">
     <div class="settings-card-header">
-      <span class="settings-card-icon">🕒</span>
+      <div class="settings-card-icon-wrapper purple">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
       <div>
         <h3>Ingestion Log</h3>
         <p class="settings-card-desc">Recent API fetch events</p>
       </div>
     </div>
-    <div class="settings-card-body">
-      <div id="ingestion-log-container">
+    <div class="settings-card-body" style="padding-top: 0;">
+      <div class="settings-tabs-wrapper">
+        <button class="settings-tab active" id="filter-all-logs">All Events</button>
+        <button class="settings-tab" id="filter-article-logs">Articles</button>
+        <button class="settings-tab" id="filter-item-logs">Items</button>
+      </div>
+      <div id="ingestion-log-container" class="settings-log-container">
         <div class="dashboard-loading"><div class="spinner"></div><p>Loading logs...</p></div>
       </div>
     </div>
   </div>
 
   <!-- Danger Zone -->
-  <div class="settings-card danger" style="grid-column: 1 / -1;">
+  <div class="settings-card danger-zone-card" style="grid-column: 1 / -1;">
     <div class="settings-card-header">
-      <span class="settings-card-icon">⚠️</span>
+      <div class="settings-card-icon-wrapper red">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </div>
       <div>
-        <h3>Danger Zone</h3>
+        <h3 class="danger-title">Danger Zone</h3>
         <p class="settings-card-desc">Irreversible destructive operations</p>
       </div>
     </div>
     <div class="settings-card-body">
       <div class="settings-danger-row">
-        <div>
+        <div class="danger-info">
           <strong>Reset System</strong>
-          <p class="hint" style="margin-top:0.25rem;">Wipes all system configuration. This action cannot be undone.</p>
+          <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action cannot be undone.</p>
         </div>
         <button id="reset-system-btn" class="admin-btn-danger settings-action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
           Reset System
         </button>
       </div>

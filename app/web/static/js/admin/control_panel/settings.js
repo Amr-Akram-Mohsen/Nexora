@@ -26,11 +26,11 @@ function loadSystemInfo() {
 
   // Simulated — replace with real /api/system/info when available
   const info = [
-    { label: "Backend Status",  value: `<span style="color:var(--success,#22c55e)">● Online</span>` },
-    { label: "Version",         value: "1.3.0" },
-    { label: "Environment",     value: "Development" },
-    { label: "Python",          value: "3.x / Flask" },
-    { label: "Database",        value: "PostgreSQL (SQLAlchemy)" },
+    { label: "Backend Status", value: `<span style="color:var(--success,#22c55e)">● Online</span>` },
+    { label: "Version", value: "1.3.0" },
+    { label: "Environment", value: "Development" },
+    { label: "Python", value: "3.x / Flask" },
+    { label: "Database", value: "PostgreSQL (SQLAlchemy)" },
   ];
 
   container.innerHTML = `
@@ -123,7 +123,7 @@ function loadIntegrationsStatus() {
   const container = document.getElementById("integrations-monitor");
   if (!container) return;
 
-  fetch('/api/dashboard/integrations/status')
+  fetch('/api/ingestions/status')
     .then(res => res.json())
     .then(data => {
       container.innerHTML = "";
@@ -131,7 +131,7 @@ function loadIntegrationsStatus() {
         container.innerHTML = `<p class="hint">No integrations found.</p>`;
         return;
       }
-      
+
       data.forEach(intg => {
         let statusClass = "status-ok";
         let statusText = "Active";
@@ -165,46 +165,19 @@ function loadIntegrationsStatus() {
     });
 }
 
+let allIngestionLogs = [];
+let currentLogFilter = 'all';
+
 function loadIngestionLogs() {
   const container = document.getElementById("ingestion-log-container");
   if (!container) return;
 
-  fetch('/api/dashboard/integrations/logs')
+  fetch('/api/ingestions/logs')
     .then(res => res.json())
     .then(logs => {
-      container.innerHTML = "";
-      if (!logs || logs.length === 0) {
-        container.innerHTML = `<p class="hint">No ingestion logs found.</p>`;
-        return;
-      }
-      
-      const ul = document.createElement("ul");
-      ul.className = "activity-feed";
-      
-      logs.forEach(log => {
-        const li = document.createElement("li");
-        li.className = "activity-item";
-        
-        const timeAgo = log.time ? new Date(log.time).toLocaleString() : "Recently";
-        const statusClass = log.status === "Success" ? "status-ok" : "status-error";
-        
-        li.innerHTML = `
-          <div class="activity-icon ${log.status === "Success" ? "icon-like" : "icon-dislike"}">
-            ${log.status === "Success" ? "✅" : "❌"}
-          </div>
-          <div class="activity-content">
-            <p class="activity-text">
-              <strong>${log.source}</strong> fetched <span class="activity-target">${log.category}</span>
-              <span class="integration-status ${statusClass}" style="float:right">${log.status}</span>
-            </p>
-            <p class="activity-meta" style="margin-bottom:0.25rem;">Query: "${log.query}"</p>
-            <p class="activity-meta">${timeAgo} ${log.failures > 0 ? `• Failures: ${log.failures}` : ''}</p>
-          </div>
-        `;
-        ul.appendChild(li);
-      });
-      
-      container.appendChild(ul);
+      allIngestionLogs = logs || [];
+      renderIngestionLogs();
+      bindLogFilters();
     })
     .catch(err => {
       console.error(err);
@@ -212,11 +185,80 @@ function loadIngestionLogs() {
     });
 }
 
+function renderIngestionLogs() {
+  const container = document.getElementById("ingestion-log-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const filteredLogs = allIngestionLogs.filter(log => {
+    if (currentLogFilter === 'all') return true;
+    return log.type === currentLogFilter;
+  });
+
+  if (filteredLogs.length === 0) {
+    container.innerHTML = `<p class="hint">No ingestion logs found for this filter.</p>`;
+    return;
+  }
+
+  const ul = document.createElement("ul");
+  ul.className = "activity-feed";
+
+  filteredLogs.forEach(log => {
+    const li = document.createElement("li");
+    li.className = "activity-item";
+
+    const timeAgo = log.time ? new Date(log.time).toLocaleString() : "Recently";
+    const statusClass = log.status === "Success" ? "status-ok" : "status-error";
+
+    li.innerHTML = `
+      <div class="activity-icon ${log.status === "Success" ? "icon-like" : "icon-dislike"}">
+        ${log.status === "Success" ? "✅" : "❌"}
+      </div>
+      <div class="activity-content">
+        <p class="activity-text">
+          <strong>${log.source}</strong> fetched <span class="activity-target">${log.category}</span>
+          <span class="integration-status ${statusClass}" style="float:right">${log.status}</span>
+          <span class="integration-status status-badge admin" style="float:right; margin-right: 0.5rem;">${log.type.toUpperCase()}</span>
+        </p>
+        <p class="activity-meta" style="margin-bottom:0.25rem;">Query: "${log.query}"</p>
+        <p class="activity-meta">${timeAgo} ${log.failures > 0 ? `• Failures: ${log.failures}` : ''}</p>
+      </div>
+    `;
+    ul.appendChild(li);
+  });
+
+  container.appendChild(ul);
+}
+
+function bindLogFilters() {
+  const btnAll = document.getElementById("filter-all-logs");
+  const btnArticles = document.getElementById("filter-article-logs");
+  const btnItems = document.getElementById("filter-item-logs");
+  if (!btnAll) return;
+
+  const btns = [btnAll, btnArticles, btnItems];
+
+  btnAll.onclick = () => { currentLogFilter = 'all'; updateActiveTab(btns, btnAll); renderIngestionLogs(); };
+  btnArticles.onclick = () => { currentLogFilter = 'article'; updateActiveTab(btns, btnArticles); renderIngestionLogs(); };
+  btnItems.onclick = () => { currentLogFilter = 'item'; updateActiveTab(btns, btnItems); renderIngestionLogs(); };
+}
+
+function updateActiveTab(btns, activeBtn) {
+  btns.forEach(b => {
+    b.style.borderColor = "var(--border)";
+    b.style.color = "var(--foreground)";
+  });
+  activeBtn.style.borderColor = "rgba(var(--brand-blue-rgb), 0.3)";
+  activeBtn.style.color = "var(--brand-blue)";
+}
+
 function bindIntegrationActions() {
   const actions = [
-    { id: "run-ingestion-btn", endpoint: "/api/dashboard/run-ingestion" },
-    { id: "run-cleaner-btn", endpoint: "/api/dashboard/run-cleaner" },
-    { id: "run-enrichment-btn", endpoint: "/api/dashboard/run-enrichment" }
+    { id: "run-ingestion-btn", endpoint: "/api/ingestions/run-articles" },
+    { id: "run-item-ingestion-btn", endpoint: "/api/ingestions/run-items" },
+    { id: "run-cleaner-btn", endpoint: "/api/ingestions/run-cleaner" },
+    { id: "run-enrichment-btn", endpoint: "/api/ingestions/run-enrichment" }
   ];
 
   actions.forEach(act => {
@@ -227,7 +269,17 @@ function bindIntegrationActions() {
       const originalText = btn.textContent;
       btn.textContent = "Running…";
 
-      fetch(act.endpoint, { method: "POST" })
+      // CSRF token retrieval
+      const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+      fetch(act.endpoint, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json"
+        }
+      })
         .then(async (res) => {
           const data = await res.json();
           if (!res.ok) {

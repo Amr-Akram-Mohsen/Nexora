@@ -17,6 +17,7 @@ from app.api.items import bp as api_item_bp
 from app.api.users import bp as api_user_bp
 from app.api.interactions import bp as api_interaction_bp
 from app.api.stats import bp as api_dashboard_bp
+from app.api.ingestions import bp as api_ingestion_bp
 
 from app.domains.admin import admin_bp
 
@@ -94,6 +95,7 @@ def create_app():
     app.register_blueprint(api_user_bp)
     app.register_blueprint(api_interaction_bp)
     app.register_blueprint(api_dashboard_bp)
+    app.register_blueprint(api_ingestion_bp)
 
     # app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)
