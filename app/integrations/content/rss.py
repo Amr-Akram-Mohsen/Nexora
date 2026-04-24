@@ -17,19 +17,9 @@ from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import feedparser
 from app.integrations.cleaner import clean_article_data
 from app.domains.article.ingestion import store_article
+from app.integrations.enrichment.pipeline import prepare_article
 from app.integrations.enrichment.brand_detector import detect_brands
-import json
-
-BRAND_ALIASES_PATH = "app/shared/constants/brand_aliases.json"
-
-def _load_brand_aliases():
-    try:
-        with open(BRAND_ALIASES_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-BRAND_ALIASES = _load_brand_aliases()
+from app.shared.constants.brand_aliases import BRAND_ALIASES
 
 logger = logging.getLogger(__name__)
 
@@ -223,7 +213,6 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 continue
 
             source_name = feed.feed.get("title") or feed_url
-            from app.integrations.enrichment.pipeline import prepare_article
             for entry in feed.entries[:15]:   # latest 15 per feed
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
                 if not raw:
@@ -235,7 +224,7 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                     "brands": []
                 }
 
-                raw = prepare_article(raw, q_obj)
+                raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
                 cleaned = clean_article_data(raw)
                 if cleaned:

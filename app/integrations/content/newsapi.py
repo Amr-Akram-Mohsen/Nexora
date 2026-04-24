@@ -15,7 +15,7 @@ from app.integrations.external.api import (
 )
 
 from app.integrations.discovery import DiscoveryManager
-
+from app.integrations.enrichment.pipeline import prepare_article
 logger = logging.getLogger(__name__)
 
 def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_data: list[dict]) -> int:
@@ -59,7 +59,6 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                 normalized_query=q_text
             )
 
-            from app.integrations.enrichment.pipeline import prepare_article
             for raw in resp.json().get("articles", []):
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
                                                 

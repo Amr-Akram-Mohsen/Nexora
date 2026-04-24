@@ -14,7 +14,7 @@ GENDER_KEYWORDS = {
 }
 
 def detect_facets(title: str, description: str, category_slug: str | None = None) -> dict:
-    text = f"{title}. {description}"
+    text = f"{title}. {description}".lower()
 
     facets = {
         "intent": None,

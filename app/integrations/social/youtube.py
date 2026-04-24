@@ -14,7 +14,7 @@ from app.integrations.external.api import (
 )
 
 from app.integrations.discovery import DiscoveryManager
-
+from app.integrations.enrichment.pipeline import prepare_article
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +64,7 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 source="youtube", 
                 normalized_query=query
             )
-            from app.integrations.enrichment.pipeline import prepare_article
+
             for item in resp.json().get("items", []):
                 video_id = item.get("id", {}).get("videoId")
                 if not video_id:
@@ -77,10 +77,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                     "image_url":    snippet.get("thumbnails", {}).get("high", {}).get("url"),
                     "published_at": snippet.get("publishedAt"),
                     "source_name":  snippet.get("channelTitle", ""),
-                    "section_slug": section_slug,
-                    "category_slug": category_slug,
                 }
-                raw = prepare_article(raw, q_obj)
+                raw = prepare_article(raw, section_slug, category_slug, q_obj)
                 cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1

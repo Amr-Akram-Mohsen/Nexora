@@ -23,5 +23,3 @@ def detect_brands(text: str, brand_aliases: dict) -> list[str]:
                 break
 
     return list(detected)
-
-# and I already added section_slug and category_slug inside prepare_article function so

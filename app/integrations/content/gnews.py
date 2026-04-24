@@ -12,7 +12,7 @@ from app.integrations.external.api import (
     can_call_gnews, record_gnews_call,
     should_refetch, mark_fetched,
 )
-
+from app.integrations.enrichment.pipeline import prepare_article
 from app.integrations.discovery import DiscoveryManager
 
 logger = logging.getLogger(__name__)
@@ -59,8 +59,7 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 source="gnews", 
                 normalized_query=q_text
             )
-
-            from app.integrations.enrichment.pipeline import prepare_article
+            
             for raw in resp.json().get("articles", []):
                 raw["image_url"] = raw.get("image")
 

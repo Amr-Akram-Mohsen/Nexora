@@ -61,14 +61,6 @@ TAXONOMY = {
       "is_leaf": False,
       "children": [
         {
-          "name": "Men’s Perfumes",
-          "is_leaf": True
-        },
-        {
-          "name": "Women’s Perfumes",
-          "is_leaf": True
-        },
-        {
           "name": "Niche & Artisanal",
           "is_leaf": True
         },
