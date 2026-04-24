@@ -1,3 +1,4 @@
+# app/integrations/enrichment/extractor.py
 import json
 import os
 

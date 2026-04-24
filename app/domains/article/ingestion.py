@@ -28,30 +28,45 @@ def store_article(cleaned_data: dict) -> Article | None:
 
     try:
         # Resolve Section & Category IDs (Deterministic)
-        section_slugs = cleaned_data.get("section_slugs") or []
-        if not section_slugs and cleaned_data.get("section_slug"):
-            section_slugs = [cleaned_data["section_slug"]]
-            
+        section_slug = cleaned_data.get("section_slug") or "news"
+        section = Section.get_by_slug(section_slug, session=db.session)
+        if not section:
+            section = Section.get_by_slug("news", session=db.session)
+
         category_slug = cleaned_data.get("category_slug") or "uncategorized"
-        category = Category.query.filter_by(slug=category_slug).first()
+        category = Category.get_by_slug(category_slug, session=db.session)
         if not category:
-            category = Category.query.filter_by(slug="uncategorized").first()
+            category = Category.get_by_slug("uncategorized", session=db.session)
 
         # 1. Deduplication / Merging Logic
         existing_article = Article.query.filter_by(url=url).first()
         if existing_article:
             # MERGE RELATIONSHIPS: Topics
             for t_slug in (cleaned_data.get("topic_slugs") or []):
-                topic = Topic.query.filter_by(slug=t_slug).first()
-                if topic and topic not in existing_article.topics:
-                    existing_article.topics.append(topic)
+                topic = Topic.get_by_slug(t_slug, session=db.session)
+                if topic:
+                    existing_article.add_topic(topic)
             
             # MERGE RELATIONSHIPS: Brands
-            for b_name in (cleaned_data.get("brand_names") or []):
-                brand = Brand.get_or_create(b_name, db.session)
-                if brand and brand not in existing_article.brands:
-                    existing_article.brands.append(brand)
+            for b_slug in (cleaned_data.get("brand_slugs") or []):
+                brand = Brand.get_by_slug(b_slug, session=db.session)
+                if brand:
+                    existing_article.add_brand(brand)
 
+            new_facets = cleaned_data.get("facets") or {}
+            existing_facets = existing_article.facets or {}
+            # MERGE RELATIONSHIPS: Facets
+            for key, value in new_facets.items():
+                if isinstance(value, list):
+                    existing_values = set(existing_facets.get(key, []))
+                    existing_facets[key] = list(existing_values.union(value))
+                else:
+                    # overwrite if new value exists
+                    if value:
+                        existing_facets[key] = value
+
+            existing_article.facets = existing_facets
+            
             db.session.commit()
             return existing_article
 
@@ -64,9 +79,11 @@ def store_article(cleaned_data: dict) -> Article | None:
             image_url=cleaned_data.get("image_url"),
             published_at=cleaned_data.get("published_at"),
             source_name=cleaned_data.get("source_name"),
-            category_id=category.id if category else None,
+            category_id=category.id,
+            section_id=section.id,
             importance_score=cleaned_data.get("importance_score") or 0.0,
             enhanced_query=cleaned_data.get("enhanced_query"),
+            facets=cleaned_data.get("facets") or {},
             is_active=True,
         )
         db.session.add(article)
@@ -75,19 +92,13 @@ def store_article(cleaned_data: dict) -> Article | None:
         for t_slug in (cleaned_data.get("topic_slugs") or []):
             topic = Topic.query.filter_by(slug=t_slug).first()
             if topic:
-                article.topics.append(topic)
+                article.add_topic(topic)
 
         # Link Brands (Deterministic)
-        for b_name in (cleaned_data.get("brand_names") or []):
-            brand = Brand.get_or_create(b_name, db.session)
+        for b_slug in (cleaned_data.get("brand_slugs") or []):
+            brand = Brand.get_by_slug(b_slug, session=db.session)
             if brand:
-                article.brands.append(brand)
-
-        # Link Sections (Deterministic)
-        for s_slug in section_slugs:
-            section = Section.query.filter_by(slug=s_slug).first()
-            if section:
-                article.sections.append(section)
+                article.add_brand(brand)
 
         db.session.commit()
         return article

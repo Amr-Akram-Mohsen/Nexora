@@ -1,3 +1,4 @@
+# app/integrations/enrichment/engine.py
 import logging
 from .extractor import ExtractorLayer
 from .scorer import ScoringLayer
@@ -22,7 +23,7 @@ class EnrichmentEngine:
             "category": article_data.get("category_slug") or "uncategorized",
             "section_slug": article_data.get("section_slug") or "news",
             "topic_slugs": article_data.get("topic_slugs") or [],
-            "brand_names": article_data.get("brand_names") or [],
+            "brand_slugs": article_data.get("brand_slugs") or [],
             "importance_score": article_data.get("importance_score") or 0.5,
             "enhanced_query": article_data.get("enhanced_query") or ""
         }

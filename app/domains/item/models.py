@@ -36,6 +36,7 @@ class Item(db.Model):
     item_type = db.Column(db.String(50), nullable=True)  
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey("brands.id"), nullable=False)
+    section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), index=True)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
@@ -45,7 +46,7 @@ class Item(db.Model):
     
     category = db.relationship("Category", back_populates="items")
     brand = db.relationship("Brand", back_populates="items")
-    sections = db.relationship("Section", secondary=item_sections, back_populates="items")
+    section = db.relationship("Section", back_populates="items")
     topics = db.relationship("Topic", secondary=item_topics, back_populates="items")
     
     linked_articles = db.relationship(

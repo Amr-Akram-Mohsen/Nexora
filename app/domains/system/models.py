@@ -1,5 +1,5 @@
 from app.core.extensions import db
-from app.domains.article.relationships import (article_sections, article_topics, article_brands, item_sections, item_topics)
+from app.domains.article.relationships import (article_sections, article_topics, article_brands, item_sections, item_topics, article_attributes)
 from app.shared.utils.slug import generate_slug, normalize_name
 # ==================== METADATA MODELS ====================
 class Section(db.Model):
@@ -12,15 +12,17 @@ class Section(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     sort_order = db.Column(db.Integer, default=0)
     
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(Section).filter_by(slug=slug).first()
+
     articles = db.relationship(
         "Article",
-        secondary=article_sections,
-        back_populates="sections"
+        back_populates="section"
     )
     items = db.relationship(
         "Item",
-        secondary=item_sections,
-        back_populates="sections"
+        back_populates="section"
     )
 
     def __repr__(self):
@@ -32,28 +34,14 @@ class Topic(db.Model):
     name = db.Column(db.String(120), nullable=False)
     normalized_name = db.Column(db.String(150), index=True)
     slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    type = db.Column(db.String(50), nullable=True)
     is_featured = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     sort_order = db.Column(db.Integer, default=0)
 
     @staticmethod
-    def get_or_create(name: str, session):
-        normalized = normalize_name(name)
-
-        obj = session.query(Topic).filter_by(normalized_name=normalized).first()
-        if obj:
-            return obj
-
-        obj = Topic(
-            name=name,
-            slug=generate_slug(name),
-            normalized_name=normalized
-        )
-        session.add(obj)
-        return obj
-    
-    
+    def get_by_slug(slug, session):
+        return session.query(Topic).filter_by(slug=slug).first()
+        
     articles = db.relationship(
         "Article",
         secondary=article_topics,
@@ -80,22 +68,8 @@ class Brand(db.Model):
     sort_order = db.Column(db.Integer, default=0)
 
     @staticmethod
-    def get_or_create(name: str, session, industry: str = None):
-        normalized = normalize_name(name)
-
-        obj = session.query(Brand).filter_by(normalized_name=normalized).first()
-        if obj:
-            return obj
-
-        obj = Brand(
-            name=name,
-            slug=generate_slug(name),
-            normalized_name=normalized,
-            industry=industry or "general"
-        )
-        session.add(obj)
-        return obj
-    
+    def get_by_slug(slug, session):
+        return session.query(Brand).filter_by(slug=slug).first()
     
     articles = db.relationship(
         "Article",
@@ -123,10 +97,10 @@ class Category(db.Model):
     )
     is_active = db.Column(db.Boolean, default=True)
     sort_order = db.Column(db.Integer, default=0)
-    is_leaf = db.Column(db.Boolean, default=False, index=True)
+    is_leaf = db.Column(db.Boolean, default=True, index=True)
 
     @staticmethod
-    def create(name: str, parent=None, is_leaf=False):
+    def create(name: str, parent=None, is_leaf=True):
         return Category(
             name=name,
             slug=generate_slug(name),
@@ -155,3 +129,49 @@ class Category(db.Model):
     
     def __repr__(self):
         return f"<Category {self.slug}>"
+
+
+
+class GenderFacet(db.Model):
+    __tablename__ = "gender_facets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+
+    articles = db.relationship("Article", back_populates="gender")
+
+class IntentFacet(db.Model):
+    __tablename__ = "intent_facets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    slug = db.Column(db.String(80), unique=True, nullable=False)
+
+    articles = db.relationship("Article", back_populates="intent")
+
+class PriceTierFacet(db.Model):
+    __tablename__ = "price_tier_facets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+
+    articles = db.relationship("Article", back_populates="price_tier")
+
+class AttributeFacet(db.Model):
+    __tablename__ = "attributes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    slug = db.Column(db.String(80), unique=True, nullable=False)
+
+
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
+    category = db.relationship("Category")
+    
+    articles = db.relationship(
+        "Article",
+        secondary=article_attributes,
+        back_populates="attributes"
+    )

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from app.core.extensions import db
-from .relationships import (article_sections, article_topics, article_brands, article_items)
+from .relationships import (article_topics, article_brands, article_items, article_attributes)
 
 class Article(db.Model):
     __tablename__ = "articles"
@@ -23,12 +23,30 @@ class Article(db.Model):
     importance_score = db.Column(db.Float, default=0, index=True)
     enhanced_query = db.Column(db.Text)
 
+    gender_id = db.Column(db.Integer, db.ForeignKey("gender_facets.id"))
+    intent_id = db.Column(db.Integer, db.ForeignKey("intent_facets.id"))
+    price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier_facets.id"))
+
+    gender = db.relationship("GenderFacet", back_populates="articles")
+    intent = db.relationship("IntentFacet", back_populates="articles")
+    price_tier = db.relationship("PriceTierFacet", back_populates="articles")
+
+    attributes = db.relationship(
+        "AttributeFacet",
+        secondary=article_attributes,
+        back_populates="articles"
+    )
+
+
     topics = db.relationship("Topic", secondary=article_topics, back_populates="articles")
-    sections = db.relationship("Section", secondary=article_sections, back_populates="articles")
     brands = db.relationship("Brand", secondary=article_brands, back_populates="articles")
     
+    facets = db.Column(db.JSON, nullable=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
+    section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)
+
     category = db.relationship("Category", back_populates="articles")
+    section = db.relationship("Section", back_populates="articles")
     
     # Products this article reviews / mentions
     linked_items = db.relationship(
@@ -61,17 +79,32 @@ class Article(db.Model):
     )
 
     __table_args__ = (
+        # Core filters
         db.Index("idx_published_at", "published_at"),
-        db.Index("idx_article_category_published", "category_id", "published_at"),
         db.Index("idx_article_active", "is_active"),
         db.Index("idx_article_views", "view_count"),
-        db.Index("idx_article_active_published", "is_active", "published_at"),
 
-        db.Index("ix_article_category_active_published",
-                "category_id", "is_active", "published_at"),
+        db.Index("ix_article_importance", "importance_score"),
 
-        db.Index("ix_article_brand_lookup",
-                "id", "is_active", "importance_score"),
+        # Core filters
+        db.Index("ix_articles_section", "section_id"),
+        db.Index("ix_articles_category", "category_id"),
+        
+        # Feed queries
+        db.Index("idx_article_category_published", "category_id", "published_at"),
+
+        # Facets
+        db.Index("ix_articles_gender", "gender_id"),
+        db.Index("ix_articles_intent", "intent_id"),
+        db.Index("ix_articles_price_tier", "price_tier_id"),
+
+        # Advanced filtering
+        db.Index("ix_articles_category_intent_date",
+            "category_id", "intent_id", "published_at"),
+        db.Index("ix_articles_section_date",
+            "section_id", "published_at"),
+        db.Index("ix_articles_active_published", "is_active", "published_at"),
+
         db.UniqueConstraint('source_name', 'title', name='uq_articles_source_title'),
     )
 
@@ -91,9 +124,6 @@ class Article(db.Model):
         return f"<Article {self.title[:60]}>"
 
     # ---------------- Convenience helpers ----------------
-    def add_section(self, section_obj):
-        if section_obj not in self.sections:
-            self.sections.append(section_obj)
     def add_brand(self, brand_obj):
         if brand_obj not in self.brands:
             self.brands.append(brand_obj)
@@ -104,4 +134,6 @@ class Article(db.Model):
         if item_obj not in self.linked_items:
             self.linked_items.append(item_obj)
 
-
+    def add_attribute(self, attr_obj):
+        if attr_obj not in self.attributes:
+            self.attributes.append(attr_obj)

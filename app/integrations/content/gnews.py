@@ -1,4 +1,4 @@
-# app/scrapers/gnews_fetcher.py
+# app/integrations/content/gnews.py
 """
 GNews.io fetcher — 100 requests/day free tier.
 Advantage: has country= filter (sa / ae) and lang=ar for regional data.
@@ -60,13 +60,12 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 normalized_query=q_text
             )
 
+            from app.integrations.enrichment.pipeline import prepare_article
             for raw in resp.json().get("articles", []):
                 raw["image_url"] = raw.get("image")
-                raw["section_slug"] = section_slug
-                raw["category_slug"] = category_slug
-                raw["topic_slugs"] = q_obj.get("topics", [])
-                raw["brand_names"] = q_obj.get("brands", [])
-                
+
+                raw = prepare_article(raw, q_obj)                
+
                 cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1

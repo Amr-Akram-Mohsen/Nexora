@@ -1,4 +1,4 @@
-# app/scrapers/newsapi.py
+# app/integrations/content/newsapi.py
 """
 NewsAPI.org fetcher — 100 requests/day free tier.
 Get a free key at: https://newsapi.org/register
@@ -59,13 +59,10 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                 normalized_query=q_text
             )
 
+            from app.integrations.enrichment.pipeline import prepare_article
             for raw in resp.json().get("articles", []):
-                # Pass deterministic classification
-                raw["section_slug"] = section_slug
-                raw["category_slug"] = category_slug
-                raw["topic_slugs"] = q_obj.get("topics", [])
-                raw["brand_names"] = q_obj.get("brands", [])
-                
+                raw = prepare_article(raw, section_slug, category_slug, q_obj)
+                                                
                 cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1

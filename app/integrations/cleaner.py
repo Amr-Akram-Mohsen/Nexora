@@ -1,4 +1,4 @@
-# app/scrapers/cleaner.py
+# app/integrations/cleaner.py
 """
 Universal article cleaner.
 Every source (RSS, NewsAPI, GNews, YouTube, Reddit) passes its raw data
@@ -213,6 +213,11 @@ def clean_article_data(raw: dict) -> dict | None:
         "image_url":     image_url,
         "published_at":  published_at,
         "source_name":   source_name,
-        # Hints from scraper (optional)
-        "category_slug": raw.get("category_slug") or "",
+
+        # Pass-through classification (CRITICAL)
+        "section_slug": raw.get("section_slug"),
+        "category_slug": raw.get("category_slug"),
+        "topic_slugs": raw.get("topic_slugs", []),
+        "brand_slugs": raw.get("brand_slugs", []),
+        "facets": raw.get("facets", {}),
     }

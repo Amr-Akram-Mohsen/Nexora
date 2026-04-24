@@ -1,4 +1,4 @@
-{
+TAXONOMY = {
   "sections": [
     {
       "name": "News",
@@ -24,85 +24,85 @@
   "categories": [
     {
       "name": "Electronics",
-      "is_leaf": false,
+      "is_leaf": False,
       "children": [
         {
           "name": "Smartphones",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Laptops",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Tablets",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Smartwatches",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Earbuds",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Headphones",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Cameras",
-          "is_leaf": true
+          "is_leaf": True
         }
       ]
     },
     {
       "name": "Perfumes",
-      "is_leaf": false,
+      "is_leaf": False,
       "children": [
         {
           "name": "Men’s Perfumes",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Women’s Perfumes",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Niche & Artisanal",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Oud & Oriental",
-          "is_leaf": true
+          "is_leaf": True
         }
       ]
     },
     {
       "name": "Accessories",
-      "is_leaf": false,
+      "is_leaf": False,
       "children": [
         {
           "name": "Watches",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Bags",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Sunglasses",
-          "is_leaf": true
+          "is_leaf": True
         },
         {
           "name": "Jewelry",
-          "is_leaf": true
+          "is_leaf": True
         }
       ]
     },
     {
       "name": "Uncategorized",
-      "is_leaf": true
+      "is_leaf": True
     }
   ],
   "topics": [

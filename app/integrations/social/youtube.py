@@ -1,4 +1,4 @@
-# app/scrapers/youtube_fetcher.py
+# app/integrations/social/youtube.py
 """
 YouTube Data API v3 fetcher — specifically for the "reviews" section.
 Quota: 10,000 units/day. 1 search = 100 units.
@@ -64,7 +64,7 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 source="youtube", 
                 normalized_query=query
             )
-
+            from app.integrations.enrichment.pipeline import prepare_article
             for item in resp.json().get("items", []):
                 video_id = item.get("id", {}).get("videoId")
                 if not video_id:
@@ -79,9 +79,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                     "source_name":  snippet.get("channelTitle", ""),
                     "section_slug": section_slug,
                     "category_slug": category_slug,
-                    "topic_slugs":  q_obj.get("topics", []),
-                    "brand_names":  q_obj.get("brands", []),
                 }
+                raw = prepare_article(raw, q_obj)
                 cleaned = clean_article_data(raw)
                 if cleaned and store_article(cleaned):
                     stored += 1

@@ -1,4 +1,4 @@
-# app/scrapers/runner.py
+# app/jobs/tasks/content/fetch_articles.py
 """
 Orchestrates all scraper/discovery jobs.
 Balanced discovery across Electronics, Perfumes, and Accessories.
@@ -53,8 +53,6 @@ def run_article_fetch():
         logger.info("[Runner] RSS done — %d articles stored", count)
     except Exception:
         logger.exception("[Runner] RSS fetch failed")
-
-
 
 def run_reddit_fetch():
     """Fetch community posts from diverse subreddits."""

@@ -12,12 +12,10 @@ from app.core.extensions import db
 from app.shared.utils.slug import generate_slug, normalize_name
 
 # Import ALL models to ensure db.drop_all() covers every table
-from app.domains.user.models import User
-from app.domains.article.models import Article
-from app.domains.item.models import Item, Store, ItemStoreLink
-from app.domains.system.models import Section, Category, Topic, Brand
-from app.domains.interaction.models import Comment, Reaction, View, Save, ItemClick
-from app.domains.external.models import LastAPIFetch, APIUsage
+from app.domains.system.models import (
+    Section, Category, Topic, Brand,
+    GenderFacet, IntentFacet, PriceTierFacet, AttributeFacet
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +50,14 @@ def seed_db():
                 name=s_data["name"],
                 slug=slug,
                 description=s_data["description"],
-                allowed_filters=["brand", "topic", "category"]
+                allowed_filters=[
+                    "brand",
+                    "topic",
+                    "price_tier",
+                    "intent",
+                    "gender",
+                    "attributes"
+                ]
             )
             db.session.add(section)
             logger.info(f"[Seeder]   + Section: {s_data['name']}")
@@ -88,18 +93,74 @@ def seed_db():
 
         # 4. Seed Topics
         for t_data in taxonomy.get("topics", []):
-            slug = generate_slug(t_data["name"])
             topic = Topic(
                 name=t_data["name"],
-                slug=slug,
-                type=t_data.get("type", "intent"),
+                slug=generate_slug(t_data["name"]),
                 normalized_name=normalize_name(t_data["name"]),
-                is_active=True
             )
             db.session.add(topic)
             logger.info(f"[Seeder]   + Topic: {t_data['name']}")
 
         db.session.commit()
+
+        # 5. Seed Brands
+        for b_data in taxonomy.get("brands", []):
+            brand = Brand(
+                name=b_data["name"],
+                slug=generate_slug(b_data["name"]),
+                normalized_name=normalize_name(b_data["name"]),
+            )
+            db.session.add(brand)
+            logger.info(f"[Seeder]   + Brand: {b_data['name']}")
+        
+        db.session.commit()
+
+        # 6. Seed Facets
+        facets = taxonomy.get("facets", {})
+
+        # Gender
+        for g in facets.get("gender", []):
+            db.session.add(GenderFacet(
+                name=g["name"],
+                slug=generate_slug(g["name"])
+            ))
+            logger.info(f"[Seeder] [Facets]   + Gender: {g['name']}")
+
+        # Intent
+        for i in facets.get("intent", []):
+            db.session.add(IntentFacet(
+                name=i["name"],
+                slug=generate_slug(i["name"])
+            ))
+            logger.info(f"[Seeder] [Facets]   + Intent: {i['name']}")
+
+        # Price Tier
+        for p in facets.get("price_tier", []):
+            db.session.add(PriceTierFacet(
+                name=p["name"],
+                slug=generate_slug(p["name"])
+            ))
+            logger.info(f"[Seeder] [Facets]   + Price Tier: {p['name']}")
+
+        # Attributes
+        for attr in facets.get("attributes", []):
+            category_obj = None
+
+            if attr.get("category"):
+                category_obj = Category.query.filter_by(
+                    normalized_name=normalize_name(attr["category"])
+                ).first()
+
+            db.session.add(AttributeFacet(
+                name=attr["name"],
+                slug=generate_slug(attr["name"]),
+                category_id=category_obj.id
+            ))
+            logger.info(f"[Seeder] [Facets]   + Attributes: {attr['name']}")
+
+        db.session.commit()
+
+
         logger.info("[Seeder] Seed complete! Database is now clean and taxonomy is active.")
     except Exception:
         db.session.rollback()
