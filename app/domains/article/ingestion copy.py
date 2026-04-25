@@ -86,48 +86,55 @@ def _apply_single_facets(article: Article, data: dict):
             article.price_tier_id = price_tier.id
 
 
-def ingest_article_stream(article: Article, data: dict) -> Article | None:
+def ingest_article_stream(raw_data: dict) -> Article | None:
     """
-    Update relationships (Topics, Brands, Sources, Facets) for an existing article.
-    Used when an article is found by URL in the scraper loop to avoid redundant scraping.
+    High-level orchestrator for raw article data from scrapers.
+    1. Checks if article exists (deduplication).
+    2. If exists: MERGES relationships (topics, brands, sources) from raw data.
+    3. If new: Cleans/Scrapes the article and creates a new record.
     """
-    try:
-        _apply_many_to_many(article, data)
-        _apply_single_facets(article, data)
-        db.session.commit()
-        return article
-    except Exception:
-        db.session.rollback()
-        logger.exception("[Ingestion] Error merging data into existing article: %s", article.url)
+    url = (raw_data.get("url") or "").strip()
+    if not url:
         return None
 
-
-def store_article(cleaned_data: dict) -> Article | None:
-    """
-    Create a new Article and link its relationships.
-    Used for fresh articles that have passed through clean_article_data().
-    """
-    url = cleaned_data.get("url")
     try:
-        section, category = _resolve_taxonomy(cleaned_data)
+        # 1. Deduplication Check
+        
+        existing_article = Article.query.filter_by(url=url).first()
+        if existing_article:
+            # Merging logic: Update relationships without re-scraping
+            _apply_many_to_many(existing_article, raw_data)
+            _apply_single_facets(existing_article, raw_data)
+            db.session.commit()
+            return existing_article
 
+        # 2. It's New: Full cleaning and scraping
+        cleaned = clean_article_data(raw_data, skip_scrape=False)
+        if not cleaned:
+            return None
+
+        # 3. Resolve Taxonomy
+        section, category = _resolve_taxonomy(cleaned)
+
+        # 4. Create New Article
         article = Article(
-            title=cleaned_data.get("title"),
-            description=cleaned_data.get("description"),
-            content=cleaned_data.get("content"),
+            title=cleaned.get("title"),
+            description=cleaned.get("description"),
+            content=cleaned.get("content"),
             url=url,
-            image_url=cleaned_data.get("image_url"),
-            published_at=cleaned_data.get("published_at"),
+            image_url=cleaned.get("image_url"),
+            published_at=cleaned.get("published_at"),
             category_id=category.id,
             section_id=section.id,
-            importance_score=cleaned_data.get("importance_score") or 0.0,
-            enhanced_query=cleaned_data.get("enhanced_query"),
-            extra_metadata={}, 
+            importance_score=cleaned.get("importance_score") or 0.0,
+            enhanced_query=cleaned.get("enhanced_query"),
+            metadata={},  # metadata starts empty as requested
             is_active=True,
         )
         
-        _apply_many_to_many(article, cleaned_data)
-        _apply_single_facets(article, cleaned_data)
+        # Apply all relationships
+        _apply_many_to_many(article, cleaned)
+        _apply_single_facets(article, cleaned)
         
         db.session.add(article)
         db.session.commit()
@@ -138,27 +145,9 @@ def store_article(cleaned_data: dict) -> Article | None:
         return Article.query.filter_by(url=url).first()
     except Exception:
         db.session.rollback()
-        logger.exception("[Ingestion] Critical error storing new article: %s", url)
+        logger.exception("[Ingestion] Critical error in stream: %s", url)
         return None
 
-def smart_ingest(raw_data: dict) -> Article | None:
-    """
-    The universal entry point for all scrapers.
-    Encapsulates existence checks, conditional scraping, and storage.
-    """
-    url = raw_data.get("url")
-    if not url:
-        return None
-    # 1. Existence check (Deduplication)
-    article = Article.get_by_url(url, db.session)
-    if article:
-        # Merge raw metadata (topics, brands, etc.) without re-scraping
-        return ingest_article_stream(article, raw_data)
-    
-    # 2. Fresh Article: Full cleaning (including network scraping)
-    cleaned = clean_article_data(raw_data, skip_scrape=False)
-    if not cleaned:
-        return None
-        
-    # 3. Create and store
-    return store_article(cleaned)
+# Deprecated: alias for backward compatibility until scrapers are updated
+def store_article(cleaned_data: dict) -> Article | None:
+    return ingest_article_stream(cleaned_data)

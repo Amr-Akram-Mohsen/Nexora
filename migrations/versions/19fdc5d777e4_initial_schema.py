@@ -1,8 +1,8 @@
-"""initial clean schema
+"""initial schema
 
-Revision ID: 447f355e8030
+Revision ID: 19fdc5d777e4
 Revises: 
-Create Date: 2026-04-12 21:37:54.936260
+Create Date: 2026-04-25 04:25:53.595450
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '447f355e8030'
+revision = '19fdc5d777e4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,25 +29,37 @@ def upgrade():
     op.create_table('brands',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=False),
+    sa.Column('normalized_name', sa.String(length=150), nullable=True),
     sa.Column('slug', sa.String(length=150), nullable=False),
+    sa.Column('industry', sa.String(length=50), nullable=True),
     sa.Column('is_featured', sa.Boolean(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('sort_order', sa.Integer(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('slug')
+    sa.PrimaryKeyConstraint('id')
     )
+    with op.batch_alter_table('brands', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_brands_industry'), ['industry'], unique=False)
+        batch_op.create_index(batch_op.f('ix_brands_normalized_name'), ['normalized_name'], unique=False)
+        batch_op.create_index(batch_op.f('ix_brands_slug'), ['slug'], unique=True)
+
     op.create_table('categories',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('normalized_name', sa.String(length=150), nullable=True),
     sa.Column('slug', sa.String(length=120), nullable=False),
     sa.Column('parent_id', sa.Integer(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('sort_order', sa.Integer(), nullable=True),
+    sa.Column('is_leaf', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['parent_id'], ['categories.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('slug')
+    sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('contact_message',
+    with op.batch_alter_table('categories', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_categories_is_leaf'), ['is_leaf'], unique=False)
+        batch_op.create_index(batch_op.f('ix_categories_normalized_name'), ['normalized_name'], unique=False)
+        batch_op.create_index(batch_op.f('ix_categories_slug'), ['slug'], unique=True)
+
+    op.create_table('contact_messages',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
@@ -58,16 +70,50 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('contact_message', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_contact_message_created_at'), ['created_at'], unique=False)
+    with op.batch_alter_table('contact_messages', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_contact_messages_created_at'), ['created_at'], unique=False)
 
+    op.create_table('gender_facets',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=50), nullable=False),
+    sa.Column('slug', sa.String(length=50), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('slug')
+    )
+    op.create_table('intent_facets',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=80), nullable=False),
+    sa.Column('slug', sa.String(length=80), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('slug')
+    )
     op.create_table('last_api_fetch',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('section', sa.String(length=100), nullable=False),
     sa.Column('query_text', sa.Text(), nullable=False),
+    sa.Column('normalized_query', sa.String(length=255), nullable=True),
     sa.Column('last_fetched_at', sa.DateTime(), nullable=False),
+    sa.Column('category', sa.String(length=100), nullable=True),
+    sa.Column('source', sa.String(length=50), nullable=True),
+    sa.Column('failure_count', sa.Integer(), nullable=True),
+    sa.Column('last_failed_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('section', 'query_text', name='unique_fetch_per_query')
+    )
+    with op.batch_alter_table('last_api_fetch', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_last_api_fetch_category'), ['category'], unique=False)
+        batch_op.create_index(batch_op.f('ix_last_api_fetch_normalized_query'), ['normalized_query'], unique=False)
+        batch_op.create_index(batch_op.f('ix_last_api_fetch_source'), ['source'], unique=False)
+
+    op.create_table('price_tier_facets',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=50), nullable=False),
+    sa.Column('slug', sa.String(length=50), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('slug')
     )
     op.create_table('sections',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -78,9 +124,25 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('sort_order', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name'),
-    sa.UniqueConstraint('slug')
+    sa.UniqueConstraint('name')
     )
+    with op.batch_alter_table('sections', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_sections_slug'), ['slug'], unique=True)
+
+    op.create_table('sources',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('slug', sa.String(length=100), nullable=False),
+    sa.Column('domain', sa.String(length=255), nullable=False),
+    sa.Column('logo_url', sa.Text(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('trust_score', sa.Float(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('sources', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_sources_domain'), ['domain'], unique=True)
+        batch_op.create_index(batch_op.f('ix_sources_slug'), ['slug'], unique=True)
+
     op.create_table('stores',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -98,23 +160,31 @@ def upgrade():
     op.create_table('topics',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
+    sa.Column('normalized_name', sa.String(length=150), nullable=True),
     sa.Column('slug', sa.String(length=120), nullable=False),
-    sa.Column('type', sa.String(length=50), nullable=True),
     sa.Column('is_featured', sa.Boolean(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('sort_order', sa.Integer(), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('slug')
+    sa.PrimaryKeyConstraint('id')
     )
+    with op.batch_alter_table('topics', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_topics_normalized_name'), ['normalized_name'], unique=False)
+        batch_op.create_index(batch_op.f('ix_topics_slug'), ['slug'], unique=True)
+
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=150), nullable=False),
-    sa.Column('password_hash', sa.String(length=128), nullable=False),
-    sa.Column('google_id', sa.String(length=120), nullable=True),
-    sa.Column('provider', sa.String(length=50), nullable=True),
+    sa.Column('name', sa.String(length=120), nullable=True),
+    sa.Column('password_hash', sa.Text(), nullable=False),
+    sa.Column('google_id', sa.Text(), nullable=True),
+    sa.Column('provider', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.Column('is_verified', sa.Boolean(), nullable=False),
+    sa.Column('verification_token', sa.String(length=255), nullable=True),
+    sa.Column('reset_token', sa.String(length=255), nullable=True),
+    sa.Column('reset_token_expires_at', sa.DateTime(), nullable=True),
     sa.CheckConstraint('(google_id IS NULL AND provider IS NULL) OR (google_id IS NOT NULL AND provider IS NOT NULL)', name='ck_google_user'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
@@ -126,8 +196,6 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('content', sa.Text(), nullable=True),
     sa.Column('url', sa.Text(), nullable=False),
-    sa.Column('source_id', sa.String(length=120), nullable=True),
-    sa.Column('source_name', sa.String(length=200), nullable=True),
     sa.Column('published_at', sa.DateTime(), nullable=True),
     sa.Column('retrieved_at', sa.DateTime(), nullable=True),
     sa.Column('image_url', sa.Text(), nullable=True),
@@ -136,16 +204,49 @@ def upgrade():
     sa.Column('view_count', sa.Integer(), nullable=True),
     sa.Column('card_type', sa.TEXT(), nullable=True),
     sa.Column('last_matched_at', sa.DateTime(), nullable=True),
+    sa.Column('importance_score', sa.Float(), nullable=True),
+    sa.Column('enhanced_query', sa.Text(), nullable=True),
+    sa.Column('gender_id', sa.Integer(), nullable=True),
+    sa.Column('intent_id', sa.Integer(), nullable=True),
+    sa.Column('price_tier_id', sa.Integer(), nullable=True),
+    sa.Column('extra_metadata', sa.JSON(), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.Column('section_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['gender_id'], ['gender_facets.id'], ),
+    sa.ForeignKeyConstraint(['intent_id'], ['intent_facets.id'], ),
+    sa.ForeignKeyConstraint(['price_tier_id'], ['price_tier_facets.id'], ),
+    sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('source_name', 'title', name='uq_articles_source_title'),
     sa.UniqueConstraint('url')
     )
     with op.batch_alter_table('articles', schema=None) as batch_op:
+        batch_op.create_index('idx_article_active', ['is_active'], unique=False)
+        batch_op.create_index('idx_article_category_published', ['category_id', 'published_at'], unique=False)
+        batch_op.create_index('idx_article_views', ['view_count'], unique=False)
         batch_op.create_index('idx_published_at', ['published_at'], unique=False)
+        batch_op.create_index('ix_article_importance', ['importance_score'], unique=False)
+        batch_op.create_index('ix_articles_active_published', ['is_active', 'published_at'], unique=False)
+        batch_op.create_index('ix_articles_category', ['category_id'], unique=False)
+        batch_op.create_index('ix_articles_category_intent_date', ['category_id', 'intent_id', 'published_at'], unique=False)
+        batch_op.create_index('ix_articles_gender', ['gender_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_articles_importance_score'), ['importance_score'], unique=False)
+        batch_op.create_index('ix_articles_intent', ['intent_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_articles_last_matched_at'), ['last_matched_at'], unique=False)
+        batch_op.create_index('ix_articles_price_tier', ['price_tier_id'], unique=False)
+        batch_op.create_index('ix_articles_section', ['section_id'], unique=False)
+        batch_op.create_index('ix_articles_section_date', ['section_id', 'published_at'], unique=False)
 
+    op.create_table('attributes',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=80), nullable=False),
+    sa.Column('slug', sa.String(length=80), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name'),
+    sa.UniqueConstraint('slug')
+    )
     op.create_table('comments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -171,9 +272,12 @@ def upgrade():
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('slug', sa.String(length=220), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('rating', sa.Float(), nullable=True),
+    sa.Column('review_count', sa.Integer(), nullable=True),
     sa.Column('item_type', sa.String(length=50), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('brand_id', sa.Integer(), nullable=False),
+    sa.Column('section_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('comment_count', sa.Integer(), nullable=True),
     sa.Column('view_count', sa.Integer(), nullable=True),
@@ -182,12 +286,16 @@ def upgrade():
     sa.Column('searchable_attributes', sa.JSON(), nullable=True),
     sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('slug')
     )
     with op.batch_alter_table('items', schema=None) as batch_op:
+        batch_op.create_index('ix_items_brand_category', ['brand_id', 'category_id'], unique=False)
+        batch_op.create_index('ix_items_category_created', ['category_id', 'created_at'], unique=False)
         batch_op.create_index(batch_op.f('ix_items_created_at'), ['created_at'], unique=False)
         batch_op.create_index('ix_items_slug', ['slug'], unique=False)
+        batch_op.create_index('ix_items_type_created', ['item_type', 'created_at'], unique=False)
 
     op.create_table('newsletter_subscribers',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -262,6 +370,17 @@ def upgrade():
     with op.batch_alter_table('views', schema=None) as batch_op:
         batch_op.create_index('idx_views_target', ['target_type', 'target_id'], unique=False)
 
+    op.create_table('article_attributes',
+    sa.Column('article_id', sa.Integer(), nullable=False),
+    sa.Column('attribute_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
+    sa.ForeignKeyConstraint(['attribute_id'], ['attributes.id'], ),
+    sa.PrimaryKeyConstraint('article_id', 'attribute_id')
+    )
+    with op.batch_alter_table('article_attributes', schema=None) as batch_op:
+        batch_op.create_index('ix_article_attributes_article', ['article_id'], unique=False)
+        batch_op.create_index('ix_article_attributes_attribute', ['attribute_id'], unique=False)
+
     op.create_table('article_brands',
     sa.Column('article_id', sa.Integer(), nullable=False),
     sa.Column('brand_id', sa.Integer(), nullable=False),
@@ -269,6 +388,10 @@ def upgrade():
     sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
     sa.PrimaryKeyConstraint('article_id', 'brand_id')
     )
+    with op.batch_alter_table('article_brands', schema=None) as batch_op:
+        batch_op.create_index('ix_article_brands_article', ['article_id'], unique=False)
+        batch_op.create_index('ix_article_brands_brand', ['brand_id'], unique=False)
+
     op.create_table('article_items',
     sa.Column('article_id', sa.Integer(), nullable=False),
     sa.Column('item_id', sa.Integer(), nullable=False),
@@ -276,13 +399,18 @@ def upgrade():
     sa.ForeignKeyConstraint(['item_id'], ['items.id'], ),
     sa.PrimaryKeyConstraint('article_id', 'item_id')
     )
-    op.create_table('article_sections',
+    op.create_table('article_sources',
     sa.Column('article_id', sa.Integer(), nullable=False),
-    sa.Column('section_id', sa.Integer(), nullable=False),
+    sa.Column('source_id', sa.Integer(), nullable=False),
+    sa.Column('url', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
-    sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
-    sa.PrimaryKeyConstraint('article_id', 'section_id')
+    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
+    sa.PrimaryKeyConstraint('article_id', 'source_id')
     )
+    with op.batch_alter_table('article_sources', schema=None) as batch_op:
+        batch_op.create_index('ix_article_sources_article', ['article_id'], unique=False)
+        batch_op.create_index('ix_article_sources_source', ['source_id'], unique=False)
+
     op.create_table('article_topics',
     sa.Column('article_id', sa.Integer(), nullable=False),
     sa.Column('topic_id', sa.Integer(), nullable=False),
@@ -290,13 +418,10 @@ def upgrade():
     sa.ForeignKeyConstraint(['topic_id'], ['topics.id'], ),
     sa.PrimaryKeyConstraint('article_id', 'topic_id')
     )
-    op.create_table('item_sections',
-    sa.Column('item_id', sa.Integer(), nullable=False),
-    sa.Column('section_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['item_id'], ['items.id'], ),
-    sa.ForeignKeyConstraint(['section_id'], ['sections.id'], ),
-    sa.PrimaryKeyConstraint('item_id', 'section_id')
-    )
+    with op.batch_alter_table('article_topics', schema=None) as batch_op:
+        batch_op.create_index('ix_article_topics_article', ['article_id'], unique=False)
+        batch_op.create_index('ix_article_topics_topic', ['topic_id'], unique=False)
+
     op.create_table('item_specifications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('item_id', sa.Integer(), nullable=False),
@@ -315,6 +440,10 @@ def upgrade():
     sa.ForeignKeyConstraint(['topic_id'], ['topics.id'], ),
     sa.PrimaryKeyConstraint('item_id', 'topic_id')
     )
+    with op.batch_alter_table('item_topics', schema=None) as batch_op:
+        batch_op.create_index('ix_item_topics_item', ['item_id'], unique=False)
+        batch_op.create_index('ix_item_topics_topic', ['topic_id'], unique=False)
+
     op.create_table('item_variants',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('item_id', sa.Integer(), nullable=False),
@@ -331,6 +460,7 @@ def upgrade():
     sa.UniqueConstraint('sku')
     )
     with op.batch_alter_table('item_variants', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_item_variants_price'), ['price'], unique=False)
         batch_op.create_index('ix_variant_default', ['item_id', 'is_default'], unique=False)
         batch_op.create_index('ix_variant_item', ['item_id'], unique=False)
 
@@ -426,18 +556,39 @@ def downgrade():
     with op.batch_alter_table('item_variants', schema=None) as batch_op:
         batch_op.drop_index('ix_variant_item')
         batch_op.drop_index('ix_variant_default')
+        batch_op.drop_index(batch_op.f('ix_item_variants_price'))
 
     op.drop_table('item_variants')
+    with op.batch_alter_table('item_topics', schema=None) as batch_op:
+        batch_op.drop_index('ix_item_topics_topic')
+        batch_op.drop_index('ix_item_topics_item')
+
     op.drop_table('item_topics')
     with op.batch_alter_table('item_specifications', schema=None) as batch_op:
         batch_op.drop_index('ix_item_specs_item')
 
     op.drop_table('item_specifications')
-    op.drop_table('item_sections')
+    with op.batch_alter_table('article_topics', schema=None) as batch_op:
+        batch_op.drop_index('ix_article_topics_topic')
+        batch_op.drop_index('ix_article_topics_article')
+
     op.drop_table('article_topics')
-    op.drop_table('article_sections')
+    with op.batch_alter_table('article_sources', schema=None) as batch_op:
+        batch_op.drop_index('ix_article_sources_source')
+        batch_op.drop_index('ix_article_sources_article')
+
+    op.drop_table('article_sources')
     op.drop_table('article_items')
+    with op.batch_alter_table('article_brands', schema=None) as batch_op:
+        batch_op.drop_index('ix_article_brands_brand')
+        batch_op.drop_index('ix_article_brands_article')
+
     op.drop_table('article_brands')
+    with op.batch_alter_table('article_attributes', schema=None) as batch_op:
+        batch_op.drop_index('ix_article_attributes_attribute')
+        batch_op.drop_index('ix_article_attributes_article')
+
+    op.drop_table('article_attributes')
     with op.batch_alter_table('views', schema=None) as batch_op:
         batch_op.drop_index('idx_views_target')
 
@@ -456,29 +607,76 @@ def downgrade():
     op.drop_table('reactions')
     op.drop_table('newsletter_subscribers')
     with op.batch_alter_table('items', schema=None) as batch_op:
+        batch_op.drop_index('ix_items_type_created')
         batch_op.drop_index('ix_items_slug')
         batch_op.drop_index(batch_op.f('ix_items_created_at'))
+        batch_op.drop_index('ix_items_category_created')
+        batch_op.drop_index('ix_items_brand_category')
 
     op.drop_table('items')
     with op.batch_alter_table('comments', schema=None) as batch_op:
         batch_op.drop_index('idx_comments_target')
 
     op.drop_table('comments')
+    op.drop_table('attributes')
     with op.batch_alter_table('articles', schema=None) as batch_op:
+        batch_op.drop_index('ix_articles_section_date')
+        batch_op.drop_index('ix_articles_section')
+        batch_op.drop_index('ix_articles_price_tier')
         batch_op.drop_index(batch_op.f('ix_articles_last_matched_at'))
+        batch_op.drop_index('ix_articles_intent')
+        batch_op.drop_index(batch_op.f('ix_articles_importance_score'))
+        batch_op.drop_index('ix_articles_gender')
+        batch_op.drop_index('ix_articles_category_intent_date')
+        batch_op.drop_index('ix_articles_category')
+        batch_op.drop_index('ix_articles_active_published')
+        batch_op.drop_index('ix_article_importance')
         batch_op.drop_index('idx_published_at')
+        batch_op.drop_index('idx_article_views')
+        batch_op.drop_index('idx_article_category_published')
+        batch_op.drop_index('idx_article_active')
 
     op.drop_table('articles')
     op.drop_table('users')
+    with op.batch_alter_table('topics', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_topics_slug'))
+        batch_op.drop_index(batch_op.f('ix_topics_normalized_name'))
+
     op.drop_table('topics')
     op.drop_table('stores')
-    op.drop_table('sections')
-    op.drop_table('last_api_fetch')
-    with op.batch_alter_table('contact_message', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_contact_message_created_at'))
+    with op.batch_alter_table('sources', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_sources_slug'))
+        batch_op.drop_index(batch_op.f('ix_sources_domain'))
 
-    op.drop_table('contact_message')
+    op.drop_table('sources')
+    with op.batch_alter_table('sections', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_sections_slug'))
+
+    op.drop_table('sections')
+    op.drop_table('price_tier_facets')
+    with op.batch_alter_table('last_api_fetch', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_last_api_fetch_source'))
+        batch_op.drop_index(batch_op.f('ix_last_api_fetch_normalized_query'))
+        batch_op.drop_index(batch_op.f('ix_last_api_fetch_category'))
+
+    op.drop_table('last_api_fetch')
+    op.drop_table('intent_facets')
+    op.drop_table('gender_facets')
+    with op.batch_alter_table('contact_messages', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_contact_messages_created_at'))
+
+    op.drop_table('contact_messages')
+    with op.batch_alter_table('categories', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_categories_slug'))
+        batch_op.drop_index(batch_op.f('ix_categories_normalized_name'))
+        batch_op.drop_index(batch_op.f('ix_categories_is_leaf'))
+
     op.drop_table('categories')
+    with op.batch_alter_table('brands', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_brands_slug'))
+        batch_op.drop_index(batch_op.f('ix_brands_normalized_name'))
+        batch_op.drop_index(batch_op.f('ix_brands_industry'))
+
     op.drop_table('brands')
     op.drop_table('api_usage')
     # ### end Alembic commands ###

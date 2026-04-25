@@ -4,7 +4,7 @@ from ..models import Category, Section, Brand, Topic
 # from app.domains.system.models import Category, Section, Brand, Topic
 from sqlalchemy import func
 from app.core.extensions import cache
-from app.domains.article.relationships import article_brands, article_sections
+from app.domains.relationships import article_brands
 
 
 @cache.memoize(timeout=3600)
@@ -18,8 +18,7 @@ def get_active_brands_for_section(section_slug, limit=20):
         db.session.query(Brand)
         .join(article_brands, Brand.id == article_brands.c.brand_id)
         .join(Article, Article.id == article_brands.c.article_id)
-        .join(article_sections, Article.id == article_sections.c.article_id)
-        .join(Section, Section.id == article_sections.c.section_id)
+        .join(Section, Section.id == Article.section_id)
         .filter(func.lower(Section.slug) == func.lower(section_slug))
         .group_by(Brand.id)
         .order_by(func.count(Article.id).desc())
@@ -33,13 +32,12 @@ def get_active_topics_for_section(section_slug, limit=20):
     Returns topics that have at least one article in the given section.
     Uses explicit join with the association table for reliability.
     """
-    from app.domains.article.relationships import article_topics, article_sections
+    from app.domains.relationships import article_topics
     return (
         db.session.query(Topic)
         .join(article_topics, Topic.id == article_topics.c.topic_id)
         .join(Article, Article.id == article_topics.c.article_id)
-        .join(article_sections, Article.id == article_sections.c.article_id)
-        .join(Section, Section.id == article_sections.c.section_id)
+        .join(Section, Section.id == Article.section_id)
         .filter(func.lower(Section.slug) == func.lower(section_slug))
         .group_by(Topic.id)
         .order_by(func.count(Article.id).desc())
@@ -55,8 +53,7 @@ def get_active_categories_for_section(section_slug, limit=20):
     return (
         db.session.query(Category)
         .join(Article, Article.category_id == Category.id)
-        .join(article_sections, Article.id == article_sections.c.article_id)
-        .join(Section, Section.id == article_sections.c.section_id)
+        .join(Section, Section.id == Article.section_id)
         .filter(func.lower(Section.slug) == func.lower(section_slug))
         .group_by(Category.id)
         .order_by(func.count(Article.id).desc())

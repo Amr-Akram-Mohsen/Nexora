@@ -33,14 +33,14 @@ def get_articles_render(filter_by_columns: tuple = ('section',), filter_values: 
         filters = []
         for col, val in filter_dict.items():
             if col == 'section':
-                filters.append(Article.sections.any(Section.slug == val))
+                filters.append(Article.section.has(Section.slug == val))
             elif hasattr(Article, col):
                 filters.append(getattr(Article, col) == val)
         if filters:
             query = query.filter(*filters)
     else:
-        # eager load sections if not filtering
-        query = query.options(joinedload(Article.sections))
+        # eager load section if not filtering
+        query = query.options(joinedload(Article.section))
 
     query = query.order_by(Article.published_at.desc())
 
@@ -59,7 +59,7 @@ def get_related_articles(article, limit=6):
     from app.domains.system.models import Category, Section, Brand, Topic
     topic_ids = [t.id for t in article.topics]
     brand_ids = [b.id for b in article.brands]
-    section_ids = [s.id for s in article.sections]
+    section_id = article.section_id
 
     relevance_score = (
         case((Topic.id.in_(topic_ids), 3), else_=0) +
@@ -72,8 +72,8 @@ def get_related_articles(article, limit=6):
             Article,
             func.sum(relevance_score).label("score")
         )
-        .join(Article.sections)
-        .filter(Section.id.in_(section_ids))
+        .join(Article.section)
+        .filter(Section.id == section_id)
         .outerjoin(Article.topics)
         .outerjoin(Article.brands)
         .outerjoin(Article.category)
@@ -108,7 +108,7 @@ def get_trending_articles(limit=6, days=7, section_ids=None):
     )
 
     if section_ids:
-        query = query.join(Article.sections).filter(Section.id.in_(section_ids))
+        query = query.join(Article.section).filter(Section.id.in_(section_ids))
 
     query = (
         query.group_by(Article.id)

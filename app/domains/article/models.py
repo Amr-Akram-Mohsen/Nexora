@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from app.core.extensions import db
-from .relationships import (article_topics, article_brands, article_items, article_attributes)
+from app.domains.relationships import (article_topics, article_brands, article_items, article_attributes, article_sources)
 
 class Article(db.Model):
     __tablename__ = "articles"
@@ -9,8 +9,6 @@ class Article(db.Model):
     description = db.Column(db.Text)
     content = db.Column(db.Text)
     url = db.Column(db.Text, nullable=False, unique=True)
-    source_id = db.Column(db.String(120))
-    source_name = db.Column(db.String(200))
     published_at = db.Column(db.DateTime)
     retrieved_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     image_url = db.Column(db.Text)
@@ -41,7 +39,7 @@ class Article(db.Model):
     topics = db.relationship("Topic", secondary=article_topics, back_populates="articles")
     brands = db.relationship("Brand", secondary=article_brands, back_populates="articles")
     
-    facets = db.Column(db.JSON, nullable=True)
+    extra_metadata = db.Column(db.JSON, nullable=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)
 
@@ -53,6 +51,13 @@ class Article(db.Model):
         "Item",
         secondary=article_items,
         back_populates="linked_articles"
+    )
+
+    # Sources where this article is published
+    sources = db.relationship(
+        "Source",
+        secondary=article_sources,
+        back_populates="articles"
     )
     
     # Reactions, Comments, Views
@@ -77,6 +82,18 @@ class Article(db.Model):
         viewonly=True,
         lazy="selectin"
     )
+
+    @classmethod
+    def exists(cls, url: str) -> bool:
+        """Check if an article with the given URL exists in the database."""
+        if not url:
+            return False
+        return db.session.query(cls.id).filter_by(url=url).first() is not None
+
+    @staticmethod
+    def get_by_url(url, session):
+        return session.query(Article).filter_by(url=url).first()
+
 
     __table_args__ = (
         # Core filters
@@ -104,8 +121,6 @@ class Article(db.Model):
         db.Index("ix_articles_section_date",
             "section_id", "published_at"),
         db.Index("ix_articles_active_published", "is_active", "published_at"),
-
-        db.UniqueConstraint('source_name', 'title', name='uq_articles_source_title'),
     )
 
     @property
@@ -137,3 +152,15 @@ class Article(db.Model):
     def add_attribute(self, attr_obj):
         if attr_obj not in self.attributes:
             self.attributes.append(attr_obj)
+
+    def add_source(self, source_obj, url: str):
+        """Add a source to the article. If the source is already linked, does nothing."""
+        # Check if already linked to this source
+        if source_obj not in self.sources:
+            # We use the association table directly to store the specific URL
+            ins = article_sources.insert().values(
+                article_id=self.id,
+                source_id=source_obj.id,
+                url=url
+            )
+            db.session.execute(ins)

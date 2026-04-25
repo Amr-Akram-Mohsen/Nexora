@@ -1,7 +1,34 @@
 from app.core.extensions import db
-from app.domains.article.relationships import (article_sections, article_topics, article_brands, item_sections, item_topics, article_attributes)
+from app.domains.relationships import (article_topics, article_brands, item_topics, article_attributes, article_sources)
 from app.shared.utils.slug import generate_slug, normalize_name
 # ==================== METADATA MODELS ====================
+class Source(db.Model):
+    __tablename__ = "sources"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    domain = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    logo_url = db.Column(db.Text, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    trust_score = db.Column(db.Float, default=1.0)
+
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(Source).filter_by(slug=slug).first()
+
+    @staticmethod
+    def get_by_domain(domain, session):
+        return session.query(Source).filter_by(domain=domain).first()
+
+    articles = db.relationship(
+        "Article",
+        secondary=article_sources,
+        back_populates="sources"
+    )
+
+    def __repr__(self):
+        return f"<Source {self.name}>"
+
 class Section(db.Model):
     __tablename__ = "sections"
     id = db.Column(db.Integer, primary_key=True)
@@ -139,6 +166,10 @@ class GenderFacet(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     slug = db.Column(db.String(50), unique=True, nullable=False)
 
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(GenderFacet).filter_by(slug=slug).first()
+
     articles = db.relationship("Article", back_populates="gender")
 
 class IntentFacet(db.Model):
@@ -147,6 +178,10 @@ class IntentFacet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     slug = db.Column(db.String(80), unique=True, nullable=False)
+
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(IntentFacet).filter_by(slug=slug).first()
 
     articles = db.relationship("Article", back_populates="intent")
 
@@ -157,6 +192,10 @@ class PriceTierFacet(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     slug = db.Column(db.String(50), unique=True, nullable=False)
 
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(PriceTierFacet).filter_by(slug=slug).first()
+
     articles = db.relationship("Article", back_populates="price_tier")
 
 class AttributeFacet(db.Model):
@@ -165,6 +204,10 @@ class AttributeFacet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     slug = db.Column(db.String(80), unique=True, nullable=False)
+
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(AttributeFacet).filter_by(slug=slug).first()
 
 
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)

@@ -16,7 +16,11 @@ from app.integrations.external.api import (
 
 from app.integrations.discovery import DiscoveryManager
 from app.integrations.enrichment.pipeline import prepare_article
+from app.domains.article.models import Article
+from app.core.extensions import db
+
 logger = logging.getLogger(__name__)
+
 
 def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_data: list[dict]) -> int:
     api_key = current_app.config.get("NEWS_API_KEY")
@@ -59,13 +63,14 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                 normalized_query=q_text
             )
 
+            from app.domains.article.ingestion import smart_ingest
             for raw in resp.json().get("articles", []):
+                # 1. Enrichment/Classification
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
-                                                
-                cleaned = clean_article_data(raw)
-                if cleaned and store_article(cleaned):
-                    stored += 1
 
+                if smart_ingest(raw):
+                    stored += 1
+                    
         except Exception:
             logger.exception("[NewsAPI] Error fetching '%s' for %s", q_text, category_slug)
 

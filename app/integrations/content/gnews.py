@@ -60,13 +60,15 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 normalized_query=q_text
             )
             
+            from app.domains.article.ingestion import smart_ingest
+
             for raw in resp.json().get("articles", []):
                 raw["image_url"] = raw.get("image")
 
-                raw = prepare_article(raw, q_obj)                
+                # 1. Enrichment/Classification
+                raw = prepare_article(raw, section_slug, category_slug, q_obj)                
 
-                cleaned = clean_article_data(raw)
-                if cleaned and store_article(cleaned):
+                if smart_ingest(raw):
                     stored += 1
 
         except Exception:

@@ -75,7 +75,7 @@ def article_page(article_id):
         user=user,
         ip_address=ip
     )
-    section_ids = [s.id for s in article.sections]
+    section_ids = [article.section_id]
     related_articles = get_related_articles(article)
     trending_articles = get_trending_articles(limit=6, days=7, section_ids=section_ids)
     

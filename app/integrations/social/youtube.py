@@ -65,6 +65,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 normalized_query=query
             )
 
+            from app.domains.article.ingestion import smart_ingest
+
             for item in resp.json().get("items", []):
                 video_id = item.get("id", {}).get("videoId")
                 if not video_id:
@@ -79,8 +81,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                     "source_name":  snippet.get("channelTitle", ""),
                 }
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
-                cleaned = clean_article_data(raw)
-                if cleaned and store_article(cleaned):
+                
+                if smart_ingest(raw):
                     stored += 1
 
         except Exception:

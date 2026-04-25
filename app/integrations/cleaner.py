@@ -132,7 +132,7 @@ def _clean_description(text: str | None) -> str:
     return sanitize_text(text)
 
 
-def clean_article_data(raw: dict) -> dict | None:
+def clean_article_data(raw: dict, skip_scrape: bool = False) -> dict | None:
     """
     Normalise a raw article dict from any source.
     Returns None if the article fails quality checks.
@@ -189,8 +189,8 @@ def clean_article_data(raw: dict) -> dict | None:
     source_name = sanitize_text(source_raw)
 
     # ── Content ──────────────────────────────────────────────────
-    content = None
-    if url and "youtube.com" not in url.lower():
+    content = raw.get("content")
+    if not skip_scrape and not content and url and "youtube.com" not in url.lower():
         full_content = scrape_article_content(url)
         if not full_content:
             # SKIP: Article extraction failed or timed out
@@ -204,6 +204,8 @@ def clean_article_data(raw: dict) -> dict | None:
         if not content or len(content) < 200:
             logger.info(f"[Cleaner] Skipping article (insufficient content after sanitization): {title[:50]}...")
             return None
+    elif skip_scrape:
+        logger.debug(f"[Cleaner] Skipping scrape for existing article: {title[:50]}...")
 
     return {
         "title":         title,

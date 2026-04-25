@@ -1,11 +1,9 @@
 # app/core/__init__.py
 from flask import Flask
-from flask_migrate import Migrate
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
-from app.domains.user.models import User
 from pathlib import Path
-from app.core.extensions import db
+from app.core.extensions import db, migrate
 from config import Config
 from .extensions import mail, csrf, limiter, cache
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -24,7 +22,7 @@ from app.domains.admin import admin_bp
 # from app.domains.dashboard.routes import bp as dashboard_bp
 
 import app.domains.system
-
+from app.domains.user.models import User
 from app.domains.user.routes import bp as user_bp
 from app.domains.article.routes import bp as article_bp
 from app.domains.item.routes import bp as item_bp
@@ -32,7 +30,7 @@ from app.domains.interaction.routes import bp as interaction_bp
 from app.domains.recommendation.routes import bp as recommendation_bp
 from app.domains.system.routes import bp as system_bp
 
-
+from .extensions import migrate
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -49,8 +47,9 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
-    migrate = Migrate(app, db)
+    from app import domains
 
     # Initialize Flask-Login
     login_manager = LoginManager()
@@ -127,19 +126,19 @@ def create_app():
     def fetch_all_command():
         """Runs all active fetchers in one go."""
         from app.jobs.tasks.content.fetch_articles import (
-            run_article_fetch, run_reddit_fetch
+            run_article_fetch, #run_reddit_fetch
         )
         # from app.jobs.tasks.content.fetch_items import (
         #     run_price_refresh, run_amazon_discovery, run_noon_discovery, run_arabclicks_price_refresh
         # )
-        from app.domains.recommendation.matcher import match_articles_to_items
+        # from app.domains.recommendation.matcher import match_articles_to_items
         # Note: run_price_refresh and run_amazon_discovery might be in another task
         print("--- [1/2] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
         run_article_fetch()
-        print("--- [2/2] Fetching Reddit Communities ---")
-        run_reddit_fetch()
-        print("--- [Matcher] Linking Articles to Items ---")
-        match_articles_to_items()
+        # print("--- [2/2] Fetching Reddit Communities ---")
+        # run_reddit_fetch()
+        # print("--- [Matcher] Linking Articles to Items ---")
+        # match_articles_to_items()
     @app.cli.command("generate-sitemap")
     def generate_sitemap_command():
         """Generate a static sitemap.xml file."""

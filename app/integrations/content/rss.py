@@ -212,6 +212,8 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 logger.info("[RSS] Empty feed (0 entries): %s", feed_url)
                 continue
 
+            from app.domains.article.ingestion import smart_ingest
+
             source_name = feed.feed.get("title") or feed_url
             for entry in feed.entries[:15]:   # latest 15 per feed
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
@@ -226,10 +228,10 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
 
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-                cleaned = clean_article_data(raw)
-                if cleaned:
-                    if store_article(cleaned):
-                        stored += 1
+
+                if smart_ingest(raw):
+                    stored += 1
+                        
         except Exception:
             logger.exception("[RSS] Failed to parse feed: %s", feed_url)
     return stored

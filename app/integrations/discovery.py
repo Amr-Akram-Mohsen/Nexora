@@ -35,7 +35,7 @@ QUERY_TEMPLATES = {
     ],
     "reviews": [
         "{category} review OR hands-on",
-        "best {category} 2025",
+        "best {category} {year}",
         "{category} test OR impressions",
         "{category} full review",
     ],
@@ -45,7 +45,7 @@ QUERY_TEMPLATES = {
         "{category} tips and tricks",
     ],
     "trends": [
-        "{category} trends 2025",
+        "{category} trends {year}",
         "future of {category}",
         "{category} upcoming releases",
     ],
@@ -61,6 +61,8 @@ class DiscoveryManager:
         self.taxonomy = TAXONOMY
 
     def get_queries_by_section(self) -> Dict[str, Dict[str, List[Dict]]]:
+        from datetime import datetime
+        current_year = datetime.now().year
         registry = {}
 
         sections = self.taxonomy.get("sections", [])
@@ -81,8 +83,10 @@ class DiscoveryManager:
 
                     queries = []
                     for template in templates:
+                        # Inject category and current year
+                        q_text = template.format(category=child["name"], year=current_year)
                         queries.append({
-                            "query": template.format(category=child["name"]),
+                            "query": q_text,
                             "topics": CATEGORY_TOPIC_MAP.get(cat_slug, []),
                             "brands": []
                         })

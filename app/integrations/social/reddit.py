@@ -62,6 +62,7 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
             normalized_query=f"r/{name}"
         )
 
+        from app.domains.article.ingestion import ingest_article_stream
         for submission in subreddit.hot(limit=limit):
             if submission.score < MIN_SCORE:
                 continue
@@ -85,8 +86,9 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
                 "section_slug": section_slug,
                 "category_slug": category_slug if category_slug != "regional" else "general",
             }
-            cleaned = clean_article_data(raw)
-            if cleaned and store_article(cleaned):
+            
+            from app.domains.article.ingestion import smart_ingest
+            if smart_ingest(raw):
                 stored += 1
         return stored
     except Exception:

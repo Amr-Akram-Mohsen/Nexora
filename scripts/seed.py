@@ -1,50 +1,37 @@
-# app/utils/seeder.py
+# scripts/seed.py
 """
-Seeding script for Sections, Categories, Topics, and Brands.
-Ensures the database is ready for the ingestion engine to work.
-Uses taxonomy_v2.json as the source of truth.
-PERFORMS A NUCLEAR RESET: Wipes all tables and resets auto-increment counters to 1.
+Seeding script for Sections, Categories, Topics, Brands, Facets, and Sources.
+
+⚠️ This script DOES NOT reset the database.
+It assumes tables are already created (via migrations) and empty (or safe to insert into).
+
+Use Supabase SQL Editor for full resets.
 """
-import json
-import os
 import logging
 from app.core.extensions import db
 from app.shared.utils.slug import generate_slug, normalize_name
+from app.shared.constants.taxonomy import TAXONOMY
 
-# Import ALL models to ensure db.drop_all() covers every table
 from app.domains.system.models import (
-    Section, Category, Topic, Brand,
+    Section, Category, Topic, Brand, Source,
     GenderFacet, IntentFacet, PriceTierFacet, AttributeFacet
 )
 
 logger = logging.getLogger(__name__)
 
-TAXONOMY_PATH = os.path.join("app", "shared", "constants", "taxonomy_v2.json")
-
-def load_taxonomy():
-    if not os.path.exists(TAXONOMY_PATH):
-        logger.error(f"[Seeder] Taxonomy file not found at {TAXONOMY_PATH}")
-        return None
-    with open(TAXONOMY_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
-
 def seed_db():
-    """Seed the database with initial metadata from taxonomy_v2.json after a NUCLEAR RESET."""
-    logger.info("[Seeder] !!! NUCLEAR RESET INITIATED !!!")
+    """Seed the database with initial metadata from TAXONOMY"""
+    # Import EVERY model module to ensure db.metadata is 100% complete
+
+    logger.info("[Seeder] Starting database seed...")
     
-    taxonomy = load_taxonomy()
-    if not taxonomy:
+    if not TAXONOMY:
+        logger.warning("[Seeder] TAXONOMY is empty. Aborting.")
         return
 
     try:
-        # 1. Nuclear Reset: Drop and Create all tables
-        # This is the most reliable way to reset auto-increment to 1 in SQLite/Postgres
-        db.drop_all()
-        db.create_all()
-        logger.info("[Seeder] All tables dropped and recreated. Counters reset to 1.")
-
-        # 2. Seed Sections
-        for s_data in taxonomy.get("sections", []):
+        # 1. Seed Sections
+        for s_data in TAXONOMY.get("sections", []):
             slug = generate_slug(s_data["name"])
             section = Section(
                 name=s_data["name"],
@@ -61,10 +48,9 @@ def seed_db():
             )
             db.session.add(section)
             logger.info(f"[Seeder]   + Section: {s_data['name']}")
-        db.session.flush()
 
-        # 3. Seed Categories (Hierarchical)
-        for c_data in taxonomy.get("categories", []):
+        # 2. Seed Categories (Hierarchical)
+        for c_data in TAXONOMY.get("categories", []):
             parent_slug = generate_slug(c_data["name"])
             parent = Category(
                 name=c_data["name"],
@@ -74,7 +60,6 @@ def seed_db():
                 is_active=True
             )
             db.session.add(parent)
-            db.session.flush() 
             logger.info(f"[Seeder]   + Category Cluster: {c_data['name']}")
 
             # Seed children
@@ -91,8 +76,8 @@ def seed_db():
                 db.session.add(child)
                 logger.info(f"[Seeder]     -> Leaf: {child_data['name']}")
 
-        # 4. Seed Topics
-        for t_data in taxonomy.get("topics", []):
+        # 3. Seed Topics
+        for t_data in TAXONOMY.get("topics", []):
             topic = Topic(
                 name=t_data["name"],
                 slug=generate_slug(t_data["name"]),
@@ -101,10 +86,8 @@ def seed_db():
             db.session.add(topic)
             logger.info(f"[Seeder]   + Topic: {t_data['name']}")
 
-        db.session.commit()
-
-        # 5. Seed Brands
-        for b_data in taxonomy.get("brands", []):
+        # 4. Seed Brands
+        for b_data in TAXONOMY.get("brands", []):
             brand = Brand(
                 name=b_data["name"],
                 slug=generate_slug(b_data["name"]),
@@ -113,10 +96,8 @@ def seed_db():
             db.session.add(brand)
             logger.info(f"[Seeder]   + Brand: {b_data['name']}")
         
-        db.session.commit()
-
-        # 6. Seed Facets
-        facets = taxonomy.get("facets", {})
+        # 5. Seed Facets
+        facets = TAXONOMY.get("facets", {})
 
         # Gender
         for g in facets.get("gender", []):
@@ -154,14 +135,38 @@ def seed_db():
             db.session.add(AttributeFacet(
                 name=attr["name"],
                 slug=generate_slug(attr["name"]),
-                category_id=category_obj.id
+                category_id=category_obj.id if category_obj else None
             ))
             logger.info(f"[Seeder] [Facets]   + Attributes: {attr['name']}")
 
+        # 6. Seed Trusted Sources
+        trusted_sources = [
+            {"name": "The Verge",      "domain": "theverge.com"},
+            {"name": "Wired",          "domain": "wired.com"},
+            {"name": "Engadget",       "domain": "engadget.com"},
+            {"name": "9to5Google",     "domain": "9to5google.com"},
+            {"name": "9to5Mac",        "domain": "9to5mac.com"},
+            {"name": "GSM Arena",      "domain": "gsmarena.com"},
+            {"name": "NotebookCheck",  "domain": "notebookcheck.net"},
+            {"name": "Fragrantica",    "domain": "fragrantica.com"},
+            {"name": "CaFleureBon",    "domain": "cafleurebon.com"},
+            {"name": "Hypebeast",      "domain": "hypebeast.com"},
+            {"name": "Highsnobiety",   "domain": "highsnobiety.com"},
+            {"name": "A Blog to Watch","domain": "ablogtowatch.com"},
+        ]
+        for s in trusted_sources:
+            db.session.add(Source(
+                name=s["name"],
+                slug=generate_slug(s["name"]),
+                domain=s["domain"],
+                is_active=True,
+                trust_score=1.0
+            ))
+            logger.info(f"[Seeder]   + Source: {s['name']}")
+        
         db.session.commit()
-
-
-        logger.info("[Seeder] Seed complete! Database is now clean and taxonomy is active.")
-    except Exception:
+        logger.info("[Seeder] Seed complete!")
+    except Exception as e:
         db.session.rollback()
-        logger.exception("[Seeder] Nuclear seed failed")
+        logger.exception("[Seeder] seed failed")
+        raise e
