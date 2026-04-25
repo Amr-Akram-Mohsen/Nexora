@@ -10,8 +10,8 @@
         <li><a href="/" class="breadcrumb-link"><i class="fas fa-home"></i></a></li>
         <li class="separator"><i class="fas fa-chevron-right"></i></li>
         {% if item.card_type == 'article' %}
-          {% if item.sections %}
-          <li><a href="{{ url_for('article.sections', section_slug=item.sections[0].slug) }}" class="breadcrumb-link">{{ item.sections[0].name }}</a></li>
+          {% if item.section %}
+          <li><a href="{{ url_for('article.sections', section_slug=item.section.slug) }}" class="breadcrumb-link">{{ item.section.name }}</a></li>
           <li class="separator"><i class="fas fa-chevron-right"></i></li>
           {% endif %}
         {% else %}

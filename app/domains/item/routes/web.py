@@ -9,7 +9,7 @@ from app.core.extensions import db
 from app.domains.system.models import Category, Brand
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
 from app.domains.interaction.service import record_view
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 from app.shared.request import get_client_ip
 
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])

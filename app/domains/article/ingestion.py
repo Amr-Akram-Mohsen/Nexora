@@ -13,6 +13,8 @@ from app.domains.system.models import (
 )
 from app.integrations.cleaner import clean_article_data
 
+from app.shared.utils.slug import generate_slug
+
 logger = logging.getLogger(__name__)
 
 def _resolve_taxonomy(data: dict) -> tuple[Section, Category]:
@@ -54,7 +56,6 @@ def _apply_many_to_many(article: Article, data: dict):
     source_name = data.get("source_name")
     url = data.get("url")
     if source_name and url:
-        from app.shared.utils.slug import generate_slug
         source_slug = generate_slug(source_name)
         source = Source.get_by_slug(source_slug, session=db.session)
         if source:
@@ -89,15 +90,13 @@ def _apply_single_facets(article: Article, data: dict):
 def ingest_article_stream(article: Article, data: dict) -> Article | None:
     """
     Update relationships (Topics, Brands, Sources, Facets) for an existing article.
-    Used when an article is found by URL in the scraper loop to avoid redundant scraping.
+    Does NOT commit; caller should manage the session.
     """
     try:
         _apply_many_to_many(article, data)
         _apply_single_facets(article, data)
-        db.session.commit()
         return article
     except Exception:
-        db.session.rollback()
         logger.exception("[Ingestion] Error merging data into existing article: %s", article.url)
         return None
 
@@ -105,7 +104,7 @@ def ingest_article_stream(article: Article, data: dict) -> Article | None:
 def store_article(cleaned_data: dict) -> Article | None:
     """
     Create a new Article and link its relationships.
-    Used for fresh articles that have passed through clean_article_data().
+    Commits the transaction on success.
     """
     url = cleaned_data.get("url")
     try:
@@ -122,17 +121,22 @@ def store_article(cleaned_data: dict) -> Article | None:
             section_id=section.id,
             importance_score=cleaned_data.get("importance_score") or 0.0,
             enhanced_query=cleaned_data.get("enhanced_query"),
+            is_content_scraped=cleaned_data.get("is_content_scraped", False),
             extra_metadata={}, 
             is_active=True,
         )
-        
-        _apply_many_to_many(article, cleaned_data)
-        _apply_single_facets(article, cleaned_data)
-        
-        db.session.add(article)
-        db.session.commit()
-        return article
 
+        db.session.add(article)
+        db.session.flush()
+        
+        # Link relationships
+        if ingest_article_stream(article, cleaned_data):
+            db.session.commit()
+            return article
+        else:
+            db.session.rollback()
+            return None
+            
     except IntegrityError:
         db.session.rollback()
         return Article.query.filter_by(url=url).first()
@@ -149,16 +153,16 @@ def smart_ingest(raw_data: dict) -> Article | None:
     url = raw_data.get("url")
     if not url:
         return None
-    # 1. Existence check (Deduplication)
+        
     article = Article.get_by_url(url, db.session)
     if article:
-        # Merge raw metadata (topics, brands, etc.) without re-scraping
-        return ingest_article_stream(article, raw_data)
+        if ingest_article_stream(article, raw_data):
+            db.session.commit()
+            return article
+        return None
     
-    # 2. Fresh Article: Full cleaning (including network scraping)
     cleaned = clean_article_data(raw_data, skip_scrape=False)
     if not cleaned:
         return None
         
-    # 3. Create and store
     return store_article(cleaned)

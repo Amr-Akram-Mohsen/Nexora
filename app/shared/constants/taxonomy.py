@@ -116,49 +116,64 @@ TAXONOMY = {
   ],
   "brands": [
     {
-      "name": "Apple"
+      "name": "Apple",
+      "aliases": ["iphone", "macbook", "ipad", "airpods", "imac", "apple watch"]
     },
     {
-      "name": "Samsung"
+      "name": "Samsung",
+      "aliases": ["galaxy", "s24", "s23", "z fold", "z flip", "qled", "crystal uhd"]
     },
     {
-      "name": "Sony"
+      "name": "Sony",
+      "aliases": ["playstation", "ps5", "bravia", "wh-1000xm", "wf-1000xm", "alpha"]
     },
     {
-      "name": "Google"
+      "name": "Google",
+      "aliases": ["pixel", "chromecast", "nest"]
     },
     {
-      "name": "Microsoft"
+      "name": "Microsoft",
+      "aliases": ["surface", "xbox", "windows"]
     },
     {
-      "name": "Dell"
+      "name": "Dell",
+      "aliases": ["xps", "alienware", "latitude", "inspiron"]
     },
     {
-      "name": "HP"
+      "name": "HP",
+      "aliases": ["spectre", "envy", "pavilion", "omen"]
     },
     {
-      "name": "Lenovo"
+      "name": "Lenovo",
+      "aliases": ["thinkpad", "yoga", "legion"]
     },
     {
-      "name": "Asus"
+      "name": "Asus",
+      "aliases": ["rog", "zenbook", "vivobook"]
     },
     {
-      "name": "Nike"
+      "name": "Nike",
+      "aliases": ["air max", "jordan", "dunk"]
     },
     {
-      "name": "Adidas"
+      "name": "Adidas",
+      "aliases": ["yeezy", "ultraboost", "originals"]
     },
     {
-      "name": "Rolex"
+      "name": "Rolex",
+      "aliases": ["submariner", "daytona", "datejust"]
     },
     {
-      "name": "Omega"
+      "name": "Omega",
+      "aliases": ["seamaster", "speedmaster"]
     },
     {
-      "name": "Dior"
+      "name": "Dior",
+      "aliases": ["sauvage", "fahrenheit"]
     },
     {
-      "name": "Chanel"
+      "name": "Chanel",
+      "aliases": ["no. 5", "bleu de chanel", "chance"]
     }
   ],
   "facets": {

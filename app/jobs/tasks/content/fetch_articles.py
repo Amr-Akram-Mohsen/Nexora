@@ -9,64 +9,96 @@ from flask import current_app
 
 logger = logging.getLogger(__name__)
 
+def run_newsapi_fetch():
+    """Fetch from NewsAPI (tech/fragrance/fashion)."""
+    if not current_app.config.get("NEWS_API_KEY"):
+        logger.warning("[NewsAPI] Key missing")
+        return {"status": "skipped", "reason": "key_missing"}
 
-def run_article_fetch():
-    """Fetch all free sources + YouTube with a diverse set of tech/fragrance/fashion queries."""
-    # ── NewsAPI (Requires Key) ───────────────────────────────────
-    if current_app.config.get("NEWS_API_KEY"):
-        try:
-            from app.integrations.content.newsapi import fetch_all_sections as fetch_newsapi
-            logger.info("[Runner] NewsAPI...")
-            fetch_newsapi()
-        except Exception:
-            logger.exception("[Runner] NewsAPI fetch failed")
-    else:
-        logger.info("[Runner] Skipping NewsAPI: Key missing")
+    try:
+        from app.integrations.content.newsapi import fetch_all_sections as fetch_newsapi
+        logger.info("[Runner] Starting NewsAPI...")
+        count = fetch_newsapi()
+        logger.info(f"[Runner] NewsAPI success — {count} stored")
+        return {"status": "success", "count": count}
+    except Exception as e:
+        logger.exception("[Runner] NewsAPI fetch failed")
+        return {"status": "error", "error": str(e)}
 
-    # ── GNews (Requires Key) ──────────────────────────────────────
-    if current_app.config.get("GNEWS_API_KEY"):
-        try:
-            from app.integrations.content.gnews import fetch_all_gnews
-            logger.info("[Runner] GNews...")
-            fetch_all_gnews()
-        except Exception:
-            logger.exception("[Runner] GNews fetch failed")
-    else:
-        logger.info("[Runner] Skipping GNews: Key missing")
+def run_gnews_fetch():
+    """Fetch from GNews (regional/global)."""
+    if not current_app.config.get("GNEWS_API_KEY"):
+        logger.warning("[GNews] Key missing")
+        return {"status": "skipped", "reason": "key_missing"}
 
-    # ── YouTube (Requires Key) ───────────────────────────────────
-    if current_app.config.get("YOUTUBE_API_KEY"):
-        try:
-            from app.integrations.social.youtube import fetch_youtube_reviews
-            logger.info("[Runner] YouTube reviews...")
-            fetch_youtube_reviews()
-        except Exception:
-            logger.exception("[Runner] YouTube fetch failed")
-    else:
-        logger.info("[Runner] Skipping YouTube: Key missing")
+    try:
+        from app.integrations.content.gnews import fetch_all_gnews
+        logger.info("[Runner] Starting GNews...")
+        count = fetch_all_gnews()
+        logger.info(f"[Runner] GNews success — {count} stored")
+        return {"status": "success", "count": count}
+    except Exception as e:
+        logger.exception("[Runner] GNews fetch failed")
+        return {"status": "error", "error": str(e)}
 
-    # ── RSS (Always Runs) ──────────────────────────────────────────
+def run_youtube_fetch():
+    """Fetch video reviews from YouTube."""
+    if not current_app.config.get("YOUTUBE_API_KEY"):
+        logger.warning("[YouTube] Key missing")
+        return {"status": "skipped", "reason": "key_missing"}
+
+    try:
+        from app.integrations.social.youtube import fetch_youtube_reviews
+        logger.info("[Runner] Starting YouTube reviews...")
+        count = fetch_youtube_reviews()
+        logger.info(f"[Runner] YouTube success — {count} stored")
+        return {"status": "success", "count": count}
+    except Exception as e:
+        logger.exception("[Runner] YouTube fetch failed")
+        return {"status": "error", "error": str(e)}
+
+def run_rss_fetch():
+    """Fetch from configured RSS feeds."""
     try:
         from app.integrations.content.rss import fetch_all_rss
-        logger.info("[Runner] RSS feeds...")
+        logger.info("[Runner] Starting RSS feeds...")
         count = fetch_all_rss()
-        logger.info("[Runner] RSS done — %d articles stored", count)
-    except Exception:
+        logger.info(f"[Runner] RSS success — {count} stored")
+        return {"status": "success", "count": count}
+    except Exception as e:
         logger.exception("[Runner] RSS fetch failed")
+        return {"status": "error", "error": str(e)}
 
 def run_reddit_fetch():
-    """Fetch community posts from diverse subreddits."""
+    """Fetch community posts from Reddit."""
     if not current_app.config.get("REDDIT_CLIENT_ID"):
-        logger.info("[Runner] Skipping Reddit: API Keys missing")
-        return
+        logger.warning("[Reddit] Keys missing")
+        return {"status": "skipped", "reason": "keys_missing"}
 
     try:
         from app.integrations.social.reddit import fetch_all_reddit
-        logger.info("[Runner] Reddit communities...")
+        logger.info("[Runner] Starting Reddit...")
         count = fetch_all_reddit()
-        logger.info("[Runner] Reddit done — %d posts stored", count)
-    except Exception:
+        logger.info(f"[Runner] Reddit success — {count} stored")
+        return {"status": "success", "count": count}
+    except Exception as e:
         logger.exception("[Runner] Reddit fetch failed")
+        return {"status": "error", "error": str(e)}
+
+
+def run_article_fetch():
+    """Fetch all active article sources and return a summary report."""
+    results = {
+        "newsapi": run_newsapi_fetch(),
+        "gnews": run_gnews_fetch(),
+        "youtube": run_youtube_fetch(),
+        "rss": run_rss_fetch(),
+        "reddit": run_reddit_fetch()
+    }
+    
+    logger.info(f"[Runner] Complete! Summary: {results}")
+    return results
+
 
 
 def run_sitemap_gen():

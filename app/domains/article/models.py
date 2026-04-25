@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from app.core.extensions import db
 from app.domains.relationships import (article_topics, article_brands, article_items, article_attributes, article_sources)
 
+from sqlalchemy.dialects.postgresql import JSONB
+
 class Article(db.Model):
     __tablename__ = "articles"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -20,6 +22,7 @@ class Article(db.Model):
     last_matched_at = db.Column(db.DateTime, nullable=True, index=True)
     importance_score = db.Column(db.Float, default=0, index=True)
     enhanced_query = db.Column(db.Text)
+    is_content_scraped = db.Column(db.Boolean, default=False, index=True)
 
     gender_id = db.Column(db.Integer, db.ForeignKey("gender_facets.id"))
     intent_id = db.Column(db.Integer, db.ForeignKey("intent_facets.id"))
@@ -39,7 +42,7 @@ class Article(db.Model):
     topics = db.relationship("Topic", secondary=article_topics, back_populates="articles")
     brands = db.relationship("Brand", secondary=article_brands, back_populates="articles")
     
-    extra_metadata = db.Column(db.JSON, nullable=True)
+    extra_metadata = db.Column(JSONB, nullable=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)
 
@@ -121,7 +124,26 @@ class Article(db.Model):
         db.Index("ix_articles_section_date",
             "section_id", "published_at"),
         db.Index("ix_articles_active_published", "is_active", "published_at"),
+        db.Index("ix_articles_content_status", "is_content_scraped", "is_active"),
     )
+
+    @property
+    def source_name(self) -> str:
+        """
+        Backward-compatible property.
+        Returns the name of the first linked Source, or the URL hostname as fallback.
+        Replaces the old `source_name` string column that was removed in the schema refactor.
+        """
+        if self.sources:
+            return self.sources[0].name
+        # Graceful fallback: extract hostname from the article URL
+        if self.url:
+            try:
+                from urllib.parse import urlparse
+                return urlparse(self.url).netloc or "Unknown"
+            except Exception:
+                pass
+        return "Unknown"
 
     @property
     def read_time_minutes(self):

@@ -1727,6 +1727,7 @@ body.dark-mode .card--item .card__img-wrapper {
   margin-top: 1rem;
 }
 
+/* 
 .article-full-text {
   margin-bottom: 2rem;
   overflow-wrap: break-word;
@@ -1743,7 +1744,7 @@ body.dark-mode .card--item .card__img-wrapper {
   height: auto;
   border-radius: var(--radius-md);
   margin: 1.5rem 0;
-}
+} */
 
 .article-source-box {
   background: var(--card);
@@ -5231,10 +5232,9 @@ body.dark-mode .detail-page--item,
 }
 
 /* 5. Content Area Refinements */
-.detail-page--article .article-full-text,
+/* .detail-page--article .article-full-text,
 .detail-page--article .article-content {
   max-width: 75ch;
-  /* Optimal reading width */
   margin: 0 auto;
 }
 
@@ -5243,7 +5243,7 @@ body.dark-mode .detail-page--item,
   margin-bottom: 1.75rem;
   font-size: 1.125rem;
   color: var(--theme-text);
-}
+} */
 
 /* Source Box styling */
 .detail-page--article .article-source-box {

@@ -8,6 +8,7 @@ venv/
 # Environment variables
 .env
 
+project_tree.txt
 # Flask instance (db, secrets)
 instance/
 

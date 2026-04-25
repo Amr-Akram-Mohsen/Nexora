@@ -1,4 +1,4 @@
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 from app.domains.interaction.constants import INTERACTION_TYPE
 
 def parse_target_type(value: str) -> str:

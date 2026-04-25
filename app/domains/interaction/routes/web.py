@@ -9,7 +9,7 @@ from app.core.extensions import limiter, db
 from app.domains.user.models import NewsletterSubscriber
 from app.domains.article.models import Article
 from app.domains.item.models import Item, ItemStoreLink
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 from ..constants import INTERACTION_TYPE
 from app.shared.parsing import parse_target_type, parse_interaction_type
 from app.shared.request import get_client_ip

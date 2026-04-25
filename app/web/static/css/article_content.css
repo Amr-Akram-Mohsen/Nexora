@@ -1,0 +1,228 @@
+/* ==========================================================================
+   article_content.css — Nexora Article Content Renderer
+   Applies to all .article-full-text__* classes produced by the extraction
+   pipeline. Uses design tokens from style.css.
+   ========================================================================== */
+
+/* ── Root wrapper (applied by the template around article content) ──────── */
+.article-full-text {
+  color: var(--foreground);
+  font-size: var(--text-base);
+  line-height: 1.75;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ── Headings ────────────────────────────────────────────────────────────── */
+.article-full-text__heading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  line-height: 1.3;
+  margin: 2rem 0 0.75rem;
+}
+
+.article-full-text__heading--h1 { font-size: var(--text-3xl); }
+.article-full-text__heading--h2 { font-size: var(--text-2xl); }
+.article-full-text__heading--h3 { font-size: var(--text-xl);  }
+.article-full-text__heading--h4,
+.article-full-text__heading--h5,
+.article-full-text__heading--h6 { font-size: var(--text-lg); font-weight: var(--weight-md); }
+
+/* ── Paragraphs ──────────────────────────────────────────────────────────── */
+.article-full-text__paragraph {
+  margin-bottom: 1.25rem;
+  color: var(--foreground);
+  font-size: var(--text-base);
+  line-height: 1.8;
+}
+
+/* ── Links ───────────────────────────────────────────────────────────────── */
+.article-full-text__link {
+  color: var(--brand-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.article-full-text__link:hover {
+  color: var(--brand-blue-dark);
+}
+
+/* ── Images ──────────────────────────────────────────────────────────────── */
+.article-full-text__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  margin: 1.75rem 0;
+  box-shadow: var(--shadow-md);
+  object-fit: cover;
+}
+
+.article-full-text__figure {
+  margin: 2rem 0;
+}
+
+.article-full-text__caption {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────────────── */
+.article-full-text__list {
+  margin: 1.25rem 0 1.25rem 0.25rem;
+  padding-left: 1.25rem;
+  list-style: none;
+}
+
+.article-full-text__list-item {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.7;
+  color: var(--foreground);
+}
+
+/* Custom bullet using brand color */
+.article-full-text__list-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--brand-blue);
+  flex-shrink: 0;
+}
+
+/* Ordered list: use counter instead of bullet */
+ol.article-full-text__list {
+  counter-reset: article-ol;
+}
+ol.article-full-text__list .article-full-text__list-item {
+  counter-increment: article-ol;
+}
+ol.article-full-text__list .article-full-text__list-item::before {
+  content: counter(article-ol) ".";
+  background: none;
+  border-radius: 0;
+  width: auto;
+  height: auto;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--brand-blue);
+  top: 0;
+  line-height: 1.7;
+}
+
+/* ── Blockquotes ─────────────────────────────────────────────────────────── */
+.article-full-text__blockquote {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid var(--brand-blue);
+  background: rgba(var(--brand-blue-rgb), 0.05);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--foreground);
+}
+.article-full-text__blockquote p {
+  margin: 0;
+}
+
+/* ── Code ────────────────────────────────────────────────────────────────── */
+.article-full-text__code-block {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.article-full-text__code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875em;
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.4em;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+.article-full-text__table-wrapper {
+  margin: 2rem 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.article-full-text__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  background: var(--card);
+  white-space: nowrap; /* prevents cell wrapping on small screens */
+}
+
+.article-full-text__table th,
+.article-full-text__table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  white-space: normal; /* re-allow wrap inside cells */
+}
+
+.article-full-text__table th {
+  background: var(--muted);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+}
+
+.article-full-text__table tr:last-child td,
+.article-full-text__table tr:last-child th {
+  border-bottom: none;
+}
+
+.article-full-text__table td:last-child,
+.article-full-text__table th:last-child {
+  border-right: none;
+}
+
+/* Zebra striping */
+.article-full-text__table tbody tr:nth-child(even) {
+  background: rgba(var(--brand-blue-rgb), 0.03);
+}
+
+/* ── Empty structural containers (kept in DOM, hidden visually) ─────────── */
+.article-full-text__empty-structure {
+  display: none;
+}
+
+/* ── Dark mode adjustments ───────────────────────────────────────────────── */
+body.dark-mode .article-full-text__blockquote {
+  background: rgba(var(--brand-blue-rgb), 0.08);
+}
+
+body.dark-mode .article-full-text__table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .article-full-text__code-block,
+body.dark-mode .article-full-text__code {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}

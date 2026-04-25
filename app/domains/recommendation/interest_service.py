@@ -4,7 +4,7 @@ from .models import UserInterest, UserEntityInterest
 from app.domains.item.models import Item
 from app.domains.article.models import Article
 from .interest_weights import INTEREST_WEIGHTS
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 
 def extract_entities_from_target(target):
     if isinstance(target, Item):

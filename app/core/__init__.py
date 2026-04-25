@@ -3,13 +3,14 @@ from flask import Flask
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from pathlib import Path
-from app.core.extensions import db, migrate
 from config import Config
-from .extensions import mail, csrf, limiter, cache
+from .extensions import mail, csrf, limiter, cache, migrate, db
 from werkzeug.middleware.proxy_fix import ProxyFix
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 from dotenv import load_dotenv
 load_dotenv()
-
 from app.api.articles import bp as api_article_bp
 from app.api.items import bp as api_item_bp
 from app.api.users import bp as api_user_bp
@@ -30,7 +31,22 @@ from app.domains.interaction.routes import bp as interaction_bp
 from app.domains.recommendation.routes import bp as recommendation_bp
 from app.domains.system.routes import bp as system_bp
 
-from .extensions import migrate
+
+def setup_logging(app):
+    """Configure rotating file logging for production-grade audit trails."""
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    
+    # 10MB per file, keeping last 5 backups
+    file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    
+    # Also ensure the standard python logger inherits this if needed
+    logging.getLogger('app').addHandler(file_handler)
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -45,6 +61,7 @@ def create_app():
         app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     app.config.from_object(Config)
+    setup_logging(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -122,6 +139,41 @@ def create_app():
         created = seed_arabclicks_stores()
         print(f"Done! {created} new ArabClicks stores seeded.")
 
+    @app.cli.command("fetch-newsapi")
+    def fetch_newsapi_command():
+        from app.jobs.tasks.content.fetch_articles import run_newsapi_fetch
+        print("Fetching articles from NewsAPI...")
+        run_newsapi_fetch()
+        print("Done!")
+
+    @app.cli.command("fetch-gnews")
+    def fetch_gnews_command():
+        from app.jobs.tasks.content.fetch_articles import run_gnews_fetch
+        print("Fetching articles from GNews...")
+        run_gnews_fetch()
+        print("Done!")
+
+    @app.cli.command("fetch-rss")
+    def fetch_rss_command():
+        from app.jobs.tasks.content.fetch_articles import run_rss_fetch
+        print("Fetching articles from rss feeds...")
+        run_rss_fetch()
+        print("Done!")
+
+    @app.cli.command("fetch-youtube")
+    def fetch_youtube_command():
+        from app.jobs.tasks.content.fetch_articles import run_youtube_fetch
+        print("Fetching youtube reviews...")
+        run_youtube_fetch()
+        print("Done!")
+
+    @app.cli.command("fetch-reddit")
+    def fetch_reddit_command():
+        from app.jobs.tasks.content.fetch_articles import run_reddit_fetch
+        print("Fetching posts from Reddit communities...")
+        run_reddit_fetch()
+        print("Done!")
+
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs all active fetchers in one go."""
@@ -139,6 +191,14 @@ def create_app():
         # run_reddit_fetch()
         # print("--- [Matcher] Linking Articles to Items ---")
         # match_articles_to_items()
+    @app.cli.command("rescrape-articles")
+    def rescrape_articles_command():
+        """Find articles with missing content and attempt to re-scrape."""
+        from app.domains.article.service.scraping import reprocess_unscraped_articles
+        print("Searching for unscraped articles...")
+        count = reprocess_unscraped_articles(limit=15)
+        print(f"Done! Successfully recovered content for {count} articles.")
+
     @app.cli.command("generate-sitemap")
     def generate_sitemap_command():
         """Generate a static sitemap.xml file."""

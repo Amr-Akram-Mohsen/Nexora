@@ -1,6 +1,6 @@
 from sqlalchemy import func, distinct, and_
 from datetime import datetime, timedelta
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink
 from app.domains.interaction.models import ItemClick, View

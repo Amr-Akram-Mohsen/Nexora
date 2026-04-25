@@ -22,7 +22,7 @@ import html
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.shared.sanitizer import sanitize_text
-from app.integrations.content.extract_article_content import scrape_article_content, enhance_article_html
+from app.integrations.content.extract_article_content import scrape_article_content
 import logging
 logger = logging.getLogger(__name__)
 # ── Safe HTML tags allowed in article content ──────────────────
@@ -190,31 +190,44 @@ def clean_article_data(raw: dict, skip_scrape: bool = False) -> dict | None:
 
     # ── Content ──────────────────────────────────────────────────
     content = raw.get("content")
+    is_content_scraped = False
+
     if not skip_scrape and not content and url and "youtube.com" not in url.lower():
         full_content = scrape_article_content(url)
-        if not full_content:
-            # SKIP: Article extraction failed or timed out
-            logger.info(f"[Cleaner] Skipping article (extraction failed): {title[:50]}...")
-            return None
-        
-        enhanced_html = enhance_article_html(full_content)
-        content = _sanitize_content(enhanced_html)
-        
-        # Verify sanitized content isn't just whitespace or too tiny
-        if not content or len(content) < 200:
-            logger.info(f"[Cleaner] Skipping article (insufficient content after sanitization): {title[:50]}...")
-            return None
+        if full_content:
+            # full_content is already enhanced inside scrape_article_content
+            content = _sanitize_content(full_content)
+            
+            # Verify sanitized content isn't just whitespace or too tiny
+            if content and len(content) >= 300:
+                is_content_scraped = True
+            else:
+                logger.debug(f"[Cleaner] Content too short for {title[:50]}, marking as unscraped.")
+                is_content_scraped = False
+        else:
+            logger.info(f"[Cleaner] Scrape failed for {title[:50]}, marking as unscraped.")
+            is_content_scraped = False
+    elif content:
+        # If content was already provided (e.g. from a full RSS feed or previous fetch)
+        content = _sanitize_content(content)
+        is_content_scraped = True if len(content or "") > 300 else False
     elif skip_scrape:
         logger.debug(f"[Cleaner] Skipping scrape for existing article: {title[:50]}...")
+        is_content_scraped = raw.get("is_content_scraped", False)
+
+    # Fallback: if no content, use description as a placeholder
+    if not content or len(content) < 50:
+        content = f'<p class="article-full-text__paragraph">{description}</p>'
 
     return {
-        "title":         title,
-        "description":   description,
-        "content":       content,
-        "url":           url,
-        "image_url":     image_url,
-        "published_at":  published_at,
-        "source_name":   source_name,
+        "title":              title,
+        "description":        description,
+        "content":            content,
+        "is_content_scraped": is_content_scraped,
+        "url":                url,
+        "image_url":          image_url,
+        "published_at":       published_at,
+        "source_name":        source_name,
 
         # Pass-through classification (CRITICAL)
         "section_slug": raw.get("section_slug"),

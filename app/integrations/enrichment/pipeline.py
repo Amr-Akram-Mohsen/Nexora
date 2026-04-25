@@ -1,6 +1,6 @@
 from app.integrations.enrichment.brand_detector import detect_brands
 from app.integrations.enrichment.facet_detector import detect_facets
-from app.shared.constants.brand_aliases import BRAND_ALIASES
+from app.shared.constants.taxonomy import TAXONOMY
 
 
 def prepare_article(raw: dict, section_slug: str, category_slug: str, q_obj: dict) -> dict:
@@ -24,7 +24,7 @@ def prepare_article(raw: dict, section_slug: str, category_slug: str, q_obj: dic
     raw["topic_slugs"] = q_obj.get("topics", [])
 
     # 3. Brands (merge query + detected)
-    detected_brands = detect_brands(text_blob, BRAND_ALIASES)
+    detected_brands = detect_brands(text_blob, TAXONOMY.get("brands", []))
     raw["brand_slugs"] = list(set(q_obj.get("brands", []) + detected_brands))
 
     # 4. Facets (NEW)

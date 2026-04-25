@@ -18,8 +18,7 @@ import feedparser
 from app.integrations.cleaner import clean_article_data
 from app.domains.article.ingestion import store_article
 from app.integrations.enrichment.pipeline import prepare_article
-from app.integrations.enrichment.brand_detector import detect_brands
-from app.shared.constants.brand_aliases import BRAND_ALIASES
+from app.shared.constants.taxonomy import TAXONOMY
 
 logger = logging.getLogger(__name__)
 

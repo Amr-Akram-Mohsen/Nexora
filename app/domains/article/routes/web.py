@@ -1,9 +1,7 @@
 from . import bp
 
-from random import shuffle
-from flask import request, render_template, Blueprint
+from flask import request, render_template
 from flask_login import current_user
-from sqlalchemy import func
 from app.core.extensions import db
 from app.domains.system.models import Section
 from app.domains.article.models import Article
@@ -11,9 +9,8 @@ from app.domains.item.models import Item, ItemVariant, ItemStoreLink
 from ..service import get_related_articles, get_trending_articles
 from app.domains.system.service import get_active_brands_for_section, get_active_topics_for_section, get_active_categories_for_section
 from app.domains.interaction.service import record_view
-from app.core.constants import TargetType
-from app.shared.request import get_client_ip, get_country
-from app.shared.parsing import safe_float
+from app.shared.constants.core import TargetType
+from app.shared.request import get_client_ip
 
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):

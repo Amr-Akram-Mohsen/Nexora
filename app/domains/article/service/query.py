@@ -121,12 +121,12 @@ def get_trending_articles(limit=6, days=7, section_ids=None):
 def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_page=24):
     """
     Handles complex filtering and pagination for section articles.
+    Uses many-to-one section_id (refactored from many-to-many).
     """
-    from app.domains.system.models import Category, Section, Brand, Topic
+    from app.domains.system.models import Category, Brand, Topic
     query = (
         Article.query
-        .join(Article.sections)
-        .filter(Section.id == section.id)
+        .filter(Article.section_id == section.id)
         .options(
             db.defer(Article.content),
             db.selectinload(Article.topics),
@@ -167,8 +167,8 @@ def get_articles(search=None, source=None, rows_count=10):
         from sqlalchemy import or_
         query = query.filter(or_(Article.title.ilike(f'%{search}%'), Article.description.ilike(f'%{search}%')))
 
-    if source:
-        query = query.filter(Article.source_name == source)
+    # source_name column was removed; sources live in the article_sources relationship.
+    # Filtering by source slug via the relationship is left for a future enhancement.
 
     if rows_count:
         query = query.limit(rows_count)

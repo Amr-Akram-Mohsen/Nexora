@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from app.core.extensions import db
 from app.domains.interaction.models import ItemClick, View
 from sqlalchemy import func
-from app.core.constants import TargetType
+from app.shared.constants.core import TargetType
 # --- weights for scoring ---
 PRICE_WEIGHT = 0.7
 CTR_WEIGHT = 0.3
