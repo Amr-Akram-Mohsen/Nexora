@@ -95,6 +95,18 @@ def ingest_article_stream(article: Article, data: dict) -> Article | None:
     try:
         _apply_many_to_many(article, data)
         _apply_single_facets(article, data)
+        
+        # Update extra_metadata with new insights
+        meta = dict(article.extra_metadata or {})
+        for key in ["region", "discovery_query", "reading_time_min"]:
+            if data.get(key):
+                meta[key] = data[key]
+        
+        if data.get("facets", {}).get("intent"):
+            meta["intent_context"] = data["facets"]["intent"]
+            
+        article.extra_metadata = meta
+
         return article
     except Exception:
         logger.exception("[Ingestion] Error merging data into existing article: %s", article.url)
@@ -109,6 +121,16 @@ def store_article(cleaned_data: dict) -> Article | None:
     url = cleaned_data.get("url")
     try:
         section, category = _resolve_taxonomy(cleaned_data)
+        
+        # Prepare extra_metadata with discovery context
+        extra_meta = {}
+        for key in ["region", "discovery_query", "reading_time_min"]:
+            if cleaned_data.get(key):
+                extra_meta[key] = cleaned_data[key]
+        
+        # Pull intent from facets for easier top-level access
+        if cleaned_data.get("facets", {}).get("intent"):
+            extra_meta["intent_context"] = cleaned_data["facets"]["intent"]
 
         article = Article(
             title=cleaned_data.get("title"),
@@ -122,7 +144,7 @@ def store_article(cleaned_data: dict) -> Article | None:
             importance_score=cleaned_data.get("importance_score") or 0.0,
             enhanced_query=cleaned_data.get("enhanced_query"),
             is_content_scraped=cleaned_data.get("is_content_scraped", False),
-            extra_metadata={}, 
+            extra_metadata=extra_meta, 
             is_active=True,
         )
 

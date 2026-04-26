@@ -191,6 +191,13 @@ def create_app():
         # run_reddit_fetch()
         # print("--- [Matcher] Linking Articles to Items ---")
         # match_articles_to_items()
+    @app.cli.command("fetch-test")
+    def fetch_test_command():
+        """Runs a limited discovery run (5 queries per source) for testing."""
+        from app.jobs.tasks.content.fetch_articles import run_article_fetch
+        print("--- Starting Limited Test Run (5 queries/source) ---")
+        run_article_fetch(limit=5)
+
     @app.cli.command("rescrape-articles")
     def rescrape_articles_command():
         """Find articles with missing content and attempt to re-scrape."""

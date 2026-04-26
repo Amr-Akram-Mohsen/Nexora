@@ -7,8 +7,6 @@ Env var: NEWS_API_KEY
 import logging
 import requests
 from flask import current_app
-from app.integrations.cleaner import clean_article_data
-from app.domains.article.ingestion import store_article
 from app.integrations.external.api import (
     can_call_newsapi, record_newsapi_call,
     should_refetch, mark_fetched,
@@ -16,8 +14,6 @@ from app.integrations.external.api import (
 
 from app.integrations.discovery import DiscoveryManager
 from app.integrations.enrichment.pipeline import prepare_article
-from app.domains.article.models import Article
-from app.core.extensions import db
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +38,9 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
             break
 
         try:
+            print(f"  [NewsAPI] Searching: {q_text}...")
+            logger.info(f"[NewsAPI] Query: {q_text}")
+
             resp = requests.get(
                 "https://newsapi.org/v2/everything",
                 params={
@@ -64,12 +63,17 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
             )
 
             from app.domains.article.ingestion import smart_ingest
+            query_stored = 0
             for raw in resp.json().get("articles", []):
                 # 1. Enrichment/Classification
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
                 if smart_ingest(raw):
-                    stored += 1
+                    query_stored += 1
+            
+            stored += query_stored
+            if query_stored > 0:
+                print(f"    -> [NewsAPI] Stored {query_stored} new articles")
                     
         except Exception:
             logger.exception("[NewsAPI] Error fetching '%s' for %s", q_text, category_slug)
@@ -77,16 +81,32 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
     return stored
 
 
-def fetch_all_sections() -> int:
+def fetch_all_sections(limit: int | None = None) -> int:
     total = 0
     discovery = DiscoveryManager()
-    queries_registry = discovery.get_queries_by_section()
+    queries_registry = discovery.get_queries_by_section(source_filter="newsapi")
     
-    for section_slug, categories in queries_registry.items():
-        logger.info("[NewsAPI] Fetching Section: %s", section_slug)
-        for category_slug, queries in categories.items():
-            logger.info("[NewsAPI]   Category: %s (%d queries)", category_slug, len(queries))
-            count = fetch_section_category_newsapi(section_slug, category_slug, queries)
-            total += count
-            logger.info("[NewsAPI]     -> %d new articles stored", count)
+    # Flatten the registry into a list of (section, category, q_obj)
+    flat_queries = []
+    for section, categories in queries_registry.items():
+        for category, queries in categories.items():
+            for q in queries:
+                flat_queries.append((section, category, q))
+    
+    if not flat_queries:
+        return 0
+
+    # If limited, shuffle to get a diverse sample across sections/categories
+    import random
+    if limit:
+        random.shuffle(flat_queries)
+        flat_queries = flat_queries[:limit]
+
+    logger.info("[NewsAPI] Starting discovery run with %d queries (Diverse Sample)", len(flat_queries))
+    
+    # Group back by section/category for efficient execution (optional, but cleaner logs)
+    for section_slug, category_slug, q_obj in flat_queries:
+        count = fetch_section_category_newsapi(section_slug, category_slug, [q_obj])
+        total += count
+        
     return total

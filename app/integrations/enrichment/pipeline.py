@@ -27,7 +27,22 @@ def prepare_article(raw: dict, section_slug: str, category_slug: str, q_obj: dic
     detected_brands = detect_brands(text_blob, TAXONOMY.get("brands", []))
     raw["brand_slugs"] = list(set(q_obj.get("brands", []) + detected_brands))
 
-    # 4. Facets (NEW)
-    raw["facets"] = detect_facets(title, description, category_slug)
+    # 4. Facets
+    # Prefer intent from the query if available
+    query_intent = q_obj.get("intent")
+    raw["facets"] = detect_facets(title, description, category_slug, query_intent=query_intent)
+
+    # 5. Region (from query/scraper context)
+    if q_obj.get("region"):
+        raw["region"] = q_obj["region"]
+
+    # 6. Discovery Context
+    if q_obj.get("query"):
+        raw["discovery_query"] = q_obj["query"]
+
+    # 7. Premium Metadata: Reading Time
+    content_text = raw.get("content") or description or ""
+    word_count = len(content_text.split())
+    raw["reading_time_min"] = max(1, word_count // 200)
 
     return raw

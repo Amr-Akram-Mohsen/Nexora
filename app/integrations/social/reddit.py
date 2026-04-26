@@ -6,19 +6,22 @@ Structure: { section_slug: { category_slug: [subreddits] } }
 import logging
 from datetime import datetime
 from flask import current_app
-from app.integrations.cleaner import clean_article_data
 from app.integrations.external.api import should_refetch, mark_fetched
-from app.domains.article.ingestion import store_article
 
 logger = logging.getLogger(__name__)
 
 # ── Subreddit Registry ────────────────────────────────────────────
 SUBREDDITS = {
     "community": {
-        "electronics": ["gadgets", "smartphones", "Android", "iphone", "hardware"],
-        "perfumes":    ["fragrance", "malefragrance", "feminineFragrance", "oud"],
-        "accessories": ["Watches", "streetwear", "malefashionadvice"],
-        "regional":    ["saudiarabia", "dubai", "abudhabi", "emirates"], # Regional is separate
+        "electronics": ["gadgets", "smartphones", "Android", "iphone", "hardware", "Apple", "Samsung", "PCMasterRace", "GooglePixel"],
+        "perfumes":    ["fragrance", "scents", "malefragrance", "feminineFragrance", "oud", "IndieExchange"],
+        "accessories": ["Watches", "LuxuryPurse", "DesignerBags", "Sunglasses", "streetwear", "malefashionadvice"],
+        "regional":    ["saudiarabia", "dubai", "abudhabi", "emirates"], 
+    },
+    "trends": {
+        "electronics": ["technology", "futurology", "startups"],
+        "perfumes":    ["fragrance", "scents"],
+        "accessories": ["streetwear", "highfashion"],
     }
 }
 
@@ -62,6 +65,9 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
             normalized_query=f"r/{name}"
         )
 
+        print(f"  [Reddit] Fetching r/{name} ({category_slug})...")
+        logger.info(f"[Reddit] Subreddit: r/{name}, Category: {category_slug}")
+
         from app.domains.article.ingestion import ingest_article_stream
         for submission in subreddit.hot(limit=limit):
             if submission.score < MIN_SCORE:
@@ -76,6 +82,10 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
             )
             thumbnail = submission.thumbnail if submission.thumbnail.startswith("http") else None
 
+            # Identify region for local subreddits
+            region_map = {"saudiarabia": "SA", "dubai": "AE", "abudhabi": "AE", "emirates": "AE"}
+            region = region_map.get(name.lower())
+
             raw = {
                 "title":        submission.title,
                 "description":  description,
@@ -85,26 +95,56 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
                 "source_name":  f"r/{name}",
                 "section_slug": section_slug,
                 "category_slug": category_slug if category_slug != "regional" else "general",
+                "region":       region
             }
             
+            from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP, SECTION_DEFAULT_INTENTS
+            from app.integrations.enrichment.pipeline import prepare_article
+            
+            # Mock q_obj for Reddit enrichment
+            q_obj = {
+                "topics": CATEGORY_TOPIC_MAP.get(category_slug, []),
+                "brands": [],
+                "intent": SECTION_DEFAULT_INTENTS.get(section_slug, ["Discussion"])[0],
+                "region": region,
+                "query": f"r/{name}"
+            }
+
+            raw = prepare_article(raw, section_slug, category_slug, q_obj)
+
             from app.domains.article.ingestion import smart_ingest
             if smart_ingest(raw):
                 stored += 1
+        
+        if stored > 0:
+            print(f"    -> [Reddit] Stored {stored} new posts from r/{name}")
+            
         return stored
     except Exception:
         logger.exception("[Reddit] Error fetching r/%s", name)
         return 0
 
 
-def fetch_all_reddit() -> int:
+def fetch_all_reddit(limit: int | None = None) -> int:
     total = 0
-    section_slug = "community"
-    categories = SUBREDDITS.get(section_slug, {})
-    
-    for category_slug, sub_list in categories.items():
-        for sub in sub_list:
-            logger.info("[Reddit] Fetching r/%s (%s)", sub, category_slug)
-            count = fetch_subreddit(sub, section_slug, category_slug)
-            total += count
-            logger.info("[Reddit]   -> %d posts stored", count)
+    discovery_tasks = []
+    for section_slug, categories in SUBREDDITS.items():
+        for category_slug, sub_list in categories.items():
+            for sub in sub_list:
+                discovery_tasks.append((sub, section_slug, category_slug))
+
+    if not discovery_tasks:
+        return 0
+
+    import random
+    if limit:
+        random.shuffle(discovery_tasks)
+        discovery_tasks = discovery_tasks[:limit]
+
+    logger.info("[Reddit] Starting discovery run with %d subreddits (Diverse Sample)", len(discovery_tasks))
+
+    for sub, section, category in discovery_tasks:
+        count = fetch_subreddit(sub, section, category)
+        total += count
+        
     return total

@@ -18,7 +18,7 @@ def my_zip(*iterables):
 
 def get_articles_render(filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
     from app.domains.system.models import Section
-    query = Article.query.options(
+    query = Article.query.filter(Article.is_active == True).options(
         defer(Article.content),
         selectinload(Article.topics),
         selectinload(Article.brands)
@@ -126,7 +126,7 @@ def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_
     from app.domains.system.models import Category, Brand, Topic
     query = (
         Article.query
-        .filter(Article.section_id == section.id)
+        .filter(Article.section_id == section.id, Article.is_active == True)
         .options(
             db.defer(Article.content),
             db.selectinload(Article.topics),

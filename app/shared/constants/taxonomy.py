@@ -28,31 +28,38 @@ TAXONOMY = {
       "children": [
         {
           "name": "Smartphones",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["mobile phones", "cell phones", "android", "iphone"]
         },
         {
           "name": "Laptops",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["notebooks", "ultrabooks", "macbook", "gaming laptops"]
         },
         {
           "name": "Tablets",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["ipad", "android tablets", "surface"]
         },
         {
           "name": "Smartwatches",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["apple watch", "galaxy watch", "fitness trackers"]
         },
         {
           "name": "Earbuds",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["true wireless", "airpods", "galaxy buds", "tws"]
         },
         {
           "name": "Headphones",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["over-ear", "noise cancelling headphones", "hi-fi audio"]
         },
         {
           "name": "Cameras",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["dslr", "mirrorless", "photography gear", "vlogging cameras"]
         }
       ]
     },
@@ -62,11 +69,13 @@ TAXONOMY = {
       "children": [
         {
           "name": "Niche & Artisanal",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["niche fragrance", "artisan perfume", "luxury scent"]
         },
         {
           "name": "Oud & Oriental",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["oud perfume", "arabic fragrance", "oriental scent", "attar"]
         }
       ]
     },
@@ -76,19 +85,23 @@ TAXONOMY = {
       "children": [
         {
           "name": "Watches",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["luxury watches", "timepieces", "chronograph", "mechanical watches"]
         },
         {
           "name": "Bags",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["handbags", "backpacks", "luxury bags", "leather bags"]
         },
         {
           "name": "Sunglasses",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["luxury eyewear", "designer sunglasses", "shades"]
         },
         {
           "name": "Jewelry",
-          "is_leaf": True
+          "is_leaf": True,
+          "search_keywords": ["fine jewelry", "rings", "necklaces", "bracelets"]
         }
       ]
     },
@@ -237,11 +250,31 @@ TAXONOMY = {
         "category": "Perfumes"
       },
       {
-        "name": "Summer",
+        "name": "Summer-Wear",
         "category": "Perfumes"
       },
       {
-        "name": "winter",
+        "name": "Winter-Wear",
+        "category": "Perfumes"
+      },
+      {
+        "name": "Woody",
+        "category": "Perfumes"
+      },
+      {
+        "name": "Floral",
+        "category": "Perfumes"
+      },
+      {
+        "name": "Citrus",
+        "category": "Perfumes"
+      },
+      {
+        "name": "Spicy",
+        "category": "Perfumes"
+      },
+      {
+        "name": "Musky",
         "category": "Perfumes"
       },
       {

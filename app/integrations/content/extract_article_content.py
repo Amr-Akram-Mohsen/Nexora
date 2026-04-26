@@ -86,6 +86,19 @@ def _remove_ghost_whitespace(soup: BeautifulSoup) -> None:
                 child.extract()
 
 
+def _collapse_internal_whitespace(soup: BeautifulSoup) -> None:
+    """
+    In-place: Collapse multiple spaces/newlines into a single space within 
+    structural elements like tables and divs to keep the HTML clean and tight.
+    """
+    for tag in soup.find_all(["table", "thead", "tbody", "tr", "td", "th", "div", "ul", "ol", "li"]):
+        for child in tag.children:
+            if isinstance(child, NavigableString):
+                # Replace all whitespace (including newlines) with a single space
+                collapsed = re.sub(r"\s+", " ", child.string)
+                child.replace_with(collapsed)
+
+
 def _trim_all_text_nodes(soup: BeautifulSoup) -> None:
     """In-place: strip leading/trailing whitespace from every text node (except pre/code)."""
     for node in soup.find_all(string=True):
@@ -192,13 +205,19 @@ def clean_html(html: str, base_url: str = "") -> str:
     _normalize_images(soup, base_url)
     _normalize_links(soup)
     _remove_ghost_whitespace(soup)
+    _collapse_internal_whitespace(soup) # NEW
     _remove_separator_elements(soup)
     _trim_all_text_nodes(soup)
     _prune_empty_nodes(soup)
-    # Second pass after prune (prune may create new empty structural tags)
+    # Final pass to ensure structural tags are clean
     _remove_ghost_whitespace(soup)
 
-    return str(soup)
+    clean_str = str(soup)
+    
+    # Post-BS4 Aggressive Regex cleanup
+    clean_str = re.sub(r'>\s+<', '><', clean_str) # Strip whitespace between tags
+    clean_str = re.sub(r'\n\s*\n', '\n', clean_str) # Collapse empty lines
+    return clean_str.strip()
 
 
 # ────────────────────────────────────────────────────────────────────────────

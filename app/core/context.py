@@ -47,8 +47,8 @@ def get_layout_context():
             "brands": popular_brands,
         },
 
-        "popular_interests": popular_interests[:5],
-        "footer_topics": popular_interests[5:],
+        "popular_interests": popular_interests,
+        "footer_topics": popular_interests,
         "footer_pages": [
             ('about', 'About Us'),
             ('contact', 'Contact'),

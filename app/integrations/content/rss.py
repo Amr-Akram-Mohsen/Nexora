@@ -22,12 +22,6 @@ from app.shared.constants.taxonomy import TAXONOMY
 
 logger = logging.getLogger(__name__)
 
-# Tracking query params to strip from article URLs before storing
-_TRACKING_PARAMS = {
-    "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
-    "ref", "source", "mc_cid", "mc_eid", "fbclid", "gclid", "_ga",
-    "cmpid", "linkId", "WT.mc_id",
-}
 
 # ── Feed Registry ─────────────────────────────────────────────────
 # Mapped by [Section] -> [Category] -> [List of URLs]
@@ -44,10 +38,14 @@ RSS_FEEDS = {
         ],
         "perfumes": [
             "https://cafleurebon.com/feed/",
+            "https://basenotes.com/feed/",
+            "https://thescentedhound.com/feed/",
         ],
         "accessories": [
             "https://www.ablogtowatch.com/feed/",
             "https://www.wristreview.com/feed/",
+            "https://www.hodinkee.com/rss",
+            "https://www.fratellowatches.com/feed/",
         ],
     },
     "news": {
@@ -60,10 +58,12 @@ RSS_FEEDS = {
         ],
         "perfumes": [
             "https://perfumerflavorist.com/feed/",
+            "https://ifragranceofficial.com/feed/",
         ],
         "accessories": [
             "https://hypebeast.com/feed",
             "https://www.highsnobiety.com/feed/",
+            "https://www.purseblog.com/feed/",
         ],
     },
     "tutorials": {
@@ -75,23 +75,17 @@ RSS_FEEDS = {
             "https://dev.to/feed/tag/tutorial",
             "https://dev.to/feed/tag/javascript",
         ],
+        "perfumes": [
+            "https://scentbound.com/feed/",
+        ],
         "accessories": [
             "https://www.apetogentleman.com/feed/",
+            "https://GentlemansGazette.com/feed/",
         ]
     }
 }
 
 
-def _strip_tracking_params(url: str) -> str:
-    """Remove known tracking query parameters from a URL for cleaner deduplication."""
-    try:
-        parsed = urlparse(url)
-        qs = parse_qs(parsed.query, keep_blank_values=False)
-        clean_qs = {k: v for k, v in qs.items() if k.lower() not in _TRACKING_PARAMS}
-        clean_query = urlencode(clean_qs, doseq=True)
-        return urlunparse(parsed._replace(query=clean_query))
-    except Exception:
-        return url
 
 
 def _extract_content(entry) -> str:
@@ -126,9 +120,6 @@ def _parse_entry(entry, section_slug: str, category_slug: str, source_name: str)
     title = getattr(entry, "title", None)
     if not url or not title:
         return None
-
-    # Normalize URL to strip tracking params before dedup check
-    url = _strip_tracking_params(url)
 
     published_at = None
     if hasattr(entry, "published_parsed") and entry.published_parsed:
@@ -170,27 +161,11 @@ def _parse_entry(entry, section_slug: str, category_slug: str, source_name: str)
     }
 
 
-# Mapping for deterministic RSS classification (No magic)
-# Maps category_slug -> {topics, brands}
-SUBJECT_MAPPING = {
-    "smartphones":  {"topics": ["mobile-tech"], "brands": []},
-    "laptops":      {"topics": ["computing"], "brands": []},
-    "tablets":      {"topics": ["computing", "mobile-tech"], "brands": []},
-    "smartwatches": {"topics": ["wearables"], "brands": []},
-    "earbuds":      {"topics": ["audio"], "brands": []},
-    "headphones":   {"topics": ["audio"], "brands": []},
-    "cameras":      {"topics": ["photography"], "brands": []},
-    "perfumes":     {"topics": ["fragrances"], "brands": []},
-    "mens-perfumes": {"topics": ["fragrances"], "brands": []},
-    "womens-perfumes": {"topics": ["fragrances"], "brands": []},
-    "watches":      {"topics": ["luxury-watches"], "brands": []},
-    "bags":         {"topics": ["fashion-accessories"], "brands": []},
-}
-
 def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls: list[str]) -> int:
     stored = 0
+    from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP
     # Determine deterministic classification for this feed set
-    mapping = SUBJECT_MAPPING.get(category_slug, {"topics": [], "brands": []})
+    topics = CATEGORY_TOPIC_MAP.get(category_slug, [])
     
     for feed_url in feed_urls:
         try:
@@ -211,6 +186,7 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 logger.info("[RSS] Empty feed (0 entries): %s", feed_url)
                 continue
 
+            from app.shared.constants.query_builder import SECTION_DEFAULT_INTENTS
             from app.domains.article.ingestion import smart_ingest
 
             source_name = feed.feed.get("title") or feed_url
@@ -219,14 +195,14 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 if not raw:
                     continue
                 
-                # Pass deterministic classification
+                # Create mock q_obj for RSS enrichment
                 q_obj = {
-                    "topics": mapping["topics"],
-                    "brands": []
+                    "topics": topics,
+                    "brands": [],
+                    "intent": SECTION_DEFAULT_INTENTS.get(section_slug, ["News"])[0]
                 }
 
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
-
 
                 if smart_ingest(raw):
                     stored += 1
@@ -236,13 +212,26 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
     return stored
 
 
-def fetch_all_rss() -> int:
+def fetch_all_rss(limit: int | None = None) -> int:
     total = 0
+    discovery_tasks = []
     for section_slug, categories in RSS_FEEDS.items():
-        logger.info("[RSS] Fetching Section: %s", section_slug)
         for category_slug, feeds in categories.items():
-            logger.info("[RSS]   Category: %s (%d feeds)", category_slug, len(feeds))
-            count = fetch_rss_section_category(section_slug, category_slug, feeds)
-            total += count
-            logger.info("[RSS]     -> %d new articles stored", count)
+            for f in feeds:
+                discovery_tasks.append((section_slug, category_slug, f))
+
+    if not discovery_tasks:
+        return 0
+
+    import random
+    if limit:
+        random.shuffle(discovery_tasks)
+        discovery_tasks = discovery_tasks[:limit]
+
+    logger.info("[RSS] Starting discovery run with %d feeds (Diverse Sample)", len(discovery_tasks))
+
+    for section, category, feed_url in discovery_tasks:
+        count = fetch_rss_section_category(section, category, [feed_url])
+        total += count
+        
     return total
