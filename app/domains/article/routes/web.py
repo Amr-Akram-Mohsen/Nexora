@@ -21,9 +21,9 @@ def sections(section_slug):
     ).first_or_404()
 
     active_filters = {
-        'category': request.args.getlist('category'),
-        'topic': request.args.getlist('topic'),
-        'brand': request.args.getlist('brand'),
+        'category': [f for f in request.args.getlist('category') if f.strip()],
+        'topic': [f for f in request.args.getlist('topic') if f.strip()],
+        'brand': [f for f in request.args.getlist('brand') if f.strip()],
         'sort': request.args.get('sort', 'newest')
     }
 

@@ -1,5 +1,4 @@
 {# catalog-sidebar.html #}
-{% from "components/shared/catalog-utils.html" import filter_url %}
 {% from "components/ui/button.html" import button %}
 
 {# ── Canonical filter priority order ── #}
@@ -109,7 +108,7 @@
       {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
 
       <li class="filter-item {{ 'is-active' if is_active }}">
-        <a href="{{ filter_url(filter_name, slug, multi=(target_type == 'products' or filter_name not in ['category'])) }}"
+        <a href="{{ get_filter_url(filter_name, slug, multi=(target_type == 'products' or filter_name not in ['category'])) }}"
            class="filter-item__link flex items-center"
            title="{{ name }}">
           <span class="checkbox-box {{ 'checked' if is_active }}" aria-hidden="true"></span>
@@ -198,7 +197,7 @@
         {% set slug = opt.slug if opt.slug is defined else opt %}
         {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
         {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-        <a href="{{ filter_url('topic', slug, multi=true) }}"
+        <a href="{{ get_filter_url('topic', slug, multi=true) }}"
            class="sidebar-trending__link {{ 'is-active' if is_active }}">
           <i class="fas fa-arrow-trend-up"></i>
           <span class="truncate">{{ name }}</span>

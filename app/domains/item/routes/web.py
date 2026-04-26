@@ -1,7 +1,6 @@
 from . import bp
 
-from random import shuffle
-from flask import request, render_template, jsonify, redirect, url_for, Blueprint
+from flask import request, render_template, jsonify, redirect, url_for
 from flask_login import current_user
 from sqlalchemy import func
 from app.core.extensions import db
@@ -27,10 +26,10 @@ def view_full_specs(item_id):
 def deals():
     from ..service import get_filtered_items
     active_filters = {
-        'category': request.args.getlist('category'),
-        'brand': request.args.getlist('brand'),
-        'store': request.args.getlist('store'),
-        'type': request.args.getlist('type'),
+        'category': [f for f in request.args.getlist('category') if f.strip()],
+        'brand': [f for f in request.args.getlist('brand') if f.strip()],
+        'store': [f for f in request.args.getlist('store') if f.strip()],
+        'type': [f for f in request.args.getlist('type') if f.strip()],
         'min_price': request.args.get('min_price'),
         'max_price': request.args.get('max_price'),
         'sort': request.args.get('sort', 'newest')

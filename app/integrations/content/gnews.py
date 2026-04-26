@@ -46,7 +46,7 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                     "q":       q_text,
                     "lang":    "en" if not any(c in q_text for c in 'ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي') else "ar",
                     "country": country,
-                    "max":     10,
+                    "max":     50,
                     "apikey":  api_key,
                 },
                 timeout=10,

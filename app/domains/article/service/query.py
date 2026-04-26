@@ -134,21 +134,24 @@ def get_filtered_articles(section, active_filters, allowed_filters, page=1, per_
         )
     )
 
-    if active_filters.get('category'):
-        query = query.join(Article.category).filter(Category.slug.in_(active_filters['category']))
+    cats = [f for f in active_filters.get('category', []) if f]
+    if cats and "category" in allowed_filters:
+        query = query.filter(Article.category.has(Category.slug.in_(cats)))
     
-    if active_filters.get('topic') and "topic" in allowed_filters:
-        query = query.join(Article.topics).filter(Topic.slug.in_(active_filters['topic']))
+    topics = [f for f in active_filters.get('topic', []) if f]
+    if topics and "topic" in allowed_filters:
+        query = query.filter(Article.topics.any(Topic.slug.in_(topics)))
     
-    if active_filters.get('brand') and "brand" in allowed_filters:
-        query = query.join(Article.brands).filter(Brand.slug.in_(active_filters['brand']))
+    brands = [f for f in active_filters.get('brand', []) if f]
+    if brands and "brand" in allowed_filters:
+        query = query.filter(Article.brands.any(Brand.slug.in_(brands)))
 
     if active_filters.get('sort') == 'oldest':
         query = query.order_by(Article.published_at.asc())
     else:
         query = query.order_by(Article.published_at.desc())
 
-    return query.distinct().paginate(page=page, per_page=per_page, error_out=False)
+    return query.paginate(page=page, per_page=per_page, error_out=False)
 
 def get_search_articles(query):
     # Articles: search title/content (limit for speed)

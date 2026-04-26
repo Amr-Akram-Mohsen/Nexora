@@ -190,7 +190,7 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
             from app.domains.article.ingestion import smart_ingest
 
             source_name = feed.feed.get("title") or feed_url
-            for entry in feed.entries[:15]:   # latest 15 per feed
+            for entry in feed.entries[:30]:   # latest 15 per feed
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
                 if not raw:
                     continue

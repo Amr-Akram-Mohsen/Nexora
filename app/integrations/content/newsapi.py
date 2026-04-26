@@ -47,7 +47,7 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                     "q":        q_text,
                     "language": "en",
                     "sortBy":   "publishedAt",
-                    "pageSize": 15,
+                    "pageSize": 80,
                     "apiKey":   api_key,
                 },
                 timeout=10,
