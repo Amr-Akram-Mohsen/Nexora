@@ -10,7 +10,7 @@ let searchDebounce = null;
 // DOMAIN CONFIG
 // ==============================
 const domainConfig = {
-  articles: {
+  contents: {
     titleField: "title",
     fields: ["id", "published_at", "view_count"],
     enableDelete: true,
@@ -343,11 +343,11 @@ function renderInteractionAnalytics(containerId) {
       grid.className = "dashboard-stats-grid";
 
       const breakdowns = [
-        { label: "Views",       key: "views",      icon: "👁️" },
-        { label: "Comments",    key: "comments",   icon: "💬" },
-        { label: "Likes",       key: "likes",      icon: "👍" },
-        { label: "Dislikes",    key: "dislikes",   icon: "👎" },
-        { label: "Saves",       key: "saves",      icon: "🔖" },
+        { label: "Views", key: "views", icon: "👁️" },
+        { label: "Comments", key: "comments", icon: "💬" },
+        { label: "Likes", key: "likes", icon: "👍" },
+        { label: "Dislikes", key: "dislikes", icon: "👎" },
+        { label: "Saves", key: "saves", icon: "🔖" },
         { label: "Item Clicks", key: "item_clicks", icon: "🛒" },
       ];
 
@@ -400,18 +400,18 @@ function renderInteractionAnalytics(containerId) {
             activityContainer.innerHTML = `<div class="dashboard-empty"><p>No recent activity.</p></div>`;
             return;
           }
-          
+
           const ul = document.createElement("ul");
           ul.className = "activity-feed";
-          
+
           // Show top 5 comments
           comments.slice(0, 5).forEach(c => {
             const li = document.createElement("li");
             li.className = "activity-item";
-            
+
             const timeAgo = c.created_at ? new Date(c.created_at).toLocaleDateString() : "Recently";
             const targetName = c.target_type ? c.target_type.toUpperCase() : "Content";
-            
+
             li.innerHTML = `
               <div class="activity-icon icon-comment">💬</div>
               <div class="activity-content">
@@ -424,7 +424,7 @@ function renderInteractionAnalytics(containerId) {
             `;
             ul.appendChild(li);
           });
-          
+
           activityContainer.appendChild(ul);
         })
         .catch(() => {
@@ -455,11 +455,11 @@ function renderInteractionBreakdown(containerId) {
     .then(res => res.json())
     .then(data => {
       const items = [
-        { label: "Views",       key: "views",       icon: "👁️" },
-        { label: "Comments",    key: "comments",    icon: "💬" },
-        { label: "Likes",       key: "likes",       icon: "👍" },
-        { label: "Dislikes",    key: "dislikes",    icon: "👎" },
-        { label: "Saves",       key: "saves",       icon: "🔖" },
+        { label: "Views", key: "views", icon: "👁️" },
+        { label: "Comments", key: "comments", icon: "💬" },
+        { label: "Likes", key: "likes", icon: "👍" },
+        { label: "Dislikes", key: "dislikes", icon: "👎" },
+        { label: "Saves", key: "saves", icon: "🔖" },
         { label: "Item Clicks", key: "item_clicks", icon: "🛒" },
       ];
       const total = data.total || 1;
@@ -467,9 +467,9 @@ function renderInteractionBreakdown(containerId) {
       container.innerHTML = `
         <div class="overview-breakdown-grid">
           ${items.map(it => {
-            const val = data[it.key] || 0;
-            const pct = Math.round((val / total) * 100);
-            return `
+        const val = data[it.key] || 0;
+        const pct = Math.round((val / total) * 100);
+        return `
               <div class="overview-breakdown-row">
                 <span class="overview-breakdown-icon">${it.icon}</span>
                 <span class="overview-breakdown-label">${it.label}</span>
@@ -480,7 +480,7 @@ function renderInteractionBreakdown(containerId) {
                 <span class="overview-breakdown-pct">${pct}%</span>
               </div>
             `;
-          }).join("")}
+      }).join("")}
         </div>
       `;
     })
@@ -497,12 +497,12 @@ function renderTopArticles(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  fetch('/api/articles/?limit=5')
+  fetch('/api/contents/?limit=5')
     .then(res => res.json())
     .then(data => {
       const sorted = [...data].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 5);
       if (!sorted.length) {
-        container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No articles yet.</p></div>`;
+        container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No contents yet.</p></div>`;
         return;
       }
       container.innerHTML = `
@@ -518,7 +518,7 @@ function renderTopArticles(containerId) {
       `;
     })
     .catch(() => {
-      container.innerHTML = `<div class="dashboard-error"><p>Could not load top articles.</p></div>`;
+      container.innerHTML = `<div class="dashboard-error"><p>Could not load top contents.</p></div>`;
     });
 }
 
@@ -653,12 +653,12 @@ function renderStatsGrid(containerId, stats) {
   container.innerHTML = "";
 
   const statConfig = [
-    { label: "Total Articles", key: "articles_count", link: "/dashboard/articles", icon: "📰", color: "blue" },
-    { label: "Total Items",    key: "items_count",    link: "/dashboard/items",    icon: "🛍️", color: "purple" },
-    { label: "Total Users",    key: "users_count",    link: "/dashboard/users",    icon: "👥", color: "green" },
-    { label: "Interactions",   key: "interactions",   link: "/dashboard/interactions", icon: "📊", color: "orange", subKey: "total" },
-    { label: "Total Views",    key: "interactions",   icon: "👁️",  color: "cyan",   subKey: "views" },
-    { label: "Total Comments", key: "interactions",   icon: "💬",  color: "indigo", subKey: "comments" },
+    { label: "Total Contents", key: "contents_count", link: "/dashboard/contents", icon: "📰", color: "blue" },
+    { label: "Total Items", key: "items_count", link: "/dashboard/items", icon: "🛍️", color: "purple" },
+    { label: "Total Users", key: "users_count", link: "/dashboard/users", icon: "👥", color: "green" },
+    { label: "Interactions", key: "interactions", link: "/dashboard/interactions", icon: "📊", color: "orange", subKey: "total" },
+    { label: "Total Views", key: "interactions", icon: "👁️", color: "cyan", subKey: "views" },
+    { label: "Total Comments", key: "interactions", icon: "💬", color: "indigo", subKey: "comments" },
   ];
 
   statConfig.forEach(stat => {

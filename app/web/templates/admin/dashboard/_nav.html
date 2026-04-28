@@ -11,26 +11,32 @@
     <a href="{{ url_for('admin.home') }}" class="nav-link {% if (domain|default('')) == 'home' %}active{% endif %}">
       <span class="nav-icon">📊</span> Overview
     </a>
-    <a href="{{ url_for('admin.dashboard_articles') }}" class="nav-link {% if (domain|default('')) == 'articles' %}active{% endif %}">
+    <a href="{{ url_for('admin.dashboard_contents') }}"
+      class="nav-link {% if (domain|default('')) == 'contents' %}active{% endif %}">
       <span class="nav-icon">📰</span> Articles
     </a>
-    <a href="{{ url_for('admin.dashboard_items') }}" class="nav-link {% if (domain|default('')) == 'items' %}active{% endif %}">
+    <a href="{{ url_for('admin.dashboard_items') }}"
+      class="nav-link {% if (domain|default('')) == 'items' %}active{% endif %}">
       <span class="nav-icon">🛍️</span> Items
     </a>
-    <a href="{{ url_for('admin.dashboard_users') }}" class="nav-link {% if (domain|default('')) == 'users' %}active{% endif %}">
+    <a href="{{ url_for('admin.dashboard_users') }}"
+      class="nav-link {% if (domain|default('')) == 'users' %}active{% endif %}">
       <span class="nav-icon">👥</span> Users
     </a>
-    <a href="{{ url_for('admin.dashboard_interactions') }}" class="nav-link {% if (domain|default('')) == 'interactions' %}active{% endif %}">
+    <a href="{{ url_for('admin.dashboard_interactions') }}"
+      class="nav-link {% if (domain|default('')) == 'interactions' %}active{% endif %}">
       <span class="nav-icon">📈</span> Analytics
     </a>
   </div>
 
   <div class="nav-section">
     <p class="nav-title">Control Panel</p>
-    <a href="{{ url_for('admin.control_users') }}" class="nav-link {% if (domain|default('')) == 'control_users' %}active{% endif %}">
+    <a href="{{ url_for('admin.control_users') }}"
+      class="nav-link {% if (domain|default('')) == 'control_users' %}active{% endif %}">
       <span class="nav-icon">🔧</span> Users
     </a>
-    <a href="{{ url_for('admin.control_settings') }}" class="nav-link {% if (domain|default('')) == 'control_settings' %}active{% endif %}">
+    <a href="{{ url_for('admin.control_settings') }}"
+      class="nav-link {% if (domain|default('')) == 'control_settings' %}active{% endif %}">
       <span class="nav-icon">⚙️</span> Settings
     </a>
   </div>

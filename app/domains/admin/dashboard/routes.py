@@ -5,9 +5,9 @@ from app.domains.admin import admin_bp as bp
 def home():
     return render_template("admin/dashboard/overview.html", title="Overview", domain="home")
 
-@bp.route("/articles")
-def dashboard_articles():
-    return render_template("admin/dashboard/domain.html", title="Articles", domain="articles")
+@bp.route("/contents")
+def dashboard_contents():
+    return render_template("admin/dashboard/domain.html", title="Content", domain="contents")
 
 
 @bp.route("/items")
