@@ -61,7 +61,8 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 normalized_query=q_text
             )
             
-            from app.domains.article.ingestion import smart_ingest
+            from app.domains.content.ingestion import ingest_content
+            from app.core.extensions import db
 
             query_stored = 0
             for raw in resp.json().get("articles", []):
@@ -73,7 +74,7 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 q_obj["region"] = country.upper()
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)                
 
-                if smart_ingest(raw):
+                if ingest_content(db.session, object_type="article", raw_data=raw):
                     query_stored += 1
             
             stored += query_stored

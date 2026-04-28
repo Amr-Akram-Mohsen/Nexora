@@ -1,5 +1,5 @@
 from app.core.extensions import db
-from app.domains.relationships import (article_topics, article_brands, item_topics, article_attributes, article_sources)
+from app.domains.relationships import (content_topics, content_brands, item_topics, content_attributes, article_sources)
 from app.shared.utils.slug import generate_slug, normalize_name
 # ==================== METADATA MODELS ====================
 class Source(db.Model):
@@ -43,8 +43,8 @@ class Section(db.Model):
     def get_by_slug(slug, session):
         return session.query(Section).filter_by(slug=slug).first()
 
-    articles = db.relationship(
-        "Article",
+    contents = db.relationship(
+        "Content",
         back_populates="section"
     )
     items = db.relationship(
@@ -69,9 +69,9 @@ class Topic(db.Model):
     def get_by_slug(slug, session):
         return session.query(Topic).filter_by(slug=slug).first()
         
-    articles = db.relationship(
-        "Article",
-        secondary=article_topics,
+    contents = db.relationship(
+        "Content",
+        secondary=content_topics,
         back_populates="topics"
     )
     items = db.relationship(
@@ -98,9 +98,9 @@ class Brand(db.Model):
     def get_by_slug(slug, session):
         return session.query(Brand).filter_by(slug=slug).first()
     
-    articles = db.relationship(
-        "Article",
-        secondary=article_brands,
+    contents = db.relationship(
+        "Content",
+        secondary=content_brands,
         back_populates="brands"
     )
     items = db.relationship(
@@ -145,8 +145,8 @@ class Category(db.Model):
         remote_side=[id],
         backref="children"
     )
-    articles = db.relationship(
-        "Article",
+    contents = db.relationship(
+        "Content",
         back_populates="category"
     )
     items = db.relationship(
@@ -170,7 +170,7 @@ class GenderFacet(db.Model):
     def get_by_slug(slug, session):
         return session.query(GenderFacet).filter_by(slug=slug).first()
 
-    articles = db.relationship("Article", back_populates="gender")
+    contents = db.relationship("Content", back_populates="gender")
 
 class IntentFacet(db.Model):
     __tablename__ = "intent_facets"
@@ -183,7 +183,7 @@ class IntentFacet(db.Model):
     def get_by_slug(slug, session):
         return session.query(IntentFacet).filter_by(slug=slug).first()
 
-    articles = db.relationship("Article", back_populates="intent")
+    contents = db.relationship("Content", back_populates="intent")
 
 class PriceTierFacet(db.Model):
     __tablename__ = "price_tier_facets"
@@ -196,7 +196,7 @@ class PriceTierFacet(db.Model):
     def get_by_slug(slug, session):
         return session.query(PriceTierFacet).filter_by(slug=slug).first()
 
-    articles = db.relationship("Article", back_populates="price_tier")
+    contents = db.relationship("Content", back_populates="price_tier")
 
 class AttributeFacet(db.Model):
     __tablename__ = "attributes"
@@ -213,8 +213,8 @@ class AttributeFacet(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
     category = db.relationship("Category")
     
-    articles = db.relationship(
-        "Article",
-        secondary=article_attributes,
+    contents = db.relationship(
+        "Content",
+        secondary=content_attributes,
         back_populates="attributes"
     )

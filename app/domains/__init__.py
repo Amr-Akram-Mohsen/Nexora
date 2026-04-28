@@ -1,6 +1,6 @@
 # Import ALL models so SQLAlchemy sees them
 from .user.models import *
-from .article.models import *
+from .content.models import *
 from .item.models import *
 from .interaction.models import *
 from .system.models import *

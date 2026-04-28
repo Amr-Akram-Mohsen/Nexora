@@ -2,7 +2,7 @@ from datetime import datetime
 from app.core.extensions import db
 from .models import UserInterest, UserEntityInterest
 from app.domains.item.models import Item
-from app.domains.article.models import Article
+from app.domains.content.models import Article
 from .interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
 

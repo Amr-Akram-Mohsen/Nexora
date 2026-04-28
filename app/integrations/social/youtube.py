@@ -71,7 +71,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 normalized_query=query
             )
 
-            from app.domains.article.ingestion import smart_ingest
+            from app.domains.content.ingestion import ingest_content
+            from app.core.extensions import db
 
             # Ensure q_obj has the region for ingestion
             q_obj["region"] = region_code
@@ -93,7 +94,8 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 }
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
                 
-                if smart_ingest(raw):
+                raw["external_id"] = video_id
+                if ingest_content(db.session, object_type="video", raw_data=raw):
                     stored += 1
 
         except Exception:

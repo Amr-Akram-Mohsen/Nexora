@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% from "components/ui/button.html" import button %}
+
+{% block content %}
+<section class="detail-page detail-page--{{ content.object_type }}">
+  <div class="container">
+
+    <!-- Breadcrumbs -->
+    {% block breadcrumbs %}{% endblock %}
+
+    <!-- Top -->
+    <div class="detail-page__top flex items-center justify-between">
+      <a href="/">
+        {{ button(text="Back", variant="ghost", class="btn-back", icon="fas fa-chevron-left") }}
+      </a>
+      {% block top %}{% endblock %}
+    </div>
+
+    <!-- Main -->
+    <div class="detail-page__main flex flex-col">
+
+      <div class="detail-page__header">
+        {% block header %}{% endblock %}
+      </div>
+
+      <div class="detail-page__image">
+        {% block image %}{% endblock %}
+      </div>
+
+      <div class="detail-page__content">
+        {% block main_content %}{% endblock %}
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="detail-page__sidebar">
+      {% block sidebar %}{% endblock %}
+    </aside>
+
+    <!-- Extra -->
+    <div class="detail-page__extra">
+      {% include "components/features/interactions.html" %}
+      {% include "components/features/comments.html" %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -5,20 +5,20 @@ class Reaction(db.Model):
     __tablename__ = "reactions"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item' or 'comment'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item' or 'comment'
     target_id = db.Column(db.Integer, nullable=False)
     type = db.Column(db.String(20), nullable=False)         # 'like', 'dislike', etc.
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     @property
     def target(self):
-        return self.article or self.item or self.comment
+        return self.content or self.item or self.comment
     
     user = db.relationship("User", back_populates="reactions")
     
-    article = db.relationship(
-        "Article",
-        primaryjoin="and_(foreign(Reaction.target_id) == Article.id, Reaction.target_type == 'article')",
+    content = db.relationship(
+        "Content",
+        primaryjoin="and_(foreign(Reaction.target_id) == Content.id, Reaction.target_type == 'content')",
         back_populates="reactions",
         viewonly=True,
         lazy="selectin"
@@ -39,10 +39,10 @@ class Reaction(db.Model):
     )
 
     __table_args__ = (
-        db.Index("idx_reactions_target", "target_type", "target_id"),
+        db.Index("ix_reactions_target", "target_type", "target_id"),
         db.UniqueConstraint('user_id', 'target_type', 'target_id', name='unique_user_reaction'),
         db.CheckConstraint(
-            "target_type IN ('article', 'item', 'comment')",
+            "target_type IN ('content', 'item', 'comment')",
             name="ck_reaction_target_type"
         ),
     )
@@ -59,7 +59,7 @@ class Comment(db.Model):
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item'
     target_id = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -71,15 +71,15 @@ class Comment(db.Model):
 
     @property
     def target(self):
-        return self.article or self.item
+        return self.content or self.item
 
     user = db.relationship("User", back_populates="comments")
     parent = db.relationship("Comment", remote_side=[id], back_populates="replies")
     replies = db.relationship("Comment", back_populates="parent", cascade="all, delete-orphan")
     
-    article = db.relationship(
-        "Article",
-        primaryjoin="and_(foreign(Comment.target_id) == Article.id, Comment.target_type == 'article')",
+    content = db.relationship(
+        "Content",
+        primaryjoin="and_(foreign(Comment.target_id) == Content.id, Comment.target_type == 'content')",
         back_populates="comments",
         viewonly=True,
         lazy="selectin"
@@ -100,8 +100,8 @@ class Comment(db.Model):
     )
 
     __table_args__ = (
-        db.Index("idx_comments_target", "target_type", "target_id"),
-        db.CheckConstraint("target_type IN ('article', 'item')", name="ck_comment_target_type"),
+        db.Index("ix_comments_target", "target_type", "target_id"),
+        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_comment_target_type"),
     )
 
     def __repr__(self):
@@ -116,19 +116,19 @@ class View(db.Model):
     __tablename__ = "views"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
-    target_type = db.Column(db.String(50), nullable=False)  # 'article' or 'item'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item'
     target_id = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(45), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     @property
     def target(self):
-        return self.article or self.item
+        return self.content or self.item
 
     user = db.relationship("User", back_populates="views")
-    article = db.relationship(
-        "Article",
-        primaryjoin="and_(foreign(View.target_id) == Article.id, View.target_type == 'article')",
+    content = db.relationship(
+        "Content",
+        primaryjoin="and_(foreign(View.target_id) == Content.id, View.target_type == 'content')",
         back_populates="views",
         viewonly=True,
         lazy="selectin"
@@ -142,10 +142,10 @@ class View(db.Model):
     )
 
     __table_args__ = (
-        db.Index("idx_views_target", "target_type", "target_id"),
+        db.Index("ix_views_target", "target_type", "target_id"),
         db.CheckConstraint("(user_id IS NOT NULL AND ip_address IS NULL) OR (user_id IS NULL AND ip_address IS NOT NULL)", name="ck_view_one_identity"),
         db.UniqueConstraint("user_id", "ip_address", "target_type", "target_id", name="unique_view"),
-        db.CheckConstraint("target_type IN ('article', 'item')", name="ck_view_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_view_target_type"),
     )
 
     def __repr__(self):
@@ -160,9 +160,9 @@ class Save(db.Model):
     target_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    article = db.relationship(
-        "Article",
-        primaryjoin="and_(foreign(Save.target_id) == Article.id, Save.target_type == 'article')",
+    content = db.relationship(
+        "Content",
+        primaryjoin="and_(foreign(Save.target_id) == Content.id, Save.target_type == 'content')",
         viewonly=True,
         lazy="selectin"
     )
@@ -175,14 +175,14 @@ class Save(db.Model):
 
     @property
     def target(self):
-        return self.article or self.item
+        return self.content or self.item
 
     user = db.relationship("User", back_populates="saves")
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "target_type", "target_id", name="uq_user_save"),
         db.Index("ix_save_target", "target_type", "target_id"),
-        db.CheckConstraint("target_type IN ('article', 'item')", name="ck_save_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_save_target_type"),
     )
 
     def __repr__(self):

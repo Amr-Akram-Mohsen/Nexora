@@ -1,3 +1,3 @@
 class TargetType:
-    ARTICLE = "article"
+    CONTENT = "content"
     ITEM = "item"

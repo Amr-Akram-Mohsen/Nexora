@@ -11,7 +11,7 @@ from logging.handlers import RotatingFileHandler
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from app.api.articles import bp as api_article_bp
+from app.api.contents import bp as api_content_bp
 from app.api.items import bp as api_item_bp
 from app.api.users import bp as api_user_bp
 from app.api.interactions import bp as api_interaction_bp
@@ -25,7 +25,7 @@ from app.domains.admin import admin_bp
 import app.domains.system
 from app.domains.user.models import User
 from app.domains.user.routes import bp as user_bp
-from app.domains.article.routes import bp as article_bp
+from app.domains.content.routes import bp as content_bp
 from app.domains.item.routes import bp as item_bp
 from app.domains.interaction.routes import bp as interaction_bp
 from app.domains.recommendation.routes import bp as recommendation_bp
@@ -101,12 +101,12 @@ def create_app():
 
     app.register_blueprint(system_bp)
     app.register_blueprint(user_bp)
-    app.register_blueprint(article_bp)
+    app.register_blueprint(content_bp)
     app.register_blueprint(item_bp)
     app.register_blueprint(interaction_bp)
     app.register_blueprint(recommendation_bp)
 
-    app.register_blueprint(api_article_bp)
+    app.register_blueprint(api_content_bp)
     app.register_blueprint(api_item_bp)
     app.register_blueprint(api_user_bp)
     app.register_blueprint(api_interaction_bp)
@@ -125,11 +125,11 @@ def create_app():
         seed_db()
         print("Database seeded successfully!")
 
-    @app.cli.command("link-articles")
-    def link_articles_command():
-        from app.domains.recommendation.matcher import match_articles_to_items
-        print("Starting article-to-item matcher...")
-        count = match_articles_to_items()
+    @app.cli.command("link-contents")
+    def link_contents_command():
+        from app.domains.recommendation.matcher import match_contents_to_items
+        print("Starting content-to-item matcher...")
+        count = match_contents_to_items()
         print(f"Matcher complete! Created {count} new links.")
 
     @app.cli.command("seed-noon-stores")
@@ -141,35 +141,35 @@ def create_app():
 
     @app.cli.command("fetch-newsapi")
     def fetch_newsapi_command():
-        from app.jobs.tasks.content.fetch_articles import run_newsapi_fetch
+        from app.jobs.tasks.content.articles import run_newsapi_fetch
         print("Fetching articles from NewsAPI...")
         run_newsapi_fetch()
         print("Done!")
 
     @app.cli.command("fetch-gnews")
     def fetch_gnews_command():
-        from app.jobs.tasks.content.fetch_articles import run_gnews_fetch
+        from app.jobs.tasks.content.articles import run_gnews_fetch
         print("Fetching articles from GNews...")
         run_gnews_fetch()
         print("Done!")
 
     @app.cli.command("fetch-rss")
     def fetch_rss_command():
-        from app.jobs.tasks.content.fetch_articles import run_rss_fetch
+        from app.jobs.tasks.content.articles import run_rss_fetch
         print("Fetching articles from rss feeds...")
         run_rss_fetch()
         print("Done!")
 
     @app.cli.command("fetch-youtube")
     def fetch_youtube_command():
-        from app.jobs.tasks.content.fetch_articles import run_youtube_fetch
+        from app.jobs.tasks.content.videos import run_youtube_fetch
         print("Fetching youtube reviews...")
         run_youtube_fetch()
         print("Done!")
 
     @app.cli.command("fetch-reddit")
     def fetch_reddit_command():
-        from app.jobs.tasks.content.fetch_articles import run_reddit_fetch
+        from app.jobs.tasks.content.posts import run_reddit_fetch
         print("Fetching posts from Reddit communities...")
         run_reddit_fetch()
         print("Done!")
@@ -177,8 +177,8 @@ def create_app():
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs all active fetchers in one go."""
-        from app.jobs.tasks.content.fetch_articles import (
-            run_article_fetch, #run_reddit_fetch
+        from app.jobs.tasks.content.all_contents import (
+            run_content_fetch, #run_reddit_fetch
         )
         # from app.jobs.tasks.content.fetch_items import (
         #     run_price_refresh, run_amazon_discovery, run_noon_discovery, run_arabclicks_price_refresh
@@ -186,7 +186,7 @@ def create_app():
         # from app.domains.recommendation.matcher import match_articles_to_items
         # Note: run_price_refresh and run_amazon_discovery might be in another task
         print("--- [1/2] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
-        run_article_fetch()
+        run_content_fetch()
         # print("--- [2/2] Fetching Reddit Communities ---")
         # run_reddit_fetch()
         # print("--- [Matcher] Linking Articles to Items ---")
@@ -194,14 +194,14 @@ def create_app():
     @app.cli.command("fetch-test")
     def fetch_test_command():
         """Runs a limited discovery run (5 queries per source) for testing."""
-        from app.jobs.tasks.content.fetch_articles import run_article_fetch
+        from app.jobs.tasks.content.all_contents import run_content_fetch
         print("--- Starting Limited Test Run (5 queries/source) ---")
-        run_article_fetch(limit=5)
+        run_content_fetch(limit=5)
 
     @app.cli.command("rescrape-articles")
     def rescrape_articles_command():
         """Find articles with missing content and attempt to re-scrape."""
-        from app.domains.article.service.scraping import reprocess_unscraped_articles
+        from app.domains.content.service.scraping import reprocess_unscraped_articles
         print("Searching for unscraped articles...")
         count = reprocess_unscraped_articles(limit=15)
         print(f"Done! Successfully recovered content for {count} articles.")

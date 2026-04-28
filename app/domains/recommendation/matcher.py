@@ -16,7 +16,7 @@ import re
 import logging
 from datetime import datetime, timedelta
 from app.core.extensions import db
-from app.domains.article.models import Article
+from app.domains.content.models import Article
 from app.domains.item.models import Item
 
 logger = logging.getLogger(__name__)

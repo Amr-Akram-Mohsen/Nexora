@@ -1,0 +1,25 @@
+{% from "components/shared/image-utils.html" import render_image_url %}
+
+{% set content = item %}
+{% set video = content.target %}
+{% block image_content %}
+{{ render_image_url(video.thumbnail_url, video.title) }}
+{% endblock %}
+{% block meta_bottom %}
+{% if video.channel_name %}
+<div class="card__meta-item flex items-center">
+  <i class="fas fa-user-circle"></i>
+  <span class="truncate">{{ video.channel_name }}</span>
+</div>
+{% endif %}
+
+<span class="card__meta-dot"></span>
+
+<div class="card__meta-item flex items-center">
+  <i class="far fa-calendar-alt"></i>
+  <time>
+    {{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}
+  </time>
+</div>
+
+{% endblock %}

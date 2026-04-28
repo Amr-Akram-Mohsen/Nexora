@@ -1,0 +1,50 @@
+{% extends "content/page/base.html" %}
+{% set video = content.target %}
+
+{% from "components/shared/image-utils.html" import render_image_url %}
+
+{% block title %}Nexora | {{ video.title }}{% endblock %}
+
+{% block description %}{{ video.preview_text }}{% endblock %}
+{% block og_type %}video.other{% endblock %}
+{% block og_image %}{{ video.thumbnail_url }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "{{ video.title }}",
+  "description": "{{ video.preview_text }}",
+  "thumbnailUrl": "{{ video.thumbnail_url }}",
+  "uploadDate": "{{ content.published_at.isoformat() if content.published_at }}",
+  "contentUrl": "{{ video.url }}",
+  "embedUrl": "{{ video.url }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexora"
+  }
+}
+</script>
+{% endblock %}
+
+
+{% block breadcrumbs %}
+{% include "content/features/breadcrumbs.html" %}
+{% endblock %}
+
+{% block header %}
+<h1>{{ video.title }}</h1>
+<p>{{ video.channel_name }}</p>
+{% endblock %}
+
+{% block image %}
+<img src="{{ video.thumbnail_url }}" />
+{% endblock %}
+
+{% block main_content %}
+<div class="video-container">
+  <iframe src="https://www.youtube.com/embed/{{ video.external_id }}"></iframe>
+  <p>{{ video.description }}</p>
+</div>
+{% endblock %}

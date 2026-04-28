@@ -68,7 +68,7 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
         print(f"  [Reddit] Fetching r/{name} ({category_slug})...")
         logger.info(f"[Reddit] Subreddit: r/{name}, Category: {category_slug}")
 
-        from app.domains.article.ingestion import ingest_article_stream
+        from app.domains.content.ingestion import ingest_article_stream
         for submission in subreddit.hot(limit=limit):
             if submission.score < MIN_SCORE:
                 continue
@@ -80,6 +80,7 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
                 submission.selftext[:500] if submission.is_self
                 else submission.url
             )
+            
             thumbnail = submission.thumbnail if submission.thumbnail.startswith("http") else None
 
             # Identify region for local subreddits
@@ -112,8 +113,11 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
 
             raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-            from app.domains.article.ingestion import smart_ingest
-            if smart_ingest(raw):
+            from app.domains.content.ingestion import ingest_content
+            from app.core.extensions import db
+            raw["external_id"] = post_id
+            
+            if ingest_content(db.session, object_type="post", raw_data=raw):
                 stored += 1
         
         if stored > 0:

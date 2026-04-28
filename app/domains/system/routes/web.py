@@ -9,10 +9,10 @@ from flask_login import login_required, current_user
 from app.core.extensions import db
 from app.domains.user.models import ContactMessage
 from app.domains.item.models import Item
-from app.domains.article.models import Article
+from app.domains.content.models import Content
 from app.domains.user.contact_service import send_admin_email
 from ..pages_service import PAGES_CONTENT
-# from app.domains.article.service import get_articles_render
+# from app.domains.content.service import get_contents_render
 
 # Specifying Country Using Cookies
 @bp.route("/set-country", methods=["POST"])
@@ -34,11 +34,11 @@ def set_country():
 def home():
     from app.domains.item.models import ItemVariant
 
-    from app.domains.article.service import get_articles_render
-    hero_articles = get_articles_render(filter_values=('trends',), rows_count=3)
-    latest_reviews = get_articles_render(filter_values=('reviews',), rows_count=6)
-    tech_news = get_articles_render(filter_values=('news',), rows_count=6)
-    tutorials = get_articles_render(filter_values=('tutorials',), rows_count=6)
+    from app.domains.content.service import get_contents_render
+    hero_contents = get_contents_render(filter_values=('trends',), rows_count=3)
+    latest_reviews = get_contents_render(filter_values=('reviews',), rows_count=6)
+    tech_news = get_contents_render(filter_values=('news',), rows_count=6)
+    tutorials = get_contents_render(filter_values=('tutorials',), rows_count=6)
     
     # Base item query
     p_query = Item.query.options(
@@ -59,17 +59,17 @@ def home():
     interleave_items = p_query.order_by(db.func.random()).limit(10).all()
     interleave_pool = list(interleave_items)
     
-    def interleave(articles, items_pool):
+    def interleave(contents, items_pool):
         result = []
-        for i, article in enumerate(articles):
-            result.append(article)
+        for i, content in enumerate(contents):
+            result.append(content)
             if (i + 1) % 3 == 0 and items_pool:
                 result.append(items_pool.pop(0))
         return result
 
     return render_template(
         "index.html",
-        hero_sliders=hero_articles,
+        hero_sliders=hero_contents,
         latest_reviews=interleave(latest_reviews, interleave_pool),
         tech_news=interleave(tech_news, interleave_pool),
         tutorials=interleave(tutorials, interleave_pool),
@@ -148,12 +148,12 @@ def sitemap():
         if "GET" in rule.methods and len(rule.arguments) == 0:
             pages.append([url_for(rule.endpoint, _external=True), datetime.now().date().isoformat()])
 
-    # Articles (Limited to top 100 for safety in fallback)
-    from app.domains.article.models import Article
-    articles = Article.query.order_by(Article.published_at.desc()).limit(100).all()
-    for article in articles:
-        pages.append([url_for('article.article_page', article_id=article.id, _external=True),
-                      (article.published_at or datetime.now()).date().isoformat()])
+    # Contents (Limited to top 100 for safety in fallback)
+    from app.domains.content.models import Content
+    contents = Content.query.order_by(Content.published_at.desc()).limit(100).all()
+    for content in contents:
+        pages.append([url_for('content.content_page', content_id=content.id, _external=True),
+                      (content.published_at or datetime.now()).date().isoformat()])
 
     response = make_response(render_template('sitemap_xml.html', pages=pages))
     response.headers['Content-Type'] = 'application/xml'

@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from ..models import Reaction, Comment, Save, ItemClick
 from app.core.extensions import limiter, db
 from app.domains.user.models import NewsletterSubscriber
-from app.domains.article.models import Article
+from app.domains.content.models import Content
 from app.domains.item.models import Item, ItemStoreLink
 from app.shared.constants.core import TargetType
 from ..constants import INTERACTION_TYPE
@@ -190,7 +190,7 @@ def check_save_batch():
         except (TypeError, ValueError):
             continue
         if target_type == TargetType.ARTICLE:
-            target = Article.query.get(target_id)
+            target = Content.query.get(target_id)
         elif target_type == TargetType.ITEM:
             target = Item.query.get(target_id)
         else:
@@ -297,7 +297,7 @@ def add_view():
     user = current_user if current_user.is_authenticated else None
     ip = None if user else get_client_ip()
     if target_type == TargetType.ARTICLE:
-        target = Article.query.get_or_404(target_id)
+        target = Content.query.get_or_404(target_id)
     else:
         target = Item.query.get_or_404(target_id)
     result = record_view(
@@ -321,7 +321,7 @@ def handle_interaction():
         if comment_id:
             target = Comment.query.get_or_404(comment_id)
         elif target_type == TargetType.ARTICLE:
-            target = Article.query.get_or_404(target_id)
+            target = Content.query.get_or_404(target_id)
         elif target_type == TargetType.ITEM:
             target = Item.query.get_or_404(target_id)
         else:
@@ -364,10 +364,10 @@ def handle_interaction():
 @bp.route('/saved')
 @login_required
 def saved_items():
-    """Display all articles and items saved by the current user."""
+    """Display all contents and items saved by the current user."""
     # Query saves for current user, grouped by type
-    saved_articles = (
-        Save.query.options(db.selectinload(Save.article))
+    saved_contents = (
+        Save.query.options(db.selectinload(Save.content))
         .filter_by(user_id=current_user.id, target_type=TargetType.ARTICLE)
         .order_by(Save.created_at.desc())
         .all()
@@ -382,6 +382,6 @@ def saved_items():
     
     return render_template(
         'saved-items.html',
-        saved_articles=saved_articles,
+        saved_contents=saved_contents,
         saved_items=saved_items
     )

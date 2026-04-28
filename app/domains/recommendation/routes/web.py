@@ -1,9 +1,9 @@
 from . import bp
 
 from random import shuffle
-from flask import request, jsonify, render_template, Blueprint
+from flask import request, jsonify, render_template
 from app.domains.item.service import get_search_items
-from app.domains.article.service import get_search_articles
+from app.domains.content.service import get_search_contents
 from app.shared.request import get_country
 
 # ============== SEARCH LOGIC ================
@@ -15,13 +15,11 @@ def search():
         q = (request.args.get('query') or '').strip()
 
     items = get_search_items(q)
-    articles = get_search_articles(q)    
+    contents = get_search_contents(q)    
 
-    search_results = articles + items
+    search_results = contents + items
     shuffle(search_results)
 
-    # If AJAX request, return only the grid HTML
-    
     return jsonify({
         'success': True,
         'html': render_template(

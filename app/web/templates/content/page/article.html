@@ -1,0 +1,131 @@
+{% extends"content/page/base.html" %}
+
+{% set article = content.target %}
+
+{% from"components/features/snippet-utils.html" import article_snippet %}
+{% from"components/shared/image-utils.html" import render_image_url %}
+{% from"components/ui/button.html" import button %}
+{% from"components/ui/badge.html" import badge %}
+{% from"components/features/inline-product-card.html" import inline_product_card %}
+
+{% block title %}Nexora | {{ article.title }}{% endblock %}
+
+{% block description %}{{ article.preview_text }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}{{ article.image_url }}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ article.title }}",
+  "image": "{{ article.image_url }}",
+  "description": "{{ article.preview_text }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.url }}"
+  },  
+  "author": {
+    "@type": "Organization",
+    "name": "Nexora"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexora",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ url_for('static', filename='img/logo-full.png', _external=True) }}"
+    }
+  },
+  "datePublished": "{{ content.published_at.isoformat() if content.published_at }}",
+  "dateModified": "{{ content.published_at.isoformat() if content.published_at }}",
+}
+</script>
+
+{% endblock %}
+{% block breadcrumbs %}
+{% include "content/features/breadcrumbs.html" %}
+{% endblock %}
+
+{% block header %}
+<div class="detail-page__header-content flex flex-col">
+  <div class="detail-page__badges flex flex-wrap">
+    {{ badge(content.category.name, 'badge--category') }}
+    {% for topic in content.topics[:2] %}
+    {{ badge(topic.name, 'badge--topic') }}
+    {% endfor %}
+    {% for brand in content.brands[:2] %}
+    {{ badge(brand.name, 'badge--brand') }}
+    {% endfor %}
+  </div>
+
+  <h1 class="detail-page__title">{{ article.title }}</h1>
+
+  <div class="detail-page__meta flex flex-wrap items-center">
+    <div class="meta-item meta-user flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-user"></i>
+      </div>
+      <span class="article__source">{{ article.source_name}}</span>
+    </div>
+    <div class="meta-item meta-clock flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-clock"></i>
+      </div>
+      <span>{{ article.read_time_minutes }} min</span>
+    </div>
+    <div class="meta-item meta-calendar flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-calendar"></i>
+      </div>
+      <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block image %}
+{{ render_image_url(article.image_url, article.title) }}
+{% endblock %}
+
+{% block main_content %}
+<div class="article-content">
+  {% if content.linked_items %}
+  {% include "partials/affiliate-disclosure.html" %}
+  {% endif %}
+
+  {% if article.body %}
+  <div class="article-full-text">
+    {{ article.body | safe }}
+  </div>
+  {% else %}
+  <p class="article-description">{{ article.description | safe }}</p>
+  {% endif %}
+
+  {% if content.linked_items %}
+  <div class="article-linked-products">
+    <h3 class="article-linked-products__title">Products Mentioned In This Article</h3>
+    {% for item in content.linked_items %}
+    {{ inline_product_card(item) }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="article-source-box flex flex-col">
+    <p class="source-metadata">Original source: <strong>{{ article.source_name }}</strong></p>
+    <a href="{{ article.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
+      {{ button(text="Read Full Article On " ~ article.source_name, class="article__view-btn") }}
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{% if trending_contents %}
+{{ article_snippet(trending_contents, 'Trending') }}
+{% endif %}
+{% if related_contents %}
+{{ article_snippet(related_contents, 'Related') }}
+{% endif %}
+{% endblock %}

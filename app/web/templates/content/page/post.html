@@ -1,0 +1,44 @@
+{% extends "content/page/base.html" %}
+{% set post = content.target %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block description %}{{ post.preview_text }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_image %}
+{{ url_for('static', filename='img/og-preview.jpg', _external=True) }}
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SocialMediaPosting",
+  "headline": "{{ post.title }}",
+  "articleBody": "{{ post.body }}",
+  "datePublished": "{{ content.published_at.isoformat() if content.published_at }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ post.author }}"
+  },
+  "url": "{{ post.url }}"
+}
+</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+{% include "content/features/breadcrumbs.html" %}
+{% endblock %}
+
+{% block header %}
+<h1>{{ post.title }}</h1>
+<p>r/{{ post.subreddit }} • {{ post.author }}</p>
+{% endblock %}
+
+{% block main_content %}
+<div class="post-body">
+  {{ post.body }}
+</div>
+
+<a href="{{ post.url }}" target="_blank">View on Reddit</a>
+{% endblock %}

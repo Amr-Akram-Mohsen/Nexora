@@ -16,7 +16,7 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import feedparser
 from app.integrations.cleaner import clean_article_data
-from app.domains.article.ingestion import store_article
+from app.domains.content.ingestion import store_article
 from app.integrations.enrichment.pipeline import prepare_article
 from app.shared.constants.taxonomy import TAXONOMY
 
@@ -187,7 +187,7 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 continue
 
             from app.shared.constants.query_builder import SECTION_DEFAULT_INTENTS
-            from app.domains.article.ingestion import smart_ingest
+            from app.domains.content.ingestion import smart_ingest
 
             source_name = feed.feed.get("title") or feed_url
             for entry in feed.entries[:30]:   # latest 15 per feed

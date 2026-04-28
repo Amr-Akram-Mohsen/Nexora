@@ -4,6 +4,7 @@ NewsAPI.org fetcher — 100 requests/day free tier.
 Get a free key at: https://newsapi.org/register
 Env var: NEWS_API_KEY
 """
+from authlib.oauth2.rfc6749.grants import resource_owner_password_credentials
 import logging
 import requests
 from flask import current_app
@@ -62,13 +63,14 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                 normalized_query=q_text
             )
 
-            from app.domains.article.ingestion import smart_ingest
+            from app.domains.content.ingestion import ingest_content
+            from app.core.extensions import db
             query_stored = 0
             for raw in resp.json().get("articles", []):
                 # 1. Enrichment/Classification
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-                if smart_ingest(raw):
+                if ingest_content(db.session, object_type="article", raw_data=raw):
                     query_stored += 1
             
             stored += query_stored

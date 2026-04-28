@@ -1,0 +1,29 @@
+{% extends "content/cards/base.html" %}
+{% from "components/ui/badge.html" import badge %}
+
+{% set content = item %}
+{% set post = content.target %}
+
+{% block header %}{% endblock %}
+
+{% block meta_top %}
+<div class="card__meta-top flex flex-wrap items-center">
+  {{ badge('Post', 'badge--card-type') }}
+</div>
+{% endblock %}
+
+{% block title %}
+<a href="{{ post.url }}" target="_blank">
+  <h3 class="card__title">{{ post.title }}</h3>
+</a>
+{% endblock %}
+
+{% block meta_bottom %}
+<span>{{ post.author or 'Unknown' }}</span>
+
+<span class="card__meta-dot"></span>
+
+<time>
+  {{ content.published_at.strftime('%b %d, %Y') }}
+</time>
+{% endblock %}

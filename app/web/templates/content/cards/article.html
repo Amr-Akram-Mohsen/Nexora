@@ -1,0 +1,50 @@
+{% extends "content/cards/base.html" %}
+{% from "components/shared/image-utils.html" import render_image_url %}
+
+{% set content = item %}
+{% set article = content.target %}
+
+{% block image_content %}
+{{ render_image_url(article.image_url, article.title) }}
+{% endblock %}
+
+{% block meta_top %}
+<!-- Meta -->
+<div class="card__meta-top flex flex-wrap items-center">
+  {{ badge(content.category.name, 'badge--category', 'secondary') }}
+  {% for topic in content.topics[:2] %}
+  {{ badge(topic.name, 'badge--topic', 'secondary') }}
+  {% endfor %}
+
+  {% for brand in content.brands[:1] %}
+  {{ badge(brand.name, 'badge--brand', 'secondary') }}
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block meta_bottom %}
+<div class="card__meta-item flex items-center">
+  <i class="fas fa-user-circle card__meta-icon"></i>
+  <span class="card__meta-text truncate">
+    {{ article.source_name }}
+  </span>
+</div>
+
+<span class="card__meta-dot" aria-hidden="true"></span>
+
+{% if article.read_time_minutes %}
+<span class="card__read-time">
+  <i class="far fa-clock"></i>
+  {{ article.read_time_minutes }} min
+</span>
+{% endif %}
+
+<span class="card__meta-dot" aria-hidden="true"></span>
+
+<div class="card__meta-item flex items-center">
+  <i class="far fa-calendar-alt card__meta-icon"></i>
+  <time class="card__meta-text">
+    {{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}
+  </time>
+</div>
+{% endblock %}

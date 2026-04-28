@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from functools import cached_property
 from app.core.extensions import db
 from app.shared.sanitizer import sanitize_json
-from app.domains.relationships import (item_topics, article_items)
+from app.domains.relationships import (item_topics, content_items)
 # ==================== ASSOCIATION TABLES ====================
 
 class Store(db.Model):
@@ -49,9 +49,9 @@ class Item(db.Model):
     section = db.relationship("Section", back_populates="items")
     topics = db.relationship("Topic", secondary=item_topics, back_populates="items")
     
-    linked_articles = db.relationship(
-        "Article",
-        secondary=article_items,
+    linked_contents = db.relationship(
+        "Content",
+        secondary=content_items,
         back_populates="linked_items"
     )
     

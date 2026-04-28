@@ -1,0 +1,45 @@
+{% from "components/shared/image-utils.html" import render_image_url %}
+{% from "components/ui/badge.html" import badge %}
+
+{% set content = item %}
+
+<article class="card card--content" data-type="content" data-id="{{ content.id }}">
+  {% block header %}
+  <!-- Image -->
+  <a href="{{ url_for('content.content_page', content_id=content.id) }}" class="card__img-link" tabindex="-1"
+    aria-hidden="true">
+
+    <div class="card__img-wrapper">
+      {% block image_content %}{% endblock %}
+      <div class="card__img-overlay"></div>
+      {{ badge(content.object_type, 'badge--object-type') }}
+    </div>
+  </a>
+  {% endblock %}
+
+  <!-- Content -->
+  <div class="card__content">
+
+    <!-- Meta Top -->
+    {% block meta_top %}{% endblock %}
+
+    <!-- Title -->
+    {% block title %}
+    <a href="{{ url_for('content.content_page', content_id=content.id) }}">
+      <h3 class="card__title">{{ content.target.title }}</h3>
+    </a>
+    {% endblock %}
+
+    <!-- Excerpt -->
+    {% block description %}
+    <p class="card__excerpt">{{ content.target.preview_text or '' }}</p>
+    {% endblock %}
+
+    <!-- Meta Bottom -->
+    <div class="card__meta-bottom flex items-center">
+      {% block meta_bottom %}
+      {% endblock %}
+    </div>
+
+  </div>
+</article>

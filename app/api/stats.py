@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from app.domains.article.service.query import count_articles
+from app.domains.content.service import count_contents
 from app.domains.item.service.query import count_items
 from app.domains.user.service.query import count_users
 from app.domains.interaction.service.query import get_interactions_breakdown, get_reaction_stats
@@ -13,7 +13,7 @@ def dashboard_stats():
     total = sum(breakdown.values())
 
     return jsonify({
-        "articles_count": count_articles(),
+        "contents_count": count_contents(),
         "items_count": count_items(),
         "users_count": count_users(),
         "interactions": {

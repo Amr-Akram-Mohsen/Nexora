@@ -10,13 +10,14 @@
         <li><a href="/" class="breadcrumb-link"><i class="fas fa-home"></i></a></li>
         <li class="separator"><i class="fas fa-chevron-right"></i></li>
         {% if item.card_type == 'article' %}
-          {% if item.section %}
-          <li><a href="{{ url_for('article.sections', section_slug=item.section.slug) }}" class="breadcrumb-link">{{ item.section.name }}</a></li>
-          <li class="separator"><i class="fas fa-chevron-right"></i></li>
-          {% endif %}
+        {% if item.section %}
+        <li><a href="{{ url_for('article.sections', section_slug=item.section.slug) }}" class="breadcrumb-link">{{
+            item.section.name }}</a></li>
+        <li class="separator"><i class="fas fa-chevron-right"></i></li>
+        {% endif %}
         {% else %}
-          <li><a href="{{ url_for('item.deals') }}" class="breadcrumb-link">Deals</a></li>
-          <li class="separator"><i class="fas fa-chevron-right"></i></li>
+        <li><a href="{{ url_for('item.deals') }}" class="breadcrumb-link">Deals</a></li>
+        <li class="separator"><i class="fas fa-chevron-right"></i></li>
         {% endif %}
         <li><span class="breadcrumb-current">{{ item.name or item.title | truncate(35) }}</span></li>
       </ul>
@@ -35,6 +36,7 @@
     <div class="detail-page__main flex flex-col">
 
       <div class="detail-page__header">
+
         {% if header %}{{ header() }}{% endif %}
       </div>
 

@@ -2,7 +2,7 @@
 import os
 from datetime import datetime, timezone
 from flask import url_for
-from app.domains.article.models import Article
+from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.system.models import Section, Category, Brand
 
@@ -30,16 +30,16 @@ def generate_static_sitemap(app):
         sections = Section.query.filter_by(is_active=True).all()
         for section in sections:
             pages.append([
-                url_for('article.sections', section_slug=section.slug, _external=True),
+                url_for('content.sections', section_slug=section.slug, _external=True),
                 today
             ])
 
-        # 3. Articles
-        articles = Article.query.all()
-        for article in articles:
-            last_mod = (article.updated_at or article.published_at or datetime.now(timezone.utc)).date().isoformat()
+        # 3. Contents
+        contents = Content.query.all()
+        for content in contents:
+            last_mod = (content.updated_at or content.published_at or datetime.now(timezone.utc)).date().isoformat()
             pages.append([
-                url_for('article.article_page', article_id=article.id, _external=True),
+                url_for('content.content_page', content_id=content.id, _external=True),
                 last_mod
             ])
 
