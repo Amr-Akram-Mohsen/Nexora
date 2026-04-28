@@ -3,13 +3,13 @@
 {% set article = item %}
 
 {#
-  article-card-compact.html
-  A horizontal, condensed article card used in sidebars, trending rows, and
-  small preview contexts. NOT used in the main grid — that uses article-card.html.
+article-card-compact.html
+A horizontal, condensed article card used in sidebars, trending rows, and
+small preview contexts. NOT used in the main grid — that uses article-card.html.
 #}
-<article class="card card--article card--compact" data-type="article" data-id="{{ item.id }}">
-  <a href="{{ url_for('article.article_page', article_id=article.id) }}" target="_blank"
-     class="card-compact__img-link" tabindex="-1" aria-hidden="true">
+<article class="card card--article card--compact" data-type="content" data-id="{{ item.id }}">
+  <a href="{{ url_for('content.content_page', content_id=article.id) }}" target="_blank" class="card-compact__img-link"
+    tabindex="-1" aria-hidden="true">
     <div class="card-compact__img-wrapper">
       {{ render_image_url(article.image_url, article.title) }}
     </div>
@@ -21,7 +21,7 @@
     {{ badge(article.topics[0].name, 'badge--category badge--xs', 'secondary') }}
     {% endif %}
 
-    <a href="{{ url_for('article.article_page', article_id=article.id) }}" target="_blank">
+    <a href="{{ url_for('content.content_page', content_id=article.id) }}" target="_blank">
       <h4 class="card-compact__title">{{ article.title }}</h4>
     </a>
 

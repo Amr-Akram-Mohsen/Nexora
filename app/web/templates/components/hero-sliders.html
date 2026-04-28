@@ -5,8 +5,7 @@
     <div class="hero-slider__wrapper">
       <div class="hero-slider__track flex">
         {% for article in hero_sliders %}
-        <div class="hero-slide flex items-center"
-          style="background-image:url('{{ url_for('static', filename=article.image) if article.image else article.image_url }}')">
+        <div class="hero-slide flex items-center" style="background-image:url('{{ article.image_url }}')">
           <div class="hero-slider__overlay"></div>
           <div class="hero-slider__content flex flex-col justify-center">
             <div class="hero-slide__content-wrapper">
@@ -17,7 +16,7 @@
               <p class="hero-slide__excerpt">
                 {{ article.description }}
               </p>
-              <a href="{{ url_for('article.article_page', article_id=article.id) }}">
+              <a href="{{ url_for('content.content_page', content_id=article.id) }}">
                 {{ button(text="Read Article", class="hero-slide__btn") }}
               </a>
             </div>

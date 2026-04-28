@@ -7,7 +7,7 @@
   <div class="filter-section active-filters-section">
     <div class="filter-section-header flex items-center">
       <h3 class="filter-section__title">Active Filters</h3>
-      <a href="{{ url_for('article.sections', section_slug=section.slug) }}" class="filters-clear-link">Clear All</a>
+      <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="filters-clear-link">Clear All</a>
     </div>
     <div class="active-deals-filters flex flex-wrap">
       {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
@@ -34,8 +34,7 @@
       {% for instance in filter_options[allowed_filter] %}
       {% set is_active = instance.slug in active_filters[allowed_filter] %}
       <li class="filter-item {{ 'is-active' if is_active }}">
-        <a
-          href="{{ get_filter_url(allowed_filter, instance.slug, multi=True) }}">
+        <a href="{{ get_filter_url(allowed_filter, instance.slug, multi=True) }}">
           <span class="checkbox-box {{ 'checked' if is_active }}"></span>
           {{ instance.name }}
         </a>

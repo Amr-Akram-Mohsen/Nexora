@@ -19,7 +19,7 @@
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for slug, name in main_sections %}
-        <a href="{{ url_for('article.sections', section_slug=slug) }}" class="main-nav__link">
+        <a href="{{ url_for('content.sections', section_slug=slug) }}" class="main-nav__link">
           {{ name }}
         </a>
         {% endfor %}
@@ -77,12 +77,12 @@
             <div class="user-info {{ item_class }}">
               <span class="user-email">{{ user_email }}</span>
             </div>
-            
+
             <a href="{{ url_for('user.profile') }}" class="{{ item_class }}">
               <i class="fas fa-id-card"></i>
               Profile
             </a>
-            
+
             <a href="{{ url_for('interaction.saved_items') }}" class="{{ item_class }}">
               <i class="far fa-bookmark"></i>
               Saved Items
@@ -123,7 +123,7 @@
       {% call form("header-search__form", variant="", method="GET", include_csrf=False) %}
       {{ input(
       name="query", type="search",
-      placeholder="Search articles and products...",
+      placeholder="Search contents and products...",
       class="header-search__input"
       ) }}
       {{ button(type="submit", icon="fas fa-search header-search__icon") }}
@@ -133,7 +133,7 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for slug, name in main_sections %}
-      <a href="{{ url_for('article.sections', section_slug=slug) }}" class="mobile-nav__link">
+      <a href="{{ url_for('content.sections', section_slug=slug) }}" class="mobile-nav__link">
         {{ name }}
       </a>
       {% endfor %}

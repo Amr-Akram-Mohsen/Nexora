@@ -123,9 +123,9 @@
 
 {% block sidebar %}
 {% if trending_contents %}
-{{ article_snippet(trending_contents, 'Trending') }}
+{{ content_snippet(trending_contents, 'Trending') }}
 {% endif %}
 {% if related_contents %}
-{{ article_snippet(related_contents, 'Related') }}
+{{ content_snippet(related_contents, 'Related') }}
 {% endif %}
 {% endblock %}

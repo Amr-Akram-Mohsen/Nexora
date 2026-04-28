@@ -67,8 +67,8 @@
         <h4 class="footer-title">{{ col.title }}</h4>
         <ul class="footer-items flex flex-col">
           {% for slug, name in col['items'] %}
-          {% set url = url_for('article.sections', section_slug=slug) if col['title'] == 'Sections'
-          else url_for('article.sections', section_slug='reviews', topic_slug=slug) if col['title'] == 'Topics'
+          {% set url = url_for('content.sections', section_slug=slug) if col['title'] == 'Sections'
+          else url_for('content.sections', section_slug='reviews', topic_slug=slug) if col['title'] == 'Topics'
           else url_for('system.' ~ slug)
           %}
 

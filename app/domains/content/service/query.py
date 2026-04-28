@@ -4,7 +4,7 @@ from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta, timezone
 from app.core.extensions import cache
 from sqlalchemy.orm import joinedload, selectinload, defer
-
+from ..content_access import resolve
 def my_zip(*iterables):
     my_list = []
     for i, val in enumerate(iterables[0]):
@@ -17,7 +17,6 @@ def my_zip(*iterables):
 def get_contents_render(filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
     from app.domains.system.models import Section
     query = Content.query.filter(Content.is_active == True).options(
-        defer(Content.content),
         selectinload(Content.topics),
         selectinload(Content.brands)
     )
@@ -126,7 +125,6 @@ def get_filtered_contents(section, active_filters, allowed_filters, page=1, per_
         Content.query
         .filter(Content.section_id == section.id, Content.is_active == True)
         .options(
-            db.defer(Content.content),
             db.selectinload(Content.topics),
             db.selectinload(Content.brands)
         )
