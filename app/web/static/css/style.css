@@ -5520,3 +5520,71 @@ body.dark-mode .detail-page--item,
 }
 
 /* === END UI FEEDBACK / UTILITIES === */
+
+
+.profile-section {
+  min-height: calc(100vh - var(--header-height));
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  background: var(--gradient-primary);
+  border-radius: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 800;
+  box-shadow: 0 10px 30px -5px rgba(var(--brand-blue-rgb), 0.5);
+}
+
+.profile-card {
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+.ajax-form button.is-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+
+.auth-section {
+  min-height: calc(100vh - var(--header-height));
+  padding: 4rem 1rem;
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 440px;
+  padding: 2.5rem;
+  border-radius: var(--radius-2xl);
+}
+
+.auth-header {
+  margin-bottom: 2rem;
+}
+
+.auth-title {
+  font-size: var(--text-3xl);
+  margin-bottom: 0.5rem;
+}
+
+.auth-text {
+  color: var(--muted-foreground);
+}
+
+.redirect-link {
+  color: var(--brand-blue);
+  transition: opacity 0.2s;
+}
+
+.redirect-link:hover {
+  opacity: 0.8;
+}
