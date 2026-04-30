@@ -14,7 +14,7 @@ def list_contents():
     return jsonify([
         {
             "id": a.id,
-            "title": a.title,
+            "title": a.object_type,
             "published_at": str(a.published_at) if a.published_at else None,
             "view_count": a.view_count,
         }

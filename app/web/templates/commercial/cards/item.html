@@ -5,7 +5,7 @@
 
 {% set best_link = item.store_links[0] if item.store_links else None %}
 
-<article class="card card--item" data-type="item" data-id="{{ item.id }}">
+<article class="card" data-type="item" data-id="{{ item.id }}">
 
   {# ── Image Section ── #}
   <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="card__img-link" tabindex="-1" aria-hidden="true">
@@ -21,8 +21,8 @@
       {{ badge('Product', 'badge--card-type') }}
 
       {# Compare toggle #}
-      <button class="compare-toggle-btn" data-id="{{ item.id }}" data-name="{{ item.name }}"
-              title="Add to compare" aria-label="Add {{ item.name }} to compare">
+      <button class="compare-toggle-btn" data-id="{{ item.id }}" data-name="{{ item.name }}" title="Add to compare"
+        aria-label="Add {{ item.name }} to compare">
         <i class="fas fa-balance-scale"></i>
       </button>
 

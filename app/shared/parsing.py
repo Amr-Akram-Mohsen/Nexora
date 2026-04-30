@@ -2,9 +2,12 @@ from app.shared.constants.core import TargetType
 from app.domains.interaction.constants import INTERACTION_TYPE
 
 def parse_target_type(value: str) -> str:
-    if value not in (TargetType.ARTICLE, TargetType.ITEM):
+    if value == TargetType.ITEM: 
+        return value
+    elif value in (TargetType.ARTICLE, TargetType.VIDEO, TargetType.POST): 
+        return TargetType.CONTENT
+    else: 
         raise ValueError("Invalid target type")
-    return value
 
 def parse_interaction_type(value: str) -> str:
     if value not in (INTERACTION_TYPE.REACT, INTERACTION_TYPE.SAVE, INTERACTION_TYPE.COMMENT):

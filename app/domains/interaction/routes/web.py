@@ -1,7 +1,7 @@
 from . import bp
 
 from datetime import datetime, timedelta, timezone
-from flask import request, jsonify, render_template, redirect, url_for, flash, abort, current_app, Blueprint
+from flask import request, jsonify, render_template, redirect, url_for, flash, abort, current_app
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from ..models import Reaction, Comment, Save, ItemClick

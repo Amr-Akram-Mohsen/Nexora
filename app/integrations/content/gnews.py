@@ -12,6 +12,9 @@ from app.integrations.external.api import (
 )
 from app.integrations.enrichment.pipeline import prepare_article
 from app.integrations.discovery import DiscoveryManager
+from app.integrations.exceptions import (
+    PipelineFatalError, PipelineQuotaExceededError
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,18 +43,26 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
             print(f"  [GNews] ({country}) Searching: {q_text}...")
             logger.info(f"[GNews] Country: {country}, Query: {q_text}")
 
-            resp = requests.get(
-                "https://gnews.io/api/v4/search",
-                params={
-                    "q":       q_text,
-                    "lang":    "en" if not any(c in q_text for c in 'ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي') else "ar",
-                    "country": country,
-                    "max":     50,
-                    "apikey":  api_key,
-                },
-                timeout=10,
-            )
-            resp.raise_for_status()
+            try:
+                resp = requests.get(
+                    "https://gnews.io/api/v4/search",
+                    params={
+                        "q":       q_text,
+                        "lang":    "en" if not any(c in q_text for c in 'ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي') else "ar",
+                        "country": country,
+                        "max":     50,
+                        "apikey":  api_key,
+                    },
+                    timeout=10,
+                )
+                resp.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                if resp is not None and resp.status_code == 403:
+                    logger.error("[GNews] Quota exceeded or Access Denied")
+                    raise PipelineQuotaExceededError("GNews Quota Exceeded")
+                logger.warning("[GNews] API request failed for query '%s': %s", q_text, str(e))
+                continue
+
             record_gnews_call()
             mark_fetched(
                 section_slug, 
@@ -74,15 +85,21 @@ def fetch_gnews_section_category(section_slug: str, category_slug: str, query_da
                 q_obj["region"] = country.upper()
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)                
 
-                if ingest_content(db.session, object_type="article", raw_data=raw):
-                    query_stored += 1
+                try:
+                    if ingest_content(db.session, object_type="article", raw_data=raw):
+                        query_stored += 1
+                except Exception as e:
+                    logger.critical("[GNews] FATAL: Database insertion failed. Pipeline stopping.")
+                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
             
             stored += query_stored
             if query_stored > 0:
                 print(f"    -> [GNews] Stored {query_stored} new articles")
 
+        except (PipelineFatalError, PipelineQuotaExceededError):
+            raise
         except Exception:
-            logger.exception("[GNews] Error for '%s' (%s) in %s", q_text, country, category_slug)
+            logger.exception("[GNews] Unexpected error for '%s' (%s)", q_text, country)
 
     return stored
 

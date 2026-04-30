@@ -7,23 +7,13 @@ import logging
 from datetime import datetime
 from flask import current_app
 from app.integrations.external.api import should_refetch, mark_fetched
+from app.integrations.exceptions import (
+    PipelineFatalError, PipelineQuotaExceededError
+)
 
 logger = logging.getLogger(__name__)
 
-# ── Subreddit Registry ────────────────────────────────────────────
-SUBREDDITS = {
-    "community": {
-        "electronics": ["gadgets", "smartphones", "Android", "iphone", "hardware", "Apple", "Samsung", "PCMasterRace", "GooglePixel"],
-        "perfumes":    ["fragrance", "scents", "malefragrance", "feminineFragrance", "oud", "IndieExchange"],
-        "accessories": ["Watches", "LuxuryPurse", "DesignerBags", "Sunglasses", "streetwear", "malefashionadvice"],
-        "regional":    ["saudiarabia", "dubai", "abudhabi", "emirates"], 
-    },
-    "trends": {
-        "electronics": ["technology", "futurology", "startups"],
-        "perfumes":    ["fragrance", "scents"],
-        "accessories": ["streetwear", "highfashion"],
-    }
-}
+from app.shared.constants.taxonomy import REDDIT_SUBREDDITS
 
 MIN_SCORE = 20    # Quality threshold
 MIN_LENGTH = 80   # Skip short posts (chars)
@@ -70,60 +60,71 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
 
         from app.domains.content.ingestion import ingest_article_stream
         for submission in subreddit.hot(limit=limit):
-            if submission.score < MIN_SCORE:
-                continue
-            if submission.is_self and len(submission.selftext) < MIN_LENGTH:
-                continue
+            try:
+                if submission.score < MIN_SCORE:
+                    continue
+                if submission.is_self and len(submission.selftext) < MIN_LENGTH:
+                    continue
 
-            url = f"https://www.reddit.com{submission.permalink}"
-            description = (
-                submission.selftext[:500] if submission.is_self
-                else submission.url
-            )
-            
-            thumbnail = submission.thumbnail if submission.thumbnail.startswith("http") else None
+                url = f"https://www.reddit.com{submission.permalink}"
+                description = (
+                    submission.selftext[:500] if submission.is_self
+                    else submission.url
+                )
+                
+                thumbnail = submission.thumbnail if submission.thumbnail.startswith("http") else None
 
-            # Identify region for local subreddits
-            region_map = {"saudiarabia": "SA", "dubai": "AE", "abudhabi": "AE", "emirates": "AE"}
-            region = region_map.get(name.lower())
+                # Identify region for local subreddits
+                region_map = {"saudiarabia": "SA", "dubai": "AE", "abudhabi": "AE", "emirates": "AE"}
+                region = region_map.get(name.lower())
 
-            raw = {
-                "title":        submission.title,
-                "description":  description,
-                "url":          url,
-                "image_url":    thumbnail,
-                "published_at": datetime.utcfromtimestamp(submission.created_utc),
-                "source_name":  f"r/{name}",
-                "section_slug": section_slug,
-                "category_slug": category_slug if category_slug != "regional" else "general",
-                "region":       region
-            }
-            
-            from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP, SECTION_DEFAULT_INTENTS
-            from app.integrations.enrichment.pipeline import prepare_article
-            
-            # Mock q_obj for Reddit enrichment
-            q_obj = {
-                "topics": CATEGORY_TOPIC_MAP.get(category_slug, []),
-                "brands": [],
-                "intent": SECTION_DEFAULT_INTENTS.get(section_slug, ["Discussion"])[0],
-                "region": region,
-                "query": f"r/{name}"
-            }
+                raw = {
+                    "title":        submission.title,
+                    "description":  description,
+                    "url":          url,
+                    "image_url":    thumbnail,
+                    "published_at": datetime.utcfromtimestamp(submission.created_utc),
+                    "source_name":  f"r/{name}",
+                    "section_slug": section_slug,
+                    "category_slug": category_slug if category_slug != "regional" else "general",
+                    "region":       region
+                }
+                
+                from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP, SECTION_DEFAULT_INTENTS
+                from app.integrations.enrichment.pipeline import prepare_article
+                
+                # Mock q_obj for Reddit enrichment
+                q_obj = {
+                    "topics": CATEGORY_TOPIC_MAP.get(category_slug, []),
+                    "brands": [],
+                    "intent": SECTION_DEFAULT_INTENTS.get(section_slug, ["Discussion"])[0],
+                    "region": region,
+                    "query": f"r/{name}"
+                }
 
-            raw = prepare_article(raw, section_slug, category_slug, q_obj)
+                raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-            from app.domains.content.ingestion import ingest_content
-            from app.core.extensions import db
-            raw["external_id"] = post_id
-            
-            if ingest_content(db.session, object_type="post", raw_data=raw):
-                stored += 1
-        
+                from app.domains.content.ingestion import ingest_content
+                from app.core.extensions import db
+                raw["external_id"] = submission.id # submission.id, not post_id
+                
+                try:
+                    if ingest_content(db.session, object_type="post", raw_data=raw):
+                        stored += 1
+                except Exception as e:
+                    logger.critical("[Reddit] FATAL: Database insertion failed. Pipeline stopping.")
+                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
+            except PipelineFatalError:
+                raise
+            except Exception:
+                logger.exception("[Reddit] Unexpected error processing submission in r/%s", name)
+
         if stored > 0:
             print(f"    -> [Reddit] Stored {stored} new posts from r/{name}")
             
         return stored
+    except (PipelineFatalError, PipelineQuotaExceededError):
+        raise
     except Exception:
         logger.exception("[Reddit] Error fetching r/%s", name)
         return 0
@@ -132,7 +133,7 @@ def fetch_subreddit(name: str, section_slug: str, category_slug: str, limit: int
 def fetch_all_reddit(limit: int | None = None) -> int:
     total = 0
     discovery_tasks = []
-    for section_slug, categories in SUBREDDITS.items():
+    for section_slug, categories in REDDIT_SUBREDDITS.items():
         for category_slug, sub_list in categories.items():
             for sub in sub_list:
                 discovery_tasks.append((sub, section_slug, category_slug))

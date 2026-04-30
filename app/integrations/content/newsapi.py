@@ -4,7 +4,7 @@ NewsAPI.org fetcher — 100 requests/day free tier.
 Get a free key at: https://newsapi.org/register
 Env var: NEWS_API_KEY
 """
-from authlib.oauth2.rfc6749.grants import resource_owner_password_credentials
+# from authlib.oauth2.rfc6749.grants import resource_owner_password_credentials
 import logging
 import requests
 from flask import current_app
@@ -13,8 +13,11 @@ from app.integrations.external.api import (
     should_refetch, mark_fetched,
 )
 
-from app.integrations.discovery import DiscoveryManager
 from app.integrations.enrichment.pipeline import prepare_article
+from app.integrations.discovery import DiscoveryManager
+from app.integrations.exceptions import (
+    PipelineFatalError, PipelineQuotaExceededError
+)
 
 logger = logging.getLogger(__name__)
 
@@ -42,18 +45,26 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
             print(f"  [NewsAPI] Searching: {q_text}...")
             logger.info(f"[NewsAPI] Query: {q_text}")
 
-            resp = requests.get(
-                "https://newsapi.org/v2/everything",
-                params={
-                    "q":        q_text,
-                    "language": "en",
-                    "sortBy":   "publishedAt",
-                    "pageSize": 80,
-                    "apiKey":   api_key,
-                },
-                timeout=10,
-            )
-            resp.raise_for_status()
+            try:
+                resp = requests.get(
+                    "https://newsapi.org/v2/everything",
+                    params={
+                        "q":        q_text,
+                        "language": "en",
+                        "sortBy":   "publishedAt",
+                        "pageSize": 80,
+                        "apiKey":   api_key,
+                    },
+                    timeout=10,
+                )
+                resp.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                if resp is not None and resp.status_code == 403:
+                    logger.error("[NewsAPI] Quota exceeded or Access Denied")
+                    raise PipelineQuotaExceededError("NewsAPI Quota Exceeded")
+                logger.warning("[NewsAPI] API request failed for query '%s': %s", q_text, str(e))
+                continue
+
             record_newsapi_call()
             mark_fetched(
                 section_slug, 
@@ -70,15 +81,21 @@ def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_
                 # 1. Enrichment/Classification
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-                if ingest_content(db.session, object_type="article", raw_data=raw):
-                    query_stored += 1
+                try:
+                    if ingest_content(db.session, object_type="article", raw_data=raw):
+                        query_stored += 1
+                except Exception as e:
+                    logger.critical("[NewsAPI] FATAL: Database insertion failed. Pipeline stopping.")
+                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
             
             stored += query_stored
             if query_stored > 0:
                 print(f"    -> [NewsAPI] Stored {query_stored} new articles")
                     
+        except (PipelineFatalError, PipelineQuotaExceededError):
+            raise
         except Exception:
-            logger.exception("[NewsAPI] Error fetching '%s' for %s", q_text, category_slug)
+            logger.exception("[NewsAPI] Unexpected error fetching '%s'", q_text)
 
     return stored
 

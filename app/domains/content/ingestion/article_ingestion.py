@@ -4,20 +4,10 @@ from ..content_access import create_content
 from sqlalchemy.exc import IntegrityError
 
 from app.integrations.cleaner import clean_article_data
-from app.domains.system.models import Section, Category
+from .taxonomy import resolve_taxonomy
 from ..service.command import apply_relationships
 
 # ---------- Taxonomy ----------
-def resolve_taxonomy(data):
-    section = Section.get_by_slug(data.get("section_slug") or "news", db.session)
-    if not section:
-        section = Section.get_by_slug("news", db.session)
-
-    category = Category.get_by_slug(data.get("category_slug") or "uncategorized", db.session)
-    if not category:
-        category = Category.get_by_slug("uncategorized", db.session)
-
-    return section, category
 
 
 def create_article(session, data):
@@ -37,22 +27,36 @@ def ingest_article(session, raw_data):
         return None
 
     try:
-        section, category = resolve_taxonomy(cleaned)
+        section, category = resolve_taxonomy(cleaned, session)
+        title_norm = cleaned.get("title", "").lower().strip()
 
-        article = create_article(session, cleaned)
+        # 1. Deduplication by Title
+        from sqlalchemy import func
+        from ..models import Content
+        
+        article = session.query(Article).filter(func.lower(Article.title) == title_norm).first()
+        
+        if not article:
+            article = create_article(session, cleaned)
+            # 2. Wrap into Content
+            content = create_content(
+                session,
+                obj=article,
+                object_type="article",
+                published_at=cleaned.get("published_at"),
+                category_id=category.id,
+                section_id=section.id
+            )
+        else:
+            # Existing Article - Find its Content record
+            content = session.query(Content).filter_by(
+                object_type="article",
+                object_id=article.id
+            ).first()
 
-        # 🔹 2. Wrap into Content
-        content = create_content(
-            db.session,
-            obj=article,
-            object_type="article",
-            published_at=cleaned.get("published_at"),
-            category_id=category.id,
-            section_id=section.id
-        )
-
-        # 3. Apply relationships
-        apply_relationships(content, cleaned)
+        # 3. Apply relationships (including linking sources)
+        if content:
+            apply_relationships(content, cleaned)
 
         session.commit()
         return content

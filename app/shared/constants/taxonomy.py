@@ -320,3 +320,16 @@ TAXONOMY = {
     ]
   }
 }
+REDDIT_SUBREDDITS = {
+    "community": {
+        "electronics": ["gadgets", "smartphones", "Android", "iphone", "hardware", "Apple", "Samsung", "PCMasterRace", "GooglePixel"],
+        "perfumes":    ["fragrance", "scents", "malefragrance", "feminineFragrance", "oud", "IndieExchange"],
+        "accessories": ["Watches", "LuxuryPurse", "DesignerBags", "Sunglasses", "streetwear", "malefashionadvice"],
+        "regional":    ["saudiarabia", "dubai", "abudhabi", "emirates"], 
+    },
+    "trends": {
+        "electronics": ["technology", "futurology", "startups"],
+        "perfumes":    ["fragrance", "scents"],
+        "accessories": ["streetwear", "highfashion"],
+    }
+}

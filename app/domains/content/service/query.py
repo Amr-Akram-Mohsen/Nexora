@@ -3,8 +3,8 @@ from ..models import Content
 from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta, timezone
 from app.core.extensions import cache
-from sqlalchemy.orm import joinedload, selectinload, defer
-from ..content_access import resolve
+from sqlalchemy.orm import joinedload, selectinload
+from ..content_access import assign_target_to_contents
 def my_zip(*iterables):
     my_list = []
     for i, val in enumerate(iterables[0]):
@@ -46,8 +46,7 @@ def get_contents_render(filter_by_columns: tuple = ('section',), filter_values: 
 
     contents = query.all()
 
-    # for a in contents:
-    #     a.card_type = 'content'
+    contents = assign_target_to_contents(contents, db.session)
 
     return contents
 
@@ -147,7 +146,10 @@ def get_filtered_contents(section, active_filters, allowed_filters, page=1, per_
     else:
         query = query.order_by(Content.published_at.desc())
 
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+    contents = query.paginate(page=page, per_page=per_page, error_out=False)
+    contents.items = assign_target_to_contents(contents.items, db.session)
+
+    return contents
 
 def get_search_contents(query):
     # Contents: search title/content (limit for speed)

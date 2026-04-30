@@ -20,8 +20,27 @@ def resolve_content_object(session, content):
 def resolve(content, session):
     return resolve_content_object(session, content)
 
+def assign_target_to_contents(contents, session):
+    for content in contents:
+        content.target = resolve(content, session)
+    return contents
+
 def create_content(session, *, obj, object_type, published_at, **kwargs):
     from .models import Content
+    
+    # 🔹 Simple deduplication: Check if this object is already linked to a Content entry
+    existing = session.query(Content).filter_by(
+        object_type=object_type,
+        object_id=obj.id
+    ).first()
+
+    if existing:
+        # Update existing record with latest metadata
+        existing.published_at = published_at
+        for k, v in kwargs.items():
+            setattr(existing, k, v)
+        return existing
+
     content = Content(
         object_type=object_type,
         object_id=obj.id,

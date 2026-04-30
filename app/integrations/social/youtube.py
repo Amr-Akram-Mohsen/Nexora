@@ -13,6 +13,10 @@ from app.integrations.external.api import (
 
 from app.integrations.discovery import DiscoveryManager
 from app.integrations.enrichment.pipeline import prepare_article
+from app.integrations.exceptions import (
+    PipelineFatalError, PipelineQuotaExceededError
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,12 +60,20 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
             if video_category_id:
                 params["videoCategoryId"] = video_category_id
 
-            resp = requests.get(
-                "https://www.googleapis.com/youtube/v3/search",
-                params=params,
-                timeout=10,
-            )
-            resp.raise_for_status()
+            try:
+                resp = requests.get(
+                    "https://www.googleapis.com/youtube/v3/search",
+                    params=params,
+                    timeout=10,
+                )
+                resp.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                if resp is not None and resp.status_code == 403:
+                    logger.error("[YouTube] Quota exceeded or Access Denied")
+                    raise PipelineQuotaExceededError("YouTube Quota Exceeded") from e
+                logger.warning("[YouTube] API request failed for query '%s': %s", query, str(e))
+                continue # Skip this query but continue with others
+
             record_youtube_call(units=units_per_search)
             mark_fetched(
                 section_slug, 
@@ -95,11 +107,21 @@ def fetch_youtube_section_category(section_slug: str, category_slug: str, query_
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
                 
                 raw["external_id"] = video_id
-                if ingest_content(db.session, object_type="video", raw_data=raw):
-                    stored += 1
+                
+                try:
+                    if ingest_content(db.session, object_type="video", raw_data=raw):
+                        stored += 1
+                except Exception as e:
+                    logger.critical("[YouTube] FATAL: Database insertion failed. Pipeline stopping.")
+                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
 
+        except (PipelineFatalError, PipelineQuotaExceededError):
+            # Re-raise fatal errors to stop the entire pipeline
+            raise
         except Exception:
-            logger.exception("[YouTube] Error for query: %s in %s", query, category_slug)
+            logger.exception("[YouTube] Unexpected error for query: %s", query)
+            # For other unexpected errors, we continue to the next query to avoid total collapse
+            # unless it's repeatedly failing (not implemented here yet)
 
     return stored
 

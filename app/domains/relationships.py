@@ -53,7 +53,7 @@ article_sources = db.Table(
     "article_sources",
     db.Column("article_id", db.Integer, db.ForeignKey("articles.id"), primary_key=True),
     db.Column("source_id",  db.Integer, db.ForeignKey("sources.id"),  primary_key=True),
-    db.Column("url",        db.Text,    nullable=False), # Specific URL for this source
+    db.Column("url",        db.Text, unique=True,    nullable=False), # Specific URL for this source
 
     db.Index("ix_article_sources_source", "source_id"),
     db.Index("ix_article_sources_article", "article_id"),

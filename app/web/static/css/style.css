@@ -2831,6 +2831,13 @@ body.dark-mode .site-footer {
   transition: all .2s;
 }
 
+.footer-link:hover {
+  color: var(--foreground);
+  background: linear-gradient(to right,
+      rgba(var(--brand-blue-rgb), .1),
+      rgba(var(--brand-purple-rgb), .1));
+}
+
 .footer-links .footer-link:hover {
   transform: translateX(4px);
 }

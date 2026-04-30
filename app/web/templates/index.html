@@ -20,6 +20,24 @@
   {% endcall %}
   {% endfor %}
 
+  {# ── Newsletter strip — footer places it, component fills it ── #}
+  <div class="footer-newsletter">
+    <div class="newsletter-block">
+
+      <div class="newsletter-icon" aria-hidden="true">
+        <i class="fas fa-envelope"></i>
+      </div>
+
+      <h3 class="newsletter-title">Stay Updated</h3>
+
+      {# .newsletter is the component root; newsletter-block.html is reusable #}
+      <div class="newsletter" data-newsletter>
+        {% include "partials/newsletter.html" %}
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 {% endblock %}

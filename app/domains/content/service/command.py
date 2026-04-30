@@ -7,6 +7,43 @@ from app.domains.system.models import (
 )
 from app.shared.utils.slug import generate_slug
 from ..content_access import resolve
+from sqlalchemy import func, insert
+
+def link_article_sources(article, data):
+    """Links an article to its specific source URL, ensuring uniqueness."""
+    source_name = data.get("source_name")
+    url = data.get("url")
+
+    if not source_name or not url:
+        return
+
+    slug = generate_slug(source_name)
+    source = Source.get_by_slug(slug, db.session)
+
+    if not source:
+        return
+
+    from app.domains.relationships import article_sources
+    
+    # 🔹 Check if this specific URL is already in the system (unique constraint)
+    existing_url = db.session.query(article_sources).filter_by(url=url).first()
+    if existing_url:
+        return
+
+    # 🔹 Check if the link already exists for this article/source pair
+    existing_link = db.session.query(article_sources).filter_by(
+        article_id=article.id,
+        source_id=source.id
+    ).first()
+
+    if not existing_link:
+        db.session.execute(
+            insert(article_sources).values(
+                article_id=article.id,
+                source_id=source.id,
+                url=url
+            )
+        )
 
 def delete_content(id: int) -> bool:
     content = db.session.get(Article, id)
@@ -18,14 +55,14 @@ def delete_content(id: int) -> bool:
     db.session.commit()
     return True
 
-def create_content_entry(session, obj, content_type, published_at):
+def create_content_entry(session, obj, object_type, published_at):
     """
     Creates a Content entry after the object is created.
     Prevents duplicates.
     """
 
     existing = session.query(Content).filter_by(
-        content_type=content_type,
+        object_type=object_type,
         object_id=obj.id
     ).first()
 
@@ -33,7 +70,7 @@ def create_content_entry(session, obj, content_type, published_at):
         return existing
 
     content = Content(
-        content_type=content_type,
+        object_type=object_type,
         object_id=obj.id,
         published_at=published_at
     )
@@ -82,13 +119,5 @@ def apply_relationships(content, data):
     # -------- Sources (ONLY for article) --------
     if content.object_type == "article":
         obj = resolve(content, db.session)
-
-        source_name = data.get("source_name")
-        url = data.get("url")
-
-        if source_name and url:
-            slug = generate_slug(source_name)
-            source = Source.get_by_slug(slug, db.session)
-
-            if source:
-                obj.sources.append(source)  # your M2M
+        if obj:
+            link_article_sources(obj, data)

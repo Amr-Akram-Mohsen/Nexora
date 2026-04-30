@@ -3,7 +3,7 @@
 {% from "components/ui/button.html" import button %}
 
 {% block content %}
-<section class="detail-page detail-page--{{ content.object_type }}">
+<section class="detail-page detail-page--{{ content.object_type }}" data-type="{{ content.object_type }}">
   <div class="container">
 
     <!-- Breadcrumbs -->
@@ -41,8 +41,8 @@
 
     <!-- Extra -->
     <div class="detail-page__extra">
-      {% include "components/features/interactions.html" %}
-      {% include "components/features/comments.html" %}
+      {% include "components/shared/interactions.html" %}
+      {% include "components/shared/comments.html" %}
     </div>
 
   </div>

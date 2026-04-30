@@ -15,10 +15,13 @@ import logging
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 import feedparser
+import feedparser
 from app.integrations.cleaner import clean_article_data
-from app.domains.content.ingestion import store_article
 from app.integrations.enrichment.pipeline import prepare_article
 from app.shared.constants.taxonomy import TAXONOMY
+from app.integrations.exceptions import (
+    PipelineFatalError, PipelineTransientError, PipelineQuotaExceededError
+)
 
 logger = logging.getLogger(__name__)
 
@@ -187,10 +190,11 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
                 continue
 
             from app.shared.constants.query_builder import SECTION_DEFAULT_INTENTS
-            from app.domains.content.ingestion import smart_ingest
+            from app.domains.content.ingestion import ingest_content
+            from app.core.extensions import db
 
             source_name = feed.feed.get("title") or feed_url
-            for entry in feed.entries[:30]:   # latest 15 per feed
+            for entry in feed.entries[:30]:   # latest 30 per feed
                 raw = _parse_entry(entry, section_slug, category_slug, source_name)
                 if not raw:
                     continue
@@ -204,11 +208,17 @@ def fetch_rss_section_category(section_slug: str, category_slug: str, feed_urls:
 
                 raw = prepare_article(raw, section_slug, category_slug, q_obj)
 
-                if smart_ingest(raw):
-                    stored += 1
+                try:
+                    if ingest_content(db.session, object_type="article", raw_data=raw):
+                        stored += 1
+                except Exception as e:
+                    logger.critical("[RSS] FATAL: Database insertion failed for feed %s. Pipeline stopping.", feed_url)
+                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
                         
+        except PipelineFatalError:
+            raise
         except Exception:
-            logger.exception("[RSS] Failed to parse feed: %s", feed_url)
+            logger.exception("[RSS] Failed to parse or process feed: %s", feed_url)
     return stored
 
 

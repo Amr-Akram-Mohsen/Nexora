@@ -42,7 +42,7 @@ def prepare_article(raw: dict, section_slug: str, category_slug: str, q_obj: dic
 
     # 7. Premium Metadata: Reading Time
     content_text = raw.get("content") or description or ""
-    word_count = len(content_text.split())
-    raw["reading_time_min"] = max(1, word_count // 200)
+    # word_count = len(content_text.split())
+    # raw["reading_time_min"] = max(1, word_count // 200)
 
     return raw
