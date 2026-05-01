@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 def run_content_fetch(limit: int | None = None):
     """Fetch all active content sources and return a summary report."""
     print("\n" + "="*50)
-    print("🚀 NEXORA GLOBAL DISCOVERY ENGINE STARTED")
+    print("NEXORA GLOBAL DISCOVERY ENGINE STARTED")
     if limit:
-        print(f"⚠️  TEST MODE ENABLED: Capping at {limit} queries per source")
+        print(f"TEST MODE ENABLED: Capping at {limit} queries per source")
     print("="*50 + "\n")
 
     results = {

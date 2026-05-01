@@ -1,39 +1,21 @@
 from ..models import Video
-from ..content_access import create_content, get_or_create_content
-from .taxonomy import resolve_taxonomy
-from ..service.command import apply_relationships
+from .base import generic_ingest
+
+def create_video_model(raw_data):
+    return Video(
+        title=raw_data["title"],
+        description=raw_data["description"],
+        external_id=raw_data["external_id"],
+        platform=raw_data.get("platform", "youtube"),
+        thumbnail_url=raw_data.get("image_url"), # Standardized in cleaner
+        channel_name=raw_data.get("source_name")  # Standardized in cleaner
+    )
 
 def ingest_video(session, raw_data):
-    try:
-        video = get_or_create_content(
-            session,
-            object_type="video",
-            external_id=raw_data["external_id"],
-            obj_factory=lambda: Video(
-                title=raw_data["title"],
-                description=raw_data["description"],
-                external_id=raw_data["external_id"],
-                platform=raw_data.get("platform", "youtube")
-            )
-        )
-
-        # Resolve Taxonomy
-        section, category = resolve_taxonomy(raw_data, session)
-
-        content = create_content(
-            session,
-            obj=video,
-            object_type="video",
-            published_at=raw_data["published_at"],
-            category_id=category.id,
-            section_id=section.id
-        )
-
-        # Apply relationships (Topics, Brands, Facets)
-        apply_relationships(content, raw_data)
-
-        session.commit()
-        return content
-    except Exception:
-        session.rollback()
-        raise
+    return generic_ingest(
+        session,
+        object_type="video",
+        raw_data=raw_data,
+        model_class=Video,
+        factory_func=create_video_model
+    )

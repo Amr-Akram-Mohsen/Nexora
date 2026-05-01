@@ -22,3 +22,14 @@ def get_users(search=None, role=None, rows_count=10):
         query = query.limit(rows_count)
 
     return query.all()
+def get_user_by_email(email):
+    return User.query.filter_by(email=email).first()
+
+def get_active_user_by_email(email):
+    return User.query.filter(User.email == email, User.is_active == True).first()
+
+def get_user_by_verification_token(token):
+    return User.query.filter_by(verification_token=token).first()
+
+def get_user_by_reset_token(token):
+    return User.query.filter_by(reset_token=token).first()

@@ -1,9 +1,11 @@
-{% extends"base.html" %}
+{% extends"content/page/base.html" %}
+
+{% set item = content.target %}
+
 {% from"components/features/media-gallery.html" import media_gallery %}
 {% from"components/render-details.html" import render_details %}
 {% from"components/ui/badge.html" import badge %}
 {% from "components/features/rating.html" import render_stars %}
-{% from"components/detail-page.html" import detail_page with context %}
 
 {% block title %}Nexora | {{ item.name }}{% endblock %}
 

@@ -2,9 +2,10 @@ from app.core.extensions import db
 from ..models import Content
 from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta, timezone
-from app.core.extensions import cache
+from app.infrastructure import cache
 from sqlalchemy.orm import joinedload, selectinload
 from ..content_access import assign_target_to_contents
+from app.shared.constants.core import TargetType
 def my_zip(*iterables):
     my_list = []
     for i, val in enumerate(iterables[0]):
@@ -14,6 +15,7 @@ def my_zip(*iterables):
             my_list.append((val, iterables[1][i]))
     return my_list
 
+@cache.memoize(timeout=600)
 def get_contents_render(filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
     from app.domains.system.models import Section
     query = Content.query.filter(Content.is_active == True).options(
@@ -51,7 +53,11 @@ def get_contents_render(filter_by_columns: tuple = ('section',), filter_values: 
     return contents
 
 
-def get_related_contents(content, limit=6):
+@cache.memoize(timeout=3600)
+def get_related_contents(content_id, limit=6):
+    from ..models import Content
+    content = db.session.get(Content, content_id)
+    if not content: return []
     from app.domains.system.models import Category, Section, Brand, Topic
     topic_ids = [t.id for t in content.topics]
     brand_ids = [b.id for b in content.brands]
@@ -99,7 +105,7 @@ def get_trending_contents(limit=6, days=7, section_ids=None):
             Content,
             func.count(View.id).label("recent_views")
         )
-        .join(View, (View.target_type == "content") & (View.target_id == Content.id))
+        .join(View, (View.target_type == TargetType.CONTENT) & (View.target_id == Content.id))
         .filter(View.created_at >= cutoff)
     )
 
@@ -175,3 +181,28 @@ def get_contents(search=None, source=None, rows_count=10):
         query = query.limit(rows_count)
 
     return query.all()
+def get_content_by_id(content_id):
+    from app.domains.item.models import Item, ItemVariant, ItemStoreLink
+    from app.domains.system.models import Source
+    return Content.query.options(
+        db.selectinload(Content.topics),
+        db.selectinload(Content.brands),
+        db.joinedload(Content.section),
+        db.joinedload(Content.category),
+        db.selectinload(Content.linked_items)
+            .selectinload(Item.variants)
+            .selectinload(ItemVariant.store_links)
+            .selectinload(ItemStoreLink.store),
+        db.selectinload(Content.linked_items)
+            .selectinload(Item.images),
+        db.selectinload(Content.linked_items)
+            .selectinload(Item.brand)
+    ).get(content_id)
+
+def resolve_content_target(content):
+    from ..content_access import resolve
+    content.target = resolve(content, db.session)
+    return content
+
+def get_latest_contents(limit=100):
+    return Content.query.order_by(Content.published_at.desc()).limit(limit).all()

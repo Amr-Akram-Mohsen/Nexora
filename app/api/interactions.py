@@ -1,17 +1,14 @@
 from flask import Blueprint, jsonify
 from app.core.decorators import admin_required
 
-from app.domains.interaction.service.query import (
-    get_comments,
+from app.domains.interaction.service import (
+    get_all_comments,
     get_interactions_breakdown,
     get_reaction_stats,
     get_view_stats,
     get_save_stats,
     get_click_stats,
-)
-
-from app.domains.interaction.service.command import (
-    delete_comment as delete_comment_service,
+    delete_comment as delete_comment_service
 )
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/api/interactions")
@@ -23,7 +20,7 @@ bp = Blueprint("api_interaction", __name__, url_prefix="/api/interactions")
 
 @bp.route("/comments", methods=["GET"])
 def list_comments():
-    comments = get_comments()
+    comments = get_all_comments()
 
     return jsonify([
         {

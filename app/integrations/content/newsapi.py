@@ -1,131 +1,57 @@
 # app/integrations/content/newsapi.py
-"""
-NewsAPI.org fetcher — 100 requests/day free tier.
-Get a free key at: https://newsapi.org/register
-Env var: NEWS_API_KEY
-"""
-# from authlib.oauth2.rfc6749.grants import resource_owner_password_credentials
 import logging
 import requests
 from flask import current_app
-from app.integrations.external.api import (
-    can_call_newsapi, record_newsapi_call,
-    should_refetch, mark_fetched,
-)
-
-from app.integrations.enrichment.pipeline import prepare_article
-from app.integrations.discovery import DiscoveryManager
-from app.integrations.exceptions import (
-    PipelineFatalError, PipelineQuotaExceededError
-)
+from app.integrations.exceptions import PipelineQuotaExceededError
 
 logger = logging.getLogger(__name__)
 
-
-def fetch_section_category_newsapi(section_slug: str, category_slug: str, query_data: list[dict]) -> int:
+def fetch_newsapi_query(q_obj: dict) -> list[dict]:
+    """
+    Pure fetcher for NewsAPI.
+    Focuses only on API request and returning raw data.
+    """
     api_key = current_app.config.get("NEWS_API_KEY")
     if not api_key:
-        logger.warning("[NewsAPI] NEWS_API_KEY not set — skipping")
-        return 0
+        logger.warning("[NewsAPI] No API key")
+        print("[NewsAPI] No API key")
+        return []
 
-    stored = 0
-    for q_obj in query_data:
-        q_text = q_obj["query"]
-        cache_key = f"newsapi:{category_slug}:{q_text}"
+    q_text = q_obj["query"]
+    
+    try:
+        resp = requests.get(
+            "https://newsapi.org/v2/everything",
+            params={
+                "q":        q_text,
+                "language": "en",
+                "sortBy":   "publishedAt",
+                "pageSize": 80,
+                "apiKey":   api_key,
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("articles", [])
         
-        if not should_refetch(section_slug, cache_key, hours=6):
-            logger.debug("[NewsAPI] Skipping '%s' — fetched recently", q_text)
-            continue
-
-        if not can_call_newsapi():
-            logger.warning("[NewsAPI] Daily limit reached — stopping")
-            break
-
-        try:
-            print(f"  [NewsAPI] Searching: {q_text}...")
-            logger.info(f"[NewsAPI] Query: {q_text}")
-
-            try:
-                resp = requests.get(
-                    "https://newsapi.org/v2/everything",
-                    params={
-                        "q":        q_text,
-                        "language": "en",
-                        "sortBy":   "publishedAt",
-                        "pageSize": 80,
-                        "apiKey":   api_key,
-                    },
-                    timeout=10,
-                )
-                resp.raise_for_status()
-            except requests.exceptions.RequestException as e:
-                if resp is not None and resp.status_code == 403:
-                    logger.error("[NewsAPI] Quota exceeded or Access Denied")
-                    raise PipelineQuotaExceededError("NewsAPI Quota Exceeded")
-                logger.warning("[NewsAPI] API request failed for query '%s': %s", q_text, str(e))
-                continue
-
-            record_newsapi_call()
-            mark_fetched(
-                section_slug, 
-                cache_key, 
-                category=category_slug, 
-                source="newsapi", 
-                normalized_query=q_text
-            )
-
-            from app.domains.content.ingestion import ingest_content
-            from app.core.extensions import db
-            query_stored = 0
-            for raw in resp.json().get("articles", []):
-                # 1. Enrichment/Classification
-                raw = prepare_article(raw, section_slug, category_slug, q_obj)
-
-                try:
-                    if ingest_content(db.session, object_type="article", raw_data=raw):
-                        query_stored += 1
-                except Exception as e:
-                    logger.critical("[NewsAPI] FATAL: Database insertion failed. Pipeline stopping.")
-                    raise PipelineFatalError(f"Database insertion failed: {str(e)}") from e
-            
-            stored += query_stored
-            if query_stored > 0:
-                print(f"    -> [NewsAPI] Stored {query_stored} new articles")
-                    
-        except (PipelineFatalError, PipelineQuotaExceededError):
-            raise
-        except Exception:
-            logger.exception("[NewsAPI] Unexpected error fetching '%s'", q_text)
-
-    return stored
-
+    except requests.exceptions.RequestException as e:
+        if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:
+            raise PipelineQuotaExceededError("NewsAPI Quota Exceeded")
+        logger.warning("[NewsAPI] API request failed for query '%s': %s", q_text, str(e))
+        return []
 
 def fetch_all_sections(limit: int | None = None) -> int:
-    total = 0
-    discovery = DiscoveryManager()
-    queries_registry = discovery.get_queries_by_section(source_filter="newsapi")
+    """Entry point refactored to use IngestionWorkflow."""
+    from app.application.content.ingestion_workflow import run_orchestrated_ingestion
+    from app.integrations.external.api import can_call_newsapi, record_newsapi_call
     
-    # Flatten the registry into a list of (section, category, q_obj)
-    flat_queries = []
-    for section, categories in queries_registry.items():
-        for category, queries in categories.items():
-            for q in queries:
-                flat_queries.append((section, category, q))
-    
-    if not flat_queries:
-        return 0
-
-    # If limited, shuffle to get a diverse sample across sections/categories
-    import random
-    if limit:
-        random.shuffle(flat_queries)
-        flat_queries = flat_queries[:limit]
-
-    logger.info("[NewsAPI] Starting discovery run with %d queries (Diverse Sample)", len(flat_queries))
-    
-    # Group back by section/category for efficient execution (optional, but cleaner logs)
-    for section_slug, category_slug, q_obj in flat_queries:
-        count = fetch_section_category_newsapi(section_slug, category_slug, [q_obj])
-        total += count
-        
-    return total
+    return run_orchestrated_ingestion(
+        source_name="NewsAPI",
+        object_type="article",
+        fetcher_func=fetch_newsapi_query,
+        can_call_func=can_call_newsapi,
+        record_call_func=record_newsapi_call,
+        source_filter="newsapi",
+        limit=limit,
+        cooldown_hours=6
+    )

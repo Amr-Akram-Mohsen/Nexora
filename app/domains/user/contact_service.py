@@ -15,3 +15,17 @@ Message:
 {data['message']}
 """
     )
+def create_contact_message(name, email, subject, message, ip_address, user_agent):
+    from app.domains.user.models import ContactMessage
+    from app.core.extensions import db
+    msg = ContactMessage(
+        name=name,
+        email=email,
+        subject=subject,
+        message=message,
+        ip_address=ip_address,
+        user_agent=user_agent
+    )
+    db.session.add(msg)
+    db.session.commit()
+    return msg

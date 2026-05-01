@@ -1,7 +1,8 @@
 from app.core.extensions import db
 from ..models import Item, ItemVariant, Store, ItemStoreLink
-from app.domains.system.models import Category, Brand
+from ...system.models import Category, Brand
 from app.shared.parsing import safe_float
+from app.infrastructure import cache
 
 def filter_items_by_country(query):
     from app.shared.request import get_country
@@ -15,6 +16,7 @@ def get_search_items(query_str):
     p_query = Item.query.filter(Item.name.ilike(f'%{query_str}%'))
     return p_query.order_by(Item.created_at.desc()).limit(50).all()
 
+@cache.memoize(timeout=300)
 def get_filtered_items(active_filters, page=1, per_page=24):
     """
     Handles complex filtering, joining, and sorting for the items catalog.
@@ -120,3 +122,49 @@ def get_items(search=None, brand=None, rows_count=10):
         query = query.limit(rows_count)
 
     return query.all()
+def get_distinct_stores():
+    from ..models import Store, ItemStoreLink, ItemVariant, Item
+    return Store.query.join(ItemStoreLink).join(ItemVariant).join(Item).distinct().all()
+
+def get_distinct_item_types():
+    from ..models import Item
+    return [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
+
+def get_item_by_id(item_id):
+    from ..models import Item, ItemVariant, ItemStoreLink
+    return Item.query.options(
+        db.selectinload(Item.variants)
+            .selectinload(ItemVariant.store_links)
+            .selectinload(ItemStoreLink.store),
+        db.selectinload(Item.images)
+    ).get(item_id)
+
+def get_items_by_ids(item_ids):
+    from ..models import Item, ItemVariant, ItemStoreLink
+    return Item.query.options(
+        db.joinedload(Item.brand),
+        db.joinedload(Item.category),
+        db.selectinload(Item.images),
+        db.selectinload(Item.specifications),
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
+    ).filter(Item.id.in_(item_ids)).all()
+
+@cache.memoize(timeout=600)
+def get_filtered_items_for_home(filter_type='recent', limit=10):
+    from ..models import ItemVariant
+    query = Item.query.options(
+        db.joinedload(Item.brand),
+        db.joinedload(Item.category),
+        db.selectinload(Item.images),
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links)
+    )
+
+    if filter_type == 'deals':
+        top_deals = query.join(Item.variants).filter(ItemVariant.old_price > ItemVariant.price).limit(limit).all()
+        if not top_deals:
+            top_deals = query.order_by(Item.id.desc()).limit(limit).all()
+        return top_deals
+    elif filter_type == 'random':
+        return query.order_by(db.func.random()).limit(limit).all()
+    else:
+        return query.order_by(Item.created_at.desc()).limit(limit).all()

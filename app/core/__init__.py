@@ -18,18 +18,14 @@ from app.api.interactions import bp as api_interaction_bp
 from app.api.stats import bp as api_dashboard_bp
 from app.api.ingestions import bp as api_ingestion_bp
 
-from app.domains.admin import admin_bp
 
 # from app.domains.dashboard.routes import bp as dashboard_bp
 
 import app.domains.system
 from app.domains.user.models import User
-from app.domains.user.routes import bp as user_bp
-from app.domains.content.routes import bp as content_bp
-from app.domains.item.routes import bp as item_bp
-from app.domains.interaction.routes import bp as interaction_bp
-from app.domains.recommendation.routes import bp as recommendation_bp
-from app.domains.system.routes import bp as system_bp
+from app.web.routes import (
+    admin_bp, user_bp, system_bp, content_bp, item_bp, interaction_bp, recommendation_bp, recommendation_bp
+)
 
 
 def setup_logging(app):

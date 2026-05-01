@@ -1,7 +1,6 @@
-# content/service/command.py
-from ..models import Article, Content
 from app.core.extensions import db
-from app.domains.system.models import (
+from ..models import Article, Content
+from ...system.models import (
     Topic, Brand, AttributeFacet,
     GenderFacet, IntentFacet, PriceTierFacet, Source
 )
@@ -31,7 +30,7 @@ def link_article_sources(article, data):
         return
 
     # 🔹 Check if the link already exists for this article/source pair
-    existing_link = db.session.query(article_sources).filter_by(
+    existing_link = db.session.query(article_sources).options(joinedload(Source)).filter_by(
         article_id=article.id,
         source_id=source.id
     ).first()

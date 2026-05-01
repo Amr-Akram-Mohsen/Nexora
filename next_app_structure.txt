@@ -1,0 +1,146 @@
+app/
+├── api/  
+│   # JSON endpoints used mainly by admin dashboard (NOT public product API yet)
+│   # Keep thin: only request parsing + call application layer
+│   ├── contents.py        # ⚠️ MAY SPLIT later (article/video/post) if dashboard grows
+│   ├── items.py
+│   ├── interactions.py
+│   ├── users.py
+│   └── stats.py
+│
+├── web/
+│   ├── routes/  
+│   │   # ⭐ NEW: ALL HTML routes moved here from domains/*/routes
+│   │   # These should ONLY call application layer (NO domain logic directly)
+│   │   ├── content.py
+│   │   ├── item.py
+│   │   ├── user.py
+│   │   ├── system.py
+│   │   └── admin.py       # ← MOVE admin routes here (from domains/admin)
+│   │
+│   ├── templates/         # ✅ KEEP AS IS (your structure is already strong)
+│   └── static/            # ✅ KEEP AS IS
+│
+├── application/           # ⭐ MOST IMPORTANT NEW LAYER (ORCHESTRATION)
+│   # This layer coordinates MULTIPLE domains
+│   # NO DB models here, NO Flask globals
+│
+│   ├── content/
+│   │   ├── get_feed.py        # combines content + ranking + filters
+│   │   ├── get_article_page.py
+│   │   ├── get_video_page.py
+│   │   └── get_post_page.py
+│   │
+│   ├── item/
+│   │   ├── get_catalog.py     # ⭐ replaces logic currently spread in routes/services
+│   │   ├── get_item_page.py
+│   │   └── compare_items.py
+│   │
+│   ├── interaction/
+│   │   ├── add_interaction.py
+│   │   └── delete_comment.py  # ← move logic from api directly here
+│   │
+│   ├── recommendation/
+│   │   ├── build_feed.py      # content + interaction + ranking
+│   │   └── rank_results.py
+│   │
+│   ├── user/
+│   │   ├── login_user.py
+│   │   ├── register_user.py
+│   │   └── newsletter_flow.py # ⭐ extracted from context.py logic
+│   │
+│   └── admin/
+│       ├── dashboard_stats.py # ← used by api/stats.py
+│       └── manage_content.py
+│
+├── domains/                # PURE BUSINESS LOGIC (NO FLASK, NO REQUEST)
+│
+│   ├── content/
+│   │   ├── models/         # article.py, video.py, post.py, content.py
+│   │   ├── service/
+│   │   │   ├── commands/   # write operations
+│   │   │   ├── queries/    # read operations
+│   │   │   └── domain_rules.py
+│   │   └── ingestion/      # keep ingestion logic here (already good)
+│
+│   ├── item/
+│   │   ├── models.py
+│   │   ├── service/
+│   │   │   ├── commands/
+│   │   │   ├── queries/
+│   │   │   └── domain_rules.py
+│   │   └── ingestion.py
+│
+│   ├── interaction/
+│   │   ├── models.py
+│   │   ├── constants.py
+│   │   └── service/
+│
+│   ├── recommendation/
+│   │   ├── models.py
+│   │   ├── ranking.py
+│   │   ├── matcher.py
+│   │   └── service/
+│
+│   ├── user/
+│   │   ├── models.py
+│   │   ├── auth_service.py   # ⚠️ MAY MOVE partly to application later
+│   │   └── service/
+│
+│   ├── system/
+│   │   ├── models.py
+│   │   ├── service/
+│   │   │   ├── queries/      # get_active_sections, etc.
+│   │   │   └── commands/
+│   │   └── sitemap.py
+│
+│   ├── admin/               # ✅ KEEP DOMAIN (business logic of admin)
+│   │   └── service/
+│
+│   └── relationships.py
+│
+├── integrations/            # ✅ KEEP (already clean)
+│   ├── content/
+│   ├── ecommerce/
+│   ├── social/
+│   ├── enrichment/
+│   └── external/
+│
+├── infrastructure/          # ⭐ NEW (gradual extraction, not immediate)
+│   ├── db/                  # future: db session management
+│   ├── cache/               # move cache config here later
+│   └── repositories/        # optional abstraction layer later
+│
+├── core/                    # ⚠️ REDEFINED ROLE (APP BOOTSTRAP ONLY)
+│   ├── __init__.py          # Flask app factory (KEEP)
+│   ├── extensions.py        # db, cache, limiter (KEEP here for now)
+│   ├── decorators.py        # admin_required (KEEP)
+│   └── config_binding.py    # ⭐ NEW (optional split from __init__)
+│
+├── presentation/            # ⭐ NEW (IMPORTANT SPLIT FROM context.py)
+│   ├── context/
+│   │   ├── layout.py        # get_layout_context (MOVE here)
+│   │   ├── user.py          # get_user_context
+│   │   ├── newsletter.py    # get_newsletter_context
+│   │   └── filters.py       # get_filter_url, get_sort_url, etc.
+│
+├── shared/                  # STRICTLY GENERIC (you did this well)
+│   ├── constants/
+│   │   ├── core.py
+│   │   ├── taxonomy.py      # ✅ KEEP (static config)
+│   │   └── query_builder.py # ⚠️ borderline → OK since used in ingestion
+│   │
+│   ├── utils/
+│   │   └── slug.py
+│   │
+│   ├── parsing.py           # OK (used across domains)
+│   ├── normalizer.py        # OK (ingestion utility)
+│   ├── sanitizer.py
+│   ├── request.py
+│   └── decorators.py
+│
+├── jobs/                    # ✅ KEEP
+│   ├── scheduler.py
+│   └── tasks/
+│
+└── main.py

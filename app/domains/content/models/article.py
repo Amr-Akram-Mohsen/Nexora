@@ -21,7 +21,9 @@ class Article(db.Model):
     # -------- Helpers --------
     @property
     def source_name(self):
-        return self.sources[0].name or None
+        if self.sources:
+            return self.sources[0].name
+        return 'Unknown'
     
     @property
     def read_time_minutes(self):

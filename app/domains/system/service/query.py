@@ -1,9 +1,8 @@
 from app.core.extensions import db
-from app.domains.content.models import Content
+from ...content.models import Content
 from ..models import Category, Section, Brand, Topic
-# from app.domains.system.models import Category, Section, Brand, Topic
 from sqlalchemy import func
-from app.core.extensions import cache
+from app.infrastructure import cache
 from app.domains.relationships import content_brands
 
 
@@ -83,3 +82,15 @@ def get_active_sections():
         # .order_by(Section.sort_order)
         .all()
     )
+def get_section_by_slug(slug):
+    return Section.query.filter(
+        Section.slug == slug,
+        Section.is_active == True
+    ).first()
+def get_distinct_item_categories():
+    from app.domains.item.models import Item
+    return Category.query.join(Item).distinct().all()
+
+def get_distinct_item_brands():
+    from app.domains.item.models import Item
+    return Brand.query.join(Item).distinct().all()
