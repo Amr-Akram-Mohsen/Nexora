@@ -10,7 +10,7 @@ from app.integrations.external.api import (
 from app.integrations.exceptions import (
     PipelineFatalError, PipelineQuotaExceededError
 )
-from app.domains.content.ingestion import ingest_content
+from app.application.content.ingestion import ingest_content
 
 logger = logging.getLogger(__name__)
 

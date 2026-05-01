@@ -1,4 +1,4 @@
-from ..models import Post
+from app.domains.content.models import Post
 from .base import generic_ingest
 
 def create_post_model(raw_data):

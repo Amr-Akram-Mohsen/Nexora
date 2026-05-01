@@ -1,4 +1,4 @@
-from ..models import Video
+from app.domains.content.models import Video
 from .base import generic_ingest
 
 def create_video_model(raw_data):

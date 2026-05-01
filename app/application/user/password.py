@@ -1,7 +1,7 @@
 import secrets
 from datetime import datetime, timezone, timedelta
 from app.domains.user.service import get_user_by_email, set_reset_token, get_user_by_reset_token, reset_password
-from app.domains.user.email_service import send_password_reset_email
+from app.application.user.email_service import send_password_reset_email
 
 def request_password_reset(email):
     """

@@ -80,7 +80,7 @@ def run_rss_fetch(limit: int | None = None):
 def run_sitemap_gen():
     """Generates the static sitemap file."""
     try:
-        from app.domains.system.sitemap import generate_static_sitemap
+        from app.application.system.sitemap import generate_static_sitemap
         from flask import current_app
         count = generate_static_sitemap(current_app)
         logger.info("[Runner] Sitemap generated with %d URLs", count)

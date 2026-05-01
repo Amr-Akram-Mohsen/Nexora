@@ -1,7 +1,7 @@
 # app/domains/article/service/scraping.py
 import logging
 from app.core.extensions import db
-from ..models import Article
+from app.domains.content.models import Article
 
 logger = logging.getLogger(__name__)
 

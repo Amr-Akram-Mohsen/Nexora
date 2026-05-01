@@ -1,4 +1,4 @@
-from ..models import Article
+from app.domains.content.models import Article
 from .base import generic_ingest
 from app.integrations.cleaner import clean_article_data
 from app.integrations.enrichment.pipeline import enrich_article_content

@@ -7,7 +7,7 @@ Automatically links items to Section, Category, and Brand.
 import logging
 from slugify import slugify
 from app.core.extensions import db
-from .models import Item, ItemVariant, ItemImage, ItemStoreLink, Store, ItemSpecification
+from app.domains.item.models import Item, ItemVariant, ItemImage, ItemStoreLink, Store, ItemSpecification
 from app.domains.system.models import Brand, Category
 
 logger = logging.getLogger(__name__)

@@ -123,9 +123,9 @@ def create_app():
 
     @app.cli.command("link-contents")
     def link_contents_command():
-        from app.domains.recommendation.matcher import match_contents_to_items
+        from app.application.recommendation.matcher import match_articles_to_items
         print("Starting content-to-item matcher...")
-        count = match_contents_to_items()
+        count = match_articles_to_items()
         print(f"Matcher complete! Created {count} new links.")
 
     @app.cli.command("seed-noon-stores")
@@ -197,7 +197,7 @@ def create_app():
     @app.cli.command("rescrape-articles")
     def rescrape_articles_command():
         """Find articles with missing content and attempt to re-scrape."""
-        from app.domains.content.service.scraping import reprocess_unscraped_articles
+        from app.application.content.workflows.enrichment import reprocess_unscraped_articles
         print("Searching for unscraped articles...")
         count = reprocess_unscraped_articles(limit=15)
         print(f"Done! Successfully recovered content for {count} articles.")
@@ -205,7 +205,7 @@ def create_app():
     @app.cli.command("generate-sitemap")
     def generate_sitemap_command():
         """Generate a static sitemap.xml file."""
-        from app.domains.system.sitemap import generate_static_sitemap
+        from app.application.system.sitemap import generate_static_sitemap
         print("Generating sitemap...")
         count = generate_static_sitemap(app)
         print(f"Done! Sitemap generated with {count} URLs.")

@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from app.domains.user.service import (
     get_newsletter_subscriber_by_email,
     create_newsletter_subscriber,
@@ -6,7 +5,7 @@ from app.domains.user.service import (
     confirm_newsletter_subscriber,
     unsubscribe_newsletter_subscriber
 )
-from app.domains.user.email_service import send_confirmation_email
+from app.application.user.email_service import send_confirmation_email
 
 def subscribe_workflow(email, user_id=None):
     """

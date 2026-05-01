@@ -4,7 +4,7 @@ from app.domains.user.service import (
     get_newsletter_subscriber_by_email,
     link_newsletter_subscriber_to_user
 )
-from app.domains.user.email_service import send_verification_email
+from app.application.user.email_service import send_verification_email
 from app.application.interaction.newsletter import subscribe_workflow
 
 def register_user_workflow(name, email, password, wants_newsletter=False):

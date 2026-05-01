@@ -3,8 +3,8 @@ import logging
 from sqlalchemy.exc import IntegrityError
 from app.core.extensions import db
 from .taxonomy import resolve_taxonomy
-from ..service.command import apply_relationships
-from ..content_access import create_content, get_or_create_content
+from app.domains.content.service.command import apply_relationships
+from app.domains.content.content_access import create_content, get_or_create_content
 
 logger = logging.getLogger(__name__)
 
