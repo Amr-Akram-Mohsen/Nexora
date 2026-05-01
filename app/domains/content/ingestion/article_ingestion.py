@@ -1,29 +1,35 @@
 from ..models import Article
 from .base import generic_ingest
 from app.integrations.cleaner import clean_article_data
+from app.integrations.enrichment.pipeline import enrich_article_content
 
 def create_article_model(data):
     return Article(
         title=data.get("title"),
         description=data.get("description"),
-        body=data.get("content"),
+        content_text=data.get("content_text"),
+        content_html=data.get("content_html"),
+        word_count=data.get("word_count"),
+        quality_score=data.get("quality_score", 0.0),
+        is_content_scraped=data.get("is_content_scraped", False),
+        content_source=data.get("content_source"),
+        body=data.get("content"),  # Still populate body for migration
         image_url=data.get("image_url")
     )
 
 def ingest_article(session, raw_data):
+    # 1. Clean metadata
     cleaned = clean_article_data(raw_data)
     if not cleaned:
         return None
 
-    # For articles, we still use title-based dedup if external_id is missing
-    # but generic_ingest handles the rest.
-    # Note: I'll stick to external_id if possible, but many RSS feeds don't have it.
-    # So we might need a small tweak in base or just handle it here.
+    # 2. Enrich content (Scraping strategy + Normalization)
+    enriched = enrich_article_content(cleaned)
     
     return generic_ingest(
         session,
         object_type="article",
-        raw_data=cleaned,
+        raw_data=enriched,
         model_class=Article,
         factory_func=create_article_model
     )

@@ -1,7 +1,6 @@
 from app.core.extensions import db
 from app.domains.item.models import Item
 
-
 def delete_item(id: int) -> bool:
     item = db.session.get(Item, id)
 
@@ -11,4 +10,3 @@ def delete_item(id: int) -> bool:
     db.session.delete(item)
     db.session.commit()
     return True
-

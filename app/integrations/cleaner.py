@@ -22,7 +22,6 @@ import html
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.shared.sanitizer import sanitize_text
-from app.integrations.content.extract_article_content import scrape_article_content
 import logging
 logger = logging.getLogger(__name__)
 # ── Safe HTML tags allowed in article content ──────────────────
@@ -188,42 +187,15 @@ def clean_article_data(raw: dict, skip_scrape: bool = False) -> dict | None:
     )
     source_name = sanitize_text(source_raw)
 
-    # ── Content ──────────────────────────────────────────────────
+    # ── Content (Sanitize only, no scraping) ─────────────────────
     content = raw.get("content")
-    is_content_scraped = False
-
-    if not skip_scrape and not content and url and "youtube.com" not in url.lower():
-        full_content = scrape_article_content(url)
-        if full_content:
-            # full_content is already enhanced inside scrape_article_content
-            content = _sanitize_content(full_content)
-            
-            # Verify sanitized content isn't just whitespace or too tiny
-            if content and len(content) >= 300:
-                is_content_scraped = True
-            else:
-                logger.debug(f"[Cleaner] Content too short for {title[:50]}, marking as unscraped.")
-                is_content_scraped = False
-        else:
-            logger.info(f"[Cleaner] Scrape failed for {title[:50]}, marking as unscraped.")
-            is_content_scraped = False
-    elif content:
-        # If content was already provided (e.g. from a full RSS feed or previous fetch)
+    if content:
         content = _sanitize_content(content)
-        is_content_scraped = True if len(content or "") > 300 else False
-    elif skip_scrape:
-        logger.debug(f"[Cleaner] Skipping scrape for existing article: {title[:50]}...")
-        is_content_scraped = raw.get("is_content_scraped", False)
-
-    # Fallback: if no content, use description as a placeholder
-    if not content or len(content) < 50:
-        content = f'<p class="article-full-text__paragraph">{description}</p>'
 
     return {
         "title":              title,
         "description":        description,
         "content":            content,
-        "is_content_scraped": is_content_scraped,
         "url":                url,
         "image_url":          image_url,
         "published_at":       published_at,

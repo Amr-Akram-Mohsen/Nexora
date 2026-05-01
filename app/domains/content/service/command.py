@@ -5,8 +5,9 @@ from ...system.models import (
     GenderFacet, IntentFacet, PriceTierFacet, Source
 )
 from app.shared.utils.slug import generate_slug
-from ..content_access import resolve
+from .content_access import resolve
 from sqlalchemy import func, insert
+from sqlalchemy.orm import joinedload
 
 def link_article_sources(article, data):
     """Links an article to its specific source URL, ensuring uniqueness."""
@@ -22,7 +23,7 @@ def link_article_sources(article, data):
     if not source:
         return
 
-    from app.domains.relationships import article_sources
+    from ...relationships import article_sources
     
     # 🔹 Check if this specific URL is already in the system (unique constraint)
     existing_url = db.session.query(article_sources).filter_by(url=url).first()

@@ -4,7 +4,7 @@ from sqlalchemy import func, case, or_
 from datetime import datetime, timedelta, timezone
 from app.infrastructure import cache
 from sqlalchemy.orm import joinedload, selectinload
-from ..content_access import assign_target_to_contents
+from .content_access import assign_target_to_contents
 from app.shared.constants.core import TargetType
 def my_zip(*iterables):
     my_list = []
@@ -200,7 +200,7 @@ def get_content_by_id(content_id):
     ).get(content_id)
 
 def resolve_content_target(content):
-    from ..content_access import resolve
+    from .content_access import resolve
     content.target = resolve(content, db.session)
     return content
 

@@ -2,7 +2,7 @@ from functools import lru_cache
 from app.core.extensions import db
 @lru_cache
 def get_model_map():
-    from .models import Article, Video, Post
+    from ..models import Article, Video, Post
     return {
         "article": Article,
         "video": Video,
@@ -53,7 +53,7 @@ def assign_target_to_contents(contents, session):
     return contents
 
 def create_content(session, *, obj, object_type, published_at, **kwargs):
-    from .models import Content
+    from ..models import Content
     
     # 🔹 Simple deduplication: Check if this object is already linked to a Content entry
     existing = session.query(Content).filter_by(

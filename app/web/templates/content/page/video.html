@@ -29,21 +29,22 @@
 {% endblock %}
 
 
-{% block breadcrumbs %}
+{% block base_breadcrumbs %}
 {% include "content/features/breadcrumbs.html" %}
 {% endblock %}
 
-{% block header %}
+{% block base_header %}
 <h1>{{ video.title }}</h1>
 <p>{{ video.channel_name }}</p>
 {% endblock %}
 
-{% block image %}
+{% block base_image %}
 <img src="{{ video.thumbnail_url }}" />
 {% endblock %}
 
-{% block main_content %}
+{% block base_content %}
 <div class="video-container">
+  <iframe src="{{ video.url }}"></iframe>
   <iframe src="https://www.youtube.com/embed/{{ video.external_id }}"></iframe>
   <p>{{ video.description }}</p>
 </div>

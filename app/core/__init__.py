@@ -11,12 +11,12 @@ from logging.handlers import RotatingFileHandler
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from app.api.contents import bp as api_content_bp
-from app.api.items import bp as api_item_bp
-from app.api.users import bp as api_user_bp
-from app.api.interactions import bp as api_interaction_bp
-from app.api.stats import bp as api_dashboard_bp
-from app.api.ingestions import bp as api_ingestion_bp
+from app.admin.contents import bp as api_content_bp
+from app.admin.items import bp as api_item_bp
+from app.admin.users import bp as api_user_bp
+from app.admin.interactions import bp as api_interaction_bp
+from app.admin.stats import bp as api_dashboard_bp
+from app.admin.ingestions import bp as api_ingestion_bp
 
 
 # from app.domains.dashboard.routes import bp as dashboard_bp

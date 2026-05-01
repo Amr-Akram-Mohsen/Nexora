@@ -26,16 +26,16 @@
 </script>
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block base_breadcrumbs %}
 {% include "content/features/breadcrumbs.html" %}
 {% endblock %}
 
-{% block header %}
+{% block base_header %}
 <h1>{{ post.title }}</h1>
 <p>r/{{ post.subreddit }} • {{ post.author }}</p>
 {% endblock %}
 
-{% block main_content %}
+{% block base_content %}
 <div class="post-body">
   {{ post.body }}
 </div>

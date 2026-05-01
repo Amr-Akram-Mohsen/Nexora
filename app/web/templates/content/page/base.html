@@ -7,36 +7,36 @@
   <div class="container">
 
     <!-- Breadcrumbs -->
-    {% block breadcrumbs %}{% endblock %}
+    {% block base_breadcrumbs %}{% endblock %}
 
     <!-- Top -->
     <div class="detail-page__top flex items-center justify-between">
       <a href="/">
         {{ button(text="Back", variant="ghost", class="btn-back", icon="fas fa-chevron-left") }}
       </a>
-      {% block top %}{% endblock %}
+      {% block base_top %}{% endblock %}
     </div>
 
     <!-- Main -->
     <div class="detail-page__main flex flex-col">
 
       <div class="detail-page__header">
-        {% block header %}{% endblock %}
+        {% block base_header %}{% endblock %}
       </div>
 
       <div class="detail-page__image">
-        {% block image %}{% endblock %}
+        {% block base_image %}{% endblock %}
       </div>
 
       <div class="detail-page__content">
-        {% block main_content %}{% endblock %}
+        {% block base_content %}{% endblock %}
       </div>
 
     </div>
 
     <!-- Sidebar -->
     <aside class="detail-page__sidebar">
-      {% block sidebar %}{% endblock %}
+      {% block base_sidebar %}{% endblock %}
     </aside>
 
     <!-- Extra -->

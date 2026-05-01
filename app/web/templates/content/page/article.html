@@ -44,11 +44,11 @@
 </script>
 
 {% endblock %}
-{% block breadcrumbs %}
+{% block base_breadcrumbs %}
 {% include "content/features/breadcrumbs.html" %}
 {% endblock %}
 
-{% block header %}
+{% block base_header %}
 <div class="detail-page__header-content flex flex-col">
   <div class="detail-page__badges flex flex-wrap">
     {{ badge(content.category.name, 'badge--category') }}
@@ -85,11 +85,11 @@
 </div>
 {% endblock %}
 
-{% block image %}
+{% block base_image %}
 {{ render_image_url(article.image_url, article.title) }}
 {% endblock %}
 
-{% block main_content %}
+{% block base_content %}
 <div class="article-content">
   {% if content.linked_items %}
   {% include "partials/affiliate-disclosure.html" %}
@@ -121,7 +121,7 @@
 </div>
 {% endblock %}
 
-{% block sidebar %}
+{% block base_sidebar %}
 {% if trending_contents %}
 {{ content_snippet(trending_contents, 'Trending') }}
 {% endif %}
