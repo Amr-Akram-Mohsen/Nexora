@@ -151,7 +151,7 @@ def add_view():
     
     target = None
     if target_type == TargetType.ARTICLE:
-        target = get_content_by_id(target_id)
+        target = get_content_by_id(db.session, target_id)
     else:
         target = get_item_by_id(target_id)
         
@@ -159,6 +159,7 @@ def add_view():
         abort(404)
         
     result = record_view(target, target_type, user, ip)
+    db.session.commit()
     return jsonify(result)
 
 @bp.route("/handle-interaction", methods=["POST"])

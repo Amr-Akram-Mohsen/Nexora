@@ -3,6 +3,7 @@ from flask import render_template
 from app.core.extensions import db
 from ..models import View, Reaction, Comment, Save
 from app.domains.recommendation.sentiment import analyze_sentiment
+from .target_access import resolve_target
 
 def viewer_filter(query, user, ip_address):
     if user:
@@ -13,7 +14,7 @@ def viewer_filter(query, user, ip_address):
     )
 
 def record_view(
-    target,
+    target_id,
     target_type,
     user=None,
     ip_address=None
@@ -28,7 +29,7 @@ def record_view(
 
     query = View.query.filter(
         View.target_type == target_type,
-        View.target_id == target.id,
+        View.target_id == target_id,
         View.created_at > cutoff
     )
 
@@ -44,11 +45,14 @@ def record_view(
         user_id=user.id if user else None,
         ip_address=ip_address,
         target_type=target_type,
-        target_id=target.id
+        target_id=target_id
     )
     db.session.add(view)
-    target.view_count = (target.view_count or 0) + 1
-    # Note: Interest tracking moved to Application Layer
+
+    target = resolve_target(db.session, target_type, target_id)
+    if target:
+        target.view_count = (target.view_count or 0) + 1
+    
     return {
         'success': True,
         'status' : "viewed"

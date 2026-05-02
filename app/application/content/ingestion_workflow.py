@@ -2,115 +2,127 @@ import logging
 import random
 from typing import Callable, List, Dict, Optional
 from flask import current_app
-from app.core.extensions import db
-from app.integrations.discovery import DiscoveryManager
-from app.integrations.external.api import (
-    should_refetch, mark_fetched
-)
-from app.integrations.exceptions import (
-    PipelineFatalError, PipelineQuotaExceededError
-)
-from app.application.content.ingestion import ingest_content
+from .ingestion.ports import DiscoveryPort, FetcherPort, EnrichmentPort, QuotaPort, CooldownPort
+from .ingestion import ingest_content
+from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
 
 logger = logging.getLogger(__name__)
 
 class IngestionWorkflow:
     """
     Centralized workflow for content ingestion.
-    Handles quota management, cooldowns, and error reporting.
     """
 
-    def __init__(self, source_name: str, can_call_func: Callable, record_call_func: Callable):
+    def __init__(
+        self, 
+        source_name: str, 
+        discovery: DiscoveryPort,
+        quota_service: QuotaPort,
+        enrichment_service: EnrichmentPort,
+        cooldown_service: CooldownPort
+    ):
         self.source_name = source_name
-        self.can_call_func = can_call_func
-        self.record_call_func = record_call_func
-        self.discovery = DiscoveryManager()
+        self.discovery = discovery
+        self.quota_service = quota_service
+        self.enrichment_service = enrichment_service
+        self.cooldown_service = cooldown_service
 
-    def run(self, object_type: str, source_filter: str, limit: Optional[int] = None, **fetch_params) -> int:
+    def run(
+        self, 
+        session,
+        object_type: str, 
+        source_filter: str, 
+        fetcher: FetcherPort,
+        limit: Optional[int] = None, 
+        **fetch_params
+    ) -> int:
         """
-        Executes the ingestion workflow for a given source and object type.
+        Executes the ingestion workflow.
         """
         total_stored = 0
         queries_registry = self.discovery.get_queries_by_section(source_filter=source_filter)
         
-        # Flatten queries into a single list of tasks
         flat_tasks = []
         for section, categories in queries_registry.items():
             for category, queries in categories.items():
                 for q in queries:
-                    flat_tasks.append({
-                        "section": section,
-                        "category": category,
-                        "query_obj": q
-                    })
+                    flat_tasks.append((section, category, q))
 
         if not flat_tasks:
             logger.info(f"[{self.source_name}] No queries found for filter: {source_filter}")
             return 0
 
-        # Diverse sampling
         if limit:
             random.shuffle(flat_tasks)
             flat_tasks = flat_tasks[:limit]
 
         logger.info(f"[{self.source_name}] Starting ingestion workflow with {len(flat_tasks)} tasks")
 
-        for task in flat_tasks:
-            section = task["section"]
-            category = task["category"]
-            q_obj = task["query_obj"]
-            q_text = q_obj["query"]
-            
-            # 1. Cooldown Check
-            cache_key = f"{source_filter}:{category}:{q_text}"
-            if not should_refetch(section, cache_key, hours=fetch_params.get("cooldown_hours", 6)):
-                continue
-
-            # 2. Quota Check
-            if not self.can_call_func():
-                logger.warning(f"[{self.source_name}] Quota exceeded or limit reached — stopping")
-                break
-
+        for section, category, q_obj in flat_tasks:
             try:
+                q_text = q_obj["query"]
+                cache_key = f"{source_filter}:{category}:{q_text}"
+                
+                # 1. Cooldown Check (Moved inside try to handle transient DB blips)
+                cooldown_hrs = fetch_params.get("cooldown_hours", 6)
+                if not self.cooldown_service.should_refetch(section, cache_key, hours=cooldown_hrs):
+                    continue
+
+                if not self.quota_service.can_call():
+                    logger.warning(f"[{self.source_name}] Quota exceeded — stopping")
+                    break
+
                 print(f"  [{self.source_name}] Fetching: {q_text}...")
                 
-                # The actual API call is passed via fetcher_func in run_orchestrated
-                # But here we assume a standardized fetcher pattern
-                from app.integrations.enrichment.pipeline import prepare_article
+                # 2. Filter fetch_params to avoid leaking app-level config to integrations
+                sanitized_params = {k: v for k, v in fetch_params.items() if k != "cooldown_hours"}
                 
-                # Call the fetcher (this will be refactored into the scrapers)
-                # For now, this is a placeholder for the logic we will move
+                raw_items = fetcher(q_obj, **sanitized_params)
+                self.quota_service.record_call()
+                self.cooldown_service.mark_fetched(section, cache_key, category=category, source=source_filter, normalized_query=q_text)
+
+                query_stored = 0
+                for raw in raw_items:
+                    # Enrichment (Classification + Content)
+                    enriched = self.enrichment_service(raw, section, category, q_obj)
+                    
+                    # Ingestion (No internal commit)
+                    try:
+                        if ingest_content(session, object_type=object_type, raw_data=enriched):
+                            query_stored += 1
+                    except Exception as e:
+                        logger.critical(f"[{self.source_name}] FATAL: Ingestion failed.")
+                        raise PipelineFatalError(f"Database error: {str(e)}") from e
                 
-                # 3. Execute Fetch (This logic will be in the scraper files)
-                # items = self.fetcher(q_obj, **fetch_params)
-                
-                # 4. Record Call
-                # self.record_call_func()
-                
-                # 5. Mark Fetched
-                # mark_fetched(...)
-                
-                # 6. Ingest
-                # for raw in items:
-                #     raw = prepare_article(raw, section, category, q_obj)
-                #     if ingest_content(db.session, object_type=object_type, raw_data=raw):
-                #         total_stored += 1
-                
-                pass # Logic will be finalized as we refactor scrapers
-                
+                # Transaction Boundary: Commit after each discovery query
+                if query_stored > 0:
+                    session.commit()
+                    total_stored += query_stored
+                    print(f"    -> Stored {query_stored} new {object_type}s")
+
             except (PipelineFatalError, PipelineQuotaExceededError):
+                session.rollback()
                 raise
-            except Exception:
-                logger.exception(f"[{self.source_name}] Unexpected error processing query: {q_text}")
+            except Exception as e:
+                session.rollback()
+                # Special handling for transient DB connection issues
+                import sqlalchemy.exc
+                if isinstance(e, sqlalchemy.exc.OperationalError):
+                    logger.error(f"[{self.source_name}] DB Connectivity issue (OperationalError). Skipping task: {q_text}")
+                else:
+                    logger.exception(f"[{self.source_name}] Unexpected error processing query: {q_text}")
 
         return total_stored
 
 def run_orchestrated_ingestion(
+    session,
     source_name: str,
     object_type: str,
     fetcher_func: Callable,
-    can_call_func: Callable,
-    record_call_func: Callable,
+    quota_service: QuotaPort,
+    enrichment_service: EnrichmentPort,
+    discovery_service: DiscoveryPort,
+    cooldown_service: CooldownPort,
     source_filter: str,
     limit: Optional[int] = None,
     cooldown_hours: int = 6,
@@ -118,71 +130,35 @@ def run_orchestrated_ingestion(
     **extra_params
 ) -> int:
     """
-    Helper to run an orchestrated ingestion run.
+    Helper to run an orchestrated ingestion run using injected dependencies.
     """
-    total_stored = 0
+    workflow = IngestionWorkflow(
+        source_name=source_name,
+        discovery=discovery_service,
+        quota_service=quota_service,
+        enrichment_service=enrichment_service,
+        cooldown_service=cooldown_service
+    )
     
-    flat_tasks = []
+    # Handle manual queries if provided
     if manual_queries:
-        for q in manual_queries:
-            flat_tasks.append((q.get("section", "news"), q.get("category", "uncategorized"), q))
-    else:
-        discovery = DiscoveryManager()
-        queries_registry = discovery.get_queries_by_section(source_filter=source_filter)
-        for section, categories in queries_registry.items():
-            for category, queries in categories.items():
-                for q in queries:
-                    flat_tasks.append((section, category, q))
+        # Custom Discovery implementation for manual queries
+        class ManualDiscovery:
+            def get_queries_by_section(self, source_filter):
+                registry = {}
+                for q in manual_queries:
+                    sec = q.get("section", "news")
+                    cat = q.get("category", "uncategorized")
+                    registry.setdefault(sec, {}).setdefault(cat, []).append(q)
+                return registry
+        workflow.discovery = ManualDiscovery()
 
-    if limit:
-        random.shuffle(flat_tasks)
-        flat_tasks = flat_tasks[:limit]
-
-    logger.info(f"[{source_name}] Orchestrating run with {len(flat_tasks)} queries")
-
-    for section, category, q_obj in flat_tasks:
-        q_text = q_obj["query"]
-        cache_key = f"{source_filter}:{category}:{q_text}"
-        
-        if not should_refetch(section, cache_key, hours=cooldown_hours):
-            continue
-
-        if not can_call_func():
-            logger.warning(f"[{source_name}] Limit reached")
-            break
-
-        try:
-            print(f"  [{source_name}] {q_text}...")
-            
-            # Fetch raw data
-            raw_items = fetcher_func(q_obj, **extra_params)
-            
-            # Tracking
-            record_call_func()
-            mark_fetched(section, cache_key, category=category, source=source_filter, normalized_query=q_text)
-            
-            from app.integrations.enrichment.pipeline import prepare_article
-            
-            query_stored = 0
-            for raw in raw_items:
-                # Enrichment
-                raw = prepare_article(raw, section, category, q_obj)
-                
-                # Ingestion
-                try:
-                    if ingest_content(db.session, object_type=object_type, raw_data=raw):
-                        query_stored += 1
-                except Exception as e:
-                    logger.critical(f"[{source_name}] FATAL: Ingestion failed.")
-                    raise PipelineFatalError(f"Database error: {str(e)}") from e
-            
-            total_stored += query_stored
-            if query_stored > 0:
-                print(f"    -> Stored {query_stored} new {object_type}s")
-
-        except (PipelineFatalError, PipelineQuotaExceededError):
-            raise
-        except Exception:
-            logger.exception(f"[{source_name}] Failed query: {q_text}")
-
-    return total_stored
+    return workflow.run(
+        session=session,
+        object_type=object_type,
+        source_filter=source_filter,
+        fetcher=fetcher_func,
+        limit=limit,
+        cooldown_hours=cooldown_hours,
+        **extra_params
+    )

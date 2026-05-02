@@ -1,7 +1,6 @@
 from app.domains.content.models import Article
 from .base import generic_ingest
 from app.integrations.cleaner import clean_article_data
-from app.integrations.enrichment.pipeline import enrich_article_content
 
 def create_article_model(data):
     return Article(
@@ -23,9 +22,6 @@ def ingest_article(session, raw_data):
     if not cleaned:
         return None
 
-    # 2. Enrich content (Scraping strategy + Normalization)
-    enriched = enrich_article_content(cleaned)
-    
     return generic_ingest(
         session,
         object_type="article",

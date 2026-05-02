@@ -94,3 +94,10 @@ def get_distinct_item_categories():
 def get_distinct_item_brands():
     from app.domains.item.models import Item
     return Brand.query.join(Item).distinct().all()
+
+def get_allowed_filters(section):
+    """
+    Returns the set of allowed filters for a given section.
+    This is a domain rule.
+    """
+    return set(section.allowed_filters or [])

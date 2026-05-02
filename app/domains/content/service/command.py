@@ -9,7 +9,7 @@ from .content_access import resolve
 from sqlalchemy import func, insert
 from sqlalchemy.orm import joinedload
 
-def link_article_sources(article, data):
+def link_article_sources(session, article, data):
     """Links an article to its specific source URL, ensuring uniqueness."""
     source_name = data.get("source_name")
     url = data.get("url")
@@ -18,7 +18,7 @@ def link_article_sources(article, data):
         return
 
     slug = generate_slug(source_name)
-    source = Source.get_by_slug(slug, db.session)
+    source = Source.get_by_slug(slug, session)
 
     if not source:
         return
@@ -26,18 +26,18 @@ def link_article_sources(article, data):
     from ...relationships import article_sources
     
     # 🔹 Check if this specific URL is already in the system (unique constraint)
-    existing_url = db.session.query(article_sources).filter_by(url=url).first()
+    existing_url = session.query(article_sources).filter_by(url=url).first()
     if existing_url:
         return
 
     # 🔹 Check if the link already exists for this article/source pair
-    existing_link = db.session.query(article_sources).options(joinedload(Source)).filter_by(
+    existing_link = session.query(article_sources).options(joinedload(Source)).filter_by(
         article_id=article.id,
         source_id=source.id
     ).first()
 
     if not existing_link:
-        db.session.execute(
+        session.execute(
             insert(article_sources).values(
                 article_id=article.id,
                 source_id=source.id,
@@ -45,14 +45,14 @@ def link_article_sources(article, data):
             )
         )
 
-def delete_content(id: int) -> bool:
-    content = db.session.get(Article, id)
+def delete_content(session, id: int) -> bool:
+    content = session.get(Article, id)
 
     if not content:
         return False
 
-    db.session.delete(content)
-    db.session.commit()
+    session.delete(content)
+    # db.session.commit()  # Removed: Transaction control moved to Application layer
     return True
 
 def create_content_entry(session, obj, object_type, published_at):
@@ -78,23 +78,23 @@ def create_content_entry(session, obj, object_type, published_at):
     session.add(content)
     return content
 
-def apply_relationships(content, data):
+def apply_relationships(session, content, data):
 
     # -------- Topics --------
     for slug in data.get("topic_slugs", []):
-        topic = Topic.get_by_slug(slug, db.session)
+        topic = Topic.get_by_slug(slug, session)
         if topic:
             content.add_topic(topic)
 
     # -------- Brands --------
     for slug in data.get("brand_slugs", []):
-        brand = Brand.get_by_slug(slug, db.session)
+        brand = Brand.get_by_slug(slug, session)
         if brand:
             content.add_brand(brand)
 
     # -------- Attributes --------
     for slug in data.get("facets", {}).get("attributes", []):
-        attr = AttributeFacet.get_by_slug(slug, db.session)
+        attr = AttributeFacet.get_by_slug(slug, session)
         if attr:
             content.add_attribute(attr)
 
@@ -102,22 +102,22 @@ def apply_relationships(content, data):
     facets = data.get("facets", {})
 
     if facets.get("gender"):
-        g = GenderFacet.get_by_slug(facets["gender"], db.session)
+        g = GenderFacet.get_by_slug(facets["gender"], session)
         if g:
             content.gender_id = g.id
 
     if facets.get("intent"):
-        i = IntentFacet.get_by_slug(facets["intent"], db.session)
+        i = IntentFacet.get_by_slug(facets["intent"], session)
         if i:
             content.intent_id = i.id
 
     if facets.get("price_tier"):
-        p = PriceTierFacet.get_by_slug(facets["price_tier"], db.session)
+        p = PriceTierFacet.get_by_slug(facets["price_tier"], session)
         if p:
             content.price_tier_id = p.id
 
     # -------- Sources (ONLY for article) --------
     if content.object_type == "article":
-        obj = resolve(content, db.session)
+        obj = resolve(content, session)
         if obj:
-            link_article_sources(obj, data)
+            link_article_sources(session, obj, data)

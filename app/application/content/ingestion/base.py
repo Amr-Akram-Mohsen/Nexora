@@ -1,10 +1,9 @@
 # app/domains/content/ingestion/base.py
 import logging
 from sqlalchemy.exc import IntegrityError
-from app.core.extensions import db
 from .taxonomy import resolve_taxonomy
 from app.domains.content.service.command import apply_relationships
-from app.domains.content.content_access import create_content, get_or_create_content
+from app.domains.content.service.content_access import create_content, get_or_create_content
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +39,8 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
 
         # 4. Apply Relationships (Topics, Brands, Facets)
         if content:
-            apply_relationships(content, raw_data)
+            apply_relationships(session, content, raw_data)
 
-        session.commit()
         return content
 
     except IntegrityError:

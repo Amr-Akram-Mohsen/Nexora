@@ -5,6 +5,8 @@ from app.application.item.get_item_page import get_item_page_data
 from app.application.item.compare_items import get_comparison_data
 from app.domains.item.service import get_item_by_id
 from app.shared.request import get_client_ip
+from app.domains.interaction.service import record_view
+from app.shared.constants.core import TargetType
 
 bp = Blueprint("item", __name__)
 
@@ -48,13 +50,20 @@ def deals():
 
 @bp.route("/items/<int:item_id>")
 def item_page(item_id):
+    from app.application.item.get_item_page import record_item_view
+    from app.core.extensions import db
+    
     user = current_user if current_user.is_authenticated else None
     ip_address = None if user else get_client_ip()
     
-    data = get_item_page_data(item_id, user, ip_address)
+    data = get_item_page_data(item_id)
     if not data:
         abort(404)
 
+    # Orchestrate Query + Command
+    record_item_view(item_id, user, ip_address)
+    db.session.commit()
+    
     return render_template(
         "item-page.html",
         **data

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 MIN_SCORE = 20
 MIN_LENGTH = 80
 
-def fetch_reddit_query(q_obj: dict) -> list[dict]:
+def fetch_reddit_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     Pure fetcher for Reddit.
     q_obj here might represent a subreddit name or a search query.
@@ -64,19 +64,3 @@ def fetch_reddit_query(q_obj: dict) -> list[dict]:
     except Exception:
         logger.exception("[Reddit] Error fetching r/%s", q_obj.get("query"))
         return []
-
-def fetch_all_reddit(limit: int | None = None) -> int:
-    """Entry point refactored to use IngestionWorkflow."""
-    from app.application.content.ingestion_workflow import run_orchestrated_ingestion
-    
-    # Reddit doesn't have a strict quota like NewsAPI, but we use can_call_func for consistency
-    return run_orchestrated_ingestion(
-        source_name="Reddit",
-        object_type="post",
-        fetcher_func=fetch_reddit_query,
-        can_call_func=lambda: True, # No strict daily limit tracked yet
-        record_call_func=lambda: None,
-        source_filter="reddit",
-        limit=limit,
-        cooldown_hours=24
-    )

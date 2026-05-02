@@ -6,7 +6,7 @@ from app.integrations.exceptions import PipelineQuotaExceededError
 
 logger = logging.getLogger(__name__)
 
-def fetch_youtube_query(q_obj: dict) -> list[dict]:
+def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     Pure fetcher for YouTube.
     """
@@ -67,19 +67,3 @@ def fetch_youtube_query(q_obj: dict) -> list[dict]:
             raise PipelineQuotaExceededError("YouTube Quota Exceeded")
         logger.warning("[YouTube] API request failed for query '%s': %s", query, str(e))
         return []
-
-def fetch_youtube_reviews(limit: int | None = None) -> int:
-    """Entry point refactored to use IngestionWorkflow."""
-    from app.application.content.ingestion_workflow import run_orchestrated_ingestion
-    from app.integrations.external.api import can_call_youtube, record_youtube_call
-    
-    return run_orchestrated_ingestion(
-        source_name="YouTube",
-        object_type="video",
-        fetcher_func=fetch_youtube_query,
-        can_call_func=lambda: can_call_youtube(units=100),
-        record_call_func=lambda: record_youtube_call(units=100),
-        source_filter="youtube",
-        limit=limit,
-        cooldown_hours=12
-    )

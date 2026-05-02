@@ -6,7 +6,7 @@ from app.integrations.exceptions import PipelineQuotaExceededError
 
 logger = logging.getLogger(__name__)
 
-def fetch_newsapi_query(q_obj: dict) -> list[dict]:
+def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     Pure fetcher for NewsAPI.
     Focuses only on API request and returning raw data.
@@ -39,19 +39,3 @@ def fetch_newsapi_query(q_obj: dict) -> list[dict]:
             raise PipelineQuotaExceededError("NewsAPI Quota Exceeded")
         logger.warning("[NewsAPI] API request failed for query '%s': %s", q_text, str(e))
         return []
-
-def fetch_all_sections(limit: int | None = None) -> int:
-    """Entry point refactored to use IngestionWorkflow."""
-    from app.application.content.ingestion_workflow import run_orchestrated_ingestion
-    from app.integrations.external.api import can_call_newsapi, record_newsapi_call
-    
-    return run_orchestrated_ingestion(
-        source_name="NewsAPI",
-        object_type="article",
-        fetcher_func=fetch_newsapi_query,
-        can_call_func=can_call_newsapi,
-        record_call_func=record_newsapi_call,
-        source_filter="newsapi",
-        limit=limit,
-        cooldown_hours=6
-    )

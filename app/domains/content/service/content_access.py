@@ -1,6 +1,5 @@
-from functools import lru_cache
 from app.core.extensions import db
-@lru_cache
+
 def get_model_map():
     from ..models import Article, Video, Post
     return {

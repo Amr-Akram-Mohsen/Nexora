@@ -4,7 +4,7 @@ from app.domains.system.service import (
     get_active_topics_for_section,
     get_active_categories_for_section
 )
-from app.domains.content.service import get_filtered_contents
+from app.application.content.query_service import get_filtered_contents
 
 def get_feed_data(section_slug, active_filters, page=1):
     """
@@ -14,7 +14,9 @@ def get_feed_data(section_slug, active_filters, page=1):
     if not section:
         return None
 
-    allowed_filters = set(section.allowed_filters or [])
+    from app.domains.system.service.query import get_allowed_filters
+
+    allowed_filters = get_allowed_filters(section)
     pagination = get_filtered_contents(section, active_filters, allowed_filters, page=page)
     
     filter_options = {}
