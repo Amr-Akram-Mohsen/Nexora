@@ -2,11 +2,11 @@
 
 {% set article = content.target %}
 
-{% from"components/features/snippet-utils.html" import article_snippet %}
+{% from"content/features/snippet-utils.html" import content_snippet %}
 {% from"components/shared/image-utils.html" import render_image_url %}
 {% from"components/ui/button.html" import button %}
 {% from"components/ui/badge.html" import badge %}
-{% from"components/features/inline-product-card.html" import inline_product_card %}
+{% from"content/cards/item-compact.html" import render_item_compact_card %}
 
 {% block title %}Nexora | {{ article.title }}{% endblock %}
 

@@ -9,6 +9,11 @@ def get_contents_render(session, filter_by_columns: tuple = ('section',), filter
         selectinload(Content.topics),
         selectinload(Content.brands)
     )
+    # articles = (
+    #     db.session.query(Content)
+    #     .options(joinedload(Content.category))
+    #     .all()
+    # )
 
     if filter_by_columns and filter_values:
         filter_dict = None
@@ -26,7 +31,7 @@ def get_contents_render(session, filter_by_columns: tuple = ('section',), filter
             query = query.filter(*filters)
     else:
         # eager load section if not filtering
-        query = query.options(joinedload(Content.section))
+        query = query.options(joinedload(Content.section), joinedload(Content.category))
 
     query = query.order_by(Content.published_at.desc())
 
