@@ -33,11 +33,14 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
         )
         resp.raise_for_status()
         
+        from app.shared.dto.ingestion import RawItemDTO
         articles = resp.json().get("articles", [])
+        raw_items = []
         for a in articles:
             a["image_url"] = a.get("image")
             a["region"] = country.upper()
-        return articles
+            raw_items.append(RawItemDTO(**a))
+        return raw_items
         
     except requests.exceptions.RequestException as e:
         if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:

@@ -32,7 +32,10 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
             timeout=10,
         )
         resp.raise_for_status()
-        return resp.json().get("articles", [])
+        from app.shared.dto.ingestion import RawItemDTO
+
+        articles = resp.json().get("articles", [])
+        return [RawItemDTO(**a) for a in articles]
         
     except requests.exceptions.RequestException as e:
         if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:

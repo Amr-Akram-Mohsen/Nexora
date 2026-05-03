@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% from "content/listing/listing-page.html" import listing_page %}
+{% from "content/components/listing-page.html" import listing_page %}
 {% from "content/components/grid.html" import grid %}
 {% from "components/ui/button.html" import button %}
 {% from "content/components/empty-state.html" import empty_state %}
 
 {% set page_title = section.name|title %}
-{% set results = contents if target_type == 'contents' else items %}
+{% set results = contents %}
 
 {% block title %}{{ page_title }} | Nexora{% endblock %}
 

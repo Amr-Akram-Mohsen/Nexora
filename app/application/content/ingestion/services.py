@@ -1,6 +1,5 @@
 from .ports import DiscoveryPort, QuotaPort, EnrichmentPort, CooldownPort, ClassificationPort
 from app.integrations.discovery import DiscoveryManager
-from app.integrations.enrichment.pipeline import enrich_article_content
 from app.integrations.enrichment.classification import classify_content_metadata
 
 class DiscoveryService(DiscoveryPort):
@@ -23,12 +22,8 @@ class EnrichmentService(EnrichmentPort):
     Expects data that has already been classified.
     """
     def __call__(self, raw_data, section, category, query_obj):
-        # Strategy-based extraction (API, Extractor, Scraper, Fallback)
-        # Only if it's an article (videos/posts handle enrichment differently or not at all here)
-        if "url" in raw_data and not any(k in raw_data["url"].lower() for k in ["youtube.com", "reddit.com"]):
-            return enrich_article_content(raw_data)
-            
-        return raw_data
+        from app.integrations.enrichment.pipeline import route_enrichment_strategy
+        return route_enrichment_strategy(raw_data)
 
 class CooldownService(CooldownPort):
     def should_refetch(self, section, cache_key, hours):

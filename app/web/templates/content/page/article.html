@@ -81,6 +81,14 @@
       </div>
       <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
     </div>
+    {% if article.is_content_scraped %}
+    <div class="meta-item meta-quality flex items-center" title="Full Article Extracted">
+      <div class="meta-icon-wrapper">
+        <i class="fas fa-check-circle text-green-500"></i>
+      </div>
+      <span>Full Article</span>
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
@@ -95,10 +103,16 @@
   {% include "partials/affiliate-disclosure.html" %}
   {% endif %}
 
-  {% if article.body %}
+  {% if article.content_html %}
+  <div class="article-full-text">
+    {{ article.content_html | safe }}
+  </div>
+  {% elif article.body %}
   <div class="article-full-text">
     {{ article.body | safe }}
   </div>
+  {% elif article.content_text %}
+  <p class="article-description">{{ article.content_text | safe }}</p>
   {% else %}
   <p class="article-description">{{ article.description | safe }}</p>
   {% endif %}

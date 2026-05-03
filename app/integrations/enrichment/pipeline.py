@@ -1,11 +1,10 @@
 import logging
 import difflib
-import re
 from urllib.parse import urlparse
 from app.integrations.content.article_utils.extract_article_content import scrape_article_content
 from app.integrations.content.article_utils.extractor_clients import extract_with_apis
 from app.integrations.content.article_utils.quality import score_content_quality
-from app.integrations.content.article_utils.content_normalizer import normalize_content, strip_html, text_to_html
+from app.integrations.content.article_utils.content_normalizer import normalize_content, text_to_html
 
 logger = logging.getLogger(__name__)
 
@@ -37,21 +36,37 @@ def _is_similar(text1: str, text2: str) -> bool:
     ratio = difflib.SequenceMatcher(None, text1[:1000], text2[:1000]).ratio()
     return ratio > 0.85
 
-def enrich_article_content(raw: dict) -> dict:
+from app.shared.dto.ingestion import ClassifiedItemDTO, EnrichedItemDTO
+
+def route_enrichment_strategy(item: ClassifiedItemDTO) -> EnrichedItemDTO:
+    """
+    Routes enrichment based on content source/type.
+    Avoids scraping social media domains directly.
+    """
+    data = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+    url = data.get("url", "").lower()
+    
+    if "youtube.com" in url or "reddit.com" in url:
+        return EnrichedItemDTO(**data)
+        
+    return enrich_article_content(item)
+
+def enrich_article_content(item: ClassifiedItemDTO) -> EnrichedItemDTO:
     """
     Core content strategy layer.
     Evaluates API, Extractor, Scraper, and Fallback.
     Selects the best candidate based on quality scoring non-sequentially.
     """
-    url = raw.get("url", "")
-    description = raw.get("description", "")
+    data = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+    url = data.get("url", "")
+    description = data.get("description", "")
     
     candidates = []
     trusted = is_trusted(url)
     is_youtube = "youtube.com" in url.lower()
     
     # --- 1. Candidate: Existing API full content ---
-    initial_content = raw.get("content", "")
+    initial_content = data.get("content", "")
     if initial_content:
         norm = normalize_content(initial_content, None)
         score = score_content_quality(norm["content_html"], norm["content_text"])
@@ -156,13 +171,10 @@ def enrich_article_content(raw: dict) -> dict:
             "content_source": "fallback"
         }
 
-    # Merge best candidate back into raw
-    raw.update(best_candidate)
+    # Merge best candidate back into data
+    data.update(best_candidate)
     
     # For backwards compatibility and migration
-    raw["content"] = best_candidate["content_html"]
+    data["content"] = best_candidate["content_html"]
 
-    return raw
-
-
-    return raw
+    return EnrichedItemDTO(**data)

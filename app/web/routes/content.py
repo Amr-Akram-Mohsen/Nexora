@@ -3,8 +3,6 @@ from app.application.content.get_feed import get_feed_data
 from app.application.content.get_article_page import get_article_page_data
 from flask_login import current_user
 from app.shared.request import get_client_ip
-from app.domains.interaction.service import record_view
-from app.shared.constants.core import TargetType
 
 bp = Blueprint("content", __name__)
 
@@ -19,7 +17,7 @@ def sections(section_slug):
         abort(404)
 
     return render_template(
-        "catalog-page.html",
+        "content/listing/catalog-page.html",
         target_type="contents",
         active_filters=active_filters,
         **data

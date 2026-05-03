@@ -78,28 +78,40 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
     session.flush()
     return content
 
-def get_or_create_content(session, object_type, external_id, obj_factory, title_fallback=None):
+def get_or_create_content(session, object_type, external_id, obj_factory, title_fallback=None, url_fallback=None):
     model = get_model_map().get(object_type)
     if not model:
-        return None
+        return None, False
 
     obj = None
+    is_new = False
     
     # 1. Try Deduplication by external_id (Videos, Posts)
     if external_id and hasattr(model, 'external_id'):
         obj = session.query(model).filter_by(external_id=external_id).first()
+        
+    # 2. Try Deduplication by url (Articles or models with url)
+    if not obj and url_fallback:
+        if object_type == 'article':
+            from app.domains.relationships import article_sources
+            res = session.query(article_sources.c.article_id).filter(article_sources.c.url == url_fallback).first()
+            if res:
+                obj = session.query(model).get(res[0])
+        elif hasattr(model, 'url'):
+            obj = session.query(model).filter_by(url=url_fallback).first()
     
-    # 2. Fallback to Title-based deduplication (Articles, or missing ID)
+    # 3. Fallback to Title-based deduplication (If missing ID and URL)
     if not obj and title_fallback and hasattr(model, 'title'):
         from sqlalchemy import func
         # Normalize title for better matching
         normalized_title = title_fallback.lower().strip()
         obj = session.query(model).filter(func.lower(model.title) == normalized_title).first()
 
-    # 3. Create if still not found
+    # 4. Create if still not found
     if not obj:
         obj = obj_factory()
         session.add(obj)
         session.flush()
+        is_new = True
 
-    return obj
+    return obj, is_new

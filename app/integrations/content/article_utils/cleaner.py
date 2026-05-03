@@ -83,38 +83,41 @@ def _sanitize_content(html_str: str) -> str:
     except ImportError:
         return re.sub(r"<[^>]+>", " ", html_str).strip()
 
-# ── 1. Article Cleaner (NewsAPI, GNews, RSS) ─────────────────────
-def clean_article_data(raw: dict, skip_scrape: bool = False) -> dict | None:
-    """Standardizes news article fields for the Article model."""
-    data = raw.copy()
-    
-    url = _normalize_url(data.get("url") or data.get("link"))
-    title = sanitize_text(data.get("title") or "")
-    
-    if not url or not title: return None
-    if any(d in url for d in BLOCKED_DOMAINS): return None
-    if "[Removed]" in title or len(title) < 10: return None
+from app.shared.dto.ingestion import EnrichedItemDTO, ArticleCreateDTO
 
-    description = data.get("description") or data.get("summary") or ""
-    if "… [+" in description: 
-        description = description.split("… [+")[0].strip()
+class DomainMapper:
+    @staticmethod
+    def to_article_dto(enriched: EnrichedItemDTO, skip_scrape: bool = False) -> ArticleCreateDTO | None:
+        """Standardizes news article fields for the Article model."""
+        data = enriched.model_dump() if hasattr(enriched, "model_dump") else dict(enriched)
+        
+        url = _normalize_url(data.get("url") or data.get("link"))
+        title = sanitize_text(data.get("title") or "")
+        
+        if not url or not title: return None
+        if any(d in url for d in BLOCKED_DOMAINS): return None
+        if "[Removed]" in title or len(title) < 10: return None
 
-    image_url = (data.get("urlToImage") or data.get("image_url") or data.get("image") or data.get("media_content"))
-    if image_url and not str(image_url).startswith("http"): image_url = None
+        description = data.get("description") or data.get("summary") or ""
+        if "… [+" in description: 
+            description = description.split("… [+")[0].strip()
 
-    published_at = _parse_date(data.get("publishedAt") or data.get("published_at") or data.get("published"))
-    source_name = sanitize_text(data.get("source_name") or (data.get("source") or {}).get("name") or "")
+        image_url = (data.get("urlToImage") or data.get("image_url") or data.get("image") or data.get("media_content"))
+        if image_url and not str(image_url).startswith("http"): image_url = None
 
-    data.update({
-        "title":          title,
-        "description":    sanitize_text(description),
-        "url":            url,
-        "image_url":      image_url,
-        "published_at":   published_at or datetime.utcnow(),
-        "source_name":    source_name,
-        "content":        _sanitize_content(data.get("content")),
-    })
-    return data
+        published_at = _parse_date(data.get("publishedAt") or data.get("published_at") or data.get("published"))
+        source_name = sanitize_text(data.get("source_name") or (data.get("source") or {}).get("name") or "")
+
+        data.update({
+            "title":          title,
+            "description":    sanitize_text(description),
+            "url":            url,
+            "image_url":      image_url,
+            "published_at":   published_at or datetime.utcnow(),
+            "source_name":    source_name,
+            "content":        _sanitize_content(data.get("content")),
+        })
+        return ArticleCreateDTO(**data)
 
 # ── 2. Video Cleaner (YouTube) ───────────────────────────────────
 def clean_video_data(raw: dict) -> dict | None:

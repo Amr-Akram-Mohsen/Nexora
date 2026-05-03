@@ -85,16 +85,64 @@ class IngestionWorkflow:
 
                 query_stored = 0
                 for raw in raw_items:
+                    item_title = getattr(raw, 'title', None)
+                    if not item_title and hasattr(raw, 'get'):
+                        item_title = raw.get('title', 'Unknown Title')
+                    item_title = str(item_title)[:50] if item_title else 'Unknown Title'
+                    
+                    print(f"      -> Processing: {item_title}...")
+
+                    # Backward compatibility hook: Convert DTO back to dict for the legacy pipeline
+                    if hasattr(raw, "model_dump"):
+                        raw = raw.model_dump()
+                    elif hasattr(raw, "dict"):
+                        raw = raw.dict()
+
                     # 3. Metadata Classification (Tags, Brands, Facets)
                     classified = self.classification_service(raw, section, category, q_obj)
                     
                     # 4. Content Enrichment (Scraping/Strategies)
                     enriched = self.enrichment_service(classified, section, category, q_obj)
                     
+                    # Backward compatibility for Cleaner / Ingest pipeline
+                    if hasattr(enriched, "model_dump"):
+                        enriched_dict = enriched.model_dump()
+                    elif hasattr(enriched, "dict"):
+                        enriched_dict = enriched.dict()
+                    else:
+                        enriched_dict = enriched
+
+                    # --- DEBUG LOGGING ---
+                    logger.debug(f"[{self.source_name}] Preparing to ingest. Keys present: {list(enriched_dict.keys())}")
+                    
+                    missing_critical = []
+                    # Check URL and title. external_id is only required for video/post.
+                    for key in ["url", "title"]:
+                        if not enriched_dict.get(key):
+                            missing_critical.append(key)
+                            
+                    if missing_critical:
+                        logger.warning(f"[{self.source_name}] WARNING: Missing critical fields {missing_critical} for item!")
+                    # ---------------------
+
                     # 5. Ingestion (Deduplication + Persistence)
                     try:
-                        if ingest_content(session, object_type=object_type, raw_data=enriched):
-                            query_stored += 1
+                        result = ingest_content(session, object_type=object_type, raw_data=enriched_dict)
+                        if result:
+                            content_obj, is_new = result
+                            if is_new:
+                                query_stored += 1
+                                msg = f"         [OK] Inserted new."
+                                print(msg)
+                                logger.info(f"[{self.source_name}] {item_title} -> {msg}")
+                            else:
+                                msg = f"         [UPDATED] Existing item updated."
+                                print(msg)
+                                logger.info(f"[{self.source_name}] {item_title} -> {msg}")
+                        else:
+                            msg = f"         [SKIP] Ignored (duplicate or invalid)."
+                            print(msg)
+                            logger.info(f"[{self.source_name}] {item_title} -> {msg}")
                     except Exception as e:
                         import sqlalchemy.exc
                         if isinstance(e, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):

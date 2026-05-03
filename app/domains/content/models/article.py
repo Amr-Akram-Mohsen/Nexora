@@ -46,6 +46,16 @@ class Article(db.Model):
         return max(1, words // 200)
 
     @property
+    def url(self):
+        from sqlalchemy.orm import object_session
+        session = object_session(self)
+        if not session:
+            return None
+        from app.domains.relationships import article_sources
+        res = session.query(article_sources.c.url).filter(article_sources.c.article_id == self.id).first()
+        return res[0] if res else None
+
+    @property
     def preview_text(self):
         return self.description or (self.content_text[:160] if self.content_text else (self.body[:160] if self.body else None))
 

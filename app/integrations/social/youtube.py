@@ -48,18 +48,19 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
             video_id = item.get("id", {}).get("videoId")
             if not video_id: continue
             snippet = item.get("snippet", {})
-            raw_items.append({
-                "title":          snippet.get("title", ""),
-                "description":    snippet.get("description", ""),
-                "url":            f"https://www.youtube.com/watch?v={video_id}",
-                "thumbnail_url":  snippet.get("thumbnails", {}).get("high", {}).get("url"),
-                "published_at":   snippet.get("publishedAt"),
-                "channel_name":   snippet.get("channelTitle", ""),
-                "is_video":       True,
-                "region":         region_code,
-                "external_id":    video_id,
-                "platform":       "youtube"
-            })
+            from app.shared.dto.ingestion import RawItemDTO
+            raw_items.append(RawItemDTO(
+                title=snippet.get("title", ""),
+                description=snippet.get("description", ""),
+                url=f"https://www.youtube.com/watch?v={video_id}",
+                thumbnail_url=snippet.get("thumbnails", {}).get("high", {}).get("url"),
+                published_at=snippet.get("publishedAt"),
+                channel_name=snippet.get("channelTitle", ""),
+                is_video=True,
+                region=region_code,
+                external_id=video_id,
+                platform="youtube"
+            ))
         return raw_items
         
     except requests.exceptions.RequestException as e:
