@@ -50,15 +50,18 @@ def fetch_reddit_query(q_obj: dict, **kwargs) -> list[dict]:
             region = region_map.get(sub_name.lower())
 
             raw_items.append({
-                "title":        submission.title,
-                "description":  description,
-                "url":          url,
-                "image_url":    thumbnail,
-                "published_at": datetime.utcfromtimestamp(submission.created_utc),
-                "source_name":  f"r/{sub_name}",
-                "region":       region,
-                "external_id":  submission.id,
-                "platform":     "reddit"
+                "title":          submission.title,
+                "body":           description, # Normalized Reddit text
+                "url":            url,
+                "image_url":      thumbnail,
+                "published_at":   datetime.utcfromtimestamp(submission.created_utc),
+                "author":         str(submission.author),
+                "subreddit":      sub_name,
+                "upvotes":        submission.score,
+                "comments_count": submission.num_comments,
+                "region":         region,
+                "external_id":    submission.id,
+                "platform":       "reddit"
             })
         return raw_items
     except Exception:

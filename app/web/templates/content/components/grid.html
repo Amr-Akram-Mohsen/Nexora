@@ -1,0 +1,7 @@
+{% macro grid(items, carousel=false) %}
+<div class="{{ 'grid-carousel' if carousel else 'grid-auto' }}">
+  {% for item in items %}
+  {% include "content/dispatcher/card.html" %}
+  {% endfor %}
+</div>
+{% endmacro %}

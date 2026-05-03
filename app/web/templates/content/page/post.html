@@ -1,7 +1,10 @@
 {% extends "content/page/base.html" %}
 {% set post = content.target %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% from "components/ui/badge.html" import badge %}
+{% from "content/features/snippet-utils.html" import content_snippet %}
+
+{% block title %}{{ post.title }} | Nexora{% endblock %}
 
 {% block description %}{{ post.preview_text }}{% endblock %}
 {% block og_type %}article{% endblock %}
@@ -31,14 +34,83 @@
 {% endblock %}
 
 {% block base_header %}
-<h1>{{ post.title }}</h1>
-<p>r/{{ post.subreddit }} • {{ post.author }}</p>
+<div class="detail-page__header-content flex flex-col">
+  <div class="detail-page__badges flex flex-wrap">
+    {{ badge('Post', 'badge--card-type') }}
+    {% if post.subreddit %}
+    {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
+    {% endif %}
+    {{ badge(content.category.name, 'badge--category') }}
+    {% for brand in content.brands[:1] %}
+    {{ badge(brand.name, 'badge--brand') }}
+    {% endfor %}
+  </div>
+
+  <h1 class="detail-page__title">{{ post.title }}</h1>
+
+  <div class="detail-page__meta flex flex-wrap items-center">
+    <div class="meta-item meta-user flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-user"></i>
+      </div>
+      <span class="article__source">{{ post.author or 'Unknown' }}</span>
+    </div>
+
+    {% if post.subreddit %}
+    <div class="meta-item flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="fab fa-reddit"></i>
+      </div>
+      <span>r/{{ post.subreddit }}</span>
+    </div>
+    {% endif %}
+
+    {% if post.upvotes %}
+    <div class="meta-item flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="fas fa-arrow-up"></i>
+      </div>
+      <span>{{ post.upvotes }} upvotes</span>
+    </div>
+    {% endif %}
+
+    <div class="meta-item meta-calendar flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-calendar"></i>
+      </div>
+      <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
-{% block base_content %}
-<div class="post-body">
-  {{ post.body }}
-</div>
+{# Posts have no image — suppress the image slot entirely #}
+{% block base_image %}{% endblock %}
 
-<a href="{{ post.url }}" target="_blank">View on Reddit</a>
+{% block base_content %}
+<div class="post-body article-content">
+  {% if post.body %}
+  <p>{{ post.body }}</p>
+  {% endif %}
+
+  {% if post.url %}
+  <div class="article-source-box flex flex-col">
+    <p class="source-metadata">
+      Original post on: <strong>r/{{ post.subreddit }}</strong>
+    </p>
+    <a href="{{ post.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
+      {{ button(text="View on Reddit", class="article__view-btn") }}
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block base_sidebar %}
+{% if trending_contents %}
+{{ content_snippet(trending_contents, 'Trending') }}
+{% endif %}
+{% if related_contents %}
+{{ content_snippet(related_contents, 'Related') }}
+{% endif %}
 {% endblock %}

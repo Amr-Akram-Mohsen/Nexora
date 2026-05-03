@@ -31,7 +31,7 @@ def link_article_sources(session, article, data):
         return
 
     # 🔹 Check if the link already exists for this article/source pair
-    existing_link = session.query(article_sources).options(joinedload(Source)).filter_by(
+    existing_link = session.query(article_sources).filter_by(
         article_id=article.id,
         source_id=source.id
     ).first()

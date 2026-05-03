@@ -3,7 +3,7 @@
 
 {% set content = item %}
 
-<article class="card" data-type="{{ content.object_type }}" data-id="{{ content.id }}">
+<article class="card card--{{ content.object_type }}" data-type="{{ content.object_type }}" data-id="{{ content.id }}">
   {% block header %}
   <!-- Image -->
   <a href="{{ url_for('content.content_page', content_id=content.id) }}" class="card__img-link" tabindex="-1"

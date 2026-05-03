@@ -1,21 +1,29 @@
 from app.domains.content.models import Video
 from .base import generic_ingest
+from app.integrations.content.article_utils.cleaner import clean_video_data
 
-def create_video_model(raw_data):
+def create_video_model(data):
+    if not data.get("external_id"):
+        raise ValueError("Missing external_id for video")
+    
     return Video(
-        title=raw_data["title"],
-        description=raw_data["description"],
-        external_id=raw_data["external_id"],
-        platform=raw_data.get("platform", "youtube"),
-        thumbnail_url=raw_data.get("image_url"), # Standardized in cleaner
-        channel_name=raw_data.get("source_name")  # Standardized in cleaner
+        title=data.get("title", "Untitled Video"),
+        description=data.get("description", ""),
+        external_id=data["external_id"],
+        platform=data.get("platform", "youtube"),
+        thumbnail_url=data.get("thumbnail_url"),
+        channel_name=data.get("channel_name")
     )
 
 def ingest_video(session, raw_data):
+    cleaned = clean_video_data(raw_data)
+    if not cleaned:
+        return None
+
     return generic_ingest(
         session,
         object_type="video",
-        raw_data=raw_data,
+        raw_data=cleaned,
         model_class=Video,
         factory_func=create_video_model
     )

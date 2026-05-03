@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 from app.application.content.ingestion_workflow import run_orchestrated_ingestion
 from app.application.content.ingestion.services import (
     DiscoveryService, EnrichmentService, NewsApiQuotaService, 
-    GNewsQuotaService, GenericQuotaService, CooldownService
+    GNewsQuotaService, GenericQuotaService, CooldownService,
+    ClassificationService
 )
 from app.core.extensions import db
 
@@ -35,6 +36,7 @@ def run_newsapi_fetch(limit: int | None = None):
             enrichment_service=EnrichmentService(),
             discovery_service=DiscoveryService(),
             cooldown_service=CooldownService(),
+            classification_service=ClassificationService(),
             source_filter="newsapi",
             limit=limit,
             cooldown_hours=6
@@ -72,6 +74,7 @@ def run_gnews_fetch(limit: int | None = None):
             enrichment_service=EnrichmentService(),
             discovery_service=DiscoveryService(),
             cooldown_service=CooldownService(),
+            classification_service=ClassificationService(),
             source_filter="gnews",
             limit=limit,
             cooldown_hours=24
@@ -116,6 +119,7 @@ def run_rss_fetch(limit: int | None = None):
             enrichment_service=EnrichmentService(),
             discovery_service=None, # Passed via manual_queries
             cooldown_service=CooldownService(),
+            classification_service=ClassificationService(),
             source_filter="rss",
             limit=limit,
             cooldown_hours=4,

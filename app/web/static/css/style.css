@@ -5417,6 +5417,208 @@ body.dark-mode .detail-page--item,
   font-style: italic;
 }
 
+/* ============================================================
+   CONTENT TYPE EXTENSIONS — Video & Post card variants
+   ============================================================ */
+
+/* ── Video card type tokens ── */
+.card--video {
+  --card-color-rgb: var(--brand-purple-rgb);
+  --card-aspect-ratio: 16 / 9;
+  --card-overlay-gradient: var(--overlay-dark-50);
+}
+
+/* ── Post card type tokens (text-only, no image) ── */
+.card--post {
+  --card-color-rgb: var(--brand-teal-rgb);
+  --card-overlay-gradient: var(--overlay-dark-40);
+}
+
+/* Post cards have no image — give content area room to breathe */
+.card--post .card__content {
+  padding: 1.5rem;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Post card top accent bar (replaces image visual weight) */
+.card--post::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, rgb(var(--brand-teal-rgb)), rgb(var(--brand-green-rgb)));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* ── Video play button overlay ── */
+.card__play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.card--video:hover .card__play-btn {
+  opacity: 1;
+}
+
+.card__play-btn i {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--brand-purple-rgb), 0.85);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xl);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 20px rgba(var(--brand-purple-rgb), 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card--video:hover .card__play-btn i {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(var(--brand-purple-rgb), 0.6);
+}
+
+/* ── Missing badge variants ── */
+.badge--topic {
+  --card-badge-rgb: var(--brand-teal-rgb);
+}
+
+/* Object-type pill in card image overlay */
+.badge--object-type {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(var(--black-rgb), 0.55);
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(4px);
+  text-transform: capitalize;
+  z-index: 2;
+  letter-spacing: 0.03em;
+  border: none;
+}
+
+/* ── Listing sort compact display fix ── */
+.listing-sort-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================================
+   VIDEO DETAIL PAGE
+   ============================================================ */
+
+/* Responsive 16:9 embed wrapper */
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--muted);
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.video-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Description prose block below embed */
+.video-description {
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.video-description p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ============================================================
+   POST DETAIL PAGE
+   ============================================================ */
+
+/* Piggybacks on .article-content prose styles */
+.post-body {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid rgb(var(--brand-teal-rgb));
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.post-body p {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Reddit icon brand colour in meta items */
+.meta-item .fa-reddit {
+  color: #ff4500;
+}
+
+/* ============================================================
+   BREADCRUMB POLISH
+   ============================================================ */
+.breadcrumbs {
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumbs ul {
+  gap: 0.35rem;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  flex-wrap: wrap;
+}
+
+.breadcrumb-link {
+  color: var(--muted-foreground);
+  transition: color 0.15s;
+  text-transform: none;
+}
+
+.breadcrumb-link:hover {
+  color: rgb(var(--brand-blue-rgb));
+}
+
+.breadcrumbs .separator {
+  font-size: var(--text-xs);
+  opacity: 0.4;
+}
+
+.breadcrumb-current {
+  color: var(--foreground);
+  font-weight: var(--weight-md);
+  text-transform: none;
+}
 
 /* === START UI FEEDBACK / UTILITIES === */
 /* === Inline message === */

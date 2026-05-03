@@ -49,16 +49,16 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
             if not video_id: continue
             snippet = item.get("snippet", {})
             raw_items.append({
-                "title":        snippet.get("title", ""),
-                "description":  snippet.get("description", ""),
-                "url":          f"https://www.youtube.com/watch?v={video_id}",
-                "image_url":    snippet.get("thumbnails", {}).get("high", {}).get("url"),
-                "published_at": snippet.get("publishedAt"),
-                "source_name":  snippet.get("channelTitle", ""),
-                "is_video":     True,
-                "region":       region_code,
-                "external_id":  video_id,
-                "platform":     "youtube"
+                "title":          snippet.get("title", ""),
+                "description":    snippet.get("description", ""),
+                "url":            f"https://www.youtube.com/watch?v={video_id}",
+                "thumbnail_url":  snippet.get("thumbnails", {}).get("high", {}).get("url"),
+                "published_at":   snippet.get("publishedAt"),
+                "channel_name":   snippet.get("channelTitle", ""),
+                "is_video":       True,
+                "region":         region_code,
+                "external_id":    video_id,
+                "platform":       "youtube"
             })
         return raw_items
         

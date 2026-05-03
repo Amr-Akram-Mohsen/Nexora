@@ -2,7 +2,7 @@ import logging
 import random
 from typing import Callable, List, Dict, Optional
 from flask import current_app
-from .ingestion.ports import DiscoveryPort, FetcherPort, EnrichmentPort, QuotaPort, CooldownPort
+from .ingestion.ports import DiscoveryPort, FetcherPort, EnrichmentPort, QuotaPort, CooldownPort, ClassificationPort
 from .ingestion import ingest_content
 from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
 
@@ -19,13 +19,15 @@ class IngestionWorkflow:
         discovery: DiscoveryPort,
         quota_service: QuotaPort,
         enrichment_service: EnrichmentPort,
-        cooldown_service: CooldownPort
+        cooldown_service: CooldownPort,
+        classification_service: ClassificationPort
     ):
         self.source_name = source_name
         self.discovery = discovery
         self.quota_service = quota_service
         self.enrichment_service = enrichment_service
         self.cooldown_service = cooldown_service
+        self.classification_service = classification_service
 
     def run(
         self, 
@@ -63,7 +65,7 @@ class IngestionWorkflow:
                 q_text = q_obj["query"]
                 cache_key = f"{source_filter}:{category}:{q_text}"
                 
-                # 1. Cooldown Check (Moved inside try to handle transient DB blips)
+                # 1. Cooldown Check
                 cooldown_hrs = fetch_params.get("cooldown_hours", 6)
                 if not self.cooldown_service.should_refetch(section, cache_key, hours=cooldown_hrs):
                     continue
@@ -74,7 +76,7 @@ class IngestionWorkflow:
 
                 print(f"  [{self.source_name}] Fetching: {q_text}...")
                 
-                # 2. Filter fetch_params to avoid leaking app-level config to integrations
+                # 2. Filter fetch_params
                 sanitized_params = {k: v for k, v in fetch_params.items() if k != "cooldown_hours"}
                 
                 raw_items = fetcher(q_obj, **sanitized_params)
@@ -83,18 +85,23 @@ class IngestionWorkflow:
 
                 query_stored = 0
                 for raw in raw_items:
-                    # Enrichment (Classification + Content)
-                    enriched = self.enrichment_service(raw, section, category, q_obj)
+                    # 3. Metadata Classification (Tags, Brands, Facets)
+                    classified = self.classification_service(raw, section, category, q_obj)
                     
-                    # Ingestion (No internal commit)
+                    # 4. Content Enrichment (Scraping/Strategies)
+                    enriched = self.enrichment_service(classified, section, category, q_obj)
+                    
+                    # 5. Ingestion (Deduplication + Persistence)
                     try:
                         if ingest_content(session, object_type=object_type, raw_data=enriched):
                             query_stored += 1
                     except Exception as e:
-                        logger.critical(f"[{self.source_name}] FATAL: Ingestion failed.")
-                        raise PipelineFatalError(f"Database error: {str(e)}") from e
+                        import sqlalchemy.exc
+                        if isinstance(e, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):
+                            logger.critical(f"[{self.source_name}] FATAL DB ERROR: {str(e)}")
+                            raise PipelineFatalError(f"Database error: {str(e)}") from e
+                        logger.error(f"[{self.source_name}] Skipping item due to ingestion error: {str(e)}")
                 
-                # Transaction Boundary: Commit after each discovery query
                 if query_stored > 0:
                     session.commit()
                     total_stored += query_stored
@@ -105,12 +112,12 @@ class IngestionWorkflow:
                 raise
             except Exception as e:
                 session.rollback()
-                # Special handling for transient DB connection issues
                 import sqlalchemy.exc
-                if isinstance(e, sqlalchemy.exc.OperationalError):
-                    logger.error(f"[{self.source_name}] DB Connectivity issue (OperationalError). Skipping task: {q_text}")
+                if isinstance(e, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):
+                    logger.error(f"[{self.source_name}] Network/DB Connection Lost during task: {q_text}. Error: {str(e)}")
+                    raise PipelineFatalError(f"Database connectivity lost: {str(e)}") from e
                 else:
-                    logger.exception(f"[{self.source_name}] Unexpected error processing query: {q_text}")
+                    logger.exception(f"[{self.source_name}] Unexpected logic error processing query: {q_text}")
 
         return total_stored
 
@@ -123,6 +130,7 @@ def run_orchestrated_ingestion(
     enrichment_service: EnrichmentPort,
     discovery_service: DiscoveryPort,
     cooldown_service: CooldownPort,
+    classification_service: ClassificationPort,
     source_filter: str,
     limit: Optional[int] = None,
     cooldown_hours: int = 6,
@@ -137,12 +145,11 @@ def run_orchestrated_ingestion(
         discovery=discovery_service,
         quota_service=quota_service,
         enrichment_service=enrichment_service,
-        cooldown_service=cooldown_service
+        cooldown_service=cooldown_service,
+        classification_service=classification_service
     )
     
-    # Handle manual queries if provided
     if manual_queries:
-        # Custom Discovery implementation for manual queries
         class ManualDiscovery:
             def get_queries_by_section(self, source_filter):
                 registry = {}

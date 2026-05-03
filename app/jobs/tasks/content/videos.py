@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 from app.core.extensions import db
 from app.application.content.ingestion_workflow import run_orchestrated_ingestion
 from app.application.content.ingestion.services import (
-    DiscoveryService, EnrichmentService, YouTubeQuotaService, CooldownService
+    DiscoveryService, EnrichmentService, YouTubeQuotaService, CooldownService,
+    ClassificationService
 )
 
 def run_youtube_fetch(limit: int | None = None):
@@ -28,6 +29,7 @@ def run_youtube_fetch(limit: int | None = None):
             enrichment_service=EnrichmentService(),
             discovery_service=DiscoveryService(),
             cooldown_service=CooldownService(),
+            classification_service=ClassificationService(),
             source_filter="youtube",
             limit=limit,
             cooldown_hours=12

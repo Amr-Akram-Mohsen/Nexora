@@ -1,6 +1,7 @@
-from .ports import DiscoveryPort, QuotaPort, EnrichmentPort, CooldownPort
+from .ports import DiscoveryPort, QuotaPort, EnrichmentPort, CooldownPort, ClassificationPort
 from app.integrations.discovery import DiscoveryManager
-from app.integrations.enrichment.pipeline import prepare_article, enrich_article_content
+from app.integrations.enrichment.pipeline import enrich_article_content
+from app.integrations.enrichment.classification import classify_content_metadata
 
 class DiscoveryService(DiscoveryPort):
     def __init__(self):
@@ -9,20 +10,25 @@ class DiscoveryService(DiscoveryPort):
     def get_queries_by_section(self, source_filter: str):
         return self.manager.get_queries_by_section(source_filter=source_filter)
 
-class EnrichmentService(EnrichmentPort):
+class ClassificationService(ClassificationPort):
     """
-    Unifies classification (prepare_article) and content extraction (enrich_article_content).
+    Handles metadata tagging (Brands, Facets, Sections) for all content types.
     """
     def __call__(self, raw_data, section, category, query_obj):
-        # 1. Classification & Tagging
-        data = prepare_article(raw_data, section, category, query_obj)
-        
-        # 2. Content Extraction (Strategy-based)
+        return classify_content_metadata(raw_data, section, category, query_obj)
+
+class EnrichmentService(EnrichmentPort):
+    """
+    Pure Content Enrichment (Strategy-based scraping).
+    Expects data that has already been classified.
+    """
+    def __call__(self, raw_data, section, category, query_obj):
+        # Strategy-based extraction (API, Extractor, Scraper, Fallback)
         # Only if it's an article (videos/posts handle enrichment differently or not at all here)
-        if "url" in data and not any(k in data["url"].lower() for k in ["youtube.com", "reddit.com"]):
-            data = enrich_article_content(data)
+        if "url" in raw_data and not any(k in raw_data["url"].lower() for k in ["youtube.com", "reddit.com"]):
+            return enrich_article_content(raw_data)
             
-        return data
+        return raw_data
 
 class CooldownService(CooldownPort):
     def should_refetch(self, section, cache_key, hours):

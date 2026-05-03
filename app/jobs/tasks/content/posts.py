@@ -5,7 +5,8 @@ from app.core.extensions import db
 
 from app.application.content.ingestion_workflow import run_orchestrated_ingestion
 from app.application.content.ingestion.services import (
-    DiscoveryService, EnrichmentService, GenericQuotaService, CooldownService
+    DiscoveryService, EnrichmentService, GenericQuotaService, CooldownService,
+    ClassificationService
 )
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ def run_reddit_fetch(limit: int | None = None):
             enrichment_service=EnrichmentService(),
             discovery_service=DiscoveryService(),
             cooldown_service=CooldownService(),
+            classification_service=ClassificationService(),
             source_filter="reddit",
             limit=limit,
             cooldown_hours=24

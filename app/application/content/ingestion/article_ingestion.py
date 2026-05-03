@@ -1,6 +1,6 @@
 from app.domains.content.models import Article
 from .base import generic_ingest
-from app.integrations.cleaner import clean_article_data
+from app.integrations.content.article_utils.cleaner import clean_article_data
 
 def create_article_model(data):
     return Article(
@@ -25,7 +25,7 @@ def ingest_article(session, raw_data):
     return generic_ingest(
         session,
         object_type="article",
-        raw_data=enriched,
+        raw_data=cleaned,
         model_class=Article,
         factory_func=create_article_model
     )

@@ -1,6 +1,6 @@
 import logging
 from flask import current_app
-from app.integrations.content.quality import score_content_quality
+from app.integrations.content.article_utils.quality import score_content_quality
 
 logger = logging.getLogger(__name__)
 

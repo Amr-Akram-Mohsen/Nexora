@@ -2,13 +2,10 @@ import logging
 import difflib
 import re
 from urllib.parse import urlparse
-from app.integrations.enrichment.brand_detector import detect_brands
-from app.integrations.enrichment.facet_detector import detect_facets
-from app.integrations.content.extract_article_content import scrape_article_content
-from app.integrations.content.extractor_clients import extract_with_apis
-from app.integrations.content.quality import score_content_quality
-from app.integrations.content.content_normalizer import normalize_content, strip_html, text_to_html
-from app.shared.constants.taxonomy import TAXONOMY
+from app.integrations.content.article_utils.extract_article_content import scrape_article_content
+from app.integrations.content.article_utils.extractor_clients import extract_with_apis
+from app.integrations.content.article_utils.quality import score_content_quality
+from app.integrations.content.article_utils.content_normalizer import normalize_content, strip_html, text_to_html
 
 logger = logging.getLogger(__name__)
 
@@ -167,37 +164,5 @@ def enrich_article_content(raw: dict) -> dict:
 
     return raw
 
-
-def prepare_article(raw: dict, section_slug: str, category_slug: str, q_obj: dict) -> dict:
-    """
-    Classification step only.
-    - merges query-based classification
-    - detects brands
-    - detects facets
-    """
-    title = raw.get("title") or ""
-    description = raw.get("description") or ""
-    text_blob = f"{title}. {description}"
-
-    # 1. Classification (deterministic)
-    raw["section_slug"] = section_slug
-    raw["category_slug"] = category_slug
-
-    # 2. Topics (from query only)
-    raw["topic_slugs"] = q_obj.get("topics", [])
-
-    # 3. Brands (merge query + detected)
-    detected_brands = detect_brands(text_blob, TAXONOMY.get("brands", []))
-    raw["brand_slugs"] = list(set(q_obj.get("brands", []) + detected_brands))
-
-    # 4. Facets
-    query_intent = q_obj.get("intent")
-    raw["facets"] = detect_facets(title, description, category_slug, query_intent=query_intent)
-
-    # 5. Region / Discovery
-    if q_obj.get("region"):
-        raw["region"] = q_obj["region"]
-    if q_obj.get("query"):
-        raw["discovery_query"] = q_obj["query"]
 
     return raw

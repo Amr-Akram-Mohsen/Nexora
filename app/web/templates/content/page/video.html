@@ -2,6 +2,8 @@
 {% set video = content.target %}
 
 {% from "components/shared/image-utils.html" import render_image_url %}
+{% from "components/ui/badge.html" import badge %}
+{% from "content/features/snippet-utils.html" import content_snippet %}
 
 {% block title %}Nexora | {{ video.title }}{% endblock %}
 
@@ -19,7 +21,7 @@
   "thumbnailUrl": "{{ video.thumbnail_url }}",
   "uploadDate": "{{ content.published_at.isoformat() if content.published_at }}",
   "contentUrl": "{{ video.url }}",
-  "embedUrl": "{{ video.url }}",
+  "embedUrl": "https://www.youtube.com/embed/{{ video.external_id }}",
   "publisher": {
     "@type": "Organization",
     "name": "Nexora"
@@ -28,24 +30,83 @@
 </script>
 {% endblock %}
 
-
 {% block base_breadcrumbs %}
 {% include "content/features/breadcrumbs.html" %}
 {% endblock %}
 
 {% block base_header %}
-<h1>{{ video.title }}</h1>
-<p>{{ video.channel_name }}</p>
+<div class="detail-page__header-content flex flex-col">
+  <div class="detail-page__badges flex flex-wrap">
+    {{ badge(content.category.name, 'badge--category') }}
+    {% for topic in content.topics[:2] %}
+    {{ badge(topic.name, 'badge--topic') }}
+    {% endfor %}
+    {% for brand in content.brands[:2] %}
+    {{ badge(brand.name, 'badge--brand') }}
+    {% endfor %}
+  </div>
+
+  <h1 class="detail-page__title">{{ video.title }}</h1>
+
+  <div class="detail-page__meta flex flex-wrap items-center">
+    {% if video.channel_name %}
+    <div class="meta-item meta-user flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="fas fa-play-circle"></i>
+      </div>
+      <span class="article__source">{{ video.channel_name }}</span>
+    </div>
+    {% endif %}
+
+    <div class="meta-item meta-calendar flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="far fa-calendar"></i>
+      </div>
+      <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+    </div>
+
+    {% if content.view_count %}
+    <div class="meta-item flex items-center">
+      <div class="meta-icon-wrapper">
+        <i class="fas fa-eye"></i>
+      </div>
+      <span>{{ content.view_count }} views</span>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
 
 {% block base_image %}
-<img src="{{ video.thumbnail_url }}" />
+{# Thumbnail shown above the embed for quick preview #}
+{% if video.thumbnail_url %}
+{{ render_image_url(video.thumbnail_url, video.title) }}
+{% endif %}
 {% endblock %}
 
 {% block base_content %}
 <div class="video-container">
-  <iframe src="{{ video.url }}"></iframe>
-  <iframe src="https://www.youtube.com/embed/{{ video.external_id }}"></iframe>
+  <iframe
+    src="https://www.youtube.com/embed/{{ video.external_id }}"
+    title="{{ video.title }}"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+    loading="lazy">
+  </iframe>
+</div>
+
+{% if video.description %}
+<div class="video-description article-content">
   <p>{{ video.description }}</p>
 </div>
+{% endif %}
+{% endblock %}
+
+{% block base_sidebar %}
+{% if trending_contents %}
+{{ content_snippet(trending_contents, 'Trending') }}
+{% endif %}
+{% if related_contents %}
+{{ content_snippet(related_contents, 'Related') }}
+{% endif %}
 {% endblock %}
