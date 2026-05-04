@@ -14,6 +14,7 @@
 @import "base/typography.css";
 
 @import "components/variants.css";
+@import "utilities/flex.css";
 
 /* 2. Layout - Site Structure */
 @import "layout/header.css";
@@ -64,12 +65,6 @@
 @import "features/affiliate.css";
 
 
-
-
 /* 5. Utilities - Global Helpers */
-@import "utilities/flex.css";
 @import "utilities/helpers.css";
 @import "utilities/animations.css";
-
-/* 6. Overrides - Cascade Dependency Layer (CRITICAL) */
-@import "overrides.css";
