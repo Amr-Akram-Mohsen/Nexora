@@ -109,18 +109,18 @@
   }
 }
 
-.articles-listing .grid-auto {
+.contents-listing .grid-auto {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 @media (max-width: 768px) {
-  .articles-listing .grid-auto {
+  .contents-listing .grid-auto {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 }
 
 @media (max-width: 480px) {
-  .articles-listing .grid-auto {
+  .contents-listing .grid-auto {
     grid-template-columns: 1fr;
   }
 }
@@ -158,4 +158,4 @@
   color: var(--foreground);
   font-weight: var(--weight-md);
   text-transform: none;
-}
+}

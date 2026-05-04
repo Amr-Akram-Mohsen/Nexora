@@ -1,9 +1,5 @@
 /* --- Structural Helpers --- */
 
-.inline-flex {
-  display: inline-flex;
-}
-
 .img-cover {
   object-fit: cover;
 }

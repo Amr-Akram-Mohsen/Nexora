@@ -270,7 +270,7 @@
   background: linear-gradient(90deg, rgb(var(--brand-green-rgb)), rgb(var(--brand-teal-rgb)));
 }
 
-.sidebar-promo--contents {
+.sidebar-promo--articles {
   background: linear-gradient(135deg,
       rgba(var(--brand-blue-rgb), 0.08),
       rgba(var(--brand-purple-rgb), 0.08));
@@ -320,4 +320,3 @@
 .sidebar-trending__link.is-active {
   font-weight: var(--weight-md);
 }
-

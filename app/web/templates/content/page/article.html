@@ -49,7 +49,7 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="detail-page__header-content flex flex-col">
+<div class="detail-page__header-article flex flex-col">
   <div class="detail-page__badges flex flex-wrap">
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
