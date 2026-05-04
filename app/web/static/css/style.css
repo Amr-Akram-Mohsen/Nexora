@@ -13,6 +13,8 @@
 @import "base/reset.css";
 @import "base/typography.css";
 
+@import "components/variants.css";
+
 /* 2. Layout - Site Structure */
 @import "layout/header.css";
 @import "layout/footer.css";
@@ -25,6 +27,17 @@
 @import "components/badges.css";
 @import "components/pagination.css";
 @import "components/slider.css";
+
+/* Catalog Components */
+@import "components/catalog/filters.css";
+@import "components/catalog/sort.css";
+
+/* Content Components */
+@import "components/content/gallery.css";
+@import "components/content/comments.css";
+@import "components/content/interaction.css";
+@import "components/content/dialogs.css";
+
 @import "components/alerts.css";
 @import "components/newsletter.css";
 @import "components/empty-state.css";
@@ -32,13 +45,24 @@
 
 /* 4. Features - Domain-Specific Logic */
 @import "features/auth.css";
-@import "features/catalog.css";
-@import "features/content.css";
-@import "features/sidebar.css";
+
+/* Catalog Features */
+@import "features/catalog/catalog.css";
+@import "features/catalog/sidebar.css";
+
+/* Content Features */
+@import "features/content/content.css";
+@import "features/content/articles.css";
+@import "features/content/products.css";
+@import "features/content/videos.css";
+@import "features/content/posts.css";
+
+/* Other Features */
 @import "features/contact.css";
 @import "features/pages.css";
 @import "features/profile.css";
 @import "features/affiliate.css";
+
 
 
 

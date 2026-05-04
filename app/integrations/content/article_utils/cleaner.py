@@ -8,9 +8,6 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.shared.sanitizer import sanitize_text
-import logging
-
-logger = logging.getLogger(__name__)
 
 # ── Configuration ────────────────────────────────────────────────
 ALLOWED_TAGS = [

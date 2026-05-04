@@ -306,7 +306,7 @@ body.dark-mode .site-header {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: var(--header-height);
+    top: var(--header-height-mobile);
     left: 0;
     right: 0;
     background: var(--background);
@@ -319,5 +319,3 @@ body.dark-mode .site-header {
     display: flex;
   }
 }
-
-
