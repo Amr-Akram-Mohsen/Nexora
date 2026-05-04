@@ -12,6 +12,7 @@ project_tree.txt
 # Flask instance (db, secrets)
 instance/
 
+brain
 *.db
 # VS Code
 .vscode/

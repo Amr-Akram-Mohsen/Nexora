@@ -12,213 +12,105 @@
             <p class="page-description">Compare technical specifications and prices side-by-side.</p>
         </header>
 
-        {% if items|length < 2 %}
-            <div class="compare-empty flex flex-col items-center justify-center">
-                <i class="fas fa-balance-scale empty-icon"></i>
-                <p>Not enough items to compare. Add at least two items.</p>
-                <a href="{{ url_for('item.deals') }}" class="btn btn--primary">Browse Products</a>
-            </div>
-        {% else %}
-            <div class="compare-table-wrapper">
-                <table class="compare-table">
-                    <thead>
-                        <tr>
-                            <th class="sticky-col">Features</th>
-                            {% for item in items %}
-                            <th class="compare-col">
-                                <div class="compare-item-header flex flex-col items-center">
-                                    <div class="compare-img-wrapper">
-                                        {{ render_image_url(item.image_url, item.name) }}
-                                    </div>
-                                    <h3 class="compare-item-name">{{ item.name }}</h3>
-                                    <p class="compare-item-brand">{{ item.brand.name }}</p>
-                                    
-                                    {% set best_link = (item.variants[0].store_links[0] if item.variants[0].store_links else None) if item.variants else None %}
-                                    <div class="compare-item-price">
-                                        {% if best_link %}
-                                            <span class="price-val">{{ best_link.currency }} {{ best_link.price }}</span>
-                                        {% else %}
-                                            <span class="price-none">Price unavailable</span>
-                                        {% endif %}
-                                    </div>
+        {% if items|length < 2 %} <div class="compare-empty flex flex-col items-center justify-center">
+            <i class="fas fa-balance-scale empty-icon"></i>
+            <p>Not enough items to compare. Add at least two items.</p>
+            <a href="{{ url_for('item.deals') }}" class="btn btn--primary">Browse Products</a>
+    </div>
+    {% else %}
+    <div class="compare-table-wrapper">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th class="sticky-col">Features</th>
+                    {% for item in items %}
+                    <th class="compare-col">
+                        <div class="compare-item-header flex flex-col items-center">
+                            <div class="compare-img-wrapper">
+                                {{ render_image_url(item.image_url, item.name) }}
+                            </div>
+                            <h3 class="compare-item-name">{{ item.name }}</h3>
+                            <p class="compare-item-brand">{{ item.brand.name }}</p>
 
-                                    <div class="compare-actions">
-                                        <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="btn btn--outline btn--sm">View Full Details</a>
-                                        {% if best_link %}
-                                            <a href="{{ best_link.affiliate_url }}" target="_blank" rel="noopener nofollow" class="btn btn--primary btn--sm mt-2">Get Deal</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {# Basic Info #}
-                        <tr class="table-row-group">
-                            <td colspan="{{ items|length + 1 }}">General Information</td>
-                        </tr>
-                        <tr>
-                            <td class="feature-label">Category</td>
-                            {% for item in items %}
-                            <td>{{ item.category.name }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td class="feature-label">Brand</td>
-                            {% for item in items %}
-                            <td>{{ item.brand.name }}</td>
-                            {% endfor %}
-                        </tr>
+                            {% set best_link = (item.variants[0].store_links[0] if item.variants[0].store_links else
+                            None) if item.variants else None %}
+                            <div class="compare-item-price">
+                                {% if best_link %}
+                                <span class="price-val">{{ best_link.currency }} {{ best_link.price }}</span>
+                                {% else %}
+                                <span class="price-none">Price unavailable</span>
+                                {% endif %}
+                            </div>
 
-                        {# Dynamic Specs from full_details #}
-                        {% for cat in all_categories %}
-                            <tr class="table-row-group">
-                                <td colspan="{{ items|length + 1 }}">{{ cat|capitalize }}</td>
-                            </tr>
-                            
-                            {# We need to find all unique keys for this category across all items #}
-                            {% set cat_keys = [] %}
-                            {% for item in items %}
-                                {% set item_cat_specs = item.full_details.get(cat, {}) %}
-                                {% for key in item_cat_specs.keys() %}
-                                    {% if key not in cat_keys %}
-                                        {% set _ = cat_keys.append(key) %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endfor %}
+                            <div class="compare-actions">
+                                <a href="{{ url_for('item.item_page', item_id=item.id) }}"
+                                    class="btn btn--outline btn--sm">View Full Details</a>
+                                {% if best_link %}
+                                <a href="{{ best_link.affiliate_url }}" target="_blank" rel="noopener nofollow"
+                                    class="btn btn--primary btn--sm mt-2">Get Deal</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {# Basic Info #}
+                <tr class="table-row-group">
+                    <td colspan="{{ items|length + 1 }}">General Information</td>
+                </tr>
+                <tr>
+                    <td class="feature-label">Category</td>
+                    {% for item in items %}
+                    <td>{{ item.category.name }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="feature-label">Brand</td>
+                    {% for item in items %}
+                    <td>{{ item.brand.name }}</td>
+                    {% endfor %}
+                </tr>
 
-                            {% for key in cat_keys %}
-                            <tr>
-                                <td class="feature-label">{{ key|replace('_', ' ')|title }}</td>
-                                {% for item in items %}
-                                    <td>
-                                        {% set val = item.full_details.get(cat, {}).get(key) %}
-                                        {% if val %}
-                                            {{ val }}
-                                        {% else %}
-                                            <span class="spec-missing">—</span>
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
+                {# Dynamic Specs from full_details #}
+                {% for cat in all_categories %}
+                <tr class="table-row-group">
+                    <td colspan="{{ items|length + 1 }}">{{ cat|capitalize }}</td>
+                </tr>
+
+                {# We need to find all unique keys for this category across all items #}
+                {% set cat_keys = [] %}
+                {% for item in items %}
+                {% set item_cat_specs = item.full_details.get(cat, {}) %}
+                {% for key in item_cat_specs.keys() %}
+                {% if key not in cat_keys %}
+                {% set _ = cat_keys.append(key) %}
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+
+                {% for key in cat_keys %}
+                <tr>
+                    <td class="feature-label">{{ key|replace('_', ' ')|title }}</td>
+                    {% for item in items %}
+                    <td>
+                        {% set val = item.full_details.get(cat, {}).get(key) %}
+                        {% if val %}
+                        {{ val }}
+                        {% else %}
+                        <span class="spec-missing">—</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
     </div>
 </section>
 
-<style>
-.compare-table-wrapper {
-    overflow-x: auto;
-    margin-top: 2rem;
-    background: var(--card-bg);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-}
-
-.compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-}
-
-.compare-table th, 
-.compare-table td {
-    padding: 1.5rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-}
-
-.compare-table thead th {
-    background: var(--background);
-    vertical-align: top;
-}
-
-.compare-col {
-    min-width: 200px;
-    width: {{ 100 / (items|length + 1) }}%;
-}
-
-.sticky-col {
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background: var(--background);
-    font-weight: var(--weight-bold);
-    min-width: 150px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-}
-
-.compare-img-wrapper {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 1rem;
-}
-
-.compare-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.compare-item-name {
-    font-size: var(--text-base);
-    font-weight: var(--weight-semibold);
-    text-align: center;
-    margin-bottom: 0.25rem;
-    color: var(--foreground);
-}
-
-.compare-item-brand {
-    font-size: var(--text-sm);
-    color: var(--muted-foreground);
-    margin-bottom: 1rem;
-}
-
-.compare-item-price {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-bold);
-    color: var(--primary);
-    margin-bottom: 1rem;
-}
-
-.table-row-group {
-    background: var(--muted);
-}
-
-.table-row-group td {
-    font-weight: var(--weight-bold);
-    text-transform: uppercase;
-    font-size: var(--text-xs);
-    letter-spacing: 0.05em;
-    color: var(--muted-foreground);
-    padding: 0.75rem 1.5rem;
-}
-
-.feature-label {
-    font-weight: var(--weight-medium);
-    color: var(--muted-foreground);
-    font-size: var(--text-sm);
-}
-
-.spec-missing {
-    color: var(--border);
-}
-
-.compare-empty {
-    padding: 5rem 2rem;
-    text-align: center;
-}
-
-.empty-icon {
-    font-size: 4rem;
-    color: var(--border);
-    margin-bottom: 1.5rem;
-}
-</style>
 {% endblock %}

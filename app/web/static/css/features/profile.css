@@ -1,0 +1,38 @@
+.profile-section {
+  min-height: calc(100vh - var(--header-height));
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  background: var(--gradient-primary);
+  border-radius: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 3rem;
+  font-weight: 800;
+  box-shadow: 0 10px 30px -5px rgba(var(--brand-blue-rgb), 0.5);
+}
+
+.profile-card {
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+}
+
+.user-status-wrapper {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.glass {
+  background: rgba(var(--card-rgb), 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border-rgb), 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}

@@ -21,9 +21,6 @@ def set_country():
 @bp.route('/')
 def home():
     data = get_home_page_data()
-    print(2*'\n')
-    print(*data)
-    print(2*'\n')
     return render_template("index.html", **data)
 
 @bp.route('/about')
