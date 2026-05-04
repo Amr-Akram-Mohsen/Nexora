@@ -45,11 +45,32 @@ def assign_target_to_contents(contents, session):
         for obj in objs:
             targets_map[(obj_type, obj.id)] = obj
 
+    result = []
     # Assign targets back to content objects
     for c in contents:
         c.target = targets_map.get((c.object_type, c.object_id))
+
+        result.append({
+            "id": c.id,
+            "object_type": c.object_type,
+            "published_at": c.published_at,
+
+            "category": {
+                "id": c.category.id,
+                "name": c.category.name,
+            } if c.category else None,
+
+            "section": {
+                "id": c.section.id,
+                "slug": c.section.slug,
+            } if c.section else None,
+
+            "target": c.target,
+            "topics": c.topics,
+            "brands": c.brands
+        })
     
-    return contents
+    return result
 
 def create_content(session, *, obj, object_type, published_at, **kwargs):
     from ..models import Content

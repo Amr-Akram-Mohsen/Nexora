@@ -7,13 +7,10 @@ def get_contents_render(session, filter_by_columns: tuple = ('section',), filter
     from app.domains.system.models import Section
     query = session.query(Content).filter(Content.is_active == True).options(
         selectinload(Content.topics),
-        selectinload(Content.brands)
+        selectinload(Content.brands),
+        joinedload(Content.category),
+        joinedload(Content.section)
     )
-    # articles = (
-    #     db.session.query(Content)
-    #     .options(joinedload(Content.category))
-    #     .all()
-    # )
 
     if filter_by_columns and filter_values:
         filter_dict = None
