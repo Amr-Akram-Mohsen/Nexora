@@ -32,11 +32,14 @@
 }
 
 .sidebar-promo {
-  padding: 1rem;
   background: var(--secondary);
-  border-radius: var(--radius-md);
-  margin-top: 0.5rem;
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  position: relative;
+  overflow: hidden;
 }
+
 
 .sidebar-promo h4 {
   font-size: var(--text-sm);
@@ -96,14 +99,6 @@
 
 .sidebar-reset-link:hover {
   opacity: 0.7;
-}
-
-.sidebar-promo {
-  border-radius: var(--radius-xl);
-  padding: 1.25rem;
-  margin-top: 1.25rem;
-  position: relative;
-  overflow: hidden;
 }
 
 .sidebar-promo__icon {
