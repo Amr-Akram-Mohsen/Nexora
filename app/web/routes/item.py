@@ -18,7 +18,7 @@ def view_full_specs(item_id):
         abort(404)
         
     html = render_template(
-        "components/features/full-specs.html",
+        "commercial/features/full-details.html",
         full_specs=item.full_details
     )
     return jsonify({
@@ -41,7 +41,7 @@ def deals():
     data = get_catalog_data(active_filters, page=page)
 
     return render_template(
-        "catalog-page.html",
+        "commercial/catalog/catalog-page.html",
         target_type="products",
         allowed_filters=["category", "brand", "store", "type"],
         active_filters=active_filters,
@@ -65,7 +65,7 @@ def item_page(item_id):
     db.session.commit()
     
     return render_template(
-        "item-page.html",
+        "commercial/page/item.html",
         **data
     )
 
@@ -86,6 +86,6 @@ def compare():
         return redirect(url_for('item.deals'))
     
     return render_template(
-        'compare-page.html',
+        'commercial/catalog/compare-page.html',
         **data
     )

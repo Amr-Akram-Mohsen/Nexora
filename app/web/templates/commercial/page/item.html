@@ -2,10 +2,10 @@
 
 {% set item = content.target %}
 
-{% from"components/features/media-gallery.html" import media_gallery %}
-{% from"components/render-details.html" import render_details %}
+{% from"components/media/item-gallery.html" import item_gallery %}
+{% from"commercial/features/render-details.html" import render_details %}
 {% from"components/ui/badge.html" import badge %}
-{% from "components/features/rating.html" import render_stars %}
+{% from "commercial/features/rating.html" import render_stars %}
 
 {% block title %}Nexora | {{ item.name }}{% endblock %}
 
@@ -76,15 +76,15 @@ _external=True) }}{% endblock %}
   {{ item.description or '' }}
 
   {% if item.item_type == 'electronics' %}
-  {% include "components/details/electronics/highlights.html" %}
+  {% include "commercial/details/electronics/highlights.html" %}
 
   {% elif item.item_type == 'perfumes' %}
-  {% include "components/details/perfume/scent-pyramid.html" %}
-  {% include "components/details/perfume/meta.html" %}
+  {% include "commercial/details/perfume/scent-pyramid.html" %}
+  {% include "commercial/details/perfume/meta.html" %}
 
   {% elif item.item_type == 'accessories' %}
-  {% include "components/details/accessory/material-badges.html" %}
-  {% include "components/details/accessory/size-guide.html" %}
+  {% include "commercial/details/accessory/material-badges.html" %}
+  {% include "commercial/details/accessory/size-guide.html" %}
 
   {% endif %}
 </div>
@@ -94,7 +94,7 @@ _external=True) }}{% endblock %}
 
 <!-- ✅ VARIANTS FIRST -->
 {% if item.has_variants %}
-{% include "components/features/variant-selector.html" %}
+{% include "commercial/features/variant-selector.html" %}
 {% endif %}
 
 {% if item.quick_details and item.quick_details|length > 0 %}
@@ -139,7 +139,7 @@ _external=True) }}{% endblock %}
 
 {% if item.store_links %}
 {% set store_links = item.store_links %}
-{% include"components/features/purchase-options.html" %}
+{% include"commercial/features/purchase-options.html" %}
 {% endif %}
 {% endmacro %}
 
@@ -154,5 +154,5 @@ sidebar=sidebar_block
 
 <!-- {% set full_details = item.full_details %} -->
 {% set full_details = item.structured_details.get('groups') %}
-{% include "components/features/full-details.html" %}
+{% include "commercial/features/full-details.html" %}
 {% endblock %}

@@ -17,7 +17,7 @@ def sections(section_slug):
         abort(404)
 
     return render_template(
-        "content/listing/catalog-page.html",
+        "content/catalog/catalog-page.html",
         target_type="contents",
         active_filters=active_filters,
         **data

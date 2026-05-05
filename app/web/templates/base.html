@@ -88,10 +88,6 @@
   {% include 'partials/footer.html' %}
   {% endblock %}
 
-  {% block overlays %}
-  {% include 'commercial/features/gallery-overlay.html' %}
-  {% endblock %}
-
   {% block scripts %}
   <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>

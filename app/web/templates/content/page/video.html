@@ -1,7 +1,7 @@
 {% extends "content/page/base.html" %}
 {% set video = content.target %}
 
-{% from "components/shared/image-utils.html" import render_image_url %}
+{% from "components/media/content-image.html" import render_image_url %}
 {% from "components/ui/badge.html" import badge %}
 {% from "content/features/snippet-utils.html" import content_snippet %}
 
@@ -86,11 +86,8 @@
 
 {% block base_content %}
 <div class="video-container">
-  <iframe
-    src="https://www.youtube.com/embed/{{ video.external_id }}"
-    title="{{ video.title }}"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
+  <iframe src="https://www.youtube.com/embed/{{ video.external_id }}" title="{{ video.title }}"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
     loading="lazy">
   </iframe>
 </div>

@@ -2,11 +2,11 @@
 {% extends"base.html" %}
 {% block title %}Nexora | Home{% endblock %}
 {% block content %}
-{% from"components/section.html" import section %}
+{% from"components/ui/section.html" import section %}
 {% include "components/hero-sliders.html" %}
 <div class="container">
 
-  {% from"components/grid.html" import grid %}
+  {% from"components/ui/grid.html" import grid %}
   {% set sections = [
   {"section":"deals","section_title":"top deals", "cards": top_deals, "carousel": true },
   {"section":"reviews","section_title":"latest reviews" ,"cards": latest_reviews },

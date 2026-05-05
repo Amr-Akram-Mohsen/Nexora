@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% from "components/listing-page.html" import listing_page %}
-{% from "components/grid.html" import grid %}
+{% from "components/listing/listing-page.html" import listing_page %}
+{% from "components/ui/grid.html" import grid %}
 {% from "components/ui/form.html" import form %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/input.html" import input %}
@@ -11,51 +11,51 @@
 {% block content %}
 
 {% call(slot) listing_page("search-results-page") %}
-  
-  {% if slot == 'sidebar' %}
-    {# Optional: We could add search filters here later #}
-    <div class="sidebar-info">
-      <h3 class="filter-section__title">New Discovery</h3>
-      <p class="text-xs color-muted">Refine your search to find the exact tech reviews or deals you need.</p>
-    </div>
-  {% endif %}
 
-  {% if slot == 'header' %}
-    <div class="listing-summary">
-      <h1 class="listing-title">Search Results</h1>
-      {% if query %}
-      <p class="listing-count">
-        Found {{ search_results|length }} results for "{{ query }}"
-      </p>
-      {% endif %}
-    </div>
+{% if slot == 'sidebar' %}
+{# Optional: We could add search filters here later #}
+<div class="sidebar-info">
+  <h3 class="filter-section__title">New Discovery</h3>
+  <p class="text-xs color-muted">Refine your search to find the exact tech reviews or deals you need.</p>
+</div>
+{% endif %}
 
-    <div class="listing-search-form">
-      {% call form("search-form", variant="", method="GET", include_csrf=False) %}
-        <div class="listing-search-wrapper flex">
-          {{ input(
-            name="query", type="search",
-            placeholder="Search tech news or products...",
-            value=query,
-            class="input-search"
-          ) }}
-          {{ button(type="submit", icon="fas fa-search") }}
-        </div>
-      {% endcall %}
-    </div>
+{% if slot == 'header' %}
+<div class="listing-summary">
+  <h1 class="listing-title">Search Results</h1>
+  {% if query %}
+  <p class="listing-count">
+    Found {{ search_results|length }} results for "{{ query }}"
+  </p>
   {% endif %}
+</div>
 
-  {% if slot == 'content' %}
-    {% if search_results %}
-      {{ grid(search_results) }}
-    {% else %}
-      <div class="no-results flex flex-col items-center">
-        <i class="fas fa-search-minus icon-empty"></i>
-        <h3>No results found</h3>
-        <p>Try different keywords or browse our latest deals.</p>
-      </div>
-    {% endif %}
-  {% endif %}
+<div class="listing-search-form">
+  {% call form("search-form", variant="", method="GET", include_csrf=False) %}
+  <div class="listing-search-wrapper flex">
+    {{ input(
+    name="query", type="search",
+    placeholder="Search tech news or products...",
+    value=query,
+    class="input-search"
+    ) }}
+    {{ button(type="submit", icon="fas fa-search") }}
+  </div>
+  {% endcall %}
+</div>
+{% endif %}
+
+{% if slot == 'content' %}
+{% if search_results %}
+{{ grid(search_results) }}
+{% else %}
+<div class="no-results flex flex-col items-center">
+  <i class="fas fa-search-minus icon-empty"></i>
+  <h3>No results found</h3>
+  <p>Try different keywords or browse our latest deals.</p>
+</div>
+{% endif %}
+{% endif %}
 
 {% endcall %}
 

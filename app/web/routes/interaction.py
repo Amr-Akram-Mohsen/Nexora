@@ -30,7 +30,7 @@ def subscribe():
         'success': True,
         'message': message,
         'html': render_template(
-            'partials/newsletter-block.html',
+            'partials/newsletter.html',
             **get_newsletter_context()
         )            
     })
@@ -54,7 +54,7 @@ def unsubscribe_auth():
         'success': True,
         'message': message,
         'html': render_template(
-            'partials/newsletter-block.html',
+            'partials/newsletter.html',
             **get_newsletter_context()
         )
     })

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% from "components/listing-page.html" import listing_page %}
-{% from "components/grid.html" import grid %}
+{% from "components/listing/listing-page.html" import listing_page %}
+{% from "components/ui/grid.html" import grid %}
 {% from "components/ui/button.html" import button %}
-{% from "components/empty-state.html" import empty_state %}
+{% from "components/ui/empty-state.html" import empty_state %}
 
-{% set page_title = section.name|title if section else "Tech Deals & Products" %}
-{% set results = contents if target_type == 'contents' else items %}
+{% set page_title = section.name|title %}
+{% set results = contents %}
 
 {% block title %}{{ page_title }} | Nexora{% endblock %}
 
@@ -18,7 +18,7 @@
 SLOT: sidebar
 ═══════════════════════════════════════ #}
 {% if slot == 'sidebar' %}
-{% include "components/shared/catalog-sidebar.html" %}
+{% include "components/catalog/content-sidebar.html" %}
 {% endif %}
 
 {# ═══════════════════════════════════════
@@ -44,14 +44,7 @@ SLOT: header
   <div class="listing-sort-compact flex items-center">
     <select id="sort-select-mobile" class="sort-select sort-select--compact" aria-label="Sort results">
       <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
-      {% if target_type == 'products' %}
-      <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price ↑
-      </option>
-      <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price ↓
-      </option>
-      {% else %}
       <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
-      {% endif %}
       <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Popular</option>
     </select>
   </div>
@@ -74,15 +67,8 @@ SLOT: header
       <select id="sort-select" class="sort-select" aria-label="Sort results">
         <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First
         </option>
-        {% if target_type == 'products' %}
-        <option value="{{ get_sort_url('price_low') }}" {{ 'selected' if active_filters.sort=='price_low' }}>Price: Low
-          to High</option>
-        <option value="{{ get_sort_url('price_high') }}" {{ 'selected' if active_filters.sort=='price_high' }}>Price:
-          High to Low</option>
-        {% else %}
         <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest First
         </option>
-        {% endif %}
         <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular
         </option>
       </select>
