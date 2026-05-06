@@ -1,7 +1,9 @@
 from ...models import Content
 from sqlalchemy import func, case
+from ..content_access import assign_target_to_contents
 
 def get_related_contents(session, content_id, limit=6):
+    from .options import CONTENT_EAGER_LOADS
     content = session.get(Content, content_id)
     if not content: return []
     from app.domains.system.models import Category, Section, Topic, Brand
@@ -32,7 +34,10 @@ def get_related_contents(session, content_id, limit=6):
             func.sum(relevance_score).desc(),
             Content.published_at.desc()
         )
+        .options(*CONTENT_EAGER_LOADS)
         .limit(limit)
     )
 
-    return [row.Content for row in query.all()]
+    rows = query.all()
+    contents = [row.Content for row in rows]
+    return assign_target_to_contents(contents, session)

@@ -1,15 +1,12 @@
 from ...models import Content
-from sqlalchemy.orm import joinedload, selectinload
 from ..content_access import assign_target_to_contents
 from app.shared.utils.collections import my_zip
 
 def get_contents_render(session, filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
+    from .options import CONTENT_EAGER_LOADS
     from app.domains.system.models import Section
     query = session.query(Content).filter(Content.is_active == True).options(
-        selectinload(Content.topics),
-        selectinload(Content.brands),
-        joinedload(Content.category),
-        joinedload(Content.section)
+        *CONTENT_EAGER_LOADS
     )
 
     if filter_by_columns and filter_values:
@@ -28,7 +25,7 @@ def get_contents_render(session, filter_by_columns: tuple = ('section',), filter
             query = query.filter(*filters)
     else:
         # eager load section if not filtering
-        query = query.options(joinedload(Content.section), joinedload(Content.category))
+        pass
 
     query = query.order_by(Content.published_at.desc())
 
@@ -42,18 +39,16 @@ def get_contents_render(session, filter_by_columns: tuple = ('section',), filter
     return contents
 
 
-def get_filtered_contents(session, section, active_filters, allowed_filters, page=1, per_page=24):
+def get_filtered_contents(session, section_id, active_filters, allowed_filters, page=1, per_page=24):
     """
     Handles complex filtering and pagination for section contents.
     """
     from app.domains.system.models import Category, Brand, Topic
+    from .options import CONTENT_EAGER_LOADS
     query = (
         session.query(Content)
-        .filter(Content.section_id == section.id, Content.is_active == True)
-        .options(
-            selectinload(Content.topics),
-            selectinload(Content.brands)
-        )
+        .filter(Content.section_id == section_id, Content.is_active == True)
+        .options(*CONTENT_EAGER_LOADS)
     )
 
     cats = [f for f in active_filters.get('category', []) if f]

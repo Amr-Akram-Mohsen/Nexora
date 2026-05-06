@@ -14,8 +14,8 @@ def get_related_contents_cached(content_id, limit=6):
 def get_trending_contents_cached(limit=6, days=7, section_ids=None):
     return domain_query.get_trending_contents(db.session, limit, days, section_ids)
 
-def get_filtered_contents(section, active_filters, allowed_filters, page=1, per_page=24):
+def get_filtered_contents(section_id, active_filters, allowed_filters, page=1, per_page=24):
     """
     Application wrapper for filtered contents (usually not cached due to high variability of filters).
     """
-    return domain_query.get_filtered_contents(db.session, section, active_filters, allowed_filters, page, per_page)
+    return domain_query.get_filtered_contents(db.session, section_id, active_filters, allowed_filters, page, per_page)

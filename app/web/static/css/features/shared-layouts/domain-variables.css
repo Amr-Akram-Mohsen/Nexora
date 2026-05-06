@@ -1,6 +1,7 @@
 [data-domain-type="contents"] {
   --domain-primary-rgb: var(--brand-blue-rgb);
   --domain-secondary-rgb: var(--brand-purple-rgb);
+
 }
 
 [data-domain-type="items"] {
@@ -23,6 +24,12 @@
   --commerce-electronics: color-mix(in srgb, var(--domain-primary) 70%, #3b82f6 30%);
   --commerce-accessories: color-mix(in srgb, var(--domain-primary) 80%, #f59e0b 20%);
 
+}
 
+[data-type="article"] {
+  /* Content types (derived from domain) */
+  --content-article-rgb: var(--domain-primary-rgb);
+  --content-video-rgb: var(--domain-secondary-rgb);
+  --content-post-rgb: color-mix(in srgb, var(--domain-primary) 70%, #0ea5a4 30%);
 
 }

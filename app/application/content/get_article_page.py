@@ -1,6 +1,5 @@
 from app.domains.content.service import (
-    get_content_by_id,
-    resolve_content_target
+    get_content_by_id
 )
 from app.application.content.query_service import (
     get_related_contents_cached,
@@ -15,14 +14,15 @@ def get_article_page_data(content_id):
     """
     from app.core.extensions import db
     content = get_content_by_id(db.session, content_id)
+    # content is now a serialized dictionary
     if not content:
         return None
 
-    # Resolve target (external link or internal item)
-    resolve_content_target(db.session, content)
-
-    related_contents = get_related_contents_cached(content.id)
-    trending_contents = get_trending_contents_cached(limit=6, days=7, section_ids=[content.section_id])
+    related_contents = get_related_contents_cached(content["id"])
+    
+    # section is a serialized dict as well
+    section_ids = [content["section"]["id"]] if content.get("section") else None
+    trending_contents = get_trending_contents_cached(limit=6, days=7, section_ids=section_ids)
 
     return {
         "content": content,

@@ -11,22 +11,16 @@ from logging.handlers import RotatingFileHandler
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from app.admin.contents import bp as api_content_bp
-from app.admin.items import bp as api_item_bp
-from app.admin.users import bp as api_user_bp
-from app.admin.interactions import bp as api_interaction_bp
-from app.admin.stats import bp as api_dashboard_bp
-from app.admin.ingestions import bp as api_ingestion_bp
 
+from app.admin import (
+    api_user_bp, api_content_bp, api_item_bp, api_interaction_bp, api_dashboard_bp, api_ingestion_bp
+)
 
-# from app.domains.dashboard.routes import bp as dashboard_bp
-
-import app.domains.system
 from app.domains.user.models import User
+
 from app.web.routes import (
     admin_bp, user_bp, system_bp, content_bp, item_bp, interaction_bp, recommendation_bp, recommendation_bp
 )
-
 
 def setup_logging(app):
     """Configure rotating file logging for production-grade audit trails."""

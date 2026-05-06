@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from functools import cached_property
 from app.core.extensions import db
 from app.shared.sanitizer import sanitize_json

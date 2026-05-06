@@ -1,4 +1,8 @@
 from app.core.extensions import db
+from app.domains.serializers import (
+    serialize_brand, serialize_topic, serialize_category,
+    serialize_section, serialize_target, dt_iso
+)
 
 def get_model_map():
     from ..models import Article, Video, Post
@@ -48,26 +52,21 @@ def assign_target_to_contents(contents, session):
     result = []
     # Assign targets back to content objects
     for c in contents:
-        c.target = targets_map.get((c.object_type, c.object_id))
+        target_obj = targets_map.get((c.object_type, c.object_id))
 
         result.append({
             "id": c.id,
             "object_type": c.object_type,
             "published_at": c.published_at,
 
-            "category": {
-                "id": c.category.id,
-                "name": c.category.name,
-            } if c.category else None,
+            "category": serialize_category(c.category),
 
-            "section": {
-                "id": c.section.id,
-                "slug": c.section.slug,
-            } if c.section else None,
+            "section": serialize_section(c.section),
 
-            "target": c.target,
-            "topics": c.topics,
-            "brands": c.brands
+            "target": serialize_target(target_obj, session) if target_obj else None,
+            "topics": [serialize_topic(t) for t in (c.topics or [])],
+            "brands": [serialize_brand(b) for b in (c.brands or [])],
+            "linked_items": [serialize_target(item, session) for item in getattr(c, 'linked_items', [])] if getattr(c, 'linked_items', None) else []
         })
     
     return result

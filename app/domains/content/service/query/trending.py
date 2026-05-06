@@ -2,8 +2,10 @@ from ...models import Content
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
 from app.shared.constants.core import TargetType
+from ..content_access import assign_target_to_contents
 
 def get_trending_contents(session, limit=6, days=7, section_ids=None):
+    from .options import CONTENT_EAGER_LOADS
     from app.domains.system.models import Section
     from app.domains.interaction.models import View
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
@@ -23,7 +25,10 @@ def get_trending_contents(session, limit=6, days=7, section_ids=None):
     query = (
         query.group_by(Content.id)
         .order_by(func.count(View.id).desc(), Content.published_at.desc())
+        .options(*CONTENT_EAGER_LOADS)
         .limit(limit)
     )
 
-    return [row.Content for row in query.all()]
+    rows = query.all()
+    contents = [row.Content for row in rows]
+    return assign_target_to_contents(contents, session)

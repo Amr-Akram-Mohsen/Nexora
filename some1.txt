@@ -1,0 +1,175 @@
+You are a senior backend architect and performance engineer specializing in Flask, SQLAlchemy ORM, and scalable web architectures.
+
+I will provide you with parts of my project, including:
+
+* Domain layer (models, entities for articles, videos, posts, items, categories, sections, etc.)
+* Service layer (query/command logic)
+* Application layer (integration, orchestration)
+* Web layer (routes/controllers)
+
+Your task is to perform a **deep, system-wide analysis**, not just surface-level feedback.
+
+## Context & Problem
+
+I am experiencing issues related to:
+
+* SQLAlchemy session lifecycle (detached/expired objects)
+* Improper or inconsistent use of eager loading (especially `joinedload`)
+* Serialization failures when accessing relationships like `section` and `category`
+* Data becoming unavailable after the session is closed or expired
+* Repeated database hits and inefficient query patterns
+* Missing or inconsistent caching of frequently accessed data (e.g., sections, active topics)
+
+These issues sometimes result in:
+
+* Errors like "object is detached" or missing relationships
+* Inconsistent rendering depending on timing (e.g., page reload works but later fails)
+* Performance degradation due to redundant queries
+
+---
+
+## What I Want From You
+
+### 1. Root Cause Analysis
+
+* Identify **exact failure points** in architecture and code structure
+* Explain why eager loading is failing or inconsistently applied
+* Detect where session lifecycle is being mishandled
+* Highlight serialization boundaries that are unsafe
+
+---
+
+### 2. ORM & Query Optimization
+
+* Identify:
+
+  * N+1 query patterns
+  * Over-fetching vs under-fetching
+  * Misuse of `joinedload`, `selectinload`, or lazy loading
+* Recommend:
+
+  * Correct loading strategies per use-case
+  * Query restructuring where needed
+  * Safe patterns for accessing relationships after session closure
+
+---
+
+### 3. Session Management Fixes
+
+* Propose a **clear session lifecycle strategy**
+* Show where:
+
+  * Sessions are prematurely closed
+  * Objects are accessed after detachment
+* Suggest best practices:
+
+  * Request-scoped sessions
+  * DTO/serialization boundaries before session teardown
+
+---
+
+### 4. Serialization Strategy
+
+* Identify where serialization is:
+
+  * Too late (after session close)
+  * Incomplete or inconsistent
+* Propose:
+
+  * A stable DTO or mapper layer
+  * Patterns to ensure all required relationships are loaded before serialization
+
+---
+
+### 5. Caching Strategy
+
+* Identify candidates for caching (e.g., sections, categories, navigation data)
+* Recommend:
+
+  * What to cache
+  * Where to cache (service layer vs application layer)
+  * Cache invalidation strategy
+* Highlight areas where caching would significantly reduce DB load
+
+---
+
+### 6. Architectural Refactoring
+
+* Suggest improvements across:
+
+  * Domain boundaries
+  * Service/query separation
+  * Data flow between layers
+* Identify:
+
+  * Tight coupling
+  * Redundant logic
+  * Poor separation of concerns
+
+---
+
+### 7. Performance Improvements
+
+* Provide concrete suggestions to:
+
+  * Reduce DB hits
+  * Improve response time
+  * Avoid unnecessary recomputation
+* Suggest batching, preloading, or restructuring where needed
+
+---
+
+### 8. Output Format (Important)
+
+Structure your response as:
+
+1. **Critical Issues (High Priority)**
+2. **Hidden Risks (Subtle Bugs / Future Break Points)**
+3. **Performance Bottlenecks**
+4. **Recommended Fixes (Concrete, Code-Level Where Possible)**
+5. **Refactoring Plan (Step-by-step, safe to implement)**
+6. **Optional Enhancements (Caching, scalability, future-proofing)**
+
+---
+
+## Important Constraints
+
+* Do NOT give generic advice
+* Do NOT repeat textbook ORM explanations
+* Focus on **my actual architecture and code**
+* Be specific, technical, and actionable
+* When suggesting fixes, explain *why they work*
+
+---
+
+I will now provide the project files.
+Analyze them carefully before responding.
+analyze the content, item, system, interaction, recommendation related files and directories in the directories below and you could ignore the other files and directories like the ingesion dirctory in application/content and workflows etc.:
+
+
+@domains: (models.py or models/*.py, and services/query.py or services/query/*.py)
+@content_access.py
+@normalization.py
+@application
+@context
+@routes
+@relationships.py
+@context.py
+@index.html
+@content
+@commercial
+@search-results.html
+@saved-items.html
+@footer.html
+@header.html
+@hero-sliders.html
+@newsletter.html
+@grid.html
+@section.html
+@catalog
+@interactions
+@listing-page.html
+@media
+@some files you may need to ensure they exist and to understand and you may modify:
+@extensions.py
+@cache

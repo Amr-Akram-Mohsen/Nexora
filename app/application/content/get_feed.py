@@ -15,9 +15,10 @@ def get_feed_data(section_slug, active_filters, page=1):
         return None
 
     from app.domains.system.service.query import get_allowed_filters
+    from app.domains.serializers import serialize_section
 
     allowed_filters = get_allowed_filters(section)
-    pagination = get_filtered_contents(section, active_filters, allowed_filters, page=page)
+    pagination = get_filtered_contents(section.id, active_filters, allowed_filters, page=page)
     
     filter_options = {}
     if "category" in allowed_filters:
@@ -28,7 +29,7 @@ def get_feed_data(section_slug, active_filters, page=1):
         filter_options["topic"] = get_active_topics_for_section(section_slug)
 
     return {
-        "section": section,
+        "section": serialize_section(section),
         "contents": pagination.items,
         "pagination": pagination,
         "allowed_filters": allowed_filters,
