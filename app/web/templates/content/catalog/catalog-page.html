@@ -12,7 +12,7 @@
 
 {% block content %}
 
-{% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing") %}
+{% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing", domain_type=target_type) %}
 
 {# ═══════════════════════════════════════
 SLOT: sidebar

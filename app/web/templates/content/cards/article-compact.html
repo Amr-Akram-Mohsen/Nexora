@@ -8,6 +8,7 @@
     <div class="card-compact__img-wrapper">
       {{ render_image_url(article.image_url, article.title) }}
     </div>
+    {{ badge(content.object_type, attrs={'data-type': content.object_type}) }}
   </a>
 
   <div class="card-compact__content">

@@ -9,7 +9,7 @@
   </div>
 
   <div class="inline-product__info flex flex-col justify-center">
-    <div class="inline-product__badge">Featured Product</div>
+    {{ badge(item.item_type, attrs={'data-type': 'item'}) }}
     <div class="inline-product__title">{{ item.name }}</div>
     {% if item.price %}
     <div class="inline-product__price">

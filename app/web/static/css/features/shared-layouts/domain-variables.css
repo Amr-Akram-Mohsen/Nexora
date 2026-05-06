@@ -1,0 +1,16 @@
+[data-domain-type="contents"] {
+  --domain-primary-rgb: var(--brand-blue-rgb);
+  --domain-secondary-rgb: var(--brand-purple-rgb);
+}
+
+[data-domain-type="items"] {
+  --domain-primary-rgb: var(--brand-green-rgb);
+  --domain-secondary-rgb: var(--brand-teal-rgb);
+}
+
+[data-domain-type] {
+  --domain-primary: rgb(var(--domain-primary-rgb));
+  --domain-secondary: rgb(var(--domain-secondary-rgb));
+  --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
+
+}

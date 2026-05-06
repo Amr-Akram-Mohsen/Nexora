@@ -3,7 +3,7 @@
 {% from "components/ui/button.html" import button %}
 
 {% block content %}
-<section class="detail-page detail-page--{{ content.object_type }}" data-type="{{ content.object_type }}">
+<section class="detail-page" data-type="{{ content.object_type }}" data-domain-type="contents">
   <div class="container">
 
     <!-- Breadcrumbs -->
@@ -30,13 +30,29 @@
 
       <div class="detail-page__content">
         {% block base_content %}{% endblock %}
+
+        {% if content.linked_items %}
+        <div class="content-linked-products">
+          <h3 class="content-linked-products__title">Products Mentioned In This Article</h3>
+          {% for item in content.linked_items %}
+          {{ inline_product_card(item) }}
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
 
     </div>
 
     <!-- Sidebar -->
     <aside class="detail-page__sidebar">
-      {% block base_sidebar %}{% endblock %}
+      {% block base_sidebar %}
+      {% if trending_contents %}
+      {{ content_snippet(trending_contents, 'Trending') }}
+      {% endif %}
+      {% if related_contents %}
+      {{ content_snippet(related_contents, 'Related') }}
+      {% endif %}
+      {% endblock %}
     </aside>
 
     <!-- Extra -->

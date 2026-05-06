@@ -49,7 +49,7 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="detail-page__header-article flex flex-col">
+<div class="detail-page__header-content flex flex-col">
   <div class="detail-page__badges flex flex-wrap">
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
@@ -98,7 +98,7 @@
 {% endblock %}
 
 {% block base_content %}
-<div class="article-content">
+<div class="article-body">
   {% if content.linked_items %}
   {% include "partials/affiliate-disclosure.html" %}
   {% endif %}
@@ -117,15 +117,6 @@
   <p class="article-description">{{ article.description | safe }}</p>
   {% endif %}
 
-  {% if content.linked_items %}
-  <div class="article-linked-products">
-    <h3 class="article-linked-products__title">Products Mentioned In This Article</h3>
-    {% for item in content.linked_items %}
-    {{ inline_product_card(item) }}
-    {% endfor %}
-  </div>
-  {% endif %}
-
   <div class="article-source-box flex flex-col">
     <p class="source-metadata">Original source: <strong>{{ article.source_name }}</strong></p>
     <a href="{{ article.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
@@ -133,13 +124,4 @@
     </a>
   </div>
 </div>
-{% endblock %}
-
-{% block base_sidebar %}
-{% if trending_contents %}
-{{ content_snippet(trending_contents, 'Trending') }}
-{% endif %}
-{% if related_contents %}
-{{ content_snippet(related_contents, 'Related') }}
-{% endif %}
 {% endblock %}

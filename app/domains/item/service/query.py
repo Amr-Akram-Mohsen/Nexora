@@ -1,8 +1,69 @@
+from flask_sqlalchemy import pagination
 from app.core.extensions import db
 from ..models import Item, ItemVariant, Store, ItemStoreLink
 from ...system.models import Category, Brand
 from app.shared.parsing import safe_float
 from app.infrastructure import cache
+
+def serialize_item(item):
+    default_variant = item.default_variant
+
+    return {
+        # ── Core identity ─────────────────────────────
+        "id": item.id,
+        "name": item.name,
+        "slug": item.slug,
+        "type": item.item_type,
+        "card_type": item.card_type,
+
+        # ── Relations (flattened) ─────────────────────
+        "brand": {
+            "name": item.brand.name,
+            "slug": item.brand.slug
+        } if item.brand else None,
+
+        "category": {
+            "name": item.category.name,
+            "slug": item.category.slug
+        } if item.category else None,
+
+        # ── Media ─────────────────────────────────────
+        "image": item.image_url,
+
+        # ── Pricing ───────────────────────────────────
+        "price": float(item.price) if item.price is not None else None,
+        "min_price": float(item.min_price) if item.min_price is not None else None,
+        "has_variants": item.has_variants,
+
+        # ── Variant snapshot (important for UI) ───────
+        "default_variant": {
+            "id": default_variant.id,
+            "sku": getattr(default_variant, "sku", None),
+            "price": float(default_variant.price) if default_variant.price else None,
+        } if default_variant else None,
+
+        # ── Store availability (lightweight) ──────────
+        "stores": [
+            {
+                "name": link.store.name,
+                "slug": link.store.slug,
+                "price": float(link.price),
+                "currency": link.currency,
+            }
+            for link in item.store_links
+        ] if item.store_links else [],
+
+        # ── Stats ─────────────────────────────────────
+        "rating": item.rating,
+        "review_count": item.review_count,
+        "view_count": item.view_count,
+
+        # ── Metadata ──────────────────────────────────
+        "created_at": item.created_at.isoformat() if item.created_at else None,
+
+        # ── Optional lightweight attributes ───────────
+        "badges": item.pick_keys(item.searchable_attributes, ["badge", "tag"]) if item.searchable_attributes else None,
+    }
 
 def filter_items_by_country(query):
     from app.shared.request import get_country
@@ -22,10 +83,11 @@ def get_filtered_items(active_filters, page=1, per_page=24):
     Handles complex filtering, joining, and sorting for the items catalog.
     """
     query = Item.query.options(
-        db.joinedload(Item.brand),
-        db.joinedload(Item.category),
         db.selectinload(Item.images),
-        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store)
+        db.selectinload(Item.variants).selectinload(ItemVariant.store_links).selectinload(ItemStoreLink.store),
+        db.joinedload(Item.brand),
+        db.joinedload(Item.section),
+        db.joinedload(Item.category),
     )
 
     # ── Category & Brand Filters ──────────────────────────────────
@@ -71,7 +133,17 @@ def get_filtered_items(active_filters, page=1, per_page=24):
         query = query.order_by(Item.created_at.desc())
 
     # query = query.distinct(Item.id)
-    return query.paginate(page=page, per_page=per_page, error_out=False)
+    # return query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        # ✅ 🔥 SERIALIZATION LAYER (THIS IS THE FIX)
+    return {
+        "items": [serialize_item(item) for item in pagination.items],
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+    }
 
 def set_default_variant(item, variant):
     for v in item.variants:

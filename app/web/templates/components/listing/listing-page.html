@@ -1,5 +1,5 @@
-{% macro listing_page(class_name="") %}
-<section class="listing-page {{ class_name }}">
+{% macro listing_page(class_name="",domain_type="") %}
+<section class="listing-page {{ class_name }}" data-domain-type="{{ domain_type }}">
 
   {# ── Mobile filter drawer overlay ── #}
   <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
@@ -53,10 +53,10 @@
 
 <script>
   (function () {
-    const sidebar  = document.getElementById('listingSidebar');
-    const overlay  = document.getElementById('sidebarOverlay');
+    const sidebar = document.getElementById('listingSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
     const closeBtn = document.getElementById('sidebarClose');
-    const openBtn  = document.getElementById('filterToggleBtn');
+    const openBtn = document.getElementById('filterToggleBtn');
 
     function openSidebar() {
       sidebar.classList.add('is-open');
@@ -69,9 +69,9 @@
       document.body.style.overflow = '';
     }
 
-    if (openBtn)  openBtn.addEventListener('click', openSidebar);
+    if (openBtn) openBtn.addEventListener('click', openSidebar);
     if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-    if (overlay)  overlay.addEventListener('click', closeSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
   })();
 </script>
 {% endmacro %}

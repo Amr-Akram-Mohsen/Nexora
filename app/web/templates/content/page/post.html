@@ -7,7 +7,7 @@
 {% block title %}{{ post.title }} | Nexora{% endblock %}
 
 {% block description %}{{ post.preview_text }}{% endblock %}
-{% block og_type %}article{% endblock %}
+{% block og_type %}post{% endblock %}
 {% block og_image %}
 {{ url_for('static', filename='img/og-preview.jpg', _external=True) }}
 {% endblock %}
@@ -18,7 +18,7 @@
   "@context": "https://schema.org",
   "@type": "SocialMediaPosting",
   "headline": "{{ post.title }}",
-  "articleBody": "{{ post.body }}",
+  "postBody": "{{ post.body }}",
   "datePublished": "{{ content.published_at.isoformat() if content.published_at }}",
   "author": {
     "@type": "Person",
@@ -36,7 +36,6 @@
 {% block base_header %}
 <div class="detail-page__header-content flex flex-col">
   <div class="detail-page__badges flex flex-wrap">
-    {{ badge('Post', 'badge--card-type') }}
     {% if post.subreddit %}
     {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
     {% endif %}
@@ -53,7 +52,7 @@
       <div class="meta-icon-wrapper">
         <i class="far fa-user"></i>
       </div>
-      <span class="article__source">{{ post.author or 'Unknown' }}</span>
+      <span class="post__source">{{ post.author or 'Unknown' }}</span>
     </div>
 
     {% if post.subreddit %}
@@ -88,18 +87,18 @@
 {% block base_image %}{% endblock %}
 
 {% block base_content %}
-<div class="post-body article-content">
+<div class="post-body">
   {% if post.body %}
   <p>{{ post.body }}</p>
   {% endif %}
 
   {% if post.url %}
-  <div class="article-source-box flex flex-col">
+  <div class="post-source-box flex flex-col">
     <p class="source-metadata">
       Original post on: <strong>r/{{ post.subreddit }}</strong>
     </p>
-    <a href="{{ post.url }}" class="article__view-link" target="_blank" rel="noopener nofollow">
-      {{ button(text="View on Reddit", class="article__view-btn") }}
+    <a href="{{ post.url }}" class="post__view-link" target="_blank" rel="noopener nofollow">
+      {{ button(text="View on Reddit", class="post__view-btn") }}
     </a>
   </div>
   {% endif %}
@@ -107,10 +106,4 @@
 {% endblock %}
 
 {% block base_sidebar %}
-{% if trending_contents %}
-{{ content_snippet(trending_contents, 'Trending') }}
-{% endif %}
-{% if related_contents %}
-{{ content_snippet(related_contents, 'Related') }}
-{% endif %}
 {% endblock %}

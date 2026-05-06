@@ -45,9 +45,10 @@
 
 .sort-select:focus {
   outline: none;
-  border-color: rgb(var(--brand-blue-rgb));
-  box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), 0.1);
+  border-color: var(--domain-primary);
+  box-shadow: 0 0 0 3px rgba(var(--domain-primary-rgb), var(--alpha-soft));
 }
+
 
 .sort-select--compact {
   min-width: 120px;

@@ -1,5 +1,4 @@
-{% macro badge(text="", class="", variant="primary") %}
-<span class="badge variant--{{ variant }} badge--{{ variant }} {{ class }} inline-flex items-center justify-center">{{
-  text }}
-</span>
+{% macro badge(text="", class="", variant="primary", attrs={}) %}
+<span class="badge variant--{{ variant }} badge--{{ variant }} {{ class }} inline-flex items-center justify-center" {%
+  for key, value in attrs.items() %} {{ key }}={{"{}".format(value) }} {%- endfor %}>{{ text }}</span>
 {% endmacro %}

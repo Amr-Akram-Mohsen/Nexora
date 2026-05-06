@@ -1,0 +1,72 @@
+/* --- Comparisons --- */
+
+.compare-table-wrapper {
+  overflow-x: auto;
+  margin-top: 2rem;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-table thead th {
+  background: var(--background);
+  vertical-align: top;
+}
+
+.compare-img-wrapper {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1rem;
+}
+
+.compare-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.compare-item-name {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  margin-bottom: 0.25rem;
+  color: var(--foreground);
+}
+
+.compare-item-brand {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+}
+
+.compare-item-price {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.compare-page__items {
+  display: flex;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .compare-page__items {
+    flex-direction: column;
+  }
+}

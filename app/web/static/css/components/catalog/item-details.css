@@ -47,10 +47,9 @@
   width: 4px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: linear-gradient(to bottom,
-      var(--brand-blue),
-      var(--brand-purple));
+  background: var(--gradient-primary);
 }
+
 
 .item-details-dialog__body {
   overflow-y: auto;

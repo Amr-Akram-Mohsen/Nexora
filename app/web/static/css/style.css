@@ -3,11 +3,6 @@
  * Modular Architecture - Cascade Verified
  */
 
-/* 0. External / Reset Foundation */
-/* @import "all.min.css";
-@import "normalize.css";
-@import "fonts.css"; */
-
 /* 1. Base - Variables & Fundamentals */
 @import "base/variables.css";
 @import "base/reset.css";
@@ -21,47 +16,53 @@
 @import "layout/grid.css";
 
 /* 3. Components - Reusable UI Elements */
-@import "components/buttons.css";
+@import "components/ui/buttons.css";
+@import "components/ui/forms.css";
+@import "components/ui/badges.css";
+@import "components/ui/empty-state.css";
+
 @import "components/cards.css";
-@import "components/forms.css";
-@import "components/badges.css";
 @import "components/pagination.css";
 @import "components/slider.css";
+@import "components/alerts.css";
+@import "components/newsletter.css";
+@import "components/skeleton.css";
+
 
 /* Catalog Components */
 @import "components/catalog/filters.css";
 @import "components/catalog/sort.css";
+@import "components/catalog/item-details.css";
+
 
 /* Content Components */
-@import "components/content/gallery.css";
-@import "components/content/comments.css";
-@import "components/content/interaction.css";
-@import "components/content/dialogs.css";
+@import "components/media/item-gallery.css";
+@import "components/interactions/comments.css";
+@import "components/interactions/interaction.css";
 
-@import "components/alerts.css";
-@import "components/newsletter.css";
-@import "components/empty-state.css";
-@import "components/skeleton.css";
 
 /* 4. Features - Domain-Specific Logic */
-@import "features/auth.css";
+@import "features/page/auth.css";
+
+@import "features/shared-layouts/domain-variables.css";
 
 /* Catalog Features */
-@import "features/catalog/catalog.css";
-@import "features/catalog/sidebar.css";
+@import "features/shared-layouts/listing.css";
+@import "features/shared-layouts/detail.css";
+@import "features/shared-layouts/sidebar.css";
 
 /* Content Features */
-@import "features/content/content.css";
-@import "features/content/articles.css";
-@import "features/content/products.css";
-@import "features/content/videos.css";
-@import "features/content/posts.css";
+@import "features/content/content-elements.css";
+@import "features/commercial/item-elements.css";
+
+@import "features/content/search.css";
+@import "features/commercial/compare.css";
 
 /* Other Features */
-@import "features/pages.css";
-@import "features/contact.css";
-@import "features/profile.css";
-@import "features/affiliate.css";
+@import "features/page/pages.css";
+@import "features/page/contact.css";
+@import "features/page/profile.css";
+@import "features/page/affiliate.css";
 
 
 /* 5. Utilities - Global Helpers */

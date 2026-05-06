@@ -42,7 +42,7 @@ def deals():
 
     return render_template(
         "commercial/catalog/catalog-page.html",
-        target_type="products",
+        target_type="items",
         allowed_filters=["category", "brand", "store", "type"],
         active_filters=active_filters,
         **data

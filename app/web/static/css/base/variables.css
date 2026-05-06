@@ -15,22 +15,25 @@
   --brand-teal-dark: #0f766e;
   --brand-red: #ef4444;
   --brand-orange: #f59e0b;
+
   --alpha-subtle: 0.05;
   --alpha-soft: 0.1;
   --alpha-soft-hover: 0.18;
   --alpha-strong: 0.3;
-  /* Semantic content contexts */
-  --context-article-rgb: var(--brand-blue-rgb);
-  --context-article-secondary-rgb: var(--brand-purple-rgb);
-  --context-item-rgb: var(--brand-green-rgb);
-  --context-item-secondary-rgb: var(--brand-teal-rgb);
+
+  /* Domain Tokens (Thematic Interface) */
+  --domain-primary-rgb: var(--brand-blue-rgb);
+  --domain-secondary-rgb: var(--brand-purple-rgb);
+  --domain-primary: rgb(var(--domain-primary-rgb));
+  --domain-secondary: rgb(var(--domain-secondary-rgb));
+
   /* Overlays */
   --overlay-dark-40: rgba(var(--black-rgb), 0.4);
   --overlay-dark-50: rgba(var(--black-rgb), 0.5);
   --overlay-dark-60: rgba(var(--black-rgb), 0.6);
   --overlay-dark-70: rgba(var(--black-rgb), 0.7);
   /* Premium Gradients */
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
   --gradient-success: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
   --gradient-surface: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
 

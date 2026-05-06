@@ -267,31 +267,31 @@
 
 /* --- Card Modifiers --- */
 
-.card--article {
+[data-type="article"] {
   --card-color-rgb: var(--brand-blue-rgb);
   --card-aspect-ratio: 4 / 3;
   --card-overlay-gradient: var(--overlay-dark-60);
 }
 
-.card--item {
+[data-type="item"] {
   --card-color-rgb: var(--brand-green-rgb);
   --card-aspect-ratio: 1 / 1;
   --card-overlay-gradient: var(--overlay-dark-40);
 }
 
-.card--item .card__img-wrapper {
+[data-type="item"] .card__img-wrapper {
   background: linear-gradient(to bottom right,
       #f3f4f6,
       #e5e7eb);
 }
 
-.card--article .card__meta-bottom {
+[data-type="article"] .card__meta-bottom {
   gap: 1rem;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-.card--item .card__meta-bottom {
+[data-type="item"] .card__meta-bottom {
   gap: .5rem;
   margin-bottom: 1rem;
 }
@@ -340,25 +340,25 @@
   color: rgb(var(--brand-blue-rgb));
 }
 
-.card--video {
+[data-type="video"] {
   --card-color-rgb: var(--brand-purple-rgb);
   --card-aspect-ratio: 16 / 9;
   --card-overlay-gradient: var(--overlay-dark-50);
 }
 
-.card--post {
+[data-type="post"] {
   --card-color-rgb: var(--brand-teal-rgb);
   --card-overlay-gradient: var(--overlay-dark-40);
 }
 
-.card--post .card__content {
+[data-type="post"] .card__content {
   padding: 1.5rem;
   min-height: 200px;
   display: flex;
   flex-direction: column;
 }
 
-.card--post::before {
+[data-type="post"]::before {
   content: '';
   position: absolute;
   top: 0;
@@ -369,11 +369,11 @@
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
-.card--video:hover .card__play-btn {
+[data-type="video"]:hover .card__play-btn {
   opacity: 1;
 }
 
-.card--video:hover .card__play-btn i {
+[data-type="video"]:hover .card__play-btn i {
   transform: scale(1.1);
   box-shadow: 0 6px 28px rgba(var(--brand-purple-rgb), 0.6);
 }
@@ -385,7 +385,7 @@ body.dark-mode .card:hover {
   /* Subtle premium lift on dark mode */
 }
 
-body.dark-mode .card--item .card__img-wrapper {
+body.dark-mode [data-type="item"] .card__img-wrapper {
   background: linear-gradient(to bottom right,
       #1f2937,
       #111827);
@@ -523,6 +523,3 @@ body.dark-mode .card--item .card__img-wrapper {
   border-radius: 100%;
   background-color: rgba(var(--meta-color), 0.1);
 }
-
-
-

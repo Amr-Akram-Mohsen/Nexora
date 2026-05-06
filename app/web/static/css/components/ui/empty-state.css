@@ -10,11 +10,11 @@
   position: relative;
   width: 100px;
   height: 100px;
-  background: rgba(var(--brand-blue-rgb), 0.05);
+  background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   border-radius: 30px;
   margin-inline: auto;
   margin-bottom: 2rem;
-  color: rgb(var(--brand-blue-rgb));
+  color: var(--domain-primary);
   font-size: 2.5rem;
   display: flex;
   align-items: center;

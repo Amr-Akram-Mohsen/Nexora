@@ -1,0 +1,115 @@
+/* --- Article-Specific Elements (Content Domain) --- */
+
+.article-body {
+  font-size: var(--text-base);
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  margin-top: 1rem;
+}
+
+.article-full-text,
+.article-content {
+  max-width: 75ch;
+  margin: 0 auto;
+}
+
+.article-full-text {
+  margin-bottom: 2rem;
+  overflow-wrap: break-word;
+  color: var(--foreground);
+}
+
+.article-full-text p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  font-size: 1.125rem;
+}
+
+.article-full-text img,
+.article-full-text iframe {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+}
+
+.article-source-box {
+  background-color: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+  border: 1px solid rgba(var(--domain-primary-rgb), var(--alpha-soft));
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  margin-top: 3rem;
+  box-shadow: var(--shadow-sm);
+  align-items: center;
+  text-align: center;
+}
+
+.article-source-box .source-metadata {
+  margin-bottom: 0;
+  color: var(--muted-foreground);
+}
+
+.article-description {
+  margin-bottom: 2rem;
+}
+
+
+.article__view-btn {
+  --variant-bg: transparent;
+  --variant-border: rgba(var(--domain-primary-rgb), var(--alpha-strong));
+  --variant-color: var(--domain-primary);
+  --variant-hover-bg: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+  box-shadow: none;
+}
+
+
+/* --- Videos --- */
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--muted);
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.video-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.video-description {
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.video-description p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Posts */
+.post-body {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid rgb(var(--brand-teal-rgb));
+  border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.post-body p {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
