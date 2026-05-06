@@ -1,0 +1,108 @@
+/* 
+base/variables.css:9:  --brand-blue: rgb(var(--brand-blue-rgb));
+base/variables.css:11:  --brand-purple: rgb(var(--brand-purple-rgb));
+base/variables.css:12:  --brand-green: rgb(var(--brand-green-rgb));
+base/variables.css:14:  --brand-teal: rgb(var(--brand-teal-rgb));
+base/variables.css:25:  --domain-primary-rgb: var(--brand-blue-rgb);
+base/variables.css:26:  --domain-secondary-rgb: var(--brand-purple-rgb);
+base/variables.css:44:  --shadow-premium: 0 20px 25px -5px rgba(var(--brand-blue-rgb), 0.1), 0 8px 10px -6px rgba(var(--brand-blue-rgb), 0.1);
+components/alerts.css:34:  background: linear-gradient(135deg, var(--brand-red), #dc2626);
+components/alerts.css:39:  background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark));
+components/alerts.css:44:  background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+components/alerts.css:45:  border-left-color: var(--brand-blue-dark);
+components/cards.css:98:  color: var(--brand-orange);
+components/cards.css:117:  background: var(--brand-red);
+components/cards.css:259:  background: rgba(var(--brand-purple-rgb), 0.85);
+components/cards.css:264:  box-shadow: 0 4px 20px rgba(var(--brand-purple-rgb), 0.5);
+components/cards.css:271:  --card-color-rgb: var(--brand-blue-rgb);
+components/cards.css:277:  --card-color-rgb: var(--brand-green-rgb);
+components/cards.css:300:  background: var(--brand-purple);
+components/cards.css:304:  background: var(--brand-blue);
+components/cards.css:308:  background: var(--brand-green);
+components/cards.css:328:  border-color: rgba(var(--brand-blue-rgb), 0.25);
+components/cards.css:340:  color: rgb(var(--brand-blue-rgb));
+components/cards.css:344:  --card-color-rgb: var(--brand-purple-rgb);
+components/cards.css:350:  --card-color-rgb: var(--brand-teal-rgb);
+components/cards.css:368:  background: linear-gradient(90deg, rgb(var(--brand-teal-rgb)), rgb(var(--brand-green-rgb)));
+components/cards.css:378:  box-shadow: 0 6px 28px rgba(var(--brand-purple-rgb), 0.6);
+components/cards.css:506:  --meta-color: var(--brand-blue-rgb);
+components/pagination.css:8:  border-color: rgba(var(--brand-blue-rgb), 0.3);
+components/pagination.css:9:  color: rgb(var(--brand-blue-rgb));
+components/pagination.css:28:  background: rgb(var(--brand-blue-rgb));
+components/pagination.css:32:  box-shadow: 0 4px 10px rgba(var(--brand-blue-rgb), 0.3);
+components/pagination.css:46:  background: rgb(var(--brand-green-rgb));
+components/pagination.css:47:  box-shadow: 0 4px 10px rgba(var(--brand-green-rgb), 0.3);
+components/ui/badges.css:16:  background: rgba(var(--brand-purple-rgb), var(--badge-opacity));
+components/ui/badges.css:39:  --card-badge-rgb: var(--brand-blue-rgb);
+components/ui/badges.css:43:  --card-badge-rgb: var(--brand-purple-rgb);
+components/ui/badges.css:47:  --card-badge-rgb: var(--brand-teal-rgb);
+components/ui/badges.css:56:  --card-badge-rgb: var(--brand-teal-rgb);
+components/ui/empty-state.css:27:  border: 2px solid rgba(var(--brand-blue-rgb), 0.1);
+components/ui/empty-state.css:47:  box-shadow: 0 10px 20px -5px rgba(var(--brand-blue-rgb), 0.3);
+components/ui/forms.css:2:  background: rgb(var(--brand-green-rgb));
+components/ui/forms.css:3:  border-color: rgb(var(--brand-green-rgb));
+components/ui/forms.css:4:  box-shadow: 0 2px 6px rgba(var(--brand-green-rgb), 0.35);
+components/ui/forms.css:107:  border-color: rgba(var(--brand-blue-rgb), 0.5);
+components/ui/forms.css:108:  box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), 0.08);
+components/ui/forms.css:164:  background: rgb(var(--brand-blue-rgb));
+components/ui/forms.css:165:  border-color: rgb(var(--brand-blue-rgb));
+components/ui/forms.css:166:  box-shadow: 0 2px 6px rgba(var(--brand-blue-rgb), 0.35);
+features/commercial/item-elements.css:316:  background: var(--brand-red);
+features/commercial/item-elements.css:321:  background: var(--brand-purple);
+features/content/content-elements.css:106:  border-left: 4px solid rgb(var(--brand-teal-rgb));
+features/page/affiliate.css:36:  border-color: var(--brand-blue);
+features/page/auth.css:63:  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+features/page/auth.css:64:    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+features/page/auth.css:98:  color: var(--brand-blue);
+features/page/profile.css:3:  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
+features/page/profile.css:4:    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+features/page/profile.css:18:  box-shadow: 0 10px 30px -5px rgba(var(--brand-blue-rgb), 0.5);
+features/shared-layouts/domain-variables.css:2:  --domain-primary-rgb: var(--brand-blue-rgb);
+features/shared-layouts/domain-variables.css:3:  --domain-secondary-rgb: var(--brand-purple-rgb);
+features/shared-layouts/domain-variables.css:7:  --domain-primary-rgb: var(--brand-green-rgb);
+features/shared-layouts/domain-variables.css:8:  --domain-secondary-rgb: var(--brand-teal-rgb);
+features/shared-layouts/sidebar.css:237:  background: linear-gradient(90deg, rgb(var(--brand-green-rgb)), rgb(var(--brand-teal-rgb)));
+features/shared-layouts/sidebar.css:242:      rgba(var(--brand-blue-rgb), 0.08),
+features/shared-layouts/sidebar.css:243:      rgba(var(--brand-purple-rgb), 0.08));
+features/shared-layouts/sidebar.css:244:  border: 1px solid rgba(var(--brand-blue-rgb), 0.15);
+features/shared-layouts/sidebar.css:249:      rgba(var(--brand-green-rgb), 0.08),
+features/shared-layouts/sidebar.css:250:      rgba(var(--brand-teal-rgb), 0.08));
+features/shared-layouts/sidebar.css:251:  border: 1px solid rgba(var(--brand-green-rgb), 0.15);
+features/shared-layouts/sidebar.css:255:  color: rgb(var(--brand-blue-rgb));
+features/shared-layouts/sidebar.css:259:  color: rgb(var(--brand-green-rgb));
+features/shared-layouts/sidebar.css:263:  color: rgb(var(--brand-blue-rgb));
+features/shared-layouts/sidebar.css:267:  color: rgb(var(--brand-green-rgb));
+layout/footer.css:48:      var(--brand-blue),
+layout/footer.css:49:      var(--brand-purple));
+layout/footer.css:58:      var(--brand-blue),
+layout/footer.css:59:      var(--brand-purple));
+layout/footer.css:89:  color: var(--brand-red);
+layout/footer.css:121:      rgba(var(--brand-blue-rgb), .1),
+layout/footer.css:122:      rgba(var(--brand-purple-rgb), .1));
+layout/footer.css:143:      var(--brand-blue),
+layout/footer.css:144:      var(--brand-purple));
+layout/footer.css:156:  background: linear-gradient(var(--brand-blue), var(--brand-purple));
+layout/footer.css:160:  background: linear-gradient(var(--brand-green), var(--brand-teal));
+layout/footer.css:164:  background: linear-gradient(var(--brand-purple), var(--brand-blue));
+layout/footer.css:168:  color: var(--brand-blue);
+layout/footer.css:172:  color: var(--brand-green);
+layout/footer.css:176:  color: var(--brand-purple);
+layout/grid.css:149:  color: rgb(var(--brand-blue-rgb));
+layout/header.css:32:      var(--brand-blue),
+layout/header.css:33:      var(--brand-purple));
+layout/header.css:50:      var(--brand-blue),
+layout/header.css:51:      var(--brand-purple));
+layout/header.css:73:      rgba(var(--brand-blue-rgb), .1),
+layout/header.css:74:      rgba(var(--brand-purple-rgb), .1));
+layout/header.css:93:  color: var(--brand-orange);
+layout/header.css:145:  background: rgba(var(--brand-purple-rgb), .1);
+layout/header.css:146:  color: var(--brand-purple);
+layout/header.css:200:  border: 1px solid rgba(var(--brand-blue-rgb), .3);
+layout/header.css:204:  --focus-border-color: var(--brand-blue);
+layout/header.css:213:  color: var(--brand-blue);
+layout/header.css:233:  background: rgba(var(--brand-purple-rgb), .1);
+layout/header.css:234:  color: var(--brand-purple);
+layout/header.css:270:  border-left-color: var(--brand-blue);
+utilities/helpers.css:71:  background-color: var(--primary, var(--brand-blue-dark));
+utilities/helpers.css:125:  color: var(--brand-red);
+*/

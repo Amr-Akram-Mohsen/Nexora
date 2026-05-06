@@ -13,4 +13,16 @@
   --domain-secondary: rgb(var(--domain-secondary-rgb));
   --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
 
+  /* Content types (derived from domain) */
+  --content-article: var(--domain-primary);
+  --content-video: var(--domain-secondary);
+  --content-post: color-mix(in srgb, var(--domain-primary) 70%, #0ea5a4 30%);
+
+  /* Commerce types */
+  --commerce-perfume: color-mix(in srgb, var(--domain-primary) 60%, #f472b6 40%);
+  --commerce-electronics: color-mix(in srgb, var(--domain-primary) 70%, #3b82f6 30%);
+  --commerce-accessories: color-mix(in srgb, var(--domain-primary) 80%, #f59e0b 20%);
+
+
+
 }
