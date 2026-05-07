@@ -16,28 +16,34 @@ from app.application.content.ingestion.services import (
     ClassificationService
 )
 from app.core.extensions import db
+from app.shared.constants.core import FetchLimits
 
 
-def run_newsapi_fetch(limit: int | None = None, should_scrape: bool = False):
+def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI, should_scrape: bool = False):
     """
     Fetch from NewsAPI (tech/fragrance/fashion).
 
+    Processes a controlled batch of queries per run (default: FetchLimits.NEWSAPI).
+    The taxonomy-group cursor in the workflow rotates groups across executions so
+    coverage spreads without exhausting the daily API quota at once.
+
     Args:
         limit:        Cap the number of queries processed per run.
+                      Pass ``None`` to disable the cap (full run).
         should_scrape: When True, triggers full article scraping after ingestion.
                        Default False — stores metadata only.
     """
     if not current_app.config.get("NEWS_API_KEY"):
-        logger.warning("[NewsAPI] Key missing")
+        logger.warning("[FETCH][newsapi] skipped  reason=key_missing")
         return {"status": "skipped", "reason": "key_missing"}
 
     try:
         from app.integrations.content.newsapi import fetch_newsapi_query
 
-        logger.info("[Runner] Starting NewsAPI  should_scrape=%s", should_scrape)
+        logger.info("[FETCH][newsapi] run started  limit=%s  should_scrape=%s", limit, should_scrape)
         count = run_orchestrated_ingestion(
             session=db.session,
-            source_name="NewsAPI",
+            source_name="newsapi",
             object_type="article",
             fetcher_func=fetch_newsapi_query,
             quota_service=NewsApiQuotaService(),
@@ -49,41 +55,44 @@ def run_newsapi_fetch(limit: int | None = None, should_scrape: bool = False):
             limit=limit,
             cooldown_hours=6,
         )
-        logger.info("[Runner] NewsAPI done  stored=%d", count)
+        logger.info("[FETCH][newsapi] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
         from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
         if isinstance(e, PipelineFatalError):
-            logger.critical("[Runner] NewsAPI ABORTED: %s", str(e))
+            logger.critical("[FETCH][newsapi] aborted  error=%s", str(e))
             return {"status": "fatal_error", "error": str(e)}
         if isinstance(e, PipelineQuotaExceededError):
-            logger.warning("[Runner] NewsAPI quota exceeded: %s", str(e))
+            logger.warning("[FETCH][newsapi] quota_exceeded  error=%s", str(e))
             return {"status": "quota_exceeded", "error": str(e)}
-        logger.exception("[Runner] NewsAPI fetch failed")
+        logger.exception("[FETCH][newsapi] unexpected error")
         return {"status": "error", "error": str(e)}
 
 
-def run_gnews_fetch(limit: int | None = None, should_scrape: bool = False):
+def run_gnews_fetch(limit: int | None = FetchLimits.GNEWS, should_scrape: bool = False):
     """
     Fetch from GNews (regional/global).
 
+    Processes a controlled batch of queries per run (default: FetchLimits.GNEWS).
+
     Args:
         limit:        Cap the number of queries processed per run.
+                      Pass ``None`` to disable the cap (full run).
         should_scrape: When True, triggers full article scraping after ingestion.
                        Default False — stores metadata only.
     """
     if not current_app.config.get("GNEWS_API_KEY"):
-        logger.warning("[GNews] Key missing")
+        logger.warning("[FETCH][gnews] skipped  reason=key_missing")
         return {"status": "skipped", "reason": "key_missing"}
 
     try:
         from app.integrations.content.gnews import fetch_gnews_query
 
-        logger.info("[Runner] Starting GNews  should_scrape=%s", should_scrape)
+        logger.info("[FETCH][gnews] run started  limit=%s  should_scrape=%s", limit, should_scrape)
         count = run_orchestrated_ingestion(
             session=db.session,
-            source_name="GNews",
+            source_name="gnews",
             object_type="article",
             fetcher_func=fetch_gnews_query,
             quota_service=GNewsQuotaService(),
@@ -95,27 +104,31 @@ def run_gnews_fetch(limit: int | None = None, should_scrape: bool = False):
             limit=limit,
             cooldown_hours=24,
         )
-        logger.info("[Runner] GNews done  stored=%d", count)
+        logger.info("[FETCH][gnews] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
         from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
         if isinstance(e, PipelineFatalError):
-            logger.critical("[Runner] GNews ABORTED: %s", str(e))
+            logger.critical("[FETCH][gnews] aborted  error=%s", str(e))
             return {"status": "fatal_error", "error": str(e)}
         if isinstance(e, PipelineQuotaExceededError):
-            logger.warning("[Runner] GNews quota exceeded: %s", str(e))
+            logger.warning("[FETCH][gnews] quota_exceeded  error=%s", str(e))
             return {"status": "quota_exceeded", "error": str(e)}
-        logger.exception("[Runner] GNews fetch failed")
+        logger.exception("[FETCH][gnews] unexpected error")
         return {"status": "error", "error": str(e)}
 
 
-def run_rss_fetch(limit: int | None = None, should_scrape: bool = False):
+def run_rss_fetch(limit: int | None = FetchLimits.RSS, should_scrape: bool = False):
     """
     Fetch from configured RSS feeds.
 
+    Processes feeds in incremental batches (default: FetchLimits.RSS feeds per run).
+    Progress is logged after each feed so monitoring is continuous.
+
     Args:
         limit:        Cap the number of feeds processed per run.
+                      Pass ``None`` to process all feeds in one run.
         should_scrape: When True, triggers full article scraping after ingestion.
                        Default False — stores metadata only.
     """
@@ -132,10 +145,13 @@ def run_rss_fetch(limit: int | None = None, should_scrape: bool = False):
                         "intent": "News" if section == "news" else "Review",
                     })
 
-        logger.info("[Runner] Starting RSS feeds  should_scrape=%s", should_scrape)
+        logger.info(
+            "[FETCH][rss] run started  feeds_total=%d  limit=%s  should_scrape=%s",
+            len(flat_queries), limit, should_scrape,
+        )
         count = run_orchestrated_ingestion(
             session=db.session,
-            source_name="RSS",
+            source_name="rss",
             object_type="article",
             fetcher_func=fetch_rss_query,
             quota_service=GenericQuotaService(),
@@ -148,11 +164,11 @@ def run_rss_fetch(limit: int | None = None, should_scrape: bool = False):
             cooldown_hours=4,
             manual_queries=flat_queries,
         )
-        logger.info("[Runner] RSS done  stored=%d", count)
+        logger.info("[FETCH][rss] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
-        logger.exception("[Runner] RSS fetch failed")
+        logger.exception("[FETCH][rss] unexpected error")
         return {"status": "error", "error": str(e)}
 
 

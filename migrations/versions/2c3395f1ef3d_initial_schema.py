@@ -1,8 +1,8 @@
-"""init
+"""initial schema
 
-Revision ID: a352d38fb37d
+Revision ID: 2c3395f1ef3d
 Revises: 
-Create Date: 2026-04-28 18:22:19.212457
+Create Date: 2026-05-07 22:05:33.589092
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a352d38fb37d'
+revision = '2c3395f1ef3d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,12 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=300), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('content_text', sa.Text(), nullable=True),
+    sa.Column('content_html', sa.Text(), nullable=True),
+    sa.Column('word_count', sa.Integer(), nullable=True),
+    sa.Column('quality_score', sa.Float(), nullable=True),
+    sa.Column('is_content_scraped', sa.Boolean(), nullable=True),
+    sa.Column('content_source', sa.String(length=50), nullable=True),
     sa.Column('body', sa.Text(), nullable=True),
     sa.Column('image_url', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -235,7 +241,8 @@ def upgrade():
     sa.Column('url', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
     sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
-    sa.PrimaryKeyConstraint('article_id', 'source_id')
+    sa.PrimaryKeyConstraint('article_id', 'source_id'),
+    sa.UniqueConstraint('url')
     )
     with op.batch_alter_table('article_sources', schema=None) as batch_op:
         batch_op.create_index('ix_article_sources_article', ['article_id'], unique=False)
@@ -308,9 +315,9 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_contents_object_type'), ['object_type'], unique=False)
         batch_op.create_index('ix_contents_price_tier_id', ['price_tier_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_contents_published_at'), ['published_at'], unique=False)
-        batch_op.create_index('ix_contents_review_count', ['review_count'], unique=False)
+        batch_op.create_index(batch_op.f('ix_contents_review_count'), ['review_count'], unique=False)
         batch_op.create_index('ix_contents_review_score', ['review_score'], unique=False)
-        batch_op.create_index(batch_op.f('ix_contents_score'), ['score'], unique=False)
+        batch_op.create_index('ix_contents_score', ['score'], unique=False)
         batch_op.create_index('ix_contents_section_id', ['section_id'], unique=False)
         batch_op.create_index('ix_contents_section_published_at', ['section_id', 'published_at'], unique=False)
         batch_op.create_index('ix_contents_view_count', ['view_count'], unique=False)
@@ -649,9 +656,9 @@ def downgrade():
         batch_op.drop_index('ix_contents_view_count')
         batch_op.drop_index('ix_contents_section_published_at')
         batch_op.drop_index('ix_contents_section_id')
-        batch_op.drop_index(batch_op.f('ix_contents_score'))
+        batch_op.drop_index('ix_contents_score')
         batch_op.drop_index('ix_contents_review_score')
-        batch_op.drop_index('ix_contents_review_count')
+        batch_op.drop_index(batch_op.f('ix_contents_review_count'))
         batch_op.drop_index(batch_op.f('ix_contents_published_at'))
         batch_op.drop_index('ix_contents_price_tier_id')
         batch_op.drop_index(batch_op.f('ix_contents_object_type'))

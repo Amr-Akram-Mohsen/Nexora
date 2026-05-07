@@ -8,23 +8,32 @@ from app.application.content.ingestion.services import (
     DiscoveryService, EnrichmentService, GenericQuotaService, CooldownService,
     ClassificationService
 )
+from app.shared.constants.core import FetchLimits
 
 logger = logging.getLogger(__name__)
 
 
-def run_reddit_fetch(limit: int | None = None):
-    """Fetch community posts from Reddit."""
+def run_reddit_fetch(limit: int | None = FetchLimits.REDDIT):
+    """
+    Fetch community posts from Reddit.
+
+    Processes a controlled batch per run (default: FetchLimits.REDDIT queries).
+    The taxonomy-group cursor rotates groups across successive runs.
+
+    Args:
+        limit: Max queries per run.  Pass ``None`` for unlimited.
+    """
     if not current_app.config.get("REDDIT_CLIENT_ID"):
-        logger.warning("[Reddit] Keys missing")
+        logger.warning("[FETCH][reddit] skipped  reason=keys_missing")
         return {"status": "skipped", "reason": "keys_missing"}
 
     try:
         from app.integrations.social.reddit import fetch_reddit_query
-        
-        logger.info("[Runner] Starting Reddit...")
+
+        logger.info("[FETCH][reddit] run started  limit=%s", limit)
         count = run_orchestrated_ingestion(
             session=db.session,
-            source_name="Reddit",
+            source_name="reddit",
             object_type="post",
             fetcher_func=fetch_reddit_query,
             quota_service=GenericQuotaService(),
@@ -34,18 +43,18 @@ def run_reddit_fetch(limit: int | None = None):
             classification_service=ClassificationService(),
             source_filter="reddit",
             limit=limit,
-            cooldown_hours=24
+            cooldown_hours=24,
         )
-        logger.info(f"[Runner] Reddit success — {count} stored")
+        logger.info("[FETCH][reddit] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
         from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
         if isinstance(e, PipelineFatalError):
-            logger.critical("[Runner] Reddit fetch ABORTED: %s", str(e))
+            logger.critical("[FETCH][reddit] aborted  error=%s", str(e))
             return {"status": "fatal_error", "error": str(e)}
         if isinstance(e, PipelineQuotaExceededError):
-            logger.warning("[Runner] Reddit quota exceeded: %s", str(e))
+            logger.warning("[FETCH][reddit] quota_exceeded  error=%s", str(e))
             return {"status": "quota_exceeded", "error": str(e)}
-        logger.exception("[Runner] Reddit fetch failed")
+        logger.exception("[FETCH][reddit] unexpected error")
         return {"status": "error", "error": str(e)}

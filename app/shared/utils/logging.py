@@ -102,3 +102,51 @@ def log_route_error(logger: logging.Logger, route: str, error: Exception, *, exc
         str(error),
         exc_info=exc_info,
     )
+
+
+# ── Fetch-progress helpers ────────────────────────────────────────────────────
+
+def log_fetch_progress(
+    logger: logging.Logger,
+    source: str,
+    *,
+    query: str,
+    completed: int,
+    total: int,
+    stored: int,
+    group: str = "",
+) -> None:
+    """
+    Emit a single-line progress update after each query completes.
+
+    Example output::
+
+        [FETCH][newsapi] progress  query="AI news"  completed=3/7  stored=5  group=electronics
+    """
+    group_str = f"  group={group}" if group else ""
+    logger.info(
+        "[FETCH][%s] progress  query=\"%s\"  completed=%d/%d  stored=%d%s",
+        source, query, completed, total, stored, group_str,
+    )
+
+
+def log_fetch_query_start(logger: logging.Logger, source: str, *, query: str, group: str = "") -> None:
+    """Log the beginning of a single query within a batch run."""
+    group_str = f"  group={group}" if group else ""
+    logger.info("[FETCH][%s] start  query=\"%s\"%s", source, query, group_str)
+
+
+def log_fetch_query_error(
+    logger: logging.Logger,
+    source: str,
+    *,
+    query: str,
+    error: Exception,
+    group: str = "",
+) -> None:
+    """Log a per-query failure without stopping the run."""
+    group_str = f"  group={group}" if group else ""
+    logger.warning(
+        "[FETCH][%s] error  query=\"%s\"  type=%s  message=%s%s",
+        source, query, type(error).__name__, str(error), group_str,
+    )
