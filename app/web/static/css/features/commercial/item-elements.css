@@ -58,7 +58,7 @@
   border-radius: 0.75rem;
   padding: 1rem;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 20px rgba(var(--black-rgb), 0.08);
+  box-shadow: 0 10px 20px rgba(var(--black-rgb), var(--alpha-muted));
 }
 
 .item-details-card__title {
@@ -84,7 +84,7 @@
   padding: 1rem;
   border-radius: var(--radius-md);
   background: linear-gradient(to right,
-      rgba(var(--muted-rgb), 0.5),
+      rgba(var(--muted-rgb), var(--alpha-bold)),
       transparent);
   border: 1px solid transparent;
   transition: all 0.2s ease;
@@ -171,7 +171,7 @@
   border-radius: 0.75rem;
   padding: 2rem;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 20px rgba(var(--black-rgb), 0.08);
+  box-shadow: 0 10px 20px rgba(var(--black-rgb), var(--alpha-muted));
 }
 
 .item-buy-links__title {
@@ -209,8 +209,8 @@
 
 .item-buy-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(var(--domain-primary-rgb), 0.35);
-  background-color: rgba(var(--domain-primary-rgb), 0.95);
+  box-shadow: 0 6px 20px rgba(var(--domain-primary-rgb), var(--alpha-accent));
+  background-color: rgba(var(--domain-primary-rgb), var(--alpha-max));
   color: #fff;
 }
 
@@ -370,6 +370,6 @@
 
 .item-details-dialog__open:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(var(--domain-primary-rgb), 0.35);
-  background-color: rgba(var(--domain-primary-rgb), 0.95);
+  box-shadow: 0 6px 20px rgba(var(--domain-primary-rgb), var(--alpha-accent));
+  background-color: rgba(var(--domain-primary-rgb), var(--alpha-max));
 }

@@ -346,7 +346,9 @@ def _fetch_rendered(url: str) -> str | None:
             browser.close()
             return result
     except Exception as e:
-        logger.warning("[Extractor] Playwright failed for %s: %s", url, e)
+        # Collapse the (potentially multi-line) exception message to a single log line
+        short_msg = str(e).split("\n")[0]
+        logger.warning("[SCRAPE] playwright_failed  url=%s  reason=%s", url, short_msg)
         return None
 
 

@@ -12,7 +12,10 @@ from app.application.interaction.get_comments import get_comments_html
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items, record_view
 from app.domains.content.service import get_content_by_id
 from app.domains.item.service import get_item_by_id
+from app.shared.utils.logging import log_route_start, log_route_success
 import logging
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("interaction", __name__)
 
@@ -170,7 +173,14 @@ def handle_interaction():
         target_type = parse_target_type(request.form.get("type"))
         target_id = int(request.form.get("id"))
         interaction_type = parse_interaction_type(request.form.get("interaction_type"))
-        
+
+        log_route_start(
+            logger, "/handle-interaction",
+            type=str(target_type),
+            id=target_id,
+            interaction=str(interaction_type),
+        )
+
         result = handle_interaction_workflow(
             user=current_user,
             target_type=target_type,
@@ -180,10 +190,11 @@ def handle_interaction():
             comment_content=request.form.get("comment", "").strip(),
             comment_id=request.form.get('comment_id', type=int)
         )
-        
+
         if not result.get("success"):
             return jsonify(result), 400
-            
+
+        log_route_success(logger, "/handle-interaction")
         return jsonify(result)
     except Exception:
         current_app.logger.exception("Interaction failed")
@@ -192,11 +203,17 @@ def handle_interaction():
 @bp.route('/saved')
 @login_required
 def saved_items():
+    log_route_start(logger, "/saved", user_id=current_user.id)
     saved_contents = get_saved_items(current_user.id, TargetType.ARTICLE)
     saved_items_list = get_saved_items(current_user.id, TargetType.ITEM)
-    
+
+    log_route_success(
+        logger, "/saved",
+        items=(len(saved_contents or []) + len(saved_items_list or [])),
+        template="saved-items.html",
+    )
     return render_template(
         'saved-items.html',
-        saved_contents=saved_contents,
-        saved_items=saved_items_list
+        saved_contents=saved_contents or [],
+        saved_items=saved_items_list or [],
     )

@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, request, render_template, jsonify, current_app, make_response, url_for
 import os
 from datetime import datetime
@@ -5,6 +6,9 @@ from app.application.system.home import get_home_page_data
 from app.application.system.contact import send_contact_message_workflow
 from app.domains.content.service import get_latest_contents
 from app.domains.system.pages_service import PAGES_CONTENT
+from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("system", __name__)
 
@@ -20,7 +24,11 @@ def set_country():
 
 @bp.route('/')
 def home():
+    log_route_start(logger, "/")
     data = get_home_page_data()
+    data.setdefault("sections", [])
+    data.setdefault("trending", [])
+    log_route_success(logger, "/", template="index.html")
     return render_template("index.html", **data)
 
 @bp.route('/about')

@@ -12,7 +12,7 @@
 }
 
 .auth-wrapper:hover {
-  box-shadow: 0 10px 25px rgba(var(--black-rgb), .08);
+  box-shadow: 0 10px 25px rgba(var(--black-rgb), var(--alpha-muted));
 }
 
 .login-hint {
@@ -60,8 +60,8 @@
 .auth-section {
   min-height: calc(100vh - var(--header-height));
   padding: 4rem 1rem;
-  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
-    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), var(--alpha-subtle)), transparent),
+    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), var(--alpha-subtle)), transparent);
 }
 
 .auth-wrapper {

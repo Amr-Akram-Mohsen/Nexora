@@ -2,8 +2,8 @@
   margin-top: 4rem;
   border-top: 1px solid var(--border);
   background: linear-gradient(to bottom,
-      rgba(var(--black-rgb), 0.03),
-      rgba(var(--black-rgb), 0.06));
+      rgba(var(--black-rgb), var(--alpha-ghost)),
+      rgba(var(--black-rgb), var(--alpha-subtle-alt)));
 }
 
 .footer-grid {
@@ -87,7 +87,7 @@
 .footer-social.instagram:hover,
 .footer-social.youtube:hover {
   color: var(--brand-red);
-  background: rgba(239, 68, 68, .1);
+  background: rgba(239, 68, 68, var(--alpha-soft));
 }
 
 .footer-title {
@@ -118,8 +118,8 @@
 .footer-link:hover {
   color: var(--foreground);
   background: linear-gradient(to right,
-      rgba(var(--brand-blue-rgb), .1),
-      rgba(var(--brand-purple-rgb), .1));
+      rgba(var(--brand-blue-rgb), var(--alpha-soft)),
+      rgba(var(--brand-purple-rgb), var(--alpha-soft)));
 }
 
 .footer-links .footer-link:hover {
@@ -180,6 +180,6 @@
 
 body.dark-mode .site-footer {
   background: linear-gradient(to bottom,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.06));
+      rgba(255, 255, 255, var(--alpha-ghost)),
+      rgba(255, 255, 255, var(--alpha-subtle-alt)));
 }

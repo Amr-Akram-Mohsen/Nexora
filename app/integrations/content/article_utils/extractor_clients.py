@@ -93,8 +93,8 @@ def extract_with_apis(url: str) -> dict | None:
             if result:
                 return result
                 
-    except RuntimeError:
-        # Outside app context or config unavailable
-        pass
+    except RuntimeError as e:
+        # Outside app context or config unavailable (e.g., during tests)
+        logger.debug("[Extractor API] skipped — no app context: %s", e)
         
     return None

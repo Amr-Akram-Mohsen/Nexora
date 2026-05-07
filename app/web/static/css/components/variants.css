@@ -69,10 +69,10 @@ body.dark-mode .btn.variant--outline {
 
 body.dark-mode .btn.variant--outline:hover,
 body.dark-mode .btn.variant--ghost:hover {
-  --variant-hover-bg: rgba(var(--accent-rgb), 0.5);
+  --variant-hover-bg: rgba(var(--accent-rgb), var(--alpha-bold));
 }
 
 body.dark-mode .variant--destructive {
-  --variant-hover-bg: rgba(var(--destructive-rgb), 0.6);
+  --variant-hover-bg: rgba(var(--destructive-rgb), var(--alpha-stronger));
   --focus-opacity: 0.4;
 }

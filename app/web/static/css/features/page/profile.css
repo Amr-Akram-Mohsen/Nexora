@@ -1,7 +1,7 @@
 .profile-section {
   min-height: calc(100vh - var(--header-height));
-  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), 0.05), transparent),
-    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), 0.05), transparent);
+  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), var(--alpha-subtle)), transparent),
+    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), var(--alpha-subtle)), transparent);
 }
 
 .profile-avatar {
@@ -15,7 +15,7 @@
   color: #fff;
   font-size: 3rem;
   font-weight: 800;
-  box-shadow: 0 10px 30px -5px rgba(var(--brand-blue-rgb), 0.5);
+  box-shadow: 0 10px 30px -5px rgba(var(--brand-blue-rgb), var(--alpha-bold));
 }
 
 .profile-card {
@@ -30,9 +30,9 @@
 }
 
 .glass {
-  background: rgba(var(--card-rgb), 0.7);
+  background: rgba(var(--card-rgb), var(--alpha-heavy));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--border-rgb), 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(var(--border-rgb), var(--alpha-soft));
+  box-shadow: 0 8px 32px 0 rgba(var(--black-rgb), var(--alpha-soft));
 }

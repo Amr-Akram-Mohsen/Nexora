@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for, abort
 from flask_login import current_user
 from app.application.item.get_catalog import get_catalog_data
@@ -7,6 +8,9 @@ from app.domains.item.service import get_item_by_id
 from app.shared.request import get_client_ip
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
+from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint("item", __name__)
 
@@ -38,7 +42,14 @@ def deals():
     }
     page = request.args.get('page', 1, type=int)
 
+    log_route_start(logger, "/deals", page=page)
+
     data = get_catalog_data(active_filters, page=page)
+    data.setdefault("items", [])
+    data.setdefault("pagination", None)
+
+    item_count = len(data.get("items") or [])
+    log_route_success(logger, "/deals", items=item_count, template="catalog-page.html")
 
     return render_template(
         "commercial/catalog/catalog-page.html",
@@ -52,18 +63,27 @@ def deals():
 def item_page(item_id):
     from app.application.item.get_item_page import record_item_view
     from app.core.extensions import db
-    
+
+    log_route_start(logger, f"/items/{item_id}")
+
     user = current_user if current_user.is_authenticated else None
     ip_address = None if user else get_client_ip()
-    
+
     data = get_item_page_data(item_id)
     if not data:
+        logger.warning("[ROUTE][/items/%d] no data returned — 404", item_id)
         abort(404)
 
-    # Orchestrate Query + Command
+    # Safety defaults
+    data.setdefault("item", None)
+    data.setdefault("related_items", [])
+    data.setdefault("related_contents", [])
+
     record_item_view(item_id, user, ip_address)
     db.session.commit()
-    
+
+    log_route_success(logger, f"/items/{item_id}", template="item.html")
+
     return render_template(
         "commercial/page/item.html",
         **data

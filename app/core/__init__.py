@@ -22,20 +22,29 @@ from app.web.routes import (
     admin_bp, user_bp, system_bp, content_bp, item_bp, interaction_bp, recommendation_bp, recommendation_bp
 )
 
+class _LevelAwareFormatter(logging.Formatter):
+    """INFO/WARNING use a clean one-liner; ERROR/CRITICAL append the source location."""
+    _PLAIN  = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+    _DETAIL = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s  [%(pathname)s:%(lineno)d]')
+
+    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+        if record.levelno >= logging.ERROR:
+            return self._DETAIL.format(record)
+        return self._PLAIN.format(record)
+
+
 def setup_logging(app):
     """Configure rotating file logging for production-grade audit trails."""
     if not os.path.exists('logs'):
         os.mkdir('logs')
-    
-    # 10MB per file, keeping last 5 backups
+
+    # 10 MB per file, keeping last 5 backups
     file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
+    file_handler.setFormatter(_LevelAwareFormatter())
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
-    
-    # Also ensure the standard python logger inherits this if needed
+
+    # Propagate to every 'app.*' logger
     logging.getLogger('app').addHandler(file_handler)
 
 def create_app():

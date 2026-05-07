@@ -20,10 +20,17 @@ class EnrichmentService(EnrichmentPort):
     """
     Pure Content Enrichment (Strategy-based scraping).
     Expects data that has already been classified.
+
+    Args:
+        should_scrape: When True, enables CloudScraper/Playwright scraping for articles.
+                       Defaults to False for safe, fast ingestion runs.
     """
+    def __init__(self, should_scrape: bool = False):
+        self.should_scrape = should_scrape
+
     def __call__(self, raw_data, section, category, query_obj):
         from app.integrations.enrichment.pipeline import route_enrichment_strategy
-        return route_enrichment_strategy(raw_data)
+        return route_enrichment_strategy(raw_data, should_scrape=self.should_scrape)
 
 class CooldownService(CooldownPort):
     def should_refetch(self, section, cache_key, hours):

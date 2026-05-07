@@ -45,7 +45,7 @@
   font-size: var(--text-sm);
   white-space: nowrap;
   z-index: 1000;
-  box-shadow: 0 3px 8px rgba(var(--black-rgb), 0.15);
+  box-shadow: 0 3px 8px rgba(var(--black-rgb), var(--alpha-medium));
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -81,7 +81,7 @@ label[data-disabled="true"] * {
   background: var(--background);
   font-weight: var(--weight-bold);
   min-width: 150px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 5px rgba(0, 0, 0, var(--alpha-subtle));
 }
 
 .table-row-group {
@@ -123,5 +123,26 @@ label[data-disabled="true"] * {
 
 .clear-all-link:hover {
   color: var(--brand-red);
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, var(--alpha-muted));
+}
+
+/* --- Interactive Utilities --- */
+
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(var(--lift-amount, -5px));
+  box-shadow: var(--lift-shadow, var(--shadow-lg));
+}
+
+/* --- Premium Surfaces --- */
+
+.glass-surface {
+  background: rgba(var(--card-rgb), var(--alpha-heavy));
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
+  border: 1px solid rgba(var(--border-rgb), var(--alpha-soft));
+  box-shadow: 0 8px 32px 0 rgba(var(--black-rgb), var(--alpha-soft));
 }

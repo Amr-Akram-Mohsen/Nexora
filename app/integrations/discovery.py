@@ -1,8 +1,11 @@
 # app/integrations/discovery.py
+import logging
 from typing import Dict, List
 from app.shared.utils.slug import generate_slug
 from app.shared.constants.taxonomy import TAXONOMY
 from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP, QUERY_TEMPLATES
+
+logger = logging.getLogger(__name__)
 
 
 class DiscoveryManager:
@@ -12,7 +15,7 @@ class DiscoveryManager:
     def get_queries_by_section(self, source_filter: str | None = None) -> Dict[str, Dict[str, List[Dict]]]:
         from datetime import datetime
         from app.shared.constants.query_builder import (
-            DEFAULT_SOURCE_ALIGNMENT, CATEGORY_SOURCE_OVERRIDES, 
+            DEFAULT_SOURCE_ALIGNMENT, CATEGORY_SOURCE_OVERRIDES,
             FACET_QUERY_TEMPLATES, QUERY_TEMPLATES, CATEGORY_TOPIC_MAP,
             INTENT_KEYWORDS, SECTION_DEFAULT_INTENTS
         )
@@ -21,6 +24,18 @@ class DiscoveryManager:
 
         sections = self.taxonomy.get("sections", [])
         categories_data = self.taxonomy.get("categories", [])
+
+        logger.info(
+            "[INTEGRATION][discovery] start  source_filter=%s  sections=%d  categories=%d",
+            source_filter or "(all)",
+            len(sections),
+            len(categories_data),
+        )
+
+        if not sections:
+            logger.warning("[INTEGRATION][discovery] no sections found in taxonomy")
+        if not categories_data:
+            logger.warning("[INTEGRATION][discovery] no categories found in taxonomy")
 
         for sec in sections:
             sec_slug = generate_slug(sec["name"])
@@ -146,6 +161,17 @@ class DiscoveryManager:
                     if queries:
                         registry[sec_slug][cat_slug] = queries
 
+        total_queries = sum(
+            len(qs)
+            for sec_cats in registry.values()
+            for qs in sec_cats.values()
+        )
+        logger.info(
+            "[INTEGRATION][discovery] success  source_filter=%s  total_queries=%d  sections_built=%d",
+            source_filter or "(all)",
+            total_queries,
+            len(registry),
+        )
         return registry
 
     def get_section_slugs(self) -> List[str]:

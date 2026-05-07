@@ -47,12 +47,12 @@
     <aside class="detail-page__sidebar">
       {% block base_sidebar %}
       {% if trending_contents %}
-      {% cache 300 'trending', content.id %}
+      {% cache 300 ('trending-' ~ content.id) %}
       {{ content_snippet(trending_contents, 'Trending') }}
       {% endcache %}
       {% endif %}
       {% if related_contents %}
-      {% cache 300 'related', content.id %}
+      {% cache 300 ('related-' ~ content.id) %}
       {{ content_snippet(related_contents, 'Related') }}
       {% endcache %}
       {% endif %}

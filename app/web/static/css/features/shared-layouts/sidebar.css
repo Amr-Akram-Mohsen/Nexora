@@ -106,7 +106,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, var(--alpha-bold));
   backdrop-filter: blur(3px);
   z-index: 199;
   opacity: 0;
@@ -233,38 +233,20 @@
 
 /* --- Sidebar Modifiers --- */
 
-.sidebar-accent--products {
-  background: linear-gradient(90deg, rgb(var(--brand-green-rgb)), rgb(var(--brand-teal-rgb)));
+.sidebar-accent {
+  background: var(--gradient-primary);
 }
 
-.sidebar-promo--articles {
+.sidebar-promo {
   background: linear-gradient(135deg,
-      rgba(var(--brand-blue-rgb), 0.08),
-      rgba(var(--brand-purple-rgb), 0.08));
-  border: 1px solid rgba(var(--brand-blue-rgb), 0.15);
+      rgba(var(--domain-primary-rgb), var(--alpha-muted)),
+      rgba(var(--domain-secondary-rgb), var(--alpha-muted)));
+  border: 1px solid rgba(var(--domain-primary-rgb), var(--alpha-medium));
 }
 
-.sidebar-promo--products {
-  background: linear-gradient(135deg,
-      rgba(var(--brand-green-rgb), 0.08),
-      rgba(var(--brand-teal-rgb), 0.08));
-  border: 1px solid rgba(var(--brand-green-rgb), 0.15);
-}
-
-.sidebar-promo--articles .sidebar-promo__icon {
-  color: rgb(var(--brand-blue-rgb));
-}
-
-.sidebar-promo--products .sidebar-promo__icon {
-  color: rgb(var(--brand-green-rgb));
-}
-
-.sidebar-promo--articles .sidebar-promo__link {
-  color: rgb(var(--brand-blue-rgb));
-}
-
-.sidebar-promo--products .sidebar-promo__link {
-  color: rgb(var(--brand-green-rgb));
+.sidebar-promo .sidebar-promo__icon,
+.sidebar-promo .sidebar-promo__link {
+  color: rgb(var(--domain-primary-rgb));
 }
 
 /* --- Sidebar UI & Overrides --- */

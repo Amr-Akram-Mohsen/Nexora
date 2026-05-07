@@ -5,12 +5,12 @@
 
 .pagination__btn:hover:not(.is-disabled) {
   background: var(--secondary);
-  border-color: rgba(var(--brand-blue-rgb), 0.3);
-  color: rgb(var(--brand-blue-rgb));
+  border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
+  color: rgb(var(--domain-primary-rgb));
 }
 
 .pagination__btn.is-disabled {
-  opacity: 0.3;
+  opacity: var(--alpha-strong);
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -25,11 +25,11 @@
 }
 
 .pagination__page.is-active {
-  background: rgb(var(--brand-blue-rgb));
+  background: rgb(var(--domain-primary-rgb));
   color: #fff;
   border-color: transparent;
   font-weight: var(--weight-bold);
-  box-shadow: 0 4px 10px rgba(var(--brand-blue-rgb), 0.3);
+  box-shadow: 0 4px 10px rgba(var(--domain-primary-rgb), var(--alpha-strong));
 }
 
 .pagination__ellipsis {
@@ -40,11 +40,6 @@
   justify-content: center;
   font-size: var(--text-sm);
   color: var(--muted-foreground);
-}
-
-.products-listing .pagination__page.is-active {
-  background: rgb(var(--brand-green-rgb));
-  box-shadow: 0 4px 10px rgba(var(--brand-green-rgb), 0.3);
 }
 
 /* --- Pagination UI & Overrides --- */

@@ -74,7 +74,7 @@ class IngestionWorkflow:
                     logger.warning(f"[{self.source_name}] Quota exceeded — stopping")
                     break
 
-                print(f"  [{self.source_name}] Fetching: {q_text}...")
+                logger.info("[%s] fetching query: %s", self.source_name, q_text)
                 
                 # 2. Filter fetch_params
                 sanitized_params = {k: v for k, v in fetch_params.items() if k != "cooldown_hours"}
@@ -90,7 +90,7 @@ class IngestionWorkflow:
                         item_title = raw.get('title', 'Unknown Title')
                     item_title = str(item_title)[:50] if item_title else 'Unknown Title'
                     
-                    print(f"      -> Processing: {item_title}...")
+                    logger.debug("[%s] processing item: %s", self.source_name, item_title)
 
                     # Backward compatibility hook: Convert DTO back to dict for the legacy pipeline
                     if hasattr(raw, "model_dump"):
@@ -132,17 +132,11 @@ class IngestionWorkflow:
                             content_obj, is_new = result
                             if is_new:
                                 query_stored += 1
-                                msg = f"         [OK] Inserted new."
-                                print(msg)
-                                logger.info(f"[{self.source_name}] {item_title} -> {msg}")
+                                logger.info("[%s] [NEW] %s", self.source_name, item_title)
                             else:
-                                msg = f"         [UPDATED] Existing item updated."
-                                print(msg)
-                                logger.info(f"[{self.source_name}] {item_title} -> {msg}")
+                                logger.info("[%s] [UPDATED] %s", self.source_name, item_title)
                         else:
-                            msg = f"         [SKIP] Ignored (duplicate or invalid)."
-                            print(msg)
-                            logger.info(f"[{self.source_name}] {item_title} -> {msg}")
+                            logger.debug("[%s] [SKIP] %s (duplicate or invalid)", self.source_name, item_title)
                     except Exception as e:
                         import sqlalchemy.exc
                         if isinstance(e, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):
@@ -153,7 +147,7 @@ class IngestionWorkflow:
                 if query_stored > 0:
                     session.commit()
                     total_stored += query_stored
-                    print(f"    -> Stored {query_stored} new {object_type}s")
+                    logger.info("[%s] stored %d new %s(s) for query: %s", self.source_name, query_stored, object_type, q_text)
 
             except (PipelineFatalError, PipelineQuotaExceededError):
                 session.rollback()

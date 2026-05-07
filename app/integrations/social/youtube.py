@@ -3,34 +3,40 @@ import logging
 import requests
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
 
 logger = logging.getLogger(__name__)
+
+_NAME = "youtube"
+_ARABIC_CHARS = set("ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي")
+
 
 def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     Pure fetcher for YouTube.
+    Always returns a list (never None).
     """
     api_key = current_app.config.get("YOUTUBE_API_KEY")
     if not api_key:
-        logger.warning("[YouTube] No API key")
-        print("[YouTube] No API key")
+        logger.warning("[INTEGRATION][%s] skipped  reason=no_api_key", _NAME)
         return []
 
-    query = q_obj["query"]
+    query = q_obj.get("query", "")
     region_code = q_obj.get("region", "SA")
-    
-    # Simple mapping for tech category
-    video_category_id = "28" if "electronics" in q_obj.get("category", "").lower() else None
+    category = q_obj.get("category", "")
+    video_category_id = "28" if "electronics" in category.lower() else None
+
+    log_integration_start(logger, _NAME, query=query, region=region_code)
 
     params = {
-        "part":             "snippet",
-        "q":                query,
-        "type":             "video",
-        "relevanceLanguage":"ar" if any(c in query for c in 'ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي') else "en",
-        "regionCode":       region_code,
-        "order":            "relevance",
-        "maxResults":       5,
-        "key":              api_key,
+        "part":              "snippet",
+        "q":                 query,
+        "type":              "video",
+        "relevanceLanguage": "ar" if any(c in query for c in _ARABIC_CHARS) else "en",
+        "regionCode":        region_code,
+        "order":             "relevance",
+        "maxResults":        5,
+        "key":               api_key,
     }
     if video_category_id:
         params["videoCategoryId"] = video_category_id
@@ -42,13 +48,21 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
             timeout=10,
         )
         resp.raise_for_status()
-        
+
+        items_data = resp.json().get("items", [])
+        if not isinstance(items_data, list):
+            logger.warning("[INTEGRATION][%s] unexpected response shape for query=%s", _NAME, query)
+            items_data = []
+
         raw_items = []
-        for item in resp.json().get("items", []):
+        from app.shared.dto.ingestion import RawItemDTO
+        for item in items_data:
+            if not isinstance(item, dict):
+                continue
             video_id = item.get("id", {}).get("videoId")
-            if not video_id: continue
+            if not video_id:
+                continue
             snippet = item.get("snippet", {})
-            from app.shared.dto.ingestion import RawItemDTO
             raw_items.append(RawItemDTO(
                 title=snippet.get("title", ""),
                 description=snippet.get("description", ""),
@@ -59,12 +73,17 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
                 is_video=True,
                 region=region_code,
                 external_id=video_id,
-                platform="youtube"
+                platform="youtube",
             ))
+
+        log_integration_success(logger, _NAME, items=len(raw_items), query=query, region=region_code)
         return raw_items
-        
+
     except requests.exceptions.RequestException as e:
-        if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:
+        if hasattr(e, "response") and e.response is not None and e.response.status_code == 403:
             raise PipelineQuotaExceededError("YouTube Quota Exceeded")
-        logger.warning("[YouTube] API request failed for query '%s': %s", query, str(e))
+        log_integration_error(logger, _NAME, e, query=query)
+        return []
+    except Exception as e:
+        log_integration_error(logger, _NAME, e, query=query, exc_info=True)
         return []

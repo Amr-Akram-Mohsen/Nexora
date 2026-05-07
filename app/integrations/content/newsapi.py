@@ -3,22 +3,27 @@ import logging
 import requests
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
 
 logger = logging.getLogger(__name__)
+
+_NAME = "newsapi"
+
 
 def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     Pure fetcher for NewsAPI.
     Focuses only on API request and returning raw data.
+    Always returns a list (never None).
     """
     api_key = current_app.config.get("NEWS_API_KEY")
     if not api_key:
-        logger.warning("[NewsAPI] No API key")
-        print("[NewsAPI] No API key")
+        logger.warning("[INTEGRATION][%s] skipped  reason=no_api_key", _NAME)
         return []
 
-    q_text = q_obj["query"]
-    
+    q_text = q_obj.get("query", "")
+    log_integration_start(logger, _NAME, query=q_text)
+
     try:
         resp = requests.get(
             "https://newsapi.org/v2/everything",
@@ -35,10 +40,19 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
         from app.shared.dto.ingestion import RawItemDTO
 
         articles = resp.json().get("articles", [])
-        return [RawItemDTO(**a) for a in articles]
-        
+        if not isinstance(articles, list):
+            logger.warning("[INTEGRATION][%s] unexpected response shape for query=%s", _NAME, q_text)
+            articles = []
+
+        raw_items = [RawItemDTO(**a) for a in articles if isinstance(a, dict)]
+        log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)
+        return raw_items
+
     except requests.exceptions.RequestException as e:
-        if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:
+        if hasattr(e, "response") and e.response is not None and e.response.status_code == 403:
             raise PipelineQuotaExceededError("NewsAPI Quota Exceeded")
-        logger.warning("[NewsAPI] API request failed for query '%s': %s", q_text, str(e))
+        log_integration_error(logger, _NAME, e, query=q_text)
+        return []
+    except Exception as e:
+        log_integration_error(logger, _NAME, e, query=q_text, exc_info=True)
         return []

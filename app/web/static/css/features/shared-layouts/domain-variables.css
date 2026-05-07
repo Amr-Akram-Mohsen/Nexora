@@ -1,35 +1,37 @@
-[data-domain-type="contents"] {
+[data-domain-type="content"] {
   --domain-primary-rgb: var(--brand-blue-rgb);
   --domain-secondary-rgb: var(--brand-purple-rgb);
-
+  
+  /* Type specific mappings for content domain */
+  --type-article-rgb: var(--brand-blue-rgb);
+  --type-video-rgb: var(--brand-purple-rgb);
+  --type-post-rgb: var(--brand-teal-rgb);
 }
 
-[data-domain-type="items"] {
+[data-domain-type="item"] {
   --domain-primary-rgb: var(--brand-green-rgb);
   --domain-secondary-rgb: var(--brand-teal-rgb);
+
+  /* Type specific mappings for item domain */
+  --type-electronics-rgb: var(--brand-blue-rgb);
+  --type-perfume-rgb: var(--brand-purple-rgb);
+  --type-accessories-rgb: var(--brand-green-rgb);
 }
 
 [data-domain-type] {
   --domain-primary: rgb(var(--domain-primary-rgb));
   --domain-secondary: rgb(var(--domain-secondary-rgb));
   --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
-
-  /* Content types (derived from domain) */
-  --content-article: var(--domain-primary);
-  --content-video: var(--domain-secondary);
-  --content-post: color-mix(in srgb, var(--domain-primary) 70%, #0ea5a4 30%);
-
-  /* Commerce types */
-  --commerce-perfume: color-mix(in srgb, var(--domain-primary) 60%, #f472b6 40%);
-  --commerce-electronics: color-mix(in srgb, var(--domain-primary) 70%, #3b82f6 30%);
-  --commerce-accessories: color-mix(in srgb, var(--domain-primary) 80%, #f59e0b 20%);
-
+  
+  /* Semantic tokens that components should use */
+  --accent-rgb: var(--domain-primary-rgb);
 }
 
-[data-type="article"] {
-  /* Content types (derived from domain) */
-  --content-article-rgb: var(--domain-primary-rgb);
-  --content-video-rgb: var(--domain-secondary-rgb);
-  --content-post-rgb: color-mix(in srgb, var(--domain-primary) 70%, #0ea5a4 30%);
+/* Specific data-type overrides that consume the domain variables */
+[data-type="article"] { --card-color-rgb: var(--type-article-rgb); }
+[data-type="video"] { --card-color-rgb: var(--type-video-rgb); }
+[data-type="post"] { --card-color-rgb: var(--type-post-rgb); }
 
-}
+[data-type="electronics"] { --card-color-rgb: var(--type-electronics-rgb); }
+[data-type="perfume"] { --card-color-rgb: var(--type-perfume-rgb); }
+[data-type="accessories"] { --card-color-rgb: var(--type-accessories-rgb); }

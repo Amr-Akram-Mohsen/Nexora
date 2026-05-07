@@ -2,7 +2,7 @@
 
 .detail-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom, var(--background), rgba(var(--muted-rgb), 0.2));
+  background: linear-gradient(to bottom, var(--background), rgba(var(--muted-rgb), var(--alpha-low)));
 }
 
 .detail-page__top {
@@ -98,7 +98,7 @@
 .detail-page__title {
   font-size: var(--text-4xl);
   font-weight: var(--weight-xbold);
-  background: linear-gradient(to right, var(--foreground), rgba(var(--foreground-rgb), 0.7));
+  background: linear-gradient(to right, var(--foreground), rgba(var(--foreground-rgb), var(--alpha-heavy)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 1rem 0;
@@ -156,7 +156,7 @@
 .inline-product-card:hover {
   background-color: rgba(var(--domain-secondary-rgb), var(--alpha-soft));
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(var(--domain-secondary-rgb), 0.06);
+  box-shadow: 0 8px 16px rgba(var(--domain-secondary-rgb), var(--alpha-muted));
 }
 
 .meta-item:hover {

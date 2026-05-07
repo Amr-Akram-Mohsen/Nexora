@@ -65,6 +65,6 @@
 
   margin-top: 2rem;
   font-size: var(--text-sm);
-  color: rgba(var(--foreground-rgb), 0.5);
+  color: rgba(var(--foreground-rgb), var(--alpha-bold));
   text-align: right;
 }

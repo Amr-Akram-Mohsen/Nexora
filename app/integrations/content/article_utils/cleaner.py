@@ -4,10 +4,13 @@ Specialized content cleaners for Articles, Videos, and Posts.
 Approach: Modify a copy of raw data only where cleaning is required.
 Ensures 1:1 alignment with Domain Models.
 """
+import logging
 import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from app.shared.sanitizer import sanitize_text
+
+logger = logging.getLogger(__name__)
 
 # ── Configuration ────────────────────────────────────────────────
 ALLOWED_TAGS = [
@@ -51,7 +54,8 @@ def _normalize_url(url: str) -> str:
         clean_qs = {k: v for k, v in qs.items() if k.lower() not in _TRACKING_PARAMS}
         clean_query = urlencode(clean_qs, doseq=True)
         return urlunparse(parsed._replace(query=clean_query, fragment=""))
-    except Exception:
+    except Exception as e:
+        logger.debug("[Cleaner] URL normalisation failed for %s: %s", url[:80], e)
         return url
 
 def _parse_date(value) -> datetime | None:
