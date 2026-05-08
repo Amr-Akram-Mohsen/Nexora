@@ -1,0 +1,121 @@
+{% from "components/media/content-image.html" import render_image_url %}
+
+{#
+Macro: render_video_thumbnail(thumbnail_url, title, external_id, duration=None, platform='youtube',
+wrapper_class='card__img-wrapper')
+- Keeps markup semantic and accessible
+- Uses a focusable play <button> that lazy-loads the iframe on demand
+#}
+
+{% macro render_video_thumbnail(thumbnail_url, title, video_url_or_id, duration=None, platform='youtube',
+  wrapper_class='card__img-wrapper') %}
+  <figure class="{{ wrapper_class }} video-preview" data-video-url="{{ video_url_or_id }}" data-platform="{{ platform }}">
+    {% if thumbnail_url %}
+    <div class="video-preview__img">
+      {{ render_image_url(thumbnail_url, title) }}
+    </div>
+    {% endif %}
+
+    <button class="card__play-btn video-preview__play" aria-label="Play {{ title }}" data-action="lazy-play"
+      data-video-url="{{ video_url_or_id }}" data-platform="{{ platform }}">
+      <i class="fas fa-play" aria-hidden="true"></i>
+    </button>
+
+    {% if duration %}
+    <span class="video-duration" aria-hidden="true">{{ duration }}</span>
+    {% endif %}
+
+  </figure>
+
+  {# Inline initializer (guards to run only once) #}
+  {% if not loop and caller is none %}
+  <script>
+    if (!window.__nexoraVideoLazyInit) {
+      window.__nexoraVideoLazyInit = true;
+      document.addEventListener('click', function (e) {
+        var btn = e.target.closest && e.target.closest('button[data-action="lazy-play"]');
+        if (!btn) return;
+        // prevent parent anchors from navigating when clicking play
+        e.preventDefault && e.preventDefault();
+        e.stopPropagation && e.stopPropagation();
+        var container = btn.closest('[data-video-id]');
+        if (!container) return;
+        var id = btn.dataset.videoId;
+        var platform = btn.dataset.platform || 'youtube';
+        var src = '';
+        if (platform === 'youtube') {
+          src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1';
+        } else {
+          src = '';
+        }
+
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('src', src);
+        iframe.setAttribute('title', btn.getAttribute('aria-label') || 'Video');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('loading', 'lazy');
+        iframe.className = 'video-player-iframe';
+        // Replace container contents with iframe inside an aspect wrapper
+        container.innerHTML = '';
+        var wrapper = document.createElement('div');
+        wrapper.className = 'video-player-wrapper';
+        wrapper.appendChild(iframe);
+        container.appendChild(wrapper);
+      });
+    }
+  </script>
+  {% endif %}
+
+  {% endmacro %}
+
+{# Ensure initializer script is present even when macro used inside loops #}
+<script>
+if (!window.__nexoraVideoLazyInit) {
+  window.__nexoraVideoLazyInit = true;
+  document.addEventListener('click', function (e) {
+      var btn = e.target.closest && e.target.closest('button[data-action="lazy-play"]');
+    if (!btn) return;
+    e.preventDefault && e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+      var container = btn.closest('[data-video-url]');
+      if (!container) return;
+      var videoRef = btn.dataset.videoUrl || btn.dataset.videoId || '';
+      var platform = btn.dataset.platform || 'youtube';
+      // derive embed id from URL or accept raw id
+      var id = (function(ref) {
+        if (!ref) return '';
+        try {
+          // If looks like a full URL, try to parse youtube id
+          if (ref.indexOf('youtu') !== -1) {
+            var m = ref.match(/v=([\w-]+)/);
+            if (m && m[1]) return m[1];
+            m = ref.match(/youtu\.be\/([\w-]+)/);
+            if (m && m[1]) return m[1];
+            // fallback: last path segment
+            var parts = ref.split('/');
+            return parts[parts.length-1];
+          }
+        } catch (e) {}
+        return ref;
+      })(videoRef);
+
+      var src = '';
+      if (platform === 'youtube' && id) {
+        src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?rel=0&autoplay=1';
+      }
+
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('src', src);
+    iframe.setAttribute('title', btn.getAttribute('aria-label') || 'Video');
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+    iframe.setAttribute('loading', 'lazy');
+    iframe.className = 'video-player-iframe';
+    // Replace container contents with iframe inside an aspect wrapper
+    container.innerHTML = '';
+    var wrapper = document.createElement('div');
+    wrapper.className = 'video-player-wrapper';
+    wrapper.appendChild(iframe);
+    container.appendChild(wrapper);
+  });
+}
+</script>

@@ -43,7 +43,7 @@ def assign_target_to_contents(contents, session):
         # Batch fetch for this type
         query = session.query(model).filter(model.id.in_(list(ids)))
         if obj_type == 'article':
-            query = query.options(db.selectinload(model.sources))
+            query = query.options(db.selectinload(model.article_sources))
         
         objs = query.all()
         for obj in objs:

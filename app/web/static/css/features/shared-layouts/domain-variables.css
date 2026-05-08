@@ -1,11 +1,6 @@
 [data-domain-type="content"] {
   --domain-primary-rgb: var(--brand-blue-rgb);
   --domain-secondary-rgb: var(--brand-purple-rgb);
-  
-  /* Type specific mappings for content domain */
-  --type-article-rgb: var(--brand-blue-rgb);
-  --type-video-rgb: var(--brand-purple-rgb);
-  --type-post-rgb: var(--brand-teal-rgb);
 }
 
 [data-domain-type="item"] {
@@ -22,16 +17,35 @@
   --domain-primary: rgb(var(--domain-primary-rgb));
   --domain-secondary: rgb(var(--domain-secondary-rgb));
   --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
-  
+
   /* Semantic tokens that components should use */
   --accent-rgb: var(--domain-primary-rgb);
 }
 
 /* Specific data-type overrides that consume the domain variables */
-[data-type="article"] { --card-color-rgb: var(--type-article-rgb); }
-[data-type="video"] { --card-color-rgb: var(--type-video-rgb); }
-[data-type="post"] { --card-color-rgb: var(--type-post-rgb); }
+[data-type="article"] {
+  --type-article-rgb: var(--brand-blue-rgb);
+  --card-color-rgb: var(--type-article-rgb);
+}
 
-[data-type="electronics"] { --card-color-rgb: var(--type-electronics-rgb); }
-[data-type="perfume"] { --card-color-rgb: var(--type-perfume-rgb); }
-[data-type="accessories"] { --card-color-rgb: var(--type-accessories-rgb); }
+[data-type="video"] {
+  --type-video-rgb: var(--brand-purple-rgb);
+  --card-color-rgb: var(--type-video-rgb);
+}
+
+[data-type="post"] {
+  --type-post-rgb: var(--brand-teal-rgb);
+  --card-color-rgb: var(--type-post-rgb);
+}
+
+[data-type="electronics"] {
+  --card-color-rgb: var(--type-electronics-rgb);
+}
+
+[data-type="perfume"] {
+  --card-color-rgb: var(--type-perfume-rgb);
+}
+
+[data-type="accessories"] {
+  --card-color-rgb: var(--type-accessories-rgb);
+}

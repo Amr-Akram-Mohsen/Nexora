@@ -46,6 +46,8 @@
 
 @import "features/shared-layouts/domain-variables.css";
 
+@import "components/media/video.css";
+
 /* Catalog Features */
 @import "features/shared-layouts/listing.css";
 @import "features/shared-layouts/detail.css";

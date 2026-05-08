@@ -2,6 +2,7 @@
 {% set video = content.target %}
 
 {% from "components/media/content-image.html" import render_image_url %}
+{% from "components/media/video-thumb.html" import render_video_thumbnail %}
 {% from "components/ui/badge.html" import badge %}
 {% from "content/features/snippet-utils.html" import content_snippet %}
 
@@ -74,24 +75,17 @@
 {% endblock %}
 
 {% block base_image %}
-{# Thumbnail shown above the embed for quick preview #}
+{# Thumbnail shown above the embed for quick preview (lazy-play) #}
 {% if video.thumbnail_url %}
-<div class="video-preview-wrapper">
-  {{ render_image_url(video.thumbnail_url, video.title) }}
-  <div class="video-preview-overlay">
-    <i class="fas fa-play"></i>
-  </div>
-</div>
+  {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url if video.url else video.external_id, duration=video.duration if video.duration else None, platform=video.platform, wrapper_class='video-preview-wrapper') }}
 {% endif %}
 {% endblock %}
 
 {% block base_content %}
 <div class="video-body">
   <div class="video-container">
-    <iframe src="https://www.youtube.com/embed/{{ video.external_id }}?rel=0" title="{{ video.title }}"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
-      loading="lazy">
-    </iframe>
+    {# Lazy-load player placeholder (click to load iframe) #}
+    {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url if video.url else video.external_id, duration=video.duration if video.duration else None, platform=video.platform, wrapper_class='video-player-placeholder') }}
   </div>
 
   {% if video.description %}
