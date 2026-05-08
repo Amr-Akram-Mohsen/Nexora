@@ -30,19 +30,15 @@
 </script>
 {% endblock %}
 
-{% block base_breadcrumbs %}
-{% include "content/features/breadcrumbs.html" %}
-{% endblock %}
-
 {% block base_header %}
 <div class="detail-page__header-content flex flex-col">
-  <div class="detail-page__badges flex flex-wrap">
+  <div class="detail-page__badges flex flex-wrap items-center">
+    <span class="platform-icon platform-icon--youtube mr-3">
+      <i class="fab fa-youtube"></i>
+    </span>
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
     {{ badge(topic.name, 'badge--topic') }}
-    {% endfor %}
-    {% for brand in content.brands[:2] %}
-    {{ badge(brand.name, 'badge--brand') }}
     {% endfor %}
   </div>
 
@@ -50,17 +46,17 @@
 
   <div class="detail-page__meta flex flex-wrap items-center">
     {% if video.channel_name %}
-    <div class="meta-item meta-user flex items-center">
+    <div class="meta-item flex items-center">
       <div class="meta-icon-wrapper">
         <i class="fas fa-play-circle"></i>
       </div>
-      <span class="video__source">{{ video.channel_name }}</span>
+      <span class="meta-text text--bold">{{ video.channel_name }}</span>
     </div>
     {% endif %}
 
-    <div class="meta-item meta-calendar flex items-center">
+    <div class="meta-item flex items-center">
       <div class="meta-icon-wrapper">
-        <i class="far fa-calendar"></i>
+        <i class="far fa-calendar-alt"></i>
       </div>
       <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
     </div>
@@ -70,7 +66,7 @@
       <div class="meta-icon-wrapper">
         <i class="fas fa-eye"></i>
       </div>
-      <span>{{ content.view_count }} views</span>
+      <span>{{ "{:,}".format(content.view_count) }} views</span>
     </div>
     {% endif %}
   </div>
@@ -80,23 +76,29 @@
 {% block base_image %}
 {# Thumbnail shown above the embed for quick preview #}
 {% if video.thumbnail_url %}
-{{ render_image_url(video.thumbnail_url, video.title) }}
+<div class="video-preview-wrapper">
+  {{ render_image_url(video.thumbnail_url, video.title) }}
+  <div class="video-preview-overlay">
+    <i class="fas fa-play"></i>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
 
 {% block base_content %}
 <div class="video-body">
   <div class="video-container">
-    <iframe src="https://www.youtube.com/embed/{{ video.external_id }}" title="{{ video.title }}"
+    <iframe src="https://www.youtube.com/embed/{{ video.external_id }}?rel=0" title="{{ video.title }}"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
       loading="lazy">
     </iframe>
   </div>
 
   {% if video.description %}
-  <div class="video-description">
+  <div class="video-description mt-6">
+    <h3 class="video-description__title">About this video</h3>
     <p>{{ video.description }}</p>
   </div>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}

@@ -1,7 +1,6 @@
 {% extends "content/cards/base.html" %}
 {% from "components/media/content-image.html" import render_image_url %}
 
-{% set content = item %}
 {% set article = content.target %}
 
 {% block image_content %}
@@ -12,19 +11,15 @@
 <!-- Meta -->
 <div class="card__meta-top flex flex-wrap items-center">
   {{ badge(content.category.name, 'badge--category', 'secondary') }}
-  {% for topic in content.topics[:2] %}
+  {% for topic in content.topics[:1] %}
   {{ badge(topic.name, 'badge--topic', 'secondary') }}
-  {% endfor %}
-
-  {% for brand in content.brands[:1] %}
-  {{ badge(brand.name, 'badge--brand', 'secondary') }}
   {% endfor %}
 </div>
 {% endblock %}
 
 {% block meta_bottom %}
 <div class="card__meta-item flex items-center">
-  <i class="fas fa-user-circle card__meta-icon"></i>
+  <i class="far fa-newspaper card__meta-icon"></i>
   <span class="card__meta-text truncate">
     {{ article.source_name }}
   </span>
@@ -41,10 +36,7 @@
 
 <span class="card__meta-dot" aria-hidden="true"></span>
 
-<div class="card__meta-item flex items-center">
-  <i class="far fa-calendar-alt card__meta-icon"></i>
-  <time class="card__meta-text">
-    {{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}
-  </time>
-</div>
+<time class="card__date">
+  {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+</time>
 {% endblock %}

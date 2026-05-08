@@ -113,10 +113,13 @@ def get_or_create_content(session, object_type, external_id, obj_factory, title_
     # 2. Try Deduplication by url (Articles or models with url)
     if not obj and url_fallback:
         if object_type == 'article':
-            from app.domains.relationships import article_sources
-            res = session.query(article_sources.c.article_id).filter(article_sources.c.url == url_fallback).first()
+            from app.domains.relationships import ArticleSource
+            res = session.query(ArticleSource).filter_by(
+                url=url_fallback
+            ).first()
+            
             if res:
-                obj = session.query(model).get(res[0])
+                obj = session.get(model, res.article_id)
         elif hasattr(model, 'url'):
             obj = session.query(model).filter_by(url=url_fallback).first()
     

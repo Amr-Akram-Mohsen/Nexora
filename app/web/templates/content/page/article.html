@@ -42,12 +42,7 @@
   "dateModified": "{{ content.published_at.isoformat() if content.published_at }}",
 }
 </script>
-
 {% endblock %}
-{% block base_breadcrumbs %}
-{% include "content/features/breadcrumbs.html" %}
-{% endblock %}
-
 {% block base_header %}
 <div class="detail-page__header-content flex flex-col">
   <div class="detail-page__badges flex flex-wrap">

@@ -29,53 +29,41 @@
 </script>
 {% endblock %}
 
-{% block base_breadcrumbs %}
-{% include "content/features/breadcrumbs.html" %}
-{% endblock %}
 
 {% block base_header %}
 <div class="detail-page__header-content flex flex-col">
-  <div class="detail-page__badges flex flex-wrap">
+  <div class="detail-page__badges flex flex-wrap items-center">
+    <span class="platform-icon platform-icon--reddit mr-3">
+      <i class="fab fa-reddit-alien"></i>
+    </span>
     {% if post.subreddit %}
     {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
     {% endif %}
     {{ badge(content.category.name, 'badge--category') }}
-    {% for brand in content.brands[:1] %}
-    {{ badge(brand.name, 'badge--brand') }}
-    {% endfor %}
   </div>
 
   <h1 class="detail-page__title">{{ post.title }}</h1>
 
   <div class="detail-page__meta flex flex-wrap items-center">
-    <div class="meta-item meta-user flex items-center">
+    <div class="meta-item flex items-center">
       <div class="meta-icon-wrapper">
         <i class="far fa-user"></i>
       </div>
-      <span class="post__source">{{ post.author or 'Unknown' }}</span>
+      <span class="meta-text text--bold">{{ post.author or 'Unknown' }}</span>
     </div>
-
-    {% if post.subreddit %}
-    <div class="meta-item flex items-center">
-      <div class="meta-icon-wrapper">
-        <i class="fab fa-reddit"></i>
-      </div>
-      <span>r/{{ post.subreddit }}</span>
-    </div>
-    {% endif %}
 
     {% if post.upvotes %}
     <div class="meta-item flex items-center">
       <div class="meta-icon-wrapper">
         <i class="fas fa-arrow-up"></i>
       </div>
-      <span>{{ post.upvotes }} upvotes</span>
+      <span class="text--accent">{{ "{:,}".format(post.upvotes) }} upvotes</span>
     </div>
     {% endif %}
 
-    <div class="meta-item meta-calendar flex items-center">
+    <div class="meta-item flex items-center">
       <div class="meta-icon-wrapper">
-        <i class="far fa-calendar"></i>
+        <i class="far fa-calendar-alt"></i>
       </div>
       <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
     </div>
@@ -89,16 +77,19 @@
 {% block base_content %}
 <div class="post-body">
   {% if post.body %}
-  <p>{{ post.body }}</p>
+  <div class="post-content-text">
+    {{ post.body | safe }}
+  </div>
   {% endif %}
 
   {% if post.url %}
-  <div class="post-source-box flex flex-col">
-    <p class="source-metadata">
-      Original post on: <strong>r/{{ post.subreddit }}</strong>
-    </p>
+  <div class="post-source-box flex flex-col mt-8">
+    <div class="source-metadata-wrapper flex items-center">
+      <i class="fab fa-reddit-alien mr-2"></i>
+      <p class="source-metadata">Original post on <strong>r/{{ post.subreddit }}</strong></p>
+    </div>
     <a href="{{ post.url }}" class="post__view-link" target="_blank" rel="noopener nofollow">
-      {{ button(text="View on Reddit", class="post__view-btn") }}
+      {{ button(text="View Full Discussion on Reddit", class="post__view-btn", icon="fab fa-reddit") }}
     </a>
   </div>
   {% endif %}
@@ -106,4 +97,8 @@
 {% endblock %}
 
 {% block base_sidebar %}
+{# Posts often have less sidebar content; we can keep it clean or add trending #}
+{% if trending_contents %}
+{{ content_snippet(trending_contents, 'Trending Discussions') }}
+{% endif %}
 {% endblock %}

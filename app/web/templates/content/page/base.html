@@ -1,20 +1,23 @@
 {% extends "base.html" %}
 
 {% from "components/ui/button.html" import button %}
+{% from "content/features/snippet-utils.html" import content_snippet %}
 
 {% block content %}
-<section class="detail-page" data-type="{{ content.object_type }}" data-domain-type="contents">
+<section class="detail-page" data-type="{{ content.object_type }}" data-domain-type="content">
   <div class="container">
 
-    <!-- Breadcrumbs -->
-    {% block base_breadcrumbs %}{% endblock %}
 
-    <!-- Top -->
+    <!-- Top Nav Row -->
     <div class="detail-page__top flex items-center justify-between">
-      <a href="/">
-        {{ button(text="Back", variant="ghost", class="btn-back", icon="fas fa-chevron-left") }}
-      </a>
-      {% block base_top %}{% endblock %}
+      <div class="detail-page__breadcrumbs-wrapper">
+        {% include "content/features/breadcrumbs.html" %}
+      </div>
+      <div class="detail-page__back-wrapper">
+        <a href="/">
+          {{ button(text="Back", variant="ghost", class="btn-back", icon="fas fa-arrow-left") }}
+        </a>
+      </div>
     </div>
 
     <!-- Main -->
@@ -32,11 +35,14 @@
         {% block base_content %}{% endblock %}
 
         {% if content.linked_items %}
+        {% from "content/cards/item-compact.html" import render_item_compact_card %}
         <div class="content-linked-products">
           <h3 class="content-linked-products__title">Products Mentioned In This Article</h3>
-          {% for item in content.linked_items %}
-          {{ inline_product_card(item) }}
-          {% endfor %}
+          <div class="linked-products-grid flex flex-col">
+            {% for item in content.linked_items %}
+            {{ render_item_compact_card(item) }}
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
       </div>
@@ -47,14 +53,10 @@
     <aside class="detail-page__sidebar">
       {% block base_sidebar %}
       {% if trending_contents %}
-      {% cache 300 ('trending-' ~ content.id) %}
       {{ content_snippet(trending_contents, 'Trending') }}
-      {% endcache %}
       {% endif %}
       {% if related_contents %}
-      {% cache 300 ('related-' ~ content.id) %}
       {{ content_snippet(related_contents, 'Related') }}
-      {% endcache %}
       {% endif %}
       {% endblock %}
     </aside>

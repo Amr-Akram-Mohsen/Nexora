@@ -4,16 +4,17 @@ from ...system.models import (
     Topic, Brand, AttributeFacet,
     GenderFacet, IntentFacet, PriceTierFacet, Source
 )
+
 from app.shared.utils.slug import generate_slug
 from .content_access import resolve
 from sqlalchemy import func, insert
-from sqlalchemy.orm import joinedload
 
 def link_article_sources(session, article, data):
     """Links an article to its specific source URL, ensuring uniqueness."""
     source_name = data.get("source_name")
     url = data.get("url")
 
+    published_at = data.get("published_at")
     if not source_name or not url:
         return
 
@@ -23,27 +24,32 @@ def link_article_sources(session, article, data):
     if not source:
         return
 
-    from ...relationships import article_sources
+    from ...relationships import ArticleSource
     
     # 🔹 Check if this specific URL is already in the system (unique constraint)
-    existing_url = session.query(article_sources).filter_by(url=url).first()
-    if existing_url:
+    existing = session.query(ArticleSource).filter_by(
+        url=url
+    ).first()
+
+    if existing:
         return
 
-    # 🔹 Check if the link already exists for this article/source pair
-    existing_link = session.query(article_sources).filter_by(
+    existing_relation = session.query(ArticleSource).filter_by(
         article_id=article.id,
         source_id=source.id
     ).first()
 
-    if not existing_link:
-        session.execute(
-            insert(article_sources).values(
-                article_id=article.id,
-                source_id=source.id,
-                url=url
-            )
-        )
+    if existing_relation:
+        return
+
+    relation = ArticleSource(
+        article_id=article.id,
+        source_id=source.id,
+        url=url,
+        published_at=published_at
+    )
+
+    session.add(relation)
 
 def delete_content(session, id: int) -> bool:
     content = session.get(Article, id)

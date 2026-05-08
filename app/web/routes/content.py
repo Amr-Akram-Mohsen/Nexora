@@ -29,13 +29,14 @@ def sections(section_slug):
         data.setdefault("items", [])
         data.setdefault("pagination", None)
         data.setdefault("section", None)
+        data.setdefault("trending_contents", [])
 
         item_count = len(data.get("items") or [])
         log_route_success(logger, f"/sections/{section_slug}", items=item_count, template="catalog-page.html")
 
         return render_template(
             "content/catalog/catalog-page.html",
-            target_type="contents",
+            target_type="content",
             active_filters=active_filters,
             **data,
         )
@@ -62,7 +63,8 @@ def content_page(content_id):
 
         # Safety defaults
         data.setdefault("content", None)
-        data.setdefault("related", [])
+        data.setdefault("related_contents", [])
+        data.setdefault("trending_contents", [])
 
         record_article_view(content_id, user, ip_address)
         db.session.commit()

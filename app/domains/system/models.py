@@ -1,5 +1,5 @@
 from app.core.extensions import db
-from app.domains.relationships import (content_topics, content_brands, item_topics, content_attributes, article_sources)
+from app.domains.relationships import (content_topics, content_brands, item_topics, content_attributes)
 from app.shared.utils.slug import generate_slug, normalize_name
 # ==================== METADATA MODELS ====================
 class Source(db.Model):
@@ -10,7 +10,7 @@ class Source(db.Model):
     domain = db.Column(db.String(255), unique=True, nullable=False, index=True)
     logo_url = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
-    trust_score = db.Column(db.Float, default=1.0)
+    authority_score = db.Column(db.Integer, default=50, nullable=False)
 
     @staticmethod
     def get_by_slug(slug, session):
@@ -20,12 +20,11 @@ class Source(db.Model):
     def get_by_domain(domain, session):
         return session.query(Source).filter_by(domain=domain).first()
 
-    articles = db.relationship(
-        "Article",
-        secondary=article_sources,
-        back_populates="sources"
+    article_sources = db.relationship(
+        "ArticleSource",
+        back_populates="source"
     )
-
+    
     def __repr__(self):
         return f"<Source {self.name}>"
 

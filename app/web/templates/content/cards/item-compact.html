@@ -1,5 +1,5 @@
 {% macro render_item_compact_card(item) %}
-<div class="inline-product-card flex items-center">
+<div class="inline-product-card">
   <div class="inline-product__image">
     {% if item.image_url %}
     <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
@@ -8,7 +8,7 @@
     {% endif %}
   </div>
 
-  <div class="inline-product__info flex flex-col justify-center">
+  <div class="inline-product__info">
     {{ badge(item.item_type, attrs={'data-type': 'item'}) }}
     <div class="inline-product__title">{{ item.name }}</div>
     {% if item.price %}

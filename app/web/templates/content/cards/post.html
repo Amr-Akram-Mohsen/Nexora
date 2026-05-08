@@ -1,7 +1,6 @@
 {% extends "content/cards/base.html" %}
 {% from "components/ui/badge.html" import badge %}
 
-{% set content = item %}
 {% set post = content.target %}
 
 {# Posts have no thumbnail — suppress image header #}
@@ -9,10 +8,13 @@
 
 {% block meta_top %}
 <div class="card__meta-top flex flex-wrap items-center">
-  {{ badge('Post', 'badge--card-type') }}
+  {{ badge('Community Post', 'badge--card-type') }}
   {% if post.subreddit %}
   {{ badge('r/' ~ post.subreddit, 'badge--topic', 'secondary') }}
   {% endif %}
+  <span class="platform-icon platform-icon--reddit ml-auto">
+    <i class="fab fa-reddit-alien"></i>
+  </span>
 </div>
 {% endblock %}
 
@@ -24,13 +26,13 @@
 
 {% block description %}
 {% if post.body %}
-<p class="card__excerpt">{{ post.body | truncate(120) }}</p>
+<p class="card__excerpt">{{ post.body | truncate(160) }}</p>
 {% endif %}
 {% endblock %}
 
 {% block meta_bottom %}
 <div class="card__meta-item flex items-center">
-  <i class="fas fa-user card__meta-icon"></i>
+  <i class="far fa-user card__meta-icon"></i>
   <span class="card__meta-text truncate">{{ post.author or 'Unknown' }}</span>
 </div>
 
@@ -45,10 +47,7 @@
 <span class="card__meta-dot" aria-hidden="true"></span>
 {% endif %}
 
-<div class="card__meta-item flex items-center">
-  <i class="far fa-calendar-alt card__meta-icon"></i>
-  <time class="card__meta-text">
-    {{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}
-  </time>
-</div>
+<time class="card__date">
+  {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+</time>
 {% endblock %}
