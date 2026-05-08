@@ -3,6 +3,7 @@
 
 {% from "components/ui/badge.html" import badge %}
 {% from "content/features/snippet-utils.html" import content_snippet %}
+{% from "components/ui/button.html" import button %}
 
 {% block title %}{{ post.title }} | Nexora{% endblock %}
 
@@ -29,72 +30,196 @@
 </script>
 {% endblock %}
 
-
 {% block base_header %}
-<div class="detail-page__header-content flex flex-col">
-  <div class="detail-page__badges flex flex-wrap items-center">
-    <span class="platform-icon platform-icon--reddit mr-3">
-      <i class="fab fa-reddit-alien"></i>
-    </span>
+<div class="post-header">
+  <div class="post-header__badges">
+    <div class="platform-badge platform-badge--{{ post.platform }}">
+        <i class="fab fa-{{ post.platform }}"></i>
+        <span>{{ post.platform | title }}</span>
+    </div>
     {% if post.subreddit %}
-    {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
+        {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
     {% endif %}
     {{ badge(content.category.name, 'badge--category') }}
   </div>
 
-  <h1 class="detail-page__title">{{ post.title }}</h1>
+  <h1 class="post-header__title">{{ post.title }}</h1>
 
-  <div class="detail-page__meta flex flex-wrap items-center">
-    <div class="meta-item flex items-center">
-      <div class="meta-icon-wrapper">
-        <i class="far fa-user"></i>
-      </div>
-      <span class="meta-text text--bold">{{ post.author or 'Unknown' }}</span>
+  <div class="post-header__meta">
+    <div class="meta-pill">
+      <i class="far fa-user"></i>
+      <span class="meta-pill__text">{{ post.author or 'Unknown' }}</span>
     </div>
 
     {% if post.upvotes %}
-    <div class="meta-item flex items-center">
-      <div class="meta-icon-wrapper">
-        <i class="fas fa-arrow-up"></i>
-      </div>
-      <span class="text--accent">{{ "{:,}".format(post.upvotes) }} upvotes</span>
+    <div class="meta-pill">
+      <i class="fas fa-arrow-up"></i>
+      <span class="meta-pill__text">{{ "{:,}".format(post.upvotes) }} upvotes</span>
     </div>
     {% endif %}
 
-    <div class="meta-item flex items-center">
-      <div class="meta-icon-wrapper">
-        <i class="far fa-calendar-alt"></i>
-      </div>
-      <span>{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+    <div class="meta-pill">
+      <i class="far fa-calendar-alt"></i>
+      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
     </div>
   </div>
 </div>
+
+<style>
+  .post-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .post-header__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .platform-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+
+  .platform-badge--reddit {
+    background: rgba(255, 69, 0, 0.1);
+    color: #ff4500;
+    border-color: rgba(255, 69, 0, 0.2);
+  }
+
+  .post-header__title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--foreground);
+    margin: 0;
+  }
+
+  .post-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--muted);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+  }
+
+  .meta-pill i {
+    color: var(--domain-primary);
+  }
+</style>
 {% endblock %}
 
-{# Posts have no image — suppress the image slot entirely #}
-{% block base_image %}{% endblock %}
+{% block base_image %}
+{# Posts usually don't have a hero image #}
+{% endblock %}
 
 {% block base_content %}
-<div class="post-body">
+<div class="post-content">
   {% if post.body %}
-  <div class="post-content-text">
+  <div class="post-rich-text">
     {{ post.body | safe }}
   </div>
   {% endif %}
 
   {% if post.url %}
-  <div class="post-source-box flex flex-col mt-8">
-    <div class="source-metadata-wrapper flex items-center">
-      <i class="fab fa-reddit-alien mr-2"></i>
-      <p class="source-metadata">Original post on <strong>r/{{ post.subreddit }}</strong></p>
+  <div class="post-cta-box">
+    <div class="cta-content">
+        <p class="cta-label">Community: <strong>r/{{ post.subreddit }}</strong></p>
+        <h4 class="cta-title">Join the Discussion</h4>
+        <p class="cta-text">This post was originally shared on {{ post.platform | title }}.</p>
     </div>
-    <a href="{{ post.url }}" class="post__view-link" target="_blank" rel="noopener nofollow">
-      {{ button(text="View Full Discussion on Reddit", class="post__view-btn", icon="fab fa-reddit") }}
+    <a href="{{ post.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
+      {{ button(text="View Original Post", variant="primary", icon="fab fa-" ~ post.platform) }}
     </a>
   </div>
   {% endif %}
 </div>
+
+<style>
+  .post-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .post-rich-text {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--foreground);
+    white-space: pre-wrap;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .post-cta-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: 3rem;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .cta-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  .cta-text {
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .post-cta-box {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+    }
+  }
+</style>
 {% endblock %}
+
 
 {% block base_sidebar %}
 {# Posts often have less sidebar content; we can keep it clean or add trending #}
