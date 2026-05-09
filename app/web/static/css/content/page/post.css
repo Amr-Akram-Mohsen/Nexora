@@ -1,0 +1,125 @@
+@import "style.css";
+
+.post-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.post-header__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.platform-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--muted);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+.platform-badge--reddit {
+  background: rgba(255, 69, 0, 0.1);
+  color: #ff4500;
+  border-color: rgba(255, 69, 0, 0.2);
+}
+
+.post-header__title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.post-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.meta-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--muted);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+}
+
+.meta-pill i {
+  color: var(--domain-primary);
+}
+
+
+.post-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.post-rich-text {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--foreground);
+  white-space: pre-wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.post-cta-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 3rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.cta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.cta-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.cta-text {
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .post-cta-box {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+}

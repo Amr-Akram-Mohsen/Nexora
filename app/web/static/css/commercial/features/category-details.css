@@ -1,0 +1,96 @@
+.item-highlights {
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.highlight-item {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.highlight-item:hover {
+  border-color: var(--domain-primary);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.highlight-label {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}
+
+.highlight-value {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  color: var(--foreground);
+}
+
+
+.scent-pyramid {
+  margin-top: 24px;
+  gap: 8px;
+}
+
+.pyramid-layer {
+  max-width: 400px;
+  text-align: center;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  color: #fff;
+}
+
+.pyramid-layer span {
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.pyramid-layer p {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+
+.pyramid-layer--heart {
+  width: 80%;
+  background: var(--brand-red);
+}
+
+.pyramid-layer--base {
+  width: 100%;
+  background: var(--brand-purple);
+}
+
+.perfume-meta {
+  margin-top: 16px;
+  gap: 8px;
+}
+
+.material-badges {
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.size-guide {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--secondary);
+}
+
+.size-guide h4 {
+  margin-bottom: 10px;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.size-guide div {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}

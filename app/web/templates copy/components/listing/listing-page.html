@@ -1,0 +1,77 @@
+{% macro listing_page(class_name="",domain_type="") %}
+<section class="listing-page {{ class_name }}" data-domain-type="{{ domain_type }}">
+
+  {# ── Mobile filter drawer overlay ── #}
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="listing-layout">
+
+    {# ── Left Sidebar ── #}
+    <aside class="listing-sidebar" id="listingSidebar" aria-label="Filters">
+      <div class="listing-sidebar__inner">
+        {# Sidebar header (mobile close) #}
+        <div class="sidebar-header flex items-center justify-between">
+          <span class="sidebar-header__title">Filters</span>
+          <button class="sidebar-close-btn btn--icon" id="sidebarClose" aria-label="Close filters">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        {{ caller('sidebar') }}
+      </div>
+    </aside>
+
+    {# ── Main Results Area ── #}
+    <main class="listing-main">
+
+      {# ── Listing Header: title + sort ── #}
+      <header class="listing-header">
+        {{ caller('header') }}
+      </header>
+
+      {# ── Active Filter Chips ── #}
+      {% set active_filter_content = caller('active_filters') %}
+      {% if active_filter_content and active_filter_content | trim %}
+      <div class="listing-filters-active flex flex-wrap items-center" role="region" aria-label="Active filters">
+        {{ active_filter_content }}
+      </div>
+      {% endif %}
+
+      {# ── Results Grid ── #}
+      <div class="listing-results" role="region" aria-label="Results">
+        {{ caller('results') }}
+      </div>
+
+      {# ── Footer / Pagination ── #}
+      <footer class="listing-footer">
+        {{ caller('footer') }}
+      </footer>
+
+    </main>
+
+  </div>{# end .listing-layout #}
+</section>
+
+<script>
+  (function () {
+    const sidebar = document.getElementById('listingSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('sidebarClose');
+    const openBtn = document.getElementById('filterToggleBtn');
+
+    function openSidebar() {
+      sidebar.classList.add('is-open');
+      overlay.classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('is-open');
+      overlay.classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+  })();
+</script>
+{% endmacro %}

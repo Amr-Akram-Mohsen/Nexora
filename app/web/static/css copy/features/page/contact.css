@@ -1,0 +1,81 @@
+.contact-wrapper {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.contact-header h1 {
+  margin-bottom: 1rem;
+}
+
+.contact-subtitle {
+  color: var(--muted-foreground);
+  margin-bottom: 3rem;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.contact-info {
+  gap: 1.5rem;
+}
+
+.contact-icon {
+  flex-shrink: 0;
+}
+
+.contact-icon i {
+  font-size: var(--text-xl);
+  color: var(--primary);
+}
+
+.contact-item h3 {
+  font-size: var(--text-sm);
+  margin-bottom: 0.25rem;
+}
+
+.contact-item p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.contact-form {
+  gap: 1.5rem;
+}
+
+.contact-submit {
+  width: 100%;
+}
+
+.contact-success {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.ajax-form button.is-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* --- Contact UI & Overrides --- */
+
+.contact-form-card {
+  grid-column: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .contact-grid {
+    grid-template-columns: 1fr 2fr;
+  }
+
+  .contact-form-card {
+    grid-column: span 2;
+  }
+}
+

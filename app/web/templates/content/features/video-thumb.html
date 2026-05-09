@@ -1,0 +1,69 @@
+{% from "content/features/content-image.html" import render_image_url %}
+
+{% macro render_video_thumbnail(thumbnail_url, title, video_url_or_id, duration=None, platform='youtube',
+wrapper_class='card__img-wrapper') %}
+<div class="video-preview-container {{ wrapper_class }}" data-video-ref="{{ video_url_or_id }}"
+    data-platform="{{ platform }}">
+
+    <div class="video-preview__surface">
+        <!-- {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img') }} -->
+
+        <div class="video-preview__overlay">
+            <button class="video-preview__play-btn" aria-label="Play {{ title }}" data-action="lazy-play">
+                <div class="play-icon-wrapper">
+                    <i class="fas fa-play"></i>
+                </div>
+            </button>
+
+            {% if duration %}
+            <span class="video-preview__duration">{{ duration }}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    if (!window.__nexoraVideoInit) {
+        window.__nexoraVideoInit = true;
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-action="lazy-play"]');
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const container = btn.closest('.video-preview-container');
+            if (!container) return;
+
+            const videoRef = container.dataset.videoRef;
+            const platform = container.dataset.platform || 'youtube';
+
+            let videoId = videoRef;
+            if (platform === 'youtube') {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = videoRef.match(regExp);
+                if (match && match[2].length === 11) {
+                    videoId = match[2];
+                }
+            }
+
+            let embedUrl = '';
+            if (platform === 'youtube') {
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+            }
+
+            if (embedUrl) {
+                container.innerHTML = `
+                    <div class="video-player-wrapper">
+                        <iframe class="video-player-iframe" 
+                                src="${embedUrl}" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                `;
+            }
+        });
+    }
+</script>
+{% endmacro %}

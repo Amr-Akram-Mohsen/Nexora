@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block title %}My Profile | Nexora{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/profile.css') }}" />
+{% endblock %}
+
 {% block content %}
 <section class="profile-section">
   <div class="container py-12">

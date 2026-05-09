@@ -1,0 +1,212 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Settings — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <h1>Settings</h1>
+  <p>System configuration and administrative controls</p>
+</div>
+
+<!-- Toast notification -->
+<div id="settings-toast" class="settings-toast" role="alert" aria-live="polite"></div>
+
+<div class="settings-grid">
+
+  <!-- System Info -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🖥️</span>
+      <div>
+        <h3>System Info</h3>
+        <p class="settings-card-desc">Live system status and version</p>
+      </div>
+    </div>
+    <div id="system-info" class="settings-card-body">
+      <div class="dashboard-loading">
+        <div class="spinner"></div>
+        <p>Loading…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cache Controls -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🗄️</span>
+      <div>
+        <h3>Cache</h3>
+        <p class="settings-card-desc">Invalidate server-side cache</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <button id="clear-cache-btn" class="admin-btn-primary settings-action-btn">
+        Clear Cache
+      </button>
+      <p class="hint">Clears server cache. First request after clearing may be slower.</p>
+    </div>
+  </div>
+
+  <!-- Maintenance Mode -->
+  <div class="settings-card">
+    <div class="settings-card-header">
+      <span class="settings-card-icon">🔧</span>
+      <div>
+        <h3>Maintenance Mode</h3>
+        <p class="settings-card-desc">Take the site offline for maintenance</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <label class="settings-toggle-row">
+        <span class="settings-toggle-label">Enable maintenance mode</span>
+        <span class="settings-toggle-wrapper">
+          <input type="checkbox" id="maintenance-toggle" class="settings-toggle-input" />
+          <span class="settings-toggle-track"></span>
+        </span>
+      </label>
+      <p class="hint" id="maintenance-status-hint">Maintenance mode is currently <strong>disabled</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Integrations Monitor -->
+  <div class="settings-card" id="integrations">
+    <div class="settings-card-header">
+      <div class="settings-card-icon-wrapper blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m8 10 4 4 4-4" />
+          <path d="M12 14v7" />
+          <path d="M12 3v7" />
+          <path d="M4 12h3" />
+          <path d="M17 12h3" />
+        </svg>
+      </div>
+      <div>
+        <h3>Integrations</h3>
+        <p class="settings-card-desc">External API source health & activity</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div id="integrations-monitor" class="integrations-monitor-list">
+        <div class="dashboard-loading">
+          <div class="spinner"></div>
+          <p>Loading status...</p>
+        </div>
+      </div>
+      <p class="hint">
+        Data ingestion is handled via scheduled jobs or CLI commands.
+      </p>
+    </div>
+  </div>
+
+  <!-- Ingestion Log -->
+  <div class="settings-card" id="ingestion-log-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon-wrapper purple">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      </div>
+      <div>
+        <h3>Ingestion Log</h3>
+        <p class="settings-card-desc">Recent API fetch events</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-tabs-wrapper">
+        <button class="settings-tab active" id="filter-all-logs">All Events</button>
+        <button class="settings-tab" id="filter-article-logs">Articles</button>
+        <button class="settings-tab" id="filter-item-logs">Items</button>
+      </div>
+      <div id="ingestion-log-container" class="settings-log-container">
+        <div class="dashboard-loading">
+          <div class="spinner"></div>
+          <p>Loading logs...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="settings-card danger-zone-card">
+    <div class="settings-card-header">
+      <div class="settings-card-icon-wrapper red">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="danger-title">Danger Zone</h3>
+        <p class="settings-card-desc">Irreversible destructive operations</p>
+      </div>
+    </div>
+    <div class="settings-card-body">
+      <div class="settings-danger-row">
+        <div class="danger-info">
+          <strong>Reset System</strong>
+          <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action
+            cannot be undone.</p>
+        </div>
+        <button id="reset-system-btn" class="admin-btn-danger settings-action-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" x2="10" y1="11" y2="17" />
+            <line x1="14" x2="14" y1="11" y2="17" />
+          </svg>
+          Reset System
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<template id="integration-row-template">
+  <div class="integration-row">
+    <span class="integration-name"></span>
+    <span class="integration-status"></span>
+    <span class="integration-meta">
+      <span class="meta-requests"></span>
+      <span class="integration-separator">|</span>
+      <span class="meta-last-fetch"></span>
+    </span>
+  </div>
+</template>
+
+
+<template id="log-item-template">
+  <li class="activity-item">
+    <div class="activity-icon"></div>
+
+    <div class="activity-content">
+      <p class="activity-text">
+        <strong class="log-source"></strong>
+        <span>fetched</span>
+        <span class="activity-target log-category"></span>
+
+        <span class="log-badges">
+          <span class="integration-status log-status"></span>
+          <span class="integration-status status-badge admin log-type"></span>
+        </span>
+      </p>
+
+      <p class="activity-meta log-query"></p>
+      <p class="activity-meta log-time"></p>
+    </div>
+  </li>
+</template>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/control_panel/settings.js') }}"></script>
+{% endblock %}

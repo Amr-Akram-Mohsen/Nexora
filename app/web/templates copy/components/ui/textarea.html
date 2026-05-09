@@ -1,0 +1,11 @@
+{% macro textarea(name="", id=None, rows=4, placeholder="", class="", required=True) %}
+<textarea
+  name="{{ name }}"
+  id="{{ id or name }}"
+  rows="{{ rows }}"
+  placeholder="{{ placeholder }}"
+  {% if required %}required{% endif %}
+  class="textarea flex {{ class }}"
+
+></textarea>
+{% endmacro %}

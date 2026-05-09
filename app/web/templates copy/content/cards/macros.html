@@ -1,0 +1,137 @@
+{# app/web/templates/content/cards/macros.html #}
+{% from "components/media/content-image.html" import render_image_url %}
+{% from "components/media/video-thumb.html" import render_video_thumbnail %}
+{% from "components/ui/badge.html" import badge %}
+
+{% macro render_content_card(item) %}
+    {% if item.object_type == "article" %}
+        {{ render_article_card(item) }}
+    {% elif item.object_type == "video" %}
+        {{ render_video_card(item) }}
+    {% elif item.object_type == "post" %}
+        {{ render_post_card(item) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_article_card(item) %}
+<article class="card" data-type="article" data-id="{{ item.id }}" data-domain-type="content">
+    <a href="{{ url_for('content.content_page', content_id=item.id) }}" class="card__img-link">
+        <div class="card__img-container">
+            {{ render_image_url(item.target.image_url, item.target.title) }}
+            <div class="card__type-indicator">
+                <i class="far fa-file-alt"></i>
+                <span>Article</span>
+            </div>
+        </div>
+    </a>
+
+    <div class="card__body">
+        <div class="card__top-meta">
+            {{ badge(item.category.name, 'badge--category') }}
+            {% for topic in item.topics[:1] %}
+                {{ badge(topic.name, 'badge--topic', 'secondary') }}
+            {% endfor %}
+        </div>
+
+        <a href="{{ url_for('content.content_page', content_id=item.id) }}" class="card__title-link">
+            <h3 class="card__title">{{ item.target.title }}</h3>
+        </a>
+
+        <p class="card__excerpt">{{ item.target.preview_text | truncate(110) or '' }}</p>
+
+        <div class="card__footer">
+            <div class="card__footer-item">
+                <i class="far fa-newspaper"></i>
+                <span class="truncate">{{ item.target.source_name }}</span>
+            </div>
+            <div class="card__footer-divider"></div>
+            {% if item.target.read_time_minutes %}
+                <div class="card__footer-item">
+                    <i class="far fa-clock"></i>
+                    <span>{{ item.target.read_time_minutes }}m</span>
+                </div>
+                <div class="card__footer-divider"></div>
+            {% endif %}
+            <time class="card__date">
+                {{ item.published_at.strftime('%b %d') if item.published_at else 'Recent' }}
+            </time>
+        </div>
+    </div>
+</article>
+{% endmacro %}
+
+{% macro render_video_card(item) %}
+<article class="card" data-type="video" data-id="{{ item.id }}" data-domain-type="content">
+    <div class="card__img-container">
+        {{ render_video_thumbnail(item.target.thumbnail_url, item.target.title, item.target.url or item.target.external_id, platform=item.target.platform) }}
+        <div class="card__type-indicator">
+            <i class="fas fa-video"></i>
+            <span>Video</span>
+        </div>
+    </div>
+
+    <div class="card__body">
+        <div class="card__top-meta">
+            {{ badge(item.category.name, 'badge--category') }}
+            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto">
+                <i class="fab fa-{{ item.target.platform }}"></i>
+            </span>
+        </div>
+
+        <a href="{{ url_for('content.content_page', content_id=item.id) }}" class="card__title-link">
+            <h3 class="card__title">{{ item.target.title }}</h3>
+        </a>
+
+        <div class="card__footer">
+            <div class="card__footer-item">
+                <i class="fas fa-play-circle"></i>
+                <span class="truncate">{{ item.target.channel_name }}</span>
+            </div>
+            <div class="card__footer-divider"></div>
+            <time class="card__date">
+                {{ item.published_at.strftime('%b %d') if item.published_at else 'Recent' }}
+            </time>
+        </div>
+    </div>
+</article>
+{% endmacro %}
+
+{% macro render_post_card(item) %}
+<article class="card" data-type="post" data-id="{{ item.id }}" data-domain-type="content">
+    <div class="card__body">
+        <div class="card__top-meta">
+            {{ badge('Community', 'badge--post-type') }}
+            {% if item.target.subreddit %}
+                {{ badge('r/' ~ item.target.subreddit, 'badge--topic', 'secondary') }}
+            {% endif %}
+            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto">
+                <i class="fab fa-{{ item.target.platform }}"></i>
+            </span>
+        </div>
+
+        <a href="{{ url_for('content.content_page', content_id=item.id) }}" class="card__title-link">
+            <h3 class="card__title">{{ item.target.title }}</h3>
+        </a>
+
+        <p class="card__excerpt">{{ item.target.body | truncate(150) or '' }}</p>
+
+        <div class="card__footer">
+            <div class="card__footer-item">
+                <i class="far fa-user"></i>
+                <span class="truncate">{{ item.target.author or 'Unknown' }}</span>
+            </div>
+            <div class="card__footer-divider"></div>
+            {% if item.target.upvotes %}
+                <div class="card__footer-item">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>{{ item.target.upvotes }}</span>
+                </div>
+                <div class="card__footer-divider"></div>
+            {% endif %}
+            <time class="card__date">
+                {{ item.published_at.strftime('%b %d') if item.published_at else 'Recent' }}
+            </time>
+        </div>
+    </div>
+</article>
+{% endmacro %}

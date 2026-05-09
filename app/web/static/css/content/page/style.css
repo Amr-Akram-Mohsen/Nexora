@@ -1,0 +1,9 @@
+@import "../../layout/detail-layout.css";
+
+@import "../features/breadcrumbs.css";
+@import "../features/content-utils.css";
+
+@import "../cards/item-compact.css";
+
+@import "../../components/interactions/comments.css";
+@import "../../components/interactions/interaction.css";

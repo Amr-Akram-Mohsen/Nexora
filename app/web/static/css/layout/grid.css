@@ -3,10 +3,6 @@
   padding: 3rem 1rem;
 }
 
-.hero-slider .container {
-  padding-block: 0;
-}
-
 .section-filters {
   margin-bottom: 2rem;
 }
@@ -123,39 +119,4 @@
   .contents-listing .grid-auto {
     grid-template-columns: 1fr;
   }
-}
-
-
-/* --- Breadcrumbs --- */
-
-.breadcrumbs {
-  margin-bottom: 1.25rem;
-}
-
-.breadcrumbs ul {
-  gap: 0.35rem;
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
-  flex-wrap: wrap;
-}
-
-.breadcrumb-link {
-  color: var(--muted-foreground);
-  transition: color 0.15s;
-  text-transform: none;
-}
-
-.breadcrumb-link:hover {
-  color: rgb(var(--brand-blue-rgb));
-}
-
-.breadcrumbs .separator {
-  font-size: var(--text-xs);
-  opacity: 0.4;
-}
-
-.breadcrumb-current {
-  color: var(--foreground);
-  font-weight: var(--weight-md);
-  text-transform: none;
 }

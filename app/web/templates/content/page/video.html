@@ -1,10 +1,9 @@
 {% extends "content/page/base.html" %}
 {% set video = content.target %}
 
-{% from "components/media/content-image.html" import render_image_url %}
-{% from "components/media/video-thumb.html" import render_video_thumbnail %}
+{% from "content/features/content-image.html" import render_image_url %}
+{% from "content/features/video-thumb.html" import render_video_thumbnail %}
 {% from "components/ui/badge.html" import badge %}
-{% from "content/features/snippet-utils.html" import content_snippet %}
 
 {% block title %}Nexora | {{ video.title }}{% endblock %}
 
@@ -35,12 +34,12 @@
 <div class="video-header">
   <div class="video-header__badges">
     <div class="platform-badge platform-badge--{{ video.platform }}">
-        <i class="fab fa-{{ video.platform }}"></i>
-        <span>{{ video.platform | title }}</span>
+      <i class="fab fa-{{ video.platform }}"></i>
+      <span>{{ video.platform | title }}</span>
     </div>
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
-        {{ badge(topic.name, 'badge--topic', 'secondary') }}
+    {{ badge(topic.name, 'badge--topic', 'secondary') }}
     {% endfor %}
   </div>
 
@@ -56,7 +55,8 @@
 
     <div class="meta-pill">
       <i class="far fa-calendar-alt"></i>
-      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
+        }}</span>
     </div>
 
     {% if content.view_count %}
@@ -69,71 +69,6 @@
 </div>
 
 <style>
-  .video-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .video-header__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .platform-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-full);
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--muted);
-    color: var(--foreground);
-    border: 1px solid var(--border);
-  }
-
-  .platform-badge--youtube {
-    background: rgba(255, 0, 0, 0.1);
-    color: #ff0000;
-    border-color: rgba(255, 0, 0, 0.2);
-  }
-
-  .video-header__title {
-    font-size: clamp(1.75rem, 4vw, 3rem);
-    font-weight: 800;
-    line-height: 1.2;
-    color: var(--foreground);
-    margin: 0;
-  }
-
-  .video-header__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .meta-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--muted);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-full);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--muted-foreground);
-    border: 1px solid var(--border);
-  }
-
-  .meta-pill i {
-    color: var(--domain-primary);
-  }
 </style>
 {% endblock %}
 
@@ -144,54 +79,20 @@
 {% block base_content %}
 <div class="video-content">
   <div class="video-player-container">
-    {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url or video.external_id, platform=video.platform, wrapper_class='video-main-player') }}
+    {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url or video.external_id, platform=video.platform,
+    wrapper_class='video-main-player') }}
   </div>
 
   {% if video.description %}
   <div class="video-description-box">
     <h3 class="video-description-box__title">Description</h3>
     <div class="video-description-box__text">
-        {{ video.description | urlize }}
+      {{ video.description | urlize }}
     </div>
   </div>
   {% endif %}
 </div>
 
 <style>
-  .video-player-container {
-    width: 100%;
-    border-radius: var(--radius-2xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-2xl);
-    background: black;
-    margin-bottom: 3rem;
-    border: 1px solid var(--border);
-  }
-
-  .video-main-player {
-    width: 100%;
-    aspect-ratio: 16/9;
-  }
-
-  .video-description-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 2rem;
-  }
-
-  .video-description-box__title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: var(--foreground);
-  }
-
-  .video-description-box__text {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--muted-foreground);
-    white-space: pre-wrap;
-  }
 </style>
 {% endblock %}

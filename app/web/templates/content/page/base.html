@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 
+{% block page_css %}
+<link rel="stylesheet"
+  href="{{ url_for('static', filename='css/content/page/%s.css' | format(content.object_type)) }}" />
+{% endblock %}
+
 {% from "components/ui/button.html" import button %}
-{% from "content/features/snippet-utils.html" import content_snippet %}
+{% from "content/features/content-utils.html" import content_snippet %}
 
 {% block content %}
 <section class="detail-page" data-type="{{ content.object_type }}" data-domain-type="content">

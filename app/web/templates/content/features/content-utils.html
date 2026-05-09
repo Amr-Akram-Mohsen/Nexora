@@ -1,0 +1,22 @@
+{% from"content/features/content-image.html" import render_image_url %}
+{% macro content_snippet(items, snippet_title) %}
+<div class="snippet-contents__section">
+  <h3 class="snippet__header">{{ snippet_title }}</h3>
+  <div class="snippet-contents flex flex-col">
+    {% for item in items %}
+    <a href="
+    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex">
+      {{ render_image_url(
+      item.image or item.image_url,
+      item.title,
+      ' snippet-content__img')
+      }}
+      <div class="snippet-content__content">
+        <h4 class="snippet-content__title">{{ item.title }}</h4>
+        <p class="snippet-content__date">{{ item.published_at.strftime('%b %d, %Y') }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}

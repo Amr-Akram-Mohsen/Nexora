@@ -1,0 +1,152 @@
+{# catalog-sidebar.html #}
+{% from "components/ui/button.html" import button %}
+
+{# ── Canonical filter priority order ── #}
+{% set filter_priority = ['category', 'topic', 'brand', 'store', 'type'] %}
+
+<div class="filter-sidebar flex flex-col">
+
+  {# ── Sidebar brand accent strip ── #}
+  <div class="sidebar-accent sidebar-accent--contents">
+  </div>
+
+  {# ── Sidebar title row ── #}
+  <div class="sidebar-heading flex items-center justify-between">
+    <span class="sidebar-heading__label">
+      <i class="fas fa-newspaper"></i>
+      Article Filters
+    </span>
+
+    {# Reset link — shown only when filters are active #}
+    {% set has_active = namespace(value=false) %}
+    {% for k, v in active_filters.items() if k not in ['sort'] %}
+    {% if v %}{% set has_active.value = true %}{% endif %}
+    {% endfor %}
+    {% if has_active.value %}
+    <a href="{{ url_for(request.endpoint, **request.view_args) }}" class="sidebar-reset-link">
+      <i class="fas fa-rotate-left"></i> Reset
+    </a>
+    {% endif %}
+  </div>
+
+
+  {# ══════════════════════════════════════════════════
+  FILTER GROUPS — rendered in priority order
+  Guarantees: category → topic → brand → store → type
+  ══════════════════════════════════════════════════ #}
+
+  {# Build the ordered list of filters to render #}
+  {% set filters_to_render = [] %}
+  {# Priority order first #}
+  {% for fname in filter_priority %}
+  {% if fname in allowed_filters and filter_options.get(fname) %}
+  {% if filters_to_render.append(fname) %}{% endif %}
+  {% endif %}
+  {% endfor %}
+  {# Any remaining allowed_filters not in priority list #}
+  {% for fname in allowed_filters %}
+  {% if fname not in filter_priority and filter_options.get(fname) %}
+  {% if filters_to_render.append(fname) %}{% endif %}
+  {% endif %}
+  {% endfor %}
+
+  {# Render each filter group #}
+  {% for filter_name in filters_to_render %}
+  {% set options = filter_options.get(filter_name, []) %}
+
+  {# Determine if ANY option in this group is active #}
+  {% set group_active = namespace(count=0) %}
+  {% for opt in options %}
+  {% set slug = opt.slug if opt.slug is defined else opt %}
+  {% if slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
+  {% set group_active.count = group_active.count + 1 %}
+  {% endif %}
+  {% endfor %}
+
+  {# Collapse groups with many options by default, open short ones and active ones #}
+  {% set is_open = (options | length <= 8) or (group_active.count> 0) %}
+
+    <details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open
+      }}>
+      <summary class="filter-section__summary flex items-center justify-between">
+        <span class="filter-section__title">
+          {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
+          {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
+          {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics
+          {%- elif filter_name == 'store' -%}<i class="fas fa-store"></i> Stores
+          {%- elif filter_name == 'type' -%}<i class="fas fa-shapes"></i> Type
+          {%- else -%}<i class="fas fa-filter"></i> {{ filter_name | title }}
+          {%- endif -%}
+        </span>
+        <span class="filter-section__meta flex items-center">
+          {% if group_active.count > 0 %}
+          <span class="filter-section__badge">{{ group_active.count }}</span>
+          {% endif %}
+          <i class="fas fa-chevron-down filter-section__chevron"></i>
+        </span>
+      </summary>
+
+      <ul class="filter-list flex flex-col">
+        {% for opt in options %}
+        {% set slug = opt.slug if opt.slug is defined else opt %}
+        {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
+        {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
+
+        <li class="filter-item {{ 'is-active' if is_active }}">
+          <a href="{{ get_filter_url(filter_name, slug, multi=(filter_name not in ['category'])) }}"
+            class="filter-item__link flex items-center" title="{{ name }}">
+            <span class="checkbox-box {{ 'checked' if is_active }}" aria-hidden="true"></span>
+            <span class="filter-item__name truncate">{{ name }}</span>
+          </a>
+        </li>
+        {% endfor %}
+
+        {# "Show more" hint if list is long (>8) and collapsed above #}
+        {% if options | length > 8 and not is_open %}
+        <li class="filter-item filter-item--more">
+          <span class="filter-item__more-hint">{{ options | length - 8 }} more…</span>
+        </li>
+        {% endif %}
+      </ul>
+    </details>
+    {% endfor %}
+
+    {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
+    <div class="sidebar-trending">
+      <div class="sidebar-trending__header flex items-center">
+        <i class="fas fa-fire"></i>
+        <span class="sidebar-trending__title">Trending Now</span>
+      </div>
+      <div class="sidebar-trending__links flex flex-col">
+
+        {# Show active topic quick-links if topics available #}
+        {% set topic_opts = filter_options.get('topic', []) %}
+        {% if topic_opts %}
+        {% for opt in topic_opts[:5] %}
+        {% set slug = opt.slug if opt.slug is defined else opt %}
+        {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
+        {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
+        <a href="{{ get_filter_url('topic', slug, multi=true) }}"
+          class="sidebar-trending__link {{ 'is-active' if is_active }}">
+          <i class="fas fa-arrow-trend-up"></i>
+          <span class="truncate">{{ name }}</span>
+        </a>
+        {% endfor %}
+        {% else %}
+        {# Fallback: generic popular link #}
+        <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}"
+          class="sidebar-trending__link">
+          <i class="fas fa-star"></i>
+          <span>Most Popular Articles</span>
+        </a>
+        {% endif %}
+
+        <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}"
+          class="sidebar-trending__view-all">
+          View all popular <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+
+</div>{# end .filter-sidebar #}

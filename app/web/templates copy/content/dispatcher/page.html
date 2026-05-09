@@ -1,0 +1,7 @@
+{% if content.object_type == "article" %}
+{% include "content/page/article.html" %}
+{% elif content.object_type == "video" %}
+{% include "content/page/video.html" %}
+{% elif content.object_type == "post" %}
+{% include "content/page/post.html" %}
+{% endif %}

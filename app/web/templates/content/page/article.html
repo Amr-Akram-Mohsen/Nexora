@@ -2,11 +2,9 @@
 
 {% set article = content.target %}
 
-{% from "content/features/snippet-utils.html" import content_snippet %}
-{% from "components/media/content-image.html" import render_image_url %}
+{% from "content/features/content-image.html" import render_image_url %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/badge.html" import badge %}
-{% from "content/cards/item-compact.html" import render_item_compact_card %}
 
 {% block title %}Nexora | {{ article.title }}{% endblock %}
 
@@ -49,7 +47,7 @@
   <div class="article-header__badges">
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:3] %}
-        {{ badge(topic.name, 'badge--topic', 'secondary') }}
+    {{ badge(topic.name, 'badge--topic', 'secondary') }}
     {% endfor %}
   </div>
 
@@ -60,7 +58,7 @@
       <i class="far fa-newspaper"></i>
       <span class="meta-pill__text">{{ article.source_name }}</span>
     </div>
-    
+
     <div class="meta-pill">
       <i class="far fa-clock"></i>
       <span class="meta-pill__text">{{ article.read_time_minutes }} min read</span>
@@ -68,7 +66,8 @@
 
     <div class="meta-pill">
       <i class="far fa-calendar"></i>
-      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent' }}</span>
+      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
+        }}</span>
     </div>
 
     {% if article.is_content_scraped %}
@@ -81,61 +80,6 @@
 </div>
 
 <style>
-  .article-header {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .article-header__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .article-header__title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1.1;
-    color: var(--foreground);
-    letter-spacing: -0.02em;
-    margin: 0;
-  }
-
-  .article-header__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .meta-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--muted);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-full);
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--muted-foreground);
-    border: 1px solid var(--border);
-  }
-
-  .meta-pill i {
-    color: var(--domain-primary);
-  }
-
-  .meta-pill--success {
-    background: rgba(var(--brand-green-rgb), 0.1);
-    color: var(--brand-green);
-    border-color: rgba(var(--brand-green-rgb), 0.2);
-  }
-
-  .meta-pill--success i {
-    color: var(--brand-green);
-  }
 </style>
 {% endblock %}
 
@@ -145,54 +89,32 @@
 </div>
 
 <style>
-  .article-hero-image {
-    width: 100%;
-    aspect-ratio: 21/9;
-    border-radius: var(--radius-2xl);
-    overflow: hidden;
-    margin-bottom: 3rem;
-    box-shadow: var(--shadow-xl);
-    border: 1px solid var(--border);
-  }
-
-  .hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  @media (max-width: 768px) {
-    .article-hero-image {
-      aspect-ratio: 16/9;
-      margin-bottom: 2rem;
-    }
-  }
 </style>
 {% endblock %}
 
 {% block base_content %}
 <div class="article-content">
   {% if content.linked_items %}
-    {% include "partials/affiliate-disclosure.html" %}
+  {% include "partials/affiliate-disclosure.html" %}
   {% endif %}
 
   <div class="article-rich-text">
     {% if article.content_html %}
-        {{ article.content_html | safe }}
+    {{ article.content_html | safe }}
     {% elif article.body %}
-        {{ article.body | safe }}
+    {{ article.body | safe }}
     {% elif article.content_text %}
-        <p>{{ article.content_text | safe }}</p>
+    <p>{{ article.content_text | safe }}</p>
     {% else %}
-        <p class="article-description-only">{{ article.description | safe }}</p>
+    <p class="article-description-only">{{ article.description | safe }}</p>
     {% endif %}
   </div>
 
   <div class="article-cta-box">
     <div class="cta-content">
-        <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
-        <h4 class="cta-title">Want to read more?</h4>
-        <p class="cta-text">Check out the full story on the original publisher's website.</p>
+      <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
+      <h4 class="cta-title">Want to read more?</h4>
+      <p class="cta-text">Check out the full story on the original publisher's website.</p>
     </div>
     <a href="{{ article.source_url or article.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
       {{ button(text="Read Full Article", variant="primary", icon="fas fa-external-link-alt") }}
@@ -201,65 +123,5 @@
 </div>
 
 <style>
-  .article-content {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .article-rich-text {
-    font-size: 1.125rem;
-    line-height: 1.8;
-    color: var(--foreground);
-    margin-bottom: 4rem;
-  }
-
-  .article-rich-text p {
-    margin-bottom: 1.5rem;
-  }
-
-  .article-rich-text h2, .article-rich-text h3 {
-    margin: 2.5rem 0 1rem;
-    font-weight: 700;
-  }
-
-  .article-cta-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    margin-top: 4rem;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .cta-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted-foreground);
-    margin-bottom: 0.5rem;
-  }
-
-  .cta-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem;
-  }
-
-  .cta-text {
-    color: var(--muted-foreground);
-    margin: 0;
-  }
-
-  @media (max-width: 640px) {
-    .article-cta-box {
-      flex-direction: column;
-      text-align: center;
-      padding: 1.5rem;
-    }
-  }
 </style>
-{% endblock %}
+{% endblock %}

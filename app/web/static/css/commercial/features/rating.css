@@ -1,0 +1,9 @@
+.item-rating {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+}
+
+.item-reviews-count {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}

@@ -46,6 +46,8 @@
   <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.cleaned.css') }}" /> -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/article_content.css') }}" />
+
+  {% block page_css %}{% endblock %}
   {% block css %}{% endblock %}
 
   {% block app_data %}

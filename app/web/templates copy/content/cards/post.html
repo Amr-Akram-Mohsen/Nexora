@@ -1,0 +1,53 @@
+{% extends "content/cards/base.html" %}
+{% from "components/ui/badge.html" import badge %}
+
+{% set post = content.target %}
+
+{# Posts have no thumbnail — suppress image header #}
+{% block header %}{% endblock %}
+
+{% block meta_top %}
+<div class="card__meta-top flex flex-wrap items-center">
+  {{ badge('Community Post', 'badge--card-type') }}
+  {% if post.subreddit %}
+  {{ badge('r/' ~ post.subreddit, 'badge--topic', 'secondary') }}
+  {% endif %}
+  <span class="platform-icon platform-icon--reddit ml-auto">
+    <i class="fab fa-reddit-alien"></i>
+  </span>
+</div>
+{% endblock %}
+
+{% block title %}
+<a href="{{ url_for('content.content_page', content_id=content.id) }}">
+  <h3 class="card__title">{{ post.title }}</h3>
+</a>
+{% endblock %}
+
+{% block description %}
+{% if post.body %}
+<p class="card__excerpt">{{ post.body | truncate(160) }}</p>
+{% endif %}
+{% endblock %}
+
+{% block meta_bottom %}
+<div class="card__meta-item flex items-center">
+  <i class="far fa-user card__meta-icon"></i>
+  <span class="card__meta-text truncate">{{ post.author or 'Unknown' }}</span>
+</div>
+
+<span class="card__meta-dot" aria-hidden="true"></span>
+
+{% if post.upvotes %}
+<div class="card__meta-item flex items-center">
+  <i class="fas fa-arrow-up card__meta-icon"></i>
+  <span class="card__meta-text">{{ post.upvotes }}</span>
+</div>
+
+<span class="card__meta-dot" aria-hidden="true"></span>
+{% endif %}
+
+<time class="card__date">
+  {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+</time>
+{% endblock %}

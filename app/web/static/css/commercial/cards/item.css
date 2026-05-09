@@ -1,0 +1,41 @@
+.item-price-box {
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.item-price-current {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--domain-primary);
+}
+
+.item-price-old {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  text-decoration: line-through;
+}
+
+.item-price-unavailable {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.item-store-box {
+  width: 100%;
+}
+
+.item-store-badge {
+  gap: 0.25rem;
+}
+
+.item-store-badge img {
+  height: 16px;
+  width: auto;
+  border-radius: 2px;
+}
+
+.item-store-badge .store-name {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}

@@ -1,0 +1,33 @@
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ul class="flex items-center">
+
+    <li>
+      <a href="/" class="breadcrumb-link">
+        <i class="fas fa-home"></i>
+      </a>
+    </li>
+
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+
+    {% if content.section %}
+    <li>
+      <a href="{{ url_for('content.sections', section_slug=content.section.slug) }}" class="breadcrumb-link">
+        {{ content.section.name }}
+      </a>
+    </li>
+
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+    {% endif %}
+
+    <li>
+      <span class="breadcrumb-current">
+        {{ content.target.title | truncate(35) }}
+      </span>
+    </li>
+
+  </ul>
+</nav>

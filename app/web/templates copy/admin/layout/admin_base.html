@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Admin{% endblock %}
+
+{% block meta %}{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block overlays %}{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+
+  <aside class="admin-sidebar">
+    {% include "admin/dashboard/_nav.html" %}
+  </aside>
+
+  <main class="admin-content">
+    {% block admin_content %}{% endblock %}
+  </main>
+
+</div>
+{% endblock %}
+
+{% block additional_content %}{% endblock %}
+
+{% block scripts %}
+{# {{ super() }} #}
+{% block admin_scripts %}{% endblock %}
+{% endblock %}

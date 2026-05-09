@@ -10,6 +10,10 @@
 
 {% block title %}{{ page_title }} | Nexora{% endblock %}
 
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/catalog-page.css') }}" />
+{% endblock %}
+
 {% block content %}
 
 {% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing", domain_type=target_type) %}
@@ -18,7 +22,7 @@
 SLOT: sidebar
 ═══════════════════════════════════════ #}
 {% if slot == 'sidebar' %}
-{% include "components/catalog/content-sidebar.html" %}
+{% include "content/features/content-sidebar.html" %}
 {% endif %}
 
 {# ═══════════════════════════════════════
@@ -56,7 +60,7 @@ SLOT: header
     <h1 class="listing-title">{{ page_title }}</h1>
     <p class="listing-count">
       <span class="listing-count__num">{{ results|length }}</span>
-      {{ target_type }} found
+      contents found
     </p>
   </div>
 
@@ -103,8 +107,8 @@ SLOT: active_filters
 {% for val in vals %}
 <div class="filter-tag flex items-center">
   <span>{{ val | replace('-', ' ') | title }}</span>
-  <a href="{{ get_filter_url(filter_name, val, multi=(target_type == 'products' or filter_name != 'category')) }}"
-    class="remove-tag" aria-label="Remove {{ val }} filter">&times;</a>
+  <a href="{{ get_filter_url(filter_name, val, multi=(filter_name != 'category')) }}" class="remove-tag"
+    aria-label="Remove {{ val }} filter">&times;</a>
 </div>
 {% endfor %}
 {% endif %}
@@ -195,7 +199,7 @@ SLOT: footer (pagination)
 {# Empty state (show in results slot) #}
 {% if slot == 'results' %}
 {{ empty_state(
-title="No " ~ target_type | title ~ " Found",
+title="No contents" | title ~ " Found",
 message="We couldn't find any match for your current filters or search query. Try clearing filters to see more.",
 action_text="Reset All Filters",
 action_url=url_for(request.endpoint, **request.view_args)

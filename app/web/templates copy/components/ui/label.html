@@ -1,0 +1,9 @@
+{% macro label(text, for_id, class="") %}
+<label for="{{ for_id }}" class="label flex items-center {{ class }}">
+  {{ text }}
+
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</label>
+{% endmacro %}

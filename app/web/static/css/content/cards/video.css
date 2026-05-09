@@ -1,0 +1,8 @@
+.platform-icon--youtube {
+  color: #ff0000;
+  background: rgba(255, 0, 0, 0.05);
+}
+
+[data-type="video"] {
+  --card-aspect-ratio: 16/9;
+}

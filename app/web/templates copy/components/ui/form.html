@@ -1,0 +1,11 @@
+{% macro form(class="", variant="default", form_action=None, attrs={}, method="POST", include_csrf=True) %}
+{% set default_classes = 'form flex flex-col '
+if variant == 'default'
+else ''
+%}
+<form method="{{ method }}" {% if form_action %} action="{{ form_action }}" {% endif %}
+  class="{{ default_classes }}{{ class }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+  {% if include_csrf %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+  {{ caller() }}
+</form>
+{% endmacro %}

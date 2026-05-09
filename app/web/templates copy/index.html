@@ -1,0 +1,43 @@
+<!-- index.html -->
+{% extends"base.html" %}
+{% block title %}Nexora | Home{% endblock %}
+{% block content %}
+{% from"components/ui/section.html" import section %}
+{% include "components/hero-sliders.html" %}
+<div class="container">
+
+  {% from"components/ui/grid.html" import grid %}
+  {% set sections = [
+  {"section":"deals","section_title":"top deals", "cards": top_deals, "carousel": true },
+  {"section":"reviews","section_title":"latest reviews" ,"cards": latest_reviews },
+  {"section":"news","section_title":"tech news & trends", "cards": tech_news },
+  {"section":"recent","section_title":"recently added", "cards": recently_added, "carousel": true },
+  {"section":"tutorials","section_title":"how-to guides & tutorials", "cards": tutorials } ] %}
+
+  {% for s in sections %}
+  {% call section(s.section_title, s.section ) %}
+  {{ grid(s.cards, carousel=s.get('carousel', false)) }}
+  {% endcall %}
+  {% endfor %}
+
+  {# ── Newsletter strip — footer places it, component fills it ── #}
+  <div class="footer-newsletter">
+    <div class="newsletter-block">
+
+      <div class="newsletter-icon" aria-hidden="true">
+        <i class="fas fa-envelope"></i>
+      </div>
+
+      <h3 class="newsletter-title">Stay Updated</h3>
+
+      {# .newsletter is the component root; newsletter-block.html is reusable #}
+      <div class="newsletter" data-newsletter>
+        {% include "partials/newsletter.html" %}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

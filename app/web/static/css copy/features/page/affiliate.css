@@ -1,0 +1,67 @@
+.affiliate-trust-banner {
+  background: var(--gradient-primary);
+  color: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  gap: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.trust-icon {
+  font-size: var(--text-3xl);
+}
+
+.affiliate-partners {
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.partner-card {
+  flex: 1;
+  min-width: 150px;
+  background: var(--card);
+  padding: 2rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.partner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand-blue);
+}
+
+.partner-icon {
+  font-size: var(--text-4xl);
+  color: var(--primary);
+}
+
+.partner-name {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+}
+
+.affiliate-disclosure-banner {
+  background: rgba(var(--primary-rgb), var(--alpha-soft));
+  border-left: 4px solid var(--primary);
+  padding: 0.75rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.affiliate-disclosure-banner .banner-icon {
+  color: var(--primary);
+}
+
+.affiliate-disclosure-banner .banner-link {
+  color: var(--primary);
+  text-decoration: underline;
+}

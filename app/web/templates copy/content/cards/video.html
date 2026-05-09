@@ -1,0 +1,36 @@
+{% extends "content/cards/base.html" %}
+{% from "components/media/video-thumb.html" import render_video_thumbnail %}
+{% from "components/ui/badge.html" import badge %}
+
+{% set video = content.target %}
+
+{% block image_content %}
+{{ render_video_thumbnail(video.thumbnail_url, video.title, video.url if video.url else video.external_id, duration=video.duration if video.duration else None, platform=video.platform, wrapper_class='card__img-wrapper') }}
+{% endblock %}
+
+{% block meta_top %}
+<div class="card__meta-top flex flex-wrap items-center">
+  {{ badge(content.category.name, 'badge--category', 'secondary') }}
+  {% for topic in content.topics[:1] %}
+  {{ badge(topic.name, 'badge--topic', 'secondary') }}
+  {% endfor %}
+  <span class="platform-icon platform-icon--youtube ml-auto">
+    <i class="fab fa-youtube"></i>
+  </span>
+</div>
+{% endblock %}
+
+{% block meta_bottom %}
+{% if video.channel_name %}
+<div class="card__meta-item flex items-center">
+  <i class="fas fa-play-circle card__meta-icon"></i>
+  <span class="card__meta-text truncate">{{ video.channel_name }}</span>
+</div>
+
+<span class="card__meta-dot" aria-hidden="true"></span>
+{% endif %}
+
+<time class="card__date">
+  {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+</time>
+{% endblock %}

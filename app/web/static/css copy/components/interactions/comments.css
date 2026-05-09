@@ -1,0 +1,138 @@
+.comments {
+  margin-top: 3rem;
+}
+
+.comments__title {
+  margin-bottom: 1.5rem;
+}
+
+.comment-form {
+  margin-bottom: 2rem;
+  gap: 0.75rem;
+}
+
+.comments__textarea {
+  padding-block: 0.75rem;
+  font-size: var(--text-sm);
+  resize: vertical;
+}
+
+.comments__list {
+  gap: 1.5rem;
+}
+
+.comments__load-more {
+  margin-top: 1rem;
+  align-self: center;
+}
+
+.comment__inner {
+  gap: 0.75rem;
+}
+
+.comment__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.comment__bubble {
+  background: var(--secondary);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  transition: background 0.2s;
+  flex: 1;
+}
+
+.comment:hover .comment__bubble {
+  background: rgba(var(--muted-rgb), 0.7);
+}
+
+.comment__header {
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment__author {
+  font-weight: var(--weight-md);
+}
+
+.comment__date {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.comment__text {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.comment__actions {
+  gap: 1rem;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.comment-action-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: var(--text-sm);
+  height: auto;
+  gap: 0.25rem;
+}
+
+.comment-action-btn:hover {
+  color: var(--primary);
+}
+
+.comment__replies-list {
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.comment__reply-form {
+  margin-top: 0.75rem;
+  gap: 0.5rem;
+}
+
+.comment__reply-actions {
+  gap: 0.5rem;
+}
+
+.comment--reply {
+  margin-left: 2rem;
+}
+
+@media (min-width: 768px) {
+  .comment--reply {
+    margin-left: 3rem;
+  }
+}
+
+.comments-toggle-content {
+  font-weight: var(--weight-md);
+}
+
+.comments-toggle-icon {
+  margin-left: .25rem;
+  transition: transform .2s ease;
+}
+
+.comments:not(.comments--collapsed) .comments-toggle-icon,
+.comment__replies--open .comments-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.comments--collapsed .comment__form,
+.comments--collapsed .comments__list {
+  display: none;
+}
+
+.comment__replies--open .comment__replies-list {
+  display: flex;
+}

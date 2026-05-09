@@ -1,0 +1,44 @@
+/* --- Breadcrumbs --- */
+
+.breadcrumbs {
+  margin-bottom: 1.25rem;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.breadcrumbs ul {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  flex-wrap: wrap;
+}
+
+.breadcrumb-link {
+  color: var(--muted-foreground);
+  transition: color 0.15s;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  font-weight: var(--weight-md);
+}
+
+.breadcrumb-link:hover {
+  color: var(--domain-primary);
+}
+
+.breadcrumbs .separator {
+  font-size: var(--text-xs);
+  opacity: 0.4;
+}
+
+.breadcrumb-current {
+  color: var(--foreground);
+  font-weight: var(--weight-md);
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}

@@ -1,0 +1,152 @@
+{% from "components/ui/form.html" import form %}
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/input.html" import input %}
+
+<header class="site-header">
+
+  <div class="container">
+
+    <div class="header flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="/" class="logo group flex items-center">
+        <div class="logo__icon flex items-center justify-center">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <span class="logo__text">Nexora</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="main-nav md:flex items-center">
+        {% for slug, name in main_sections %}
+        <a href="{{ url_for('content.sections', section_slug=slug) }}" class="main-nav__link">
+          {{ name }}
+        </a>
+        {% endfor %}
+        <a href="{{ url_for('item.deals') }}" class="main-nav__link">
+          <i class="fas fa-tag mr-1"></i> Deals
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="header-actions flex items-center">
+        {% set v = 'ghost' %}
+        {% set class = 'btn--icon ' %}
+
+        <!-- Search -->
+        {{ button(variant=v,
+        class=class ~ "search-toggle",
+        icon="fas fa-search") }}
+
+        <!-- Theme -->
+        {{ button(variant=v,
+        class=class ~ "mode-toggle",
+        icon="far fa-sun") }}
+
+        {% if is_authenticated %}
+        <!-- Saved (Shortcut) -->
+        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon btn--ghost" title="Saved Items">
+          <i class="far fa-bookmark"></i>
+        </a>
+        {% endif %}
+
+        <!-- User -->
+        <div class="nav-user">
+          {% set params = {} %}
+
+          {% if is_authenticated %}
+          {% set _ = params.update({
+          'text': user_email[0].upper(),
+          'btn_span_class': "initial flex items-center justify-center"
+          }) %}
+          {% else %}
+          {% set _ = params.update({
+          'icon': "fa-regular fa-circle-user"
+          }) %}
+          {% endif %}
+
+          {% call button(
+          variant=v, class=class ~ "user-toggle", **params
+          ) %}
+          <i class="fas fa-chevron-down"></i>
+          {% endcall %}
+
+          <div class="user-dropdown">
+            {% set item_class = "dropdown-item flex items-center"%}
+            {% if is_authenticated %}
+            <div class="user-info {{ item_class }}">
+              <span class="user-email">{{ user_email }}</span>
+            </div>
+
+            <a href="{{ url_for('user.profile') }}" class="{{ item_class }}">
+              <i class="fas fa-id-card"></i>
+              Profile
+            </a>
+
+            <a href="{{ url_for('interaction.saved_items') }}" class="{{ item_class }}">
+              <i class="far fa-bookmark"></i>
+              Saved Items
+            </a>
+
+            {% call form(variant="", form_action=url_for('user.logout'), class="logout-form") %}
+            {{ button(
+            text="Logout", variant="",
+            type="submit", icon="fas fa-sign-out-alt",
+            class=item_class ~ " logout-btn")}}
+            {% endcall %}
+            {% else %}
+            <a href="{{ url_for('user.login') }}" class="{{ item_class }}">
+              <i class="fas fa-sign-in-alt"></i>
+              Login
+            </a>
+            <a href="{{ url_for('user.register') }}" class="{{ item_class }}">
+              <i class="fas fa-user-plus"></i>
+              Sign Up
+            </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        {{ button(
+        variant=v,
+        class=class ~ "mobile-menu-toggle",
+        icon="fas fa-bars") }}
+
+      </div>
+
+    </div>
+
+    <!-- Search Bar -->
+
+    <div class="header-search">
+      {% call form("header-search__form", variant="", method="GET", include_csrf=False) %}
+      {{ input(
+      name="query", type="search",
+      placeholder="Search contents and products...",
+      class="header-search__input"
+      ) }}
+      {{ button(type="submit", icon="fas fa-search header-search__icon") }}
+      {% endcall %}
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav flex-col">
+      {% for slug, name in main_sections %}
+      <a href="{{ url_for('content.sections', section_slug=slug) }}" class="mobile-nav__link">
+        {{ name }}
+      </a>
+      {% endfor %}
+      <a href="{{ url_for('item.deals') }}" class="mobile-nav__link">
+        <i class="fas fa-tag mr-1"></i> Deals
+      </a>
+      {% if is_authenticated %}
+      <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link">
+        <i class="far fa-bookmark mr-1"></i> Saved Items
+      </a>
+      {% endif %}
+    </nav>
+
+  </div>
+
+</header>

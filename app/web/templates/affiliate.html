@@ -1,24 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Nexora | Affiliate Disclosure{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/affiliate.css') }}" />
+{% endblock %}
 {% block content %}
 {% from"components/page.html" import page %}
 {% call page("Affiliate Disclosure", "affiliate-page") %}
 <div class="content-block flex flex-col">
     <div class="affiliate-trust-banner flex items-center justify-center">
         <i class="fas fa-handshake trust-icon"></i>
-        <p class="trust-text">Transparency and honesty are our top priorities. Here's exactly how Nexora makes money.</p>
+        <p class="trust-text">Transparency and honesty are our top priorities. Here's exactly how Nexora makes money.
+        </p>
     </div>
 
     <p class="page__text">
-        Nexora is proudly supported by its readers. This means that when you click on links to various merchants on this site and make a purchase, this can result in a commission that is credited to this site.
+        Nexora is proudly supported by its readers. This means that when you click on links to various merchants on this
+        site and make a purchase, this can result in a commission that is credited to this site.
     </p>
 
     <h2 class="page__subtitle">How Affiliate Links Work</h2>
     <p class="page__text">
-        Throughout our website, you will see buttons and links (such as "View Deal" or "Check Price") pointing to online retailers. These are special tracking links. When you click one, the retailer's system knows you came from Nexora. If you buy a product, they share a small percentage of the sale with us as a referral fee.
+        Throughout our website, you will see buttons and links (such as "View Deal" or "Check Price") pointing to online
+        retailers. These are special tracking links. When you click one, the retailer's system knows you came from
+        Nexora. If you buy a product, they share a small percentage of the sale with us as a referral fee.
     </p>
     <p class="page__text font-bold">
-        Important: Using an affiliate link does NOT cost you anything extra. The price you pay is exactly the same whether you use our link or go directly to the store.
+        Important: Using an affiliate link does NOT cost you anything extra. The price you pay is exactly the same
+        whether you use our link or go directly to the store.
     </p>
 
     <h2 class="page__subtitle">Our Trusted Partners</h2>
@@ -40,10 +48,13 @@
 
     <h2 class="page__subtitle">Editorial Independence</h2>
     <p class="page__text">
-        Our article content and product selections are completely independent of our affiliate partnerships. We are never paid to write a positive review, and we only recommend products that we genuinely believe deliver value. If a product is bad, we will say so.
+        Our article content and product selections are completely independent of our affiliate partnerships. We are
+        never paid to write a positive review, and we only recommend products that we genuinely believe deliver value.
+        If a product is bad, we will say so.
     </p>
     <p class="page__text">
-        The commissions we earn empower us to pay for hosting, development, and content discovery tools, enabling Nexora to remain a free platform for discovering great tech and deals.
+        The commissions we earn empower us to pay for hosting, development, and content discovery tools, enabling Nexora
+        to remain a free platform for discovering great tech and deals.
     </p>
 </div>
 {% endcall %}

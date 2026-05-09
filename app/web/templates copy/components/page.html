@@ -1,0 +1,10 @@
+{% macro page(title=None, class_name="") %}
+<section class="content-page {{ class_name }} container">
+  {% if title %}
+    <h1 class="page__title">{{ title|safe }}</h1>
+  {% endif %}
+  <div class="page__body flex flex-col">
+    {{ caller() }}
+  </div>
+</section>
+{% endmacro %}

@@ -1,0 +1,17 @@
+{% macro empty_state(title="No results found", message="We couldn't find what you're looking for. Try adjusting your
+filters or search keywords.", icon="fa-search-minus", action_text=None, action_url=None) %}
+<div class="empty-state flex flex-col items-center justify-center">
+    <div class="empty-state__icon-wrapper flex items-center justify-center">
+        <i class="fas {{ icon }}"></i>
+        <div class="empty-state__pulse"></div>
+    </div>
+    <h2 class="empty-state__title">{{ title }}</h2>
+    <p class="empty-state__message">{{ message }}</p>
+    {% if action_text and action_url %}
+    <a href="{{ action_url }}" class="btn variant--primary empty-state__btn">
+        {{ action_text }}
+    </a>
+    {% endif %}
+</div>
+
+{% endmacro %}

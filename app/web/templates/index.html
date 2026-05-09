@@ -1,6 +1,11 @@
 <!-- index.html -->
 {% extends"base.html" %}
 {% block title %}Nexora | Home{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/hero-slider.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/newsletter.css') }}" />
+{% endblock %}
+
 {% block content %}
 {% from"components/ui/section.html" import section %}
 {% include "components/hero-sliders.html" %}

@@ -1,0 +1,46 @@
+.flash-messages {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1000;
+  max-width: 24rem;
+  gap: 0.5rem;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-md);
+  font-size: var(--text-sm);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(var(--black-rgb), 0.15);
+  border-left: 0.25rem solid;
+  cursor: default;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.alert .alert-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 1rem;
+}
+
+.alert-error {
+  background: linear-gradient(135deg, var(--brand-red), #dc2626);
+  border-left-color: #b91c1c;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark));
+  border-left-color: #047857;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-dark));
+  border-left-color: var(--brand-blue-dark);
+}
