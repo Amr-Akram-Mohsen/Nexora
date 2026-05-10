@@ -15,7 +15,7 @@ def get_catalog_data(active_filters, page=1):
     }
 
     return {
-        "items": pagination.items,
+        "items": pagination.get("items", []),
         "pagination": pagination,
         "filter_options": filter_options
     }

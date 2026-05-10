@@ -86,6 +86,70 @@
   gap: 1rem;
 }
 
+/* --- Listing UI Components --- */
+
+.listing-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.listing-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-xbold);
+  color: var(--foreground);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.listing-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.listing-count {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.listing-count__num {
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  padding: 0.1rem 0.4rem;
+  background: var(--secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+}
+
+.listing-mobile-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1025px) {
+  .listing-mobile-bar {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .listing-header__inner {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .listing-title {
+    font-size: var(--text-xl);
+  }
+}
+
 .listing-results {
   min-height: 200px;
 }

@@ -101,3 +101,8 @@ def serialize_target(obj, session=None):
         })
 
     return data
+
+def unify_common_attrs(obj, session=None):
+    return {
+        "title": getattr(obj, "title", None),
+    }

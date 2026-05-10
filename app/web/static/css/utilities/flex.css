@@ -22,6 +22,10 @@
   align-items: center;
 }
 
+.items-start {
+  align-items: flex-start;
+}
+
 .inline-flex {
   display: inline-flex;
 }

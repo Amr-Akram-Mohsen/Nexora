@@ -10,6 +10,10 @@
 
 {% block title %}Deals | Nexora{% endblock %}
 
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/commercial/catalog/catalog-page.css') }}" />
+{% endblock %}
+
 {% block content %}
 
 {% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing", domain_type=target_type) %}
@@ -18,7 +22,7 @@
 SLOT: sidebar
 ═══════════════════════════════════════ #}
 {% if slot == 'sidebar' %}
-{% include "components/catalog/content-sidebar.html" %}
+{% include "commercial/features/item-sidebar.html" %}
 {% endif %}
 
 {# ═══════════════════════════════════════

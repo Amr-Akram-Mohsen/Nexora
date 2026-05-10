@@ -28,3 +28,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+supabase.dump
+sync_supabase_to_local.bat
+

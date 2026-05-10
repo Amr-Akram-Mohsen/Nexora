@@ -2,28 +2,30 @@
 {% macro content_snippet(items, snippet_title) %}
 <div class="snippet-contents__section">
   <h3 class="snippet__header">{{ snippet_title }}</h3>
-  <div class="snippet-contents flex flex-col">
+  <div class="snippet-contents flex">
     {% for item in items %}
     <a href="
-    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex">
+    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex items-start flex-col">
       {{ render_image_url(
-      item.image or item.image_url,
-      item.title,
+      item.target.image_url,
+      item.target.title,
       ' snippet-content__img')
       }}
       <div class="snippet-content__content">
-        <h4 class="snippet-content__title">{{ item.title }}</h4>
-        <div class="snippet-content__meta flex items-center">
+        <h4 class="snippet-content__title">{{ item.target.title }}</h4>
+        <!-- <div class="snippet-content__meta flex items-center">
           {% if item.intent %}
           <span class="snippet-content__badge">
             <i class="fas fa-tag"></i> {{ item.intent.name }}
           </span>
           {% else %}
           <span class="snippet-content__badge">
-            <i class="fas {% if item.object_type == 'video' %}fa-video{% elif item.object_type == 'post' %}fa-comment{% else %}fa-file-alt{% endif %}"></i> {{ item.object_type | title }}
+            <i
+              class="fas {% if item.object_type == 'video' %}fa-video{% elif item.object_type == 'post' %}fa-comment{% else %}fa-file-alt{% endif %}"></i>
+            {{ item.object_type | title }}
           </span>
           {% endif %}
-        </div>
+        </div> -->
       </div>
     </a>
     {% endfor %}

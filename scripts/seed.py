@@ -138,23 +138,10 @@ def seed_db():
                 category_id=category_obj.id if category_obj else None
             ))
             logger.info(f"[Seeder] [Facets]   + Attributes: {attr['name']}")
-
+        
+        from app.shared.constants.taxonomy import TRUSTED_SOURCES
         # 6. Seed Trusted Sources
-        trusted_sources = [
-            {"name": "The Verge",      "domain": "theverge.com"},
-            {"name": "Wired",          "domain": "wired.com"},
-            {"name": "Engadget",       "domain": "engadget.com"},
-            {"name": "9to5Google",     "domain": "9to5google.com"},
-            {"name": "9to5Mac",        "domain": "9to5mac.com"},
-            {"name": "GSM Arena",      "domain": "gsmarena.com"},
-            {"name": "NotebookCheck",  "domain": "notebookcheck.net"},
-            {"name": "Fragrantica",    "domain": "fragrantica.com"},
-            {"name": "CaFleureBon",    "domain": "cafleurebon.com"},
-            {"name": "Hypebeast",      "domain": "hypebeast.com"},
-            {"name": "Highsnobiety",   "domain": "highsnobiety.com"},
-            {"name": "A Blog to Watch","domain": "ablogtowatch.com"},
-        ]
-        for s in trusted_sources:
+        for s in TRUSTED_SOURCES:
             db.session.add(Source(
                 name=s["name"],
                 slug=generate_slug(s["name"]),

@@ -143,6 +143,8 @@ def get_filtered_items(active_filters, page=1, per_page=24):
         "total": pagination.total,
         "has_next": pagination.has_next,
         "has_prev": pagination.has_prev,
+        "prev_num": getattr(pagination, 'prev_num', pagination.page - 1 if pagination.has_prev else None),
+        "next_num": getattr(pagination, 'next_num', pagination.page + 1 if pagination.has_next else None),
     }
 
 def set_default_variant(item, variant):

@@ -334,3 +334,18 @@ REDDIT_SUBREDDITS = {
         "accessories": ["streetwear", "highfashion"],
     }
 }
+
+TRUSTED_SOURCES = [
+    {"name": "The Verge",      "domain": "theverge.com"},
+    {"name": "Wired",          "domain": "wired.com"},
+    {"name": "Engadget",       "domain": "engadget.com"},
+    {"name": "9to5Google",     "domain": "9to5google.com"},
+    {"name": "9to5Mac",        "domain": "9to5mac.com"},
+    {"name": "GSM Arena",      "domain": "gsmarena.com"},
+    {"name": "NotebookCheck",  "domain": "notebookcheck.net"},
+    {"name": "Fragrantica",    "domain": "fragrantica.com"},
+    {"name": "CaFleureBon",    "domain": "cafleurebon.com"},
+    {"name": "Hypebeast",      "domain": "hypebeast.com"},
+    {"name": "Highsnobiety",   "domain": "highsnobiety.com"},
+    {"name": "A Blog to Watch","domain": "ablogtowatch.com"},
+]

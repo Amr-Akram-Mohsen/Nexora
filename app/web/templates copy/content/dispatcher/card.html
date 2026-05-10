@@ -1,8 +1,0 @@
-{% set content = item %}
-{% if content.object_type == "article" %}
-{% include "content/cards/article.html" %}
-{% elif content.object_type == "video" %}
-{% include "content/cards/video.html" %}
-{% elif content.object_type == "post" %}
-{% include "content/cards/post.html" %}
-{% endif %}

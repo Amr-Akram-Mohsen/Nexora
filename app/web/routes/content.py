@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, request, render_template, abort
 from app.application.content.get_feed import get_feed_data
-from app.application.content.get_article_page import get_article_page_data
+# from app.application.content.get_article_page import get_article_page_data
 from flask_login import current_user
 from app.shared.request import get_client_ip
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
@@ -47,7 +47,7 @@ def sections(section_slug):
 
 @bp.route("/contents/<int:content_id>")
 def content_page(content_id):
-    from app.application.content.get_article_page import record_article_view
+    from app.application.content.get_article_page import record_article_view, get_article_page_data
     from app.core.extensions import db
 
     log_route_start(logger, f"/contents/{content_id}")
