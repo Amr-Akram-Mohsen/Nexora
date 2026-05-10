@@ -171,3 +171,46 @@
     font-size: var(--text-xl);
   }
 }
+
+/* --- Topics Ribbon --- */
+
+.topics-ribbon {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
+  gap: 0.5rem;
+  scrollbar-width: none; /* Firefox */
+}
+
+.topics-ribbon::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.topic-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.topic-pill:hover {
+  background: var(--secondary);
+  border-color: var(--border);
+}
+
+.topic-pill.is-active {
+  background: var(--domain-primary);
+  color: #ffffff;
+  border-color: var(--domain-primary);
+}

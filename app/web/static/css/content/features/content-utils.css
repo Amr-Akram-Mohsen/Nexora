@@ -73,8 +73,22 @@
   color: var(--domain-primary);
 }
 
-.snippet-content__date {
+.snippet-content__meta {
   font-size: var(--text-xs);
-  color: var(--muted-foreground);
   font-weight: var(--weight-md);
+  color: var(--domain-primary);
+}
+
+.snippet-content__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(var(--domain-primary-rgb), var(--alpha-soft));
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+}
+
+.snippet-content__badge i {
+  font-size: 0.85em;
+  opacity: 0.8;
 }

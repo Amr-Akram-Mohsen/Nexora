@@ -14,7 +14,7 @@ bp = Blueprint("content", __name__)
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):
     from app.web.helpers.content import parse_active_filters
-    active_filters = parse_active_filters(["category", "topic", "brand"])
+    active_filters = parse_active_filters(["category", "topic", "brand", "intent", "price_tier", "type"])
     page = request.args.get("page", 1, type=int)
 
     log_route_start(logger, f"/sections/{section_slug}", page=page, filters=active_filters)

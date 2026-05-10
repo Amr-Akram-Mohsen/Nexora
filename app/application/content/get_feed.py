@@ -27,6 +27,15 @@ def get_feed_data(section_slug, active_filters, page=1):
         filter_options["brand"] = get_active_brands_for_section(section_slug)
     if "topic" in allowed_filters:
         filter_options["topic"] = get_active_topics_for_section(section_slug)
+    if "intent" in allowed_filters:
+        from app.domains.system.service.query import get_active_intents_for_section
+        filter_options["intent"] = get_active_intents_for_section(section_slug)
+    if "price_tier" in allowed_filters:
+        from app.domains.system.service.query import get_active_price_tiers_for_section
+        filter_options["price_tier"] = get_active_price_tiers_for_section(section_slug)
+    if "type" in allowed_filters:
+        from app.domains.system.service.query import get_active_types_for_section
+        filter_options["type"] = get_active_types_for_section(section_slug)
 
     return {
         "section": serialize_section(section),

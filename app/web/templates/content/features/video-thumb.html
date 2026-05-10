@@ -6,7 +6,7 @@ wrapper_class='card__img-wrapper') %}
     data-platform="{{ platform }}">
 
     <div class="video-preview__surface">
-        <!-- {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img') }} -->
+        {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img') }}
 
         <div class="video-preview__overlay">
             <button class="video-preview__play-btn" aria-label="Play {{ title }}" data-action="lazy-play">

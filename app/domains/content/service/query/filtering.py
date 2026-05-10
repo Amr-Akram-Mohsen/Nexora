@@ -63,6 +63,20 @@ def get_filtered_contents(session, section_id, active_filters, allowed_filters, 
     if brands and "brand" in allowed_filters:
         query = query.filter(Content.brands.any(Brand.slug.in_(brands)))
 
+    intents = [f for f in active_filters.get('intent', []) if f]
+    if intents and "intent" in allowed_filters:
+        from app.domains.system.models import IntentFacet
+        query = query.filter(Content.intent.has(IntentFacet.slug.in_(intents)))
+
+    price_tiers = [f for f in active_filters.get('price_tier', []) if f]
+    if price_tiers and "price_tier" in allowed_filters:
+        from app.domains.system.models import PriceTierFacet
+        query = query.filter(Content.price_tier.has(PriceTierFacet.slug.in_(price_tiers)))
+
+    types = [f for f in active_filters.get('type', []) if f]
+    if types and "type" in allowed_filters:
+        query = query.filter(Content.object_type.in_(types))
+
     if active_filters.get('sort') == 'oldest':
         query = query.order_by(Content.published_at.asc())
     else:

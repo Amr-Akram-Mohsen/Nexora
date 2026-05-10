@@ -65,8 +65,8 @@ def assign_target_to_contents(contents, session):
 
             "target": serialize_target(target_obj, session) if target_obj else None,
             "topics": [serialize_topic(t) for t in (c.topics or [])],
-            "brands": [serialize_brand(b) for b in (c.brands or [])],
-            "linked_items": [serialize_target(item, session) for item in getattr(c, 'linked_items', [])] if getattr(c, 'linked_items', None) else []
+            "brands": [serialize_brand(b) for b in (c.brands or [])]
+            # "linked_items": [serialize_target(item, session) for item in getattr(c, 'linked_items', [])] if getattr(c, 'linked_items', None) else []
         })
     
     return result

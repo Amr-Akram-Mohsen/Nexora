@@ -13,15 +13,6 @@
       {% block image_content %}{% endblock %}
       <div class="card__img-overlay"></div>
     </div>
-    <div class="card__type-badge">
-      {% if content.object_type == "article" %}
-      <i class="far fa-file-alt"></i>
-      <span>Article</span>
-      {% elif content.object_type == "video" %}
-      <i class="fas fa-video"></i>
-      <span>Video</span>
-      {% endif %}
-    </div>
   </a>
   {% endblock %}
 

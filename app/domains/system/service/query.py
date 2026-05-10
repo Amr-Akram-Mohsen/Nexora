@@ -104,4 +104,49 @@ def get_allowed_filters(section):
     Returns the set of allowed filters for a given section.
     This is a domain rule.
     """
-    return set(section.allowed_filters or [])
+    filters = section.allowed_filters
+    if not filters:
+        filters = ["category", "topic", "brand", "intent", "price_tier", "type"]
+    return set(filters)
+
+@cache.memoize(timeout=3600)
+def get_active_intents_for_section(section_slug, limit=20):
+    from ..models import IntentFacet
+    intents = (
+        db.session.query(IntentFacet)
+        .join(Content, Content.intent_id == IntentFacet.id)
+        .join(Section, Section.id == Content.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
+        .group_by(IntentFacet.id)
+        .order_by(func.count(Content.id).desc())
+        .limit(limit)
+        .all()
+    )
+    return [{"slug": i.slug, "name": i.name} for i in intents]
+
+@cache.memoize(timeout=3600)
+def get_active_price_tiers_for_section(section_slug, limit=20):
+    from ..models import PriceTierFacet
+    price_tiers = (
+        db.session.query(PriceTierFacet)
+        .join(Content, Content.price_tier_id == PriceTierFacet.id)
+        .join(Section, Section.id == Content.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
+        .group_by(PriceTierFacet.id)
+        .order_by(func.count(Content.id).desc())
+        .limit(limit)
+        .all()
+    )
+    return [{"slug": p.slug, "name": p.name} for p in price_tiers]
+
+@cache.memoize(timeout=3600)
+def get_active_types_for_section(section_slug):
+    types = (
+        db.session.query(Content.object_type)
+        .join(Section, Section.id == Content.section_id)
+        .filter(func.lower(Section.slug) == func.lower(section_slug))
+        .group_by(Content.object_type)
+        .all()
+    )
+    return [{"slug": t[0], "name": t[0].title()} for t in types if t[0]]
+

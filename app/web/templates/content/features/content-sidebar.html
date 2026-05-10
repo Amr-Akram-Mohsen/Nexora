@@ -2,7 +2,7 @@
 {% from "components/ui/button.html" import button %}
 
 {# ── Canonical filter priority order ── #}
-{% set filter_priority = ['category', 'topic', 'brand', 'store', 'type'] %}
+{% set filter_priority = ['category', 'brand', 'intent', 'price_tier', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
@@ -13,8 +13,8 @@
   {# ── Sidebar title row ── #}
   <div class="sidebar-heading flex items-center justify-between">
     <span class="sidebar-heading__label">
-      <i class="fas fa-newspaper"></i>
-      Article Filters
+      <i class="fas fa-filter"></i>
+      Filters
     </span>
 
     {# Reset link — shown only when filters are active #}
@@ -32,7 +32,7 @@
 
   {# ══════════════════════════════════════════════════
   FILTER GROUPS — rendered in priority order
-  Guarantees: category → topic → brand → store → type
+  Guarantees: category → brand → intent → price_tier → store → type
   ══════════════════════════════════════════════════ #}
 
   {# Build the ordered list of filters to render #}
@@ -51,7 +51,7 @@
   {% endfor %}
 
   {# Render each filter group #}
-  {% for filter_name in filters_to_render %}
+  {% for filter_name in filters_to_render if filter_name != 'topic' %}
   {% set options = filter_options.get(filter_name, []) %}
 
   {# Determine if ANY option in this group is active #}

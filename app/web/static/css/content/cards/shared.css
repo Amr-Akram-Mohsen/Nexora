@@ -143,9 +143,14 @@
 }
 
 .card__date {
-  margin-left: auto;
   white-space: nowrap;
   font-weight: 500;
+}
+
+.card__meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Platform Icons */
@@ -192,4 +197,13 @@
 .meta-icon-wrapper i {
   color: rgb(var(--meta-color));
   font-size: 0.875rem;
+}
+
+/* --- Mobile Layout Refinements --- */
+@media (max-width: 768px) {
+  .card__date,
+  .card__meta-dot,
+  .card__read-time {
+    display: none !important;
+  }
 }

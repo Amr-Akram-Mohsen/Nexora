@@ -1,6 +1,7 @@
 {% extends "content/page/base.html" %}
 
 {% set article = content.target %}
+{% set page_css = "css/content/page/article.css" %}
 
 {% from "content/features/content-image.html" import render_image_url %}
 {% from "components/ui/button.html" import button %}
@@ -46,7 +47,7 @@
 <div class="article-header">
   <div class="article-header__badges">
     {{ badge(content.category.name, 'badge--category') }}
-    {% for topic in content.topics[:3] %}
+    {% for topic in content.topics[:2] %}
     {{ badge(topic.name, 'badge--topic', 'secondary') }}
     {% endfor %}
   </div>

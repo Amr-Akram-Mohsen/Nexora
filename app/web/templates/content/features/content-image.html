@@ -1,10 +1,7 @@
 {% macro render_image_url(image_url, alt, additional_classes='', attrs={}) %}
 <div class="image-wrapper {{ additional_classes }}">
-  <img src="{{ image_url or url_for('static', filename='fallback-image.png') }}" class="card__img img-cover"
+  <img src="{{ image_url or url_for('static', filename='logo.png') }}" class="card__img img-cover"
     alt="{{ alt or 'Content Image' }}" loading="lazy" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%
     endfor %} />
 </div>
-
-<style>
-</style>
 {% endmacro %}

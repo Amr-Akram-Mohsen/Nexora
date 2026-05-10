@@ -1,6 +1,6 @@
 {% extends "content/page/base.html" %}
 {% set video = content.target %}
-
+{% set page_css = "css/content/page/video.css" %}
 {% from "content/features/content-image.html" import render_image_url %}
 {% from "content/features/video-thumb.html" import render_video_thumbnail %}
 {% from "components/ui/badge.html" import badge %}
@@ -38,7 +38,7 @@
       <span>{{ video.platform | title }}</span>
     </div>
     {{ badge(content.category.name, 'badge--category') }}
-    {% for topic in content.topics[:2] %}
+    {% for topic in content.topics[:1] %}
     {{ badge(topic.name, 'badge--topic', 'secondary') }}
     {% endfor %}
   </div>
@@ -53,18 +53,18 @@
     </div>
     {% endif %}
 
-    <div class="meta-pill">
-      <i class="far fa-calendar-alt"></i>
-      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
-        }}</span>
-    </div>
-
     {% if content.view_count %}
     <div class="meta-pill">
       <i class="fas fa-eye"></i>
       <span class="meta-pill__text">{{ "{:,}".format(content.view_count) }} views</span>
     </div>
     {% endif %}
+
+    <div class="meta-pill">
+      <i class="far fa-calendar-alt"></i>
+      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
+        }}</span>
+    </div>
   </div>
 </div>
 
