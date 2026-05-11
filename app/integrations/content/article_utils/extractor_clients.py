@@ -27,10 +27,15 @@ def _extract_diffbot(url: str, api_key: str) -> dict | None:
             word_count = len(content_text.split()) if content_text else 0
             quality = score_content_quality(content_html, content_text)
             
+            # Extract image (Diffbot returns a list of images)
+            images = article.get("images", [])
+            image_url = images[0].get("url") if images and isinstance(images, list) else None
+
             return {
                 "content_html": content_html,
                 "content_text": content_text,
-                "word_count": word_count,
+                "image_url":    image_url,
+                "word_count":   word_count,
                 "quality_score": quality,
                 "source": "diffbot"
             }
@@ -63,7 +68,8 @@ def _extract_mercury(url: str, api_key: str) -> dict | None:
         return {
             "content_html": content_html,
             "content_text": content_text,
-            "word_count": word_count,
+            "image_url":    data.get("lead_image_url"),
+            "word_count":   word_count,
             "quality_score": quality,
             "source": "mercury"
         }

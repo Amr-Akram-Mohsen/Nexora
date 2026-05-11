@@ -150,3 +150,15 @@ def log_fetch_query_error(
         "[FETCH][%s] error  query=\"%s\"  type=%s  message=%s%s",
         source, query, type(error).__name__, str(error), group_str,
     )
+
+
+def log_item_ingested(logger: logging.Logger, source: str, title: str, status: str = "stored", **extra: Any) -> None:
+    """Log details about a specific item being ingested."""
+    extra_str = "  " + "  ".join(f'{k}={v}' for k, v in extra.items()) if extra else ""
+    logger.info("[INGEST][%s] %-8s  title=\"%s\"%s", source, status, title[:60], extra_str)
+
+
+def log_item_skipped(logger: logging.Logger, source: str, title: str, reason: str, **extra: Any) -> None:
+    """Log why an item was skipped during ingestion."""
+    extra_str = "  " + "  ".join(f'{k}={v}' for k, v in extra.items()) if extra else ""
+    logger.debug("[INGEST][%s] skipped   reason=%-15s  title=\"%s\"%s", source, reason, title[:60], extra_str)

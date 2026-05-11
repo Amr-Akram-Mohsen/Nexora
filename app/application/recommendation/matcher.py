@@ -16,7 +16,7 @@ import re
 import logging
 from datetime import datetime, timedelta
 from app.core.extensions import db
-from app.domains.content.models import Article
+from app.domains.content.models import Article, Content
 from app.domains.item.models import Item
 
 logger = logging.getLogger(__name__)
@@ -114,7 +114,8 @@ def match_articles_to_items(
         # ── Build article query with pagination ───────────────────
         cutoff = datetime.utcnow() - REPROCESS_AFTER
         article_q = (
-            Article.query
+            db.session.query(Article)
+            .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id))
             .filter(
                 # Either never matched, or matched long enough ago to re-check
                 db.or_(
@@ -124,7 +125,7 @@ def match_articles_to_items(
             )
         )
         if since:
-            article_q = article_q.filter(Article.published_at >= since)
+            article_q = article_q.filter(Content.published_at >= since)
 
         batch = article_q.offset(page * BATCH_SIZE).limit(BATCH_SIZE).all()
         if not batch:

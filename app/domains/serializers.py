@@ -62,10 +62,12 @@ def serialize_target(obj, session=None):
     if type_name == "article":
         data.update({
             "source_name": obj.source_name,
+            "source_url": obj.source_url,
             "read_time_minutes": obj.read_time_minutes,
             "is_content_scraped": getattr(obj, "is_content_scraped", False),
             "content_html": getattr(obj, "content_html", None),
             "content_text": getattr(obj, "content_text", None),
+            "body": getattr(obj, "body", None),
             "description": getattr(obj, "description", None),
             "word_count": getattr(obj, "word_count", 0),
         })
@@ -76,6 +78,7 @@ def serialize_target(obj, session=None):
             "external_id": getattr(obj, "external_id", None),
             "channel_name": getattr(obj, "channel_name", "Unknown"),
             "description": getattr(obj, "description", None),
+            "thumbnail_url": getattr(obj, "thumbnail_url", None),
         })
 
     elif type_name == "post":

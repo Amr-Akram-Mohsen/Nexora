@@ -9,6 +9,8 @@ from app.shared.utils.logging import (
     log_fetch_query_start,
     log_fetch_progress,
     log_fetch_query_error,
+    log_item_ingested,
+    log_item_skipped,
 )
 
 logger = logging.getLogger(__name__)
@@ -101,35 +103,53 @@ class IngestionWorkflow:
         except Exception as exc:
             logger.warning("[FETCH][%s] batch state unavailable — running ungrouped  err=%s", self.source_name, exc)
 
+        def get_fresh_tasks(tasks):
+            cooldown_hrs = fetch_params.get("cooldown_hours", 6)
+            fresh = []
+            for sec, cat, q_obj in tasks:
+                q_text = q_obj.get("query", "")
+                cache_key = f"{source_filter}:{cat}:{q_text}"
+                if self.cooldown_service.should_refetch(sec, cache_key, hours=cooldown_hrs):
+                    fresh.append((sec, cat, q_obj))
+            return fresh
+
         if group:
             group_tasks = [
                 (sec, cat, q) for sec, cat, q in flat_tasks
                 if cat.startswith(group) or group in cat
             ]
-            # Fall back to full list if the group produced nothing
-            # (e.g. "perfumes" has very few sections that match some sources).
-            if group_tasks:
-                flat_tasks = group_tasks
+            
+            fresh_group_tasks = get_fresh_tasks(group_tasks)
+            
+            if fresh_group_tasks:
+                flat_tasks = fresh_group_tasks
                 logger.info(
-                    "[FETCH][%s] batch group=%s  group_queries=%d  total_available=%d",
-                    self.source_name, group, len(flat_tasks),
-                    sum(len(qs) for cats in queries_registry.values() for qs in cats.values()),
+                    "[FETCH][%s] batch group=%s  fresh_queries=%d/%d",
+                    self.source_name, group, len(flat_tasks), len(group_tasks)
                 )
             else:
                 logger.info(
-                    "[FETCH][%s] batch group=%s produced 0 queries — using full set",
-                    self.source_name, group,
+                    "[FETCH][%s] group %s exhausted (all on cooldown) — falling back to full set",
+                    self.source_name, group
                 )
-                group = ""  # treat as ungrouped for progress labels
+                flat_tasks = get_fresh_tasks(flat_tasks)
+                group = "" # Treat as ungrouped for this run
+        else:
+            flat_tasks = get_fresh_tasks(flat_tasks)
+
+        if not flat_tasks:
+            logger.info("[FETCH][%s] all categories are on cooldown. nothing to do.", self.source_name)
+            return 0
 
         # ── Apply limit cap ───────────────────────────────────────────
         if limit and limit < len(flat_tasks):
+            # We shuffle to ensure we don't always pick the same categories
             random.shuffle(flat_tasks)
             flat_tasks = flat_tasks[:limit]
 
         total_tasks = len(flat_tasks)
         logger.info(
-            "[FETCH][%s] run started  tasks=%d  group=%s  limit=%s",
+            "[FETCH][%s] run starting  tasks=%d  group=%s  limit=%s",
             self.source_name, total_tasks, group or "(all)", limit or "none",
         )
 
@@ -210,10 +230,9 @@ class IngestionWorkflow:
         q_text = q_obj.get("query", "")
         cache_key = f"{source_filter}:{category}:{q_text}"
 
-        # 1. Cooldown check
+        # 1. Cooldown check (Double check inside the loop, though already pre-filtered)
         cooldown_hrs = fetch_params.get("cooldown_hours", 6)
         if not self.cooldown_service.should_refetch(section, cache_key, hours=cooldown_hrs):
-            logger.debug("[FETCH][%s] cooldown active  query=\"%s\"", self.source_name, q_text)
             return 0
 
         # 2. Quota check
@@ -269,16 +288,36 @@ class IngestionWorkflow:
 
             # 4c. Ingest
             try:
+                # Inject staged status if it's an article
+                if object_type == "article":
+                    # If enrichment was skipped or is partial, mark as pending
+                    # Quality gate: Must have image to be published
+                    if not enriched_dict.get("is_content_scraped") or not enriched_dict.get("image_url"):
+                        enriched_dict["status"] = "pending"
+                        enriched_dict["is_published"] = False
+                    else:
+                        # If already high quality, publish
+                        enriched_dict["status"] = "complete"
+                        enriched_dict["is_published"] = True
+                else:
+                    # Videos/Posts are published immediately by default if they have a thumbnail/image
+                    has_visual = bool(enriched_dict.get("thumbnail_url") or enriched_dict.get("image_url"))
+                    enriched_dict["is_published"] = has_visual
+
                 result = ingest_content(session, object_type=object_type, raw_data=enriched_dict)
                 if result:
                     content_obj, is_new = result
                     if is_new:
                         query_stored += 1
-                        logger.info("[FETCH][%s] stored  title=\"%s\"", self.source_name, item_title)
+                        log_item_ingested(
+                            logger, self.source_name, item_title,
+                            status="stored",
+                            published=enriched_dict.get("is_published", False)
+                        )
                     else:
-                        logger.debug("[FETCH][%s] updated  title=\"%s\"", self.source_name, item_title)
+                        log_item_ingested(logger, self.source_name, item_title, status="updated")
                 else:
-                    logger.debug("[FETCH][%s] skipped (dup/invalid)  title=\"%s\"", self.source_name, item_title)
+                    log_item_skipped(logger, self.source_name, item_title, reason="duplicate_or_invalid")
             except Exception as exc:
                 import sqlalchemy.exc
                 if isinstance(exc, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):

@@ -147,7 +147,7 @@ def seed_db():
                 slug=generate_slug(s["name"]),
                 domain=s["domain"],
                 is_active=True,
-                trust_score=1.0
+                authority_score=s.get("score", 50)
             ))
             logger.info(f"[Seeder]   + Source: {s['name']}")
         

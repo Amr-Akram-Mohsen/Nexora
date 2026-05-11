@@ -32,6 +32,7 @@ class Content(db.Model):
     )
 
     is_active = db.Column(db.Boolean, default=True)
+    is_published = db.Column(db.Boolean, default=False, index=True)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
     

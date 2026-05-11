@@ -44,7 +44,14 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
             logger.warning("[INTEGRATION][%s] unexpected response shape for query=%s", _NAME, q_text)
             articles = []
 
-        raw_items = [RawItemDTO(**a) for a in articles if isinstance(a, dict)]
+        raw_items = []
+        for a in articles:
+            if not isinstance(a, dict):
+                continue
+            # Map NewsAPI specific fields to standard DTO fields
+            a["image_url"] = a.get("urlToImage")
+            raw_items.append(RawItemDTO(**a))
+
         log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)
         return raw_items
 

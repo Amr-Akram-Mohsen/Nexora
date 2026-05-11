@@ -63,16 +63,18 @@ content_attributes = db.Table(
 class ArticleSource(db.Model):
     __tablename__ = "article_sources"
 
+    id = db.Column(db.Integer, primary_key=True)
+
     article_id = db.Column(
         db.Integer,
         db.ForeignKey("articles.id"),
-        primary_key=True
+        nullable=False
     )
 
     source_id = db.Column(
         db.Integer,
         db.ForeignKey("sources.id"),
-        primary_key=True
+        nullable=False
     )
 
     url = db.Column(
@@ -89,7 +91,8 @@ class ArticleSource(db.Model):
 
     article = db.relationship(
         "Article",
-        back_populates="article_sources"
+        back_populates="article_sources",
+        foreign_keys=[article_id]
     )
 
     source = db.relationship(

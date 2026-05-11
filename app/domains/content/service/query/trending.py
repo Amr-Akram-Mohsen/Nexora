@@ -16,7 +16,7 @@ def get_trending_contents(session, limit=6, days=7, section_ids=None):
             func.count(View.id).label("recent_views")
         )
         .join(View, (View.target_type == TargetType.CONTENT) & (View.target_id == Content.id))
-        .filter(View.created_at >= cutoff)
+        .filter(View.created_at >= cutoff, Content.is_published == True, Content.is_active == True)
     )
 
     if section_ids:

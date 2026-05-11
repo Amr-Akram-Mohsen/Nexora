@@ -22,7 +22,33 @@ def link_article_sources(session, article, data):
     source = Source.get_by_slug(slug, session)
 
     if not source:
-        return
+        # 🔹 Dynamic Source Creation with Tiered Authority
+        from urllib.parse import urlparse
+        from app.shared.constants.taxonomy import TRUSTED_SOURCES
+        
+        domain = urlparse(url).netloc.lower()
+        if domain.startswith("www."):
+            domain = domain[4:]
+            
+        # Default score
+        authority_score = 50
+        
+        # Check for trusted domain match
+        for s_trusted in TRUSTED_SOURCES:
+            t_domain = s_trusted["domain"].lower()
+            if domain == t_domain or domain.endswith("." + t_domain):
+                authority_score = s_trusted.get("score", 70)
+                break
+        
+        source = Source(
+            name=source_name,
+            slug=slug,
+            domain=domain,
+            authority_score=authority_score,
+            is_active=True
+        )
+        session.add(source)
+        session.flush() # Ensure ID is available
 
     from ...relationships import ArticleSource
     
@@ -50,6 +76,10 @@ def link_article_sources(session, article, data):
     )
 
     session.add(relation)
+    session.flush() # Get relation.id
+
+    # 🔹 Update Article's Primary Source (Performance Optimization)
+    article.update_primary_source()
 
 def delete_content(session, id: int) -> bool:
     content = session.get(Article, id)

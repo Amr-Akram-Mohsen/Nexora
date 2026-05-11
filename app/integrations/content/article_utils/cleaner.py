@@ -103,8 +103,20 @@ class DomainMapper:
         if "… [+" in description: 
             description = description.split("… [+")[0].strip()
 
-        image_url = (data.get("urlToImage") or data.get("image_url") or data.get("image") or data.get("media_content"))
-        if image_url and not str(image_url).startswith("http"): image_url = None
+        # Robust image extraction (handles strings, lists, or dicts from various APIs/RSS)
+        raw_image = (data.get("image_url") or data.get("urlToImage") or data.get("image") or data.get("media_content"))
+        image_url = None
+        
+        if isinstance(raw_image, list) and raw_image:
+            item = raw_image[0]
+            image_url = item.get("url") if isinstance(item, dict) else str(item)
+        elif isinstance(raw_image, dict):
+            image_url = raw_image.get("url")
+        else:
+            image_url = raw_image
+
+        if image_url and not str(image_url).startswith("http"): 
+            image_url = None
 
         published_at = _parse_date(data.get("publishedAt") or data.get("published_at") or data.get("published"))
         source_name = sanitize_text(data.get("source_name") or (data.get("source") or {}).get("name") or "")

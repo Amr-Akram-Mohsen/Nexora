@@ -79,9 +79,6 @@
     {% endif %}
   </div>
 </div>
-
-<style>
-</style>
 {% endblock %}
 
 {% block base_image %}
@@ -100,15 +97,18 @@
   {% endif %}
 
   <div class="article-rich-text">
+    {% if not content.is_published %}
+    <p class="article-description-only">{{ article.description | safe }}</p>
+    {% else %}
     {% if article.content_html %}
     {{ article.content_html | safe }}
     {% elif article.body %}
     {{ article.body | safe }}
     {% elif article.content_text %}
     <p>{{ article.content_text | safe }}</p>
-    {% else %}
-    <p class="article-description-only">{{ article.description | safe }}</p>
     {% endif %}
+    {% endif %}
+
   </div>
 
   <div class="article-cta-box">

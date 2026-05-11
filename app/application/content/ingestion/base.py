@@ -21,7 +21,8 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
                 external_id=raw_data.get("external_id"),
                 obj_factory=lambda: factory_func(raw_data),
                 title_fallback=raw_data.get("title"),
-                url_fallback=raw_data.get("url")
+                url_fallback=raw_data.get("url"),
+                canonical_url=raw_data.get("canonical_url")
             )
 
             if not obj:
@@ -37,7 +38,8 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
                 object_type=object_type,
                 published_at=raw_data.get("published_at"),
                 category_id=category.id,
-                section_id=section.id
+                section_id=section.id,
+                is_published=raw_data.get("is_published", False)
             )
 
             # 4. Apply Relationships (Topics, Brands, Facets)

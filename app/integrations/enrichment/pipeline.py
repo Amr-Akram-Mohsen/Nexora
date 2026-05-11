@@ -4,7 +4,13 @@ from urllib.parse import urlparse
 from app.integrations.content.article_utils.extract_article_content import scrape_article_content
 from app.integrations.content.article_utils.extractor_clients import extract_with_apis
 from app.integrations.content.article_utils.quality import score_content_quality
-from app.integrations.content.article_utils.content_normalizer import normalize_content, text_to_html
+from app.domains.content.service.normalization import (
+    sanitize_html as clean_html,
+    normalize_content_shaping as normalize_content,
+    text_to_html,
+    parse_date as normalize_date 
+)
+from app.integrations.content.article_utils.metadata import recover_article_metadata
 from app.shared.utils.logging import (
     log_integration_start, log_integration_success, log_integration_error,
     log_integration_warning, log_scrape_start, log_scrape_success, log_scrape_error,
@@ -16,12 +22,37 @@ _NAME = "enrichment"
 
 # ── Trusted sources (eligible for full-content scraping) ───────────────────────
 TRUSTED_DOMAINS = {
+    # Technology & Gadgets
     "theverge.com", "wired.com", "engadget.com", "techcrunch.com",
     "gsmarena.com", "macrumors.com", "9to5mac.com", "androidcentral.com",
     "tomsguide.com", "digitaltrends.com", "cnet.com", "zdnet.com",
     "arstechnica.com", "venturebeat.com", "gizmodo.com", "slashgear.com",
     "pocket-lint.com", "trustedreviews.com", "whathifi.com", "stuff.tv",
     "pcgamer.com", "eurogamer.net", "ign.com", "gamespot.com", "polygon.com",
+    "tweaktown.com", "techpowerup.com", "anandtech.com", "hardwarecanucks.com",
+    "overclockers.co.uk", "guru3d.com", "phoronix.com", "extremetech.com",
+    "techspot.com", "notebookcheck.net", "liliputing.com", "cnx-software.com",
+    "neowin.net", "winbeta.org", "thurrott.com", "petapixel.com", "dpreview.com",
+    "imaging-resource.com", "thephoblographer.com", "canonrumors.com",
+    "fujirumors.com", "sonyalpharumors.com", "43rumors.com", "photorumors.com",
+
+    # Gaming & Entertainment
+    "comicbook.com", "screenrant.com", "variety.com", "hollywoodreporter.com",
+    "deadline.com", "thewrap.com", "indiewire.com", "collider.com", "slashfilm.com",
+    "darkhorizons.com", "comingsoon.net", "denofgeek.com", "bleedingcool.com",
+    "newsarama.com", "cbr.com", "kotaku.com", "destructoid.com", "shacknews.com",
+    "siliconera.com", "gematsu.com", "vg247.com", "videogamer.com", "pushsquare.com",
+    "nintendolife.com", "purexbox.com", "vgc.com", "fanbyte.com", "rockpapershotgun.com",
+
+    # Lifestyle & General News
+    "dailymail.com", "dailymail.co.uk", "nypost.com", "foxnews.com", "cnn.com",
+    "nbcnews.com", "abcnews.go.com", "cbsnews.com", "reuters.com", "apnews.com",
+    "bloomberg.com", "forbes.com", "fortune.com", "businessinsider.com",
+    "wsj.com", "nytimes.com", "theguardian.com", "telegraph.co.uk", "independent.co.uk",
+    "bbc.com", "bbc.co.uk", "aljazeera.com", "ndtv.com", "indiatimes.com",
+    "economictimes.indiatimes.com", "thehindu.com", "yahoo.com", "sports.yahoo.com",
+    "robbreport.com", "gentlemansjournal.com", "gq.com", "esquire.com",
+    "vogue.com", "hypebeast.com", "highsnobiety.com", "inputmag.com",
 }
 
 
@@ -129,6 +160,7 @@ def enrich_article_content(item: ClassifiedItemDTO, should_scrape: bool = False)
                 candidates.append({
                     "content_html": extractor_result["content_html"],
                     "content_text": extractor_result["content_text"],
+                    "image_url":    extractor_result.get("image_url"),
                     "word_count":   extractor_result["word_count"],
                     "quality_score": extractor_result["quality_score"],
                     "is_content_scraped": False,
@@ -146,7 +178,8 @@ def enrich_article_content(item: ClassifiedItemDTO, should_scrape: bool = False)
     best_wc_so_far = max((c["word_count"] for c in candidates), default=0)
 
     if should_scrape and not is_youtube and (not initial_content or best_wc_so_far < 200):
-        if trusted or extractor_failed:
+        # We scrape if it's a trusted domain OR if the extractor failed to find a substantial article
+        if trusted or best_wc_so_far < 150:
             log_scrape_start(logger, url)
             try:
                 scraped_html = scrape_article_content(url)
@@ -229,7 +262,25 @@ def enrich_article_content(item: ClassifiedItemDTO, should_scrape: bool = False)
             "content_source": "fallback",
         }
 
+    # Select image_url: Prioritize existing -> Best Candidate -> OG:Recovery
+    selected_image = data.get("image_url")
+    canonical_url = data.get("canonical_url")
+
+    if not selected_image or not canonical_url:
+        # Perform lightweight metadata scraping (Canonical + OG Image Recovery)
+        logger.info("[INTEGRATION][%s] metadata_recovery  url=%s", _NAME, url[:80])
+        recovered = recover_article_metadata(url)
+        
+        if not selected_image:
+            # Metadata Backfill check
+            selected_image = best_candidate.get("image_url") or recovered.get("image_url")
+            
+        if not canonical_url:
+            canonical_url = recovered.get("canonical_url")
+
     data.update(best_candidate)
+    data["image_url"] = selected_image
+    data["canonical_url"] = canonical_url
     # For backwards compatibility and migration
     data["content"] = best_candidate["content_html"]
 
@@ -238,5 +289,6 @@ def enrich_article_content(item: ClassifiedItemDTO, should_scrape: bool = False)
         source=best_candidate["content_source"],
         score=f"{best_candidate['quality_score']:.3f}",
         words=best_candidate["word_count"],
+        has_image=bool(selected_image),
     )
     return EnrichedItemDTO(**data)

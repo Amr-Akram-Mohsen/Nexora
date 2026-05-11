@@ -43,7 +43,11 @@ def assign_target_to_contents(contents, session):
         # Batch fetch for this type
         query = session.query(model).filter(model.id.in_(list(ids)))
         if obj_type == 'article':
-            query = query.options(db.selectinload(model.article_sources))
+            from app.domains.relationships import ArticleSource
+            query = query.options(
+                db.joinedload(model.primary_source).joinedload(ArticleSource.source),
+                db.selectinload(model.article_sources).selectinload(ArticleSource.source)
+            )
         
         objs = query.all()
         for obj in objs:
@@ -58,6 +62,8 @@ def assign_target_to_contents(contents, session):
             "id": c.id,
             "object_type": c.object_type,
             "published_at": c.published_at,
+            "is_published": getattr(c, "is_published", True),
+            "is_active": getattr(c, "is_active", True),
 
             "category": serialize_category(c.category),
 
@@ -98,7 +104,7 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
     session.flush()
     return content
 
-def get_or_create_content(session, object_type, external_id, obj_factory, title_fallback=None, url_fallback=None):
+def get_or_create_content(session, object_type, external_id, obj_factory, title_fallback=None, url_fallback=None, **kwargs):
     model = get_model_map().get(object_type)
     if not model:
         return None, False
@@ -112,13 +118,24 @@ def get_or_create_content(session, object_type, external_id, obj_factory, title_
         
     # 2. Try Deduplication by url (Articles or models with url)
     if not obj and url_fallback:
+        canonical_url = kwargs.get("canonical_url")
+        
         if object_type == 'article':
             from app.domains.relationships import ArticleSource
-            res = session.query(ArticleSource).filter_by(
-                url=url_fallback
-            ).first()
             
-            if res:
+            # Check primary URL
+            res = session.query(ArticleSource).filter_by(url=url_fallback).first()
+            
+            # If not found, check if canonical_url matches an existing article's canonical or primary source URL
+            if not res and canonical_url:
+                # Does canonical_url match any Source URL?
+                res = session.query(ArticleSource).filter_by(url=canonical_url).first()
+                
+                # Or does it match any Article's stored canonical_url?
+                if not res:
+                    obj = session.query(model).filter_by(canonical_url=canonical_url).first()
+            
+            if res and not obj:
                 obj = session.get(model, res.article_id)
         elif hasattr(model, 'url'):
             obj = session.query(model).filter_by(url=url_fallback).first()

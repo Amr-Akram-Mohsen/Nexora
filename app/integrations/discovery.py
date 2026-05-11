@@ -159,6 +159,7 @@ class DiscoveryManager:
                                     })
 
                     if queries:
+                        random.shuffle(queries)
                         registry[sec_slug][cat_slug] = queries
 
         total_queries = sum(

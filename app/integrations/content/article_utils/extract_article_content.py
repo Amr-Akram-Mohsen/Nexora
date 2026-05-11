@@ -339,7 +339,7 @@ def _fetch_rendered(url: str) -> str | None:
                 )
             )
             page = ctx.new_page()
-            page.goto(url, timeout=25000, wait_until="domcontentloaded")
+            page.goto(url, timeout=45000, wait_until="domcontentloaded")
             page.evaluate("window.scrollTo(0, document.body.scrollHeight / 3)")
             time.sleep(0.8)
             result = page.content()

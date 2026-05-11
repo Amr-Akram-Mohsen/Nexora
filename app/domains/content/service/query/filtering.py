@@ -5,7 +5,7 @@ from app.shared.utils.collections import my_zip
 def get_contents_render(session, filter_by_columns: tuple = ('section',), filter_values: tuple = (None,), rows_count=None):
     from .options import CONTENT_EAGER_LOADS
     from app.domains.system.models import Section
-    query = session.query(Content).filter(Content.is_active == True).options(
+    query = session.query(Content).filter(Content.is_active == True, Content.is_published == True).options(
         *CONTENT_EAGER_LOADS
     )
 
@@ -47,7 +47,11 @@ def get_filtered_contents(session, section_id, active_filters, allowed_filters, 
     from .options import CONTENT_EAGER_LOADS
     query = (
         session.query(Content)
-        .filter(Content.section_id == section_id, Content.is_active == True)
+        .filter(
+            Content.section_id == section_id,
+            Content.is_active == True,
+            Content.is_published == True
+        )
         .options(*CONTENT_EAGER_LOADS)
     )
 

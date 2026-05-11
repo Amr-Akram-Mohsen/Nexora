@@ -13,6 +13,7 @@ def create_article_model(data):
         quality_score=data.get("quality_score", 0.0),
         is_content_scraped=data.get("is_content_scraped", False),
         content_source=data.get("content_source"),
+        status=data.get("status", "pending"),
         body=data.get("content"),  # Still populate body for migration
         image_url=data.get("image_url")
     )
@@ -24,8 +25,9 @@ def ingest_article(session, raw_data):
     else:
         enriched_dto = raw_data
 
-    # 1. Map to domain DTO via cleaner logic
-    cleaned_dto = DomainMapper.to_article_dto(enriched_dto)
+    # 1. Map to domain DTO via consolidated normalization service
+    from app.domains.content.service.normalization import normalize_article_data
+    cleaned_dto = normalize_article_data(enriched_dto)
     if not cleaned_dto:
         return None, False
 

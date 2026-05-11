@@ -197,13 +197,41 @@ def create_app():
         print("--- Starting Limited Test Run (5 queries/source) ---")
         run_content_fetch(limit=5)
 
-    @app.cli.command("rescrape-articles")
-    def rescrape_articles_command():
-        """Find articles with missing content and attempt to re-scrape."""
+    @app.cli.command("enrich-articles")
+    def enrich_articles_command():
+        """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import reprocess_unscraped_articles
-        print("Searching for unscraped articles...")
-        count = reprocess_unscraped_articles(limit=15)
-        print(f"Done! Successfully recovered content for {count} articles.")
+        print("Starting full-body enrichment for pending articles...")
+        count = reprocess_unscraped_articles(limit=25)
+        print(f"Done! Successfully published {count} articles.")
+
+    @app.cli.command("init-content-status")
+    def init_content_status_command():
+        """Initialize status and is_published for existing content."""
+        from app.domains.content.models import Article, Content
+        print("Initializing Article status...")
+        articles = Article.query.all()
+        for a in articles:
+            # Update Article-specific status
+            if (a.content_text and len(a.content_text) > 200) or (a.body and len(a.body) > 200):
+                a.status = "complete"
+            else:
+                a.status = "pending"
+            
+            # Find associated Content record
+            content_rec = Content.query.filter_by(object_type="article", object_id=a.id).first()
+            if content_rec:
+                # Publish if it has content AND an image
+                if a.status == "complete" and a.image_url:
+                    content_rec.is_published = True
+                else:
+                    content_rec.is_published = False
+
+        print("Initializing Video/Post status...")
+        Content.query.filter(Content.object_type.in_(["video", "post"])).update({Content.is_published: True}, synchronize_session=False)
+        
+        db.session.commit()
+        print("Done!")
 
     @app.cli.command("generate-sitemap")
     def generate_sitemap_command():
