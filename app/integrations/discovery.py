@@ -68,9 +68,13 @@ class DiscoveryManager:
                     # Get primary intent for this section
                     intents = SECTION_DEFAULT_INTENTS.get(sec_slug, ["Review"])
                     
-                    # Brand Selection (Layer 1)
+                    # Brand Selection (Layer 1 - Deterministic Rotation)
                     target_brands = CATEGORY_BRAND_MAP.get(cat_slug, [])
-                    selected_brand = random.choice(target_brands) if target_brands else None
+                    selected_brand = None
+                    if target_brands:
+                        from app.shared.utils.rotation_state import RotationState
+                        rotator = RotationState("discovery_brands")
+                        selected_brand = rotator.get_next(cat_slug, target_brands)
 
                     if source_filter in ["newsapi", "gnews"]:
                         for intent in intents:
@@ -160,7 +164,8 @@ class DiscoveryManager:
 
                     if queries:
                         random.shuffle(queries)
-                        registry[sec_slug][cat_slug] = queries
+                        full_cat_slug = f"{parent_slug}:{cat_slug}"
+                        registry[sec_slug][full_cat_slug] = queries
 
         total_queries = sum(
             len(qs)

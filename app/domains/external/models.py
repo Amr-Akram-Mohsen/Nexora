@@ -18,9 +18,18 @@ class LastAPIFetch(db.Model):
 
     category = db.Column(db.String(100), index=True)
     source = db.Column(db.String(50), index=True)  # newsapi / gnews / rss
+    
+    # ── Conditional Fetching (RSS / Static APIs) ──────────────────────
+    etag = db.Column(db.String(255))
+    last_modified = db.Column(db.String(100))
 
+    # ── Source Health & Reliability ──────────────────────────────────
     failure_count = db.Column(db.Integer, default=0)
+    consecutive_failures = db.Column(db.Integer, default=0)
+    success_count = db.Column(db.Integer, default=0)
     last_failed_at = db.Column(db.DateTime)
+    last_error = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True, index=True)
 
 
     __table_args__ = (

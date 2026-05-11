@@ -18,4 +18,15 @@ class QuotaPort(Protocol):
 
 class CooldownPort(Protocol):
     def should_refetch(self, section: str, cache_key: str, hours: int) -> bool: ...
-    def mark_fetched(self, section: str, cache_key: str, category: str, source: str, normalized_query: str) -> None: ...
+    def get_fetch_metadata(self, section: str, cache_key: str) -> Dict: ...
+    def mark_fetched(
+        self, 
+        section: str, 
+        cache_key: str, 
+        category: str, 
+        source: str, 
+        normalized_query: str,
+        etag: Optional[str] = None,
+        last_modified: Optional[str] = None
+    ) -> None: ...
+    def mark_failed(self, section: str, cache_key: str, error: Exception, source: str = None) -> None: ...

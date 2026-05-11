@@ -155,10 +155,30 @@ def log_fetch_query_error(
 def log_item_ingested(logger: logging.Logger, source: str, title: str, status: str = "stored", **extra: Any) -> None:
     """Log details about a specific item being ingested."""
     extra_str = "  " + "  ".join(f'{k}={v}' for k, v in extra.items()) if extra else ""
-    logger.info("[INGEST][%s] %-8s  title=\"%s\"%s", source, status, title[:60], extra_str)
+    # We use INFO for new items, and DEBUG for updates to keep logs clean
+    lvl = logging.INFO if status == "stored" else logging.DEBUG
+    logger.log(lvl, "[INGEST][%s] %-8s  title=\"%s\"%s", source, status, title[:60], extra_str)
 
 
 def log_item_skipped(logger: logging.Logger, source: str, title: str, reason: str, **extra: Any) -> None:
     """Log why an item was skipped during ingestion."""
     extra_str = "  " + "  ".join(f'{k}={v}' for k, v in extra.items()) if extra else ""
     logger.debug("[INGEST][%s] skipped   reason=%-15s  title=\"%s\"%s", source, reason, title[:60], extra_str)
+
+
+def log_query_summary(
+    logger: logging.Logger,
+    source: str,
+    *,
+    query: str,
+    stored: int,
+    updated: int,
+    skipped: int,
+    group: str = ""
+) -> None:
+    """Emit a final summary of ingestion results for a single query."""
+    group_str = f"  group={group}" if group else ""
+    logger.info(
+        "[INGEST][%s] query_done  stored=%d  updated=%d  skipped=%d  query=\"%s\"%s",
+        source, stored, updated, skipped, query, group_str
+    )

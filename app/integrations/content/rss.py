@@ -82,12 +82,21 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
 
     log_integration_start(logger, _NAME, url=feed_url)
 
+    # Support for Conditional GET
+    etag = kwargs.get("etag")
+    modified = kwargs.get("modified")
+
     try:
-        feed = feedparser.parse(feed_url, agent="NexoraBot/1.0")
+        feed = feedparser.parse(feed_url, etag=etag, modified=modified, agent="NexoraBot/1.0")
+
+        # 304 Not Modified
+        if feed.status == 304:
+            logger.info("[INTEGRATION][%s] not modified  url=%s", _NAME, feed_url)
+            return {"items": [], "etag": etag, "modified": modified}
 
         if not feed.entries:
-            logger.info("[INTEGRATION][%s] empty feed  url=%s", _NAME, feed_url)
-            return []
+            logger.info("[INTEGRATION][%s] empty feed or error  url=%s  status=%s", _NAME, feed_url, feed.status)
+            return {"items": [], "etag": feed.get("etag"), "modified": feed.get("modified")}
 
         source_name = feed.feed.get("title") or feed_url
         raw_items = []
@@ -115,7 +124,11 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
             })
 
         log_integration_success(logger, _NAME, items=len(raw_items), url=feed_url)
-        return raw_items
+        return {
+            "items": raw_items,
+            "etag": feed.get("etag"),
+            "modified": feed.get("modified")
+        }
 
     except Exception as e:
         log_integration_error(logger, _NAME, e, url=feed_url)

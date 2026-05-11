@@ -202,7 +202,7 @@ def create_app():
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import reprocess_unscraped_articles
         print("Starting full-body enrichment for pending articles...")
-        count = reprocess_unscraped_articles(limit=25)
+        count = reprocess_unscraped_articles(5)
         print(f"Done! Successfully published {count} articles.")
 
     @app.cli.command("init-content-status")

@@ -11,6 +11,7 @@ from app.shared.utils.logging import (
     log_fetch_query_error,
     log_item_ingested,
     log_item_skipped,
+    log_query_summary,
 )
 
 logger = logging.getLogger(__name__)
@@ -82,27 +83,6 @@ class IngestionWorkflow:
             logger.info("[FETCH][%s] no queries found  source_filter=%s", self.source_name, source_filter)
             return 0
 
-        # ── Taxonomy-group batching ───────────────────────────────────
-        #
-        # Filter the flat task list to only queries whose *category* slug
-        # starts with the active parent group name.  This narrows a run of
-        # ~100 queries down to ~20-30 before the hard `limit` cap is applied.
-        # The cursor is advanced at the end of every successful run so the
-        # next call processes the following group.
-        #
-        # If the source already delivers a very narrow query set (e.g. RSS
-        # with manual_queries), group filtering is skipped transparently.
-
-        group: str = ""
-        batch_state = None
-
-        try:
-            from app.shared.utils.batch_state import BatchState
-            batch_state = BatchState(source_filter)
-            group = batch_state.current_group(_TAXONOMY_GROUPS) or ""
-        except Exception as exc:
-            logger.warning("[FETCH][%s] batch state unavailable — running ungrouped  err=%s", self.source_name, exc)
-
         def get_fresh_tasks(tasks):
             cooldown_hrs = fetch_params.get("cooldown_hours", 6)
             fresh = []
@@ -113,33 +93,64 @@ class IngestionWorkflow:
                     fresh.append((sec, cat, q_obj))
             return fresh
 
-        if group:
-            group_tasks = [
-                (sec, cat, q) for sec, cat, q in flat_tasks
-                if cat.startswith(group) or group in cat
-            ]
-            
-            fresh_group_tasks = get_fresh_tasks(group_tasks)
-            
-            if fresh_group_tasks:
-                flat_tasks = fresh_group_tasks
-                logger.info(
-                    "[FETCH][%s] batch group=%s  fresh_queries=%d/%d",
-                    self.source_name, group, len(flat_tasks), len(group_tasks)
-                )
-            else:
-                logger.info(
-                    "[FETCH][%s] group %s exhausted (all on cooldown) — falling back to full set",
-                    self.source_name, group
-                )
-                flat_tasks = get_fresh_tasks(flat_tasks)
-                group = "" # Treat as ungrouped for this run
-        else:
-            flat_tasks = get_fresh_tasks(flat_tasks)
+        # ── Taxonomy-group batching & Cooldown filtering ──────────────────────
+        group: str = ""
+        batch_state = None
+        cooldown_hrs = fetch_params.get("cooldown_hours", 6)
 
-        if not flat_tasks:
-            logger.info("[FETCH][%s] all categories are on cooldown. nothing to do.", self.source_name)
-            return 0
+        try:
+            from app.shared.utils.batch_state import BatchState
+            batch_state = BatchState(source_filter)
+        except Exception as exc:
+            logger.warning("[FETCH][%s] batch state unavailable — running ungrouped  err=%s", self.source_name, exc)
+
+        if batch_state:
+            # We try to find a group that has fresh tasks. 
+            # We check up to len(_TAXONOMY_GROUPS) to avoid infinite loops if everything is on cooldown.
+            groups_checked = 0
+            while groups_checked < len(_TAXONOMY_GROUPS):
+                group = batch_state.current_group(_TAXONOMY_GROUPS) or ""
+                if not group:
+                    break
+                
+                # Filter tasks for this group
+                group_tasks = [
+                    (sec, cat, q) for sec, cat, q in flat_tasks
+                    if cat.startswith(group) or group in cat
+                ]
+                
+                if not group_tasks:
+                    logger.info("[FETCH][%s] group %s has no allowed queries for this source — skipping", self.source_name, group)
+                    batch_state.advance(_TAXONOMY_GROUPS)
+                    groups_checked += 1
+                    continue
+                
+                fresh_group_tasks = get_fresh_tasks(group_tasks)
+                if fresh_group_tasks:
+                    flat_tasks = fresh_group_tasks
+                    logger.info(
+                        "[FETCH][%s] batch group=%s  eligible_queries=%d/%d",
+                        self.source_name, group, len(flat_tasks), len(group_tasks)
+                    )
+                    break # Found a productive group
+                else:
+                    logger.info(
+                        "[FETCH][%s] group %s is skipped (all %d queries are on cooldown or inactive)", 
+                        self.source_name, group, len(group_tasks)
+                    )
+                    batch_state.advance(_TAXONOMY_GROUPS)
+                    groups_checked += 1
+            
+            if groups_checked >= len(_TAXONOMY_GROUPS):
+                logger.info("[FETCH][%s] all groups are currently on cooldown or inactive. nothing to do.", self.source_name)
+                return 0
+        else:
+            # Ungrouped fallback
+            total_before = len(flat_tasks)
+            flat_tasks = get_fresh_tasks(flat_tasks)
+            if not flat_tasks:
+                logger.info("[FETCH][%s] all %d queries are on cooldown or inactive. nothing to do.", self.source_name, total_before)
+                return 0
 
         # ── Apply limit cap ───────────────────────────────────────────
         if limit and limit < len(flat_tasks):
@@ -242,17 +253,52 @@ class IngestionWorkflow:
 
         # 3. Fetch
         sanitized_params = {k: v for k, v in fetch_params.items() if k != "cooldown_hours"}
-        raw_items = fetcher(q_obj, **sanitized_params)
-        self.quota_service.record_call()
-        self.cooldown_service.mark_fetched(
-            section, cache_key,
-            category=category,
-            source=source_filter,
-            normalized_query=q_text,
-        )
+        
+        # Load conditional fetch metadata
+        meta = self.cooldown_service.get_fetch_metadata(section, cache_key)
+        if meta:
+            sanitized_params.update({
+                "etag": meta.get("etag"),
+                "modified": meta.get("last_modified")
+            })
+
+        try:
+            response = fetcher(q_obj, **sanitized_params)
+            self.quota_service.record_call()
+
+            # Handle both list and dict response types
+            if isinstance(response, dict):
+                raw_items = response.get("items", [])
+                new_etag = response.get("etag")
+                new_modified = response.get("modified")
+            else:
+                raw_items = response
+                new_etag = None
+                new_modified = None
+
+            self.cooldown_service.mark_fetched(
+                section, cache_key,
+                category=category,
+                source=source_filter,
+                normalized_query=q_text,
+                etag=new_etag,
+                last_modified=new_modified,
+            )
+        except Exception as e:
+            # RECORD FAILURE IN REGISTRY
+            self.cooldown_service.mark_failed(section, cache_key, error=e, source=source_filter)
+            # Re-raise if it's a fatal or quota error, otherwise log and continue
+            from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
+            if isinstance(e, (PipelineFatalError, PipelineQuotaExceededError)):
+                raise
+            log_fetch_query_error(logger, source_filter, query=q_text, error=e)
+            return 0
 
         # 4. Process each raw item
         query_stored = 0
+        query_updated = 0
+        query_skipped = 0
+
         for raw in raw_items:
             item_title = _safe_title(raw)
 
@@ -315,8 +361,10 @@ class IngestionWorkflow:
                             published=enriched_dict.get("is_published", False)
                         )
                     else:
+                        query_updated += 1
                         log_item_ingested(logger, self.source_name, item_title, status="updated")
                 else:
+                    query_skipped += 1
                     log_item_skipped(logger, self.source_name, item_title, reason="duplicate_or_invalid")
             except Exception as exc:
                 import sqlalchemy.exc
@@ -330,6 +378,16 @@ class IngestionWorkflow:
 
         if query_stored > 0:
             session.commit()
+
+        # Emit summary for this query
+        log_query_summary(
+            logger, self.source_name,
+            query=q_text,
+            stored=query_stored,
+            updated=query_updated,
+            skipped=query_skipped,
+            # We don't have the group here, but it's okay for the item-level summary
+        )
 
         return query_stored
 

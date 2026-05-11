@@ -11,86 +11,84 @@ _NAME = "rescrape"
 
 def reprocess_unscraped_articles(limit: int = 50) -> int:
     """
-    Finds articles stored in 'pending' status and attempts to fully enrich them.
-    Targets articles waiting for scraping or with poor initial metadata.
+    Phase 2: Enrichment Workflow
+    Finds articles in 'pending' status and performs full-body scraping.
     """
+    from datetime import datetime, timedelta
+    
+    # Only retry 'failed' articles after 24 hours
+    retry_threshold = datetime.utcnow() - timedelta(hours=24)
+    
     unscraped = (
         db.session.query(Article)
-        .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id) & (Content.is_active == True))
-        .filter(Article.status == "pending")
+        .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id))
+        .filter(
+            (Article.status == "pending") | 
+            ((Article.status == "failed") & (Article.last_enrichment_attempt < retry_threshold))
+        )
         .order_by(Content.published_at.desc())
         .limit(limit)
         .all()
     )
 
     if not unscraped:
-        logger.info("[%s] no articles in 'pending' status needing enrichment", _NAME)
+        logger.info("[%s] no articles needing enrichment at this time", _NAME)
         return 0
 
-    logger.info("[%s] start  processing=%d articles", _NAME, len(unscraped))
+    logger.info("[%s] phase_2_start  processing=%d articles", _NAME, len(unscraped))
     success_count = 0
 
-    from app.integrations.enrichment.pipeline import enrich_article_content
-    from datetime import datetime
+    from app.integrations.enrichment.pipeline import full_article_scraping_pipeline
 
     for article in unscraped:
         url = article.url or ""
-        log_scrape_start(logger, url)
+        article.last_enrichment_attempt = datetime.utcnow()
         
         try:
+            # Prepare data for pipeline
             raw_data = {
-                "url":         url,
-                "title":       article.title,
-                "description": article.description,
-                "content":     article.content_html,
-                "image_url":   article.image_url,
+                "url":           url,
+                "title":         article.title,
+                "description":   article.description,
+                "content":       article.content_html,
+                "image_url":     article.image_url,
                 "canonical_url": article.canonical_url,
             }
 
-            # Run full enrichment (scraping enabled)
-            enriched_dto = enrich_article_content(raw_data, should_scrape=True)
-            
-            # Convert DTO to dict for easy access
-            if hasattr(enriched_dto, "model_dump"):
-                enriched = enriched_dto.model_dump()
-            else:
-                enriched = dict(enriched_dto)
+            # Run Phase 2 Enrichment (Heavy Scraping)
+            enriched_dto = full_article_scraping_pipeline(raw_data)
+            enriched = enriched_dto.model_dump() if hasattr(enriched_dto, "model_dump") else dict(enriched_dto)
 
-            article.last_enrichment_attempt = datetime.utcnow()
-
-            # Update core fields
-            article.content_text       = enriched.get("content_text")
-            article.content_html       = enriched.get("content_html")
-            article.word_count         = enriched.get("word_count", 0)
-            article.quality_score      = enriched.get("quality_score", 0.0)
-            article.is_content_scraped  = enriched.get("is_content_scraped", False)
-            article.content_source     = enriched.get("content_source")
+            # Update content ONLY if scraper found something substantial
+            new_text = enriched.get("content_text")
+            if new_text and len(new_text) > (article.word_count or 0):
+                article.content_text       = new_text
+                article.content_html       = enriched.get("content_html")
+                article.word_count         = enriched.get("word_count", 0)
+                article.quality_score      = enriched.get("quality_score", 0.0)
+                article.is_content_scraped  = enriched.get("is_content_scraped", False)
+                article.content_source     = enriched.get("content_source")
             
-            # Backfill missing image/canonical if recovered
-            if enriched.get("image_url"):
+            # Backfill missing metadata (conservative approach)
+            if enriched.get("image_url") and not article.image_url:
                 article.image_url = enriched["image_url"]
-            if enriched.get("canonical_url"):
+            if enriched.get("canonical_url") and not article.canonical_url:
                 article.canonical_url = enriched["canonical_url"]
 
             # --- Quality Gate ---
-            # Threshold: > 250 words AND has an image
-            is_good_quality = article.word_count > 250 and article.image_url
+            # Threshold: Sufficient content length AND has a valid image
+            is_good_quality = (article.word_count or 0) > 250 and article.image_url
             
             if is_good_quality:
                 article.status = "complete"
-                # Update the associated Content record
-                content_rec = Content.query.filter_by(object_type="article", object_id=article.id).first()
-                if content_rec:
-                    content_rec.is_published = True
                 success_count += 1
-                log_scrape_success(logger, url, words=article.word_count, source=article.content_source)
             else:
-                # Still failing quality gate - mark as partial or failed
-                article.status = "failed" if article.word_count < 100 else "partial"
-                content_rec = Content.query.filter_by(object_type="article", object_id=article.id).first()
-                if content_rec:
-                    content_rec.is_published = False
-                log_scrape_error(logger, url, reason=f"low_quality (words={article.word_count}, img={bool(article.image_url)})")
+                article.status = "partial" if (article.word_count or 0) > 100 else "failed"
+
+            # Sync with Content record
+            content_rec = Content.query.filter_by(object_type="article", object_id=article.id).first()
+            if content_rec:
+                content_rec.is_published = (article.status == "complete")
 
             db.session.commit()
 
@@ -98,7 +96,7 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
             db.session.rollback()
             article.status = "failed"
             db.session.commit()
-            log_scrape_error(logger, url, reason=f"exception: {str(e)}")
+            logger.error("[%s] error  url=%s  err=%s", _NAME, url[:60], str(e))
 
-    logger.info("[%s] done  published=%d / %d", _NAME, success_count, len(unscraped))
+    logger.info("[%s] phase_2_done  success=%d / %d", _NAME, success_count, len(unscraped))
     return success_count

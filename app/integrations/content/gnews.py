@@ -59,10 +59,10 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
         return raw_items
 
     except requests.exceptions.RequestException as e:
-        if hasattr(e, "response") and e.response is not None and e.response.status_code == 403:
-            raise PipelineQuotaExceededError("GNews Quota Exceeded")
-        log_integration_error(logger, _NAME, e, query=q_text, country=country)
-        return []
+        if hasattr(e, "response") and e.response is not None and (e.response.status_code == 403 or e.response.status_code == 429):
+            raise PipelineQuotaExceededError("GNews quota exhausted")
+        from app.integrations.exceptions import PipelineTransientError
+        raise PipelineTransientError(f"GNews network error: {str(e)}") from e
     except Exception as e:
-        log_integration_error(logger, _NAME, e, query=q_text, exc_info=True)
-        return []
+        from app.integrations.exceptions import PipelineFatalError
+        raise PipelineFatalError(f"GNews unexpected error: {str(e)}") from e

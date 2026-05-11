@@ -29,12 +29,10 @@ class EnrichmentService(EnrichmentPort):
         should_scrape: When True, enables CloudScraper/Playwright scraping for articles.
                        Defaults to False for safe, fast ingestion runs.
     """
-    def __init__(self, should_scrape: bool = False):
-        self.should_scrape = should_scrape
-
     def __call__(self, raw_data, section, category, query_obj):
-        from app.integrations.enrichment.pipeline import route_enrichment_strategy
-        return route_enrichment_strategy(raw_data, should_scrape=self.should_scrape)
+        from app.integrations.enrichment.pipeline import ingest_enrichment_router
+        # Ingestion enrichment is always lightweight (normalization only)
+        return ingest_enrichment_router(raw_data)
 
 
 class CooldownService(CooldownPort):
@@ -42,9 +40,24 @@ class CooldownService(CooldownPort):
         from app.integrations.external.api import should_refetch
         return should_refetch(section, cache_key, hours=hours)
 
-    def mark_fetched(self, section, cache_key, category, source, normalized_query):
+    def get_fetch_metadata(self, section, cache_key):
+        from app.integrations.external.api import get_fetch_metadata
+        return get_fetch_metadata(section, cache_key)
+
+    def mark_fetched(self, section, cache_key, category, source, normalized_query, etag=None, last_modified=None):
         from app.integrations.external.api import mark_fetched
-        mark_fetched(section, cache_key, category=category, source=source, normalized_query=normalized_query)
+        mark_fetched(
+            section, cache_key, 
+            category=category, 
+            source=source, 
+            normalized_query=normalized_query,
+            etag=etag,
+            last_modified=last_modified
+        )
+
+    def mark_failed(self, section, cache_key, error, source=None):
+        from app.integrations.external.api import mark_failed
+        mark_failed(section, cache_key, error=error, source=source)
 
 
 class NewsApiQuotaService(QuotaPort):

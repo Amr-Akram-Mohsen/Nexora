@@ -147,30 +147,17 @@ Analyze them carefully before responding.
 analyze the content, item, system, interaction, recommendation related files and directories in the directories below and you could ignore the other files and directories like the ingesion dirctory in application/content and workflows etc.:
 
 
-@domains: (models.py or models/*.py, and services/query.py or services/query/*.py)
-@content_access.py
-@normalization.py
-@application
-@context
-@routes
-@relationships.py
-@context.py
-@index.html
-@content
-@commercial
-@search-results.html
-@saved-items.html
-@footer.html
-@header.html
-@hero-sliders.html
-@newsletter.html
-@grid.html
-@section.html
-@catalog
-@interactions
-@listing-page.html
-@media
-@some files you may need to ensure they exist and to understand and you may modify:
-@extensions.py
-@cache
+
+@app/application/content/ingestion_workflow.py
+@app/integrations/discovery.py
+@app/integrations/external/api.py
+@app/shared/utils/batch_state.py
+@app/shared/constants/taxonomy.py
+@app/shared/constants/query_builder.py
+@app/shared/constants/core.py
+@app/shared/dto/ingestion.py
+@app/jobs/tasks/content/articles.py
+@app/integrations/content/newsapi.py
+@app/integrations/content/gnews.py
+@app/domains/external/models.py]
 

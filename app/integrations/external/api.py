@@ -60,23 +60,57 @@ def record_youtube_call(units: int = 100):
 
 # ── Fetch-cooldown guard ──────────────────────────────────────────
 
-def should_refetch(section: str, query_text: str, hours: int = 6) -> bool:
+FAILURE_RETRY_MINS = 15
+
+def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
     """
-    Returns True if we haven't fetched this section+query combination
-    in the past `hours` hours.
+    Checks if a query is on cooldown or disabled due to health issues.
+    Differentiates between success (long) and failure (short) cooldowns.
     """
     rec = LastAPIFetch.query.filter_by(
         section=section, query_text=query_text
     ).first()
+    
     if not rec:
         return True
-    return datetime.utcnow() - rec.last_fetched_at > timedelta(hours=hours)
+    
+    if not rec.is_active:
+        return False
+
+    now = datetime.utcnow()
+    
+    # 1. Success Cooldown (if last attempt was a success)
+    is_last_success = rec.success_count > 0 and (not rec.last_failed_at or rec.last_fetched_at > rec.last_failed_at)
+    
+    if is_last_success:
+        return now - rec.last_fetched_at > timedelta(hours=hours)
+    
+    # 2. Failure Cooldown (Short retry period)
+    if rec.last_failed_at:
+        return now - rec.last_failed_at > timedelta(minutes=FAILURE_RETRY_MINS)
+
+    return True
 
 
-def mark_fetched(section: str, query_text: str, category: str = None, source: str = None, normalized_query: str = None):
+def get_fetch_metadata(section: str, query_text: str) -> dict:
+    """Returns stored etag/last_modified for a specific fetch task."""
+    rec = LastAPIFetch.query.filter_by(section=section, query_text=query_text).first()
+    if not rec:
+        return {}
+    return {"etag": rec.etag, "last_modified": rec.last_modified}
+
+
+def mark_fetched(
+    section: str, 
+    query_text: str, 
+    category: str = None, 
+    source: str = None, 
+    normalized_query: str = None,
+    etag: str = None,
+    last_modified: str = None
+):
     """
-    Updates or creates a record of the last time a specific query was executed.
-    Populates metadata columns for better debugging and analysis.
+    Updates or creates a record of a successful fetch.
     """
     rec = LastAPIFetch.query.filter_by(
         section=section, query_text=query_text
@@ -86,10 +120,15 @@ def mark_fetched(section: str, query_text: str, category: str = None, source: st
     
     if rec:
         rec.last_fetched_at = now
-        # Update metadata if provided and currently null
+        rec.success_count += 1
+        rec.consecutive_failures = 0
+        rec.is_active = True
+        
         if category and not rec.category: rec.category = category
         if source and not rec.source: rec.source = source
         if normalized_query and not rec.normalized_query: rec.normalized_query = normalized_query
+        if etag: rec.etag = etag
+        if last_modified: rec.last_modified = last_modified
     else:
         db.session.add(LastAPIFetch(
             section=section,
@@ -97,6 +136,46 @@ def mark_fetched(section: str, query_text: str, category: str = None, source: st
             category=category,
             source=source,
             normalized_query=normalized_query,
+            etag=etag,
+            last_modified=last_modified,
             last_fetched_at=now,
+            success_count=1,
+            consecutive_failures=0,
+            is_active=True
+        ))
+    db.session.commit()
+
+
+def mark_failed(section: str, query_text: str, error: Exception, source: str = None):
+    """
+    Records a fetch failure and increments consecutive failure count.
+    """
+    rec = LastAPIFetch.query.filter_by(
+        section=section, query_text=query_text
+    ).first()
+    
+    now = datetime.utcnow()
+    err_msg = str(error)[:500]
+    
+    if rec:
+        rec.failure_count += 1
+        rec.consecutive_failures += 1
+        rec.last_failed_at = now
+        rec.last_error = err_msg
+        if source and not rec.source: rec.source = source
+        
+        if rec.consecutive_failures >= 5:
+            rec.is_active = False
+    else:
+        db.session.add(LastAPIFetch(
+            section=section,
+            query_text=query_text,
+            source=source,
+            last_fetched_at=datetime(2000, 1, 1),
+            failure_count=1,
+            consecutive_failures=1,
+            last_failed_at=now,
+            last_error=err_msg,
+            is_active=True
         ))
     db.session.commit()
