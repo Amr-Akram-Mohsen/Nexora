@@ -1,17 +1,18 @@
 import logging
 import random
 import time
-from datetime import datetime
-from typing import Callable, List, Dict, Optional
+from typing import List, Dict, Optional
 from flask import current_app
 from .ingestion.services import (
     DiscoveryService, EnrichmentService, GenericQuotaService, GNewsQuotaService, YouTubeQuotaService, NewsApiQuotaService, CooldownService, ClassificationService
 )
-from .ingestion.ports import FetcherPort, DiscoveryPort
+from .ingestion.ports import FetcherPort
 from .ingestion import ingest_content
 from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
-from app.shared.utils.logging import log_fetch_query_error
+from app.shared.utils.logging import (log_fetch_query_error, log_fetch_run_start, log_fetch_run_done, log_batch_rotation)
 from app.shared.constants.source_profiles import SOURCE_PROFILES
+from app.integrations.content import (fetch_newsapi_query, fetch_gnews_query, fetch_rss_query)
+from app.integrations.social import (fetch_reddit_query, fetch_youtube_query)
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,16 @@ _TAXONOMY_GROUPS = ["electronics", "perfumes", "accessories"]
 
 QUOTA_SERVICE_MAP = {
     'newsapi': NewsApiQuotaService,
-    'gnews': GenericQuotaService,
+    'gnews': GNewsQuotaService,
     'youtube': YouTubeQuotaService,
+}    
+
+FETCHER_FUNCS_MAP = {
+    'newsapi': fetch_newsapi_query,
+    'gnews': fetch_gnews_query,
+    'rss': fetch_rss_query,
+    'youtube': fetch_youtube_query,
+    'reddit': fetch_reddit_query,
 }    
 
 class IngestionWorkflow:
@@ -43,11 +52,6 @@ class IngestionWorkflow:
     def __init__(
         self,
         source_name: str,
-        # discovery: DiscoveryPort,
-        # quota_service: QuotaPort,
-        # enrichment_service: EnrichmentPort,
-        # cooldown_service: CooldownPort,
-        # classification_service: ClassificationPort,
     ):
         self.source_name = source_name
         self.discovery = None if source_name == 'rss' else DiscoveryService()
@@ -57,6 +61,8 @@ class IngestionWorkflow:
         self.classification_service = ClassificationService()
         self.profile = SOURCE_PROFILES[source_name]
 
+        logger.info("[FETCH][%s] run started  limit=%s", self.source_name, self.profile.fetch_limit)
+
     # ------------------------------------------------------------------
     # Public entry point
     # ------------------------------------------------------------------
@@ -65,8 +71,6 @@ class IngestionWorkflow:
         self,
         session,
         object_type: str,
-        # source_filter: str,
-        fetcher: FetcherPort,
         limit: Optional[int] = None,
         **fetch_params,
     ) -> int:
@@ -173,15 +177,14 @@ class IngestionWorkflow:
         total_tasks = len(flat_tasks)
 
         # ── Run banner (full date+time stamps this run) ──────────────
-        logger.info(
-            "=== [FETCH][%s]  %s  group=%-12s  tasks=%d/%d  limit=%s ===",
+        log_fetch_run_start(
+            logger,
             self.source_name,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            group or "(all)",
-            total_tasks, total_eligible,
-            limit or "inf",
+            group=group or "(all)",
+            tasks=total_tasks,
+            eligible=total_eligible,
+            limit=limit or "inf",
         )
-
         # ── Main loop ─────────────────────────────────────────────────
         total_stored = 0
         total_updated = 0
@@ -198,7 +201,7 @@ class IngestionWorkflow:
                     session=session,
                     object_type=object_type,
                     # source_filter=source_filter,
-                    fetcher=fetcher,
+                    fetcher=FETCHER_FUNCS_MAP.get(self.source_name, None),
                     section=section,
                     category=category,
                     q_obj=q_obj,
@@ -234,12 +237,15 @@ class IngestionWorkflow:
             except Exception as exc:
                 logger.warning("[FETCH][%s] could not advance batch cursor  err=%s", self.source_name, exc)
 
-        logger.info(
-            "=== [FETCH][%s] DONE   stored=%-3d  updated=%-3d  elapsed=%.1fs  -> next=%s ===",
-            self.source_name, total_stored, total_updated,
-            time.monotonic() - t_run,
-            next_group or group or "(all)",
+        log_fetch_run_done(
+            logger,
+            self.source_name,
+            stored=total_stored,
+            updated=total_updated,
+            elapsed=time.monotonic() - t_run,
+            next_group=next_group or group or "(all)",
         )
+
         return total_stored
 
     # ------------------------------------------------------------------
@@ -364,11 +370,6 @@ class IngestionWorkflow:
                     content_obj, is_new = result
                     if is_new:
                         query_stored += 1
-                        # logger.info(
-                        #     "[INGEST][%s] +stored  \"%.55s\"  published=%s",
-                        #     self.source_name, item_title,
-                        #     enriched_dict.get("is_published", False),
-                        # )
                     else:
                         query_updated += 1
                 else:
@@ -412,15 +413,6 @@ def run_orchestrated_ingestion(
     session,
     source_name: str,
     object_type: str,
-    fetcher_func: Callable,
-    # quota_service: QuotaPort,
-    # enrichment_service: EnrichmentPort(),
-    # discovery_service: DiscoveryPort,
-    # cooldown_service: CooldownPort,
-    # classification_service: ClassificationPort,
-    # source_filter: str,
-    # limit: Optional[int] = None,
-    # cooldown_hours: int = 6,
     manual_queries: Optional[List[Dict]] = None,
     **extra_params,
 ) -> int:
@@ -431,11 +423,6 @@ def run_orchestrated_ingestion(
     """
     workflow = IngestionWorkflow(
         source_name=source_name,
-        # discovery=discovery_service,
-        # quota_service=quota_service,
-        # enrichment_service=enrichment_service,
-        # cooldown_service=cooldown_service,
-        # classification_service=classification_service,
     )
 
     if manual_queries:
@@ -452,9 +439,5 @@ def run_orchestrated_ingestion(
     return workflow.run(
         session=session,
         object_type=object_type,
-        # source_filter=source_filter,
-        fetcher=fetcher_func,
-        # limit=limit,
-        # cooldown_hours=cooldown_hours,
         **extra_params,
     )

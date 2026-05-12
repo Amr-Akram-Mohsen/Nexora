@@ -182,3 +182,56 @@ def log_query_summary(
         "[INGEST][%s] query_done  stored=%d  updated=%d  skipped=%d  query=\"%s\"%s",
         source, stored, updated, skipped, query, group_str
     )
+
+
+def log_fetch_run_start(
+    logger: logging.Logger,
+    source: str,
+    *,
+    group: str,
+    tasks: int,
+    eligible: int,
+    limit: Any,
+) -> None:
+    """Log the start of a full fetch run."""
+    logger.info(
+        "[FETCH][%s] run_start  group=%s  tasks=%d/%d  limit=%s",
+        source,
+        group,
+        tasks,
+        eligible,
+        limit,
+    )
+
+
+def log_fetch_run_done(
+    logger: logging.Logger,
+    source: str,
+    *,
+    stored: int,
+    updated: int,
+    elapsed: float,
+    next_group: str,
+) -> None:
+    """Log the completion of a full fetch run."""
+    logger.info(
+        "[FETCH][%s] run_done  stored=%d  updated=%d  elapsed=%.1fs  next=%s",
+        source,
+        stored,
+        updated,
+        elapsed,
+        next_group,
+    )
+    
+def log_batch_rotation(
+    logger: logging.Logger,
+    source: str,
+    *,
+    next_group: str,
+) -> None:
+    """Log taxonomy cursor rotation."""
+    logger.info(
+        "[BATCH][%s] cursor_advanced  next_group=%s",
+        source,
+        next_group,
+    )

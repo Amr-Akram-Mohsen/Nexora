@@ -6,52 +6,31 @@ Fails gracefully if API keys are missing.
 """
 import logging
 from flask import current_app
+from app.application.content.ingestion_workflow import run_orchestrated_ingestion
+from app.core.extensions import db
+
 
 logger = logging.getLogger(__name__)
 
-from app.application.content.ingestion_workflow import run_orchestrated_ingestion
-from app.application.content.ingestion.services import (
-    DiscoveryService, EnrichmentService, NewsApiQuotaService,
-    GNewsQuotaService, GenericQuotaService, CooldownService,
-    ClassificationService
-)
-from app.core.extensions import db
-from app.shared.constants.source_profiles import SOURCE_PROFILES
-
-
-def run_newsapi_fetch(limit: int | None = SOURCE_PROFILES['newsapi'].fetch_limit):
+def run_newsapi_fetch():
     """
     Fetch from NewsAPI (tech/fragrance/fashion).
 
-    Processes a controlled batch of queries per run (default: FetchLimits.NEWSAPI).
+    Uses the fetch limit defined in the source profile.
     The taxonomy-group cursor in the workflow rotates groups across executions so
     coverage spreads without exhausting the daily API quota at once.
-
-    Args:
-        limit:        Cap the number of queries processed per run.
-                      Pass ``None`` to disable the cap (full run).
     """
     if not current_app.config.get("NEWS_API_KEY"):
         logger.warning("[FETCH][newsapi] skipped  reason=key_missing")
         return {"status": "skipped", "reason": "key_missing"}
 
     try:
-        from app.integrations.content.newsapi import fetch_newsapi_query
 
-        logger.info("[FETCH][newsapi] run started  limit=%s", limit)
+        # logger.info("[FETCH][newsapi] run started  limit=%s", limit)
         count = run_orchestrated_ingestion(
             session=db.session,
             source_name="newsapi",
             object_type="article",
-            fetcher_func=fetch_newsapi_query,
-            # quota_service=NewsApiQuotaService(),
-            # enrichment_service=EnrichmentService(),
-            # discovery_service=DiscoveryService(),
-            # cooldown_service=CooldownService(),
-            # classification_service=ClassificationService(),
-            # source_filter="newsapi",
-            # limit=limit,
-            # cooldown_hours=SOURCE_PROFILES['newsapi'].cooldown_hours,
         )
         return {"status": "success", "count": count}
     except Exception as e:
@@ -67,37 +46,22 @@ def run_newsapi_fetch(limit: int | None = SOURCE_PROFILES['newsapi'].fetch_limit
         return {"status": "error", "error": str(e)}
 
 
-def run_gnews_fetch(limit: int | None = SOURCE_PROFILES['gnews'].fetch_limit):
+def run_gnews_fetch():
     """
     Fetch from GNews (regional/global).
 
-    Processes a controlled batch of queries per run (default: FetchLimits.GNEWS).
-
-    Args:
-        limit:        Cap the number of queries processed per run.
-                      Pass ``None`` to disable the cap (full run).
+    Uses the fetch limit defined in the source profile.
     """
     if not current_app.config.get("GNEWS_API_KEY"):
         logger.warning("[FETCH][gnews] skipped  reason=key_missing")
         return {"status": "skipped", "reason": "key_missing"}
 
     try:
-        from app.integrations.content.gnews import fetch_gnews_query
-
-        logger.info("[FETCH][gnews] run started  limit=%s", limit)
+        # logger.info("[FETCH][gnews] run started  limit=%s", limit)
         count = run_orchestrated_ingestion(
             session=db.session,
             source_name="gnews",
             object_type="article",
-            fetcher_func=fetch_gnews_query,
-            # quota_service=GNewsQuotaService(),
-            # enrichment_service=EnrichmentService(),
-            # discovery_service=DiscoveryService(),
-            # cooldown_service=CooldownService(),
-            # classification_service=ClassificationService(),
-            # source_filter="gnews",
-            # limit=limit,
-            # cooldown_hours=SOURCE_PROFILES['gnews'].cooldown_hours,
         )
         return {"status": "success", "count": count}
     except Exception as e:
@@ -113,19 +77,15 @@ def run_gnews_fetch(limit: int | None = SOURCE_PROFILES['gnews'].fetch_limit):
         return {"status": "error", "error": str(e)}
 
 
-def run_rss_fetch(limit: int | None = SOURCE_PROFILES['rss'].fetch_limit):
+def run_rss_fetch():
     """
     Fetch from configured RSS feeds.
 
-    Processes feeds in incremental batches (default: FetchLimits.RSS feeds per run).
+    Processes feeds in incremental batches using the source profile limits.
     Progress is logged after each feed so monitoring is continuous.
-
-    Args:
-        limit:        Cap the number of feeds processed per run.
-                      Pass ``None`` to process all feeds in one run.
     """
     try:
-        from app.integrations.content.rss import fetch_rss_query, RSS_FEEDS
+        from app.integrations.content.rss import RSS_FEEDS
 
         flat_queries = []
         for section, categories in RSS_FEEDS.items():
@@ -139,21 +99,12 @@ def run_rss_fetch(limit: int | None = SOURCE_PROFILES['rss'].fetch_limit):
 
         logger.info(
             "[FETCH][rss] run started  feeds_total=%d  limit=%s",
-            len(flat_queries), limit,
+            # len(flat_queries), limit,
         )
         count = run_orchestrated_ingestion(
             session=db.session,
             source_name="rss",
             object_type="article",
-            fetcher_func=fetch_rss_query,
-            # quota_service=GenericQuotaService(),
-            # enrichment_service=EnrichmentService(),
-            # discovery_service=None,
-            # cooldown_service=CooldownService(),
-            # classification_service=ClassificationService(),
-            # source_filter="rss",
-            # limit=limit,
-            # cooldown_hours=SOURCE_PROFILES['rss'].cooldown_hours,
             manual_queries=flat_queries,
         )
         return {"status": "success", "count": count}

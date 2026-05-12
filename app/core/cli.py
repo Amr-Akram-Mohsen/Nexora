@@ -81,7 +81,7 @@ def register_commands(app):
         """Runs a limited discovery run (5 queries per source) for testing."""
         from app.jobs.tasks.content.all_contents import run_content_fetch
         app.logger.info("--- Starting Limited Test Run (5 queries/source) ---")
-        run_content_fetch(limit=5)
+        run_content_fetch()
 
     @app.cli.command("enrich-articles")
     def enrich_articles_command():

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 
 @dataclass(frozen=True)
@@ -35,6 +35,7 @@ class SourceProfile:
 
     # Allowed taxonomy sections
     allowed_sections: Optional[List[str]] = None
+
 
 
 

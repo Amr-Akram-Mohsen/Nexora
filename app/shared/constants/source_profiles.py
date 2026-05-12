@@ -1,5 +1,6 @@
 from .source_profile_model import SourceProfile
 
+
 SOURCE_PROFILES: dict[str, SourceProfile] = {
     "rss": SourceProfile(
         content_type="article",

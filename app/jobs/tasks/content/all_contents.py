@@ -2,40 +2,26 @@ import logging
 from .articles import run_newsapi_fetch, run_gnews_fetch, run_rss_fetch
 from .videos import run_youtube_fetch
 from .posts import run_reddit_fetch
-from app.shared.constants.source_profiles import SOURCE_PROFILES
 logger = logging.getLogger(__name__)
 
 
-def run_content_fetch(limit: int | None = None):
+def run_content_fetch():
     """
     Fetch all active content sources and return a summary report.
 
-    When ``limit`` is supplied it overrides FetchLimits for every source,
-    useful for test/debug runs (e.g. limit=2 to smoke-test all sources
-    with minimal API usage).
-
-    When ``limit`` is None each source uses its own FetchLimits default,
-    which keeps quota usage controlled while maximising coverage.
+    This coordinator orchestrates discovery across all configured sources
+    (RSS, NewsAPI, GNews, YouTube, Reddit). Each source uses its own 
+    dedicated profile for fetch limits and cooldowns.
     """
-    if limit is not None:
-        mode = f"OVERRIDE MODE — capping all sources at {limit} queries"
-    else:
-        mode = (
-            f"PRODUCTION MODE — "
-            f"newsapi={SOURCE_PROFILES['newsapi'].fetch_limit}  gnews={SOURCE_PROFILES['gnews'].fetch_limit}  "
-            f"youtube={SOURCE_PROFILES['youtube'].fetch_limit}  rss={SOURCE_PROFILES['rss'].fetch_limit}  "
-            f"reddit={SOURCE_PROFILES['reddit'].fetch_limit}"
-        )
 
     logger.info("[Runner] ====== NEXORA GLOBAL DISCOVERY ENGINE STARTED ======")
-    logger.info("[Runner] %s", mode)
 
     results = {
-        "newsapi": run_newsapi_fetch(limit=limit),
-        "gnews":   run_gnews_fetch(limit=limit),
-        "youtube": run_youtube_fetch(limit=limit),
-        "rss":     run_rss_fetch(limit=limit),
-        "reddit":  run_reddit_fetch(limit=limit),
+        "newsapi": run_newsapi_fetch(),
+        "gnews":   run_gnews_fetch(),
+        "youtube": run_youtube_fetch(),
+        "rss":     run_rss_fetch(),
+        "reddit":  run_reddit_fetch(),
     }
 
     logger.info("[Runner] ====== DISCOVERY COMPLETE — SUMMARY REPORT ======")
