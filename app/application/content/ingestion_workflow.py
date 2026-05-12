@@ -167,12 +167,12 @@ class IngestionWorkflow:
 
         # ── Run banner (full date+time stamps this run) ──────────────
         logger.info(
-            "\u2501\u2501\u2501 [FETCH][%s]  %s  group=%-12s  tasks=%d/%d  limit=%s \u2501\u2501\u2501",
+            "=== [FETCH][%s]  %s  group=%-12s  tasks=%d/%d  limit=%s ===",
             self.source_name,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             group or "(all)",
             total_tasks, total_eligible,
-            limit or "\u221e",
+            limit or "inf",
         )
 
         # ── Main loop ─────────────────────────────────────────────────
@@ -200,7 +200,7 @@ class IngestionWorkflow:
             except (PipelineFatalError, PipelineQuotaExceededError):
                 session.rollback()
                 logger.info(
-                    "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs) \u2715 halted",
+                    "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs) X halted",
                     completed + 1, total_tasks, f'"{q_text[:40]}"',
                     0, 0, 0, time.monotonic() - t_q,
                 )
@@ -228,7 +228,7 @@ class IngestionWorkflow:
                 logger.warning("[FETCH][%s] could not advance batch cursor  err=%s", self.source_name, exc)
 
         logger.info(
-            "\u2501\u2501\u2501 [FETCH][%s] DONE   stored=%-3d  updated=%-3d  elapsed=%.1fs  \u2192 next=%s \u2501\u2501\u2501",
+            "=== [FETCH][%s] DONE   stored=%-3d  updated=%-3d  elapsed=%.1fs  -> next=%s ===",
             self.source_name, total_stored, total_updated,
             time.monotonic() - t_run,
             next_group or group or "(all)",

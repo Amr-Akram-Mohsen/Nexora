@@ -8,6 +8,5 @@ def get_client_ip():
 
 get_country = lambda: request.cookies.get("country", "")
 
-print(get_country)
 # def get_country():
 #     return request.cookies.get("country", "")

@@ -34,6 +34,12 @@ class _LevelAwareFormatter(logging.Formatter):
             return self._DETAIL.format(record)
         return self._PLAIN.format(record)
 
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message="Using the in-memory storage for tracking rate limits"
+)
 
 def setup_logging(app):
     """Configure rotating file logging for production-grade audit trails."""
@@ -41,19 +47,29 @@ def setup_logging(app):
         os.mkdir('logs')
 
     # 10 MB per file, keeping last 5 backups
-    file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5)
+    file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5, encoding='utf-8')
     file_handler.setFormatter(_LevelAwareFormatter())
     file_handler.setLevel(logging.INFO)
 
-    # ── CRITICAL: set the 'app' logger level to INFO.
-    # Without this the root logger's default WARNING level silently drops
-    # every INFO/DEBUG message before it can reach any handler.
+    # 1. Clean up app.logger (Flask's internal logger)
+    # Removing existing handlers prevents double-logging and console output in production
+    app.logger.handlers = [file_handler]
+    app.logger.propagate = False
+
+    # 2. Clean up 'app' namespace logger (used by tasks and integrations)
+    # This ensures all ingestion sub-loggers inherit ONLY the file handler
     app_logger = logging.getLogger('app')
     app_logger.setLevel(logging.INFO)
-    app_logger.addHandler(file_handler)
-    app_logger.propagate = False   # prevent double-logging to root
+    app_logger.handlers = [file_handler]
+    app_logger.propagate = False
 
-    app.logger.addHandler(file_handler)
+    # 3. Suppress root StreamHandlers to prevent library leakage to terminal
+    # Centralize all logs in nexora.log to keep the terminal clean.
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.WARNING)
+    for h in root_logger.handlers[:]:
+        if type(h) is logging.StreamHandler:
+            root_logger.removeHandler(h)
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -123,144 +139,9 @@ def create_app():
     # app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)
 
-    # ── Ensure api_models tables are created ─────────────────────
-    from app.domains.external.models import LastAPIFetch, APIUsage  # noqa: F401
-
-    @app.cli.command("seed-db")
-    def seed_db_command():
-        from scripts.seed import seed_db
-        seed_db()
-        print("Database seeded successfully!")
-
-    @app.cli.command("link-contents")
-    def link_contents_command():
-        from app.application.recommendation.matcher import match_articles_to_items
-        print("Starting content-to-item matcher...")
-        count = match_articles_to_items()
-        print(f"Matcher complete! Created {count} new links.")
-
-    @app.cli.command("seed-noon-stores")
-    def seed_noon_stores_command():
-        """Seed Noon/Namshi store records for ArabClicks affiliate network."""
-        from app.integrations.ecommerce.noon import seed_arabclicks_stores
-        created = seed_arabclicks_stores()
-        print(f"Done! {created} new ArabClicks stores seeded.")
-
-    @app.cli.command("fetch-newsapi")
-    def fetch_newsapi_command():
-        from app.jobs.tasks.content.articles import run_newsapi_fetch
-        print("Fetching articles from NewsAPI...")
-        run_newsapi_fetch()
-        print("Done!")
-
-    @app.cli.command("fetch-gnews")
-    def fetch_gnews_command():
-        from app.jobs.tasks.content.articles import run_gnews_fetch
-        print("Fetching articles from GNews...")
-        run_gnews_fetch()
-        print("Done!")
-
-    @app.cli.command("fetch-rss")
-    def fetch_rss_command():
-        from app.jobs.tasks.content.articles import run_rss_fetch
-        print("Fetching articles from rss feeds...")
-        run_rss_fetch()
-        print("Done!")
-
-    @app.cli.command("fetch-youtube")
-    def fetch_youtube_command():
-        from app.jobs.tasks.content.videos import run_youtube_fetch
-        print("Fetching youtube reviews...")
-        run_youtube_fetch()
-        print("Done!")
-
-    @app.cli.command("fetch-reddit")
-    def fetch_reddit_command():
-        from app.jobs.tasks.content.posts import run_reddit_fetch
-        print("Fetching posts from Reddit communities...")
-        run_reddit_fetch()
-        print("Done!")
-
-    @app.cli.command("fetch-all")
-    def fetch_all_command():
-        """Runs all active fetchers in one go."""
-        from app.jobs.tasks.content.all_contents import (
-            run_content_fetch, #run_reddit_fetch
-        )
-        # from app.jobs.tasks.content.fetch_items import (
-        #     run_price_refresh, run_amazon_discovery, run_noon_discovery, run_arabclicks_price_refresh
-        # )
-        # from app.domains.recommendation.matcher import match_articles_to_items
-        # Note: run_price_refresh and run_amazon_discovery might be in another task
-        print("--- [1/2] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
-        run_content_fetch()
-        # print("--- [2/2] Fetching Reddit Communities ---")
-        # run_reddit_fetch()
-        # print("--- [Matcher] Linking Articles to Items ---")
-        # match_articles_to_items()
-    @app.cli.command("fetch-test")
-    def fetch_test_command():
-        """Runs a limited discovery run (5 queries per source) for testing."""
-        from app.jobs.tasks.content.all_contents import run_content_fetch
-        print("--- Starting Limited Test Run (5 queries/source) ---")
-        run_content_fetch(limit=5)
-
-    @app.cli.command("enrich-articles")
-    def enrich_articles_command():
-        """Perform full-body scraping and quality-gated publication for pending articles."""
-        from app.application.content.workflows.enrichment import reprocess_unscraped_articles
-        print("Starting full-body enrichment for pending articles...")
-        count = reprocess_unscraped_articles(50)
-        print(f"Done! Successfully published {count} articles.")
-
-    @app.cli.command("init-content-status")
-    def init_content_status_command():
-        """Initialize status and is_published for existing content."""
-        from app.domains.content.models import Article, Content
-        print("Initializing Article status...")
-        articles = Article.query.all()
-        for a in articles:
-            # Update Article-specific status
-            if (a.content_text and len(a.content_text) > 200) or (a.body and len(a.body) > 200):
-                a.status = "complete"
-            else:
-                a.status = "pending"
-            
-            # Find associated Content record
-            content_rec = Content.query.filter_by(object_type="article", object_id=a.id).first()
-            if content_rec:
-                # Publish if it has content AND an image
-                if a.status == "complete" and a.image_url:
-                    content_rec.is_published = True
-                else:
-                    content_rec.is_published = False
-
-        print("Initializing Video/Post status...")
-        Content.query.filter(Content.object_type.in_(["video", "post"])).update({Content.is_published: True}, synchronize_session=False)
-        
-        db.session.commit()
-        print("Done!")
-
-    @app.cli.command("generate-sitemap")
-    def generate_sitemap_command():
-        """Generate a static sitemap.xml file."""
-        from app.application.system.sitemap import generate_static_sitemap
-        print("Generating sitemap...")
-        count = generate_static_sitemap(app)
-        print(f"Done! Sitemap generated with {count} URLs.")
-
-    @app.cli.command("run-scheduler")
-    def run_scheduler_command():
-        """Run the background scheduler in a standalone process."""
-        from app.jobs.scheduler import init_scheduler
-        import time
-        print("Starting Nexora Background Scheduler...")
-        init_scheduler(app)
-        try:
-            while True:
-                time.sleep(60)
-        except (KeyboardInterrupt, SystemExit):
-            print("Scheduler stopping...")
+    # ── Register CLI Commands ────────────────────────────────────
+    from .cli import register_commands
+    register_commands(app)
 
     @app.errorhandler(429)
     def ratelimit_handler(e):
