@@ -9,10 +9,10 @@ from app.application.content.ingestion.services import (
     DiscoveryService, EnrichmentService, YouTubeQuotaService, CooldownService,
     ClassificationService
 )
-from app.shared.constants.core import FetchLimits
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 
 
-def run_youtube_fetch(limit: int | None = FetchLimits.YOUTUBE):
+def run_youtube_fetch(limit: int | None = SOURCE_PROFILES['youtube'].fetch_limit):
     """
     Fetch video reviews from YouTube.
 
@@ -40,14 +40,14 @@ def run_youtube_fetch(limit: int | None = FetchLimits.YOUTUBE):
             source_name="youtube",
             object_type="video",
             fetcher_func=fetch_youtube_query,
-            quota_service=YouTubeQuotaService(),
-            enrichment_service=EnrichmentService(),
-            discovery_service=DiscoveryService(),
-            cooldown_service=CooldownService(),
-            classification_service=ClassificationService(),
-            source_filter="youtube",
-            limit=limit,
-            cooldown_hours=12,
+            # quota_service=YouTubeQuotaService(),
+            # enrichment_service=EnrichmentService(),
+            # discovery_service=DiscoveryService(),
+            # cooldown_service=CooldownService(),
+            # classification_service=ClassificationService(),
+            # source_filter="youtube",
+            # limit=limit,
+            # cooldown_hours=SOURCE_PROFILES['youtube'].cooldown_hours,
         )
         logger.info("[FETCH][youtube] run done  total_stored=%d", count)
         return {"status": "success", "count": count}

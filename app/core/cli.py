@@ -39,14 +39,21 @@ def register_commands(app):
         from app.jobs.tasks.content.articles import run_gnews_fetch
         app.logger.info("Fetching articles from GNews...")
         run_gnews_fetch()
-        app.logger.info("Done!")
+        app.logger.info("Done!\n")
+        app.logger.info('=' * 50)
+        app.logger.info('=' * 50)
+        app.logger.info("\n\n")
 
     @app.cli.command("fetch-rss")
     def fetch_rss_command():
         from app.jobs.tasks.content.articles import run_rss_fetch
         app.logger.info("Fetching articles from rss feeds...")
         run_rss_fetch()
-        app.logger.info("Done!")
+        app.logger.info("Done!\n")
+        app.logger.info('=' * 50)
+        app.logger.info('=' * 50)
+        app.logger.info("\n\n")
+
 
     @app.cli.command("fetch-youtube")
     def fetch_youtube_command():

@@ -2,8 +2,7 @@ import logging
 from .articles import run_newsapi_fetch, run_gnews_fetch, run_rss_fetch
 from .videos import run_youtube_fetch
 from .posts import run_reddit_fetch
-from app.shared.constants.core import FetchLimits
-
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 logger = logging.getLogger(__name__)
 
 
@@ -23,9 +22,9 @@ def run_content_fetch(limit: int | None = None):
     else:
         mode = (
             f"PRODUCTION MODE — "
-            f"newsapi={FetchLimits.NEWSAPI}  gnews={FetchLimits.GNEWS}  "
-            f"youtube={FetchLimits.YOUTUBE}  rss={FetchLimits.RSS}  "
-            f"reddit={FetchLimits.REDDIT}"
+            f"newsapi={SOURCE_PROFILES['newsapi'].fetch_limit}  gnews={SOURCE_PROFILES['gnews'].fetch_limit}  "
+            f"youtube={SOURCE_PROFILES['youtube'].fetch_limit}  rss={SOURCE_PROFILES['rss'].fetch_limit}  "
+            f"reddit={SOURCE_PROFILES['reddit'].fetch_limit}"
         )
 
     logger.info("[Runner] ====== NEXORA GLOBAL DISCOVERY ENGINE STARTED ======")

@@ -4,10 +4,14 @@ import time
 from datetime import datetime
 from typing import Callable, List, Dict, Optional
 from flask import current_app
-from .ingestion.ports import DiscoveryPort, FetcherPort, EnrichmentPort, QuotaPort, CooldownPort, ClassificationPort
+from .ingestion.services import (
+    DiscoveryService, EnrichmentService, GenericQuotaService, GNewsQuotaService, YouTubeQuotaService, NewsApiQuotaService, CooldownService, ClassificationService
+)
+from .ingestion.ports import FetcherPort, DiscoveryPort
 from .ingestion import ingest_content
 from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
 from app.shared.utils.logging import log_fetch_query_error
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +19,11 @@ logger = logging.getLogger(__name__)
 # Matches the top-level category names in TAXONOMY["categories"].
 _TAXONOMY_GROUPS = ["electronics", "perfumes", "accessories"]
 
+QUOTA_SERVICE_MAP = {
+    'newsapi': NewsApiQuotaService,
+    'gnews': GenericQuotaService,
+    'youtube': YouTubeQuotaService,
+}    
 
 class IngestionWorkflow:
     """
@@ -34,18 +43,19 @@ class IngestionWorkflow:
     def __init__(
         self,
         source_name: str,
-        discovery: DiscoveryPort,
-        quota_service: QuotaPort,
-        enrichment_service: EnrichmentPort,
-        cooldown_service: CooldownPort,
-        classification_service: ClassificationPort,
+        # discovery: DiscoveryPort,
+        # quota_service: QuotaPort,
+        # enrichment_service: EnrichmentPort,
+        # cooldown_service: CooldownPort,
+        # classification_service: ClassificationPort,
     ):
         self.source_name = source_name
-        self.discovery = discovery
-        self.quota_service = quota_service
-        self.enrichment_service = enrichment_service
-        self.cooldown_service = cooldown_service
-        self.classification_service = classification_service
+        self.discovery = None if source_name == 'rss' else DiscoveryService()
+        self.quota_service = QUOTA_SERVICE_MAP.get(source_name, GenericQuotaService)()
+        self.enrichment_service = EnrichmentService()
+        self.cooldown_service = CooldownService()
+        self.classification_service = ClassificationService()
+        self.profile = SOURCE_PROFILES[source_name]
 
     # ------------------------------------------------------------------
     # Public entry point
@@ -55,7 +65,7 @@ class IngestionWorkflow:
         self,
         session,
         object_type: str,
-        source_filter: str,
+        # source_filter: str,
         fetcher: FetcherPort,
         limit: Optional[int] = None,
         **fetch_params,
@@ -65,7 +75,7 @@ class IngestionWorkflow:
 
         Returns the number of newly stored content items.
         """
-        queries_registry = self.discovery.get_queries_by_section(source_filter=source_filter)
+        queries_registry = self.discovery.get_queries_by_section(source_filter=self.source_name)
 
         # ── Build flat task list ──────────────────────────────────────
         flat_tasks = []
@@ -76,30 +86,27 @@ class IngestionWorkflow:
 
         if not flat_tasks:
             logger.info(
-                "[FETCH][%s] skip  reason=no_queries_discovered  source_filter=%s"
-                "  hint=check_CATEGORY_SOURCE_OVERRIDES_and_DEFAULT_SOURCE_ALIGNMENT",
-                self.source_name, source_filter,
+                "[FETCH][%s] skip  reason=no_queries_discovered  hint=check_CATEGORY_SOURCE_OVERRIDES_and_DEFAULT_SOURCE_ALIGNMENT",
+                self.source_name,
             )
             return 0
 
         def get_fresh_tasks(tasks):
-            cooldown_hrs = fetch_params.get("cooldown_hours", 6)
             fresh = []
             for sec, cat, q_obj in tasks:
                 q_text = q_obj.get("query", "")
-                cache_key = f"{source_filter}:{cat}:{q_text}"
-                if self.cooldown_service.should_refetch(sec, cache_key, hours=cooldown_hrs):
+                cache_key = f"{self.source_name}:{cat}:{q_text}"
+                if self.cooldown_service.should_refetch(sec, cache_key, hours=self.profile.cooldown_hours):
                     fresh.append((sec, cat, q_obj))
             return fresh
 
         # ── Taxonomy-group batching & Cooldown filtering ──────────────────────
         group: str = ""
         batch_state = None
-        cooldown_hrs = fetch_params.get("cooldown_hours", 6)
 
         try:
             from app.shared.utils.batch_state import BatchState
-            batch_state = BatchState(source_filter)
+            batch_state = BatchState(self.source_name)
         except Exception as exc:
             logger.warning("[FETCH][%s] batch state unavailable — running ungrouped  err=%s", self.source_name, exc)
 
@@ -142,8 +149,8 @@ class IngestionWorkflow:
             
             if groups_checked >= len(_TAXONOMY_GROUPS):
                 logger.info(
-                    "[FETCH][%s] skip  reason=all_groups_cooldown  groups_checked=%d  source_filter=%s",
-                    self.source_name, groups_checked, source_filter,
+                    "[FETCH][%s] skip  reason=all_groups_cooldown  groups_checked=%d",
+                    self.source_name, groups_checked,
                 )
                 return 0
         else:
@@ -152,8 +159,8 @@ class IngestionWorkflow:
             flat_tasks = get_fresh_tasks(flat_tasks)
             if not flat_tasks:
                 logger.info(
-                    "[FETCH][%s] skip  reason=all_queries_cooldown  total_queries_blocked=%d  source_filter=%s",
-                    self.source_name, total_before, source_filter,
+                    "[FETCH][%s] skip  reason=all_queries_cooldown  total_queries_blocked=%d",
+                    self.source_name, total_before,
                 )
                 return 0
 
@@ -190,7 +197,7 @@ class IngestionWorkflow:
                 stored_n, updated_n, fetched_n = self._process_query(
                     session=session,
                     object_type=object_type,
-                    source_filter=source_filter,
+                    # source_filter=source_filter,
                     fetcher=fetcher,
                     section=section,
                     category=category,
@@ -244,7 +251,7 @@ class IngestionWorkflow:
         *,
         session,
         object_type: str,
-        source_filter: str,
+        # source_filter: str,
         fetcher: FetcherPort,
         section: str,
         category: str,
@@ -257,11 +264,10 @@ class IngestionWorkflow:
         Raises on fatal/quota errors so the caller can halt the run.
         """
         q_text = q_obj.get("query", "")
-        cache_key = f"{source_filter}:{category}:{q_text}"
+        cache_key = f"{self.source_name}:{category}:{q_text}"
 
         # 1. Cooldown check
-        cooldown_hrs = fetch_params.get("cooldown_hours", 6)
-        if not self.cooldown_service.should_refetch(section, cache_key, hours=cooldown_hrs):
+        if not self.cooldown_service.should_refetch(section, cache_key, hours=self.profile.cooldown_hours):
             return 0, 0, 0
 
         # 2. Quota check
@@ -297,18 +303,18 @@ class IngestionWorkflow:
             self.cooldown_service.mark_fetched(
                 section, cache_key,
                 category=category,
-                source=source_filter,
+                source=self.source_name,
                 normalized_query=q_text,
                 etag=new_etag,
                 last_modified=new_modified,
                 had_results=bool(raw_items),   # ← do NOT count empty responses as successes
             )
         except Exception as e:
-            self.cooldown_service.mark_failed(section, cache_key, error=e, source=source_filter)
+            self.cooldown_service.mark_failed(section, cache_key, error=e, source=self.source_name)
             from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
             if isinstance(e, (PipelineFatalError, PipelineQuotaExceededError)):
                 raise
-            log_fetch_query_error(logger, source_filter, query=q_text, error=e)
+            log_fetch_query_error(logger, self.source_name, query=q_text, error=e)
             return 0, 0, 0
 
         # 4. Process each raw item
@@ -358,11 +364,11 @@ class IngestionWorkflow:
                     content_obj, is_new = result
                     if is_new:
                         query_stored += 1
-                        logger.info(
-                            "[INGEST][%s] +stored  \"%.55s\"  published=%s",
-                            self.source_name, item_title,
-                            enriched_dict.get("is_published", False),
-                        )
+                        # logger.info(
+                        #     "[INGEST][%s] +stored  \"%.55s\"  published=%s",
+                        #     self.source_name, item_title,
+                        #     enriched_dict.get("is_published", False),
+                        # )
                     else:
                         query_updated += 1
                 else:
@@ -407,14 +413,14 @@ def run_orchestrated_ingestion(
     source_name: str,
     object_type: str,
     fetcher_func: Callable,
-    quota_service: QuotaPort,
-    enrichment_service: EnrichmentPort,
-    discovery_service: DiscoveryPort,
-    cooldown_service: CooldownPort,
-    classification_service: ClassificationPort,
-    source_filter: str,
-    limit: Optional[int] = None,
-    cooldown_hours: int = 6,
+    # quota_service: QuotaPort,
+    # enrichment_service: EnrichmentPort(),
+    # discovery_service: DiscoveryPort,
+    # cooldown_service: CooldownPort,
+    # classification_service: ClassificationPort,
+    # source_filter: str,
+    # limit: Optional[int] = None,
+    # cooldown_hours: int = 6,
     manual_queries: Optional[List[Dict]] = None,
     **extra_params,
 ) -> int:
@@ -425,11 +431,11 @@ def run_orchestrated_ingestion(
     """
     workflow = IngestionWorkflow(
         source_name=source_name,
-        discovery=discovery_service,
-        quota_service=quota_service,
-        enrichment_service=enrichment_service,
-        cooldown_service=cooldown_service,
-        classification_service=classification_service,
+        # discovery=discovery_service,
+        # quota_service=quota_service,
+        # enrichment_service=enrichment_service,
+        # cooldown_service=cooldown_service,
+        # classification_service=classification_service,
     )
 
     if manual_queries:
@@ -446,9 +452,9 @@ def run_orchestrated_ingestion(
     return workflow.run(
         session=session,
         object_type=object_type,
-        source_filter=source_filter,
+        # source_filter=source_filter,
         fetcher=fetcher_func,
-        limit=limit,
-        cooldown_hours=cooldown_hours,
+        # limit=limit,
+        # cooldown_hours=cooldown_hours,
         **extra_params,
     )

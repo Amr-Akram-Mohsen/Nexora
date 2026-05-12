@@ -8,12 +8,12 @@ from app.application.content.ingestion.services import (
     DiscoveryService, EnrichmentService, GenericQuotaService, CooldownService,
     ClassificationService
 )
-from app.shared.constants.core import FetchLimits
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 
 logger = logging.getLogger(__name__)
 
 
-def run_reddit_fetch(limit: int | None = FetchLimits.REDDIT):
+def run_reddit_fetch(limit: int | None = SOURCE_PROFILES['reddit'].fetch_limit):
     """
     Fetch community posts from Reddit.
 
@@ -36,14 +36,14 @@ def run_reddit_fetch(limit: int | None = FetchLimits.REDDIT):
             source_name="reddit",
             object_type="post",
             fetcher_func=fetch_reddit_query,
-            quota_service=GenericQuotaService(),
-            enrichment_service=EnrichmentService(),
-            discovery_service=DiscoveryService(),
-            cooldown_service=CooldownService(),
-            classification_service=ClassificationService(),
-            source_filter="reddit",
-            limit=limit,
-            cooldown_hours=24,
+            # quota_service=GenericQuotaService(),
+            # enrichment_service=EnrichmentService(),
+            # discovery_service=DiscoveryService(),
+            # cooldown_service=CooldownService(),
+            # classification_service=ClassificationService(),
+            # source_filter="reddit",
+            # limit=limit,
+            # cooldown_hours=SOURCE_PROFILES['reddit'].cooldown_hours,
         )
         logger.info("[FETCH][reddit] run done  total_stored=%d", count)
         return {"status": "success", "count": count}

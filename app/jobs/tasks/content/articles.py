@@ -16,10 +16,10 @@ from app.application.content.ingestion.services import (
     ClassificationService
 )
 from app.core.extensions import db
-from app.shared.constants.core import FetchLimits, CooldownHours
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 
 
-def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI):
+def run_newsapi_fetch(limit: int | None = SOURCE_PROFILES['newsapi'].fetch_limit):
     """
     Fetch from NewsAPI (tech/fragrance/fashion).
 
@@ -44,14 +44,14 @@ def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI):
             source_name="newsapi",
             object_type="article",
             fetcher_func=fetch_newsapi_query,
-            quota_service=NewsApiQuotaService(),
-            enrichment_service=EnrichmentService(),
-            discovery_service=DiscoveryService(),
-            cooldown_service=CooldownService(),
-            classification_service=ClassificationService(),
-            source_filter="newsapi",
-            limit=limit,
-            cooldown_hours=CooldownHours.NEWSAPI,
+            # quota_service=NewsApiQuotaService(),
+            # enrichment_service=EnrichmentService(),
+            # discovery_service=DiscoveryService(),
+            # cooldown_service=CooldownService(),
+            # classification_service=ClassificationService(),
+            # source_filter="newsapi",
+            # limit=limit,
+            # cooldown_hours=SOURCE_PROFILES['newsapi'].cooldown_hours,
         )
         return {"status": "success", "count": count}
     except Exception as e:
@@ -67,7 +67,7 @@ def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI):
         return {"status": "error", "error": str(e)}
 
 
-def run_gnews_fetch(limit: int | None = FetchLimits.GNEWS):
+def run_gnews_fetch(limit: int | None = SOURCE_PROFILES['gnews'].fetch_limit):
     """
     Fetch from GNews (regional/global).
 
@@ -90,14 +90,14 @@ def run_gnews_fetch(limit: int | None = FetchLimits.GNEWS):
             source_name="gnews",
             object_type="article",
             fetcher_func=fetch_gnews_query,
-            quota_service=GNewsQuotaService(),
-            enrichment_service=EnrichmentService(),
-            discovery_service=DiscoveryService(),
-            cooldown_service=CooldownService(),
-            classification_service=ClassificationService(),
-            source_filter="gnews",
-            limit=limit,
-            cooldown_hours=CooldownHours.GNEWS,
+            # quota_service=GNewsQuotaService(),
+            # enrichment_service=EnrichmentService(),
+            # discovery_service=DiscoveryService(),
+            # cooldown_service=CooldownService(),
+            # classification_service=ClassificationService(),
+            # source_filter="gnews",
+            # limit=limit,
+            # cooldown_hours=SOURCE_PROFILES['gnews'].cooldown_hours,
         )
         return {"status": "success", "count": count}
     except Exception as e:
@@ -113,7 +113,7 @@ def run_gnews_fetch(limit: int | None = FetchLimits.GNEWS):
         return {"status": "error", "error": str(e)}
 
 
-def run_rss_fetch(limit: int | None = FetchLimits.RSS):
+def run_rss_fetch(limit: int | None = SOURCE_PROFILES['rss'].fetch_limit):
     """
     Fetch from configured RSS feeds.
 
@@ -146,14 +146,14 @@ def run_rss_fetch(limit: int | None = FetchLimits.RSS):
             source_name="rss",
             object_type="article",
             fetcher_func=fetch_rss_query,
-            quota_service=GenericQuotaService(),
-            enrichment_service=EnrichmentService(),
-            discovery_service=None,
-            cooldown_service=CooldownService(),
-            classification_service=ClassificationService(),
-            source_filter="rss",
-            limit=limit,
-            cooldown_hours=CooldownHours.RSS,
+            # quota_service=GenericQuotaService(),
+            # enrichment_service=EnrichmentService(),
+            # discovery_service=None,
+            # cooldown_service=CooldownService(),
+            # classification_service=ClassificationService(),
+            # source_filter="rss",
+            # limit=limit,
+            # cooldown_hours=SOURCE_PROFILES['rss'].cooldown_hours,
             manual_queries=flat_queries,
         )
         return {"status": "success", "count": count}
