@@ -1,18 +1,13 @@
 import logging
 import random
+import time
+from datetime import datetime
 from typing import Callable, List, Dict, Optional
 from flask import current_app
 from .ingestion.ports import DiscoveryPort, FetcherPort, EnrichmentPort, QuotaPort, CooldownPort, ClassificationPort
 from .ingestion import ingest_content
 from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
-from app.shared.utils.logging import (
-    log_fetch_query_start,
-    log_fetch_progress,
-    log_fetch_query_error,
-    log_item_ingested,
-    log_item_skipped,
-    log_query_summary,
-)
+from app.shared.utils.logging import log_fetch_query_error
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +75,11 @@ class IngestionWorkflow:
                     flat_tasks.append((section, category, q))
 
         if not flat_tasks:
-            logger.info("[FETCH][%s] no queries found  source_filter=%s", self.source_name, source_filter)
+            logger.info(
+                "[FETCH][%s] skip  reason=no_queries_discovered  source_filter=%s"
+                "  hint=check_CATEGORY_SOURCE_OVERRIDES_and_DEFAULT_SOURCE_ALIGNMENT",
+                self.source_name, source_filter,
+            )
             return 0
 
         def get_fresh_tasks(tasks):
@@ -142,38 +141,53 @@ class IngestionWorkflow:
                     groups_checked += 1
             
             if groups_checked >= len(_TAXONOMY_GROUPS):
-                logger.info("[FETCH][%s] all groups are currently on cooldown or inactive. nothing to do.", self.source_name)
+                logger.info(
+                    "[FETCH][%s] skip  reason=all_groups_cooldown  groups_checked=%d  source_filter=%s",
+                    self.source_name, groups_checked, source_filter,
+                )
                 return 0
         else:
             # Ungrouped fallback
             total_before = len(flat_tasks)
             flat_tasks = get_fresh_tasks(flat_tasks)
             if not flat_tasks:
-                logger.info("[FETCH][%s] all %d queries are on cooldown or inactive. nothing to do.", self.source_name, total_before)
+                logger.info(
+                    "[FETCH][%s] skip  reason=all_queries_cooldown  total_queries_blocked=%d  source_filter=%s",
+                    self.source_name, total_before, source_filter,
+                )
                 return 0
 
-        # ── Apply limit cap ───────────────────────────────────────────
+        # ── Apply limit cap ──────────────────────────────────────────
+        total_eligible = len(flat_tasks)
         if limit and limit < len(flat_tasks):
-            # We shuffle to ensure we don't always pick the same categories
             random.shuffle(flat_tasks)
             flat_tasks = flat_tasks[:limit]
 
         total_tasks = len(flat_tasks)
+
+        # ── Run banner (full date+time stamps this run) ──────────────
         logger.info(
-            "[FETCH][%s] run starting  tasks=%d  group=%s  limit=%s",
-            self.source_name, total_tasks, group or "(all)", limit or "none",
+            "\u2501\u2501\u2501 [FETCH][%s]  %s  group=%-12s  tasks=%d/%d  limit=%s \u2501\u2501\u2501",
+            self.source_name,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            group or "(all)",
+            total_tasks, total_eligible,
+            limit or "\u221e",
         )
 
         # ── Main loop ─────────────────────────────────────────────────
         total_stored = 0
+        total_updated = 0
         completed = 0
+        t_run = time.monotonic()
 
         for section, category, q_obj in flat_tasks:
             q_text = q_obj.get("query", "")
-            log_fetch_query_start(logger, self.source_name, query=q_text, group=group)
+            t_q = time.monotonic()
 
+            stored_n = updated_n = fetched_n = 0
             try:
-                stored_this_query = self._process_query(
+                stored_n, updated_n, fetched_n = self._process_query(
                     session=session,
                     object_type=object_type,
                     source_filter=source_filter,
@@ -184,36 +198,40 @@ class IngestionWorkflow:
                     fetch_params=fetch_params,
                 )
             except (PipelineFatalError, PipelineQuotaExceededError):
-                # Fatal/quota errors bubble up — stop the run immediately.
                 session.rollback()
+                logger.info(
+                    "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs) \u2715 halted",
+                    completed + 1, total_tasks, f'"{q_text[:40]}"',
+                    0, 0, 0, time.monotonic() - t_q,
+                )
                 raise
             except Exception as exc:
-                # Unexpected per-query error — log it, skip, keep going.
                 log_fetch_query_error(logger, self.source_name, query=q_text, error=exc, group=group)
                 session.rollback()
-                stored_this_query = 0
 
             completed += 1
-            total_stored += stored_this_query
-            log_fetch_progress(
-                logger, self.source_name,
-                query=q_text,
-                completed=completed,
-                total=total_tasks,
-                stored=stored_this_query,
-                group=group,
+            total_stored += stored_n
+            total_updated += updated_n
+            logger.info(
+                "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs)",
+                completed, total_tasks, f'"{q_text[:40]}"',
+                fetched_n, stored_n, updated_n, time.monotonic() - t_q,
             )
 
-        # ── Advance batch cursor ──────────────────────────────────────
-        if batch_state is not None:
+        # ── Advance cursor + run footer ───────────────────────────────
+        next_group = ""
+        if batch_state is not None and completed > 0:
             try:
                 batch_state.advance(_TAXONOMY_GROUPS)
+                next_group = _TAXONOMY_GROUPS[batch_state.cursor]
             except Exception as exc:
                 logger.warning("[FETCH][%s] could not advance batch cursor  err=%s", self.source_name, exc)
 
         logger.info(
-            "[FETCH][%s] run complete  completed=%d/%d  total_stored=%d  group=%s",
-            self.source_name, completed, total_tasks, total_stored, group or "(all)",
+            "\u2501\u2501\u2501 [FETCH][%s] DONE   stored=%-3d  updated=%-3d  elapsed=%.1fs  \u2192 next=%s \u2501\u2501\u2501",
+            self.source_name, total_stored, total_updated,
+            time.monotonic() - t_run,
+            next_group or group or "(all)",
         )
         return total_stored
 
@@ -232,19 +250,19 @@ class IngestionWorkflow:
         category: str,
         q_obj: dict,
         fetch_params: dict,
-    ) -> int:
+    ) -> tuple:
         """
-        Run one query through the full pipeline: cooldown check → fetch →
-        classify → enrich → ingest.  Returns the number of new items stored.
-        Raises on fatal/quota errors so the caller can decide whether to stop.
+        Run one query through the full pipeline: cooldown → fetch → classify → enrich → ingest.
+        Returns (stored, updated, fetched) counts.
+        Raises on fatal/quota errors so the caller can halt the run.
         """
         q_text = q_obj.get("query", "")
         cache_key = f"{source_filter}:{category}:{q_text}"
 
-        # 1. Cooldown check (Double check inside the loop, though already pre-filtered)
+        # 1. Cooldown check
         cooldown_hrs = fetch_params.get("cooldown_hours", 6)
         if not self.cooldown_service.should_refetch(section, cache_key, hours=cooldown_hrs):
-            return 0
+            return 0, 0, 0
 
         # 2. Quota check
         if not self.quota_service.can_call():
@@ -283,40 +301,32 @@ class IngestionWorkflow:
                 normalized_query=q_text,
                 etag=new_etag,
                 last_modified=new_modified,
+                had_results=bool(raw_items),   # ← do NOT count empty responses as successes
             )
         except Exception as e:
-            # RECORD FAILURE IN REGISTRY
             self.cooldown_service.mark_failed(section, cache_key, error=e, source=source_filter)
-            # Re-raise if it's a fatal or quota error, otherwise log and continue
             from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
             if isinstance(e, (PipelineFatalError, PipelineQuotaExceededError)):
                 raise
             log_fetch_query_error(logger, source_filter, query=q_text, error=e)
-            return 0
+            return 0, 0, 0
 
         # 4. Process each raw item
         query_stored = 0
         query_updated = 0
-        query_skipped = 0
 
         for raw in raw_items:
             item_title = _safe_title(raw)
-
             logger.debug("[FETCH][%s] processing  title=\"%s\"", self.source_name, item_title)
 
-            # Normalise DTO → dict for the legacy pipeline
             if hasattr(raw, "model_dump"):
                 raw = raw.model_dump()
             elif hasattr(raw, "dict"):
                 raw = raw.dict()
 
-            # 4a. Classification
             classified = self.classification_service(raw, section, category, q_obj)
-
-            # 4b. Enrichment
             enriched = self.enrichment_service(classified, section, category, q_obj)
 
-            # Normalise enriched → dict
             if hasattr(enriched, "model_dump"):
                 enriched_dict = enriched.model_dump()
             elif hasattr(enriched, "dict"):
@@ -324,7 +334,6 @@ class IngestionWorkflow:
             else:
                 enriched_dict = enriched
 
-            # Sanity: warn if critical fields are missing
             missing = [k for k in ("url", "title") if not enriched_dict.get(k)]
             if missing:
                 logger.warning(
@@ -332,21 +341,15 @@ class IngestionWorkflow:
                     self.source_name, missing, item_title,
                 )
 
-            # 4c. Ingest
             try:
-                # Inject staged status if it's an article
                 if object_type == "article":
-                    # If enrichment was skipped or is partial, mark as pending
-                    # Quality gate: Must have image to be published
                     if not enriched_dict.get("is_content_scraped") or not enriched_dict.get("image_url"):
                         enriched_dict["status"] = "pending"
                         enriched_dict["is_published"] = False
                     else:
-                        # If already high quality, publish
                         enriched_dict["status"] = "complete"
                         enriched_dict["is_published"] = True
                 else:
-                    # Videos/Posts are published immediately by default if they have a thumbnail/image
                     has_visual = bool(enriched_dict.get("thumbnail_url") or enriched_dict.get("image_url"))
                     enriched_dict["is_published"] = has_visual
 
@@ -355,17 +358,18 @@ class IngestionWorkflow:
                     content_obj, is_new = result
                     if is_new:
                         query_stored += 1
-                        log_item_ingested(
-                            logger, self.source_name, item_title,
-                            status="stored",
-                            published=enriched_dict.get("is_published", False)
+                        logger.info(
+                            "[INGEST][%s] +stored  \"%.55s\"  published=%s",
+                            self.source_name, item_title,
+                            enriched_dict.get("is_published", False),
                         )
                     else:
                         query_updated += 1
-                        log_item_ingested(logger, self.source_name, item_title, status="updated")
                 else:
-                    query_skipped += 1
-                    log_item_skipped(logger, self.source_name, item_title, reason="duplicate_or_invalid")
+                    logger.debug(
+                        "[INGEST][%s] skip  reason=duplicate_or_invalid  title=\"%s\"",
+                        self.source_name, item_title,
+                    )
             except Exception as exc:
                 import sqlalchemy.exc
                 if isinstance(exc, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):
@@ -379,17 +383,7 @@ class IngestionWorkflow:
         if query_stored > 0:
             session.commit()
 
-        # Emit summary for this query
-        log_query_summary(
-            logger, self.source_name,
-            query=q_text,
-            stored=query_stored,
-            updated=query_updated,
-            skipped=query_skipped,
-            # We don't have the group here, but it's okay for the item-level summary
-        )
-
-        return query_stored
+        return query_stored, query_updated, len(raw_items)
 
 
 # ---------------------------------------------------------------------------

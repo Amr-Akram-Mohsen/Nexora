@@ -21,7 +21,7 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
     
     unscraped = (
         db.session.query(Article)
-        .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id))
+        .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id) & (Content.is_active == True))
         .filter(
             (Article.status == "pending") | 
             ((Article.status == "failed") & (Article.last_enrichment_attempt < retry_threshold))

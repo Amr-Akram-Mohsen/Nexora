@@ -23,9 +23,11 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
         return []
 
     q_text = q_obj.get("query", "")
+    # Sanitize: '&' in category names (e.g. "Niche & Artisanal") breaks GNews URL parsing
+    q_text = q_text.replace(" & ", " and ").replace("&", "and")
     country = q_obj.get("region", "sa").lower()
     lang = "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en"
-    log_integration_start(logger, _NAME, query=q_text, country=country, lang=lang)
+    logger.debug("[INTEGRATION][%s] start  query=%s  country=%s  lang=%s", _NAME, q_text, country, lang)
 
     try:
         resp = requests.get(
@@ -55,7 +57,7 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
             a["region"] = country.upper()
             raw_items.append(RawItemDTO(**a))
 
-        log_integration_success(logger, _NAME, items=len(raw_items), query=q_text, country=country)
+        logger.debug("[INTEGRATION][%s] success  items=%d  query=%s", _NAME, len(raw_items), q_text)
         return raw_items
 
     except requests.exceptions.RequestException as e:

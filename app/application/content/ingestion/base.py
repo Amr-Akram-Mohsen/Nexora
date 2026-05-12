@@ -51,7 +51,10 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
     except IntegrityError:
         # The SAVEPOINT is automatically rolled back by the context manager.
         # The parent session transaction remains unpoisoned.
-        logger.info(f"Duplicate skipped: {object_type} - {raw_data.get('external_id')}")
+        logger.debug(
+            "[INGEST] duplicate_skip  type=%s  external_id=%s",
+            object_type, raw_data.get("external_id"),
+        )
         return None, False
     except Exception:
         # The SAVEPOINT is automatically rolled back.

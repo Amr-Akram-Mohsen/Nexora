@@ -88,14 +88,18 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
 
     try:
         feed = feedparser.parse(feed_url, etag=etag, modified=modified, agent="NexoraBot/1.0")
+        status = getattr(feed, "status", 200)  # feedparser omits .status on some CDN responses
 
-        # 304 Not Modified
-        if feed.status == 304:
-            logger.info("[INTEGRATION][%s] not modified  url=%s", _NAME, feed_url)
+        # 304 Not Modified — nothing new, skip processing
+        if status == 304:
+            logger.info("[INTEGRATION][%s] not_modified  url=%s", _NAME, feed_url)
             return {"items": [], "etag": etag, "modified": modified}
 
-        if not feed.entries:
-            logger.info("[INTEGRATION][%s] empty feed or error  url=%s  status=%s", _NAME, feed_url, feed.status)
+        if not getattr(feed, "entries", None):
+            logger.info(
+                "[INTEGRATION][%s] empty_feed  url=%s  status=%s",
+                _NAME, feed_url, status,
+            )
             return {"items": [], "etag": feed.get("etag"), "modified": feed.get("modified")}
 
         source_name = feed.feed.get("title") or feed_url

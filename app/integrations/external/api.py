@@ -66,28 +66,55 @@ def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
     """
     Checks if a query is on cooldown or disabled due to health issues.
     Differentiates between success (long) and failure (short) cooldowns.
+
+    A "true success" requires that the API returned at least one item
+    (had_results=True in mark_fetched). Empty-result fetches do NOT count
+    as successes and will not block re-fetching after the short cooldown.
     """
     rec = LastAPIFetch.query.filter_by(
         section=section, query_text=query_text
     ).first()
-    
+
     if not rec:
         return True
-    
+
     if not rec.is_active:
+        logger.info(
+            "[COOLDOWN] skip  reason=inactive  section=%s  key=%s",
+            section, query_text,
+        )
         return False
 
     now = datetime.utcnow()
-    
-    # 1. Success Cooldown (if last attempt was a success)
-    is_last_success = rec.success_count > 0 and (not rec.last_failed_at or rec.last_fetched_at > rec.last_failed_at)
-    
+
+    # 1. Success Cooldown — only applies when a real result was returned
+    is_last_success = (
+        rec.success_count > 0
+        and (not rec.last_failed_at or rec.last_fetched_at > rec.last_failed_at)
+    )
+
     if is_last_success:
-        return now - rec.last_fetched_at > timedelta(hours=hours)
-    
+        elapsed = now - rec.last_fetched_at
+        if elapsed <= timedelta(hours=hours):
+            logger.info(
+                "[COOLDOWN] skip  reason=success_cooldown  remaining_hrs=%.1f  section=%s  key=%.60s",
+                (timedelta(hours=hours) - elapsed).total_seconds() / 3600,
+                section, query_text,
+            )
+            return False
+        return True
+
     # 2. Failure Cooldown (Short retry period)
     if rec.last_failed_at:
-        return now - rec.last_failed_at > timedelta(minutes=FAILURE_RETRY_MINS)
+        elapsed = now - rec.last_failed_at
+        if elapsed <= timedelta(minutes=FAILURE_RETRY_MINS):
+            logger.info(
+                "[COOLDOWN] skip  reason=failure_cooldown  remaining_mins=%.1f  section=%s  key=%.60s",
+                (timedelta(minutes=FAILURE_RETRY_MINS) - elapsed).total_seconds() / 60,
+                section, query_text,
+            )
+            return False
+        return True
 
     return True
 
@@ -101,29 +128,38 @@ def get_fetch_metadata(section: str, query_text: str) -> dict:
 
 
 def mark_fetched(
-    section: str, 
-    query_text: str, 
-    category: str = None, 
-    source: str = None, 
+    section: str,
+    query_text: str,
+    category: str = None,
+    source: str = None,
     normalized_query: str = None,
     etag: str = None,
-    last_modified: str = None
+    last_modified: str = None,
+    had_results: bool = True,
 ):
     """
-    Updates or creates a record of a successful fetch.
+    Updates or creates a record of a fetch attempt.
+
+    ``had_results`` MUST be ``True`` only when the API returned ≥1 item.
+    When ``False`` (empty-list response), the success_count is NOT
+    incremented and last_fetched_at is not updated, so the query stays
+    eligible after the normal short cooldown instead of being locked for
+    the full ``hours`` success cooldown. This prevents the "empty-result
+    success trap" where zero-result queries block themselves for 24 h.
     """
     rec = LastAPIFetch.query.filter_by(
         section=section, query_text=query_text
     ).first()
-    
+
     now = datetime.utcnow()
-    
+
     if rec:
-        rec.last_fetched_at = now
-        rec.success_count += 1
-        rec.consecutive_failures = 0
-        rec.is_active = True
-        
+        if had_results:
+            rec.last_fetched_at = now
+            rec.success_count += 1
+            rec.consecutive_failures = 0
+            rec.is_active = True
+        # Always update metadata fields
         if category and not rec.category: rec.category = category
         if source and not rec.source: rec.source = source
         if normalized_query and not rec.normalized_query: rec.normalized_query = normalized_query
@@ -138,10 +174,11 @@ def mark_fetched(
             normalized_query=normalized_query,
             etag=etag,
             last_modified=last_modified,
-            last_fetched_at=now,
-            success_count=1,
+            # If first call returned nothing, store epoch so cooldown doesn't apply
+            last_fetched_at=now if had_results else datetime(2000, 1, 1),
+            success_count=1 if had_results else 0,
             consecutive_failures=0,
-            is_active=True
+            is_active=True,
         ))
     db.session.commit()
 

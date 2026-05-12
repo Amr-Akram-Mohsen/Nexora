@@ -25,11 +25,9 @@ class DiscoveryManager:
         sections = self.taxonomy.get("sections", [])
         categories_data = self.taxonomy.get("categories", [])
 
-        logger.info(
-            "[INTEGRATION][discovery] start  source_filter=%s  sections=%d  categories=%d",
-            source_filter or "(all)",
-            len(sections),
-            len(categories_data),
+        logger.debug(
+            "[DISCOVERY] source=%-8s  sections=%d  categories=%d",
+            source_filter or "(all)", len(sections), len(categories_data),
         )
 
         if not sections:
@@ -55,6 +53,10 @@ class DiscoveryManager:
                         allowed_sources = DEFAULT_SOURCE_ALIGNMENT.get(sec_slug, [])
 
                     if source_filter and source_filter not in allowed_sources:
+                        logger.debug(
+                            "[INTEGRATION][discovery] rejected  source=%s  section=%s  category=%s  allowed=%s",
+                            source_filter, sec_slug, cat_slug, allowed_sources,
+                        )
                         continue
 
                     # 2. Build Queries based on Source Strength
@@ -173,10 +175,8 @@ class DiscoveryManager:
             for qs in sec_cats.values()
         )
         logger.info(
-            "[INTEGRATION][discovery] success  source_filter=%s  total_queries=%d  sections_built=%d",
-            source_filter or "(all)",
-            total_queries,
-            len(registry),
+            "[DISCOVERY] source=%-8s  queries=%d  sections=%d",
+            source_filter or "(all)", total_queries, len(registry),
         )
         return registry
 

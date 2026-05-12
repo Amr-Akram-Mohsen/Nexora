@@ -35,11 +35,9 @@ def classify_content_metadata(
         description = data.get("description") or ""
         text_blob = f"{title}. {description}"
 
-        log_integration_start(
-            logger, _NAME,
-            section=section_slug,
-            category=category_slug,
-            title=title[:60],
+        logger.debug(
+            "[INTEGRATION][%s] start  section=%s  category=%s  title=%.60s",
+            _NAME, section_slug, category_slug, title,
         )
 
         # 1. Classification (deterministic from query)
@@ -64,10 +62,9 @@ def classify_content_metadata(
             data["discovery_query"] = q_obj["query"]
 
         result = ClassifiedItemDTO(**data)
-        log_integration_success(
-            logger, _NAME, items=1,
-            brands=len(result.brand_slugs),
-            facets=list(result.facets.keys()),
+        logger.debug(
+            "[INTEGRATION][%s] success  brands=%d  facets=%s",
+            _NAME, len(result.brand_slugs), list(result.facets.keys()),
         )
         return result
 

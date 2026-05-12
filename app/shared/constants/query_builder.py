@@ -37,13 +37,13 @@ CATEGORY_SOURCE_OVERRIDES = {
         "trends": ["newsapi", "reddit", "rss"],
     },
     "perfumes": {
-        "news":      ["youtube", "reddit"], # NewsAPI is useless for perfumes
-        "reviews":   ["youtube", "reddit"], # Reddit dominates fragrance opinions
+        "news":      ["youtube", "reddit", "gnews"],  # gnews added — covers fragrance news
+        "reviews":   ["youtube", "reddit"],
         "tutorials": ["youtube"],
         "trends":    ["reddit", "youtube"],
     },
     "accessories": {
-        "news":      ["rss", "newsapi"],
+        "news":      ["rss", "newsapi", "gnews"],      # gnews added — covers fashion/watch news
         "reviews":   ["youtube", "reddit", "rss"],
         "community": ["reddit"],
     }

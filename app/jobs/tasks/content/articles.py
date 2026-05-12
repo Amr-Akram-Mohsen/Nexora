@@ -16,7 +16,7 @@ from app.application.content.ingestion.services import (
     ClassificationService
 )
 from app.core.extensions import db
-from app.shared.constants.core import FetchLimits
+from app.shared.constants.core import FetchLimits, CooldownHours
 
 
 def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI):
@@ -51,9 +51,8 @@ def run_newsapi_fetch(limit: int | None = FetchLimits.NEWSAPI):
             classification_service=ClassificationService(),
             source_filter="newsapi",
             limit=limit,
-            cooldown_hours=6,
+            cooldown_hours=CooldownHours.NEWSAPI,
         )
-        logger.info("[FETCH][newsapi] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
@@ -98,9 +97,8 @@ def run_gnews_fetch(limit: int | None = FetchLimits.GNEWS):
             classification_service=ClassificationService(),
             source_filter="gnews",
             limit=limit,
-            cooldown_hours=24,
+            cooldown_hours=CooldownHours.GNEWS,
         )
-        logger.info("[FETCH][gnews] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()
@@ -155,10 +153,9 @@ def run_rss_fetch(limit: int | None = FetchLimits.RSS):
             classification_service=ClassificationService(),
             source_filter="rss",
             limit=limit,
-            cooldown_hours=0.5,
+            cooldown_hours=CooldownHours.RSS,
             manual_queries=flat_queries,
         )
-        logger.info("[FETCH][rss] run done  total_stored=%d", count)
         return {"status": "success", "count": count}
     except Exception as e:
         db.session.rollback()

@@ -23,11 +23,13 @@ from app.web.routes import (
 )
 
 class _LevelAwareFormatter(logging.Formatter):
-    """INFO/WARNING use a clean one-liner; ERROR/CRITICAL append the source location."""
-    _PLAIN  = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
-    _DETAIL = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s  [%(pathname)s:%(lineno)d]')
+    """Detail lines use HH:MM:SS only; ERROR/CRITICAL append source location."""
+    _PLAIN  = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s',
+                                datefmt='%H:%M:%S')
+    _DETAIL = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s  [%(filename)s:%(lineno)d]',
+                                datefmt='%H:%M:%S')
 
-    def format(self, record: logging.LogRecord) -> str:  # type: ignore[override]
+    def format(self, record: logging.LogRecord) -> str:
         if record.levelno >= logging.ERROR:
             return self._DETAIL.format(record)
         return self._PLAIN.format(record)
@@ -42,10 +44,16 @@ def setup_logging(app):
     file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5)
     file_handler.setFormatter(_LevelAwareFormatter())
     file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
 
-    # Propagate to every 'app.*' logger
-    logging.getLogger('app').addHandler(file_handler)
+    # ── CRITICAL: set the 'app' logger level to INFO.
+    # Without this the root logger's default WARNING level silently drops
+    # every INFO/DEBUG message before it can reach any handler.
+    app_logger = logging.getLogger('app')
+    app_logger.setLevel(logging.INFO)
+    app_logger.addHandler(file_handler)
+    app_logger.propagate = False   # prevent double-logging to root
+
+    app.logger.addHandler(file_handler)
 
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
@@ -202,7 +210,7 @@ def create_app():
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import reprocess_unscraped_articles
         print("Starting full-body enrichment for pending articles...")
-        count = reprocess_unscraped_articles(5)
+        count = reprocess_unscraped_articles(50)
         print(f"Done! Successfully published {count} articles.")
 
     @app.cli.command("init-content-status")

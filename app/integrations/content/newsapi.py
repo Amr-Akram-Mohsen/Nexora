@@ -22,7 +22,7 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
         return []
 
     q_text = q_obj.get("query", "")
-    log_integration_start(logger, _NAME, query=q_text)
+    logger.debug("[INTEGRATION][%s] start  query=%s", _NAME, q_text)
 
     try:
         resp = requests.get(
@@ -52,7 +52,7 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
             a["image_url"] = a.get("urlToImage")
             raw_items.append(RawItemDTO(**a))
 
-        log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)
+        logger.debug("[INTEGRATION][%s] success  items=%d  query=%s", _NAME, len(raw_items), q_text)
         return raw_items
 
     except requests.exceptions.RequestException as e:
