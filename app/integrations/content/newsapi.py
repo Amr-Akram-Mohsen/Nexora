@@ -1,6 +1,8 @@
 # app/integrations/content/newsapi.py
 import logging
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
 from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
@@ -9,6 +11,16 @@ logger = logging.getLogger(__name__)
 
 _NAME = "newsapi"
 
+def _get_session():
+    session = requests.Session()
+    retries = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retries))
+    return session
 
 def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
     """
@@ -24,8 +36,9 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
     q_text = q_obj.get("query", "")
     log_integration_start(logger, _NAME, query=q_text)
 
+    session = _get_session()
     try:
-        resp = requests.get(
+        resp = session.get(
             "https://newsapi.org/v2/everything",
             params={
                 "q":        q_text,
@@ -34,7 +47,7 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
                 "pageSize": 80,
                 "apiKey":   api_key,
             },
-            timeout=10,
+            timeout=(5, 15), # (connect, read) timeout
         )
         resp.raise_for_status()
         from app.shared.dto.ingestion import RawItemDTO
@@ -50,6 +63,7 @@ def fetch_newsapi_query(q_obj: dict, **kwargs) -> list[dict]:
                 continue
             # Map NewsAPI specific fields to standard DTO fields
             a["image_url"] = a.get("urlToImage")
+            a["source_name"] = (a.get("source") or {}).get("name")
             raw_items.append(RawItemDTO(**a))
 
         log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)

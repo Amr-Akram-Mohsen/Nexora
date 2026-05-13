@@ -67,7 +67,23 @@ class Topic(db.Model):
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Topic).filter_by(slug=slug).first()
-        
+    
+    @staticmethod
+    def get_or_create(name, session):
+        """Checks for topic existence, creates if missing."""
+        if not name: return None
+        slug = generate_slug(name)
+        topic = Topic.get_by_slug(slug, session)
+        if not topic:
+            topic = Topic(
+                name=name,
+                slug=slug,
+                normalized_name=normalize_name(name)
+            )
+            session.add(topic)
+            session.flush()
+        return topic
+
     contents = db.relationship(
         "Content",
         secondary=content_topics,
@@ -97,6 +113,23 @@ class Brand(db.Model):
     def get_by_slug(slug, session):
         return session.query(Brand).filter_by(slug=slug).first()
     
+    @staticmethod
+    def get_or_create(name, session, industry=None):
+        """Checks for brand existence, creates if missing."""
+        if not name: return None
+        slug = generate_slug(name)
+        brand = Brand.get_by_slug(slug, session)
+        if not brand:
+            brand = Brand(
+                name=name,
+                slug=slug,
+                normalized_name=normalize_name(name),
+                industry=industry
+            )
+            session.add(brand)
+            session.flush() # Makes brand.id available for relationships
+        return brand
+
     contents = db.relationship(
         "Content",
         secondary=content_brands,
@@ -182,6 +215,22 @@ class IntentFacet(db.Model):
     def get_by_slug(slug, session):
         return session.query(IntentFacet).filter_by(slug=slug).first()
 
+    @staticmethod
+    def get_or_create(name, session):
+        """Checks for Intent existence, creates if missing."""
+        if not name: return None
+        slug = generate_slug(name)
+        intent = IntentFacet.get_by_slug(slug, session)
+        if not intent:
+            intent = IntentFacet(
+                name=name,
+                slug=slug
+            )
+            session.add(intent)
+            session.flush()
+        return intent
+
+
     contents = db.relationship("Content", back_populates="intent")
 
 class PriceTierFacet(db.Model):
@@ -194,6 +243,22 @@ class PriceTierFacet(db.Model):
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(PriceTierFacet).filter_by(slug=slug).first()
+
+    @staticmethod
+    def get_or_create(name, session):
+        """Checks for Intent existence, creates if missing."""
+        if not name: return None
+        slug = generate_slug(name)
+        price_tier = PriceTierFacet.get_by_slug(slug, session)
+        if not price_tier:
+            price_tier = PriceTierFacet(
+                name=name,
+                slug=slug
+            )
+            session.add(price_tier)
+            session.flush()
+        return price_tier
+
 
     contents = db.relationship("Content", back_populates="price_tier")
 
@@ -208,6 +273,21 @@ class AttributeFacet(db.Model):
     def get_by_slug(slug, session):
         return session.query(AttributeFacet).filter_by(slug=slug).first()
 
+    @staticmethod
+    def get_or_create(name, session, category_id=None):
+        """Checks for attribute existence, creates if missing."""
+        if not name: return None
+        slug = generate_slug(name)
+        attr = AttributeFacet.get_by_slug(slug, session)
+        if not attr:
+            attr = AttributeFacet(
+                name=name,
+                slug=slug,
+                category_id=category_id
+            )
+            session.add(attr)
+            session.flush()
+        return attr
 
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
     category = db.relationship("Category")

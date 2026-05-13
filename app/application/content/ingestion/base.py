@@ -60,9 +60,13 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
     except IntegrityError:
         # The SAVEPOINT is automatically rolled back by the context manager.
         # The parent session transaction remains unpoisoned.
+        source = raw_data.get("source", "unknown")
+        if isinstance(source, dict):
+            source = source.get("name", "unknown")
+
         log_item_skipped(
             logger, 
-            source=raw_data.get("source", "unknown"),
+            source=source,
             title=raw_data.get("title", "untitled"),
             reason="duplicate_integrity_error",
             external_id=raw_data.get("external_id")
@@ -71,5 +75,16 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
     except Exception as e:
         # The SAVEPOINT is automatically rolled back.
         # We re-raise to let the workflow handle non-integrity exceptions.
-        logger.error("[INGEST] critical_failure  type=%s  err=%s", object_type, e)
+        source = raw_data.get("source", "unknown")
+        if isinstance(source, dict):
+            source = source.get("name", "unknown")
+
+        logger.error(
+            "[INGEST] critical_failure  type=%s  title=\"%s\"  source=%s  err=%s", 
+            object_type, 
+            raw_data.get("title", "unknown")[:60], 
+            source, 
+            e,
+            stacklevel=2
+        )
         raise

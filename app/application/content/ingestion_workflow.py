@@ -13,6 +13,7 @@ from app.shared.utils.logging import (
     log_fetch_query_error, log_fetch_run_start, log_fetch_run_done, 
     log_batch_rotation, log_item_ingested, log_item_skipped, log_quota_exhausted
 )
+from app.shared.utils.query_cursor_state import QueryCursorState
 from app.shared.constants.source_profiles import SOURCE_PROFILES
 from app.integrations.content import (fetch_newsapi_query, fetch_gnews_query, fetch_rss_query)
 from app.integrations.social import (fetch_reddit_query, fetch_youtube_query)
@@ -84,12 +85,30 @@ class IngestionWorkflow:
         """
         queries_registry = self.discovery.get_queries_by_section(source_filter=self.source_name)
 
-        # ── Build flat task list ──────────────────────────────────────
+        # # ── Build flat task list ──────────────────────────────────────
+        # flat_tasks = []
+        # for section, categories in queries_registry.items():
+        #     for category, queries in categories.items():
+        #         for q in queries:
+        #             flat_tasks.append((section, category, q))
+
+        cursor_state = QueryCursorState(self.source_name)
         flat_tasks = []
+
         for section, categories in queries_registry.items():
             for category, queries in categories.items():
-                for q in queries:
-                    flat_tasks.append((section, category, q))
+
+                last_index = cursor_state.get(section, category)
+
+                start = last_index
+                total = len(queries)
+
+                # deterministic slice from last position
+                ordered = queries[start:] + queries[:start]
+
+                for i, q in enumerate(ordered):
+                    flat_tasks.append((section, category, q, (start + i) % total))
+
 
         if not flat_tasks:
             logger.info(
@@ -100,11 +119,11 @@ class IngestionWorkflow:
 
         def get_fresh_tasks(tasks):
             fresh = []
-            for sec, cat, q_obj in tasks:
+            for sec, cat, q_obj, idx in tasks:
                 q_text = q_obj.get("query", "")
                 cache_key = f"{self.source_name}:{cat}:{q_text}"
                 if self.cooldown_service.should_refetch(sec, cache_key, hours=self.profile.cooldown_hours):
-                    fresh.append((sec, cat, q_obj))
+                    fresh.append((sec, cat, q_obj, idx))
             return fresh
 
         # ── Taxonomy-group batching & Cooldown filtering ──────────────────────
@@ -128,7 +147,7 @@ class IngestionWorkflow:
                 
                 # Filter tasks for this group
                 group_tasks = [
-                    (sec, cat, q) for sec, cat, q in flat_tasks
+                    (sec, cat, q, idx) for sec, cat, q, idx in flat_tasks
                     if cat.startswith(group) or group in cat
                 ]
                 
@@ -164,6 +183,7 @@ class IngestionWorkflow:
             # Ungrouped fallback
             total_before = len(flat_tasks)
             flat_tasks = get_fresh_tasks(flat_tasks)
+            
             if not flat_tasks:
                 logger.info(
                     "[FETCH][%s] skip  reason=all_queries_cooldown  total_queries_blocked=%d",
@@ -173,9 +193,9 @@ class IngestionWorkflow:
 
         # ── Apply limit cap ──────────────────────────────────────────
         total_eligible = len(flat_tasks)
-        if limit and limit < len(flat_tasks):
-            random.shuffle(flat_tasks)
-            flat_tasks = flat_tasks[:limit]
+        # if limit and limit < len(flat_tasks):
+        #     random.shuffle(flat_tasks)
+        #     flat_tasks = flat_tasks[:limit]
 
         total_tasks = len(flat_tasks)
 
@@ -194,7 +214,7 @@ class IngestionWorkflow:
         completed = 0
         t_run = time.monotonic()
 
-        for section, category, q_obj in flat_tasks:
+        for section, category, q_obj, idx in flat_tasks:
             q_text = q_obj.get("query", "")
             t_q = time.monotonic()
 
@@ -210,6 +230,8 @@ class IngestionWorkflow:
                     q_obj=q_obj,
                     fetch_params=fetch_params,
                 )
+
+                cursor_state.update(section, category, idx)
             except (PipelineFatalError, PipelineQuotaExceededError):
                 session.rollback()
                 logger.info(
@@ -240,6 +262,7 @@ class IngestionWorkflow:
             except Exception as exc:
                 logger.warning("[FETCH][%s] could not advance batch cursor  err=%s", self.source_name, exc)
 
+        cursor_state.commit()
         log_fetch_run_done(
             logger,
             self.source_name,

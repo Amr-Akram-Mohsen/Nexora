@@ -59,5 +59,12 @@ class ArticleCreateDTO(BaseModel):
     is_content_scraped: Optional[bool] = False
     content_source: Optional[str] = None
     content: Optional[str] = None # legacy key for body
+    
+    # Metadata preserved from Classification/Enrichment
+    section_slug: Optional[str] = None
+    category_slug: Optional[str] = None
+    topic_slugs: list[str] = Field(default_factory=list)
+    brand_slugs: list[str] = Field(default_factory=list)
+    facets: dict = Field(default_factory=dict)
 
 

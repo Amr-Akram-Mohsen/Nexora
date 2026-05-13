@@ -113,8 +113,6 @@ CATEGORY_BRAND_MAP = {
     "watches":      ["Rolex", "Omega", "Seiko", "Tissot"],
 }
 
-# Randomization qualifiers to keep results fresh and diverse.
-RANDOM_QUALIFIERS = ["Top 5", "Top 10", "Best of", "New", "Must-have"]
 
 # Facet-specific templates to target attributes like price, gender, or seasonal use.
 FACET_QUERY_TEMPLATES = {

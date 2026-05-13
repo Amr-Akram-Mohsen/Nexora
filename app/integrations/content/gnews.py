@@ -1,6 +1,8 @@
 # app/integrations/content/gnews.py
 import logging
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
 from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
@@ -10,7 +12,30 @@ logger = logging.getLogger(__name__)
 _NAME = "gnews"
 
 _ARABIC_CHARS = set("ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي")
+_session = None
 
+def _get_session():
+    global _session
+    if _session is None:
+        _session = requests.Session()
+        _session.headers.update({
+            "User-Agent": "Nexora Content Fetcher"
+        })
+
+        retries = Retry(
+            total=3,
+            backoff_factor=2,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET"],
+            respect_retry_after_header=True
+        )
+        adapter = HTTPAdapter(
+            max_retries=retries,
+            pool_connections=10,
+            pool_maxsize=10,
+        )
+        _session.mount("https://", adapter)
+    return _session
 
 def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
     """
@@ -29,17 +54,18 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
     lang = "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en"
     log_integration_start(logger, _NAME, query=q_text, country=country, lang=lang)
 
+    session = _get_session()
     try:
-        resp = requests.get(
+        resp = session.get(
             "https://gnews.io/api/v4/search",
             params={
                 "q":       q_text,
                 "lang":    lang,
                 "country": country,
-                "max":     50,
+                "max":     30,
                 "apikey":  api_key,
             },
-            timeout=10,
+            timeout=(3.5, 10),
         )
         resp.raise_for_status()
 
@@ -55,6 +81,7 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
                 continue
             a["image_url"] = a.get("image")
             a["region"] = country.upper()
+            a["source_name"] = (a.get("source") or {}).get("name")
             raw_items.append(RawItemDTO(**a))
 
         log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)

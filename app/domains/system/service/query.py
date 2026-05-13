@@ -62,7 +62,7 @@ def get_active_categories_for_section(section_slug, limit=20):
         .limit(limit)
         .all()
     )
-    return [serialize_category(c) for c in categories]
+    return [serialize_category(c) for c in categories if c.slug != 'uncategorized']
 
 @cache.memoize(timeout=3600)
 def get_popular_general_topics():

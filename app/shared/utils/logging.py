@@ -18,12 +18,12 @@ def log_integration_success(logger: logging.Logger, name: str, items: int, **kwa
 def log_integration_error(logger: logging.Logger, name: str, error: Exception, **kwargs) -> None:
     """Log an integration error."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.error("[INTEGRATION][%s] error  %s  err=%s", name, extras, error)
+    logger.error("[INTEGRATION][%s] error  %s  err=%s", name, extras, error, stacklevel=2)
 
 def log_integration_warning(logger: logging.Logger, name: str, reason: str, **kwargs) -> None:
     """Log an integration skip or minor issue."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.warning("[INTEGRATION][%s] skipped  reason=%s  %s", name, reason, extras)
+    logger.warning("[INTEGRATION][%s] skipped  reason=%s  %s", name, reason, extras, stacklevel=2)
 
 
 # ---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ def log_scrape_success(logger: logging.Logger, url: str, words: int, source: str
 
 def log_scrape_error(logger: logging.Logger, url: str, reason: str) -> None:
     """Log a failed scrape."""
-    logger.warning("[SCRAPE] failed  reason=%s  url=%s", reason, url)
+    logger.warning("[SCRAPE] failed  reason=%s  url=%s", reason, url, stacklevel=2)
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +101,7 @@ def log_route_error(logger: logging.Logger, route: str, error: Exception, *, exc
         type(error).__name__,
         str(error),
         exc_info=exc_info,
+        stacklevel=2
     )
 
 
@@ -142,6 +143,7 @@ def log_fetch_query_error(
         query,
         group,
         error,
+        stacklevel=2
     )
 
 def log_fetch_run_start(
@@ -198,7 +200,7 @@ def log_batch_rotation(
 
 def log_quota_exhausted(logger: logging.Logger, source: str) -> None:
     """Log that an API quota has been exhausted, halting the run."""
-    logger.warning("[FETCH][%s] quota_exhausted — halting run", source)
+    logger.warning("[FETCH][%s] quota_exhausted — halting run", source, stacklevel=2)
 
 
 def log_runner_banner(logger: logging.Logger, message: str) -> None:

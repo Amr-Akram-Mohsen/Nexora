@@ -123,44 +123,48 @@ def apply_relationships(session, content, data) -> dict:
 
     # -------- Topics --------
     for slug in data.get("topic_slugs", []):
-        topic = Topic.get_by_slug(slug, session)
+        topic = Topic.get_or_create(slug, session)
         if topic:
             if content.add_topic(topic):
                 updated_relationships["topics"].append(topic.slug)
 
     # -------- Brands --------
     for slug in data.get("brand_slugs", []):
-        brand = Brand.get_by_slug(slug, session)
+        brand = Brand.get_or_create(slug, session)
         if brand:
             if content.add_brand(brand):
                 updated_relationships["brands"].append(brand.slug)
 
-    updated_relationships.setdefault("facets", {})
-
     # -------- Attributes --------
-    for slug in data.get("facets", {}).get("attributes", []):
-        attr = AttributeFacet.get_by_slug(slug, session)
-        if attr:
-            if content.add_attribute(attr):
-                updated_relationships["facets"]["attributes"].append(attr.slug)
+    facets_data = data.get("facets", {})
+    if facets_data.get("attributes"):
+        updated_relationships.setdefault("facets", {})
+        updated_relationships["facets"].setdefault("attributes", [])
+        
+        for slug in facets_data["attributes"]:
+            attr = AttributeFacet.get_or_create(slug, session)
+            if attr:
+                if content.add_attribute(attr):
+                    updated_relationships["facets"]["attributes"].append(attr.slug)
 
     # -------- Facets --------
-    facets = data.get("facets", {})
+    if facets_data.get("gender") or facets_data.get("intent") or facets_data.get("price_tier"):
+        updated_relationships.setdefault("facets", {})
 
-    if facets.get("gender"):
-        g = GenderFacet.get_by_slug(facets["gender"], session)
+    if facets_data.get("gender"):
+        g = GenderFacet.get_by_slug(facets_data["gender"], session)
         if g and content.gender_id != g.id:
             content.gender_id = g.id
             updated_relationships["facets"]["gender"] = g.slug
 
-    if facets.get("intent"):
-        i = IntentFacet.get_by_slug(facets["intent"], session)
+    if facets_data.get("intent"):
+        i = IntentFacet.get_or_create(facets_data["intent"], session)
         if i and content.intent_id != i.id:
             content.intent_id = i.id
             updated_relationships["facets"]["intent"] = i.slug
 
-    if facets.get("price_tier"):
-        p = PriceTierFacet.get_by_slug(facets["price_tier"], session)
+    if facets_data.get("price_tier"):
+        p = PriceTierFacet.get_or_create(facets_data["price_tier"], session)
         if p and content.price_tier_id != p.id:
             content.price_tier_id = p.id
             updated_relationships["facets"]["price_tier"] = p.slug

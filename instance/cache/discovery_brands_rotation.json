@@ -1,7 +1,10 @@
 {
-  "smartphones": 3,
-  "laptops": 3,
+  "smartphones": 2,
+  "laptops": 7,
   "smartwatches": 0,
-  "cameras": 3,
-  "watches": 3
+  "cameras": 2,
+  "watches": 0,
+  "earbuds": 6,
+  "bags": 6,
+  "jewelry": 3
 }
