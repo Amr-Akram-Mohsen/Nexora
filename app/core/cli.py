@@ -30,44 +30,28 @@ def register_commands(app):
     @app.cli.command("fetch-newsapi")
     def fetch_newsapi_command():
         from app.jobs.tasks.content.articles import run_newsapi_fetch
-        app.logger.info("Fetching articles from NewsAPI...")
         run_newsapi_fetch()
-        app.logger.info("Done!")
 
     @app.cli.command("fetch-gnews")
     def fetch_gnews_command():
         from app.jobs.tasks.content.articles import run_gnews_fetch
-        app.logger.info("Fetching articles from GNews...")
         run_gnews_fetch()
-        app.logger.info("Done!\n")
-        app.logger.info('=' * 50)
-        app.logger.info('=' * 50)
-        app.logger.info("\n\n")
 
     @app.cli.command("fetch-rss")
     def fetch_rss_command():
         from app.jobs.tasks.content.articles import run_rss_fetch
-        app.logger.info("Fetching articles from rss feeds...")
         run_rss_fetch()
-        app.logger.info("Done!\n")
-        app.logger.info('=' * 50)
-        app.logger.info('=' * 50)
-        app.logger.info("\n\n")
 
 
     @app.cli.command("fetch-youtube")
     def fetch_youtube_command():
         from app.jobs.tasks.content.videos import run_youtube_fetch
-        app.logger.info("Fetching youtube reviews...")
         run_youtube_fetch()
-        app.logger.info("Done!")
 
     @app.cli.command("fetch-reddit")
     def fetch_reddit_command():
         from app.jobs.tasks.content.posts import run_reddit_fetch
-        app.logger.info("Fetching posts from Reddit communities...")
         run_reddit_fetch()
-        app.logger.info("Done!")
 
     @app.cli.command("fetch-all")
     def fetch_all_command():

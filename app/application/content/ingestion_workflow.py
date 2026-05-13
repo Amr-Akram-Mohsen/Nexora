@@ -9,7 +9,10 @@ from .ingestion.services import (
 from .ingestion.ports import FetcherPort
 from .ingestion import ingest_content
 from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
-from app.shared.utils.logging import (log_fetch_query_error, log_fetch_run_start, log_fetch_run_done, log_batch_rotation)
+from app.shared.utils.logging import (
+    log_fetch_query_error, log_fetch_run_start, log_fetch_run_done, 
+    log_batch_rotation, log_item_ingested, log_item_skipped, log_quota_exhausted
+)
 from app.shared.constants.source_profiles import SOURCE_PROFILES
 from app.integrations.content import (fetch_newsapi_query, fetch_gnews_query, fetch_rss_query)
 from app.integrations.social import (fetch_reddit_query, fetch_youtube_query)
@@ -278,7 +281,7 @@ class IngestionWorkflow:
 
         # 2. Quota check
         if not self.quota_service.can_call():
-            logger.warning("[FETCH][%s] quota exhausted — halting run", self.source_name)
+            log_quota_exhausted(logger, self.source_name)
             raise PipelineQuotaExceededError(f"{self.source_name} quota exhausted")
 
         # 3. Fetch
@@ -317,7 +320,6 @@ class IngestionWorkflow:
             )
         except Exception as e:
             self.cooldown_service.mark_failed(section, cache_key, error=e, source=self.source_name)
-            from app.integrations.exceptions import PipelineFatalError, PipelineQuotaExceededError
             if isinstance(e, (PipelineFatalError, PipelineQuotaExceededError)):
                 raise
             log_fetch_query_error(logger, self.source_name, query=q_text, error=e)
@@ -329,7 +331,6 @@ class IngestionWorkflow:
 
         for raw in raw_items:
             item_title = _safe_title(raw)
-            logger.debug("[FETCH][%s] processing  title=\"%s\"", self.source_name, item_title)
 
             if hasattr(raw, "model_dump"):
                 raw = raw.model_dump()
@@ -348,10 +349,7 @@ class IngestionWorkflow:
 
             missing = [k for k in ("url", "title") if not enriched_dict.get(k)]
             if missing:
-                logger.warning(
-                    "[FETCH][%s] missing fields=%s  title=\"%s\"",
-                    self.source_name, missing, item_title,
-                )
+                log_item_skipped(logger, self.source_name, item_title, reason="missing_required_fields", missing=missing)
 
             try:
                 if object_type == "article":
@@ -367,25 +365,23 @@ class IngestionWorkflow:
 
                 result = ingest_content(session, object_type=object_type, raw_data=enriched_dict)
                 if result:
-                    content_obj, is_new = result
-                    if is_new:
+                    content_obj, status = result
+                    if status == "created":
                         query_stored += 1
-                    else:
+                        log_item_ingested(logger, self.source_name, item_title, status="stored", published=enriched_dict.get("is_published"))
+                    elif status == "updated":
                         query_updated += 1
+                        log_item_ingested(logger, self.source_name, item_title, status="updated")
+                    else:
+                        log_item_skipped(logger, self.source_name, item_title, reason="duplicate_no_changes")
                 else:
-                    logger.debug(
-                        "[INGEST][%s] skip  reason=duplicate_or_invalid  title=\"%s\"",
-                        self.source_name, item_title,
-                    )
+                    log_item_skipped(logger, self.source_name, item_title, reason="ingestion_refused")
             except Exception as exc:
                 import sqlalchemy.exc
                 if isinstance(exc, (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InterfaceError)):
                     logger.critical("[FETCH][%s] DB error: %s", self.source_name, exc)
                     raise PipelineFatalError(f"Database error: {exc}") from exc
-                logger.error(
-                    "[FETCH][%s] item ingestion failed  title=\"%s\"  err=%s",
-                    self.source_name, item_title, exc,
-                )
+                log_item_skipped(logger, self.source_name, item_title, reason="ingestion_failed", error=str(exc))
 
         if query_stored > 0:
             session.commit()

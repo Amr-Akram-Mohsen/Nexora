@@ -2,7 +2,7 @@
 import logging
 from app.core.extensions import db
 from app.domains.content.models import Article, Content
-from app.shared.utils.logging import log_scrape_start, log_scrape_success, log_scrape_error
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_item_ingested, log_item_skipped
 
 logger = logging.getLogger(__name__)
 
@@ -32,10 +32,9 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
     )
 
     if not unscraped:
-        logger.info("[%s] no articles needing enrichment at this time", _NAME)
         return 0
 
-    logger.info("[%s] phase_2_start  processing=%d articles", _NAME, len(unscraped))
+    log_integration_start(logger, _NAME, processing=len(unscraped))
     success_count = 0
 
     from app.integrations.enrichment.pipeline import full_article_scraping_pipeline
@@ -82,8 +81,10 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
             if is_good_quality:
                 article.status = "complete"
                 success_count += 1
+                log_item_ingested(logger, _NAME, article.title[:60], status="published", words=article.word_count)
             else:
                 article.status = "partial" if (article.word_count or 0) > 100 else "failed"
+                log_item_skipped(logger, _NAME, article.title[:60], reason=f"quality_gate_{article.status}", words=article.word_count)
 
             # Sync with Content record
             content_rec = Content.query.filter_by(object_type="article", object_id=article.id).first()
@@ -96,7 +97,8 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
             db.session.rollback()
             article.status = "failed"
             db.session.commit()
-            logger.error("[%s] error  url=%s  err=%s", _NAME, url[:60], str(e))
+            log_item_skipped(logger, _NAME, url[:60], reason="exception", error=str(e))
+            log_integration_error(logger, _NAME, e, url=url[:60])
 
-    logger.info("[%s] phase_2_done  success=%d / %d", _NAME, success_count, len(unscraped))
+    log_integration_success(logger, _NAME, items=success_count, total=len(unscraped))
     return success_count

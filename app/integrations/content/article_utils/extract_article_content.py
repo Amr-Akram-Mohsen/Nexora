@@ -23,6 +23,7 @@ from urllib.parse import urljoin, urlparse
 import cloudscraper
 import trafilatura
 from bs4 import BeautifulSoup, NavigableString, Comment
+from app.shared.utils.logging import log_scrape_start, log_scrape_success, log_scrape_error
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +292,7 @@ def _fetch_static(url: str) -> str | None:
         if resp.status_code == 200 and len(resp.text) > 2000:
             return resp.text
     except Exception as e:
-        logger.debug("[Extractor] CloudScraper failed for %s: %s", url, e)
+        logger.debug("[SCRAPE] cloudscraper_failed  url=%s  err=%s", url, e)
     return None
 
 
@@ -313,10 +314,10 @@ def _fetch_rendered(url: str) -> str | None:
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
-        logger.warning("[Extractor] Playwright not installed, skipping render.")
+        log_scrape_error(logger, url, "playwright_not_installed")
         return None
 
-    logger.info("[Extractor] Headless rendering: %s", url)
+    logger.debug("[SCRAPE] headless_rendering  url=%s", url)
     try:
         with sync_playwright() as p:
             browser = None
@@ -328,7 +329,7 @@ def _fetch_rendered(url: str) -> str | None:
                     continue
 
             if not browser:
-                logger.error("[Extractor] No browser available. Run: playwright install chromium")
+                log_scrape_error(logger, url, "no_browser_available")
                 return None
 
             ctx = browser.new_context(
@@ -348,7 +349,7 @@ def _fetch_rendered(url: str) -> str | None:
     except Exception as e:
         # Collapse the (potentially multi-line) exception message to a single log line
         short_msg = str(e).split("\n")[0]
-        logger.warning("[SCRAPE] playwright_failed  url=%s  reason=%s", url, short_msg)
+        log_scrape_error(logger, url, f"playwright_failed: {short_msg}")
         return None
 
 
@@ -432,6 +433,7 @@ def scrape_article_content(url: str) -> str | None:
     """
     # Polite delay
     time.sleep(random.uniform(0.3, 0.9))
+    log_scrape_start(logger, url)
 
     # ── Step 1: Fetch ────────────────────────────────────────────
     html_source = _fetch_static(url)
@@ -441,7 +443,7 @@ def scrape_article_content(url: str) -> str | None:
             html_source = rendered
 
     if not html_source:
-        logger.info("[Extractor] No HTML fetched for: %s", url)
+        log_scrape_error(logger, url, "fetch_failed")
         return None
 
     # ── Step 2: Pre-process lazy images on the raw source ────────
@@ -458,14 +460,20 @@ def scrape_article_content(url: str) -> str | None:
     if not extracted or len(extracted.strip()) < 250:
         extracted = _extract_via_json_ld(html_source)
         if extracted:
-            logger.info("[Extractor] JSON-LD fallback succeeded: %s", url)
+            logger.debug("[SCRAPE] json_ld_fallback_success  url=%s", url)
 
     if not extracted or len(extracted.strip()) < 150:
-        logger.info("[Extractor] Extraction yielded insufficient content: %s", url)
+        log_scrape_error(logger, url, "insufficient_content")
         return None
 
     # ── Step 4: Clean, normalize, enhance ────────────────────────
     cleaned  = clean_html(extracted, base_url=url)
     enhanced = enhance_article_html(cleaned)
 
-    return enhanced if enhanced.strip() else None
+    if enhanced and enhanced.strip():
+        word_count = len(re.sub(r'<[^>]+>', '', enhanced).split())
+        log_scrape_success(logger, url, words=word_count, source="trafilatura_or_jsonld")
+        return enhanced
+    
+    log_scrape_error(logger, url, "empty_result_after_cleaning")
+    return None

@@ -2,7 +2,7 @@
 import logging
 from datetime import datetime
 import feedparser
-from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     feed_url = q_obj.get("query", "")
     if not feed_url:
-        logger.warning("[INTEGRATION][%s] skipped  reason=no_feed_url", _NAME)
+        log_integration_warning(logger, _NAME, reason="no_feed_url")
         return []
 
     log_integration_start(logger, _NAME, url=feed_url)
@@ -92,14 +92,11 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
 
         # 304 Not Modified — nothing new, skip processing
         if status == 304:
-            logger.info("[INTEGRATION][%s] not_modified  url=%s", _NAME, feed_url)
+            log_integration_success(logger, _NAME, items=0, status=304, url=feed_url)
             return {"items": [], "etag": etag, "modified": modified}
 
         if not getattr(feed, "entries", None):
-            logger.info(
-                "[INTEGRATION][%s] empty_feed  url=%s  status=%s",
-                _NAME, feed_url, status,
-            )
+            log_integration_warning(logger, _NAME, reason="empty_feed", url=feed_url, status=status)
             return {"items": [], "etag": feed.get("etag"), "modified": feed.get("modified")}
 
         source_name = feed.feed.get("title") or feed_url

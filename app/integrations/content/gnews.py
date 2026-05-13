@@ -3,7 +3,7 @@ import logging
 import requests
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
-from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     api_key = current_app.config.get("GNEWS_API_KEY")
     if not api_key:
-        logger.warning("[INTEGRATION][%s] skipped  reason=no_api_key", _NAME)
+        log_integration_warning(logger, _NAME, reason="no_api_key")
         return []
 
     q_text = q_obj.get("query", "")
@@ -27,7 +27,7 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
     q_text = q_text.replace(" & ", " and ").replace("&", "and")
     country = q_obj.get("region", "sa").lower()
     lang = "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en"
-    logger.debug("[INTEGRATION][%s] start  query=%s  country=%s  lang=%s", _NAME, q_text, country, lang)
+    log_integration_start(logger, _NAME, query=q_text, country=country, lang=lang)
 
     try:
         resp = requests.get(
@@ -46,7 +46,7 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
         from app.shared.dto.ingestion import RawItemDTO
         articles = resp.json().get("articles", [])
         if not isinstance(articles, list):
-            logger.warning("[INTEGRATION][%s] unexpected response shape for query=%s", _NAME, q_text)
+            log_integration_warning(logger, _NAME, reason="unexpected_response_shape", query=q_text)
             articles = []
 
         raw_items = []
@@ -57,14 +57,17 @@ def fetch_gnews_query(q_obj: dict, **kwargs) -> list[dict]:
             a["region"] = country.upper()
             raw_items.append(RawItemDTO(**a))
 
-        logger.debug("[INTEGRATION][%s] success  items=%d  query=%s", _NAME, len(raw_items), q_text)
+        log_integration_success(logger, _NAME, items=len(raw_items), query=q_text)
         return raw_items
 
     except requests.exceptions.RequestException as e:
         if hasattr(e, "response") and e.response is not None and (e.response.status_code == 403 or e.response.status_code == 429):
+            log_integration_error(logger, _NAME, e, query=q_text)
             raise PipelineQuotaExceededError("GNews quota exhausted")
         from app.integrations.exceptions import PipelineTransientError
+        log_integration_error(logger, _NAME, e, query=q_text)
         raise PipelineTransientError(f"GNews network error: {str(e)}") from e
     except Exception as e:
         from app.integrations.exceptions import PipelineFatalError
+        log_integration_error(logger, _NAME, e, query=q_text)
         raise PipelineFatalError(f"GNews unexpected error: {str(e)}") from e

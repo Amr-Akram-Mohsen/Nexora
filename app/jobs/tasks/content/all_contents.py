@@ -2,6 +2,8 @@ import logging
 from .articles import run_newsapi_fetch, run_gnews_fetch, run_rss_fetch
 from .videos import run_youtube_fetch
 from .posts import run_reddit_fetch
+from app.shared.utils.logging import log_runner_banner
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,7 +16,7 @@ def run_content_fetch():
     dedicated profile for fetch limits and cooldowns.
     """
 
-    logger.info("[Runner] ====== NEXORA GLOBAL DISCOVERY ENGINE STARTED ======")
+    log_runner_banner(logger, "NEXORA GLOBAL DISCOVERY ENGINE STARTED")
 
     results = {
         "newsapi": run_newsapi_fetch(),
@@ -24,7 +26,7 @@ def run_content_fetch():
         "reddit":  run_reddit_fetch(),
     }
 
-    logger.info("[Runner] ====== DISCOVERY COMPLETE — SUMMARY REPORT ======")
+    log_runner_banner(logger, "DISCOVERY COMPLETE — SUMMARY REPORT")
     for source, res in results.items():
         status = res.get("status", "error").upper()
         count  = res.get("count", 0)

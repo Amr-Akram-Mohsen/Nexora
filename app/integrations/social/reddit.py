@@ -2,8 +2,7 @@
 import logging
 from datetime import datetime
 from flask import current_app
-from app.shared.constants.taxonomy import REDDIT_SUBREDDITS
-from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +27,13 @@ def fetch_reddit_query(q_obj: dict, **kwargs) -> list[dict]:
     try:
         import praw
     except ImportError as e:
-        logger.warning("[INTEGRATION][%s] skipped  reason=praw_not_installed  error=%s", _NAME, e)
+        log_integration_warning(logger, _NAME, reason="praw_not_installed", error=str(e))
         return []
 
     client_id     = current_app.config.get("REDDIT_CLIENT_ID")
     client_secret = current_app.config.get("REDDIT_CLIENT_SECRET")
     if not client_id or not client_secret:
-        logger.warning("[INTEGRATION][%s] skipped  reason=no_api_credentials", _NAME)
+        log_integration_warning(logger, _NAME, reason="no_api_credentials")
         return []
 
     sub_name = q_obj.get("query", "").replace("r/", "")

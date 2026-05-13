@@ -40,7 +40,7 @@ def recover_article_metadata(url: str) -> dict:
             result["canonical_url"] = canonical["href"]
 
     except Exception as e:
-        logger.debug(f"[Metadata Recovery] Failed for {url}: {e}")
+        logger.debug("[METADATA] recovery_failed  url=%s  err=%s", url, e)
         
     return result
 

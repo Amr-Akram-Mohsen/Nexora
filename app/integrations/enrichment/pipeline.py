@@ -138,7 +138,7 @@ def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
     if not url:
         return normalize_ingested_data(item)
 
-    logger.info("[ENRICHMENT] phase_2_heavy_start  url=%s", url[:80])
+    log_integration_start(logger, _NAME, mode="phase_2_heavy", url=url[:80])
     
     candidates = []
     trusted = is_trusted(url)
@@ -172,6 +172,7 @@ def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
     best_wc_so_far = max((c["word_count"] for c in candidates), default=0)
     if trusted or best_wc_so_far < 150:
         try:
+            log_scrape_start(logger, url)
             scraped_html = scrape_article_content(url)
             if scraped_html:
                 norm = normalize_content(scraped_html, None)

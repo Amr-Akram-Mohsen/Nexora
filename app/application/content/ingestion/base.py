@@ -1,6 +1,7 @@
 # app/domains/content/ingestion/base.py
 import logging
 from sqlalchemy.exc import IntegrityError
+from app.shared.utils.logging import log_item_skipped
 from .taxonomy import resolve_taxonomy
 from app.domains.content.service.command import apply_relationships
 from app.domains.content.service.content_access import create_content, get_or_create_content
@@ -26,13 +27,13 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
             )
 
             if not obj:
-                return None, False
+                return None, "skipped"
 
             # 2. Resolve Taxonomy (Section/Category)
             section, category = resolve_taxonomy(raw_data, session)
 
             # 3. Create/Link to Content Wrapper
-            content = create_content(
+            content, was_content_updated = create_content(
                 session,
                 obj=obj,
                 object_type=object_type,
@@ -43,21 +44,32 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
             )
 
             # 4. Apply Relationships (Topics, Brands, Facets)
+            updated_relationships = {}
             if content:
-                apply_relationships(session, content, raw_data)
+                updated_relationships = apply_relationships(session, content, raw_data)
 
-            return content, is_new
+            if is_new:
+                return content, "created"
+            
+            if updated_relationships:
+                return content, updated_relationships
+            
+            # If it's not new and nothing changed, it's effectively a skipped duplicate
+            return None, "skipped"
 
     except IntegrityError:
         # The SAVEPOINT is automatically rolled back by the context manager.
         # The parent session transaction remains unpoisoned.
-        logger.debug(
-            "[INGEST] duplicate_skip  type=%s  external_id=%s",
-            object_type, raw_data.get("external_id"),
+        log_item_skipped(
+            logger, 
+            source=raw_data.get("source", "unknown"),
+            title=raw_data.get("title", "untitled"),
+            reason="duplicate_integrity_error",
+            external_id=raw_data.get("external_id")
         )
-        return None, False
-    except Exception:
+        return None, "skipped"
+    except Exception as e:
         # The SAVEPOINT is automatically rolled back.
         # We re-raise to let the workflow handle non-integrity exceptions.
-        logger.exception(f"[Ingestion] Failed to ingest {object_type}")
+        logger.error("[INGEST] critical_failure  type=%s  err=%s", object_type, e)
         raise

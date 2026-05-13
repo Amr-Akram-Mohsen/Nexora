@@ -1,6 +1,7 @@
-import logging
 from flask import current_app
 from app.integrations.content.article_utils.quality import score_content_quality
+from app.shared.utils.logging import log_scrape_start, log_scrape_success, log_scrape_error
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ def _extract_diffbot(url: str, api_key: str) -> dict | None:
                 "source": "diffbot"
             }
     except Exception as e:
-        logger.warning(f"[Extractor API] Diffbot failed for {url}: {e}")
+        log_scrape_error(logger, url, f"diffbot_failed: {e}")
     return None
 
 def _extract_mercury(url: str, api_key: str) -> dict | None:
@@ -74,7 +75,7 @@ def _extract_mercury(url: str, api_key: str) -> dict | None:
             "source": "mercury"
         }
     except Exception as e:
-        logger.warning(f"[Extractor API] Mercury failed for {url}: {e}")
+        log_scrape_error(logger, url, f"mercury_failed: {e}")
     return None
 
 def extract_with_apis(url: str) -> dict | None:
@@ -86,21 +87,23 @@ def extract_with_apis(url: str) -> dict | None:
         # Check Diffbot
         diffbot_key = current_app.config.get("DIFFBOT_API_KEY")
         if diffbot_key:
-            logger.info(f"[Enrichment] Trying Diffbot for {url}")
+            log_scrape_start(logger, url)
             result = _extract_diffbot(url, diffbot_key)
             if result:
+                log_scrape_success(logger, url, words=result.get("word_count", 0), source="diffbot")
                 return result
                 
         # Check Mercury
         mercury_key = current_app.config.get("MERCURY_API_KEY")
         if mercury_key:
-            logger.info(f"[Enrichment] Trying Mercury for {url}")
+            log_scrape_start(logger, url)
             result = _extract_mercury(url, mercury_key)
             if result:
+                log_scrape_success(logger, url, words=result.get("word_count", 0), source="mercury")
                 return result
                 
     except RuntimeError as e:
         # Outside app context or config unavailable (e.g., during tests)
-        logger.debug("[Extractor API] skipped — no app context: %s", e)
+        logger.debug("[SCRAPE] skipped  reason=no_app_context  url=%s  err=%s", url, e)
         
     return None

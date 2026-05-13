@@ -20,6 +20,7 @@ import logging
 import os
 from pathlib import Path
 from typing import List, Optional
+from app.shared.utils.logging import log_batch_rotation
 
 logger = logging.getLogger(__name__)
 
@@ -98,10 +99,7 @@ class BatchState:
         self._data["cursor"] = (current_idx + 1) % len(groups)
         self._save()
         next_group = groups[self._data["cursor"]]
-        logger.info(
-            "[BATCH][%s] cursor advanced  next_group=%s",
-            self.source, next_group,
-        )
+        log_batch_rotation(logger, self.source, next_group=next_group)
 
     def reset(self) -> None:
         """Reset cursor to 0 (useful in tests or manual overrides)."""

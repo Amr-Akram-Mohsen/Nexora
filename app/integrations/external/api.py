@@ -9,6 +9,8 @@ from datetime import date, datetime, timedelta
 from app.core.extensions import db
 from app.domains.external.models import LastAPIFetch, APIUsage
 
+from app.shared.utils.logging import log_cooldown_skip
+
 logger = logging.getLogger(__name__)
 
 # ── Per-day limits for free tiers ─────────────────────────────────
@@ -79,10 +81,7 @@ def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
         return True
 
     if not rec.is_active:
-        logger.info(
-            "[COOLDOWN] skip  reason=inactive  section=%s  key=%s",
-            section, query_text,
-        )
+        log_cooldown_skip(logger, "inactive", section=section, key=query_text)
         return False
 
     now = datetime.utcnow()
@@ -96,10 +95,12 @@ def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
     if is_last_success:
         elapsed = now - rec.last_fetched_at
         if elapsed <= timedelta(hours=hours):
-            logger.info(
-                "[COOLDOWN] skip  reason=success_cooldown  remaining_hrs=%.1f  section=%s  key=%.60s",
-                (timedelta(hours=hours) - elapsed).total_seconds() / 3600,
-                section, query_text,
+            remaining_hrs = (timedelta(hours=hours) - elapsed).total_seconds() / 3600
+            log_cooldown_skip(
+                logger, "success_cooldown", 
+                remaining_hrs=f"{remaining_hrs:.1f}", 
+                section=section, 
+                key=query_text[:60]
             )
             return False
         return True
@@ -108,10 +109,12 @@ def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
     if rec.last_failed_at:
         elapsed = now - rec.last_failed_at
         if elapsed <= timedelta(minutes=FAILURE_RETRY_MINS):
-            logger.info(
-                "[COOLDOWN] skip  reason=failure_cooldown  remaining_mins=%.1f  section=%s  key=%.60s",
-                (timedelta(minutes=FAILURE_RETRY_MINS) - elapsed).total_seconds() / 60,
-                section, query_text,
+            remaining_mins = (timedelta(minutes=FAILURE_RETRY_MINS) - elapsed).total_seconds() / 60
+            log_cooldown_skip(
+                logger, "failure_cooldown", 
+                remaining_mins=f"{remaining_mins:.1f}", 
+                section=section, 
+                key=query_text[:60]
             )
             return False
         return True

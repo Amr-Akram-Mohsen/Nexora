@@ -1,3 +1,4 @@
+from collections import defaultdict
 from app.core.extensions import db
 from ..models import Article, Content
 from ...system.models import (
@@ -9,14 +10,15 @@ from app.shared.utils.slug import generate_slug
 from .content_access import resolve
 from sqlalchemy import func, insert
 
-def link_article_sources(session, article, data):
+def link_article_sources(session, article, data) -> bool:
     """Links an article to its specific source URL, ensuring uniqueness."""
+    changed = False
     source_name = data.get("source_name")
     url = data.get("url")
 
     published_at = data.get("published_at")
     if not source_name or not url:
-        return
+        return False
 
     slug = generate_slug(source_name)
     source = Source.get_by_slug(slug, session)
@@ -58,7 +60,7 @@ def link_article_sources(session, article, data):
     ).first()
 
     if existing:
-        return
+        return False
 
     existing_relation = session.query(ArticleSource).filter_by(
         article_id=article.id,
@@ -66,7 +68,7 @@ def link_article_sources(session, article, data):
     ).first()
 
     if existing_relation:
-        return
+        return False
 
     relation = ArticleSource(
         article_id=article.id,
@@ -80,6 +82,7 @@ def link_article_sources(session, article, data):
 
     # 🔹 Update Article's Primary Source (Performance Optimization)
     article.update_primary_source()
+    return True
 
 def delete_content(session, id: int) -> bool:
     content = session.get(Article, id)
@@ -114,46 +117,60 @@ def create_content_entry(session, obj, object_type, published_at):
     session.add(content)
     return content
 
-def apply_relationships(session, content, data):
+def apply_relationships(session, content, data) -> dict:
+    from collections import defaultdict
+    updated_relationships = defaultdict(list)
 
     # -------- Topics --------
     for slug in data.get("topic_slugs", []):
         topic = Topic.get_by_slug(slug, session)
         if topic:
-            content.add_topic(topic)
+            if content.add_topic(topic):
+                updated_relationships["topics"].append(topic.slug)
 
     # -------- Brands --------
     for slug in data.get("brand_slugs", []):
         brand = Brand.get_by_slug(slug, session)
         if brand:
-            content.add_brand(brand)
+            if content.add_brand(brand):
+                updated_relationships["brands"].append(brand.slug)
+
+    updated_relationships.setdefault("facets", {})
 
     # -------- Attributes --------
     for slug in data.get("facets", {}).get("attributes", []):
         attr = AttributeFacet.get_by_slug(slug, session)
         if attr:
-            content.add_attribute(attr)
+            if content.add_attribute(attr):
+                updated_relationships["facets"]["attributes"].append(attr.slug)
 
     # -------- Facets --------
     facets = data.get("facets", {})
 
     if facets.get("gender"):
         g = GenderFacet.get_by_slug(facets["gender"], session)
-        if g:
+        if g and content.gender_id != g.id:
             content.gender_id = g.id
+            updated_relationships["facets"]["gender"] = g.slug
 
     if facets.get("intent"):
         i = IntentFacet.get_by_slug(facets["intent"], session)
-        if i:
+        if i and content.intent_id != i.id:
             content.intent_id = i.id
+            updated_relationships["facets"]["intent"] = i.slug
 
     if facets.get("price_tier"):
         p = PriceTierFacet.get_by_slug(facets["price_tier"], session)
-        if p:
+        if p and content.price_tier_id != p.id:
             content.price_tier_id = p.id
+            updated_relationships["facets"]["price_tier"] = p.slug
 
     # -------- Sources (ONLY for article) --------
     if content.object_type == "article":
         obj = resolve(content, session)
         if obj:
-            link_article_sources(session, obj, data)
+            if link_article_sources(session, obj, data):
+                updated_relationships["sources"] = [s.source.slug for s in obj.article_sources]
+                updated_relationships["sources"].append(data.get("source_name").lower())
+    
+    return updated_relationships

@@ -55,7 +55,7 @@ def _normalize_url(url: str) -> str:
         clean_query = urlencode(clean_qs, doseq=True)
         return urlunparse(parsed._replace(query=clean_query, fragment=""))
     except Exception as e:
-        logger.debug("[Cleaner] URL normalisation failed for %s: %s", url[:80], e)
+        logger.debug("[CLEANER] url_norm_failed  url=%s  err=%s", url[:80], e)
         return url
 
 def _parse_date(value) -> datetime | None:

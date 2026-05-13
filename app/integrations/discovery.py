@@ -4,6 +4,7 @@ from typing import Dict, List
 from app.shared.utils.slug import generate_slug
 from app.shared.constants.taxonomy import TAXONOMY
 from app.shared.constants.query_builder import CATEGORY_TOPIC_MAP, QUERY_TEMPLATES
+from app.shared.utils.logging import log_integration_warning
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +32,9 @@ class DiscoveryManager:
         )
 
         if not sections:
-            logger.warning("[INTEGRATION][discovery] no sections found in taxonomy")
+            log_integration_warning(logger, "discovery", reason="no_sections_in_taxonomy")
         if not categories_data:
-            logger.warning("[INTEGRATION][discovery] no categories found in taxonomy")
+            log_integration_warning(logger, "discovery", reason="no_categories_in_taxonomy")
 
         for sec in sections:
             sec_slug = generate_slug(sec["name"])
@@ -54,7 +55,7 @@ class DiscoveryManager:
 
                     if source_filter and source_filter not in allowed_sources:
                         logger.debug(
-                            "[INTEGRATION][discovery] rejected  source=%s  section=%s  category=%s  allowed=%s",
+                            "[DISCOVERY] rejected  source=%s  section=%s  category=%s  allowed=%s",
                             source_filter, sec_slug, cat_slug, allowed_sources,
                         )
                         continue

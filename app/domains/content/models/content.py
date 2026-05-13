@@ -157,19 +157,27 @@ class Content(db.Model):
     #     return getattr(self.target, "preview_text", None)
 
     # ---------------- Convenience helpers ----------------
-    def add_brand(self, brand_obj):
+    def add_brand(self, brand_obj) -> bool:
         if brand_obj not in self.brands:
             self.brands.append(brand_obj)
-    def add_topic(self, topic_obj):
+            return True
+        return False
+    def add_topic(self, topic_obj) -> bool:
         if topic_obj not in self.topics:
             self.topics.append(topic_obj)
-    def link_item(self, item_obj):
+            return True
+        return False
+    def link_item(self, item_obj) -> bool:
         if item_obj not in self.linked_items:
             self.linked_items.append(item_obj)
+            return True
+        return False
 
-    def add_attribute(self, attr_obj):
+    def add_attribute(self, attr_obj) -> bool:
         if attr_obj not in self.attributes:
             self.attributes.append(attr_obj)
+            return True
+        return False
 
     def __repr__(self):
         return f"<Content {self.object_type}:{self.object_id}>"

@@ -87,11 +87,17 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
     ).first()
 
     if existing:
+        changed = False
         # Update existing record with latest metadata
-        existing.published_at = published_at
+        if existing.published_at != published_at:
+            existing.published_at = published_at
+            changed = True
+            
         for k, v in kwargs.items():
-            setattr(existing, k, v)
-        return existing
+            if getattr(existing, k) != v:
+                setattr(existing, k, v)
+                changed = True
+        return existing, changed
 
     content = Content(
         object_type=object_type,
@@ -102,7 +108,7 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
 
     session.add(content)
     session.flush()
-    return content
+    return content, False
 
 def get_or_create_content(session, object_type, external_id, obj_factory, title_fallback=None, url_fallback=None, **kwargs):
     model = get_model_map().get(object_type)

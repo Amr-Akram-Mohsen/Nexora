@@ -17,7 +17,7 @@ def create_post_model(data):
 def ingest_post(session, raw_data):
     cleaned = clean_post_data(raw_data)
     if not cleaned:
-        return None, False
+        return None, "skipped"
 
     return generic_ingest(
         session,

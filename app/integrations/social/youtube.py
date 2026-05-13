@@ -3,7 +3,7 @@ import logging
 import requests
 from flask import current_app
 from app.integrations.exceptions import PipelineQuotaExceededError
-from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error
+from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
     """
     api_key = current_app.config.get("YOUTUBE_API_KEY")
     if not api_key:
-        logger.warning("[INTEGRATION][%s] skipped  reason=no_api_key", _NAME)
+        log_integration_warning(logger, _NAME, reason="no_api_key")
         return []
 
     query = q_obj.get("query", "")
@@ -51,7 +51,7 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
 
         items_data = resp.json().get("items", [])
         if not isinstance(items_data, list):
-            logger.warning("[INTEGRATION][%s] unexpected response shape for query=%s", _NAME, query)
+            log_integration_warning(logger, _NAME, reason="unexpected_response_shape", query=query)
             items_data = []
 
         raw_items = []
@@ -81,6 +81,7 @@ def fetch_youtube_query(q_obj: dict, **kwargs) -> list[dict]:
 
     except requests.exceptions.RequestException as e:
         if hasattr(e, "response") and e.response is not None and e.response.status_code == 403:
+            log_integration_error(logger, _NAME, e, query=query)
             raise PipelineQuotaExceededError("YouTube Quota Exceeded")
         log_integration_error(logger, _NAME, e, query=query)
         return []

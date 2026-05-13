@@ -18,7 +18,7 @@ def create_video_model(data):
 def ingest_video(session, raw_data):
     cleaned = clean_video_data(raw_data)
     if not cleaned:
-        return None, False
+        return None, "skipped"
 
     return generic_ingest(
         session,

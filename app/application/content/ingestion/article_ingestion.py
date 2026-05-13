@@ -29,7 +29,7 @@ def ingest_article(session, raw_data):
     from app.domains.content.service.normalization import normalize_article_data
     cleaned_dto = normalize_article_data(enriched_dto)
     if not cleaned_dto:
-        return None, False
+        return None, "skipped"
 
     # Fallback to dict for generic_ingest compatibility
     cleaned_dict = cleaned_dto.model_dump()
