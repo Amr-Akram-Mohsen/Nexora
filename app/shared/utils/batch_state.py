@@ -15,9 +15,9 @@ Usage::
     group   = state.current_group(GROUPS)   # e.g. "electronics"
     state.advance(GROUPS)                   # move cursor to next group
 """
+
 import json
 import logging
-import os
 from pathlib import Path
 from typing import List, Optional
 from app.shared.utils.logging import log_batch_rotation
@@ -33,6 +33,7 @@ def _state_dir() -> Path:
     """Return the directory used for batch state files, creating it if needed."""
     try:
         from flask import current_app
+
         base = Path(current_app.instance_path) / "cache" / "batch_state"
     except RuntimeError:
         base = _DEFAULT_DIR
@@ -71,7 +72,8 @@ class BatchState:
             except (json.JSONDecodeError, OSError) as exc:
                 logger.warning(
                     "[BATCH][%s] state file corrupt or unreadable — resetting  err=%s",
-                    self.source, exc,
+                    self.source,
+                    exc,
                 )
         return {"cursor": 0}
 

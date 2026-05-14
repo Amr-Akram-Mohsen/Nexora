@@ -1,13 +1,14 @@
 import json
-import os
 from pathlib import Path
 from flask import current_app
+
 
 class RotationState:
     """
     Manages persistent cursors for round-robin rotation of items (e.g. brands).
     Stored in instance/cache/rotation.json.
     """
+
     def __init__(self, namespace: str):
         self.namespace = namespace
         self.cache_dir = Path(current_app.instance_path) / "cache"
@@ -34,19 +35,19 @@ class RotationState:
         """
         if not items:
             return None
-        
+
         current_idx = self.state.get(key, 0)
-        
+
         # Ensure index is within bounds
         if current_idx >= len(items):
             current_idx = 0
-            
+
         selected_item = items[current_idx]
-        
+
         # Advance index for next time
         self.state[key] = (current_idx + 1) % len(items)
         self._save()
-        
+
         return selected_item
 
     def peek(self, key: str, items: list):

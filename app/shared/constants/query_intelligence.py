@@ -1,6 +1,5 @@
 from datetime import datetime
 
-
 # ==========================================================
 # RECENCY
 # ==========================================================
@@ -29,10 +28,8 @@ CATEGORY_TOPIC_MAP = {
     "earbuds": ["fitness", "commuting"],
     "headphones": ["home-office", "gaming"],
     "cameras": ["photography", "travel"],
-
     "niche-artisanal": ["luxury"],
     "oud-oriental": ["luxury", "middle-eastern"],
-
     "watches": ["fashion", "fitness"],
     "bags": ["travel-gear", "everyday-carry"],
     "sunglasses": ["fashion", "summer"],
@@ -62,14 +59,12 @@ CATEGORY_SOURCE_OVERRIDES = {
         "news": ["gnews", "newsapi", "rss"],
         "trends": ["newsapi", "reddit", "rss"],
     },
-
     "perfumes": {
         "news": ["youtube", "reddit", "gnews"],
         "reviews": ["youtube", "reddit"],
         "tutorials": ["youtube"],
         "trends": ["reddit", "youtube"],
     },
-
     "accessories": {
         "news": ["rss", "newsapi", "gnews"],
         "reviews": ["youtube", "reddit", "rss"],
@@ -82,16 +77,20 @@ CATEGORY_SOURCE_OVERRIDES = {
 # INTENT KEYWORDS (Non-Section Specific)
 # ==========================================================
 INTENT_KEYWORDS = {
-    "Buying Guide": ["buying guide", "best", "what to buy", "recommendations"],
-    "Gift Ideas": ["gift ideas", "best gifts", "presents for"],
-    "Comparison": ["vs", "comparison", "alternative to", "better than"],
-    "Unboxing": ["unboxing", "package opening"],
-    "First Impressions": ["first impressions", "hands on", "initial thoughts"],
-    "Value Check": ["worth it", "value for money", "deal", "cheap vs expensive"],
-    "Long-term Use": ["long term review", "6 months later", "durability", "reliability"],
-    "Technical": ["specs", "teardown", "benchmarks", "performance test"],
-    "Lifestyle": ["aesthetic", "daily carry", "setup", "vibe"],
+    "Buying Guide": ["best", "buying guide"],
+    "Gift Ideas": ["gift ideas", "best gifts"],
+    "Comparison": ["vs", "comparison"],
+    "Unboxing": ["unboxing"],
+    "First Impressions": ["hands on", "first look"],
+    "Value Check": ["worth it", "deal"],
+    "Long-term Use": ["long term review"],
+    "Technical": ["specs", "benchmarks"],
+    "Lifestyle": ["aesthetic", "daily carry"],
+    "News": [""],
 }
+
+# Sources that support (OR / AND / Parentheses)
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "gnews", "reddit"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS
@@ -112,42 +111,24 @@ SECTION_DEFAULT_INTENTS = {
 
 QUERY_TEMPLATES = {
     "news": [
-        "{category} news",
-        "{category} launch OR announcement",
-        "new {category} releases",
-        "{brand} launch",
-        "{brand} announced",
+        "{category} (news OR launch OR release)",
+        "{brand} (launch OR announced OR news)",
     ],
-
     "reviews": [
-        "{category} review",
+        "{category} (review OR hands-on OR {problem})",
         "best {category} {year}",
-        "{category} hands-on impressions",
-        "{category} comparison vs",
-        "{brand} review",
-        "{brand} long term review",
+        "{brand} (review OR vs OR {problem})",
     ],
-
     "tutorials": [
-        "how to use {category}",
-        "{category} setup guide",
-        "{category} tips and tricks",
-        "{category} maintenance and care",
+        "{category} (setup OR guide OR tips OR {problem})",
     ],
-
     "trends": [
-        "{category} market trends {year}",
-        "future of {category}",
-        "most anticipated {category}",
+        "{category} ({feature} OR trends OR anticipated) {year}",
         "{category} buying guide {year}",
     ],
-
     "community": [
-        "{category} discussion",
-        "{category} user feedback",
-        "{category} problems OR issues",
+        "{category} (discussion OR issues OR {problem})",
         "is {category} worth it",
-        "{category} reddit",
     ],
 }
 
@@ -158,12 +139,40 @@ QUERY_TEMPLATES = {
 
 # Expanded in app/shared/constants/query_intelligence.py
 CATEGORY_BRAND_MAP = {
-    "smartphones": ["Apple", "Samsung", "Google", "Xiaomi", "Nothing", "OnePlus", "Sony", "Motorola"],
-    "laptops": ["Apple", "Dell", "HP", "Lenovo", "Asus", "Microsoft", "Razer", "MSI", "Acer"],
+    "smartphones": [
+        "Apple",
+        "Samsung",
+        "Google",
+        "Xiaomi",
+        "Nothing",
+        "OnePlus",
+        "Sony",
+        "Motorola",
+    ],
+    "laptops": [
+        "Apple",
+        "Dell",
+        "HP",
+        "Lenovo",
+        "Asus",
+        "Microsoft",
+        "Razer",
+        "MSI",
+        "Acer",
+    ],
     "earbuds": ["Apple", "Sony", "Bose", "Sennheiser", "Jabra", "Beats", "Soundcore"],
     "cameras": ["Sony", "Canon", "Nikon", "Fujifilm", "Lumix", "Leica", "GoPro"],
     "perfumes": ["Dior", "Chanel", "Creed", "Tom Ford", "Armani", "Versace", "Prada"],
-    "watches": ["Rolex", "Omega", "Seiko", "Tissot", "Casio", "Hamilton", "Tudor", "Cartier"],
+    "watches": [
+        "Rolex",
+        "Omega",
+        "Seiko",
+        "Tissot",
+        "Casio",
+        "Hamilton",
+        "Tudor",
+        "Cartier",
+    ],
     "bags": ["Peak Design", "Bellroy", "Aer", "Nomad", "Timbuk2", "Nike", "Adidas"],
     "jewelry": ["Tiffany", "Cartier", "Pandora", "Bulgari", "Swarovski"],
 }
@@ -181,28 +190,24 @@ CATEGORY_PROBLEM_MAP = {
         "gaming performance",
         "charging speed",
     ],
-
     "laptops": [
         "fan noise",
         "thermal throttling",
         "battery drain",
         "portable workstation",
     ],
-
     "earbuds": [
         "noise cancellation",
         "mic quality",
         "connectivity issues",
         "comfort",
     ],
-
     "perfumes": [
         "longevity",
         "projection",
         "summer fragrances",
         "compliment factor",
     ],
-
     "watches": [
         "accuracy",
         "daily wear",
@@ -222,20 +227,17 @@ FEATURE_MAP = {
         "minimalist",
         "carry on",
     ],
-
     "watches": [
         "automatic",
         "solar",
         "field watch",
         "diver",
     ],
-
     "headphones": [
         "wireless",
         "ANC",
         "open back",
     ],
-
     "smartphones": [
         "foldable",
         "AI camera",
@@ -256,20 +258,17 @@ AUDIENCE_SEGMENTS = {
         "gamers",
         "creators",
     ],
-
     "laptops": [
         "developers",
         "students",
         "remote work",
     ],
-
     "perfumes": [
         "men",
         "women",
         "office wear",
         "date night",
     ],
-
     "bags": [
         "travel",
         "minimalist",
@@ -282,42 +281,7 @@ AUDIENCE_SEGMENTS = {
 # SEASONAL / EVENT DISCOVERY
 # ==========================================================
 
-SEASONAL_TERMS = [
-    "summer",
-    "winter",
-    "back to school",
-    "holiday gifts",
-    "travel season",
-]
-
-
-# ==========================================================
-# PLATFORM DIALECTS
-# ==========================================================
-
-REDDIT_SUFFIXES = [
-    "reddit",
-    "discussion",
-    "worth it",
-    "real experience",
-    "daily use",
-]
-
-YOUTUBE_SUFFIXES = [
-    "review",
-    "hands on",
-    "comparison",
-    "vs",
-    "unboxing",
-    "long term review",
-]
-
-NEWS_SUFFIXES = [
-    "launch",
-    "announced",
-    "release",
-    "industry",
-]
+# Suffixes are now handled via templates or source-specific logic
 
 
 # ==========================================================
@@ -353,12 +317,10 @@ FACET_QUERY_TEMPLATES = {
         "best {category} for {facet_value}",
         "{category} for {facet_value} review",
     ],
-
     "price_tier": [
         "best {facet_value} {category}",
         "top {facet_value} {category} {year}",
     ],
-
     "attributes": [
         "{category} with {facet_value}",
         "best {facet_value} {category}",
@@ -381,7 +343,6 @@ SOURCE_DIALECTS = {
             "battery test",
         ],
     },
-
     "reddit": {
         "community": [
             "reddit",
@@ -396,7 +357,6 @@ SOURCE_DIALECTS = {
             "long term review",
         ],
     },
-
     "newsapi": {
         "news": [
             "launch",
@@ -427,23 +387,9 @@ EXPLORATION_MODIFIERS = [
 ]
 
 SEARCH_KEYWORD_EXPANSIONS = {
-    "smartphones": [
-        "android phone",
-        "flagship phone",
-        "camera phone",
-    ],
-
-    "laptops": [
-        "ultrabook",
-        "gaming laptop",
-        "creator laptop",
-    ],
-
-    "watches": [
-        "automatic watch",
-        "chronograph",
-        "dive watch",
-    ],
+    "smartphones": "(android phone OR flagship phone OR camera phone)",
+    "laptops": "(ultrabook OR gaming laptop OR creator laptop)",
+    "watches": "(automatic watch OR chronograph OR dive watch)",
 }
 
 
@@ -455,4 +401,3 @@ QUERY_SUFFIX_ROTATIONS = [
     "for gaming",
     "for productivity",
 ]
-

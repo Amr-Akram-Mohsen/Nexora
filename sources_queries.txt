@@ -1,0 +1,5 @@
+source_name     all_queries   electronics    perfumes    accessories
+newsapi          1043           648            none         396 
+gnews          402              216            54         132 
+youtube          1940              960            431         548 
+rss          not-specified              3            2         2 

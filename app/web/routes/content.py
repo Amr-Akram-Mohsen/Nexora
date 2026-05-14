@@ -1,7 +1,6 @@
 import logging
 from flask import Blueprint, request, render_template, abort
 from app.application.content.get_feed import get_feed_data
-# from app.application.content.get_article_page import get_article_page_data
 from flask_login import current_user
 from app.shared.request import get_client_ip
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
@@ -14,10 +13,15 @@ bp = Blueprint("content", __name__)
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):
     from app.web.helpers.content import parse_active_filters
-    active_filters = parse_active_filters(["category", "topic", "brand", "intent", "price_tier", "type"])
+
+    active_filters = parse_active_filters(
+        ["category", "topic", "brand", "intent", "price_tier", "type"]
+    )
     page = request.args.get("page", 1, type=int)
 
-    log_route_start(logger, f"/sections/{section_slug}", page=page, filters=active_filters)
+    log_route_start(
+        logger, f"/sections/{section_slug}", page=page, filters=active_filters
+    )
 
     try:
         data = get_feed_data(section_slug, active_filters, page=page)
@@ -32,7 +36,12 @@ def sections(section_slug):
         data.setdefault("trending_contents", [])
 
         item_count = len(data.get("items") or [])
-        log_route_success(logger, f"/sections/{section_slug}", items=item_count, template="catalog-page.html")
+        log_route_success(
+            logger,
+            f"/sections/{section_slug}",
+            items=item_count,
+            template="catalog-page.html",
+        )
 
         return render_template(
             "content/catalog/catalog-page.html",
@@ -47,7 +56,10 @@ def sections(section_slug):
 
 @bp.route("/contents/<int:content_id>")
 def content_page(content_id):
-    from app.application.content.get_article_page import record_article_view, get_article_page_data
+    from app.application.content.get_article_page import (
+        record_article_view,
+        get_article_page_data,
+    )
     from app.core.extensions import db
 
     log_route_start(logger, f"/contents/{content_id}")

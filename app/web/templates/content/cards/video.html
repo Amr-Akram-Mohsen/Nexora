@@ -11,7 +11,9 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
 
 {% block meta_top %}
 <div class="card__meta-top flex items-center">
+  {% if content.category %}
   {{ badge(content.category.name, 'badge--category', 'secondary') }}
+  {% endif %}
   <span class="platform-icon platform-icon--youtube ml-auto">
     <i class="fab fa-youtube"></i>
   </span>

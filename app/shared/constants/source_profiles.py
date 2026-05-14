@@ -1,12 +1,11 @@
 from .source_profile_model import SourceProfile
 
-
 SOURCE_PROFILES: dict[str, SourceProfile] = {
     "rss": SourceProfile(
         content_type="article",
         transport="feed",
-        cooldown_hours=0.5,
-        fetch_limit=15,
+        cooldown_hours=0,
+        fetch_limit=3,
         requires_scraping=True,
         supports_etag=True,
         supports_last_modified=True,
@@ -17,12 +16,11 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
         allowed_sections=["news", "reviews", "tutorials", "trends"],
     ),
-
     "newsapi": SourceProfile(
         content_type="article",
         transport="api",
-        cooldown_hours=1,
-        fetch_limit=30,
+        cooldown_hours=0,
+        fetch_limit=3,
         requires_scraping=True,
         freshness_priority="very_high",
         quality_weight=0.75,
@@ -31,12 +29,11 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
         allowed_sections=["news", "trends"],
     ),
-
     "gnews": SourceProfile(
         content_type="article",
         transport="api",
-        cooldown_hours=1,
-        fetch_limit=30,
+        cooldown_hours=0,
+        fetch_limit=3,
         requires_scraping=True,
         freshness_priority="high",
         quality_weight=0.70,
@@ -45,12 +42,11 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
         allowed_sections=["news", "trends"],
     ),
-
     "youtube": SourceProfile(
         content_type="video",
         transport="api",
-        cooldown_hours=1,
-        fetch_limit=10,
+        cooldown_hours=0,
+        fetch_limit=3,
         quota_cost=100,
         requires_scraping=False,
         freshness_priority="medium",
@@ -59,12 +55,11 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         dedupe_strategy=["external_id", "normalized_url"],
         allowed_sections=["reviews", "tutorials", "trends", "community"],
     ),
-
     "reddit": SourceProfile(
         content_type="post",
         transport="api",
-        cooldown_hours=4,
-        fetch_limit=20,
+        cooldown_hours=0,
+        fetch_limit=3,
         quota_cost=1,
         requires_scraping=False,
         freshness_priority="high",
@@ -74,4 +69,3 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         allowed_sections=["community", "trends", "reviews"],
     ),
 }
-

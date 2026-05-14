@@ -10,7 +10,9 @@
 {% block meta_top %}
 <!-- Meta -->
 <div class="card__meta-top flex items-center">
+  {% if content.category %}
   {{ badge(content.category.name, 'badge--category', 'secondary') }}
+  {% endif %}
   <span class="platform-icon ml-auto">
     <i class="far fa-file-alt"></i>
   </span>

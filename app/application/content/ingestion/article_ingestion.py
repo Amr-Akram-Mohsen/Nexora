@@ -1,7 +1,7 @@
 from app.domains.content.models import Article
 from .base import generic_ingest
-from app.integrations.content.article_utils.cleaner import DomainMapper
 from app.shared.dto.ingestion import EnrichedItemDTO
+
 
 def create_article_model(data):
     return Article(
@@ -15,8 +15,9 @@ def create_article_model(data):
         content_source=data.get("content_source"),
         status=data.get("status", "pending"),
         body=data.get("content"),  # Still populate body for migration
-        image_url=data.get("image_url")
+        image_url=data.get("image_url"),
     )
+
 
 def ingest_article(session, raw_data):
     # Backward compatibility: wrap dict into EnrichedItemDTO if necessary
@@ -27,6 +28,7 @@ def ingest_article(session, raw_data):
 
     # 1. Map to domain DTO via consolidated normalization service
     from app.domains.content.service.normalization import normalize_article_data
+
     cleaned_dto = normalize_article_data(enriched_dto)
     if not cleaned_dto:
         return None, "skipped"
@@ -39,5 +41,5 @@ def ingest_article(session, raw_data):
         object_type="article",
         raw_data=cleaned_dict,
         model_class=Article,
-        factory_func=create_article_model
+        factory_func=create_article_model,
     )

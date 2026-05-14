@@ -9,45 +9,64 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from dotenv import load_dotenv
-load_dotenv()
+import warnings
 
+from dotenv import load_dotenv
 from app.admin import (
-    api_user_bp, api_content_bp, api_item_bp, api_interaction_bp, api_dashboard_bp, api_ingestion_bp
+    api_user_bp,
+    api_content_bp,
+    api_item_bp,
+    api_interaction_bp,
+    api_dashboard_bp,
+    api_ingestion_bp,
 )
 
 from app.domains.user.models import User
 
 from app.web.routes import (
-    admin_bp, user_bp, system_bp, content_bp, item_bp, interaction_bp, recommendation_bp, recommendation_bp
+    admin_bp,
+    user_bp,
+    system_bp,
+    content_bp,
+    item_bp,
+    interaction_bp,
+    recommendation_bp,
 )
+
+load_dotenv()
+
 
 class _LevelAwareFormatter(logging.Formatter):
     """Detail lines use HH:MM:SS only; ERROR/CRITICAL append source location."""
-    _PLAIN  = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s',
-                                datefmt='%H:%M:%S')
-    _DETAIL = logging.Formatter('%(asctime)s  %(levelname)-7s  %(message)s  [%(filename)s:%(lineno)d]',
-                                datefmt='%H:%M:%S')
+
+    _PLAIN = logging.Formatter(
+        "%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%H:%M:%S"
+    )
+    _DETAIL = logging.Formatter(
+        "%(asctime)s  %(levelname)-7s  %(message)s  [%(filename)s:%(lineno)d]",
+        datefmt="%H:%M:%S",
+    )
 
     def format(self, record: logging.LogRecord) -> str:
         if record.levelno >= logging.ERROR:
             return self._DETAIL.format(record)
         return self._PLAIN.format(record)
 
-import warnings
 
 warnings.filterwarnings(
-    "ignore",
-    message="Using the in-memory storage for tracking rate limits"
+    "ignore", message="Using the in-memory storage for tracking rate limits"
 )
+
 
 def setup_logging(app):
     """Configure rotating file logging for production-grade audit trails."""
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
 
     # 10 MB per file, keeping last 5 backups
-    file_handler = RotatingFileHandler('logs/nexora.log', maxBytes=10240000, backupCount=5, encoding='utf-8')
+    file_handler = RotatingFileHandler(
+        "logs/nexora.log", maxBytes=10240000, backupCount=5, encoding="utf-8"
+    )
     file_handler.setFormatter(_LevelAwareFormatter())
     file_handler.setLevel(logging.INFO)
 
@@ -58,7 +77,7 @@ def setup_logging(app):
 
     # 2. Clean up 'app' namespace logger (used by tasks and integrations)
     # This ensures all ingestion sub-loggers inherit ONLY the file handler
-    app_logger = logging.getLogger('app')
+    app_logger = logging.getLogger("app")
     app_logger.setLevel(logging.INFO)
     app_logger.handlers = [file_handler]
     app_logger.propagate = False
@@ -71,13 +90,14 @@ def setup_logging(app):
         if type(h) is logging.StreamHandler:
             root_logger.removeHandler(h)
 
+
 def create_app():
     base_dir = Path(__file__).resolve().parent  # app/core
-    
+
     app = Flask(
         __name__,
         template_folder=str(base_dir.parent / "web" / "templates"),
-        static_folder=str(base_dir.parent / "web" / "static")
+        static_folder=str(base_dir.parent / "web" / "static"),
     )
 
     if not app.debug:
@@ -94,7 +114,7 @@ def create_app():
     # Initialize Flask-Login
     login_manager = LoginManager()
     login_manager.init_app(app)
-    login_manager.login_view = 'user.login'
+    login_manager.login_view = "user.login"
 
     # Initialize Flask-Mail
     mail.init_app(app)
@@ -110,11 +130,11 @@ def create_app():
     # Initialize OAuth
     oauth = OAuth(app)
     google = oauth.register(
-        name='google',
-        client_id=app.config.get('GOOGLE_CLIENT_ID'),
-        client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
-        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-        client_kwargs={'scope': 'openid email profile'},
+        name="google",
+        client_id=app.config.get("GOOGLE_CLIENT_ID"),
+        client_secret=app.config.get("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
     )
     app.google = google
 
@@ -141,10 +161,11 @@ def create_app():
 
     # ── Register CLI Commands ────────────────────────────────────
     from .cli import register_commands
+
     register_commands(app)
 
     @app.errorhandler(429)
     def ratelimit_handler(e):
-        return f"Too many requests. Please slow down and try again later.", 429
+        return "Too many requests. Please slow down and try again later.", 429
 
     return app

@@ -1,7 +1,25 @@
-from .ports import DiscoveryPort, QuotaPort, EnrichmentPort, CooldownPort, ClassificationPort
-from app.integrations.discovery import DiscoveryManager
-from app.integrations.enrichment.classification import classify_content_metadata
+from .ports import (
+    DiscoveryPort,
+    QuotaPort,
+    EnrichmentPort,
+    CooldownPort,
+    ClassificationPort,
+)
+from app.integrations.content.discovery import DiscoveryManager
+from app.integrations.content.enrichment.classification import classify_content_metadata
 from app.shared.constants.core import YouTubeQuota
+from app.integrations.content.external.api import (
+    should_refetch,
+    get_fetch_metadata,
+    mark_fetched,
+    mark_failed,
+    can_call_newsapi,
+    record_newsapi_call,
+    can_call_gnews,
+    record_gnews_call,
+    can_call_youtube,
+    record_youtube_call,
+)
 
 
 class DiscoveryService(DiscoveryPort):
@@ -16,6 +34,7 @@ class ClassificationService(ClassificationPort):
     """
     Handles metadata tagging (Brands, Facets, Sections) for all content types.
     """
+
     def __call__(self, raw_data, section, category, query_obj):
         return classify_content_metadata(raw_data, section, category, query_obj)
 
@@ -29,25 +48,38 @@ class EnrichmentService(EnrichmentPort):
         should_scrape: When True, enables CloudScraper/Playwright scraping for articles.
                        Defaults to False for safe, fast ingestion runs.
     """
+
     def __call__(self, raw_data, section, category, query_obj):
-        from app.integrations.enrichment.pipeline import ingest_enrichment_router
+        from app.integrations.content.enrichment.pipeline import (
+            ingest_enrichment_router,
+        )
+
         # Ingestion enrichment is always lightweight (normalization only)
         return ingest_enrichment_router(raw_data)
 
 
 class CooldownService(CooldownPort):
     def should_refetch(self, section, cache_key, hours):
-        from app.integrations.external.api import should_refetch
         return should_refetch(section, cache_key, hours=hours)
 
     def get_fetch_metadata(self, section, cache_key):
-        from app.integrations.external.api import get_fetch_metadata
         return get_fetch_metadata(section, cache_key)
 
-    def mark_fetched(self, section, cache_key, category, source, normalized_query, etag=None, last_modified=None, had_results=True):
-        from app.integrations.external.api import mark_fetched
+    def mark_fetched(
+        self,
+        section,
+        cache_key,
+        category,
+        source,
+        normalized_query,
+        etag=None,
+        last_modified=None,
+        had_results=True,
+    ):
+
         mark_fetched(
-            section, cache_key,
+            section,
+            cache_key,
             category=category,
             source=source,
             normalized_query=normalized_query,
@@ -57,27 +89,27 @@ class CooldownService(CooldownPort):
         )
 
     def mark_failed(self, section, cache_key, error, source=None):
-        from app.integrations.external.api import mark_failed
+
         mark_failed(section, cache_key, error=error, source=source)
 
 
 class NewsApiQuotaService(QuotaPort):
     def can_call(self):
-        from app.integrations.external.api import can_call_newsapi
+
         return can_call_newsapi()
 
     def record_call(self):
-        from app.integrations.external.api import record_newsapi_call
+
         record_newsapi_call()
 
 
 class GNewsQuotaService(QuotaPort):
     def can_call(self):
-        from app.integrations.external.api import can_call_gnews
+
         return can_call_gnews()
 
     def record_call(self):
-        from app.integrations.external.api import record_gnews_call
+
         record_gnews_call()
 
 
@@ -95,7 +127,7 @@ class YouTubeQuotaService(QuotaPort):
         self._units_used: int = 0
 
     def can_call(self) -> bool:
-        from app.integrations.external.api import can_call_youtube
+
         # First check the shared global quota tracker, then the run budget.
         if not can_call_youtube(units=YouTubeQuota.UNITS_PER_SEARCH):
             return False
@@ -108,12 +140,16 @@ class YouTubeQuotaService(QuotaPort):
         return True
 
     def record_call(self) -> None:
-        from app.integrations.external.api import record_youtube_call
+
         record_youtube_call(units=YouTubeQuota.UNITS_PER_SEARCH)
         self._units_used += YouTubeQuota.UNITS_PER_SEARCH
 
 
 class GenericQuotaService(QuotaPort):
     """Fallback quota service that always allows."""
-    def can_call(self): return True
-    def record_call(self): pass
+
+    def can_call(self):
+        return True
+
+    def record_call(self):
+        pass

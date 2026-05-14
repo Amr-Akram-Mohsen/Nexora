@@ -1,42 +1,61 @@
 import logging
-from typing import Optional, List, Dict, Any
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Integration Lifecycle
 # ---------------------------------------------------------------------------
+
 
 def log_integration_start(logger: logging.Logger, name: str, **kwargs) -> None:
     """Log the start of an integration fetch."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.debug("[INTEGRATION][%s] start  %s", name, extras)
 
-def log_integration_success(logger: logging.Logger, name: str, items: int, **kwargs) -> None:
+
+def log_integration_success(
+    logger: logging.Logger, name: str, items: int, **kwargs
+) -> None:
     """Log a successful integration fetch."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.debug("[INTEGRATION][%s] success  items=%d  %s", name, items, extras)
 
-def log_integration_error(logger: logging.Logger, name: str, error: Exception, **kwargs) -> None:
+
+def log_integration_error(
+    logger: logging.Logger, name: str, error: Exception, **kwargs
+) -> None:
     """Log an integration error."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.error("[INTEGRATION][%s] error  %s  err=%s", name, extras, error, stacklevel=2)
+    logger.error(
+        "[INTEGRATION][%s] error  %s  err=%s", name, extras, error, stacklevel=2
+    )
 
-def log_integration_warning(logger: logging.Logger, name: str, reason: str, **kwargs) -> None:
+
+def log_integration_warning(
+    logger: logging.Logger, name: str, reason: str, **kwargs
+) -> None:
     """Log an integration skip or minor issue."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.warning("[INTEGRATION][%s] skipped  reason=%s  %s", name, reason, extras, stacklevel=2)
+    logger.warning(
+        "[INTEGRATION][%s] skipped  reason=%s  %s", name, reason, extras, stacklevel=2
+    )
 
 
 # ---------------------------------------------------------------------------
 # Scraping & Extraction
 # ---------------------------------------------------------------------------
 
+
 def log_scrape_start(logger: logging.Logger, url: str) -> None:
     """Log the start of a scraping attempt."""
     logger.debug("[SCRAPE] start  url=%s", url)
 
-def log_scrape_success(logger: logging.Logger, url: str, words: int, source: str) -> None:
+
+def log_scrape_success(
+    logger: logging.Logger, url: str, words: int, source: str
+) -> None:
     """Log a successful scrape."""
     logger.info("[SCRAPE] success  words=%d  source=%s  url=%s", words, source, url)
+
 
 def log_scrape_error(logger: logging.Logger, url: str, reason: str) -> None:
     """Log a failed scrape."""
@@ -47,21 +66,41 @@ def log_scrape_error(logger: logging.Logger, url: str, reason: str) -> None:
 # Ingestion Workflow
 # ---------------------------------------------------------------------------
 
-def log_item_ingested(logger: logging.Logger, source: str, title: str, status: str, published: bool = None, **kwargs) -> None:
+
+def log_item_ingested(
+    logger: logging.Logger,
+    source: str,
+    title: str,
+    status: str,
+    published: bool = None,
+    **kwargs,
+) -> None:
     """Log an item being stored or updated in the DB."""
     pub_str = f"  published={published}" if published is not None else ""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.info("[INGEST][%s] %-8s  title=\"%s\"%s  %s", source, status, title, pub_str, extras)
+    logger.info(
+        '[INGEST][%s] %-8s  title="%s"%s  %s', source, status, title, pub_str, extras
+    )
 
-def log_item_skipped(logger: logging.Logger, source: str, title: str, reason: str, **kwargs) -> None:
+
+def log_item_skipped(
+    logger: logging.Logger, source: str, title: str, reason: str, **kwargs
+) -> None:
     """Log an item being skipped during ingestion."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.debug("[INGEST][%s] skipped  reason=%-20s  title=\"%s\"  %s", source, reason, title, extras)
+    logger.debug(
+        '[INGEST][%s] skipped  reason=%-20s  title="%s"  %s',
+        source,
+        reason,
+        title,
+        extras,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Routing & API
 # ---------------------------------------------------------------------------
+
 
 def log_route_call(logger: logging.Logger, route: str, method: str, **kwargs) -> None:
     """Log an incoming API or UI route call."""
@@ -69,10 +108,11 @@ def log_route_call(logger: logging.Logger, route: str, method: str, **kwargs) ->
     logger.info("[ROUTE] %-6s  %-20s  %s", method, route, extras)
 
 
-
 def log_route_start(logger: logging.Logger, route: str, **params: Any) -> None:
     """Log the start of a route handler."""
-    param_str = "  " + "  ".join(f'{k}="{v}"' for k, v in params.items()) if params else ""
+    param_str = (
+        "  " + "  ".join(f'{k}="{v}"' for k, v in params.items()) if params else ""
+    )
     logger.info("[ROUTE][%s] start%s", route, param_str)
 
 
@@ -93,7 +133,9 @@ def log_route_success(
     logger.info("[ROUTE][%s] success  %s", route, "  ".join(parts))
 
 
-def log_route_error(logger: logging.Logger, route: str, error: Exception, *, exc_info: bool = True) -> None:
+def log_route_error(
+    logger: logging.Logger, route: str, error: Exception, *, exc_info: bool = True
+) -> None:
     """Log a route-level error."""
     logger.error(
         "[ROUTE][%s] error  type=%s  message=%s",
@@ -101,13 +143,14 @@ def log_route_error(logger: logging.Logger, route: str, error: Exception, *, exc
         type(error).__name__,
         str(error),
         exc_info=exc_info,
-        stacklevel=2
+        stacklevel=2,
     )
 
 
 # ---------------------------------------------------------------------------
 # Batch & Fetch Runner (High-level orchestration)
 # ---------------------------------------------------------------------------
+
 
 def log_fetch_progress(
     logger: logging.Logger,
@@ -120,7 +163,7 @@ def log_fetch_progress(
 ) -> None:
     """Log a single query line in a multi-query fetch run."""
     logger.info(
-        "[FETCH][%s] progress  query=\"%s\"  completed=%d/%d  stored=%d%s",
+        '[FETCH][%s] progress  query="%s"  completed=%d/%d  stored=%d%s',
         source,
         query[:40],
         completed,
@@ -128,6 +171,7 @@ def log_fetch_progress(
         stored,
         f"  {extra}" if extra else "",
     )
+
 
 def log_fetch_query_error(
     logger: logging.Logger,
@@ -138,13 +182,14 @@ def log_fetch_query_error(
 ) -> None:
     """Log an error for a single query in a run."""
     logger.error(
-        "[FETCH][%s] error  query=\"%s\"  group=%s  err=%s",
+        '[FETCH][%s] error  query="%s"  group=%s  err=%s',
         source,
         query,
         group,
         error,
-        stacklevel=2
+        stacklevel=2,
     )
+
 
 def log_fetch_run_start(
     logger: logging.Logger,
@@ -165,6 +210,7 @@ def log_fetch_run_start(
         limit,
     )
 
+
 def log_fetch_run_done(
     logger: logging.Logger,
     source: str,
@@ -183,6 +229,7 @@ def log_fetch_run_done(
         elapsed,
         next_group,
     )
+
 
 def log_batch_rotation(
     logger: logging.Logger,
