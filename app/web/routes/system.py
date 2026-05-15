@@ -34,12 +34,13 @@ def set_country():
 
 @bp.route("/")
 def home():
-    log_route_start(logger, "/")
-    data = get_home_page_data()
-    data.setdefault("sections", [])
-    data.setdefault("trending", [])
-    log_route_success(logger, "/", template="index.html")
-    return render_template("index.html", **data)
+    # log_route_start(logger, "/")
+    # data = get_home_page_data()
+    # data.setdefault("sections", [])
+    # data.setdefault("trending", [])
+    # log_route_success(logger, "/", template="index.html")
+    # return render_template("index.html", **data)
+    return "OK"
 
 
 @bp.route("/about")
