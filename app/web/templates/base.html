@@ -1,4 +1,3 @@
-<!-- base.html -->
 <!doctype html>
 <html lang="en">
 
@@ -7,13 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   <title>{% block title %}{% endblock %}</title>
+  <meta name="verify-admitad" content="2cf02e443f" />
 
   <!-- Primary Meta Tags -->
   <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
   <meta name="description"
     content="{% block description %}Nexora is your premium source for technology, perfumes, accessories and fasion  news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
 
-  <meta name="verify-admitad" content="2cf02e443f" />
+
   {% block meta %}
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
