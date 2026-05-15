@@ -1,1 +1,11 @@
-{} 
+{
+  "news": {
+    "electronics:smartphones": 11,
+    "electronics:laptops": 11,
+    "electronics:tablets": 7,
+    "electronics:smartwatches": 7,
+    "electronics:earbuds": 11,
+    "electronics:headphones": 7,
+    "electronics:cameras": 11
+  }
+}
