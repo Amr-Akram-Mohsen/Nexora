@@ -1,17 +1,29 @@
 import json
+import logging
 from pathlib import Path
-from flask import current_app
+
+logger = logging.getLogger(__name__)
+
+_DEFAULT_CACHE = Path("instance") / "cache"
 
 
 class RotationState:
     """
     Manages persistent cursors for round-robin rotation of items (e.g. brands).
-    Stored in instance/cache/rotation.json.
+    Stored in instance/cache/<namespace>_rotation.json.
+
+    Safe to instantiate outside a Flask request context — falls back to a
+    relative path if the Flask app context is not available.
     """
 
     def __init__(self, namespace: str):
         self.namespace = namespace
-        self.cache_dir = Path(current_app.instance_path) / "cache"
+        try:
+            from flask import current_app
+
+            self.cache_dir = Path(current_app.instance_path) / "cache"
+        except RuntimeError:
+            self.cache_dir = _DEFAULT_CACHE
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.file_path = self.cache_dir / f"{namespace}_rotation.json"
         self.state = self._load()

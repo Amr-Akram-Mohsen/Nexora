@@ -13,14 +13,24 @@ from app.shared.utils.logging import log_runner_banner
 
 logger = logging.getLogger(__name__)
 
+# Sources in priority order — changing this order changes which source
+# gets first access to quota/DB writes when run synchronously.
+_SOURCES = [
+    ("newsapi",  run_newsapi_fetch),
+    ("gnews",    run_gnews_fetch),
+    ("youtube",  run_youtube_fetch),
+    ("rss",      run_rss_fetch),
+    ("reddit",   run_reddit_fetch),
+]
+
 
 def run_content_fetch():
     """
     Fetch all active content sources and return a summary report.
 
-    This coordinator orchestrates discovery across all configured sources
-    (RSS, NewsAPI, GNews, YouTube, Reddit). Each source uses its own
-    dedicated profile for fetch limits and cooldowns.
+    Each source is wrapped in its own try/except so a fatal crash in one
+    source (e.g. a transient DB issue at source N) does not prevent
+    subsequent sources from running.
     """
 
     log_runner_banner(
@@ -28,13 +38,18 @@ def run_content_fetch():
         "NEXORA GLOBAL DISCOVERY ENGINE STARTED",
     )
 
-    results = {
-        "newsapi": run_newsapi_fetch(),
-        "gnews": run_gnews_fetch(),
-        "youtube": run_youtube_fetch(),
-        "rss": run_rss_fetch(),
-        "reddit": run_reddit_fetch(),
-    }
+    results: dict = {}
+    for source_name, runner in _SOURCES:
+        try:
+            results[source_name] = runner()
+        except Exception as exc:  # unexpected — runner should never raise
+            logger.error(
+                "[Runner] %-10s UNEXPECTED_ERROR  err=%s",
+                source_name,
+                exc,
+                exc_info=True,
+            )
+            results[source_name] = {"status": "error", "error": str(exc), "count": 0}
 
     log_runner_banner(
         logger,

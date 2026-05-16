@@ -31,7 +31,7 @@ def fetch_newsapi_query(q_obj):
             "q": q_text,
             "language": "en",
             "sortBy": "publishedAt",
-            "pageSize": 80,
+            "pageSize": 20,
             "apiKey": api_key,
         },
         timeout=(5, 15),
@@ -74,7 +74,7 @@ def fetch_gnews_query(q_obj):
             "q": q_text,
             "lang": lang,
             "country": country,
-            "max": 30,
+            "max": 10,
             "apikey": api_key,
         },
         timeout=(3.05, 10),
@@ -116,7 +116,7 @@ def fetch_youtube_query(q_obj):
         "relevanceLanguage": "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en",
         "regionCode": region_code,
         "order": "relevance",
-        "maxResults": 5,
+        "maxResults": 10,
         "key": api_key,
     }
     if video_category_id:
@@ -178,7 +178,7 @@ def fetch_reddit_query(q_obj):
 
         subreddit = reddit.subreddit(sub_name)
 
-        submissions = list(subreddit.hot(limit=20))
+        submissions = list(subreddit.hot(limit=15))
 
         items = map_reddit(submissions, sub_name)
 

@@ -24,9 +24,14 @@ from app.shared.utils.logging import (
     log_item_ingested,
     log_item_skipped,
     log_quota_exhausted,
+    log_velocity_cooldown,
 )
 from app.shared.utils.query_cursor_state import QueryCursorState
 from app.shared.constants.source_profiles import SOURCE_PROFILES
+from app.shared.constants.query_intelligence import (
+    CATEGORY_VELOCITY,
+    VELOCITY_COOLDOWN_MULTIPLIER,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +74,9 @@ class IngestionWorkflow:
         self.profile = SOURCE_PROFILES[source_name]
 
         logger.info(
-            "[FETCH][%s] run started  limit=%s",
+            "[FETCH][%s] run started  max_queries_per_run=%s",
             self.source_name,
-            self.profile.fetch_limit,
+            self.profile.max_queries_per_run,
         )
 
     # ------------------------------------------------------------------
@@ -89,8 +94,16 @@ class IngestionWorkflow:
         """
         Execute the ingestion workflow for a single fetch run.
 
+        ``limit`` caps how many queries from the fresh task list actually
+        execute this run (burst protection).  When not explicitly provided,
+        the profile's ``max_queries_per_run`` is used automatically.
+
         Returns the number of newly stored content items.
         """
+        # Apply burst cap from profile unless an explicit override is provided.
+        if limit is None:
+            limit = self.profile.max_queries_per_run
+
         queries_registry = self.discovery.get_queries_by_section(
             source_filter=self.source_name
         )
@@ -116,7 +129,7 @@ class IngestionWorkflow:
                 ordered = queries[start:] + queries[:start]
 
                 for i, q in enumerate(ordered):
-                    flat_tasks.append((section, category, q, (start + i) % total))
+                    flat_tasks.append((section, category, q, (start + i) % total, total))
 
         if not flat_tasks:
             logger.info(
@@ -127,13 +140,18 @@ class IngestionWorkflow:
 
         def get_fresh_tasks(tasks):
             fresh = []
-            for sec, cat, q_obj, idx in tasks:
+            for sec, cat, q_obj, idx, total in tasks:
                 q_text = q_obj.get("query", "")
+                # Extract the leaf category slug from composite "group:leaf" key
+                cat_slug = cat.split(":")[-1] if ":" in cat else cat
+                velocity = CATEGORY_VELOCITY.get(cat_slug, "medium")
+                multiplier = VELOCITY_COOLDOWN_MULTIPLIER.get(velocity, 1.0)
+                effective_cooldown = self.profile.cooldown_hours * multiplier
                 cache_key = f"{self.source_name}:{cat}:{q_text}"
                 if self.cooldown_service.should_refetch(
-                    sec, cache_key, hours=self.profile.cooldown_hours
+                    sec, cache_key, hours=effective_cooldown
                 ):
-                    fresh.append((sec, cat, q_obj, idx))
+                    fresh.append((sec, cat, q_obj, idx, total))
             return fresh
 
         # ── Taxonomy-group batching & Cooldown filtering ──────────────────────
@@ -162,8 +180,8 @@ class IngestionWorkflow:
 
                 # Filter tasks for this group
                 group_tasks = [
-                    (sec, cat, q, idx)
-                    for sec, cat, q, idx in flat_tasks
+                    (sec, cat, q, idx, total)
+                    for sec, cat, q, idx, total in flat_tasks
                     if cat.startswith(group) or group in cat
                 ]
 
@@ -218,15 +236,19 @@ class IngestionWorkflow:
                 )
                 return 0
 
-        # ── Apply limit cap ──────────────────────────────────────────
+        # ── Apply burst-protection cap ────────────────────────────────
+        # max_queries_per_run is the per-execution ceiling that prevents a cold
+        # start (or cache reset) from consuming the full daily API quota at
+        # once.  Cooldown hours handle temporal spreading; this caps the burst.
+        # We preserve cursor ordering (no shuffle) so the deterministic
+        # cursor progression is never disrupted.
         total_eligible = len(flat_tasks)
-        # if limit and limit < len(flat_tasks):
-        #     random.shuffle(flat_tasks)
-        #     flat_tasks = flat_tasks[:limit]
+        if limit and limit < len(flat_tasks):
+            flat_tasks = flat_tasks[:limit]
 
         total_tasks = len(flat_tasks)
 
-        # ── Run banner (full date+time stamps this run) ──────────────
+        # ── Run banner ────────────────────────────────────────────────
         log_fetch_run_start(
             logger,
             self.source_name,
@@ -241,7 +263,7 @@ class IngestionWorkflow:
         completed = 0
         t_run = time.monotonic()
 
-        for section, category, q_obj, idx in flat_tasks:
+        for section, category, q_obj, idx, total in flat_tasks:
             q_text = q_obj.get("query", "")
             t_q = time.monotonic()
 
@@ -250,7 +272,6 @@ class IngestionWorkflow:
                 stored_n, updated_n, fetched_n = self._process_query(
                     session=session,
                     object_type=object_type,
-                    # source_filter=source_filter,
                     fetcher=fetcher,
                     section=section,
                     category=category,
@@ -258,7 +279,8 @@ class IngestionWorkflow:
                     fetch_params=fetch_params,
                 )
 
-                cursor_state.update(section, category, idx)
+                # FIX: advance to next query (not just record current index)
+                cursor_state.update(section, category, idx, total)
             except (PipelineFatalError, PipelineQuotaExceededError):
                 session.rollback()
                 logger.info(
@@ -339,11 +361,25 @@ class IngestionWorkflow:
         Raises on fatal/quota errors so the caller can halt the run.
         """
         q_text = q_obj.get("query", "")
+        cat_slug = category.split(":")[-1] if ":" in category else category
+        velocity = CATEGORY_VELOCITY.get(cat_slug, "medium")
+        multiplier = VELOCITY_COOLDOWN_MULTIPLIER.get(velocity, 1.0)
+        effective_cooldown = self.profile.cooldown_hours * multiplier
         cache_key = f"{self.source_name}:{category}:{q_text}"
 
-        # 1. Cooldown check
+        if effective_cooldown != self.profile.cooldown_hours:
+            log_velocity_cooldown(
+                logger,
+                self.source_name,
+                category=cat_slug,
+                velocity=velocity,
+                base_hours=self.profile.cooldown_hours,
+                effective_hours=effective_cooldown,
+            )
+
+        # 1. Cooldown check (velocity-scaled)
         if not self.cooldown_service.should_refetch(
-            section, cache_key, hours=self.profile.cooldown_hours
+            section, cache_key, hours=effective_cooldown
         ):
             return 0, 0, 0
 

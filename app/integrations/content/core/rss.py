@@ -2,7 +2,12 @@
 import logging
 from datetime import datetime
 import feedparser
-from app.shared.utils.logging import log_integration_start, log_integration_success, log_integration_error, log_integration_warning
+from app.shared.utils.logging import (
+    log_integration_start,
+    log_integration_success,
+    log_integration_error,
+    log_integration_warning,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +16,10 @@ _NAME = "rss"
 # Feed Registry
 RSS_FEEDS = {
     "reviews": {
-        "electronics": ["https://www.gsmarena.com/rss-news-reviews.php3", "https://www.techradar.com/rss"],
+        "electronics": [
+            "https://www.gsmarena.com/rss-news-reviews.php3",
+            "https://www.techradar.com/rss",
+        ],
         "perfumes": ["https://cafleurebon.com/feed/"],
         "accessories": ["https://www.ablogtowatch.com/feed/"],
     },
@@ -43,7 +51,12 @@ def _extract_image_url(entry) -> str | None:
     if media_content and isinstance(media_content, list):
         for media in media_content:
             url = media.get("url")
-            if url and ("image" in media.get("type", "") or url.split("?")[0].lower().endswith((".jpg", ".jpeg", ".png", ".webp"))):
+            if url and (
+                "image" in media.get("type", "")
+                or url.split("?")[0]
+                .lower()
+                .endswith((".jpg", ".jpeg", ".png", ".webp"))
+            ):
                 return url
 
     # 2. Enclosures
@@ -87,8 +100,12 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
     modified = kwargs.get("modified")
 
     try:
-        feed = feedparser.parse(feed_url, etag=etag, modified=modified, agent="NexoraBot/1.0")
-        status = getattr(feed, "status", 200)  # feedparser omits .status on some CDN responses
+        feed = feedparser.parse(
+            feed_url, etag=etag, modified=modified, agent="NexoraBot/1.0"
+        )
+        status = getattr(
+            feed, "status", 200
+        )  # feedparser omits .status on some CDN responses
 
         # 304 Not Modified — nothing new, skip processing
         if status == 304:
@@ -96,12 +113,18 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
             return {"items": [], "etag": etag, "modified": modified}
 
         if not getattr(feed, "entries", None):
-            log_integration_warning(logger, _NAME, reason="empty_feed", url=feed_url, status=status)
-            return {"items": [], "etag": feed.get("etag"), "modified": feed.get("modified")}
+            log_integration_warning(
+                logger, _NAME, reason="empty_feed", url=feed_url, status=status
+            )
+            return {
+                "items": [],
+                "etag": feed.get("etag"),
+                "modified": feed.get("modified"),
+            }
 
         source_name = feed.feed.get("title") or feed_url
         raw_items = []
-        for entry in feed.entries[:30]:
+        for entry in feed.entries[:25]:
             url = getattr(entry, "link", None)
             title = getattr(entry, "title", None)
             if not url or not title:
@@ -112,23 +135,31 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
                 try:
                     pub_date = datetime(*entry.published_parsed[:6])
                 except (TypeError, ValueError) as date_err:
-                    logger.debug("[INTEGRATION][%s] date parse failed  url=%s  err=%s", _NAME, url, date_err)
+                    logger.debug(
+                        "[INTEGRATION][%s] date parse failed  url=%s  err=%s",
+                        _NAME,
+                        url,
+                        date_err,
+                    )
 
-            raw_items.append({
-                "title":        title,
-                "description":  getattr(entry, "summary", "") or getattr(entry, "description", ""),
-                "content":      _extract_content(entry),
-                "url":          url,
-                "image_url":    _extract_image_url(entry),
-                "published_at": pub_date,
-                "source_name":  source_name,
-            })
+            raw_items.append(
+                {
+                    "title": title,
+                    "description": getattr(entry, "summary", "")
+                    or getattr(entry, "description", ""),
+                    "content": _extract_content(entry),
+                    "url": url,
+                    "image_url": _extract_image_url(entry),
+                    "published_at": pub_date,
+                    "source_name": source_name,
+                }
+            )
 
         log_integration_success(logger, _NAME, items=len(raw_items), url=feed_url)
         return {
             "items": raw_items,
             "etag": feed.get("etag"),
-            "modified": feed.get("modified")
+            "modified": feed.get("modified"),
         }
 
     except Exception as e:

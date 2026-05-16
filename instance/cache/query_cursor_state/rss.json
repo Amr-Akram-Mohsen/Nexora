@@ -1,1 +1,8 @@
-{} 
+{
+  "reviews": {
+    "electronics": 0
+  },
+  "news": {
+    "electronics": 0
+  }
+}

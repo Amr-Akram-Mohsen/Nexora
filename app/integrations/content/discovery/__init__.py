@@ -14,6 +14,7 @@ from app.shared.constants.query_intelligence import (
     SECTION_DEFAULT_INTENTS,
     CATEGORY_TOPIC_MAP,
 )
+from app.shared.constants.source_profiles import SOURCE_PROFILES
 
 from .query_generator import (
     generate_discovery_queries,
@@ -60,6 +61,8 @@ class DiscoveryManager:
             sec_slug = generate_slug(sec["name"])
             registry[sec_slug] = {}
 
+            category_index = 0  # stable counter for deterministic modifier slots
+
             for cat_group in categories_data:
                 parent_slug = generate_slug(cat_group["name"])
 
@@ -70,15 +73,18 @@ class DiscoveryManager:
                         continue
 
                     # --------------------------------------------------
-                    # Source alignment
+                    # Source alignment (primary gate)
                     # --------------------------------------------------
 
-                    allowed_sources = CATEGORY_SOURCE_OVERRIDES.get(
+                    override_sources = CATEGORY_SOURCE_OVERRIDES.get(
                         parent_slug, {}
                     ).get(sec_slug)
-
-                    if allowed_sources is None:
-                        allowed_sources = DEFAULT_SOURCE_ALIGNMENT.get(sec_slug, [])
+                    has_override = override_sources is not None
+                    allowed_sources = (
+                        override_sources
+                        if has_override
+                        else DEFAULT_SOURCE_ALIGNMENT.get(sec_slug, [])
+                    )
 
                     if source_filter and source_filter not in allowed_sources:
                         logger.debug(
@@ -88,6 +94,29 @@ class DiscoveryManager:
                             cat_slug,
                         )
                         continue
+
+                    # --------------------------------------------------
+                    # SourceProfile.allowed_sections (secondary gate)
+                    # Only enforced when no category-level override is present.
+                    # If an explicit override includes this source for this
+                    # section, we trust that intentional decision over the
+                    # profile-level hint (e.g. YouTube used for perfumes:news).
+                    # --------------------------------------------------
+
+                    if source_filter and not has_override:
+                        profile = SOURCE_PROFILES.get(source_filter)
+                        if (
+                            profile
+                            and profile.allowed_sections
+                            and sec_slug not in profile.allowed_sections
+                        ):
+                            logger.debug(
+                                "[DISCOVERY] profile_rejected  source=%s  section=%s  category=%s",
+                                source_filter,
+                                sec_slug,
+                                cat_slug,
+                            )
+                            continue
 
                     # --------------------------------------------------
                     # Query generation
@@ -106,7 +135,10 @@ class DiscoveryManager:
                         ),
                         topics=CATEGORY_TOPIC_MAP.get(cat_slug, []),
                         facets_data=self.taxonomy.get("facets", {}),
+                        category_query_index=category_index,
                     )
+
+                    category_index += 1
 
                     if not queries:
                         continue
@@ -118,11 +150,15 @@ class DiscoveryManager:
         total_queries = sum(
             len(qs) for sec_cats in registry.values() for qs in sec_cats.values()
         )
+        # Count only sections that actually produced queries (after source filtering).
+        # This is what operators care about — not the total taxonomy sections.
+        sections_with_queries = sum(1 for sec_cats in registry.values() if sec_cats)
 
         logger.info(
-            "[DISCOVERY] source=%s  queries=%d  sections=%d",
+            "[DISCOVERY] source=%s  queries=%d  sections_with_queries=%d/%d",
             source_filter or "(all)",
             total_queries,
+            sections_with_queries,
             len(registry),
         )
 

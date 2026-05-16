@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 2c3395f1ef3d
+Revision ID: 4cf6e3e662b2
 Revises: 
-Create Date: 2026-05-07 22:05:33.589092
+Create Date: 2026-05-16 04:38:42.066289
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2c3395f1ef3d'
+revision = '4cf6e3e662b2'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,6 +26,10 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('date', 'api_name', name='uq_api_usage_date_api')
     )
+    # Create 'articles' first WITHOUT the FK to article_sources.
+    # article_sources references articles.id, and articles.primary_source_id
+    # references article_sources.id — circular dependency.
+    # Resolution: create articles → article_sources → add FK back.
     op.create_table('articles',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=300), nullable=False),
@@ -36,10 +40,18 @@ def upgrade():
     sa.Column('quality_score', sa.Float(), nullable=True),
     sa.Column('is_content_scraped', sa.Boolean(), nullable=True),
     sa.Column('content_source', sa.String(length=50), nullable=True),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('last_enrichment_attempt', sa.DateTime(), nullable=True),
     sa.Column('body', sa.Text(), nullable=True),
     sa.Column('image_url', sa.Text(), nullable=True),
+    sa.Column('canonical_url', sa.String(length=500), nullable=True),
+    sa.Column('primary_source_id', sa.Integer(), nullable=True),  # FK added after article_sources
     sa.PrimaryKeyConstraint('id')
     )
+    with op.batch_alter_table('articles', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_articles_canonical_url'), ['canonical_url'], unique=False)
+        batch_op.create_index(batch_op.f('ix_articles_status'), ['status'], unique=False)
+
     op.create_table('brands',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=False),
@@ -111,13 +123,20 @@ def upgrade():
     sa.Column('last_fetched_at', sa.DateTime(), nullable=False),
     sa.Column('category', sa.String(length=100), nullable=True),
     sa.Column('source', sa.String(length=50), nullable=True),
+    sa.Column('etag', sa.String(length=255), nullable=True),
+    sa.Column('last_modified', sa.String(length=100), nullable=True),
     sa.Column('failure_count', sa.Integer(), nullable=True),
+    sa.Column('consecutive_failures', sa.Integer(), nullable=True),
+    sa.Column('success_count', sa.Integer(), nullable=True),
     sa.Column('last_failed_at', sa.DateTime(), nullable=True),
+    sa.Column('last_error', sa.Text(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('section', 'query_text', name='unique_fetch_per_query')
     )
     with op.batch_alter_table('last_api_fetch', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_last_api_fetch_category'), ['category'], unique=False)
+        batch_op.create_index(batch_op.f('ix_last_api_fetch_is_active'), ['is_active'], unique=False)
         batch_op.create_index(batch_op.f('ix_last_api_fetch_normalized_query'), ['normalized_query'], unique=False)
         batch_op.create_index(batch_op.f('ix_last_api_fetch_source'), ['source'], unique=False)
 
@@ -167,12 +186,38 @@ def upgrade():
     sa.Column('domain', sa.String(length=255), nullable=False),
     sa.Column('logo_url', sa.Text(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('trust_score', sa.Float(), nullable=True),
+    sa.Column('authority_score', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('sources', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_sources_domain'), ['domain'], unique=True)
         batch_op.create_index(batch_op.f('ix_sources_slug'), ['slug'], unique=True)
+
+    # article_sources requires both articles.id and sources.id to exist.
+    # articles was created above (without its FK); sources was just created.
+    # Now it is safe to create article_sources and then wire the final FK.
+    op.create_table('article_sources',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('article_id', sa.Integer(), nullable=False),
+    sa.Column('source_id', sa.Integer(), nullable=False),
+    sa.Column('url', sa.Text(), nullable=False),
+    sa.Column('published_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
+    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('url')
+    )
+    with op.batch_alter_table('article_sources', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_article_sources_published_at'), ['published_at'], unique=False)
+
+    # Complete the circle: add the FK from articles.primary_source_id → article_sources.id
+    with op.batch_alter_table('articles', schema=None) as batch_op:
+        batch_op.create_foreign_key(
+            'fk_articles_primary_source_id',
+            'article_sources',
+            ['primary_source_id'],
+            ['id'],
+        )
 
     op.create_table('stores',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -235,19 +280,6 @@ def upgrade():
     with op.batch_alter_table('videos', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_videos_platform'), ['platform'], unique=False)
 
-    op.create_table('article_sources',
-    sa.Column('article_id', sa.Integer(), nullable=False),
-    sa.Column('source_id', sa.Integer(), nullable=False),
-    sa.Column('url', sa.Text(), nullable=False),
-    sa.ForeignKeyConstraint(['article_id'], ['articles.id'], ),
-    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
-    sa.PrimaryKeyConstraint('article_id', 'source_id'),
-    sa.UniqueConstraint('url')
-    )
-    with op.batch_alter_table('article_sources', schema=None) as batch_op:
-        batch_op.create_index('ix_article_sources_article', ['article_id'], unique=False)
-        batch_op.create_index('ix_article_sources_source', ['source_id'], unique=False)
-
     op.create_table('attributes',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=80), nullable=False),
@@ -284,6 +316,7 @@ def upgrade():
     sa.Column('published_at', sa.DateTime(), nullable=False),
     sa.Column('ingested_at', sa.DateTime(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('is_published', sa.Boolean(), nullable=True),
     sa.Column('comment_count', sa.Integer(), nullable=True),
     sa.Column('view_count', sa.Integer(), nullable=True),
     sa.Column('score', sa.Float(), nullable=True),
@@ -311,6 +344,7 @@ def upgrade():
         batch_op.create_index('ix_contents_category_published_at', ['category_id', 'published_at'], unique=False)
         batch_op.create_index('ix_contents_gender_id', ['gender_id'], unique=False)
         batch_op.create_index('ix_contents_intent_id', ['intent_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_contents_is_published'), ['is_published'], unique=False)
         batch_op.create_index(batch_op.f('ix_contents_object_id'), ['object_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_contents_object_type'), ['object_type'], unique=False)
         batch_op.create_index('ix_contents_price_tier_id', ['price_tier_id'], unique=False)
@@ -663,6 +697,7 @@ def downgrade():
         batch_op.drop_index('ix_contents_price_tier_id')
         batch_op.drop_index(batch_op.f('ix_contents_object_type'))
         batch_op.drop_index(batch_op.f('ix_contents_object_id'))
+        batch_op.drop_index(batch_op.f('ix_contents_is_published'))
         batch_op.drop_index('ix_contents_intent_id')
         batch_op.drop_index('ix_contents_gender_id')
         batch_op.drop_index('ix_contents_category_published_at')
@@ -677,11 +712,6 @@ def downgrade():
 
     op.drop_table('comments')
     op.drop_table('attributes')
-    with op.batch_alter_table('article_sources', schema=None) as batch_op:
-        batch_op.drop_index('ix_article_sources_source')
-        batch_op.drop_index('ix_article_sources_article')
-
-    op.drop_table('article_sources')
     with op.batch_alter_table('videos', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_videos_platform'))
 
@@ -711,6 +741,7 @@ def downgrade():
     with op.batch_alter_table('last_api_fetch', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_last_api_fetch_source'))
         batch_op.drop_index(batch_op.f('ix_last_api_fetch_normalized_query'))
+        batch_op.drop_index(batch_op.f('ix_last_api_fetch_is_active'))
         batch_op.drop_index(batch_op.f('ix_last_api_fetch_category'))
 
     op.drop_table('last_api_fetch')
@@ -732,6 +763,16 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_brands_industry'))
 
     op.drop_table('brands')
+    # Drop the cross-FK first, then article_sources, then articles
+    with op.batch_alter_table('articles', schema=None) as batch_op:
+        batch_op.drop_constraint('fk_articles_primary_source_id', type_='foreignkey')
+        batch_op.drop_index(batch_op.f('ix_articles_status'))
+        batch_op.drop_index(batch_op.f('ix_articles_canonical_url'))
+
     op.drop_table('articles')
+    with op.batch_alter_table('article_sources', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_article_sources_published_at'))
+
+    op.drop_table('article_sources')
     op.drop_table('api_usage')
     # ### end Alembic commands ###

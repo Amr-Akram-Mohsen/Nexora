@@ -259,3 +259,27 @@ def log_cooldown_skip(logger: logging.Logger, reason: str, **kwargs) -> None:
     """Log a fetch skip due to cooldown."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.info("[COOLDOWN] skip  reason=%s  %s", reason, extras)
+
+
+def log_velocity_cooldown(
+    logger: logging.Logger,
+    source: str,
+    *,
+    category: str,
+    velocity: str,
+    base_hours: float,
+    effective_hours: float,
+) -> None:
+    """Log when velocity scaling changes the effective cooldown for a category.
+
+    Only emitted at DEBUG level to avoid noise; useful when diagnosing why
+    a category is fetched more or less often than the base profile suggests.
+    """
+    logger.debug(
+        "[COOLDOWN][%s] velocity_scaled  category=%s  velocity=%s  base=%.1fh  effective=%.1fh",
+        source,
+        category,
+        velocity,
+        base_hours,
+        effective_hours,
+    )

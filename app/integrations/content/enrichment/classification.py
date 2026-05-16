@@ -43,8 +43,15 @@ def classify_content_metadata(
         )
 
         # 1. Classification (deterministic from query)
+        #    The workflow passes composite slugs like "electronics:smartphones".
+        #    We store only the leaf ("smartphones") in category_slug so that
+        #    the taxonomy resolver can find it in the DB by leaf slug.
         data["section_slug"] = section_slug
-        data["category_slug"] = category_slug
+        # Strip parent prefix from composite discovery keys, e.g. "electronics:smartphones" → "smartphones"
+        leaf_slug = category_slug.split(":")[-1] if ":" in category_slug else category_slug
+        data["category_slug"] = leaf_slug
+        # Keep the full composite key for traceability / debugging
+        data["discovery_category"] = category_slug
 
         # 2. Topics (from discovery query context)
         data["topic_slugs"] = q_obj.get("topics", [])
