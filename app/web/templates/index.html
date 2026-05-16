@@ -19,7 +19,7 @@
   {"section":"recent","section_title":"recently added", "cards": recently_added, "carousel": true },
   {"section":"tutorials","section_title":"how-to guides & tutorials", "cards": tutorials } ] %}
 
-  {% for s in sections %}
+  {% for s in sections if s.cards %}
   {% call section(s.section_title, s.section ) %}
   {{ grid(s.cards, carousel=s.get('carousel', false)) }}
   {% endcall %}
