@@ -13,12 +13,21 @@ logger = logging.getLogger(__name__)
 
 _NAME = "rss"
 
+IRRELEVANT_RSS_KEYWORDS = [
+    "NYT Connections", "NYT Strands", "Quordle", "Wordle", "Eurovision",
+    "How to watch", "Zee TV", "Star Plus", "Tubi", "coffee habit",
+    "Memorial Day sale", "running shoes", "lawnmowers",
+    "VPN", "stream online", "free movies", "best deals", "save money"
+]
+
 # Feed Registry
 RSS_FEEDS = {
     "reviews": {
         "electronics": [
             "https://www.gsmarena.com/rss-news-reviews.php3",
-            "https://www.techradar.com/rss",
+            "https://www.techradar.com/phones/rss",
+            "https://www.techradar.com/laptops/rss",
+            "https://www.techradar.com/tablets/rss",
         ],
         "perfumes": ["https://cafleurebon.com/feed/"],
         "accessories": ["https://www.ablogtowatch.com/feed/"],
@@ -128,6 +137,10 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
             url = getattr(entry, "link", None)
             title = getattr(entry, "title", None)
             if not url or not title:
+                continue
+
+            # Skip irrelevant content
+            if any(k.lower() in title.lower() for k in IRRELEVANT_RSS_KEYWORDS):
                 continue
 
             pub_date = None

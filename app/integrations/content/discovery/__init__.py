@@ -72,6 +72,10 @@ class DiscoveryManager:
                     if cat_slug == "uncategorized":
                         continue
 
+                    # Temporarily skip categories the user already has enough data for
+                    if cat_slug in ["smartphones", "laptops"]:
+                        continue
+
                     # --------------------------------------------------
                     # Source alignment (primary gate)
                     # --------------------------------------------------

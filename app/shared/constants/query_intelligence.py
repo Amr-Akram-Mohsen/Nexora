@@ -132,18 +132,18 @@ INTENT_KEYWORDS = {
 }
 
 # Sources that support (OR / AND / Parentheses)
-BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "gnews", "reddit"]
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "reddit"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS
 # ==========================================================
 
 SECTION_DEFAULT_INTENTS = {
-    "news":      ["News"],
-    "reviews":   ["Review"],          # "First Impressions" generates near-identical queries
+    "news": ["News"],
+    "reviews": ["Review"],  # "First Impressions" generates near-identical queries
     "tutorials": ["Tutorial"],
-    "trends":    ["Top List"],         # "Buying Guide" overlaps heavily with "Top List"
-    "community": ["Comparison"],      # "Review" is already covered by the reviews section
+    "trends": ["Top List"],  # "Buying Guide" overlaps heavily with "Top List"
+    "community": ["Comparison"],  # "Review" is already covered by the reviews section
 }
 
 
@@ -654,22 +654,22 @@ EXPLORATION_MODIFIERS = [
 
 SEARCH_KEYWORD_EXPANSIONS = {
     # Electronics
-    "smartphones":    "(android phone OR flagship phone OR camera phone OR mobile phone)",
-    "laptops":        "(ultrabook OR gaming laptop OR creator laptop OR MacBook OR notebook)",
-    "tablets":        "(iPad OR android tablet OR drawing tablet OR e-reader)",
-    "smartwatches":   "(fitness tracker OR smart band OR wearable OR GPS watch)",
-    "earbuds":        "(wireless earbuds OR true wireless OR in-ear headphones OR AirPods)",
-    "headphones":     "(over-ear headphones OR noise cancelling OR wireless headset)",
-    "cameras":        "(mirrorless camera OR DSLR OR action camera OR compact camera)",
+    "smartphones": "(android phone OR flagship phone OR camera phone OR mobile phone)",
+    "laptops": "(ultrabook OR gaming laptop OR creator laptop OR MacBook OR notebook)",
+    "tablets": "(iPad OR android tablet OR drawing tablet OR e-reader)",
+    "smartwatches": "(fitness tracker OR smart band OR wearable OR GPS watch)",
+    "earbuds": "(wireless earbuds OR true wireless OR in-ear headphones OR AirPods)",
+    "headphones": "(over-ear headphones OR noise cancelling OR wireless headset)",
+    "cameras": "(mirrorless camera OR DSLR OR action camera OR compact camera)",
     # Perfumes
-    "perfumes":        "(fragrance OR cologne OR eau de parfum OR scent OR perfume review)",
+    "perfumes": "(fragrance OR cologne OR eau de parfum OR scent OR perfume review)",
     "niche-artisanal": "(niche fragrance OR artisan perfume OR indie scent OR niche perfume)",
-    "oud-oriental":    "(oud fragrance OR oriental perfume OR arabic perfume OR bakhoor)",
+    "oud-oriental": "(oud fragrance OR oriental perfume OR arabic perfume OR bakhoor)",
     # Accessories
-    "watches":        "(automatic watch OR chronograph OR dive watch OR luxury watch)",
-    "bags":           "(backpack review OR leather bag OR travel bag OR everyday carry)",
-    "sunglasses":     "(polarized sunglasses OR UV protection OR designer sunglasses)",
-    "jewelry":        "(gold jewelry OR silver jewelry OR minimalist jewelry OR fine jewelry)",
+    "watches": "(automatic watch OR chronograph OR dive watch OR luxury watch)",
+    "bags": "(backpack review OR leather bag OR travel bag OR everyday carry)",
+    "sunglasses": "(polarized sunglasses OR UV protection OR designer sunglasses)",
+    "jewelry": "(gold jewelry OR silver jewelry OR minimalist jewelry OR fine jewelry)",
 }
 
 
@@ -677,7 +677,7 @@ SEARCH_KEYWORD_EXPANSIONS = {
 # Keep these category-neutral and realistic. Do NOT add category-specific
 # terms here (those belong in FEATURE_MAP / CATEGORY_PROBLEM_MAP).
 QUERY_SUFFIX_ROTATIONS = [
-    "",           # No suffix (most common — keeps query clean)
+    "",  # No suffix (most common — keeps query clean)
     "under $500",
     "for beginners",
     "for travel",

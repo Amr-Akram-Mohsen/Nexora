@@ -25,7 +25,7 @@ def safe_get_json(
     except requests.exceptions.RequestException as e:
         status = getattr(e.response, "status_code", None)
 
-        if status in (403, 429):
+        if status in (403, 429) or (status is None and "429" in str(e)):
             log_integration_error(logger, source_name, e)
             raise PipelineQuotaExceededError(f"{source_name} quota exceeded")
 

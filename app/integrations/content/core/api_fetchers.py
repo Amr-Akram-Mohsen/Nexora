@@ -13,7 +13,11 @@ from .fetchers_mappers import map_newsapi, map_gnews, map_youtube, map_reddit
 logger = logging.getLogger(__name__)
 
 
-def fetch_newsapi_query(q_obj):
+import time
+import re
+
+
+def fetch_newsapi_query(q_obj, **kwargs):
     api_key = current_app.config.get("NEWS_API_KEY")
     if not api_key:
         log_integration_warning(logger, "newsapi", reason="no_api_key")
@@ -22,6 +26,9 @@ def fetch_newsapi_query(q_obj):
     q_text = q_obj.get("query", "")
 
     log_integration_start(logger, "newsapi", query=q_text)
+    # 429 Mitigation: NewsAPI has a strict per-second rate limit on free tier.
+    # Increasing to 2.5s to be safer against burst detections.
+    time.sleep(2.5)
     session = _get_session()
 
     data = safe_get_json(
@@ -40,7 +47,7 @@ def fetch_newsapi_query(q_obj):
     )
 
     items = map_newsapi(data)
-    if items:
+    if isinstance(items, list):
         log_integration_success(logger, "newsapi", items=len(items), query=q_text)
     else:
         log_integration_warning(
@@ -50,7 +57,7 @@ def fetch_newsapi_query(q_obj):
     return items
 
 
-def fetch_gnews_query(q_obj):
+def fetch_gnews_query(q_obj, **kwargs):
     api_key = current_app.config.get("GNEWS_API_KEY")
     if not api_key:
         log_integration_warning(logger, "gnews", reason="no_api_key")
@@ -59,8 +66,12 @@ def fetch_gnews_query(q_obj):
     _ARABIC_CHARS = set("ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي")
 
     q_text = q_obj.get("query", "")
-    # Sanitize: '&' in category names (e.g. "Niche & Artisanal") breaks GNews URL parsing
+    # Sanitize: '&' and special chars in category names break GNews URL parsing
     q_text = q_text.replace(" & ", " and ").replace("&", "and")
+    # GNews uses '-' for the NOT operator, which can cause 400 Bad Requests.
+    q_text = q_text.replace("-", " ")
+    q_text = re.sub(r"[^\w\s\(\)\"\'OR]", " ", q_text)
+    q_text = re.sub(r"\s+", " ", q_text).strip()
     country = q_obj.get("region", "sa").lower()
     lang = "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en"
 
@@ -84,7 +95,7 @@ def fetch_gnews_query(q_obj):
 
     items = map_gnews(data, region=country)
 
-    if items:
+    if isinstance(items, list):
         log_integration_success(logger, "gnews", items=len(items), query=q_text)
     else:
         log_integration_warning(
@@ -94,7 +105,7 @@ def fetch_gnews_query(q_obj):
     return items
 
 
-def fetch_youtube_query(q_obj):
+def fetch_youtube_query(q_obj, **kwargs):
     api_key = current_app.config.get("YOUTUBE_API_KEY")
     if not api_key:
         log_integration_warning(logger, "youtube", reason="no_api_key")
@@ -135,7 +146,7 @@ def fetch_youtube_query(q_obj):
 
     items = map_youtube(data, region=region_code)
 
-    if items:
+    if isinstance(items, list):
         log_integration_success(logger, "youtube", items=len(items), query=q_text)
     else:
         log_integration_warning(
@@ -145,7 +156,7 @@ def fetch_youtube_query(q_obj):
     return items
 
 
-def fetch_reddit_query(q_obj):
+def fetch_reddit_query(q_obj, **kwargs):
     """
     Pure fetcher for Reddit.
     q_obj["query"] is the subreddit name or a search query.

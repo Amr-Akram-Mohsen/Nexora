@@ -122,25 +122,38 @@ def build_query_variants(
 
     templates = QUERY_TEMPLATES.get(section_slug, ["{category}"])
 
+    # Sanitize category name for sensitive parsers (GNews)
+    if source == "gnews":
+        category_name = category_name.replace(" & ", " and ").replace("&", "and")
+
     category_terms = [category_name]
-    # Brand is placed at position 1 (right after the category name) so it is
-    # always included even when max_terms caps the list to 3 for YouTube/RSS.
-    # Without this, brands appended last would be silently dropped.
     if selected_brand:
         category_terms.append(selected_brand)
     category_terms.extend(keywords)
+
+    if source == "gnews":
+        if selected_brand:
+            category_terms = [f"{selected_brand} {category_name}", selected_brand]
+        else:
+            category_terms = [category_name]
 
     expanded_terms = []
     slug = category_slug.lower()
     expansion = SEARCH_KEYWORD_EXPANSIONS.get(slug)
     is_bool_source = source in BOOLEAN_SUPPORTED_SOURCES
 
+    is_bool_source = source in BOOLEAN_SUPPORTED_SOURCES
+
     for term in category_terms:
         if expansion and is_bool_source:
             # Combine term + expansion into a single OR-clause.
-            # This gives boolean sources broad coverage WITHOUT adding extra
-            # entries to expanded_terms (no multiplication).
-            inner = expansion.strip("()")
+            # GNews: limit inner OR-block size to avoid "unexpected_response_shape"
+            if source == "gnews":
+                inner_list = expansion.strip("()").split(" OR ")[:2]
+                inner = " OR ".join(inner_list)
+            else:
+                inner = expansion.strip("()")
+
             expanded_terms.append(f"({term} OR {inner})")
         else:
             expanded_terms.append(term)
@@ -162,18 +175,53 @@ def build_query_variants(
         if is_boolean:
             return q_str
         import re
-        match = re.search(r"\(([^)]+)\)", q_str)
-        if match:
+        while True:
+            match = re.search(r"\(([^)]+)\)", q_str)
+            if not match:
+                break
             options = match.group(1).split(" OR ")
-            return q_str.replace(match.group(0), options[0].strip())
+            q_str = q_str.replace(match.group(0), options[0].strip())
         return q_str
+
+    def _sanitize_query(q_str: str, source: str) -> str:
+        q_str = q_str.replace("  ", " ")
+        tokens = q_str.split()
+        seen = set()
+        deduped = []
+        for t in tokens:
+            clean_tl = t.lower().replace("(", "").replace(")", "")
+            if clean_tl in ["or", "and"] or t in ["(", ")"]:
+                deduped.append(t)
+            elif clean_tl not in seen:
+                seen.add(clean_tl)
+                deduped.append(t)
+        
+        q_str = " ".join(deduped)
+
+        import re
+        if source in ["gnews", "newsapi"]:
+            def limit_or_2(m):
+                parts = m.group(1).split(" OR ")
+                return "(" + " OR ".join(parts[:2]) + ")"
+            q_str = re.sub(r"\(([^)]+)\)", limit_or_2, q_str)
+            
+            if source == "gnews":
+                toks = q_str.split()
+                if len(toks) > 12:
+                    q_str = " ".join(toks[:12])
+
+        q_str = re.sub(r"\(\s*(?:OR\s+)+", "(", q_str)
+        q_str = re.sub(r"(?:\s+OR)+\s*\)", ")", q_str)
+        q_str = re.sub(r"\bOR\s+OR\b", "OR", q_str)
+        q_str = re.sub(r"\(\s*\)", "", q_str)
+        q_str = re.sub(r"^\s*OR\b|\bOR\s*$", "", q_str)
+        
+        return q_str.replace("  ", " ").strip()
 
     slot_base = category_query_index  # deterministic starting offset for modifiers
 
     for t_idx, template in enumerate(templates):
         for e_idx, term in enumerate(expanded_terms[:max_terms]):
-            # For boolean sources, combine intent terms into one OR block so
-            # they cover multiple signals in a single query (no loop overhead).
             if is_bool_source and len(intent_terms) > 1:
                 intent_block = f"({' OR '.join(intent_terms[:3])})"
                 process_intent_terms = [intent_block]
@@ -181,7 +229,6 @@ def build_query_variants(
                 process_intent_terms = intent_terms[:max_intents]
 
             for i_idx, intent_term in enumerate(process_intent_terms):
-                # Pick a deterministic problem/feature from the position
                 problems = CATEGORY_PROBLEM_MAP.get(category_slug, ["issue"])
                 features = FEATURE_MAP.get(category_slug, ["feature"])
                 position = slot_base + t_idx * 100 + e_idx * 10 + i_idx
@@ -199,44 +246,43 @@ def build_query_variants(
                 if "{category}" not in template:
                     raw_query = f"{term} {raw_query}"
 
-                # Ensure source-safe query logic
                 query = _safe_query(raw_query, is_bool_source)
 
-                # Avoid redundant intent terms
-                if intent_term.lower() not in query.lower():
+                query_lower = query.lower()
+                intent_words = intent_term.lower().replace("(", "").replace(")", "").split(" or ")
+                
+                is_redundant = any(word.strip() in query_lower for word in intent_words if len(word.strip()) > 3)
+                
+                if not is_redundant:
                     query = f"{query} {intent_term}".strip()
+                elif is_bool_source and "(" in intent_term and len(intent_words) > 1:
+                    pass
 
-                # Cleanup Boolean remnants for non-boolean sources
                 if not is_bool_source:
                     query = _safe_query(query, False)
 
-                # Deterministic modifier injection based on position slot
                 temporal, exploration, suffix = _pick_modifiers(position)
 
                 if source == "gnews":
-                    # GNews: simple queries only — add at most one modifier
                     if temporal:
                         query += f" {temporal}"
                 elif source == "youtube":
-                    # YouTube: temporal only — exploration/suffix modifiers
-                    # inflate queries without improving discovery quality in video search
                     if temporal:
                         query += f" {temporal}"
                 elif source == "rss":
-                    # RSS: no modifiers — feed content is already fresh
                     pass
                 elif source != "reddit":
-                    # newsapi and other text-search sources: full modifiers
                     if temporal:
                         query += f" {temporal}"
-                    if exploration:
-                        query += f" {exploration}"
-                    if suffix:
-                        query += f" {suffix}"
-                # Reddit: no trailing modifiers — keep queries natural
+                    # Do not add exploration or suffix to news/trends, as it ruins precision.
+                    if section_slug not in ["news", "trends"]:
+                        if exploration:
+                            query += f" {exploration}"
+                        if suffix:
+                            query += f" {suffix}"
 
-                # Final cleanup
                 query = query.replace("  ", " ").strip()
+                query = _sanitize_query(query, source)
                 if source == "youtube":
                     query = query.replace("review review", "review")
 

@@ -1,1 +1,27 @@
-{} 
+{
+  "reviews": {
+    "electronics:smartphones": 0,
+    "electronics:laptops": 2,
+    "accessories:watches": 3,
+    "accessories:bags": 3,
+    "perfumes:niche-artisanal": 2,
+    "accessories:sunglasses": 6,
+    "accessories:jewelry": 3,
+    "electronics:tablets": 3,
+    "electronics:smartwatches": 6,
+    "electronics:earbuds": 4,
+    "electronics:headphones": 4,
+    "electronics:cameras": 2
+  },
+  "news": {
+    "perfumes:niche-artisanal": 0,
+    "perfumes:oud-oriental": 4
+  },
+  "tutorials": {
+    "accessories:watches": 3,
+    "accessories:bags": 3,
+    "accessories:sunglasses": 1,
+    "accessories:jewelry": 1,
+    "electronics:tablets": 1
+  }
+}

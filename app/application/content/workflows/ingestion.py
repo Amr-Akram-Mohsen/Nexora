@@ -129,7 +129,9 @@ class IngestionWorkflow:
                 ordered = queries[start:] + queries[:start]
 
                 for i, q in enumerate(ordered):
-                    flat_tasks.append((section, category, q, (start + i) % total, total))
+                    flat_tasks.append(
+                        (section, category, q, (start + i) % total, total)
+                    )
 
         if not flat_tasks:
             logger.info(
@@ -237,14 +239,60 @@ class IngestionWorkflow:
                 return 0
 
         # ── Apply burst-protection cap ────────────────────────────────
-        # max_queries_per_run is the per-execution ceiling that prevents a cold
-        # start (or cache reset) from consuming the full daily API quota at
-        # once.  Cooldown hours handle temporal spreading; this caps the burst.
-        # We preserve cursor ordering (no shuffle) so the deterministic
-        # cursor progression is never disrupted.
+        # We apply Dynamic Category Quotas with Weighted Round-Robin
+        # This prevents high-velocity categories from starving low-velocity ones
+        # while still honoring their priority (high gets more slots per pass).
         total_eligible = len(flat_tasks)
         if limit and limit < len(flat_tasks):
-            flat_tasks = flat_tasks[:limit]
+            cat_queues = {}
+            for task in flat_tasks:
+                sec_cat = (task[0], task[1])
+                cat_queues.setdefault(sec_cat, []).append(task)
+            
+            cat_list = list(cat_queues.keys())
+            cat_weights = {}
+            for sec_cat in cat_list:
+                cat_slug = sec_cat[1].split(":")[-1] if ":" in sec_cat[1] else sec_cat[1]
+                velocity = CATEGORY_VELOCITY.get(cat_slug, "medium")
+                # Weight mapping: high=3, medium=2, low=1
+                cat_weights[sec_cat] = 3 if velocity == "high" else 2 if velocity == "medium" else 1
+
+            # Rotate starting category to prevent the first taxonomy items from dominating
+            try:
+                from app.shared.utils.rotation_state import RotationState
+                rotator = RotationState("category_batch")
+                rot_key = f"{self.source_name}_{group or 'all'}"
+                start_idx = rotator.state.get(rot_key, 0)
+                if start_idx >= len(cat_list):
+                    start_idx = 0
+                
+                cat_list = cat_list[start_idx:] + cat_list[:start_idx]
+                rotator.state[rot_key] = (start_idx + 1) % max(1, len(cat_list))
+                rotator._save()
+            except Exception as exc:
+                logger.warning("[FETCH][%s] Could not rotate categories: %s", self.source_name, exc)
+
+            selected = []
+            while len(selected) < limit and cat_queues:
+                for sec_cat in list(cat_list):
+                    if len(selected) >= limit:
+                        break
+                    if sec_cat not in cat_queues:
+                        continue
+                    
+                    weight = cat_weights[sec_cat]
+                    queue = cat_queues[sec_cat]
+                    
+                    popped = 0
+                    while popped < weight and queue and len(selected) < limit:
+                        selected.append(queue.pop(0))
+                        popped += 1
+                        
+                    if not queue:
+                        del cat_queues[sec_cat]
+                        cat_list.remove(sec_cat)
+                        
+            flat_tasks = selected
 
         total_tasks = len(flat_tasks)
 
@@ -283,14 +331,12 @@ class IngestionWorkflow:
                 cursor_state.update(section, category, idx, total)
             except (PipelineFatalError, PipelineQuotaExceededError):
                 session.rollback()
-                logger.info(
-                    "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs) X halted",
+                logger.warning(
+                    "[FETCH][%s] query_halted [%d/%d] %s  (%.1fs)",
+                    self.source_name,
                     completed + 1,
                     total_tasks,
-                    f'"{q_text[:40]}"',
-                    0,
-                    0,
-                    0,
+                    f'"{q_text[:60]}"',
                     time.monotonic() - t_q,
                 )
                 raise
@@ -304,10 +350,11 @@ class IngestionWorkflow:
             total_stored += stored_n
             total_updated += updated_n
             logger.info(
-                "  [%d/%d] %-44s fetched=%-3d  stored=%d  updated=%d  (%.1fs)",
+                "[FETCH][%s] query_done [%d/%d] %s  fetched=%d  stored=%d  updated=%d  (%.1fs)",
+                self.source_name,
                 completed,
                 total_tasks,
-                f'"{q_text[:40]}"',
+                f'"{q_text}"',
                 fetched_n,
                 stored_n,
                 updated_n,

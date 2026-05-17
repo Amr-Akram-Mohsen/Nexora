@@ -59,31 +59,57 @@ warnings.filterwarnings(
 
 
 def setup_logging(app):
-    """Configure rotating file logging for production-grade audit trails."""
+    """Configure domain-specific rotating file logging."""
     if not os.path.exists("logs"):
         os.mkdir("logs")
 
-    # 10 MB per file, keeping last 5 backups
-    file_handler = RotatingFileHandler(
-        "logs/nexora.log", maxBytes=10240000, backupCount=5, encoding="utf-8"
-    )
-    file_handler.setFormatter(_LevelAwareFormatter())
-    file_handler.setLevel(logging.INFO)
+    # Shared formatter
+    formatter = _LevelAwareFormatter()
+    log_cfg = {"maxBytes": 10240000, "backupCount": 5, "encoding": "utf-8"}
 
-    # 1. Clean up app.logger (Flask's internal logger)
-    # Removing existing handlers prevents double-logging and console output in production
-    app.logger.handlers = [file_handler]
-    app.logger.propagate = False
+    # 1. Ingestion & Discovery log
+    class IngestionFilter(logging.Filter):
+        def filter(self, record):
+            msg = record.getMessage()
+            return "[FETCH]" in msg or ("[INGEST]" in msg and "[rescrape]" not in msg) or "[DISCOVERY]" in msg or "[BATCH]" in msg
 
-    # 2. Clean up 'app' namespace logger (used by tasks and integrations)
-    # This ensures all ingestion sub-loggers inherit ONLY the file handler
+    ingest_h = RotatingFileHandler("logs/ingestion.log", **log_cfg)
+    ingest_h.setFormatter(formatter)
+    ingest_h.setLevel(logging.INFO)
+    ingest_h.addFilter(IngestionFilter())
+
+    # 2. Enrichment (Scraping) log
+    class EnrichmentFilter(logging.Filter):
+        def filter(self, record):
+            msg = record.getMessage()
+            return "[SCRAPE]" in msg or "[rescrape]" in msg
+
+    enrich_h = RotatingFileHandler("logs/enrichment.log", **log_cfg)
+    enrich_h.setFormatter(formatter)
+    enrich_h.setLevel(logging.INFO)
+    enrich_h.addFilter(EnrichmentFilter())
+
+    # 3. Web Routes log
+    class RouteFilter(logging.Filter):
+        def filter(self, record):
+            return "[ROUTE]" in record.getMessage()
+
+    route_h = RotatingFileHandler("logs/routes.log", **log_cfg)
+    route_h.setFormatter(formatter)
+    route_h.setLevel(logging.INFO)
+    route_h.addFilter(RouteFilter())
+
+    # Apply handlers to the 'app' logger (where our custom logs go)
     app_logger = logging.getLogger("app")
     app_logger.setLevel(logging.INFO)
-    app_logger.handlers = [file_handler]
+    app_logger.handlers = [ingest_h, enrich_h, route_h]
     app_logger.propagate = False
 
-    # 3. Suppress root StreamHandlers to prevent library leakage to terminal
-    # Centralize all logs in nexora.log to keep the terminal clean.
+    # Apply route handler to Flask's logger (for request logs)
+    app.logger.handlers = [route_h]
+    app.logger.propagate = False
+
+    # Root logger handles library warnings only
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.WARNING)
     for h in root_logger.handlers[:]:

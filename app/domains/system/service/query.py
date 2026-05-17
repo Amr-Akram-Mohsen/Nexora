@@ -27,6 +27,7 @@ def get_active_brands_for_section(section_slug, limit=20):
     )
     return [serialize_brand(b) for b in brands]
 
+
 @cache.memoize(timeout=3600)
 def get_active_topics_for_section(section_slug, limit=20):
     """
@@ -34,6 +35,7 @@ def get_active_topics_for_section(section_slug, limit=20):
     Uses explicit join with the association table for reliability.
     """
     from app.domains.relationships import content_topics
+
     topics = (
         db.session.query(Topic)
         .join(content_topics, Topic.id == content_topics.c.topic_id)
@@ -46,6 +48,8 @@ def get_active_topics_for_section(section_slug, limit=20):
         .all()
     )
     return [serialize_topic(t) for t in topics]
+
+
 @cache.memoize(timeout=3600)
 def get_active_categories_for_section(section_slug, limit=20):
     """
@@ -62,21 +66,18 @@ def get_active_categories_for_section(section_slug, limit=20):
         .limit(limit)
         .all()
     )
-    return [serialize_category(c) for c in categories if c.slug != 'uncategorized']
+    return [serialize_category(c) for c in categories]
+
 
 @cache.memoize(timeout=3600)
 def get_popular_general_topics():
-    return (
-        db.session.query(Topic.slug, Topic.name)
-        .all()
-    )
+    return db.session.query(Topic.slug, Topic.name).all()
+
+
 @cache.memoize(timeout=3600)
 def get_popular_brands(limit=5):
-    return (
-        db.session.query(Brand.slug, Brand.name)
-        .limit(limit)
-        .all()
-    )
+    return db.session.query(Brand.slug, Brand.name).limit(limit).all()
+
 
 @cache.memoize(timeout=3600)
 def get_active_sections():
@@ -86,18 +87,23 @@ def get_active_sections():
         # .order_by(Section.sort_order)
         .all()
     )
+
+
 def get_section_by_slug(slug):
-    return Section.query.filter(
-        Section.slug == slug,
-        Section.is_active == True
-    ).first()
+    return Section.query.filter(Section.slug == slug, Section.is_active).first()
+
+
 def get_distinct_item_categories():
     from app.domains.item.models import Item
+
     return Category.query.join(Item).distinct().all()
+
 
 def get_distinct_item_brands():
     from app.domains.item.models import Item
+
     return Brand.query.join(Item).distinct().all()
+
 
 def get_allowed_filters(section):
     """
@@ -109,9 +115,11 @@ def get_allowed_filters(section):
         filters = ["category", "topic", "brand", "intent", "price_tier", "type"]
     return set(filters)
 
+
 @cache.memoize(timeout=3600)
 def get_active_intents_for_section(section_slug, limit=20):
     from ..models import IntentFacet
+
     intents = (
         db.session.query(IntentFacet)
         .join(Content, Content.intent_id == IntentFacet.id)
@@ -124,9 +132,11 @@ def get_active_intents_for_section(section_slug, limit=20):
     )
     return [{"slug": i.slug, "name": i.name} for i in intents]
 
+
 @cache.memoize(timeout=3600)
 def get_active_price_tiers_for_section(section_slug, limit=20):
     from ..models import PriceTierFacet
+
     price_tiers = (
         db.session.query(PriceTierFacet)
         .join(Content, Content.price_tier_id == PriceTierFacet.id)
@@ -139,6 +149,7 @@ def get_active_price_tiers_for_section(section_slug, limit=20):
     )
     return [{"slug": p.slug, "name": p.name} for p in price_tiers]
 
+
 @cache.memoize(timeout=3600)
 def get_active_types_for_section(section_slug):
     types = (
@@ -149,4 +160,3 @@ def get_active_types_for_section(section_slug):
         .all()
     )
     return [{"slug": t[0], "name": t[0].title()} for t in types if t[0]]
-

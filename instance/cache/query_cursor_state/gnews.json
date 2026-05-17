@@ -1,1 +1,15 @@
-{}
+{
+  "news": {
+    "electronics:smartphones": 3,
+    "electronics:laptops": 2,
+    "perfumes:niche-artisanal": 0,
+    "perfumes:oud-oriental": 4,
+    "accessories:watches": 0,
+    "accessories:bags": 4,
+    "electronics:smartwatches": 2,
+    "electronics:earbuds": 2,
+    "electronics:headphones": 1,
+    "electronics:cameras": 3,
+    "electronics:tablets": 1
+  }
+}

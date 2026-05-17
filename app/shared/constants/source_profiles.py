@@ -58,7 +58,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Daily quota: 100 requests.
         # Assuming ~6 meaningful runs/day (after cooldowns thin the pool):
         #   100 / 6 = ~16 → use 15 (conservative margin).
-        max_queries_per_run=15,
+        max_queries_per_run=7,
         requires_scraping=True,
         freshness_priority="very_high",
         quality_weight=0.75,
@@ -76,7 +76,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Daily quota: 100 requests.
         # Pool is smaller (~134 total queries); runs are fewer.
         # 100 / 6 = ~16 → use 12 (extra margin for GNews being quota-sensitive).
-        max_queries_per_run=12,
+        max_queries_per_run=3,
         requires_scraping=True,
         freshness_priority="high",
         quality_weight=0.70,
