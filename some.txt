@@ -1,8 +1,0 @@
-implement those fixes you mentioned and start with the high priority. here's the files you would probably need to modify and apply those changes.
-@ingestion.py
-@api_fetchers.py
-@http.py
-@fetchers_mappers.py
-@discovery
-@query_intelligence.py
-@core.py
