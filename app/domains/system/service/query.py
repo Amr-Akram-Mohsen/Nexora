@@ -10,6 +10,7 @@ from app.domains.system.models import (
     IntentFacet,
     PriceTierFacet,
     Section,
+    AttributeFacet,
 )
 
 REL_MODELS = {
@@ -18,6 +19,7 @@ REL_MODELS = {
     "brand": Brand,
     "intent": IntentFacet,
     "price_tier": PriceTierFacet,
+    "attributes": AttributeFacet,
 }
 
 
@@ -122,3 +124,54 @@ def get_distinct_item_brands():
     from app.domains.item.models import Item
 
     return Brand.query.join(Item).distinct().all()
+
+
+def get_attributes_for_section(section_slug, category_slugs=None, limit=20):
+    """
+    Retrieves active attributes for a section, optionally filtered by selected categories.
+    """
+    if category_slugs:
+        if isinstance(category_slugs, str):
+            category_slugs = (category_slugs,)
+        elif isinstance(category_slugs, list):
+            category_slugs = tuple(sorted([s for s in category_slugs if s]))
+    else:
+        category_slugs = None
+
+    return _cached_attributes_for_section(section_slug, category_slugs, limit)
+
+
+@cache.memoize(timeout=3600)
+def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit):
+    from app.domains.system.models import AttributeFacet, Category
+
+    stmt = select(*build_filter_projection(AttributeFacet)).join(AttributeFacet.contents)
+
+    if category_slugs_tuple:
+        # Resolve selected categories to load parent-child hierarchies
+        categories = db.session.execute(
+            select(Category).where(func.lower(Category.slug).in_([func.lower(s) for s in category_slugs_tuple]))
+        ).scalars().all()
+
+        category_ids = set()
+        for cat in categories:
+            category_ids.add(cat.id)
+            # Add parent category if it exists (e.g. Smartphones -> Electronics)
+            if cat.parent_id:
+                category_ids.add(cat.parent_id)
+            # Add child categories if any exist (e.g. Electronics -> Smartphones, Laptops)
+            if cat.children:
+                for child in cat.children:
+                    category_ids.add(child.id)
+
+        stmt = stmt.where(AttributeFacet.category_id.in_(list(category_ids)))
+
+    stmt = apply_content_section_filters(
+        stmt=stmt,
+        model=AttributeFacet,
+        section_slug=section_slug,
+        limit=limit,
+    )
+
+    return execute_mapped_query(stmt)
+

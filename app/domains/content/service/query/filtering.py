@@ -102,6 +102,11 @@ def get_filtered_contents(
     if types and "type" in allowed_filters:
         query = query.filter(Content.object_type.in_(types))
 
+    attributes = [f for f in active_filters.get("attributes", []) if f]
+    if attributes and "attributes" in allowed_filters:
+        from app.domains.system.models import AttributeFacet
+        query = query.filter(Content.attributes.any(AttributeFacet.slug.in_(attributes)))
+
     if active_filters.get("sort") == "oldest":
         query = query.order_by(Content.published_at.asc())
     else:

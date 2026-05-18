@@ -7,14 +7,14 @@
     "accessories:sunglasses": 0,
     "accessories:jewelry": 2,
     "electronics:tablets": 2,
-    "electronics:smartwatches": 4,
-    "electronics:earbuds": 7,
-    "electronics:headphones": 6,
-    "electronics:cameras": 7
+    "electronics:smartwatches": 1,
+    "electronics:earbuds": 5,
+    "electronics:headphones": 4,
+    "electronics:cameras": 5
   },
   "trends": {
-    "electronics:tablets": 8,
-    "electronics:smartwatches": 6,
+    "electronics:tablets": 5,
+    "electronics:smartwatches": 3,
     "electronics:earbuds": 4,
     "electronics:headphones": 3,
     "electronics:cameras": 4

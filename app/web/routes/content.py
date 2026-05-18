@@ -15,7 +15,7 @@ def sections(section_slug):
     from app.web.helpers.content import parse_active_filters
 
     active_filters = parse_active_filters(
-        ["category", "topic", "brand", "intent", "price_tier", "type"]
+        ["category", "topic", "brand", "intent", "price_tier", "type", "attributes"]
     )
     page = request.args.get("page", 1, type=int)
 

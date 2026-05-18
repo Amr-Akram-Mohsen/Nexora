@@ -2,6 +2,7 @@ from app.domains.system.service import (
     get_section_by_slug,
     get_relationships_for_section,
     get_types_for_section,
+    get_attributes_for_section,
 )
 from app.application.content.query_service import get_filtered_contents
 
@@ -38,6 +39,11 @@ def get_feed_data(section_slug, active_filters, page=1):
         )
     if "type" in allowed_filters:
         filter_options["type"] = get_types_for_section(section_slug)
+    if "attributes" in allowed_filters:
+        category_slugs = active_filters.get("category", [])
+        filter_options["attributes"] = get_attributes_for_section(
+            section_slug, category_slugs=category_slugs
+        )
 
     return {
         "section": serialize_model(section),

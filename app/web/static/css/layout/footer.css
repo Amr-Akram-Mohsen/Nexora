@@ -16,8 +16,9 @@ body.dark-mode .site-footer {
 .footer-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2.5rem;
-  padding: 4.5rem 0 3.5rem 0;
+  gap: 2rem;
+  padding: 2.5rem 0 1.5rem 0;
+  /* tightened padding to resolve empty vertical space */
 }
 
 @media (min-width: 640px) {
@@ -135,7 +136,8 @@ body.dark-mode .site-footer {
 
 /* --- Columns Typography --- */
 .footer-title {
-  font-size: 0.875rem; /* 14px titles */
+  font-size: 0.875rem;
+  /* 14px titles */
   font-weight: 700;
   color: var(--foreground);
   margin-bottom: 1.25rem;
@@ -167,7 +169,8 @@ body.dark-mode .site-footer {
 
 .footer-link:hover {
   color: var(--foreground);
-  transform: translateX(4px); /* elegant horizontal shift on hover */
+  transform: translateX(4px);
+  /* elegant horizontal shift on hover */
 }
 
 /* --- Brand Logo Group Interaction --- */
@@ -183,7 +186,8 @@ body.dark-mode .site-footer {
 }
 
 .footer-copy {
-  font-size: 0.8125rem; /* 13px copyright */
+  font-size: 0.8125rem;
+  /* 13px copyright */
   color: var(--muted-foreground);
   line-height: 1.5;
   margin: 0;
