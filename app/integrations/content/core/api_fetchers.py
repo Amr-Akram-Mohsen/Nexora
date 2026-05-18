@@ -88,7 +88,7 @@ def fetch_gnews_query(q_obj, **kwargs):
             "max": 10,
             "apikey": api_key,
         },
-        timeout=(3.05, 10),
+        timeout=(5, 15),
         logger=logger,
         source_name="gnews",
     )

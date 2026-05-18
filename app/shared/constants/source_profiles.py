@@ -58,7 +58,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Daily quota: 100 requests.
         # Assuming ~6 meaningful runs/day (after cooldowns thin the pool):
         #   100 / 6 = ~16 → use 15 (conservative margin).
-        max_queries_per_run=15,
+        max_queries_per_run=20,
         requires_scraping=True,
         freshness_priority="very_high",
         quality_weight=0.75,
@@ -76,7 +76,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Daily quota: 100 requests.
         # Pool is smaller (~134 total queries); runs are fewer.
         # 100 / 6 = ~16 → use 12 (extra margin for GNews being quota-sensitive).
-        max_queries_per_run=10,
+        max_queries_per_run=27,
         requires_scraping=True,
         freshness_priority="high",
         quality_weight=0.70,
@@ -96,7 +96,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Budget per run: 100 / 8 = 12.5 → use 10 (strict — YouTube quota is
         # the most expensive resource in the pipeline).
         # 10 runs × 10 searches × 10 items/search = 1,000 videos/day maximum.
-        max_queries_per_run=10,
+        max_queries_per_run=23,
         quota_cost=100,
         requires_scraping=False,
         freshness_priority="medium",

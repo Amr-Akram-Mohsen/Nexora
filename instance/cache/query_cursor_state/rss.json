@@ -2,11 +2,24 @@
   "reviews": {
     "electronics": 0,
     "perfumes": 0,
-    "accessories": 0
+    "accessories": 0,
+    "electronics:smartphones": 0,
+    "electronics:laptops": 0,
+    "electronics:tablets": 0,
+    "electronics:smartwatches": 0,
+    "electronics:earbuds": 0,
+    "electronics:headphones": 0,
+    "electronics:cameras": 0,
+    "perfumes:niche-artisanal": 0,
+    "perfumes:oud-oriental": 0,
+    "accessories:watches": 0,
+    "accessories:bags": 0,
+    "accessories:jewelry": 0
   },
   "news": {
     "electronics": 0,
     "perfumes": 0,
-    "accessories": 0
+    "accessories": 0,
+    "perfumes:niche-artisanal": 0
   }
 }

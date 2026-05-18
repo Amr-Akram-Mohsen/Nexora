@@ -146,15 +146,16 @@ def build_query_variants(
 
     for term in category_terms:
         if expansion and is_bool_source:
-            # Combine term + expansion into a single OR-clause.
-            # GNews: limit inner OR-block size to avoid "unexpected_response_shape"
             if source == "gnews":
                 inner_list = expansion.strip("()").split(" OR ")[:2]
-                inner = " OR ".join(inner_list)
+                quoted_inner = [f'"{x}"' if " " in x and not x.startswith('"') else x for x in inner_list]
+                inner = " OR ".join(quoted_inner)
+                
+                quoted_term = f'"{term}"' if " " in term and not term.startswith('"') else term
+                expanded_terms.append(f"({quoted_term} OR {inner})")
             else:
                 inner = expansion.strip("()")
-
-            expanded_terms.append(f"({term} OR {inner})")
+                expanded_terms.append(f"({term} OR {inner})")
         else:
             expanded_terms.append(term)
             if expansion and not is_bool_source:
@@ -190,7 +191,8 @@ def build_query_variants(
         deduped = []
         for t in tokens:
             clean_tl = t.lower().replace("(", "").replace(")", "")
-            if clean_tl in ["or", "and"] or t in ["(", ")"]:
+            # Do not deduplicate words that are part of a quoted phrase
+            if '"' in t or clean_tl in ["or", "and"] or t in ["(", ")"]:
                 deduped.append(t)
             elif clean_tl not in seen:
                 seen.add(clean_tl)
@@ -209,6 +211,8 @@ def build_query_variants(
                 toks = q_str.split()
                 if len(toks) > 12:
                     q_str = " ".join(toks[:12])
+                # Explicitly insert AND between parenthesis groups for GNews
+                q_str = re.sub(r"\)\s*\(", ") AND (", q_str)
 
         q_str = re.sub(r"\(\s*(?:OR\s+)+", "(", q_str)
         q_str = re.sub(r"(?:\s+OR)+\s*\)", ")", q_str)
@@ -223,7 +227,11 @@ def build_query_variants(
     for t_idx, template in enumerate(templates):
         for e_idx, term in enumerate(expanded_terms[:max_terms]):
             if is_bool_source and len(intent_terms) > 1:
-                intent_block = f"({' OR '.join(intent_terms[:3])})"
+                if source == "gnews":
+                    quoted_intents = [f'"{x}"' if " " in x and not x.startswith('"') else x for x in intent_terms[:3]]
+                    intent_block = f"({' OR '.join(quoted_intents)})"
+                else:
+                    intent_block = f"({' OR '.join(intent_terms[:3])})"
                 process_intent_terms = [intent_block]
             else:
                 process_intent_terms = intent_terms[:max_intents]
@@ -243,7 +251,7 @@ def build_query_variants(
                     feature=feature,
                 )
 
-                if "{category}" not in template:
+                if "{category}" not in template and source != "gnews":
                     raw_query = f"{term} {raw_query}"
 
                 query = _safe_query(raw_query, is_bool_source)
@@ -264,8 +272,9 @@ def build_query_variants(
                 temporal, exploration, suffix = _pick_modifiers(position)
 
                 if source == "gnews":
-                    if temporal:
-                        query += f" {temporal}"
+                    # GNews: temporal modifiers like "this month" break text search.
+                    # Use the API's date filters instead of appending them to the query string.
+                    pass
                 elif source == "youtube":
                     if temporal:
                         query += f" {temporal}"

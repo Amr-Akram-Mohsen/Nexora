@@ -132,7 +132,7 @@ INTENT_KEYWORDS = {
 }
 
 # Sources that support (OR / AND / Parentheses)
-BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "reddit"]
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "reddit", "gnews"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS

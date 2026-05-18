@@ -23,19 +23,59 @@ IRRELEVANT_RSS_KEYWORDS = [
 # Feed Registry
 RSS_FEEDS = {
     "reviews": {
-        "electronics": [
+        "electronics:smartphones": [
             "https://www.gsmarena.com/rss-news-reviews.php3",
             "https://www.techradar.com/phones/rss",
+        ],
+        "electronics:laptops": [
             "https://www.techradar.com/laptops/rss",
+        ],
+        "electronics:tablets": [
             "https://www.techradar.com/tablets/rss",
         ],
-        "perfumes": ["https://cafleurebon.com/feed/"],
-        "accessories": ["https://www.ablogtowatch.com/feed/"],
+        "electronics:smartwatches": [
+            "https://www.techradar.com/feeds/category/health-fitness",
+        ],
+        "electronics:earbuds": [
+            "https://www.techradar.com/feeds/audio",
+        ],
+        "electronics:headphones": [
+            "https://www.techradar.com/feeds/audio",
+        ],
+        "electronics:cameras": [
+            "https://petapixel.com/feed/",
+        ],
+        "perfumes:niche-artisanal": [
+            "https://cafleurebon.com/feed/",
+            "https://colognoisseur.com/feed/",
+        ],
+        "perfumes:oud-oriental": [
+            "https://ensaroud.com/blog/feed/",
+        ],
+        "accessories:watches": [
+            "https://www.ablogtowatch.com/feed/",
+            "https://www.hodinkee.com/blog/rss.xml",
+        ],
+        "accessories:bags": [
+            "https://www.gearpatrol.com/rss/",
+        ],
+        "accessories:jewelry": [
+            "https://www.jewellermagazine.com/rss/jeweller.xml",
+            "https://www.thejewelleryeditor.com/rss/",
+        ],
     },
     "news": {
-        "electronics": ["https://www.theverge.com/rss/index.xml"],
-        "perfumes": ["https://perfumerflavorist.com/feed/"],
-        "accessories": ["https://hypebeast.com/feed"],
+        "electronics": [
+            "https://www.theverge.com/rss/index.xml",
+            "https://www.engadget.com/rss.xml",
+            "https://www.wired.com/feed/rss",
+        ],
+        "perfumes:niche-artisanal": [
+            "https://perfumerflavorist.com/feed/",
+        ],
+        "accessories": [
+            "https://hypebeast.com/feed",
+        ],
     },
 }
 

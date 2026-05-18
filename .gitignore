@@ -31,3 +31,7 @@ Thumbs.db
 supabase.dump
 sync_supabase_to_local.bat
 
+instance/
+
+stores_programs_terms/
+
