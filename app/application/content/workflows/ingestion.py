@@ -384,6 +384,23 @@ class IngestionWorkflow:
             next_group=next_group or group or "(all)",
         )
 
+        if total_stored > 0:
+            try:
+                from app.core.extensions import cache
+                from app.domains.system.service.query import get_relationships_for_section, get_types_for_section
+                cache.delete_memoized(get_relationships_for_section)
+                cache.delete_memoized(get_types_for_section)
+                logger.info(
+                    "[FETCH][%s] Invalidated cached section filter options due to new content ingestion.",
+                    self.source_name,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "[FETCH][%s] Cache invalidation failed: %s",
+                    self.source_name,
+                    exc,
+                )
+
         return total_stored
 
     # ------------------------------------------------------------------

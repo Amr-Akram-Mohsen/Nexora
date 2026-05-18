@@ -1,38 +1,147 @@
+/* --- Premium Minimalist Auth Layout --- */
+
+.auth-section {
+  min-height: calc(100vh - var(--header-height, 80px));
+  padding: 4rem 1.5rem;
+  background: var(--background); /* clean, solid background color */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2.5rem;
+  box-shadow: var(--shadow-sm); /* extremely soft, professional shadow */
+}
+
+/* --- Auth Header --- */
+.auth-header {
+  margin-bottom: 2.25rem;
+}
+
+.auth-title {
+  font-size: 1.75rem; /* modern scale title */
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.auth-text {
+  color: var(--muted-foreground);
+  margin: 0;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* --- Auth Form Spacing --- */
 .auth-form {
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .auth-btn {
+  height: 2.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  margin-top: 0.5rem;
   width: 100%;
 }
 
-.auth-status-text {
+/* --- Vertical Field Spacing & Labels --- */
+.field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem; /* perfect professional spacing between label and input */
+  width: 100%;
+}
+
+.field-wrapper .label {
+  font-size: 0.8125rem; /* 13px - highly professional label size */
+  font-weight: 600; /* semi-bold prominence */
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+/* --- Input Fields Styles Override (High-Fidelity) --- */
+.field-wrapper input {
+  height: 2.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.15s ease-in-out;
+}
+
+.field-wrapper input:focus {
+  outline: none;
+  border-color: var(--domain-primary, var(--primary));
+  box-shadow: 0 0 0 2px rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.12);
+  background: var(--card);
+}
+
+.field-wrapper input::placeholder {
   color: var(--muted-foreground);
-  margin-right: .25rem;
+  opacity: 0.6;
 }
 
-.auth-wrapper:hover {
-  box-shadow: 0 10px 25px rgba(var(--black-rgb), var(--alpha-muted));
-}
-
-.login-hint {
-  font-size: var(--text-sm);
+.field-hint {
+  font-size: 0.75rem;
   color: var(--muted-foreground);
+  margin-top: 0.35rem;
 }
 
-.login-hint a {
-  color: var(--primary);
-  font-weight: var(--weight-bold);
+/* --- Social login Button --- */
+.google-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  height: 2.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  width: 100%;
 }
 
-.login-hint a:hover {
-  text-decoration: underline;
+.google-auth-btn:hover {
+  background: var(--accent);
+  border-color: var(--border);
 }
 
+.google-auth-btn i {
+  font-size: 0.875rem;
+  color: var(--domain-primary, var(--primary));
+}
+
+/* --- Crisp Auth Divider --- */
 .auth-divider {
   position: relative;
   text-align: center;
-  margin: 1.5rem 0;
+  margin: 1.75rem 0;
 }
 
 .auth-divider::before {
@@ -49,56 +158,64 @@
 .auth-divider span {
   position: relative;
   background: var(--card);
-  padding: 0 1rem;
+  padding: 0 0.75rem;
   color: var(--muted-foreground);
-  font-size: var(--text-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   z-index: 1;
 }
 
-/* --- Auth UI & Overrides --- */
-
-.auth-section {
-  min-height: calc(100vh - var(--header-height));
-  padding: 4rem 1rem;
-  background: radial-gradient(circle at top right, rgba(var(--brand-blue-rgb), var(--alpha-subtle)), transparent),
-    radial-gradient(circle at bottom left, rgba(var(--brand-purple-rgb), var(--alpha-subtle)), transparent);
-}
-
-.auth-wrapper {
-  width: 100%;
-  max-width: 440px;
-  margin: 1rem auto;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-2xl);
-  padding: 2.5rem;
-  transition: box-shadow 0.2s;
-}
-
-.auth-header {
-  margin-bottom: 2rem;
-}
-
-.auth-title {
-  font-size: var(--text-3xl);
-  font-weight: var(--weight-bold);
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.auth-text {
-  color: var(--muted-foreground);
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-}
-
+/* --- Redirect Links --- */
 .redirect-link {
-  font-size: var(--text-sm);
-  color: var(--brand-blue);
-  transition: opacity 0.2s;
+  font-size: 0.8125rem;
+  color: var(--domain-primary, var(--primary));
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: color 0.15s ease;
 }
 
 .redirect-link:hover {
+  color: var(--domain-primary-dark, var(--primary));
+  text-decoration: underline !important;
+}
+
+/* --- High-Fidelity Professional Auth Footer --- */
+.auth-footer {
+  margin-top: 2rem !important; /* overrides inline tailwind mt classes */
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(var(--border-rgb), 0.5); /* extremely thin and soft line */
+  font-size: 0.8125rem; /* 13px - perfectly balanced */
+  text-align: center;
+  line-height: 1.5;
+}
+
+.auth-status-text {
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+.auth-footer .redirect-link {
+  color: var(--domain-primary, var(--primary));
+  font-weight: 600;
+  margin-left: 0.25rem;
+  text-decoration: none !important;
+  transition: opacity 0.15s ease;
+  display: inline-block;
+}
+
+.auth-footer .redirect-link:hover {
   opacity: 0.8;
-}
+  text-decoration: underline !important;
+}
+
+/* --- Alert Box --- */
+.resend-alert {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(var(--muted-rgb), 0.1);
+  text-align: center;
+}

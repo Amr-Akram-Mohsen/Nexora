@@ -35,13 +35,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 1.5rem;
+  gap: 1.5rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
 }
 
 .detail-page__breadcrumbs-wrapper {
   flex: 1;
   min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 .detail-page__main {

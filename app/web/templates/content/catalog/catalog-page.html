@@ -122,7 +122,7 @@ SLOT: active_filters
 {% for val in vals %}
 <div class="filter-tag flex items-center">
   <span>{{ val | replace('-', ' ') | title }}</span>
-  <a href="{{ get_filter_url(filter_name, val, multi=(filter_name != 'category')) }}" class="remove-tag"
+  <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag"
     aria-label="Remove {{ val }} filter">&times;</a>
 </div>
 {% endfor %}

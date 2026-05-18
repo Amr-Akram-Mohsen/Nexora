@@ -146,3 +146,54 @@ label[data-disabled="true"] * {
   border: 1px solid rgba(var(--border-rgb), var(--alpha-soft));
   box-shadow: 0 8px 32px 0 rgba(var(--black-rgb), var(--alpha-soft));
 }
+
+/* --- High-Fidelity Professional Back to Top Button --- */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-full);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+}
+
+.back-to-top:hover {
+  background: var(--accent);
+  color: var(--domain-primary, var(--primary));
+  border-color: var(--domain-primary, var(--primary));
+  transform: translateY(-2px);
+}
+
+.back-to-top:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.back-to-top i {
+  font-size: 0.875rem; /* clean chevron-up arrow sizing */
+  transition: transform 0.2s ease;
+}
+
+.back-to-top:hover i {
+  transform: translateY(-1px);
+}
+
+/* Responsive spacing modifications */
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}

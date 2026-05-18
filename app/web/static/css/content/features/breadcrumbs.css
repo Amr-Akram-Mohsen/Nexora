@@ -1,44 +1,75 @@
-/* --- Breadcrumbs --- */
+/* --- Premium Minimalist Breadcrumbs --- */
 
 .breadcrumbs {
-  margin-bottom: 1.25rem;
-  font-size: var(--text-sm);
-  color: var(--muted-foreground);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 
 .breadcrumbs ul {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: var(--text-sm);
+  gap: 0.5rem;
+  font-size: 0.8125rem; /* 13px - perfect typography size for navigation */
   color: var(--muted-foreground);
   flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
+.breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* --- Breadcrumb Links --- */
 .breadcrumb-link {
   color: var(--muted-foreground);
-  transition: color 0.15s;
+  transition: color 0.15s ease-in-out;
   text-transform: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  font-weight: var(--weight-md);
+  font-weight: 500;
+  text-decoration: none !important;
 }
 
 .breadcrumb-link:hover {
-  color: var(--domain-primary);
+  color: var(--foreground); /* clean, high-contrast, professional text transition */
 }
 
+.breadcrumb-link i.fa-home {
+  font-size: 0.875rem; /* slightly larger for geometric harmony */
+  color: var(--muted-foreground);
+  transition: color 0.15s ease-in-out;
+}
+
+.breadcrumb-link:hover i.fa-home {
+  color: var(--foreground);
+}
+
+/* --- Breadcrumb Separators --- */
 .breadcrumbs .separator {
-  font-size: var(--text-xs);
-  opacity: 0.4;
+  font-size: 9px;
+  color: var(--muted-foreground);
+  opacity: 0.35;
+  margin-inline: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
+/* --- Current Item (Active Trail Endpoint) --- */
 .breadcrumb-current {
   color: var(--foreground);
-  font-weight: var(--weight-md);
+  font-weight: 600; /* strong and readable */
   text-transform: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 250px;
+  max-width: 320px;
+  pointer-events: none;
 }

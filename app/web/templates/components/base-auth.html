@@ -1,11 +1,12 @@
 {% extends"base.html" %}
 {% block title %}{{ title }} | Nexora{% endblock %}
 {% block page_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/auth.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/auth.css') }}" />
 {% endblock %}
+
 {% block content %}
 <section class="auth-section flex items-center justify-center">
-  <div class="auth-wrapper glass animate-fade-in">
+  <div class="auth-wrapper animate-fade-in">
     <div class="auth-header text-center">
       <h1 class="auth-title">{{ auth_title or "Welcome Back" }}</h1>
       <p class="auth-text">{{ auth_text or "Please enter your details to continue" }}</p>

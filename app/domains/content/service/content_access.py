@@ -1,9 +1,6 @@
 from app.core.extensions import db
 from app.domains.serializers import (
-    serialize_brand,
-    serialize_topic,
-    serialize_category,
-    serialize_section,
+    serialize_model,
     serialize_target,
 )
 
@@ -71,16 +68,18 @@ def assign_target_to_contents(contents, session):
             {
                 "id": c.id,
                 "object_type": c.object_type,
+                "section_id": c.section_id,
+                "category_id": c.category_id,
                 "published_at": c.published_at,
                 "is_published": getattr(c, "is_published", True),
                 "is_active": getattr(c, "is_active", True),
-                "category": serialize_category(c.category)
+                "category": serialize_model(c.category)
                 if c.category.slug != "uncategorized"
                 else None,
-                "section": serialize_section(c.section),
+                "section": serialize_model(c.section),
                 "target": serialize_target(target_obj, session) if target_obj else None,
-                "topics": [serialize_topic(t) for t in (c.topics or [])],
-                "brands": [serialize_brand(b) for b in (c.brands or [])],
+                "topics": [serialize_model(t) for t in (c.topics or [])],
+                "brands": [serialize_model(b) for b in (c.brands or [])],
                 # "linked_items": [serialize_target(item, session) for item in getattr(c, 'linked_items', [])] if getattr(c, 'linked_items', None) else []
             }
         )

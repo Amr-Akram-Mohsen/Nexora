@@ -67,7 +67,14 @@ def get_filtered_contents(
 
     cats = [f for f in active_filters.get("category", []) if f]
     if cats and "category" in allowed_filters:
-        query = query.filter(Content.category.has(Category.slug.in_(cats)))
+        category_objs = session.query(Category).filter(Category.slug.in_(cats)).all()
+        cat_ids = set()
+        for cat in category_objs:
+            cat_ids.add(cat.id)
+            if cat.children:
+                for child in cat.children:
+                    cat_ids.add(child.id)
+        query = query.filter(Content.category_id.in_(list(cat_ids)))
 
     topics = [f for f in active_filters.get("topic", []) if f]
     if topics and "topic" in allowed_filters:

@@ -38,12 +38,14 @@ def seed_db():
                 slug=slug,
                 description=s_data["description"],
                 allowed_filters=[
+                    "category",
                     "brand",
                     "topic",
                     "price_tier",
                     "intent",
                     "gender",
-                    "attributes"
+                    "attributes",
+                    "type"
                 ]
             )
             db.session.add(section)

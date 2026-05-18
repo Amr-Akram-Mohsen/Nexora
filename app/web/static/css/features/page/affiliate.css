@@ -1,67 +1,108 @@
+/* --- Affiliate Marketing Styling --- */
+
 .affiliate-trust-banner {
-  background: var(--gradient-primary);
-  color: white;
-  padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  gap: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: var(--shadow-md);
-  text-align: center;
+  background: var(--accent); /* subtle professional backdrop, no bright primary gradients */
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 1.75rem 2rem;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
 }
 
 .trust-icon {
-  font-size: var(--text-3xl);
+  font-size: 2.25rem;
+  color: var(--domain-primary, var(--primary));
+  flex-shrink: 0;
 }
 
+.affiliate-trust-banner p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+/* --- Partner Card grid --- */
 .affiliate-partners {
-  gap: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .partner-card {
   flex: 1;
-  min-width: 150px;
+  min-width: 180px;
   background: var(--card);
-  padding: 2rem 1rem;
-  border-radius: var(--radius-lg);
+  padding: 2.25rem 1.5rem;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .partner-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: var(--brand-blue);
+  border-color: var(--domain-primary, var(--brand-blue));
 }
 
 .partner-icon {
-  font-size: var(--text-4xl);
-  color: var(--primary);
+  font-size: 2.5rem;
+  color: var(--domain-primary, var(--primary));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.partner-card:hover .partner-icon {
+  transform: scale(1.1);
 }
 
 .partner-name {
-  font-weight: var(--weight-bold);
-  font-size: var(--text-lg);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--foreground);
+  margin: 0;
 }
 
+/* --- Advisory Disclosure Callouts --- */
 .affiliate-disclosure-banner {
-  background: rgba(var(--primary-rgb), var(--alpha-soft));
-  border-left: 4px solid var(--primary);
-  padding: 0.75rem 1rem;
-  margin-bottom: 2rem;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  gap: 0.5rem;
-  font-size: var(--text-sm);
+  background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.05);
+  border-left: 4px solid var(--domain-primary, var(--primary));
+  padding: 1rem 1.25rem;
+  margin-bottom: 2.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.875rem;
   color: var(--muted-foreground);
+  line-height: 1.55;
 }
 
 .affiliate-disclosure-banner .banner-icon {
-  color: var(--primary);
+  color: var(--domain-primary, var(--primary));
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
 }
 
 .affiliate-disclosure-banner .banner-link {
-  color: var(--primary);
-  text-decoration: underline;
+  color: var(--domain-primary, var(--primary));
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+.affiliate-disclosure-banner .banner-link:hover {
+  text-decoration: underline !important;
 }

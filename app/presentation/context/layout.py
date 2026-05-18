@@ -6,30 +6,26 @@ from app.domains.system.service import (
 )
 from config import SOCIAL_LINKS
 
-@cache.cached(timeout=3600, key_prefix='layout_context')
+
+@cache.cached(timeout=3600, key_prefix="layout_context")
 def get_layout_context():
     """
     Header + footer + shared UI data
     """
-    popular_interests = get_popular_general_topics()
-    popular_brands = get_popular_brands()
 
     return {
         "main_sections": get_active_sections(),
-
         "column_reviews": {
-            "brands": popular_brands,
+            "brands": get_popular_brands(),
         },
-
-        "popular_interests": popular_interests,
-        "footer_topics": popular_interests,
+        # "popular_interests": popular_interests,
+        "footer_topics": get_popular_general_topics(),
         "footer_pages": [
-            ('about', 'About Us'),
-            ('contact', 'Contact'),
-            ('privacy', 'Privacy Policy'),
-            ('terms', 'Terms'),
-            ('affiliate', 'Affiliate Disclosure'),
+            {"slug": "about", "name": "About Us"},
+            {"slug": "contact", "name": "Contact"},
+            {"slug": "privacy", "name": "Privacy Policy"},
+            {"slug": "terms", "name": "Terms"},
+            {"slug": "affiliate", "name": "Affiliate Disclosure"},
         ],
-
         "social_links": SOCIAL_LINKS,
     }

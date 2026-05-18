@@ -18,9 +18,9 @@
 
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
-        {% for slug, name in main_sections %}
-        <a href="{{ url_for('content.sections', section_slug=slug) }}" class="main-nav__link">
-          {{ name }}
+        {% for section in main_sections %}
+        <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="main-nav__link">
+          {{ section.name }}
         </a>
         {% endfor %}
         <a href="{{ url_for('item.deals') }}" class="main-nav__link">
@@ -118,31 +118,32 @@
     </div>
 
     <!-- Search Bar -->
-
     <div class="header-search">
       {% call form("header-search__form", variant="", method="GET", include_csrf=False) %}
-      {{ input(
-      name="query", type="search",
-      placeholder="Search contents and products...",
-      class="header-search__input"
-      ) }}
-      {{ button(type="submit", icon="fas fa-search header-search__icon") }}
+      <div class="header-search__wrapper">
+        <i class="fas fa-search header-search__icon"></i>
+        {{ input(
+        name="query", type="search",
+        placeholder="Search contents and products...",
+        class="header-search__input"
+        ) }}
+      </div>
       {% endcall %}
     </div>
 
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
-      {% for slug, name in main_sections %}
-      <a href="{{ url_for('content.sections', section_slug=slug) }}" class="mobile-nav__link">
-        {{ name }}
+      {% for section in main_sections %}
+      <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="mobile-nav__link">
+        {{ section.name }}
       </a>
       {% endfor %}
       <a href="{{ url_for('item.deals') }}" class="mobile-nav__link">
-        <i class="fas fa-tag mr-1"></i> Deals
+        <i class="fas fa-tag mr-2"></i>Deals
       </a>
       {% if is_authenticated %}
       <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link">
-        <i class="far fa-bookmark mr-1"></i> Saved Items
+        <i class="far fa-bookmark mr-2"></i>Saved Items
       </a>
       {% endif %}
     </nav>
