@@ -1,7 +1,7 @@
-{% from "components/media/content-image.html" import render_image_url %}
+{% from "commercial/features/item-image.html" import render_image_url %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/badge.html" import badge %}
-{% from "components/features/rating.html" import render_stars %}
+{% from "commercial/features/rating.html" import render_stars %}
 
 {% set best_link = item.store_links[0] if item.store_links else None %}
 
@@ -42,8 +42,8 @@
 
     {# Category + Brand badges #}
     <div class="card__meta-top flex items-center">
-      {{ badge(item.category.name, 'badge--category', 'secondary') }}
-      {{ badge(item.brand.name, 'badge--brand', 'secondary') }}
+      {{ badge(item.category.name, 'badge--category', 'secondary') if item.category else '' }}
+      {{ badge(item.brand.name, 'badge--brand', 'secondary') if item.brand else '' }}
     </div>
 
     {# Title #}
@@ -54,10 +54,10 @@
     {# Ratings row #}
     <div class="card__meta-bottom flex items-center">
       <div class="card__rating flex items-center">
-        {{ render_stars(item.rating) }}
-        <span class="item-rating">({{ item.rating }})</span>
+        {{ render_stars(item.rating or 0) }}
+        <span class="item-rating">({{ item.rating or 0 }})</span>
       </div>
-      <span class="item-reviews-count">{{ item.review_count }} reviews</span>
+      <span class="item-reviews-count">{{ item.review_count or 0 }} reviews</span>
     </div>
 
     {# ── Price + Store + CTA ── #}

@@ -5,8 +5,8 @@
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/empty-state.html" import empty_state %}
 
-{# % set page_title = section.name|title % #}
-{% set results = contents %}
+{% set page_title = page_title or 'Deals' %}
+{% set results = items %}
 
 {% block title %}Deals | Nexora{% endblock %}
 
@@ -107,8 +107,8 @@ SLOT: active_filters
 {% for val in vals %}
 <div class="filter-tag flex items-center">
   <span>{{ val | replace('-', ' ') | title }}</span>
-  <a href="{{ get_filter_url(filter_name, val, multi=True) }}"
-    class="remove-tag" aria-label="Remove {{ val }} filter">&times;</a>
+  <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag"
+    aria-label="Remove {{ val }} filter">&times;</a>
 </div>
 {% endfor %}
 {% endif %}
@@ -144,7 +144,7 @@ SLOT: results
 ═══════════════════════════════════════ #}
 {% if results %}
 {% if slot == 'results' %}
-{{ grid(results) }}
+{{ grid(results, target_type='item') }}
 {% endif %}
 
 {# ═══════════════════════════════════════

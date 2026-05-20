@@ -55,6 +55,11 @@
   font-size: var(--text-sm);
 }
 
+.pyramid-layer--top {
+  width: 60%;
+  background: var(--brand-blue);
+}
+
 .pyramid-layer--heart {
   width: 80%;
   background: var(--brand-red);

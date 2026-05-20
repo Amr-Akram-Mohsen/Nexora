@@ -14,33 +14,32 @@ logger = logging.getLogger(__name__)
 
 bp = Blueprint("item", __name__)
 
+
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])
 def view_full_specs(item_id):
     # This is a small helper, but still should use service
     item = get_item_by_id(item_id)
     if not item:
         abort(404)
-        
+
     html = render_template(
-        "commercial/features/full-details.html",
-        full_specs=item.full_details
+        "commercial/features/full-details.html", full_specs=item.full_details
     )
-    return jsonify({
-        "html": html
-    })
+    return jsonify({"html": html})
+
 
 @bp.route("/deals")
 def deals():
     active_filters = {
-        'category': [f for f in request.args.getlist('category') if f.strip()],
-        'brand': [f for f in request.args.getlist('brand') if f.strip()],
-        'store': [f for f in request.args.getlist('store') if f.strip()],
-        'type': [f for f in request.args.getlist('type') if f.strip()],
-        'min_price': request.args.get('min_price'),
-        'max_price': request.args.get('max_price'),
-        'sort': request.args.get('sort', 'newest')
+        "category": [f for f in request.args.getlist("category") if f.strip()],
+        "brand": [f for f in request.args.getlist("brand") if f.strip()],
+        "store": [f for f in request.args.getlist("store") if f.strip()],
+        "type": [f for f in request.args.getlist("type") if f.strip()],
+        "min_price": request.args.get("min_price"),
+        "max_price": request.args.get("max_price"),
+        "sort": request.args.get("sort", "newest"),
     }
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get("page", 1, type=int)
 
     log_route_start(logger, "/deals", page=page)
 
@@ -56,8 +55,9 @@ def deals():
         target_type="item",
         allowed_filters=["category", "brand", "store", "type"],
         active_filters=active_filters,
-        **data
+        **data,
     )
+
 
 @bp.route("/items/<int:item_id>")
 def item_page(item_id):
@@ -84,28 +84,27 @@ def item_page(item_id):
 
     log_route_success(logger, f"/items/{item_id}", template="item.html")
 
-    return render_template(
-        "commercial/page/item.html",
-        **data
-    )
+    return render_template("commercial/page/item.html", **data)
 
-@bp.route('/compare')
+
+@bp.route("/compare")
 def compare():
     """Side-by-side comparison of 2-4 products."""
-    ids_str = request.args.get('ids', '')
+    ids_str = request.args.get("ids", "")
     try:
-        item_ids = [int(id_strip) for id_strip in ids_str.split(',') if id_strip.strip()]
+        item_ids = [
+            int(id_strip) for id_strip in ids_str.split(",") if id_strip.strip()
+        ]
     except ValueError:
         item_ids = []
-    
+
     if not item_ids:
-        return redirect(url_for('item.deals'))
-        
+        return redirect(url_for("item.deals"))
+
     data = get_comparison_data(item_ids)
     if not data:
-        return redirect(url_for('item.deals'))
-    
+        return redirect(url_for("item.deals"))
+
     return render_template(
-        'commercial/catalog/compare-page.html',
-        **data
+        "commercial/catalog/compare-page.html", target_type="item", **data
     )

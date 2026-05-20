@@ -1,15 +1,22 @@
-{% extends"content/page/base.html" %}
+{% extends "content/page/base.html" %}
 
-{% set item = content.target %}
+{# Define content mock variable so content/page/base.html breadcrumbs and attributes don't crash #}
+{% set content = {
+'object_type': 'item',
+'target': item,
+'section': None,
+'linked_items': []
+} %}
+{% set page_css = "css/commercial/page/item.css" %}
 
-{% from"components/media/item-gallery.html" import item_gallery %}
-{% from"commercial/features/render-details.html" import render_details %}
-{% from"components/ui/badge.html" import badge %}
+{% from "commercial/features/item-gallery.html" import item_gallery %}
+{% from "commercial/features/render-details.html" import render_details %}
+{% from "components/ui/badge.html" import badge %}
 {% from "commercial/features/rating.html" import render_stars %}
 
 {% block title %}Nexora | {{ item.name }}{% endblock %}
 
-{% block description %}{{ item.description | truncate(160) }}{% endblock %}
+{% block description %}{{ (item.description or '') | truncate(160) }}{% endblock %}
 
 {% block og_type %}product{% endblock %}
 
@@ -27,46 +34,46 @@ _external=True) }}{% endblock %}
     "{{ img.image_url }}"{% if not loop.last %},{% endif %}
     {% endfor %}
   ],
-  "description": "{{ item.description }}",
+  "description": "{{ item.description or '' }}",
   "brand": {
     "@type": "Brand",
-    "name": "{{ item.brand.name }}"
+    "name": "{{ item.brand.name if item.brand else 'Unknown' }}"
   },
   "offers": {
     "@type": "Offer",
     "priceCurrency": "SAR",
-    "price": "{{ item.min_price }}",
+    "price": "{{ item.min_price or '' }}",
     "availability": "https://schema.org/InStock",
     "url": "{{ request.url }}"
   }
 }
 </script>
 {% endblock %}
-{% block content %}
-{% macro header_block() %}
+
+{% block base_header %}
 <div class="detail-page__header-content">
   <div class="detail-page__badges">
-    {{ badge(item.category.name, 'badge--category') }}
-    {{ badge(item.brand.name, 'badge--brand') }}
+    {{ badge(item.category.name, 'badge--category') if item.category else '' }}
+    {{ badge(item.brand.name, 'badge--brand') if item.brand else '' }}
   </div>
 
   <h1 class="detail-page__title">{{ item.name }}</h1>
 
   <div class="detail-page__meta flex items-center">
     <div class="meta-item flex items-center">
-      {{ render_stars(item.rating) }}
+      {{ render_stars(item.rating or 0) }}
     </div>
-    <span class="item-rating">({{ item.rating }})</span>
-    <span class="item-reviews-count">({{ item.review_count }}) reviews</span>
+    <span class="item-rating">({{ item.rating or 0 }})</span>
+    <span class="item-reviews-count">({{ item.review_count or 0 }}) reviews</span>
   </div>
 </div>
-{% endmacro %}
+{% endblock %}
 
-{% macro image_block() %}
-{{ media_gallery(item) }}
-{% endmacro %}
+{% block base_image %}
+{{ item_gallery(item) }}
+{% endblock %}
 
-{% macro content_block() %}
+{% block base_content %}
 <!-- optional: description, highlights, etc. -->
 <div class="item-content">
   {% if item.store_links %}
@@ -76,22 +83,21 @@ _external=True) }}{% endblock %}
   {{ item.description or '' }}
 
   {% if item.item_type == 'electronics' %}
-  {% include "commercial/details/electronics/highlights.html" %}
+  {% include "commercial/detail/electronics/highlights.html" %}
 
   {% elif item.item_type == 'perfumes' %}
-  {% include "commercial/details/perfume/scent-pyramid.html" %}
-  {% include "commercial/details/perfume/meta.html" %}
+  {% include "commercial/detail/perfume/scent-pyramid.html" %}
+  {% include "commercial/detail/perfume/meta.html" %}
 
   {% elif item.item_type == 'accessories' %}
-  {% include "commercial/details/accessory/material-badges.html" %}
-  {% include "commercial/details/accessory/size-guide.html" %}
+  {% include "commercial/detail/accessory/material-badges.html" %}
+  {% include "commercial/detail/accessory/size-guide.html" %}
 
   {% endif %}
 </div>
-{% endmacro %}
+{% endblock %}
 
-{% macro sidebar_block() %}
-
+{% block base_sidebar %}
 <!-- ✅ VARIANTS FIRST -->
 {% if item.has_variants %}
 {% include "commercial/features/variant-selector.html" %}
@@ -139,20 +145,14 @@ _external=True) }}{% endblock %}
 
 {% if item.store_links %}
 {% set store_links = item.store_links %}
-{% include"commercial/features/purchase-options.html" %}
+{% include "commercial/features/purchase-options.html" %}
 {% endif %}
-{% endmacro %}
+{% endblock %}
 
-
-{{ detail_page(
-item,
-header=header_block,
-image=image_block,
-content=content_block,
-sidebar=sidebar_block
-) }}
-
-<!-- {% set full_details = item.full_details %} -->
-{% set full_details = item.structured_details.get('groups') %}
+{% block additional_content %}
+{{ super() }}
+{% set full_details = item.structured_details.get('groups') if item.structured_details else None %}
+{% if full_details %}
 {% include "commercial/features/full-details.html" %}
+{% endif %}
 {% endblock %}

@@ -4,7 +4,7 @@
     "electronics:laptops": 2,
     "perfumes:niche-artisanal": 0,
     "perfumes:oud-oriental": 0,
-    "accessories:watches": 0,
+    "accessories:watches": 2,
     "accessories:bags": 0,
     "electronics:smartwatches": 1,
     "electronics:earbuds": 0,
@@ -12,6 +12,6 @@
     "electronics:cameras": 0,
     "electronics:tablets": 1,
     "accessories:sunglasses": 2,
-    "accessories:jewelry": 2
+    "accessories:jewelry": 1
   }
 }

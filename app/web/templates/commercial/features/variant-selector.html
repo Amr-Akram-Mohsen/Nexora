@@ -24,10 +24,10 @@
       {% for value in values %}
 
       {% if attr in ['color', 'finish'] %}
-      <button class="variant-option variant-option--color" style="background: {{ value }}" title="{{ value }}">
+      <button class="variant-option variant-option--color {{ 'active' if loop.first }}" style="background: {{ value }}" title="{{ value }}" onclick="selectVariant(this)">
       </button>
       {% else %}
-      <button class="variant-option">
+      <button class="variant-option {{ 'active' if loop.first }}" onclick="selectVariant(this)">
         {{ value }}
       </button>
       {% endif %}

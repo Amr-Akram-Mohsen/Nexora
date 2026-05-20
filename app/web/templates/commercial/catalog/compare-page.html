@@ -2,7 +2,7 @@
 {% block title %}Nexora | Product Comparison{% endblock %}
 
 {% block content %}
-{% from "components/media/content-image.html" import render_image_url %}
+{% from "components/media/item-image.html" import render_image_url %}
 {% from "components/ui/button.html" import button %}
 
 <section class="compare-page content-page" data-domain-type="items">
@@ -30,7 +30,7 @@
                                 {{ render_image_url(item.image_url, item.name) }}
                             </div>
                             <h3 class="compare-item-name">{{ item.name }}</h3>
-                            <p class="compare-item-brand">{{ item.brand.name }}</p>
+                            <p class="compare-item-brand">{{ item.brand.name if item.brand else 'Unknown' }}</p>
 
                             {% set best_link = (item.variants[0].store_links[0] if item.variants[0].store_links else
                             None) if item.variants else None %}
@@ -69,7 +69,7 @@
                 <tr>
                     <td class="feature-label">Brand</td>
                     {% for item in items %}
-                    <td>{{ item.brand.name }}</td>
+                    <td>{{ item.brand.name if item.brand else 'Unknown' }}</td>
                     {% endfor %}
                 </tr>
 

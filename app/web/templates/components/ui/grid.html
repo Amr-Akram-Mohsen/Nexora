@@ -1,7 +1,13 @@
-{% macro grid(items, carousel=false) %}
+{% macro grid(items, target_type="content", carousel=false) %}
 <div class="{{ 'grid-carousel' if carousel else 'grid-auto' }}">
+  {% if target_type == 'content' %}
   {% for item in items %}
   {% include "content/dispatcher/card.html" %}
   {% endfor %}
+  {% else %}
+  {% for item in items %}
+  {% include 'commercial/cards/item.html' %}
+  {% endfor %}
+  {% endif %}
 </div>
 {% endmacro %}

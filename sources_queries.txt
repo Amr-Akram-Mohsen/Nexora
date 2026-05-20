@@ -1,5 +1,156 @@
-source_name     all_queries   electronics    perfumes    accessories
-newsapi          1043           648            none         396 
-gnews          402              216            54         132 
-youtube          1940              960            431         548 
-rss          not-specified              3            2         2 
+CREATE OR REPLACE FUNCTION slugify(input TEXT)
+RETURNS TEXT AS $$
+BEGIN
+    RETURN lower(regexp_replace(trim(input), '[^a-zA-Z0-9]+', '-', 'g'));
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_or_create_category(p_name TEXT)
+RETURNS INT AS $$
+DECLARE v_id INT;
+BEGIN
+
+    SELECT id INTO v_id
+    FROM categories
+    WHERE lower(name) = lower(p_name);
+
+    IF v_id IS NOT NULL THEN
+        RETURN v_id;
+    END IF;
+
+    INSERT INTO categories (name, slug)
+    VALUES (p_name, slugify(p_name))
+    RETURNING id INTO v_id;
+
+    RETURN v_id;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_or_create_brand(p_name TEXT)
+RETURNS INT AS $$
+DECLARE v_id INT;
+BEGIN
+
+    SELECT id INTO v_id
+    FROM brands
+    WHERE lower(name) = lower(p_name);
+
+    IF v_id IS NOT NULL THEN
+        RETURN v_id;
+    END IF;
+
+    INSERT INTO brands (name, slug)
+    VALUES (p_name, slugify(p_name))
+    RETURNING id INTO v_id;
+
+    RETURN v_id;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION create_item_with_store_link(
+    p_name TEXT,
+    p_description TEXT,
+    p_category_name TEXT,
+    p_brand_name TEXT,
+    p_price NUMERIC,
+    p_currency TEXT,
+    p_store_id INT,
+    p_affiliate_url TEXT,
+    p_original_url TEXT
+)
+RETURNS INT AS $$
+DECLARE
+    v_item_id INT;
+    v_variant_id INT;
+    v_category_id INT;
+    v_brand_id INT;
+BEGIN
+
+    -- 1. resolve category + brand (auto create if missing)
+    v_category_id := get_or_create_category(p_category_name);
+    v_brand_id := get_or_create_brand(p_brand_name);
+
+    -- 2. insert item
+    INSERT INTO items (
+        name,
+        slug,
+        description,
+        category_id,
+        brand_id,
+        item_type,
+        created_at
+    )
+    VALUES (
+        p_name,
+        slugify(p_name),
+        p_description,
+        v_category_id,
+        v_brand_id,
+        'electronics',
+        NOW()
+    )
+    RETURNING id INTO v_item_id;
+
+    -- 3. insert default variant
+    INSERT INTO item_variants (
+        item_id,
+        price,
+        currency,
+        is_default,
+        created_at
+    )
+    VALUES (
+        v_item_id,
+        p_price,
+        p_currency,
+        TRUE,
+        NOW()
+    )
+    RETURNING id INTO v_variant_id;
+
+    -- 4. insert store link
+    INSERT INTO item_store_links (
+        variant_id,
+        store_id,
+        original_url,
+        affiliate_url,
+        price,
+        currency,
+        is_active,
+        created_at
+    )
+    VALUES (
+        v_variant_id,
+        p_store_id,
+        p_original_url,
+        p_affiliate_url,
+        p_price,
+        p_currency,
+        TRUE,
+        NOW()
+    );
+
+    RETURN v_item_id;
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+
+
+SELECT create_item_with_store_link(
+    'HUAWEI FreeClip 2 Wireless Earphones, Bluetooth Earbuds, iOS And Android, Saudi Version & Local Warranty',
+    '',
+    'Earbuds',
+    'HUAWEI',
+    654.27,
+    'SAR',
+    1,
+    'https://rzekl.com/g/1e8d114494382e912a3b16525dc3e8/?ulp=https%3A%2F%2Far.aliexpress.com%2Fitem%2F1005010507405338.html%3Fspm%3Da2g0o.productlist.main.1.3f3957f0gBW7re%26algo_pvid%3D1da629fb-44dc-4209-bde4-36b5fe809167%26algo_exp_id%3D1da629fb-44dc-4209-bde4-36b5fe809167-0%26pdp_ext_f%3D%257B%2522order%2522%253A%25221677%2522%252C%2522spu_best_type%2522%253A%2522price%2522%252C%2522eval%2522%253A%25221%2522%252C%2522fromPage%2522%253A%2522search%2522%257D%26pdp_npi%3D6%2540dis%2521SAR%2521938.14%2521654.27%2521%2521%25211660.13%25211157.79%2521%25402141115b17791417196251090e764b%252112000052633232751%2521sea%2521SA%25210%2521ABX%25211%25210%2521n_tag%253A-29910%253Bd%253Ac530086a%253Bm03_new_user%253A-29895%253BpisId%253A5000000204892277%26curPageLogUid%3DTD2LxMUxtBoJ%26utparam-url%3Dscene%253Asearch%257Cquery_from%253A%257Cx_object_id%253A1005010507405338%257C_p_origin_prod%253A',
+    'https://ar.aliexpress.com/item/1005010507405338.html?spm=a2g0o.productlist.main.1.3f3957f0gBW7re&algo_pvid=1da629fb-44dc-4209-bde4-36b5fe809167&algo_exp_id=1da629fb-44dc-4209-bde4-36b5fe809167-0&pdp_ext_f=%7B%22order%22%3A%221677%22%2C%22spu_best_type%22%3A%22price%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21SAR%21938.14%21654.27%21%21%211660.13%211157.79%21%402141115b17791417196251090e764b%2112000052633232751%21sea%21SA%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3Ac530086a%3Bm03_new_user%3A-29895%3BpisId%3A5000000204892277&curPageLogUid=TD2LxMUxtBoJ&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005010507405338%7C_p_origin_prod%3A'
+);

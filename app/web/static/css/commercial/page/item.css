@@ -1,3 +1,13 @@
+@import "../features/item-gallery.css";
+@import "../features/variant-selector.css";
+@import "../features/full-details.css";
+@import "../features/category-details.css";
+@import "../features/purchase-options.css";
+
+
+@import "../../components/interactions/comments.css";
+@import "../../components/interactions/interaction.css";
+
 .item-details-card {
   background: var(--card);
   margin-bottom: 1rem;

@@ -2,10 +2,11 @@
 
 {% if dims %}
 <div class="size-guide">
+  <h4>Size Guide</h4>
 
   {% for key, value in dims.items() %}
   <div>
-    {{ key.replace('_', ' ') }}: {{ value }}
+    {{ key.replace('_', ' ') | title }}: {{ value }}
   </div>
   {% endfor %}
 

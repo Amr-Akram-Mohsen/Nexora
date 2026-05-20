@@ -185,6 +185,11 @@ function handleImageControls(control) {
     nextBtn.dataset.galleryNewImage = newIndex + 1;
     nextBtn.classList.toggle("disabled", newIndex === galleryLength);
   }
+
+  // 4. Update active class on thumbnails
+  thumbnails.forEach((thumb, idx) => {
+    thumb.classList.toggle("is-active", idx + 1 === newIndex);
+  });
 }
 function navigateGallery(direction) {
   const overlay = document.querySelector("[data-gallery-overlay]");
@@ -240,4 +245,11 @@ function initGallery(e) {
 
 function toggleActive(el) {
   el.classList.toggle("active", !el.classList.contains('active'));
+}
+
+function selectVariant(btn) {
+  const group = btn.closest('.variant-group__options');
+  if (!group) return;
+  group.querySelectorAll('.variant-option').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
 }

@@ -72,11 +72,11 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         transport="api",
         # 16h base — GNews has a stricter daily quota than NewsAPI.
         # Velocity: smartphones → 4h, niche perfumes → 32h.
-        cooldown_hours=16,
+        cooldown_hours=15,
         # Daily quota: 100 requests.
         # Pool is smaller (~134 total queries); runs are fewer.
         # 100 / 6 = ~16 → use 12 (extra margin for GNews being quota-sensitive).
-        max_queries_per_run=27,
+        max_queries_per_run=15,
         requires_scraping=True,
         freshness_priority="high",
         quality_weight=0.70,
@@ -96,7 +96,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Budget per run: 100 / 8 = 12.5 → use 10 (strict — YouTube quota is
         # the most expensive resource in the pipeline).
         # 10 runs × 10 searches × 10 items/search = 1,000 videos/day maximum.
-        max_queries_per_run=23,
+        max_queries_per_run=25,
         quota_cost=100,
         requires_scraping=False,
         freshness_priority="medium",

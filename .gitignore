@@ -35,3 +35,6 @@ instance/
 
 stores_programs_terms/
 
+data/
+raw_html/
+
