@@ -17,13 +17,14 @@ bp = Blueprint("item", __name__)
 
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])
 def view_full_specs(item_id):
-    # This is a small helper, but still should use service
-    item = get_item_by_id(item_id)
+    # Retrieve serialized item details
+    item = get_item_by_id(item_id, serialize=True)
     if not item:
         abort(404)
 
+    full_details = item.get("structured_details", {}).get("groups")
     html = render_template(
-        "commercial/features/full-details.html", full_specs=item.full_details
+        "commercial/features/full-details.html", item=item, full_details=full_details
     )
     return jsonify({"html": html})
 

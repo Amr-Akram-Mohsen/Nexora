@@ -6,8 +6,39 @@ from app.shared.parsing import safe_float
 from app.infrastructure import cache
 
 
+def _get_detail_eager_loads():
+    return [
+        db.joinedload(Item.brand),
+        db.joinedload(Item.category),
+        db.selectinload(Item.images),
+        db.selectinload(Item.specifications),
+        db.selectinload(Item.variants)
+            .selectinload(ItemVariant.store_links)
+            .selectinload(ItemStoreLink.store)
+    ]
+
+
 def serialize_item(item):
+    if not item:
+        return None
     default_variant = item.default_variant
+
+    serialized_store_links = []
+    if default_variant:
+        for link in default_variant.store_links:
+            if link.is_active:
+                serialized_store_links.append({
+                    "id": link.id,
+                    "affiliate_url": link.affiliate_url,
+                    "price": float(link.price) if link.price is not None else None,
+                    "old_price": float(link.old_price) if link.old_price is not None else None,
+                    "currency": link.currency,
+                    "store": {
+                        "name": link.store.name,
+                        "logo_url": link.store.logo_url,
+                        "slug": link.store.slug,
+                    } if link.store else None
+                })
 
     return {
         # ── Core identity ─────────────────────────────
@@ -15,16 +46,14 @@ def serialize_item(item):
         "name": item.name,
         "slug": item.slug,
         "type": item.item_type,
+        "item_type": item.item_type,
         "card_type": item.card_type,
         # ── Relations (flattened) ─────────────────────
-        "brand": {"name": item.brand.name, "slug": item.brand.slug}
-        if item.brand
-        else None,
-        "category": {"name": item.category.name, "slug": item.category.slug}
-        if item.category
-        else None,
+        "brand": {"name": item.brand.name, "slug": item.brand.slug} if item.brand else None,
+        "category": {"name": item.category.name, "slug": item.category.slug} if item.category else None,
         # ── Media ─────────────────────────────────────
         "image": item.image_url,
+        "image_url": item.image_url,
         # ── Pricing ───────────────────────────────────
         "price": float(item.price) if item.price is not None else None,
         "min_price": float(item.min_price) if item.min_price is not None else None,
@@ -33,22 +62,19 @@ def serialize_item(item):
         "default_variant": {
             "id": default_variant.id,
             "sku": getattr(default_variant, "sku", None),
-            "price": float(default_variant.price) if default_variant.price else None,
-        }
-        if default_variant
-        else None,
+            "price": float(default_variant.price) if default_variant.price is not None else None,
+        } if default_variant else None,
         # ── Store availability (lightweight) ──────────
+        "store_links": serialized_store_links,
         "stores": [
             {
-                "name": link.store.name,
-                "slug": link.store.slug,
-                "price": float(link.price),
-                "currency": link.currency,
+                "name": link["store"]["name"] if link["store"] else "",
+                "slug": link["store"]["slug"] if link["store"] else "",
+                "price": link["price"],
+                "currency": link["currency"],
             }
-            for link in item.store_links
-        ]
-        if item.store_links
-        else [],
+            for link in serialized_store_links
+        ],
         # ── Stats ─────────────────────────────────────
         "rating": item.rating,
         "review_count": item.review_count,
@@ -60,6 +86,74 @@ def serialize_item(item):
         if item.searchable_attributes
         else None,
     }
+
+
+def serialize_item_detail(item):
+    if not item:
+        return None
+
+    data = serialize_item(item)
+
+    serialized_images = [
+        {
+            "id": img.id,
+            "image_url": img.image_url,
+            "position": img.position,
+        }
+        for img in item.images
+    ]
+
+    serialized_variants = []
+    for v in item.variants:
+        variant_links = []
+        for link in v.store_links:
+            if link.is_active:
+                variant_links.append({
+                    "id": link.id,
+                    "affiliate_url": link.affiliate_url,
+                    "price": float(link.price) if link.price is not None else None,
+                    "old_price": float(link.old_price) if link.old_price is not None else None,
+                    "currency": link.currency,
+                    "store": {
+                        "name": link.store.name,
+                        "logo_url": link.store.logo_url,
+                        "slug": link.store.slug,
+                    } if link.store else None
+                })
+
+        serialized_variants.append({
+            "id": v.id,
+            "title": v.title,
+            "sku": v.sku,
+            "attributes": v.attributes or {},
+            "is_default": v.is_default,
+            "price": float(v.price) if v.price is not None else None,
+            "old_price": float(v.old_price) if v.old_price is not None else None,
+            "currency": v.currency,
+            "display_name": v.display_name(),
+            "store_links": variant_links,
+        })
+
+    serialized_specs = [
+        {
+            "id": spec.id,
+            "category": spec.category,
+            "spec_json": spec.spec_json,
+        }
+        for spec in item.specifications
+    ]
+
+    data.update({
+        "images": serialized_images,
+        "variants": serialized_variants,
+        "specifications": serialized_specs,
+        "full_details": item.full_details,
+        "structured_details": item.structured_details,
+        "quick_details": item.quick_details,
+    })
+
+    return data
+
 
 
 def filter_items_by_country(query):
@@ -232,33 +326,30 @@ def get_distinct_item_types():
     return [t[0] for t in db.session.query(Item.item_type).distinct().all() if t[0]]
 
 
-def get_item_by_id(item_id):
-    from ..models import Item, ItemVariant, ItemStoreLink
+def get_item_by_id(item_id, serialize=False):
+    from ..models import Item
 
-    return Item.query.options(
-        db.selectinload(Item.variants)
-        .selectinload(ItemVariant.store_links)
-        .selectinload(ItemStoreLink.store),
-        db.selectinload(Item.images),
-    ).get(item_id)
+    item = Item.query.options(*_get_detail_eager_loads()).get(item_id)
+    if not item:
+        return None
+
+    if serialize:
+        return serialize_item_detail(item)
+    return item
 
 
-def get_items_by_ids(item_ids):
-    from ..models import Item, ItemVariant, ItemStoreLink
+def get_items_by_ids(item_ids, serialize=False):
+    from ..models import Item
 
-    return (
-        Item.query.options(
-            db.joinedload(Item.brand),
-            db.joinedload(Item.category),
-            db.selectinload(Item.images),
-            db.selectinload(Item.specifications),
-            db.selectinload(Item.variants)
-            .selectinload(ItemVariant.store_links)
-            .selectinload(ItemStoreLink.store),
-        )
+    items = (
+        Item.query.options(*_get_detail_eager_loads())
         .filter(Item.id.in_(item_ids))
         .all()
     )
+
+    if serialize:
+        return [serialize_item_detail(item) for item in items]
+    return items
 
 
 @cache.memoize(timeout=600)
@@ -281,8 +372,10 @@ def get_filtered_items_for_home(filter_type="recent", limit=10):
         )
         if not top_deals:
             top_deals = query.order_by(Item.id.desc()).limit(limit).all()
-        return top_deals
+        items = top_deals
     elif filter_type == "random":
-        return query.order_by(db.func.random()).limit(limit).all()
+        items = query.order_by(db.func.random()).limit(limit).all()
     else:
-        return query.order_by(Item.created_at.desc()).limit(limit).all()
+        items = query.order_by(Item.created_at.desc()).limit(limit).all()
+
+    return [serialize_item(item) for item in items]

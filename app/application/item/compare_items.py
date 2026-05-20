@@ -9,16 +9,17 @@ def get_comparison_data(item_ids):
 
     # Limit to 4 items for layout sanity
     item_ids = item_ids[:4]
-    items = get_items_by_ids(item_ids)
-    
+    items = get_items_by_ids(item_ids, serialize=True)
+
     if not items:
         return None
 
     # Extract all possible specification categories from all items being compared
     all_categories = set()
     for item in items:
-        if item.full_details:
-            all_categories.update(item.full_details.keys())
+        full_details = item.get("full_details")
+        if full_details:
+            all_categories.update(full_details.keys())
     
     return {
         "items": items,

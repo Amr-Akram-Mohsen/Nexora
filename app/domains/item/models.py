@@ -129,7 +129,8 @@ class Item(db.Model):
 
     @property
     def min_price(self):
-        return min(v.price for v in self.variants) if self.variants else None
+        prices = [v.price for v in self.variants if v.price is not None]
+        return min(prices) if prices else None
 
     @property
     def has_variants(self):
@@ -145,7 +146,12 @@ class Item(db.Model):
     def pick_keys(d, keys):
         if not isinstance(d, dict):
             return None
-        result = {k: d[k] for k in keys if k in d and d[k] is not None}
+        norm_d = {str(k).lower().strip(): v for k, v in d.items()}
+        result = {}
+        for key in keys:
+            norm_key = str(key).lower().strip()
+            if norm_key in norm_d and norm_d[norm_key] is not None:
+                result[key] = norm_d[norm_key]
         return result or None
 
     @staticmethod
@@ -232,9 +238,11 @@ class Item(db.Model):
         return self._quick_details(self.structured_details.get("quick_details", {}))
 
     def _quick_details(self, details=None, parent=""):
+        if not isinstance(details, dict):
+            return []
         items = []
         for key, value in details.items():
-            label = key.replace("_", " ").title()
+            label = str(key).replace("_", " ").title()
             current_group = parent or label
             if isinstance(value, dict):
                 items.extend(self._quick_details(value, current_group))
