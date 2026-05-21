@@ -53,8 +53,8 @@ def deals():
 
     return render_template(
         "commercial/catalog/catalog-page.html",
-        target_type="item",
-        allowed_filters=["category", "brand", "store", "type"],
+        target_type="commercial",
+        allowed_filters=["category", "brand", "store"],
         active_filters=active_filters,
         **data,
     )
@@ -85,7 +85,7 @@ def item_page(item_id):
 
     log_route_success(logger, f"/items/{item_id}", template="item.html")
 
-    return render_template("commercial/page/item.html", **data)
+    return render_template("commercial/dispatcher/page.html", **data)
 
 
 @bp.route("/compare")

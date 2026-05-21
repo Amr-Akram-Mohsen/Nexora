@@ -4,9 +4,6 @@
   min-height: calc(100vh - var(--header-height, 80px));
   padding: 4rem 1.5rem;
   background: var(--background); /* clean, solid background color */
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .auth-wrapper {
@@ -44,8 +41,6 @@
 
 /* --- Auth Form Spacing --- */
 .auth-form {
-  display: flex;
-  flex-direction: column;
   gap: 1.25rem;
 }
 
@@ -60,8 +55,6 @@
 
 /* --- Vertical Field Spacing & Labels --- */
 .field-wrapper {
-  display: flex;
-  flex-direction: column;
   gap: 0.45rem; /* perfect professional spacing between label and input */
   width: 100%;
 }
@@ -111,9 +104,6 @@
 
 /* --- Social login Button --- */
 .google-auth-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 0.75rem;
   height: 2.75rem;
   font-weight: 600;
@@ -172,18 +162,18 @@
   font-size: 0.8125rem;
   color: var(--domain-primary, var(--primary));
   font-weight: 600;
-  text-decoration: none !important;
+  text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .redirect-link:hover {
   color: var(--domain-primary-dark, var(--primary));
-  text-decoration: underline !important;
+  text-decoration: underline;
 }
 
 /* --- High-Fidelity Professional Auth Footer --- */
 .auth-footer {
-  margin-top: 2rem !important; /* overrides inline tailwind mt classes */
+  margin-top: 2rem; /* overrides inline tailwind mt classes */
   padding-top: 1.5rem;
   border-top: 1px solid rgba(var(--border-rgb), 0.5); /* extremely thin and soft line */
   font-size: 0.8125rem; /* 13px - perfectly balanced */
@@ -200,14 +190,14 @@
   color: var(--domain-primary, var(--primary));
   font-weight: 600;
   margin-left: 0.25rem;
-  text-decoration: none !important;
+  text-decoration: none;
   transition: opacity 0.15s ease;
   display: inline-block;
 }
 
 .auth-footer .redirect-link:hover {
   opacity: 0.8;
-  text-decoration: underline !important;
+  text-decoration: underline;
 }
 
 /* --- Alert Box --- */

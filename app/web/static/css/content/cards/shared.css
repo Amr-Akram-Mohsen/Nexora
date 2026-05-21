@@ -3,8 +3,6 @@
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   transition: all 0.4s cubic-bezier(0.2, 0, 0.2, 1);
   height: 100%;
   position: relative;
@@ -51,8 +49,6 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
   gap: 6px;
   z-index: 5;
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -63,16 +59,12 @@
 .card__body,
 .card__content {
   padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
   flex-grow: 1;
   gap: 0.875rem;
 }
 
 .card__top-meta,
 .card__meta-top {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
@@ -110,8 +102,6 @@
 .card__meta-bottom {
   margin-top: auto;
   padding-top: 1.25rem;
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
   font-size: 0.75rem;
   color: var(--muted-foreground);
@@ -120,8 +110,6 @@
 
 .card__footer-item,
 .card__meta-item {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   min-width: 0;
 }
@@ -148,8 +136,6 @@
 }
 
 .card__meta-group {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -157,9 +143,6 @@
 .platform-icon {
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: var(--radius-full);
   font-size: 1.125rem;
   transition: all 0.3s ease;
@@ -174,24 +157,26 @@
 
 /* --- Meta Context Colors --- */
 .meta-user {
-  --meta-color: var(--brand-blue-rgb);
+  /* Prefer type-specific card color, fall back to domain primary */
+  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
 }
 
 .meta-clock {
-  --meta-color: 16, 185, 129;
+  /* Prefer type-specific card color, fall back to domain primary */
+  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
 }
 
 .meta-calendar {
-  --meta-color: 139, 92, 246;
+  /* Prefer type-specific card color, fall back to domain primary */
+  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
 }
 
 .meta-icon-wrapper {
   padding: 0.5rem;
   border-radius: 50%;
   background-color: rgba(var(--meta-color), 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
 }
 
 .meta-icon-wrapper i {
@@ -204,6 +189,6 @@
   .card__date,
   .card__meta-dot,
   .card__read-time {
-    display: none !important;
+    display: none;
   }
 }

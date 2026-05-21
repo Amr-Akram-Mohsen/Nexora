@@ -31,9 +31,9 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="video-header">
-  <div class="video-header__badges">
-    <div class="platform-badge platform-badge--{{ video.platform }}">
+<div class="video-header flex flex-col">
+  <div class="video-header__badges flex flex-wrap items-center">
+    <div class="platform-badge flex items-center platform-badge--{{ video.platform }}">
       <i class="fab fa-{{ video.platform }}"></i>
       <span>{{ video.platform | title }}</span>
     </div>
@@ -45,9 +45,9 @@
 
   <h1 class="video-header__title">{{ video.title }}</h1>
 
-  <div class="video-header__meta">
+  <div class="video-header__meta flex flex-wrap">
     {% if video.channel_name %}
-    <div class="meta-pill">
+    <div class="meta-pill flex items-center">
       <i class="fas fa-play-circle"></i>
       <span class="meta-pill__text">{{ video.channel_name }}</span>
     </div>

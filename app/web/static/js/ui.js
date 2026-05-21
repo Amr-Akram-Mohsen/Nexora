@@ -151,14 +151,15 @@ function handleImageControls(control) {
   const gallery = control.closest(".item-gallery");
   if (!gallery) return;
 
-  const displayImg = gallery.querySelector(".item-gallery__img");
+  const displayImg = gallery.querySelector("[data-gallery-main]");
+  if (!displayImg) return;
+
   const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
   const galleryLength = thumbnails.length;
-  
-  let currentIndex = parseInt(displayImg.dataset.galleryMain || "1");
+
   let newIndex = parseInt(control.dataset.galleryNewImage || control.dataset.galleryThumb);
 
-  if (!newIndex || newIndex < 1 || newIndex > galleryLength) return;
+  if (isNaN(newIndex) || newIndex < 1 || newIndex > galleryLength) return;
 
   // Find the thumbnail for the new index
   const newThumb = gallery.querySelector(`[data-gallery-thumb="${newIndex}"] img`);
@@ -180,10 +181,12 @@ function handleImageControls(control) {
   if (prevBtn) {
     prevBtn.dataset.galleryNewImage = newIndex - 1;
     prevBtn.classList.toggle("disabled", newIndex === 1);
+    prevBtn.disabled = newIndex === 1;
   }
   if (nextBtn) {
     nextBtn.dataset.galleryNewImage = newIndex + 1;
     nextBtn.classList.toggle("disabled", newIndex === galleryLength);
+    nextBtn.disabled = newIndex === galleryLength;
   }
 
   // 4. Update active class on thumbnails
@@ -206,7 +209,7 @@ function navigateGallery(direction) {
   if (nextIndex >= images.length) nextIndex = 0;
 
   overlay.dataset.index = nextIndex;
-  
+
   const displayImg = overlay.querySelector(".displayed-img");
   displayImg.src = images[nextIndex];
 
@@ -221,7 +224,6 @@ function initGallery(e) {
   const gallery = e.target.closest(".item-gallery");
   if (!gallery) return;
 
-  // Use the larger images list from data-gallery-thumbs or similar, but for now thumbnails
   const thumbs = [...gallery.querySelectorAll("[data-gallery-thumb] img")];
   if (!thumbs.length) return;
 
@@ -230,13 +232,17 @@ function initGallery(e) {
 
   const images = thumbs.map(img => img.src);
   overlay.dataset.images = JSON.stringify(images);
-  overlay.dataset.index = "0";
 
-  const displayImg = overlay.querySelector(".displayed-img");
-  displayImg.src = images[0];
+  // Sync zoom overlay index with currently displayed image in gallery
+  const displayImg = gallery.querySelector("[data-gallery-main]");
+  const activeIndex = displayImg ? (parseInt(displayImg.dataset.galleryMain || "1") - 1) : 0;
+  overlay.dataset.index = activeIndex;
+
+  const overlayImg = overlay.querySelector(".displayed-img");
+  if (overlayImg) overlayImg.src = images[activeIndex];
 
   const currentEl = overlay.querySelector(".current");
-  if (currentEl) currentEl.textContent = "1";
+  if (currentEl) currentEl.textContent = activeIndex + 1;
   const totalEl = overlay.querySelector(".total");
   if (totalEl) totalEl.textContent = images.length;
 
@@ -252,4 +258,96 @@ function selectVariant(btn) {
   if (!group) return;
   group.querySelectorAll('.variant-option').forEach(el => el.classList.remove('active'));
   btn.classList.add('active');
-}
+
+  const variantImgUrl = btn.dataset.variantImage;
+  const colorAttr = btn.closest('.variant-group')?.querySelector('.variant-group__label')?.textContent?.trim()?.toLowerCase();
+  const isColor = colorAttr === 'color' || colorAttr === 'finish';
+
+  if (variantImgUrl) {
+    const gallery = document.querySelector(".item-gallery");
+    if (gallery) {
+      const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
+      const match = thumbnails.find(thumb => {
+        const img = thumb.querySelector("img");
+        return img && img.src === variantImgUrl;
+      });
+      if (match) {
+        match.click(); // Cleanest: click the matching thumbnail to sync everything
+      } else {
+        // Fallback: directly update display if image not in thumbnails
+        const displayImg = gallery.querySelector("[data-gallery-main]");
+        if (displayImg) {
+          displayImg.src = variantImgUrl;
+          displayImg.dataset.galleryMain = "0";
+          thumbnails.forEach(t => t.classList.remove("is-active"));
+        }
+      }
+    }
+  } else if (isColor) {
+    const colorName = btn.title || btn.textContent.trim();
+    if (colorName) {
+      const gallery = document.querySelector(".item-gallery");
+      if (gallery) {
+        const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
+        const match = thumbnails.find(thumb => {
+          const img = thumb.querySelector("img");
+          const srcMatch = img && img.src.toLowerCase().includes(colorName.toLowerCase().replace(/[^a-z0-9]/g, ''));
+          const altMatch = img && img.alt.toLowerCase().includes(colorName.toLowerCase());
+          return srcMatch || altMatch;
+        });
+        if (match) {
+          match.click();
+        }
+      }
+    }
+  }
+}
+
+// function toggleInlineSpecs() {
+//   const container = document.getElementById('hidden-details-container');
+//   const btn = document.getElementById('toggle-specs-btn');
+//   if (!container || !btn) return;
+
+//   const isOpen = container.classList.contains('is-open');
+//   if (isOpen) {
+//     container.classList.remove('is-open');
+//     btn.textContent = 'Show More';
+//   } else {
+//     container.classList.add('is-open');
+//     btn.textContent = 'Show Less';
+//   }
+// }
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  const btn =
+    document.getElementById('toggle-specs-btn');
+
+  if (!btn) return;
+
+  const hiddenItems =
+    document.querySelectorAll(
+      '.item-detail-item--hidden'
+    );
+
+  let expanded = false;
+
+  btn.addEventListener('click', () => {
+
+    expanded = !expanded;
+
+    hiddenItems.forEach(item => {
+      item.classList.toggle(
+        'is-visible',
+        expanded
+      );
+    });
+
+    btn.textContent =
+      expanded
+        ? 'Show Less'
+        : 'Show More';
+
+  });
+
+});

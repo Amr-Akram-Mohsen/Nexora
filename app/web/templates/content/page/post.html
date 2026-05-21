@@ -32,9 +32,9 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="post-header">
-  <div class="post-header__badges">
-    <div class="platform-badge platform-badge--{{ post.platform }}">
+<div class="post-header flex flex-col">
+  <div class="post-header__badges flex flex-wrap items-center">
+    <div class="platform-badge flex items-center platform-badge--{{ post.platform }}">
       <i class="fab fa-{{ post.platform }}"></i>
       <span>{{ post.platform | title }}</span>
     </div>
@@ -46,8 +46,8 @@
 
   <h1 class="post-header__title">{{ post.title }}</h1>
 
-  <div class="post-header__meta">
-    <div class="meta-pill">
+  <div class="post-header__meta flex flex-wrap">
+    <div class="meta-pill flex items-center">
       <i class="far fa-user"></i>
       <span class="meta-pill__text">{{ post.author or 'Unknown' }}</span>
     </div>
@@ -84,7 +84,7 @@
   {% endif %}
 
   {% if post.url %}
-  <div class="post-cta-box">
+  <div class="post-cta-box flex items-center justify-between">
     <div class="cta-content">
       <p class="cta-label">Community: <strong>r/{{ post.subreddit }}</strong></p>
       <h4 class="cta-title">Join the Discussion</h4>

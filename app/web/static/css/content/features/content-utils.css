@@ -55,9 +55,10 @@
 .snippet-content {
   display: flex;
   gap: 1rem;
-  text-decoration: none;
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .snippet-content:hover {
@@ -66,11 +67,8 @@
 
 @media (max-width: 1024px) {
   .snippet-content {
-    flex: 0 0 280px;
     /* scroll-snap-align: start; */
     background: var(--background);
-    border: 1px solid var(--border);
-    padding: 0.75rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
   }
@@ -86,7 +84,6 @@
   max-width: 200px;
   max-height: 200px;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-md);
   flex-shrink: 0;
   border: 1px solid var(--border);
   overflow: hidden;
@@ -97,6 +94,8 @@
   flex-direction: column;
   width: 100%;
   max-width: 200px;
+  padding: 0.25rem;
+
 }
 
 .snippet-content__title {

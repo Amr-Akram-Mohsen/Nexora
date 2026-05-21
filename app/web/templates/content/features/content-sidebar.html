@@ -69,7 +69,7 @@
     <details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open
       }}>
       <summary class="filter-section__summary flex items-center justify-between">
-        <span class="filter-section__title">
+        <span class="filter-section__title flex items-center">
           {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
           {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
           {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics
@@ -98,7 +98,7 @@
             {% if render_extra %}style="display: none;"{% endif %}>
           <a href="{{ get_filter_url(filter_name, slug, multi=True) }}"
             class="filter-item__link flex items-center" title="{{ name }}">
-            <span class="checkbox-box {{ 'checked' if is_active }}" aria-hidden="true"></span>
+            <span class="checkbox-box inline-flex items-center justify-center {{ 'checked' if is_active }}" aria-hidden="true"></span>
             <span class="filter-item__name truncate">{{ name }}</span>
           </a>
         </li>

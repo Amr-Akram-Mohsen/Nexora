@@ -33,7 +33,7 @@
   display: inline-flex;
   align-items: center;
   font-weight: 500;
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .breadcrumb-link:hover {

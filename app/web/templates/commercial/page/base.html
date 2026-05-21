@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% set content = {
+'object_type': 'item',
+'target': item,
+'section': None,
+'linked_items': []
+} %}
+
+{% set page_css = "css/commercial/page/item.css" %}
+
+{% from "commercial/features/item-gallery.html" import item_gallery %}
+{% from "components/ui/badge.html" import badge %}
+{% from "commercial/features/rating.html" import render_stars %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename=page_css) }}" />
+{% endblock %}
+
+{% block title %}
+Nexora | {{ item.name }}
+{% endblock %}
+
+{% block description %}
+{{ (item.description or '') | truncate(160) }}
+{% endblock %}
+
+{% block og_type %}
+product
+{% endblock %}
+
+{% block og_image %}
+{{ item.images[0].image_url if item.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context":"https://schema.org",
+    "@type":"Product",
+    "name":"{{ item.name }}",
+    "image":[
+        {% for img in item.images[:3] %}
+        "{{ img.image_url }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ],
+    "description":"{{ item.description or '' }}",
+    "brand":{
+        "@type":"Brand",
+        "name":"{{ item.brand.name if item.brand else 'Unknown' }}"
+    },
+    "offers":{
+        "@type":"Offer",
+        "priceCurrency":"SAR",
+        "price":"{{ item.min_price or '' }}",
+        "availability":"https://schema.org/InStock",
+        "url":"{{ request.url }}"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="detail-page" data-type="{{ item.item_type }}" data-domain-type="commercial">
+
+    <div class="container">
+
+        {# ══ Breadcrumbs — full width top row ══ #}
+        <div class="detail-page__top flex items-center justify-between">
+            <div class="detail-page__breadcrumbs-wrapper">
+                {% include "content/features/breadcrumbs.html" %}
+            </div>
+        </div>
+
+        {# ══ Main (display:contents on desktop — children participate directly in grid) ══
+             Source / mobile order: header → gallery → content → specs
+             Desktop visual order is controlled by grid-template-areas in item.css #}
+        <div class="detail-page__main">
+
+            {# ── Right-column top: title, badges, rating ── #}
+            <div class="detail-page__header">
+
+                <div class="detail-page__badges flex flex-wrap items-center">
+                    {{ badge(item.category.name, 'badge--category') if item.category else '' }}
+                    {{ badge(item.brand.name,     'badge--brand')    if item.brand    else '' }}
+                </div>
+
+                <h1 class="detail-page__title">{{ item.name }}</h1>
+
+                <div class="detail-page__meta flex items-center flex-wrap">
+
+                    <div class="meta-item flex items-center">
+                        {{ render_stars(item.rating or 0) }}
+                    </div>
+
+                    <span class="item-rating">({{ item.rating or 0 }})</span>
+
+                    <span class="item-reviews-count">
+                        {{ item.review_count or 0 }} reviews
+                    </span>
+
+                </div>
+
+            </div>
+
+            {# ── Left-column top: gallery (always left, always above specs) ── #}
+            <div class="detail-page__image">
+                {{ item_gallery(item) }}
+            </div>
+
+            {# ── Left-column body: description + category blocks ── #}
+            <div class="detail-page__content">
+                <div class="item-content">
+
+                    {{ item.description or '' }}
+
+                    {% block category_content %}
+                    {% endblock %}
+
+                    {% if item.store_links %}
+                    {% include "partials/affiliate-disclosure.html" %}
+                    {% endif %}
+
+                </div>
+            </div>
+
+            {# ── Left-column bottom: specifications (always below gallery) ── #}
+            {% if item.quick_details and item.quick_details|length > 0 %}
+            <div class="detail-page__specs">
+
+                <div class="item-details-card">
+
+                    <h3 class="item-details-card__title flex items-center">
+                        <span class="item-details-card__bar"></span>
+                        {% block details_title %}
+                        Product Details
+                        {% endblock %}
+                    </h3>
+
+                    {% set full_details = item.structured_details.get('groups')
+                       if item.structured_details else None %}
+
+                    {% if full_details %}
+                    <div class="item-details-card__items flex flex-col">
+                        {% from "commercial/features/render-details.html" import render_details %}
+                        {{ render_details(full_details) }}
+                    </div>
+
+                    <button
+                        class="item-details-inline-toggle flex items-center justify-center"
+                        id="toggle-specs-btn"
+                        type="button"
+                        aria-expanded="false">
+                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        Show More
+                    </button>
+                    {% endif %}
+
+                </div>
+
+            </div>
+            {% endif %}
+
+        </div>{# end .detail-page__main #}
+
+        {# ══ Sidebar — right column, spans from row 3 downward (sticky on desktop)
+             Contains: variant selector + purchase / buy links
+             Mobile: stacked between gallery and specs #}
+        <aside class="detail-page__sidebar flex flex-col">
+
+            {% if item.has_variants %}
+            {% include "commercial/features/variant-selector.html" %}
+            {% endif %}
+
+            {% if item.store_links %}
+            {% set store_links = item.store_links %}
+            {% include "commercial/features/purchase-options.html" %}
+            {% endif %}
+
+        </aside>
+
+    </div>
+
+</section>
+{% endblock %}

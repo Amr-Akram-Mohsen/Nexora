@@ -8,15 +8,11 @@ Usage (from project root, inside Flask app context):
 
 Workflow:
     Load batch JSON
-      → iterate products
-      → AliExpressParser  →  ParsedProduct
-      → ProductInserter   →  DB models
-      → db.session.commit()
+    run_import.py — CLI entry point for the commercial product ingestion pipeline.
 
-Adding a new source later:
-    1. Create a parser in app/integrations/commercial/<source>/parser.py
-    2. Register it in PARSER_REGISTRY below.
-    3. No other changes needed.
+    This module is store-agnostic: parsers are registered in
+    `app.integrations.commercial.registry` and per-store raw HTML files are
+    expected under `app/integrations/commercial/<store>/raw_html/p{index}.html`.
 """
 from __future__ import annotations
 
@@ -25,32 +21,17 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Optional
+
+from app.integrations.commercial import registry
+from app.integrations.commercial import io as commercial_io
 
 # Use a logger outside the app.* namespace so it always reaches the
 # root handler set up by basicConfig, bypassing Flask's ingestion filters.
 logger = logging.getLogger("commercial.import")
 
-# Default batch file location
-_DEFAULT_BATCH = (
-    Path(__file__).parent / "data" / "products_batch.json"
-)
-
-# Registry maps the "store" field in the JSON to the correct parser class.
-# Add new parsers here as you build them — nothing else changes.
-PARSER_REGISTRY: dict[str, str] = {
-    "aliexpress": "app.integrations.commercial.aliexpress.parser.AliExpressParser",
-}
-
-
-def _load_parser(store_slug: str):
-    """Dynamically import and instantiate the parser for a given store slug."""
-    dotted = PARSER_REGISTRY.get(store_slug)
-    if not dotted:
-        raise ValueError(f"No parser registered for store '{store_slug}'")
-    module_path, class_name = dotted.rsplit(".", 1)
-    import importlib
-    module = importlib.import_module(module_path)
-    return getattr(module, class_name)()
+# Default batch file location (keeps prior default for backwards compat)
+_DEFAULT_BATCH = Path(__file__).parent / "aliexpress" / "products_batch.json"
 
 
 def _load_batch(path: Path) -> list[dict]:
@@ -65,45 +46,13 @@ def _load_batch(path: Path) -> list[dict]:
     return data
 
 
-_HTML_FIELDS = ("product_info_html", "specifications_html")
-
-
-def _resolve_html_fields(raw: dict, batch_dir: Path) -> dict:
-    """
-    For each HTML field: if the value looks like a file path (ends with .html
-    and is not a long HTML string), load the file content from disk.
-    Paths are resolved relative to the batch JSON file's directory.
-    """
-    result = dict(raw)
-    for field in _HTML_FIELDS:
-        value = result.get(field, "")
-        if not value:
-            continue
-        # Treat it as a file path if it ends with .html and has no angle brackets
-        stripped = value.strip()
-        if stripped.endswith(".html") and "<" not in stripped:
-            candidate = (batch_dir / stripped).resolve()
-            if candidate.exists():
-                result[field] = candidate.read_text(encoding="utf-8")
-            else:
-                logger.warning(
-                    "[Import] HTML file not found: %s (field=%s)", candidate, field
-                )
-                result[field] = ""
-    return result
-
-
-def run_import(batch_path: Path, dry_run: bool = False) -> None:
-    """
-    Main import loop.  Must be called inside a Flask application context
-    (handled by __main__ block below, or by the Flask CLI command).
-    """
+def run_import(batch_path: Path, dry_run: bool = False, store_override: Optional[str] = None) -> None:
+    """Main import loop. Must be called inside a Flask application context."""
     from app.core.extensions import db
     from app.integrations.commercial.inserter import ProductInserter
 
     batch = _load_batch(batch_path)
-    batch_dir = batch_path.resolve().parent
-    logger.info("[AliExpress Import] Loaded %d entries from %s", len(batch), batch_path)
+    logger.info("[Import] Loaded %d entries from %s", len(batch), batch_path)
 
     # Group entries by store so we instantiate each parser once
     parsers: dict[str, object] = {}
@@ -113,14 +62,18 @@ def run_import(batch_path: Path, dry_run: bool = False) -> None:
     errors = 0
 
     for idx, raw in enumerate(batch, start=1):
-        store_slug: str = raw.get("store", "").lower().strip()
+        store_slug = (store_override or raw.get("store", "")).lower().strip()
         if not store_slug:
-            logger.warning("[Import] Entry %d has no 'store' field — skipping.", idx)
+            logger.warning(
+                "[Import] Entry %d has no 'store' field and no --store specified — skipping.",
+                idx,
+            )
             skipped += 1
             continue
 
-        # Resolve file-path HTML fields before any other processing
-        raw = _resolve_html_fields(raw, batch_dir)
+        # Load any per-store raw HTML file p{index}.html
+        html_fields = commercial_io.load_html_for_product(store_slug, idx)
+        raw.update(html_fields)
 
         # Skip template placeholders (checked after resolution)
         if "PASTE" in str(raw.get("product_info_html", "")):
@@ -130,7 +83,7 @@ def run_import(batch_path: Path, dry_run: bool = False) -> None:
 
         try:
             if store_slug not in parsers:
-                parsers[store_slug] = _load_parser(store_slug)
+                parsers[store_slug] = registry.get_parser_instance(store_slug)
             parser = parsers[store_slug]
         except ValueError as exc:
             logger.warning("[Import] Entry %d: %s — skipping.", idx, exc)
@@ -141,7 +94,9 @@ def run_import(batch_path: Path, dry_run: bool = False) -> None:
         if parsed is None:
             logger.warning(
                 "[Import] Entry %d could not be parsed (store=%s url=%s).",
-                idx, store_slug, raw.get("product_url", ""),
+                idx,
+                store_slug,
+                raw.get("product_url", ""),
             )
             errors += 1
             continue
@@ -163,40 +118,22 @@ def run_import(batch_path: Path, dry_run: bool = False) -> None:
 
         if item is not None:
             db.session.commit()
-            logger.info(
-                "[Import] Inserted: '%s' (id=%s, slug=%s)",
-                item.name, item.id, item.slug,
-            )
+            logger.info("[Import] Inserted: '%s' (id=%s, slug=%s)", item.name, item.id, item.slug)
             inserted += 1
         else:
             # None means duplicate (already logged) or a DB exception (inserter logs it).
             db.session.rollback()
             skipped += 1
 
-    logger.info(
-        "[Import] Done — inserted=%d  skipped/duplicate=%d  errors=%d",
-        inserted, skipped, errors,
-    )
-    print(
-        f"\n[OK] Import complete: {inserted} inserted, {skipped} skipped/duplicate, {errors} errors.\n"
-    )
+    logger.info("[Import] Done — inserted=%d  skipped/duplicate=%d  errors=%d", inserted, skipped, errors)
+    print(f"\n[OK] Import complete: {inserted} inserted, {skipped} skipped/duplicate, {errors} errors.\n")
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        description="Import AliExpress products from a batch JSON file into the database."
-    )
-    ap.add_argument(
-        "--batch",
-        type=Path,
-        default=_DEFAULT_BATCH,
-        help=f"Path to the batch JSON file (default: {_DEFAULT_BATCH})",
-    )
-    ap.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Parse and log products without writing to the database.",
-    )
+    ap = argparse.ArgumentParser(description="Import products from a batch JSON file into the database.")
+    ap.add_argument("--batch", type=Path, default=_DEFAULT_BATCH, help=f"Path to the batch JSON file (default: {_DEFAULT_BATCH})")
+    ap.add_argument("--dry-run", action="store_true", help="Parse and log products without writing to the database.")
+    ap.add_argument("--store", type=str, help="Optional: force a store slug for all entries in the batch.")
     return ap
 
 
@@ -204,22 +141,20 @@ if __name__ == "__main__":
     args = _build_arg_parser().parse_args()
 
     # Load .env BEFORE importing create_app.
-    # Config.SQLALCHEMY_DATABASE_URI is evaluated at class-definition time
-    # (when config.py is first imported), so DATABASE_URL must already be in
-    # os.environ at that point, otherwise it falls back to the SQLite default.
     from dotenv import load_dotenv
+
     load_dotenv()
 
     from app.core import create_app
 
     app = create_app()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s  %(levelname)-7s  %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%H:%M:%S")
 
     with app.app_context():
-        run_import(batch_path=args.batch, dry_run=args.dry_run)
+        run_import(batch_path=args.batch, dry_run=args.dry_run, store_override=args.store)
+
+
+# with app.app_context():
+#     run_import(batch_path=args.batch, dry_run=args.dry_run)
 

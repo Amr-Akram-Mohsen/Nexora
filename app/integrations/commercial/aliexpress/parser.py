@@ -66,17 +66,31 @@ class AliExpressParser(BaseParser):
     def _parse(self, raw: dict) -> Optional[ParsedProduct]:
         product_url: str = raw.get("product_url", "")
         affiliate_url: str = raw.get("affiliate_url") or product_url
-        info_html: str = raw.get("product_info_html", "")
-        spec_html: str = raw.get("specifications_html", "")
+        
+        html: str = raw.get("html", "")
 
-        if not info_html:
+        if not html:
             logger.warning(
-                "[AliExpress] Skipping entry with no product_info_html: %s", product_url
+                "[AliExpress] Skipping entry with no HTML: %s",
+                product_url
             )
             return None
 
-        info = BeautifulSoup(info_html, "html.parser")
-        spec = BeautifulSoup(spec_html, "html.parser") if spec_html else None
+        soup = BeautifulSoup(html, "html.parser")
+
+        info = soup.find("div", class_="pdp-info")
+
+        spec = soup.find(
+            "ul",
+            class_=re.compile(r"specification--list")
+        )
+
+        if not info:
+            logger.warning(
+                "[AliExpress] Missing pdp-info block: %s",
+                product_url
+            )
+            return None
 
         name = self._parse_title(info)
         if not name:

@@ -19,7 +19,7 @@ else url_for('interaction.subscribe') %}
 </p>
 {% endif %}
 
-{% call form("justify-center newsletter-form", form_action=action, attrs={"data-newsletter-form": ""}) %}
+{% call form("flex justify-center newsletter-form", form_action=action, attrs={"data-newsletter-form": ""}) %}
 {% if not is_authenticated %}
 {{ input(
 name='email',

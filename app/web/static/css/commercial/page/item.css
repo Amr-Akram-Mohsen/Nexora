@@ -3,87 +3,255 @@
 @import "../features/full-details.css";
 @import "../features/category-details.css";
 @import "../features/purchase-options.css";
-
+@import "../features/rating.css";
 
 @import "../../components/interactions/comments.css";
 @import "../../components/interactions/interaction.css";
 
+/* ─── Utilities ──────────────────────────────────────────────────────── */
+
+.u-break-words {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.u-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ─── Item Details Card ──────────────────────────────────────────────── */
+
 .item-details-card {
   background: var(--card);
-  margin-bottom: 1rem;
-  border-radius: 0.75rem;
-  padding: 1rem;
+  margin-bottom: 0;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
   border: 1px solid var(--border);
-  box-shadow: 0 10px 20px rgba(var(--black-rgb), var(--alpha-muted));
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s ease;
+}
+
+.item-details-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .item-details-card__title {
-  gap: 0.5rem;
-  font-size: var(--text-2xl);
-  margin-bottom: 1.5rem;
+  gap: 0.625rem;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  margin-bottom: 1.25rem;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
 }
 
 .item-details-card__bar {
-  width: 4px;
-  height: 24px;
+  width: 3px;
+  height: 16px;
   border-radius: var(--radius-full);
   background: var(--gradient-primary);
+  flex-shrink: 0;
 }
-
 
 .item-details-card__items {
   gap: 0.75rem;
 }
 
-.item-detail-item {
-  font-size: var(--text-sm);
-  padding: 1rem;
-  border-radius: var(--radius-md);
-  background: linear-gradient(to right,
-      rgba(var(--muted-rgb), var(--alpha-bold)),
-      transparent);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.item-detail-item:hover {
-  background: linear-gradient(to right,
-      rgba(var(--domain-primary-rgb), var(--alpha-soft)),
-      transparent);
-  border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
-}
-
-
-.item-detail-item__label {
-  color: var(--muted-foreground);
-  font-weight: var(--weight-md);
-}
-
-.item-detail-item__value {
-  font-weight: var(--weight-bold);
-  text-align: right;
-  max-width: 60%;
-}
+/* ─── Item Content (description) ─────────────────────────────────────── */
 
 .item-content {
-  line-height: 1.7;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  font-size: var(--text-base);
 }
 
-.item-details-dialog__open {
-  background-color: var(--domain-primary);
-  color: #fff;
-  font-weight: 600;
-  border: none;
+/* ─── Affiliate disclosure banner ────────────────────────────────────── */
+
+.detail-page[data-domain-type="commercial"] .affiliate-disclosure-banner {
+  background: rgba(var(--domain-primary-rgb), 0.03);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--domain-primary);
+  padding: 0.875rem 1.125rem;
+  margin-top: 2rem;
+  margin-bottom: 0;
   border-radius: var(--radius-lg);
-  padding: 0.875rem;
-  box-shadow: 0 4px 14px rgba(var(--domain-primary-rgb), var(--alpha-soft));
-  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  box-shadow: var(--shadow-sm);
+  gap: 0.625rem;
   width: 100%;
-  margin-top: 1rem;
 }
 
-.item-details-dialog__open:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(var(--domain-primary-rgb), var(--alpha-accent));
-  background-color: rgba(var(--domain-primary-rgb), var(--alpha-max));
+.detail-page[data-domain-type="commercial"] .affiliate-disclosure-banner .banner-icon {
+  color: var(--domain-primary);
+  font-size: var(--text-sm);
+  flex-shrink: 0;
+}
+
+/* ─── Commercial domain — base grid setup ────────────────────────────── */
+
+/*
+  detail-page__main has display:contents so its children participate
+  directly in the container grid alongside the aside element.
+  Grid areas are assigned below and shared across breakpoints.
+*/
+
+.detail-page[data-domain-type="commercial"] .container {
+  display: grid;
+  align-items: start;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__main {
+  display: contents;
+}
+
+/* Grid area assignments ─ same class→area mapping at every breakpoint */
+.detail-page[data-domain-type="commercial"] .detail-page__top     { grid-area: top; }
+.detail-page[data-domain-type="commercial"] .detail-page__header  { grid-area: header; }
+.detail-page[data-domain-type="commercial"] .detail-page__image   { grid-area: gallery; }
+.detail-page[data-domain-type="commercial"] .detail-page__content { grid-area: content; }
+.detail-page[data-domain-type="commercial"] .detail-page__specs   { grid-area: specs; }
+.detail-page[data-domain-type="commercial"] .detail-page__sidebar { grid-area: sidebar; }
+
+/* ─── Title ──────────────────────────────────────────────────────────── */
+
+.detail-page[data-domain-type="commercial"] .detail-page__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-xbold);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.875rem 0;
+  line-height: 1.2;
+  color: var(--foreground);
+}
+
+/* Badges row */
+.detail-page[data-domain-type="commercial"] .detail-page__badges {
+  margin-bottom: 0.875rem;
+  gap: 0.5rem;
+}
+
+/* Meta row (stars / review count) */
+.detail-page[data-domain-type="commercial"] .detail-page__meta {
+  padding-block: 0.875rem;
+  margin-bottom: 0;
+  gap: 0.75rem;
+  border-top: none;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+/* ─── Mobile — single column (default, no media query needed) ────────── */
+
+.detail-page[data-domain-type="commercial"] .container {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "top"
+    "header"
+    "gallery"
+    "sidebar"
+    "specs"
+    "content";
+  row-gap: 0;
+  padding-block: 1.5rem;
+}
+
+/* Mobile spacing helpers */
+.detail-page[data-domain-type="commercial"] .detail-page__image   { margin-top: 1.25rem; }
+.detail-page[data-domain-type="commercial"] .detail-page__sidebar { margin-top: 1.25rem; }
+.detail-page[data-domain-type="commercial"] .detail-page__specs   { margin-top: 1.5rem; }
+.detail-page[data-domain-type="commercial"] .detail-page__content { margin-top: 1.5rem; }
+
+/* ─── Tablet title bump ──────────────────────────────────────────────── */
+
+@media (min-width: 768px) {
+  .detail-page[data-domain-type="commercial"] .detail-page__title {
+    font-size: var(--text-3xl);
+  }
+}
+
+/* ─── Desktop two-column layout ──────────────────────────────────────── */
+
+@media (min-width: 1024px) {
+  .detail-page[data-domain-type="commercial"] .container {
+    /*
+      Left col  (1.2fr): gallery (rows 2-4) → specs (row 5) → content (row 6)
+      Right col (0.8fr): header (row 2) then sidebar (rows 3-6, sticky)
+
+      gallery appears in rows 2–4 of the template so it spans those rows.
+      sidebar appears in rows 3–6 so it spans those rows (enables sticky to
+      remain visible while specs & content scroll on the left).
+    */
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    grid-template-areas:
+      "top     top"
+      "gallery header"
+      "gallery sidebar"
+      "gallery sidebar"
+      "specs   sidebar"
+      "content sidebar";
+    column-gap: 3rem;
+    row-gap: 0;
+    padding-block: 2rem;
+  }
+
+  /* Reset mobile margin helpers on desktop */
+  .detail-page[data-domain-type="commercial"] .detail-page__image   { margin-top: 0; }
+  .detail-page[data-domain-type="commercial"] .detail-page__sidebar { margin-top: 0; }
+
+  /* Gallery image wrapper: no extra chrome */
+  .detail-page[data-domain-type="commercial"] .detail-page__image {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    border-radius: 0;
+    padding-right: 0.5rem;
+  }
+
+  /* Header area — right column, row 2 */
+  .detail-page[data-domain-type="commercial"] .detail-page__header {
+    padding-top: 0.125rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Gallery image wrapper: no extra chrome */
+  .detail-page[data-domain-type="commercial"] .detail-page__image {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    border-radius: 0;
+    padding-right: 0.5rem;
+  }
+
+  /* Content and specs: slight right padding to breathe from the sidebar */
+  .detail-page[data-domain-type="commercial"] .detail-page__content {
+    padding-right: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  .detail-page[data-domain-type="commercial"] .detail-page__specs {
+    padding-right: 0.5rem;
+    margin-top: 2rem;
+  }
+
+  /* Sidebar: sticky so variants + buy-links stay in view while
+     the user reads specs & description on the left */
+  .detail-page[data-domain-type="commercial"] .detail-page__sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+    align-self: start;
+    padding-left: 0.25rem;
+  }
+
+  /* Breadcrumb / top bar */
+  .detail-page[data-domain-type="commercial"] .detail-page__top {
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
 }

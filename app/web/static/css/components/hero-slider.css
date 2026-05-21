@@ -148,7 +148,7 @@
 .hero-slider__arrow:hover {
   opacity: 1;
   background: var(--background);
-  color: var(--domain-primary);
+  color: var(--brand-blue);
 }
 
 .hero-slider__arrow--prev {
@@ -181,7 +181,7 @@
 
 .hero-slider__dot.active {
   width: 2rem;
-  background: var(--domain-primary, var(--primary));
+  background: var(--brand-blue);
 }
 
 .hero-slider__dot:not(.active):hover {

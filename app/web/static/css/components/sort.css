@@ -45,8 +45,8 @@
 
 .sort-select:focus {
   outline: none;
-  border-color: var(--domain-primary);
-  box-shadow: 0 0 0 3px rgba(var(--domain-primary-rgb), var(--alpha-soft));
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), var(--alpha-soft));
 }
 
 

@@ -26,9 +26,9 @@
       <div class="contact-grid">
 
         <!-- Contact Info -->
-        <aside class="contact-info">
+        <aside class="contact-info flex flex-col">
           {% for card in contact_cards %}
-          <div class="contact-item">
+          <div class="contact-item flex items-start">
             <div class="contact-icon">
               <i class="{{ card.icon }}"></i>
             </div>

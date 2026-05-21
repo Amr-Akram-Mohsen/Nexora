@@ -5,8 +5,8 @@
 
 .pagination__btn:hover:not(.is-disabled) {
   background: var(--secondary);
-  border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
-  color: rgb(var(--domain-primary-rgb));
+  border-color: rgba(var(--brand-blue-rgb), var(--alpha-strong));
+  color: rgb(var(--brand-blue-rgb));
 }
 
 .pagination__btn.is-disabled {
@@ -25,11 +25,11 @@
 }
 
 .pagination__page.is-active {
-  background: rgb(var(--domain-primary-rgb));
+  background: rgb(var(--brand-blue-rgb));
   color: #fff;
   border-color: transparent;
   font-weight: var(--weight-bold);
-  box-shadow: 0 4px 10px rgba(var(--domain-primary-rgb), var(--alpha-strong));
+  box-shadow: 0 4px 10px rgba(var(--brand-blue-rgb), var(--alpha-strong));
 }
 
 .pagination__ellipsis {
@@ -83,4 +83,4 @@
     height: 2rem;
     font-size: var(--text-xs);
   }
-}
+}

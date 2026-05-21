@@ -44,8 +44,8 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="article-header">
-  <div class="article-header__badges">
+<div class="article-header flex flex-col">
+  <div class="article-header__badges flex flex-wrap">
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
     {{ badge(topic.name, 'badge--topic', 'secondary') }}
@@ -54,7 +54,7 @@
 
   <h1 class="article-header__title">{{ article.title }}</h1>
 
-  <div class="article-header__meta">
+  <div class="article-header__meta flex flex-wrap items-center">
     <div class="meta-pill">
       <i class="far fa-newspaper"></i>
       <span class="meta-pill__text">{{ article.source_name }}</span>
@@ -111,7 +111,7 @@
 
   </div>
 
-  <div class="article-cta-box">
+  <div class="article-cta-box flex items-center justify-between">
     <div class="cta-content">
       <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
       <h4 class="cta-title">Want to read more?</h4>

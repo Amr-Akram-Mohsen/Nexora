@@ -76,3 +76,22 @@ body.dark-mode .variant--destructive {
   --variant-hover-bg: rgba(var(--destructive-rgb), var(--alpha-stronger));
   --focus-opacity: 0.4;
 }
+
+
+.btn,
+.badge {
+  background-color: var(--variant-bg, transparent);
+  color: var(--variant-color, inherit);
+  border: 1px solid var(--variant-border, transparent);
+  font-weight: var(--weight-md);
+  white-space: nowrap;
+  text-transform: capitalize;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover,
+.badge:hover {
+  background-color: var(--variant-hover-bg, var(--variant-bg, transparent));
+  color: var(--variant-hover-color, var(--variant-color, inherit));
+  border-color: var(--variant-hover-border, var(--variant-border, transparent));
+}

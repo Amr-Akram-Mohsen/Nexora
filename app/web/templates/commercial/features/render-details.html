@@ -1,40 +1,59 @@
-{% macro render_details(details) %}
+{% macro render_details(details, counter=namespace(value=0)) %}
 
 {% if details is mapping %}
-  {% for key, value in details.items() %}
-    {% if value is mapping %}
-      <div class="item-details-group flex flex-col">
-        <h4 class="item-details-group__title">{{ key.replace('_', ' ') | title }}</h4>
-        <div class="item-details-group__items flex flex-col">
-          {{ render_details(value) }}
-        </div>
-      </div>
-    {% elif value is sequence and value is not string %}
-      <div class="item-details-group flex flex-col">
-        <h4 class="item-details-group__title">{{ key.replace('_', ' ') | title }}</h4>
-        <ul class="item-details-group__list">
-          {% for item in value %}
-            <li>{{ render_details(item) }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% else %}
-      <div class="item-detail-item item-detail-item--full flex justify-between items-start">
-        <span class="item-detail-item__label">{{ key.replace('_', ' ') | title }}</span>
-        <span class="item-detail-item__value">{{ value }}</span>
-      </div>
-    {% endif %}
-  {% endfor %}
 
-{% elif details is sequence and details is not string %}
-  <ul class="item-details-group__list">
-    {% for item in details %}
-      <li>{{ render_details(item) }}</li>
+{% for key, value in details.items() %}
+
+{% if value is mapping %}
+
+{# Nested mapping → render as a titled group #}
+<div class="item-details-group">
+  <h4 class="item-details-group__title">
+    {{ key.replace('_',' ') | title }}
+  </h4>
+  <div class="item-details-group__items">
+    {{ render_details(value, counter) }}
+  </div>
+</div>
+
+{% elif value is sequence and value is not string %}
+
+{# Sequence value → bulleted list inside a group #}
+<div class="item-details-group">
+  <h4 class="item-details-group__title">
+    {{ key.replace('_',' ') | title }}
+  </h4>
+  <ul class="item-details-group__list flex flex-col">
+    {% for item in value %}
+    <li>{{ render_details(item, counter) }}</li>
     {% endfor %}
   </ul>
+</div>
 
 {% else %}
-  <span class="item-detail-item__value">{{ details }}</span>
+
+{# Scalar key→value pair: two-tone row #}
+{% set counter.value = counter.value + 1 %}
+{% set hidden_class = " item-detail-item--hidden" if counter.value > 6 else "" %}
+
+<div class="item-detail-item flex items-start {{ hidden_class }}">
+  <span class="item-detail-item__label">
+    {{ key.replace('_',' ') | title }}
+  </span>
+  <span class="item-detail-item__value u-break-words">
+    {{ value }}
+  </span>
+</div>
+
+{% endif %}
+
+{% endfor %}
+
+{% elif details is not mapping and details is not sequence %}
+
+{# Plain scalar — just print the value #}
+<span class="item-detail-scalar">{{ details }}</span>
+
 {% endif %}
 
 {% endmacro %}

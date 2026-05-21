@@ -60,24 +60,29 @@
   gap: .5rem;
 }
 
+/* Core checkbox box styles (canonical) */
 .checkbox-box {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   border: 1.5px solid var(--border);
-  border-radius: 3px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
+  border-radius: 4px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  background: var(--input-background);
+  position: relative;
 }
 
+/* Default checked indicator (used in form contexts where FontAwesome is available) */
 .checkbox-box.checked::after {
   content: '\f00c';
   font-family: 'Font Awesome 6 Free';
   font-weight: 900;
   font-size: 9px;
   color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .input-sm {
@@ -90,18 +95,7 @@
   font-size: var(--text-sm);
 }
 
-.checkbox-box {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  border: 1.5px solid var(--border);
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-  background: var(--input-background);
-}
+/* (merged above) */
 
 .filter-item__link:hover .checkbox-box {
   border-color: rgba(var(--brand-blue-rgb), 0.5);
@@ -164,4 +158,4 @@
   background: rgb(var(--brand-blue-rgb));
   border-color: rgb(var(--brand-blue-rgb));
   box-shadow: 0 2px 6px rgba(var(--brand-blue-rgb), 0.35);
-}
+}

@@ -20,9 +20,9 @@
   },
   "tutorials": {
     "accessories:watches": 3,
-    "accessories:bags": 3,
-    "accessories:sunglasses": 3,
-    "accessories:jewelry": 3,
+    "accessories:bags": 0,
+    "accessories:sunglasses": 2,
+    "accessories:jewelry": 2,
     "electronics:tablets": 4,
     "perfumes:niche-artisanal": 3,
     "perfumes:oud-oriental": 3,

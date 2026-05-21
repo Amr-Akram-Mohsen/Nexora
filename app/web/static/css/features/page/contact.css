@@ -33,14 +33,10 @@
 
 /* Contact Details Info */
 .contact-info {
-  display: flex;
-  flex-direction: column;
   gap: 1.75rem;
 }
 
 .contact-item {
-  display: flex;
-  align-items: flex-start;
   gap: 1rem;
 }
 

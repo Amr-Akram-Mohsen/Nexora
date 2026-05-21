@@ -10,7 +10,7 @@
   align-items: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .inline-product-card:hover {

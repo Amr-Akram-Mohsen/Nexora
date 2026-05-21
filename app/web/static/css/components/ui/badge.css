@@ -5,20 +5,19 @@
   width: fit-content;
   border-radius: var(--radius-full);
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
   gap: 0.35rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  background-color: rgba(var(--card-badge-rgb, var(--domain-primary-rgb)), var(--badge-opacity));
-  color: rgb(var(--card-badge-rgb, var(--domain-primary-rgb)));
-  border: 1px solid rgba(var(--card-badge-rgb, var(--domain-primary-rgb)), 0.1);
+  /* Global component: prefer brand tokens; domain overrides via variants remain supported */
+  background-color: rgba(var(--card-badge-rgb, var(--brand-blue-rgb)), var(--badge-opacity));
+  color: rgb(var(--card-badge-rgb, var(--brand-blue-rgb)));
+  border: 1px solid rgba(var(--card-badge-rgb, var(--brand-blue-rgb)), 0.1);
   transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .badge:hover {
-  background-color: rgba(var(--card-badge-rgb, var(--domain-primary-rgb)), var(--badge-opacity-hover));
+  background-color: rgba(var(--card-badge-rgb, var(--brand-blue-rgb)), var(--badge-opacity-hover));
   transform: translateY(-1px);
 }
 

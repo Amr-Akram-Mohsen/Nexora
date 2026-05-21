@@ -53,7 +53,7 @@
 
 /* view all arrows */
 .view-all {
-  text-decoration: none !important;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
 }

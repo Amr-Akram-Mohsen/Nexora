@@ -110,10 +110,10 @@
 
       <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}"
           {% if render_extra %}style="display: none;"{% endif %}>
-        <a href="{{ get_filter_url(filter_name, slug, multi=True) }}"
+          <a href="{{ get_filter_url(filter_name, slug, multi=True) }}"
            class="filter-item__link flex items-center"
            title="{{ name }}">
-          <span class="checkbox-box {{ 'checked' if is_active }}" aria-hidden="true"></span>
+          <span class="checkbox-box inline-flex items-center justify-center {{ 'checked' if is_active }}" aria-hidden="true"></span>
           <span class="filter-item__name truncate">{{ name }}</span>
         </a>
       </li>
@@ -174,17 +174,17 @@
       {% endif %}
       {% endfor %}
 
-      <div class="price-range-inputs">
-        <div class="price-input-group">
+      <div class="price-range-inputs flex items-center">
+        <div class="price-input-group flex flex-col">
           <label for="min_price" class="price-input-label">Min</label>
-          <div class="price-input-wrapper">
+          <div class="price-input-wrapper flex items-center">
             <span class="price-currency">$</span>
             <input type="number" id="min_price" name="min_price" placeholder="0"
                    value="{{ active_filters.min_price or '' }}"
                    class="price-input" min="0" step="1">
           </div>
         </div>
-        <div class="price-range-divider"><span></span></div>
+        <div class="price-range-divider flex items-center"><span></span></div>
         <div class="price-input-group">
           <label for="max_price" class="price-input-label">Max</label>
           <div class="price-input-wrapper">
@@ -196,7 +196,7 @@
         </div>
       </div>
 
-      <button type="submit" class="price-apply-btn">
+      <button type="submit" class="price-apply-btn flex items-center justify-center">
         <i class="fas fa-check"></i> Apply Range
       </button>
     </form>

@@ -14,7 +14,7 @@
       <aside class="profile-sidebar space-y-6">
         <div class="profile-card glass animate-fade-in">
           <div class="profile-avatar-wrapper flex flex-col items-center py-6">
-            <div class="profile-avatar mb-4">
+            <div class="profile-avatar flex items-center justify-center mb-4">
               {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
             </div>
             <h2 class="profile-display-name text-xl font-bold">{{ current_user.name or "Nexora Member" }}</h2>

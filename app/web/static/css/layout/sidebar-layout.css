@@ -9,9 +9,6 @@
 
 /* Sidebar Title Row */
 .sidebar-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--border);
   margin-bottom: 1.25rem;
@@ -23,8 +20,6 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted-foreground);
-  display: inline-flex;
-  align-items: center;
   gap: 0.45rem;
 }
 
@@ -40,15 +35,13 @@
   font-weight: 600;
   color: var(--domain-primary, var(--primary));
   transition: opacity 0.15s ease;
-  text-decoration: none !important;
-  display: inline-flex;
-  align-items: center;
+  text-decoration: none;
   gap: 0.35rem;
 }
 
 .sidebar-reset-link:hover {
   opacity: 0.85;
-  text-decoration: underline !important;
+  text-decoration: underline;
 }
 
 /* --- Premium Minimalist Sidebar Filters --- */
@@ -97,8 +90,6 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--foreground);
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -121,9 +112,6 @@ details[open] .filter-section__chevron {
 
 /* Active Badge */
 .filter-section__badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-width: 1.125rem;
   height: 1.125rem;
   padding: 0 0.35rem;
@@ -141,8 +129,6 @@ details[open] .filter-section__chevron {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
   gap: 0.25rem;
   margin-top: 0.5rem;
 }
@@ -168,13 +154,11 @@ details[open] .filter-section__chevron {
 }
 
 .filter-item__link {
-  display: flex;
-  align-items: center;
   gap: 0.65rem;
   padding: 0.45rem 0.6rem;
   color: var(--muted-foreground);
   transition: color 0.15s ease;
-  text-decoration: none !important;
+  text-decoration: none;
   font-size: 0.8125rem; /* 13px clean list item labels */
   font-weight: 500;
 }
@@ -188,20 +172,8 @@ details[open] .filter-section__chevron {
   font-weight: 600;
 }
 
-/* --- High-Fidelity Custom Checkbox --- */
-.checkbox-box {
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border);
-  background: var(--card);
-  transition: all 0.15s ease-in-out;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
+/* Checkbox visuals: core layout properties are canonicalized into
+   components/ui/form.css. Sidebar keeps only contextual overrides. */
 
 .filter-item:hover .checkbox-box {
   border-color: var(--muted-foreground);
@@ -212,8 +184,8 @@ details[open] .filter-section__chevron {
   border-color: var(--domain-primary, var(--primary));
 }
 
-/* Draw a sharp geometric checkmark inside active box */
-.checkbox-box.checked::after {
+/* Draw a sharp geometric checkmark inside active box for sidebar filters */
+.filter-item .checkbox-box.checked::after {
   content: "";
   width: 4px;
   height: 7px;
@@ -231,8 +203,6 @@ details[open] .filter-section__chevron {
 }
 
 .sidebar-trending__header {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.85rem;
 }
@@ -251,21 +221,17 @@ details[open] .filter-section__chevron {
 }
 
 .sidebar-trending__links {
-  display: flex;
-  flex-direction: column;
   gap: 0.25rem;
 }
 
 .sidebar-trending__link {
-  display: flex;
-  align-items: center;
   gap: 0.65rem;
   padding: 0.45rem 0.6rem;
   border-radius: var(--radius-md);
   font-size: 0.8125rem;
   color: var(--muted-foreground);
   transition: all 0.15s ease;
-  text-decoration: none !important;
+  text-decoration: none;
   font-weight: 500;
 }
 
@@ -293,8 +259,6 @@ details[open] .filter-section__chevron {
 }
 
 .sidebar-trending__view-all {
-  display: inline-flex;
-  align-items: center;
   gap: 0.35rem;
   margin-top: 0.5rem;
   padding: 0.35rem 0.6rem;
@@ -302,7 +266,7 @@ details[open] .filter-section__chevron {
   font-weight: 600;
   color: var(--domain-primary, var(--primary));
   border-radius: var(--radius-md);
-  text-decoration: none !important;
+  text-decoration: none;
   transition: all 0.15s ease;
 }
 
@@ -332,8 +296,6 @@ details[open] .filter-section__chevron {
   font-weight: 600;
   padding: 0.45rem 0.6rem;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
   gap: 0.35rem;
   transition: all 0.15s ease;
   width: 100%;

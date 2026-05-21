@@ -26,7 +26,7 @@
                     {% for item in items %}
                     <th class="compare-col">
                         <div class="compare-item-header flex flex-col items-center">
-                            <div class="compare-img-wrapper">
+                            <div class="compare-img-wrapper flex items-center justify-center">
                                 {{ render_image_url(item.image_url, item.name) }}
                             </div>
                             <h3 class="compare-item-name">{{ item.name }}</h3>
@@ -42,7 +42,7 @@
                                 {% endif %}
                             </div>
 
-                            <div class="compare-actions">
+                            <div class="compare-actions flex flex-col">
                                 <a href="{{ url_for('item.item_page', item_id=item.id) }}"
                                     class="btn btn--outline btn--sm">View Full Details</a>
                                 {% if best_link %}

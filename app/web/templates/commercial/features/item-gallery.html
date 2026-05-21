@@ -1,12 +1,12 @@
 {% from "commercial/features/item-image.html" import render_image_url %}
-{% from "components/ui/button.html" import button %}
+
 {% macro item_gallery(item) %}
 {% if item.images %}
 
 <div class="item-gallery flex flex-col" data-gallery>
 
   <!-- MAIN IMAGE -->
-  <div class="item-gallery__viewer">
+  <div class="item-gallery__viewer flex items-center justify-center">
 
     {{ render_image_url(
     item.images[0].image_url,
@@ -16,29 +16,20 @@
     ) }}
 
     <!-- Fullscreen button -->
-    {{ button(
-    text="",
-    class="item-gallery__fullscreen flex items-center justify-center",
-    icon="fa-expand",
-    attrs={'data-gallery-open': '1'}
-    ) }}
+    <button type="button" class="item-gallery__fullscreen flex items-center justify-center" data-gallery-open="1" aria-label="Zoom image">
+      <i class="fa fa-expand"></i>
+    </button>
 
     {% if item.images|length > 1 %}
 
     <!-- arrows -->
-    {{ button(
-    text="",
-    class="item-gallery__nav item-gallery__nav--prev disabled",
-    icon="fa-chevron-left",
-    attrs={'data-gallery-new-image': '1'}
-    ) }}
+    <button type="button" class="item-gallery__nav item-gallery__nav--prev flex items-center justify-center" data-gallery-new-image="0" disabled aria-label="Previous image">
+      <i class="fa fa-chevron-left"></i>
+    </button>
 
-    {{ button(
-    text="",
-    class="item-gallery__nav item-gallery__nav--next",
-    icon="fa-chevron-right",
-    attrs={'data-gallery-new-image': '2'}
-    ) }}
+    <button type="button" class="item-gallery__nav item-gallery__nav--next flex items-center justify-center" data-gallery-new-image="2" aria-label="Next image">
+      <i class="fa fa-chevron-right"></i>
+    </button>
 
     <!-- counter -->
     <div class="item-gallery__counter">
@@ -56,9 +47,9 @@
   <div class="item-gallery__thumbs">
 
     {% for image in item.images %}
-    {% call button(class='item-gallery__thumb', attrs={'data-gallery-thumb': loop.index}) %}
-    {{ render_image_url(image.image_url, item.name, 'img-cover') }}
-    {% endcall %}
+    <button type="button" class="item-gallery__thumb {{ 'is-active' if loop.first }}" data-gallery-thumb="{{ loop.index }}" aria-label="View product image {{ loop.index }}">
+      {{ render_image_url(image.image_url, item.name, 'img-cover') }}
+    </button>
     {% endfor %}
 
   </div>

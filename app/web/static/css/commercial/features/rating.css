@@ -1,13 +1,27 @@
+/* ─── Star color ─────────────────────────────────────────────────────── */
+
+.star {
+  color: #f59e0b;
+  margin-right: 0.075rem;
+}
+
+/* ─── Rating value ───────────────────────────────────────────────────── */
+
 .item-rating {
   font-size: var(--text-sm);
-  font-weight: var(--weight-md);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
 }
+
+/* ─── Reviews count ──────────────────────────────────────────────────── */
 
 .item-reviews-count {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
-.star {
-  color: gold;
+/* ─── Inline meta separator ──────────────────────────────────────────── */
+
+.meta-item {
+  gap: 0.25rem;
 }

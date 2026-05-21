@@ -15,7 +15,7 @@ block content %} {% from"components/page.html" import page %}
 </p>
 
 <h2 class="page__subtitle">What We Cover</h2>
-<ul class="page__items">
+<ul class="page__items flex flex-col">
   {% for card in cover_cards %}
   <li class="page__item">
     <strong>
@@ -27,7 +27,7 @@ block content %} {% from"components/page.html" import page %}
   {% endfor %}
 </ul>
 <h2 class="page__subtitle">Our Core Values</h2>
-<ul class="page__items">
+<ul class="page__items flex flex-col">
   <li>Accuracy and honesty in every article</li>
   <li>Security, privacy and digital awareness</li>
   <li>Simple explanations for complex ideas</li>

@@ -3,7 +3,7 @@
   --domain-secondary-rgb: var(--brand-purple-rgb);
 }
 
-[data-domain-type="item"] {
+[data-domain-type="commercial"] {
   --domain-primary-rgb: var(--brand-green-rgb);
   --domain-secondary-rgb: var(--brand-teal-rgb);
 
