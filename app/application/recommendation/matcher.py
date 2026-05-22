@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 from app.core.extensions import db
 from app.domains.content.models import Article, Content
 from app.domains.item.models import Item
+from app.domains.item.service.options import get_item_load_options
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +101,7 @@ def match_articles_to_items(
 
     # Load all items once — item count is much smaller than article count
     # and each item is lightweight (name + brand + category only needed)
-    items = Item.query.all()
+    items = Item.query.options(*get_item_load_options("minimal")).all()
     if not items:
         logger.info("[Matcher] No items found. Nothing to match against.")
         return 0

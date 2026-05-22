@@ -89,6 +89,7 @@
 .item-buy-link__store img.store-logo {
   height: 20px;
   width: auto;
+  margin-right: 0.5rem;
   border-radius: var(--radius-sm);
   object-fit: contain;
   flex-shrink: 0;

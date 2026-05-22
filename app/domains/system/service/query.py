@@ -114,16 +114,27 @@ def get_section_by_slug(slug):
     return Section.query.filter(Section.slug == slug, Section.is_active).first()
 
 
+@cache.memoize(timeout=3600)
 def get_distinct_item_categories():
     from app.domains.item.models import Item
 
-    return Category.query.join(Item).distinct().all()
+    stmt = (
+        select(Category.slug, Category.name)
+        .join(Item)
+        .distinct()
+        .order_by(Category.name)
+    )
+    return execute_mapped_query(stmt)
 
 
+@cache.memoize(timeout=3600)
 def get_distinct_item_brands():
     from app.domains.item.models import Item
 
-    return Brand.query.join(Item).distinct().all()
+    stmt = (
+        select(Brand.slug, Brand.name).join(Item).distinct().order_by(Brand.name)
+    )
+    return execute_mapped_query(stmt)
 
 
 def get_attributes_for_section(section_slug, category_slugs=None, limit=20):

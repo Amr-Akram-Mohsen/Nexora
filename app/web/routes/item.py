@@ -4,7 +4,7 @@ from flask_login import current_user
 from app.application.item.get_catalog import get_catalog_data
 from app.application.item.get_item_page import get_item_page_data
 from app.application.item.compare_items import get_comparison_data
-from app.domains.item.service import get_item_by_id
+from app.domains.item.service import get_item_spec_groups
 from app.shared.request import get_client_ip
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
@@ -17,14 +17,14 @@ bp = Blueprint("item", __name__)
 
 @bp.route("/item/<int:item_id>/view_full_specs", methods=["POST"])
 def view_full_specs(item_id):
-    # Retrieve serialized item details
-    item = get_item_by_id(item_id, serialize=True)
-    if not item:
+    full_details = get_item_spec_groups(item_id)
+    if full_details is None:
         abort(404)
 
-    full_details = item.get("structured_details", {}).get("groups")
     html = render_template(
-        "commercial/features/full-details.html", item=item, full_details=full_details
+        "commercial/features/full-details.html",
+        item={"structured_details": {"groups": full_details}},
+        full_details=full_details,
     )
     return jsonify({"html": html})
 

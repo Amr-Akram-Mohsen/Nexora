@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timezone
 from flask import url_for
+from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.system.models import Section
@@ -59,16 +60,14 @@ def generate_static_sitemap(app):
                 ]
             )
 
-        # 4. Items
-        items = Item.query.all()
-        for item in items:
+        # 4. Items (id + created_at only — avoid loading full item graphs)
+        item_rows = db.session.query(Item.id, Item.created_at).all()
+        for item_id, created_at in item_rows:
             last_mod = (
-                (item.updated_at or item.created_at or datetime.now(timezone.utc))
-                .date()
-                .isoformat()
+                (created_at or datetime.now(timezone.utc)).date().isoformat()
             )
             pages.append(
-                [url_for("item.item_page", item_id=item.id, _external=True), last_mod]
+                [url_for("item.item_page", item_id=item_id, _external=True), last_mod]
             )
 
         # Render Sitemap XML

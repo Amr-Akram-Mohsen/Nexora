@@ -153,6 +153,12 @@ def store_amazon_item(data: dict) -> Item | None:
 
     try:
         db.session.commit()
+        try:
+            from app.infrastructure.cache.item import invalidate_item_after_write
+
+            invalidate_item_after_write(item.id)
+        except Exception:
+            logger.warning("Item cache invalidation failed for item id=%s", item.id)
         return item
     except Exception:
         db.session.rollback()

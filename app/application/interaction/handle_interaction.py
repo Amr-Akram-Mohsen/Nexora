@@ -16,7 +16,7 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
     elif target_type == TargetType.ARTICLE:
         target = get_content_by_id(db.session, target_id)
     elif target_type == TargetType.ITEM:
-        target = get_item_by_id(target_id)
+        target = get_item_by_id(target_id, load="minimal")
 
     if not target:
         return {"success": False, "error": "Target not found"}

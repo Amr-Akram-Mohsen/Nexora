@@ -4,6 +4,9 @@ class TargetType:
     VIDEO = "video"
     POST = "post"
     ITEM = "item"
+    ELECTRONICS = "electronics"
+    PERFUMEs = "perfumes"
+    ACCESSORIES = "accessories"
 
 
 class YouTubeQuota:

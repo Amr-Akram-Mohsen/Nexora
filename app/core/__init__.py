@@ -12,6 +12,10 @@ import os
 import warnings
 
 from dotenv import load_dotenv
+
+# Register every ORM model before admin/routes import eager-load or mapper setup.
+from app import domains  # noqa: F401
+
 from app.admin import (
     api_user_bp,
     api_content_bp,

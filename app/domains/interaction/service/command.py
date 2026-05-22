@@ -3,6 +3,7 @@ from flask import render_template
 from app.core.extensions import db
 from ..models import View, Reaction, Comment, Save
 from app.domains.recommendation.sentiment import analyze_sentiment
+from app.shared.constants.core import TargetType
 from .target_access import resolve_target
 
 def viewer_filter(query, user, ip_address):
@@ -49,10 +50,18 @@ def record_view(
     )
     db.session.add(view)
 
-    target = resolve_target(db.session, target_type, target_id)
-    if target:
-        target.view_count = (target.view_count or 0) + 1
-    
+    if target_type == TargetType.ITEM:
+        from app.domains.item.models import Item
+
+        db.session.query(Item).filter_by(id=target_id).update(
+            {Item.view_count: db.func.coalesce(Item.view_count, 0) + 1},
+            synchronize_session=False,
+        )
+    else:
+        target = resolve_target(db.session, target_type, target_id)
+        if target:
+            target.view_count = (target.view_count or 0) + 1
+
     return {
         'success': True,
         'status' : "viewed"

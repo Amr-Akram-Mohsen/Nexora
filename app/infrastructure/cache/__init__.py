@@ -28,3 +28,8 @@ def delete(key):
 def clear():
     """Clear the entire cache."""
     return cache.clear()
+
+
+def delete_memoized(fn, *args, **kwargs):
+    """Invalidate a single memoized function result (optionally scoped by args)."""
+    return cache.delete_memoized(fn, *args, **kwargs)

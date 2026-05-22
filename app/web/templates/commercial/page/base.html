@@ -101,27 +101,20 @@ product
 
                 </div>
 
+                {% if item.has_variants %}
+                {% include "commercial/features/variant-selector.html" %}
+                {% endif %}
+    
+                {% if item.store_links %}
+                {% set store_links = item.store_links %}
+                {% include "commercial/features/purchase-options.html" %}
+                {% endif %}
+    
             </div>
 
             {# ── Left-column top: gallery (always left, always above specs) ── #}
             <div class="detail-page__image">
                 {{ item_gallery(item) }}
-            </div>
-
-            {# ── Left-column body: description + category blocks ── #}
-            <div class="detail-page__content">
-                <div class="item-content">
-
-                    {{ item.description or '' }}
-
-                    {% block category_content %}
-                    {% endblock %}
-
-                    {% if item.store_links %}
-                    {% include "partials/affiliate-disclosure.html" %}
-                    {% endif %}
-
-                </div>
             </div>
 
             {# ── Left-column bottom: specifications (always below gallery) ── #}
@@ -161,23 +154,31 @@ product
             </div>
             {% endif %}
 
-        </div>{# end .detail-page__main #}
 
-        {# ══ Sidebar — right column, spans from row 3 downward (sticky on desktop)
-             Contains: variant selector + purchase / buy links
-             Mobile: stacked between gallery and specs #}
-        <aside class="detail-page__sidebar flex flex-col">
+            {# ── Left-column body: description + category blocks ── #}
+            <div class="detail-page__content">
+                <div class="item-content">
 
-            {% if item.has_variants %}
-            {% include "commercial/features/variant-selector.html" %}
-            {% endif %}
+                    {{ item.description or '' }}
 
-            {% if item.store_links %}
-            {% set store_links = item.store_links %}
-            {% include "commercial/features/purchase-options.html" %}
-            {% endif %}
+                    {% block category_content %}
+                    {% endblock %}
 
-        </aside>
+                    {% if item.store_links %}
+                    {% include "partials/affiliate-disclosure.html" %}
+                    {% endif %}
+
+                </div>
+            </div>            
+
+            <!-- Extra (Moved inside Main) -->
+            <div class="detail-page__extra">
+                {% include "components/interactions/interactions.html" %}
+                {% include "components/interactions/comments.html" %}
+            </div>
+            
+        </div>
+        {# end .detail-page__main #}
 
     </div>
 

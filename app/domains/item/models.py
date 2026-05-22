@@ -85,21 +85,21 @@ class Item(db.Model):
         primaryjoin="and_(foreign(Reaction.target_id)==Item.id, Reaction.target_type=='item')",
         back_populates="item",
         viewonly=True,
-        lazy="selectin",
+        lazy="noload",
     )
     comments = db.relationship(
         "Comment",
         primaryjoin="and_(foreign(Comment.target_id)==Item.id, Comment.target_type=='item')",
         back_populates="item",
         viewonly=True,
-        lazy="selectin",
+        lazy="noload",
     )
     views = db.relationship(
         "View",
         primaryjoin="and_(foreign(View.target_id)==Item.id, View.target_type=='item')",
         back_populates="item",
         viewonly=True,
-        lazy="selectin",
+        lazy="noload",
     )
 
     def set_default_variant(self):

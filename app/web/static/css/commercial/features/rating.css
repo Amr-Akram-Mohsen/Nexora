@@ -11,6 +11,11 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   color: var(--foreground);
+  line-height: 1;
+}
+
+.detail-page[data-domain-type="commercial"] .meta-item .star {
+  font-size: var(--text-sm);
 }
 
 /* ─── Reviews count ──────────────────────────────────────────────────── */
