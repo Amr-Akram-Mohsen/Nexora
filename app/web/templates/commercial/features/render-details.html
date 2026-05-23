@@ -8,9 +8,6 @@
 
 {# Nested mapping → render as a titled group #}
 <div class="item-details-group">
-  <h4 class="item-details-group__title">
-    {{ key.replace('_',' ') | title }}
-  </h4>
   <div class="item-details-group__items">
     {{ render_details(value, counter) }}
   </div>

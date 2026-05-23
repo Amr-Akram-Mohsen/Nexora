@@ -1,12 +1,12 @@
 /* ─── Purchase options card ───────────────────────────────────────────── */
 
 .item-buy-links {
+  flex: 0 0 40%;
   background: var(--card);
   border-radius: var(--radius-xl);
-  padding: 1.5rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 1.25rem;
   transition: box-shadow 0.25s ease;
 }
 

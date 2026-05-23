@@ -341,6 +341,14 @@ const VariantSelector={
             return
         }
 
+        // Sync selected values to attribute headers in the DOM
+        Object.entries(this.selected).forEach(([attr, value]) => {
+            const labelEl = document.querySelector(`[data-selected-for="${attr}"]`);
+            if (labelEl) {
+                labelEl.textContent = value;
+            }
+        });
+
 
         Gallery.update(
             variant.images

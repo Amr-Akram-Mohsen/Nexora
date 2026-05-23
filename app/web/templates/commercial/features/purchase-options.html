@@ -1,8 +1,5 @@
 <div class="item-buy-links">
-  <h3 class="item-buy-links__title flex items-center">
-    <span class="item-buy-links__bar"></span>
-    Where to Buy
-  </h3>
+  <h3 class="item-buy-links__title">Where to Buy</h3>
   <div class="item-buy-links__disclosure flex items-center">
     <i class="fas fa-link mr-1"></i> <span class="disclosure-text">Affiliate links · We may earn a commission</span>
   </div>
@@ -13,7 +10,8 @@
       <div class="item-buy-link__info flex flex-col">
         <div class="item-buy-link__store flex items-center">
           {% if link.store.logo_url %}
-          <img src="{{ link.store.logo_url }}" alt="" class="store-logo" loading="lazy" width="24" height="24">
+          <img src="{{ url_for('static', filename=link.store.logo_url)}}" alt="" class="store-logo" loading="lazy"
+            width="24" height="24">
           {% endif %}
           {{ link.store.name }}
         </div>

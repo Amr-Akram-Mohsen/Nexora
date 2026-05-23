@@ -109,12 +109,29 @@
 }
 
 /* Grid area assignments ─ same class→area mapping at every breakpoint */
-.detail-page[data-domain-type="commercial"] .detail-page__top     { grid-area: top; }
-.detail-page[data-domain-type="commercial"] .detail-page__header  { grid-area: header; }
-.detail-page[data-domain-type="commercial"] .detail-page__image   { grid-area: gallery; }
-.detail-page[data-domain-type="commercial"] .detail-page__content { grid-area: content; }
-.detail-page[data-domain-type="commercial"] .detail-page__specs   { grid-area: specs; }
-.detail-page[data-domain-type="commercial"] .detail-page__sidebar { grid-area: sidebar; }
+.detail-page[data-domain-type="commercial"] .detail-page__top {
+  grid-area: top;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__header {
+  grid-area: header;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__image {
+  grid-area: gallery;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__content {
+  grid-area: content;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__specs {
+  grid-area: specs;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__sidebar {
+  grid-area: sidebar;
+}
 
 /* ─── Title ──────────────────────────────────────────────────────────── */
 
@@ -159,10 +176,21 @@
 }
 
 /* Mobile spacing helpers */
-.detail-page[data-domain-type="commercial"] .detail-page__image   { margin-top: 1.25rem; }
-.detail-page[data-domain-type="commercial"] .detail-page__sidebar { margin-top: 1.25rem; }
-.detail-page[data-domain-type="commercial"] .detail-page__specs   { margin-top: 1.5rem; }
-.detail-page[data-domain-type="commercial"] .detail-page__content { margin-top: 1.5rem; }
+.detail-page[data-domain-type="commercial"] .detail-page__image {
+  margin-top: 1.25rem;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__sidebar {
+  margin-top: 1.25rem;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__specs {
+  margin-top: 1.5rem;
+}
+
+.detail-page[data-domain-type="commercial"] .detail-page__content {
+  margin-top: 1.5rem;
+}
 
 /* ─── Tablet title bump ──────────────────────────────────────────────── */
 
@@ -198,8 +226,13 @@
   }
 
   /* Reset mobile margin helpers on desktop */
-  .detail-page[data-domain-type="commercial"] .detail-page__image   { margin-top: 0; }
-  .detail-page[data-domain-type="commercial"] .detail-page__sidebar { margin-top: 0; }
+  .detail-page[data-domain-type="commercial"] .detail-page__image {
+    margin-top: 0;
+  }
+
+  .detail-page[data-domain-type="commercial"] .detail-page__sidebar {
+    margin-top: 0;
+  }
 
   /* Gallery image wrapper: no extra chrome */
   .detail-page[data-domain-type="commercial"] .detail-page__image {
@@ -255,3 +288,136 @@
     margin-bottom: 0;
   }
 }
+
+.detail-page__variants {
+  position: relative;
+  margin-top: 0.5rem;
+  gap: 1rem;
+}
+
+
+/* Start New Styles That May Need to Be In separate css files if the page grows more */
+.item-quick-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .75rem;
+  margin: 1.5rem 0;
+}
+
+.quick-detail {
+  padding: .75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.quick-detail__label {
+  display: block;
+  font-size: .8rem;
+  opacity: .7;
+  margin-bottom: .25rem;
+}
+
+.quick-detail__value {
+  font-weight: 600;
+}
+
+
+
+.item-price-summary {
+  margin: 1rem 0;
+}
+
+.current-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.old-price {
+  margin-left: .5rem;
+  text-decoration: line-through;
+  opacity: .6;
+}
+
+
+
+
+.purchase-sidebar {
+  position: sticky;
+  top: 100px;
+
+}
+
+
+.related-items-section {
+
+  margin-top: 4rem;
+
+}
+
+.item-grid {
+
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(220px, 1fr));
+
+  gap: 1.25rem;
+
+}
+
+.item-card {
+
+  display: block;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  text-decoration: none;
+  color: inherit;
+
+}
+
+.item-card__image {
+
+  aspect-ratio: 1;
+
+}
+
+.item-card__image img {
+
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+
+}
+
+.item-card__body {
+
+  padding: 1rem;
+
+}
+
+.item-card__brand {
+
+  font-size: .85rem;
+  opacity: .7;
+
+}
+
+.item-card__title {
+
+  margin: .5rem 0;
+
+  font-size: .95rem;
+
+}
+
+.item-card__price {
+
+  font-weight: 700;
+
+  margin-top: .5rem;
+
+}
+
+/* End New Styles That May Need to Be In separate css files if the page grows more */

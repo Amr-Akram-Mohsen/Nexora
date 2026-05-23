@@ -73,8 +73,8 @@ product
         </div>
 
         {# ══ Main (display:contents on desktop — children participate directly in grid) ══
-             Source / mobile order: header → gallery → content → specs
-             Desktop visual order is controlled by grid-template-areas in item.css #}
+        Source / mobile order: header → gallery → content → specs
+        Desktop visual order is controlled by grid-template-areas in item.css #}
         <div class="detail-page__main">
 
             {# ── Right-column top: title, badges, rating ── #}
@@ -82,7 +82,7 @@ product
 
                 <div class="detail-page__badges flex flex-wrap items-center">
                     {{ badge(item.category.name, 'badge--category') if item.category else '' }}
-                    {{ badge(item.brand.name,     'badge--brand')    if item.brand    else '' }}
+                    {{ badge(item.brand.name, 'badge--brand') if item.brand else '' }}
                 </div>
 
                 <h1 class="detail-page__title">{{ item.name }}</h1>
@@ -101,21 +101,95 @@ product
 
                 </div>
 
-                {% if item.has_variants %}
-                {% include "commercial/features/variant-selector.html" %}
+                {% if item.quick_details %}
+                <div class="item-quick-details">
+
+                    {% for detail in item.quick_details[:6] %}
+                    <div class="quick-detail">
+
+                        <span class="quick-detail__label">
+                            {{ detail.label }}
+                        </span>
+
+                        <span class="quick-detail__value">
+                            {{ detail.value }}
+                        </span>
+
+                    </div>
+                    {% endfor %}
+
+                </div>
                 {% endif %}
-    
-                {% if item.store_links %}
-                {% set store_links = item.store_links %}
-                {% include "commercial/features/purchase-options.html" %}
+
+
+                {% if item.default_variant %}
+                <div class="item-price-summary">
+
+                    <span class="current-price">
+
+                        {{ item.default_variant.price }}
+                        {{ item.default_variant.currency }}
+
+                    </span>
+
+                    {% if item.default_variant.old_price %}
+                    <span class="old-price">
+
+                        {{ item.default_variant.old_price }}
+
+                    </span>
+                    {% endif %}
+
+                </div>
                 {% endif %}
-    
+
+
+                <div class="detail-page__variants flex flex-wrap">
+                    {% if item.has_variants %}
+                    {% include "commercial/features/variant-selector.html" %}
+                    {% endif %}
+
+                    {% if item.store_links %}
+                    {% set store_links = item.store_links %}
+                    <div class="purchase-sidebar">
+                        {% include "commercial/features/purchase-options.html" %}
+                    </div>
+                    {% endif %}
+                </div>
+
+
             </div>
 
             {# ── Left-column top: gallery (always left, always above specs) ── #}
             <div class="detail-page__image">
                 {{ item_gallery(item) }}
             </div>
+
+            {% if item.structured_details.highlights %}
+            <div class="item-highlights item-details-card">
+
+                <h3>Highlights</h3>
+
+                <ul>
+
+                    {% for key,value in item.structured_details.highlights.items() %}
+
+                    <li>
+
+                        <strong>
+                            {{ key|replace("_"," ")|title }}
+                        </strong>
+
+                        {{ value }}
+
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+            {% endif %}
 
             {# ── Left-column bottom: specifications (always below gallery) ── #}
             {% if item.quick_details and item.quick_details|length > 0 %}
@@ -131,7 +205,7 @@ product
                     </h3>
 
                     {% set full_details = item.structured_details.get('groups')
-                       if item.structured_details else None %}
+                    if item.structured_details else None %}
 
                     {% if full_details %}
                     <div class="item-details-card__items flex flex-col">
@@ -139,11 +213,8 @@ product
                         {{ render_details(full_details) }}
                     </div>
 
-                    <button
-                        class="item-details-inline-toggle flex items-center justify-center"
-                        id="toggle-specs-btn"
-                        type="button"
-                        aria-expanded="false">
+                    <button class="item-details-inline-toggle flex items-center justify-center" id="toggle-specs-btn"
+                        type="button" aria-expanded="false">
                         <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         Show More
                     </button>
@@ -169,50 +240,58 @@ product
                     {% endif %}
 
                 </div>
-            </div>            
+            </div>
 
             <!-- Extra (Moved inside Main) -->
             <div class="detail-page__extra">
                 {% include "components/interactions/interactions.html" %}
                 {% include "components/interactions/comments.html" %}
             </div>
-            
+
         </div>
         {# end .detail-page__main #}
 
     </div>
 
+    {% if related_items %}
+
+    <section class="related-items-section">
+
+        <h2 class="section-title">
+
+            You may also like
+
+        </h2>
+
+        {% include "commercial/features/item-grid.html" %}
+
+    </section>
+
+    {% endif %}
 </section>
 
-<script
-type="application/json"
-id="variant-data"
->
+<script type="application/json" id="variant-data">
 
 {{ item.variant_data|tojson }}
 
 </script>
 
-<script
-src="{{url_for(
+<script src="{{url_for(
 'static',
 filename='js/commercial/features/variant-selector.js'
 )}}"></script>
 
-<script
-src="{{url_for(
+<script src="{{url_for(
 'static',
 filename='js/commercial/features/gallery.js'
 )}}"></script>
 
-<script
-src="{{url_for(
+<script src="{{url_for(
 'static',
 filename='js/commercial/features/purchase-options.js'
 )}}"></script>
 
-<script
-src="{{url_for(
+<script src="{{url_for(
 'static',
 filename='js/commercial/page/item-page.js'
 )}}"></script>

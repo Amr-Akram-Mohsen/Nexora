@@ -1,0 +1,45 @@
+<div class="item-grid">
+
+    {% for item in related_items %}
+
+    <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item-card">
+
+        <div class="item-card__image">
+
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
+
+        </div>
+
+        <div class="item-card__body">
+
+            {% if item.brand %}
+            <div class="item-card__brand">
+
+                {{ item.brand.name }}
+
+            </div>
+            {% endif %}
+
+            <h3 class="item-card__title">
+
+                {{ item.name }}
+
+            </h3>
+
+            {% if item.min_price %}
+            <div class="item-card__price">
+
+                {{ item.min_price }}
+
+                SAR
+
+            </div>
+            {% endif %}
+
+        </div>
+
+    </a>
+
+    {% endfor %}
+
+</div>

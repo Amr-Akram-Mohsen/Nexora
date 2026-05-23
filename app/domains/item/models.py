@@ -27,6 +27,17 @@ class Store(db.Model):
     )
 
 
+# ==================== CONSTANTS ====================
+
+# Priority order for variant attribute groups in the selector UI
+_VARIANT_ATTR_PRIORITY = {
+    "color": 1,
+    "storage": 2,
+    "ram": 3,
+    "size": 4,
+    "volume": 5,
+}
+
 # ==================== ITEM MODELS ====================
 class Item(db.Model):
     __tablename__ = "items"
@@ -112,23 +123,27 @@ class Item(db.Model):
     def title(self):
         return self.name
 
-    @property
+    @cached_property
     def image_url(self):
+        """URL of the first item image. Cached for the lifetime of this instance."""
         return self.images[0].image_url if self.images else None
 
-    @property
+    @cached_property
     def default_variant(self):
+        """The default variant (is_default=True), or first variant, or None."""
         return next(
             (v for v in self.variants if v.is_default),
             self.variants[0] if self.variants else None,
         )
 
-    @property
+    @cached_property
     def price(self):
+        """Price of the default variant."""
         return self.default_variant.price if self.default_variant else None
 
-    @property
+    @cached_property
     def min_price(self):
+        """Lowest price across all variants."""
         prices = [v.price for v in self.variants if v.price is not None]
         return min(prices) if prices else None
 
@@ -136,8 +151,9 @@ class Item(db.Model):
     def has_variants(self):
         return len(self.variants) > 1
 
-    @property
+    @cached_property
     def store_links(self):
+        """Active store links for the default variant."""
         if not self.default_variant:
             return []
         return [link for link in self.default_variant.store_links if link.is_active]
@@ -233,8 +249,9 @@ class Item(db.Model):
             schema["offers"] = offers
         return schema
 
-    @property
+    @cached_property
     def quick_details(self):
+        """Flat list of {group, label, value} dicts for the quick-details grid."""
         return self._quick_details(self.structured_details.get("quick_details", {}))
 
     def _quick_details(self, details=None, parent=""):
@@ -250,126 +267,26 @@ class Item(db.Model):
                 items.append({"group": parent, "label": label, "value": value})
         return items
     
-    @property
+    @cached_property
     def variant_groups(self):
+        """Attribute→sorted-values mapping used by the variant selector.
 
-        groups={}
-
+        Groups are ordered by the canonical priority list so Color always
+        appears before Storage, RAM, Size, Volume, etc.
+        Cached: computed once per Item instance.
+        """
+        groups: dict[str, set] = {}
         for variant in self.variants:
-
-            attrs=variant.attributes or {}
-
-            for key,value in attrs.items():
-
-                if not value:
-                    continue
-
-                groups.setdefault(
-                    key,
-                    set()
-                ).add(value)
-
-        PRIORITY={
-
-            "color":1,
-            "storage":2,
-            "ram":3,
-            "size":4,
-            "volume":5
-        }
+            for key, value in (variant.attributes or {}).items():
+                if value:
+                    groups.setdefault(key, set()).add(value)
 
         return dict(
             sorted(
-                {
-                    k:sorted(v)
-                    for k,v in groups.items()
-                }.items(),
-                key=lambda x:
-                PRIORITY.get(
-                    x[0],
-                    999
-                )
+                {k: sorted(v) for k, v in groups.items()}.items(),
+                key=lambda x: _VARIANT_ATTR_PRIORITY.get(x[0], 999),
             )
         )
-
-    def merged_images(self, item_images,variant_images):
-
-        seen=set()
-
-        result=[]
-
-        for img in (
-            variant_images+
-            item_images
-        ):
-
-            url=img.image_url
-
-            if url in seen:
-                continue
-
-            seen.add(url)
-
-            result.append(url)
-
-        return result
-
-    @property
-    def variant_payload(self):
-
-        payload=[]
-
-        for variant in self.variants:
-
-            payload.append({
-
-                "id":variant.id,
-
-                "attributes":
-                    variant.attributes or {},
-
-                "price":
-                    float(
-                        variant.price or 0
-                    ),
-
-                "old_price":
-                    float(
-                        variant.old_price or 0
-                    ),
-
-                "currency":
-                    variant.currency,
-
-                "images": self.merged_images(self.images, variant.images),
-
-                "store_links":[
-
-                    {
-
-                        "id":link.id,
-                        "name":link.store.name,
-                        "logo":
-                            link.store.logo_url,
-                        "url":
-                            link.affiliate_url,
-                        "price":
-                            float(
-                                link.price or 0
-                            ),
-                        "currency":
-                            link.currency
-                    }
-
-                    for link
-                    in variant.store_links
-                    if link.is_active
-
-                ]
-
-            })
-
-        return payload
 
 
     __table_args__ = (

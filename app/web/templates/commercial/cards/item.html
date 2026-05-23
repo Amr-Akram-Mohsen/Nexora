@@ -21,8 +21,8 @@
       {{ badge('Product', 'badge--card-type') }}
 
       {# Compare toggle #}
-      <button class="compare-toggle-btn flex items-center justify-center" data-id="{{ item.id }}" data-name="{{ item.name }}" title="Add to compare"
-        aria-label="Add {{ item.name }} to compare">
+      <button class="compare-toggle-btn flex items-center justify-center" data-id="{{ item.id }}"
+        data-name="{{ item.name }}" title="Add to compare" aria-label="Add {{ item.name }} to compare">
         <i class="fas fa-balance-scale"></i>
       </button>
 
@@ -77,7 +77,8 @@
       <div class="item-store-box flex items-center justify-between">
         <div class="item-store-badge flex items-center">
           {% if best_link and best_link.store.logo_url %}
-          <img src="{{ best_link.store.logo_url }}" alt="{{ best_link.store.name }}" loading="lazy">
+          <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
+            loading="lazy">
           {% endif %}
           <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span>
         </div>

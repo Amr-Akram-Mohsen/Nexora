@@ -113,7 +113,6 @@ def get_filtered_items(active_filters, page=1, per_page=24):
         ),
     }
 
-
 def set_default_variant(item, variant):
     for v in item.variants:
         v.is_default = False
@@ -210,6 +209,30 @@ def get_items_by_ids(item_ids, serialize=False, load="detail"):
         return [fn(item) for item in items]
     return items
 
+def get_related_items(item, limit=8):
+    """
+    Get related items from same category and optionally same brand.
+    """
+
+    query = (
+        Item.query
+        .options(*get_item_card_load_options())
+        .filter(
+            Item.id != item.id,
+            Item.category_id == item.category_id
+        )
+    )
+
+    if item.brand_id:
+        query = query.order_by(
+            db.case(
+                (Item.brand_id == item.brand_id, 0),
+                else_=1
+            ),
+            Item.created_at.desc()
+        )
+
+    return query.limit(limit).all()
 
 def get_item_spec_groups(item_id):
     """Lightweight spec payload for AJAX full-specs partial."""

@@ -19,10 +19,6 @@
   padding: 0;
 }
 
-.item-detail-item:last-child {
-  /* no special rule needed; gap handles spacing */
-}
-
 .item-detail-item:hover {
   border-color: rgba(var(--domain-primary-rgb), 0.35);
   box-shadow: 0 2px 8px rgba(var(--domain-primary-rgb), var(--alpha-soft));

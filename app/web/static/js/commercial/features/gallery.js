@@ -98,127 +98,59 @@ const Gallery={
 
         if(
             !gallery ||
+            !images ||
             !images.length
         ){
             return
         }
-
-        const thumbsContainer=
-        gallery.querySelector(
-            ".item-gallery__thumbs"
-        )
 
         const displayImg=
         gallery.querySelector(
             "[data-gallery-main]"
         )
 
-        const indexEl=
-        gallery.querySelector(
-            "[data-gallery-index]"
-        )
-
-        const lengthEl=
-        gallery.querySelector(
-            "[data-gallery-length]"
-        )
-
-        const prevBtn=
-        gallery.querySelector(
-            ".item-gallery__nav--prev"
-        )
-
-        const nextBtn=
-        gallery.querySelector(
-            ".item-gallery__nav--next"
-        )
-
-        if(
-            !displayImg ||
-            !thumbsContainer
-        ){
+        if(!displayImg){
             return
         }
 
+        const thumbnails=[...gallery.querySelectorAll("[data-gallery-thumb]")]
+        let matchedThumb = null;
 
-        thumbsContainer.innerHTML=""
+        // Search for the first image URL that has a matching static thumbnail
+        for (const url of images) {
+            const match = thumbnails.find(thumb => {
+                const img = thumb.querySelector("img");
+                if (!img) return false;
+                
+                const thumbUrl = img.src;
+                try {
+                    const thumbPath = new URL(thumbUrl, window.location.origin).pathname;
+                    const varPath = new URL(url, window.location.origin).pathname;
+                    return thumbPath === varPath;
+                } catch(e) {
+                    return thumbUrl.includes(url) || url.includes(thumbUrl);
+                }
+            });
 
-
-        images.forEach(
-
-            (image,index)=>{
-
-                thumbsContainer
-                .insertAdjacentHTML(
-
-                    "beforeend",
-
-`
-<button
-type="button"
-
-class="item-gallery__thumb ${index===0?'is-active':''}"
-
-data-gallery-thumb="${index+1}"
-
-aria-label="View image ${index+1}"
->
-
-<div class="image-wrapper flex items-center justify-center">
-
-<img
-src="${image}"
-class="card__img img-cover"
-loading="lazy"
->
-
-</div>
-
-</button>
-`
-
-                )
-
+            if (match) {
+                matchedThumb = match;
+                break;
             }
-
-        )
-
-
-        displayImg.src=
-        images[0]
-
-        displayImg.dataset.galleryMain=1
-
-
-        if(indexEl){
-
-            indexEl.textContent=1
-
         }
 
-        if(lengthEl){
-
-            lengthEl.textContent=
-            images.length
-
-        }
-
-
-        if(prevBtn){
-
-            prevBtn.disabled=true
-
-            prevBtn.dataset.galleryNewImage=0
-
-        }
-
-        if(nextBtn){
-
-            nextBtn.disabled=
-            images.length<=1
-
-            nextBtn.dataset.galleryNewImage=2
-
+        if (matchedThumb) {
+            // Programmatically click the matched thumbnail to trigger transitions naturally,
+            // which updates index counters, navigation arrows, and highlights cleanly.
+            matchedThumb.click();
+        } else {
+            // Fallback: update main view directly if no thumbnail is found
+            displayImg.src = images[0];
+            thumbnails.forEach(t => t.classList.remove("is-active"));
+            
+            const indexEl = gallery.querySelector("[data-gallery-index]");
+            if (indexEl) {
+                indexEl.textContent = "—";
+            }
         }
 
     }
