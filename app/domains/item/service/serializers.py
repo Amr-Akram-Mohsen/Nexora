@@ -58,6 +58,8 @@ def serialize_item(item):
         }
         if default_variant
         else None,
+        "variant_data": item.variant_payload,
+        "variant_groups": item.variant_groups,
         "store_links": serialized_store_links,
         "stores": [
             {
@@ -126,6 +128,7 @@ def serialize_item_detail(item):
             ],
             "structured_details": structured,
             "quick_details": item.quick_details,
+            # "variant_data": item.variant_payload,
             # Compare page and legacy callers; same payload as structured groups.
             "full_details": groups if isinstance(groups, dict) else item.full_details,
         }

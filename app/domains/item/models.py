@@ -249,6 +249,128 @@ class Item(db.Model):
             else:
                 items.append({"group": parent, "label": label, "value": value})
         return items
+    
+    @property
+    def variant_groups(self):
+
+        groups={}
+
+        for variant in self.variants:
+
+            attrs=variant.attributes or {}
+
+            for key,value in attrs.items():
+
+                if not value:
+                    continue
+
+                groups.setdefault(
+                    key,
+                    set()
+                ).add(value)
+
+        PRIORITY={
+
+            "color":1,
+            "storage":2,
+            "ram":3,
+            "size":4,
+            "volume":5
+        }
+
+        return dict(
+            sorted(
+                {
+                    k:sorted(v)
+                    for k,v in groups.items()
+                }.items(),
+                key=lambda x:
+                PRIORITY.get(
+                    x[0],
+                    999
+                )
+            )
+        )
+
+    def merged_images(self, item_images,variant_images):
+
+        seen=set()
+
+        result=[]
+
+        for img in (
+            variant_images+
+            item_images
+        ):
+
+            url=img.image_url
+
+            if url in seen:
+                continue
+
+            seen.add(url)
+
+            result.append(url)
+
+        return result
+
+    @property
+    def variant_payload(self):
+
+        payload=[]
+
+        for variant in self.variants:
+
+            payload.append({
+
+                "id":variant.id,
+
+                "attributes":
+                    variant.attributes or {},
+
+                "price":
+                    float(
+                        variant.price or 0
+                    ),
+
+                "old_price":
+                    float(
+                        variant.old_price or 0
+                    ),
+
+                "currency":
+                    variant.currency,
+
+                "images": self.merged_images(self.images, variant.images),
+
+                "store_links":[
+
+                    {
+
+                        "id":link.id,
+                        "name":link.store.name,
+                        "logo":
+                            link.store.logo_url,
+                        "url":
+                            link.affiliate_url,
+                        "price":
+                            float(
+                                link.price or 0
+                            ),
+                        "currency":
+                            link.currency
+                    }
+
+                    for link
+                    in variant.store_links
+                    if link.is_active
+
+                ]
+
+            })
+
+        return payload
+
 
     __table_args__ = (
         db.Index("ix_items_slug", "slug"),

@@ -24,7 +24,10 @@ def get_item_page_data(item_id):
     if view_count is not None:
         item = {**item, "view_count": view_count}
 
-    return {"item": item}
+    return {
+        "item": item,
+        "variant_data": item.get("variant_data", [])
+    }
 
 
 def record_item_view(item_id, user, ip_address):

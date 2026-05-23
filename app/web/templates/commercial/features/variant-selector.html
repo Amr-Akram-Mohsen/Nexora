@@ -1,78 +1,94 @@
-{% if item.has_variants %}
+{% if item.has_variants and item.variant_groups %}
 
 <div class="item-variants">
 
-  {# ── Card heading with gradient accent bar ── #}
-  <h3 class="item-variants__title flex items-center">
-    <span class="item-variants__bar"></span>
-    <i class="fas fa-sliders item-variants__icon"></i>
-    Choose Option
-  </h3>
+    <h3 class="item-variants__title flex items-center">
+        <span class="item-variants__bar"></span>
+        <i class="fas fa-sliders item-variants__icon"></i>
+        Choose Options
+    </h3>
 
-  {% if item.variants and item.variants|length > 0 %}
-  {% set attributes = item.variants[0].attributes.keys() if item.variants[0].attributes else [] %}
+    {% for attr, values in item.variant_groups.items() %}
 
-  {% for attr in attributes %}
+    <div
+        class="variant-group"
+        data-group="{{ attr }}"
+    >
 
-  <div class="variant-group">
+        <div class="variant-group__label flex items-center">
 
-    <div class="variant-group__label flex items-center">
-      {# icon hint per attribute type #}
-      {% if attr in ['color', 'finish'] %}
-      <i class="fas fa-palette variant-group__label-icon"></i>
-      {% elif attr in ['size', 'length', 'width'] %}
-      <i class="fas fa-ruler-horizontal variant-group__label-icon"></i>
-      {% elif attr in ['material', 'fabric'] %}
-      <i class="fas fa-layer-group variant-group__label-icon"></i>
-      {% else %}
-      <i class="fas fa-tag variant-group__label-icon"></i>
-      {% endif %}
-      {{ attr.replace('_', ' ') | title }}
-    </div>
+            {% if attr in ['color', 'finish'] %}
+                <i class="fas fa-palette variant-group__label-icon"></i>
 
-    <div class="variant-group__options flex flex-wrap">
+            {% elif attr in ['size', 'length', 'width'] %}
+                <i class="fas fa-ruler-horizontal variant-group__label-icon"></i>
 
-      {% set values = item.variants | map(attribute='attributes') | map(attribute=attr) | list | unique %}
+            {% elif attr in ['material', 'fabric'] %}
+                <i class="fas fa-layer-group variant-group__label-icon"></i>
 
-      {% for value in values %}
+            {% elif attr in ['storage','ram'] %}
+                <i class="fas fa-memory variant-group__label-icon"></i>
 
-      {% set ns = namespace(variant_img=None) %}
-      {% if item.variants %}
-        {% for v in item.variants %}
-          {% if v.attributes and v.attributes.get(attr) == value %}
-            {% if v.images and v.images|length > 0 %}
-              {% set ns.variant_img = v.images[0].image_url %}
+            {% elif attr in ['volume'] %}
+                <i class="fas fa-flask variant-group__label-icon"></i>
+
+            {% else %}
+                <i class="fas fa-tag variant-group__label-icon"></i>
             {% endif %}
-          {% endif %}
-        {% endfor %}
-      {% endif %}
 
-      {% if attr in ['color', 'finish'] %}
-      <button
-        class="variant-option variant-option--color {{ 'active' if loop.first }}"
-        style="background: {{ value }}"
-        title="{{ value }}"
-        aria-label="Select color: {{ value }}"
-        {% if ns.variant_img %}data-variant-image="{{ ns.variant_img }}"{% endif %}
-        onclick="selectVariant(this)">
-      </button>
-      {% else %}
-      <button
-        class="variant-option {{ 'active' if loop.first }}"
-        {% if ns.variant_img %}data-variant-image="{{ ns.variant_img }}"{% endif %}
-        onclick="selectVariant(this)">
-        {{ value }}
-      </button>
-      {% endif %}
+            {{ attr.replace('_',' ')|title }}
 
-      {% endfor %}
+        </div>
+
+
+        <div
+            class="variant-group__options flex flex-wrap"
+        >
+
+            {% for value in values %}
+
+                {% if attr in ['color','finish'] %}
+
+                <button
+                    type="button"
+
+                    class="variant-option variant-option--color"
+
+                    data-attribute="{{ attr }}"
+                    data-value="{{ value }}"
+
+                    style="background: {{ value }}"
+
+                    title="{{ value }}"
+                    aria-label="Select {{ attr }}: {{ value }}"
+                >
+                </button>
+
+                {% else %}
+
+                <button
+                    type="button"
+
+                    class="variant-option"
+
+                    data-attribute="{{ attr }}"
+                    data-value="{{ value }}"
+                >
+
+                    {{ value }}
+
+                </button>
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
 
     </div>
 
-  </div>
-
-  {% endfor %}
-  {% endif %}
+    {% endfor %}
 
 </div>
+
 {% endif %}

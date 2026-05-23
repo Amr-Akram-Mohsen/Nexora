@@ -183,4 +183,38 @@ product
     </div>
 
 </section>
+
+<script
+type="application/json"
+id="variant-data"
+>
+
+{{ item.variant_data|tojson }}
+
+</script>
+
+<script
+src="{{url_for(
+'static',
+filename='js/commercial/features/variant-selector.js'
+)}}"></script>
+
+<script
+src="{{url_for(
+'static',
+filename='js/commercial/features/gallery.js'
+)}}"></script>
+
+<script
+src="{{url_for(
+'static',
+filename='js/commercial/features/purchase-options.js'
+)}}"></script>
+
+<script
+src="{{url_for(
+'static',
+filename='js/commercial/page/item-page.js'
+)}}"></script>
+
 {% endblock %}

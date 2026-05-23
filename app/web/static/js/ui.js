@@ -147,6 +147,11 @@ function closeOverlay() {
   if (gallery) gallery.hidden = true;
 }
 
+function toggleActive(el) {
+  el.classList.toggle("active", !el.classList.contains('active'));
+}
+
+
 function handleImageControls(control) {
   const gallery = control.closest(".item-gallery");
   if (!gallery) return;
@@ -249,59 +254,55 @@ function initGallery(e) {
   overlay.hidden = false;
 }
 
-function toggleActive(el) {
-  el.classList.toggle("active", !el.classList.contains('active'));
-}
+// function selectVariant(btn) {
+//   const group = btn.closest('.variant-group__options');
+//   if (!group) return;
+//   group.querySelectorAll('.variant-option').forEach(el => el.classList.remove('active'));
+//   btn.classList.add('active');
 
-function selectVariant(btn) {
-  const group = btn.closest('.variant-group__options');
-  if (!group) return;
-  group.querySelectorAll('.variant-option').forEach(el => el.classList.remove('active'));
-  btn.classList.add('active');
+//   const variantImgUrl = btn.dataset.variantImage;
+//   const colorAttr = btn.closest('.variant-group')?.querySelector('.variant-group__label')?.textContent?.trim()?.toLowerCase();
+//   const isColor = colorAttr === 'color' || colorAttr === 'finish';
 
-  const variantImgUrl = btn.dataset.variantImage;
-  const colorAttr = btn.closest('.variant-group')?.querySelector('.variant-group__label')?.textContent?.trim()?.toLowerCase();
-  const isColor = colorAttr === 'color' || colorAttr === 'finish';
-
-  if (variantImgUrl) {
-    const gallery = document.querySelector(".item-gallery");
-    if (gallery) {
-      const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
-      const match = thumbnails.find(thumb => {
-        const img = thumb.querySelector("img");
-        return img && img.src === variantImgUrl;
-      });
-      if (match) {
-        match.click(); // Cleanest: click the matching thumbnail to sync everything
-      } else {
-        // Fallback: directly update display if image not in thumbnails
-        const displayImg = gallery.querySelector("[data-gallery-main]");
-        if (displayImg) {
-          displayImg.src = variantImgUrl;
-          displayImg.dataset.galleryMain = "0";
-          thumbnails.forEach(t => t.classList.remove("is-active"));
-        }
-      }
-    }
-  } else if (isColor) {
-    const colorName = btn.title || btn.textContent.trim();
-    if (colorName) {
-      const gallery = document.querySelector(".item-gallery");
-      if (gallery) {
-        const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
-        const match = thumbnails.find(thumb => {
-          const img = thumb.querySelector("img");
-          const srcMatch = img && img.src.toLowerCase().includes(colorName.toLowerCase().replace(/[^a-z0-9]/g, ''));
-          const altMatch = img && img.alt.toLowerCase().includes(colorName.toLowerCase());
-          return srcMatch || altMatch;
-        });
-        if (match) {
-          match.click();
-        }
-      }
-    }
-  }
-}
+//   if (variantImgUrl) {
+//     const gallery = document.querySelector(".item-gallery");
+//     if (gallery) {
+//       const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
+//       const match = thumbnails.find(thumb => {
+//         const img = thumb.querySelector("img");
+//         return img && img.src === variantImgUrl;
+//       });
+//       if (match) {
+//         match.click(); // Cleanest: click the matching thumbnail to sync everything
+//       } else {
+//         // Fallback: directly update display if image not in thumbnails
+//         const displayImg = gallery.querySelector("[data-gallery-main]");
+//         if (displayImg) {
+//           displayImg.src = variantImgUrl;
+//           displayImg.dataset.galleryMain = "0";
+//           thumbnails.forEach(t => t.classList.remove("is-active"));
+//         }
+//       }
+//     }
+//   } else if (isColor) {
+//     const colorName = btn.title || btn.textContent.trim();
+//     if (colorName) {
+//       const gallery = document.querySelector(".item-gallery");
+//       if (gallery) {
+//         const thumbnails = [...gallery.querySelectorAll("[data-gallery-thumb]")];
+//         const match = thumbnails.find(thumb => {
+//           const img = thumb.querySelector("img");
+//           const srcMatch = img && img.src.toLowerCase().includes(colorName.toLowerCase().replace(/[^a-z0-9]/g, ''));
+//           const altMatch = img && img.alt.toLowerCase().includes(colorName.toLowerCase());
+//           return srcMatch || altMatch;
+//         });
+//         if (match) {
+//           match.click();
+//         }
+//       }
+//     }
+//   }
+// }
 
 // function toggleInlineSpecs() {
 //   const container = document.getElementById('hidden-details-container');
