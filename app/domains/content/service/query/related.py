@@ -5,7 +5,7 @@ from ..content_access import assign_target_to_contents
 def get_related_contents(session, content_id, limit=6):
     from .options import CONTENT_EAGER_LOADS
     from app.domains.system.models import Category, Section, Topic, Brand
-    content = session.get(Content, content_id)
+    content = session.query(Content).options(*CONTENT_EAGER_LOADS).get(content_id)
     if not content: return []
     topic_ids = [t.id for t in content.topics]
     brand_ids = [b.id for b in content.brands]

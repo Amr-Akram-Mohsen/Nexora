@@ -160,8 +160,16 @@ def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit):
 
     if category_slugs_tuple:
         # Resolve selected categories to load parent-child hierarchies
+        from sqlalchemy.orm import selectinload
+
         categories = db.session.execute(
-            select(Category).where(func.lower(Category.slug).in_([func.lower(s) for s in category_slugs_tuple]))
+            select(Category)
+            .options(selectinload(Category.children))
+            .where(
+                func.lower(Category.slug).in_(
+                    [func.lower(s) for s in category_slugs_tuple]
+                )
+            )
         ).scalars().all()
 
         category_ids = set()

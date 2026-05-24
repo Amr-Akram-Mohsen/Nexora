@@ -80,7 +80,7 @@
           <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
             loading="lazy">
           {% endif %}
-          <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span>
+          <!-- <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span> -->
         </div>
         <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item__view-link">
           {{ button(text="View Deal", class="item__view-btn") }}

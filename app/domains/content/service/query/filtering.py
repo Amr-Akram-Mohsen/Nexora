@@ -9,13 +9,13 @@ def get_contents_render(
     filter_values: tuple = (None,),
     rows_count=None,
 ):
-    from .options import CONTENT_EAGER_LOADS
+    from .options import CONTENT_LIST_EAGER_LOADS
     from app.domains.system.models import Section
 
     query = (
         session.query(Content)
         .filter(Content.is_active, Content.is_published)
-        .options(*CONTENT_EAGER_LOADS)
+        .options(*CONTENT_LIST_EAGER_LOADS)
     )
 
     if filter_by_columns and filter_values:
@@ -55,19 +55,26 @@ def get_filtered_contents(
     Handles complex filtering and pagination for section contents.
     """
     from app.domains.system.models import Category, Brand, Topic
-    from .options import CONTENT_EAGER_LOADS
+    from .options import CONTENT_LIST_EAGER_LOADS
 
     query = (
         session.query(Content)
         .filter(
             Content.section_id == section_id, Content.is_active, Content.is_published
         )
-        .options(*CONTENT_EAGER_LOADS)
+        .options(*CONTENT_LIST_EAGER_LOADS)
     )
 
     cats = [f for f in active_filters.get("category", []) if f]
     if cats and "category" in allowed_filters:
-        category_objs = session.query(Category).filter(Category.slug.in_(cats)).all()
+        from sqlalchemy.orm import selectinload
+
+        category_objs = (
+            session.query(Category)
+            .options(selectinload(Category.children))
+            .filter(Category.slug.in_(cats))
+            .all()
+        )
         cat_ids = set()
         for cat in category_objs:
             cat_ids.add(cat.id)

@@ -3,6 +3,19 @@
 from app.domains.serializers import serialize_model
 
 
+def serialize_asset_url(url):
+    if not url:
+        return None
+
+    if url.startswith(("http://", "https://", "//", "/")):
+        return url
+
+    if url.startswith("static/"):
+        return f"/{url}"
+
+    return f"/static/{url}"
+
+
 def serialize_store_link(link):
     """Serialize a single active store link.
 
@@ -14,8 +27,9 @@ def serialize_store_link(link):
         return None
 
     store = link.store
+    store_logo = store.logo_url if store else None
     store_data = (
-        {"name": store.name, "logo_url": store.logo_url, "slug": store.slug}
+        {"name": store.name, "logo_url": store_logo, "slug": store.slug}
         if store
         else None
     )
@@ -33,7 +47,7 @@ def serialize_store_link(link):
         "store": store_data,
         # Flat keys (purchase-options.js reads `link.name` / `link.logo`)
         "name": store.name if store else "",
-        "logo": store.logo_url if store else None,
+        "logo": serialize_asset_url(store_logo),
     }
 
 
@@ -42,7 +56,7 @@ def serialize_store_links(links):
     return [row for row in (serialize_store_link(link) for link in links) if row]
 
 
-def serialize_item_variant(variant, item=None):
+def serialize_item_variant(variant, item=None, include_variant_images=True):
     """Serialize an item variant.
 
     Images are merged (variant-specific first, then item-level) so that
@@ -54,7 +68,7 @@ def serialize_item_variant(variant, item=None):
         return None
 
     item_images = item.images if item else []
-    variant_images = variant.images or []
+    variant_images = list(variant.images or []) if include_variant_images else []
 
     seen: set = set()
     merged_images: list[str] = []
@@ -87,7 +101,7 @@ def serialize_item_variant(variant, item=None):
     }
 
 
-def serialize_item(item):
+def serialize_item(item, include_variant_images=False):
     """Serialize basic item info for catalog cards and related-items lists.
 
     Kept intentionally lean: only what cards and listing pages need.
@@ -102,7 +116,12 @@ def serialize_item(item):
         serialize_store_links(default_variant.store_links) if default_variant else []
     )
 
-    variant_data = [serialize_item_variant(v, item=item) for v in item.variants]
+    variant_data = [
+        serialize_item_variant(
+            v, item=item, include_variant_images=include_variant_images
+        )
+        for v in item.variants
+    ]
 
     return {
         "id": item.id,
@@ -122,6 +141,7 @@ def serialize_item(item):
             {
                 "id": default_variant.id,
                 "sku": getattr(default_variant, "sku", None),
+                "currency": getattr(default_variant, "currency", None),
                 "price": (
                     float(default_variant.price)
                     if default_variant.price is not None
@@ -165,7 +185,7 @@ def serialize_item_detail(item):
     if not item:
         return None
 
-    data = serialize_item(item)
+    data = serialize_item(item, include_variant_images=True)
 
     structured = item.structured_details
     groups = structured.get("groups") if structured else None
@@ -175,8 +195,11 @@ def serialize_item_detail(item):
         for img in item.images
     ]
 
-    # O(N) — serialize each variant exactly once
-    variants_detailed = [serialize_item_variant(v, item=item) for v in item.variants]
+    # Keep the explicit detail key for templates that read item.variants.
+    variants_detailed = [
+        serialize_item_variant(v, item=item, include_variant_images=True)
+        for v in item.variants
+    ]
 
     data.update(
         {
