@@ -4,3 +4,9 @@
 @import "../../components/pagination.css";
 @import "../features/item-sidebar.css";
 @import "../../components/ui/empty-state.css";
+
+@media (max-width: 1024px) {
+  .listing-sidebar.is-open {
+    transform: translateX(0);
+  }
+}

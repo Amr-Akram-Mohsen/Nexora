@@ -32,6 +32,7 @@
 }
 
 .sidebar-header {
+  display: none;
   margin-bottom: 1.25rem;
 }
 
@@ -123,7 +124,7 @@
 
 /* --- Listing Mobile Bar (Refined & Premium Card) --- */
 .listing-mobile-bar {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -179,6 +180,7 @@
 
 .listing-sort-compact {
   /* compact sort styles moved to components/sort.css */
+}
 
 /* --- Premium Active Filter Chips (.filter-tag) --- */
 .filter-tag {
@@ -242,6 +244,10 @@
 }
 
 @media (max-width: 1024px) {
+  .listing-mobile-bar {
+    display: flex;
+  }
+
   .listing-header__inner {
     display: none;
   }
@@ -291,10 +297,21 @@
     border: none;
     border-right: 1px solid var(--border);
     box-shadow: var(--shadow-2xl);
+    overflow-y: auto;
   }
 
   .listing-sidebar.is-open {
     transform: translateX(0);
+  }
+
+  .sidebar-header {
+    display: flex;
+  }
+
+  .sidebar-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
