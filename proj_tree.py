@@ -4,7 +4,7 @@ ROOT = "."
 
 ALLOWED = {".py", ".html", ".css", ".js", ".log"}
 
-IGNORE_DIRS = {"__pycache__", ".git", ".idea", "venv", "env", ".github", ".vscode"}
+IGNORE_DIRS = {"__pycache__", ".git", ".idea", "venv", "env", ".github", ".vscode", "raw_html", "stores_programs_terms"}
 
 def walk(dir_path, prefix=""):
     entries = sorted(os.listdir(dir_path))

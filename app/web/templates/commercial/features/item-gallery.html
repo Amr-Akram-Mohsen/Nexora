@@ -3,10 +3,10 @@
 {% macro item_gallery(item) %}
 {% if item.images %}
 
-<div class="item-gallery flex flex-col" data-gallery>
+<div class="item-gallery" data-gallery>
 
   <!-- MAIN IMAGE -->
-  <div class="item-gallery__viewer flex items-center justify-center">
+  <div class="item-gallery__viewer">
 
     {{ render_image_url(
     item.images[0].image_url,
@@ -16,18 +16,21 @@
     ) }}
 
     <!-- Fullscreen button -->
-    <button type="button" class="item-gallery__fullscreen flex items-center justify-center" data-gallery-open="1" aria-label="Zoom image">
+    <button type="button" class="item-gallery__fullscreen flex items-center justify-center" data-gallery-open="1"
+      aria-label="Zoom image">
       <i class="fa fa-expand"></i>
     </button>
 
     {% if item.images|length > 1 %}
 
     <!-- arrows -->
-    <button type="button" class="item-gallery__nav item-gallery__nav--prev flex items-center justify-center" data-gallery-new-image="0" disabled aria-label="Previous image">
+    <button type="button" class="item-gallery__nav item-gallery__nav--prev flex items-center justify-center"
+      data-gallery-new-image="0" disabled aria-label="Previous image">
       <i class="fa fa-chevron-left"></i>
     </button>
 
-    <button type="button" class="item-gallery__nav item-gallery__nav--next flex items-center justify-center" data-gallery-new-image="2" aria-label="Next image">
+    <button type="button" class="item-gallery__nav item-gallery__nav--next flex items-center justify-center"
+      data-gallery-new-image="2" aria-label="Next image">
       <i class="fa fa-chevron-right"></i>
     </button>
 
@@ -47,7 +50,8 @@
   <div class="item-gallery__thumbs">
 
     {% for image in item.images %}
-    <button type="button" class="item-gallery__thumb {{ 'is-active' if loop.first }}" data-gallery-thumb="{{ loop.index }}" aria-label="View product image {{ loop.index }}">
+    <button type="button" class="item-gallery__thumb {{ 'is-active' if loop.first }}"
+      data-gallery-thumb="{{ loop.index }}" aria-label="View product image {{ loop.index }}">
       {{ render_image_url(image.image_url, item.name, 'img-cover') }}
     </button>
     {% endfor %}

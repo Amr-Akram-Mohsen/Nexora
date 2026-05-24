@@ -2,8 +2,9 @@ from app.domains.item.service import get_item_by_id, get_related_items, serializ
 from app.domains.item.service.serializers import serialize_item_detail
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
+from app.infrastructure.cache import cache
 
-
+@cache.memoize(timeout=1800)
 def get_item_page_data(item_id):
     """Item page orchestration: single DB load.
 

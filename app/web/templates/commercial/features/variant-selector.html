@@ -2,63 +2,69 @@
 
 <div class="item-variants">
 
-    <h3 class="item-variants__title">Choose Options</h3>
+    <h3 class="item-variants__title flex items-center">
+        <span class="item-variants__bar"></span>
+        Choose Options
+    </h3>
 
-    {% for attr, values in item.variant_groups.items() %}
+    <div class="variant-groups flex flex-col">
+        {% for attr, values in item.variant_groups.items() %}
+        <div class="variant-group" data-group="{{ attr }}">
 
-    <div class="variant-group" data-group="{{ attr }}">
+            <div class="variant-group__label flex items-center w-full">
+                <span class="flex items-center gap-1.5">
+                    {% if attr in ['color', 'finish'] %}
+                    <i class="fas fa-palette variant-group__label-icon"></i>
+                    {% elif attr in ['size', 'length', 'width'] %}
+                    <i class="fas fa-ruler-horizontal variant-group__label-icon"></i>
+                    {% elif attr in ['material', 'fabric'] %}
+                    <i class="fas fa-layer-group variant-group__label-icon"></i>
+                    {% elif attr in ['storage', 'ram'] %}
+                    <i class="fas fa-memory variant-group__label-icon"></i>
+                    {% elif attr in ['volume'] %}
+                    <i class="fas fa-flask variant-group__label-icon"></i>
+                    {% else %}
+                    <i class="fas fa-tag variant-group__label-icon"></i>
+                    {% endif %}
+                    {{ attr.replace('_', ' ') | title }}
+                </span>
+                <span class="variant-group__selected-value"
+                    data-selected-for="{{ attr }}"></span>
+            </div>
 
-        <div class="variant-group__label flex items-center justify-between w-full">
-            <span class="flex items-center gap-1.5">
+            <div class="variant-group__options flex flex-wrap">
+
+                {% for value in values %}
+
                 {% if attr in ['color', 'finish'] %}
-                <i class="fas fa-palette variant-group__label-icon"></i>
-                {% elif attr in ['size', 'length', 'width'] %}
-                <i class="fas fa-ruler-horizontal variant-group__label-icon"></i>
-                {% elif attr in ['material', 'fabric'] %}
-                <i class="fas fa-layer-group variant-group__label-icon"></i>
-                {% elif attr in ['storage','ram'] %}
-                <i class="fas fa-memory variant-group__label-icon"></i>
-                {% elif attr in ['volume'] %}
-                <i class="fas fa-flask variant-group__label-icon"></i>
+
+                <button type="button"
+                    class="variant-option variant-option--color-pill flex items-center"
+                    data-attribute="{{ attr }}" data-value="{{ value }}"
+                    title="{{ value }}"
+                    aria-label="Select {{ attr }}: {{ value }}">
+                    <span class="variant-option__color-label">{{ value }}</span>
+                </button>
+
                 {% else %}
-                <i class="fas fa-tag variant-group__label-icon"></i>
+
+                <button type="button"
+                    class="variant-option"
+                    data-attribute="{{ attr }}"
+                    data-value="{{ value }}"
+                    aria-label="Select {{ attr }}: {{ value }}">
+                    {{ value }}
+                </button>
+
                 {% endif %}
-                {{ attr.replace('_',' ')|title }}
-            </span>
-            <span class="variant-group__selected-value font-semibold text-foreground text-xs"
-                data-selected-for="{{ attr }}"></span>
-        </div>
 
+                {% endfor %}
 
-        <div class="variant-group__options flex flex-wrap">
-
-            {% for value in values %}
-
-            {% if attr in ['color','finish'] %}
-
-            <button type="button" class="variant-option variant-option--color-pill flex items-center"
-                data-attribute="{{ attr }}" data-value="{{ value }}" title="{{ value }}"
-                aria-label="Select {{ attr }}: {{ value }}">
-                <span class="variant-option__color-label">{{ value }}</span>
-            </button>
-
-            {% else %}
-
-            <button type="button" class="variant-option" data-attribute="{{ attr }}" data-value="{{ value }}">
-
-                {{ value }}
-
-            </button>
-
-            {% endif %}
-
-            {% endfor %}
+            </div>
 
         </div>
-
+        {% endfor %}
     </div>
-
-    {% endfor %}
 
 </div>
 

@@ -77,7 +77,7 @@ product
         Desktop visual order is controlled by grid-template-areas in item.css #}
         <div class="detail-page__main">
 
-            {# ── Right-column top: title, badges, rating ── #}
+            {# ── Right column: title, badges, rating, price, quick-details ── #}
             <div class="detail-page__header">
 
                 <div class="detail-page__badges flex flex-wrap items-center">
@@ -101,63 +101,45 @@ product
 
                 </div>
 
-                {% if item.quick_details %}
-                <div class="item-quick-details">
-
-                    {% for detail in item.quick_details[:6] %}
-                    <div class="quick-detail">
-
-                        <span class="quick-detail__label">
-                            {{ detail.label }}
-                        </span>
-
-                        <span class="quick-detail__value">
-                            {{ detail.value }}
-                        </span>
-
-                    </div>
-                    {% endfor %}
-
-                </div>
-                {% endif %}
-
-
+                {# Price — immediately below rating for clear hierarchy #}
                 {% if item.default_variant %}
                 <div class="item-price-summary">
-
                     <span class="current-price">
-
                         {{ item.default_variant.price }}
                         {{ item.default_variant.currency }}
-
                     </span>
-
                     {% if item.default_variant.old_price %}
-                    <span class="old-price">
-
-                        {{ item.default_variant.old_price }}
-
-                    </span>
+                    <span class="old-price">{{ item.default_variant.old_price }}</span>
                     {% endif %}
-
                 </div>
                 {% endif %}
 
-
-                <div class="detail-page__variants flex flex-wrap">
-                    {% if item.has_variants %}
-                    {% include "commercial/features/variant-selector.html" %}
-                    {% endif %}
-
-                    {% if item.store_links %}
-                    {% set store_links = item.store_links %}
-                    <div class="purchase-sidebar">
-                        {% include "commercial/features/purchase-options.html" %}
+                {# Quick details — key specs at a glance #}
+                {% if item.quick_details %}
+                <div class="item-quick-details">
+                    {% for detail in item.quick_details[:6] %}
+                    <div class="quick-detail">
+                        <span class="quick-detail__label">{{ detail.label }}</span>
+                        <span class="quick-detail__value">{{ detail.value }}</span>
                     </div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
+                {% endif %}
 
+            </div>
 
+            {# Variants + purchase options — below header in right column #}
+            <div class="detail-page__variants flex flex-wrap items-start">
+                {% if item.has_variants %}
+                {% include "commercial/features/variant-selector.html" %}
+                {% endif %}
+
+                {% if item.store_links %}
+                {% set store_links = item.store_links %}
+                <div class="purchase-sidebar">
+                    {% include "commercial/features/purchase-options.html" %}
+                </div>
+                {% endif %}
             </div>
 
             {# ── Left-column top: gallery (always left, always above specs) ── #}
@@ -165,31 +147,7 @@ product
                 {{ item_gallery(item) }}
             </div>
 
-            {% if item.structured_details.highlights %}
-            <div class="item-highlights item-details-card">
 
-                <h3>Highlights</h3>
-
-                <ul>
-
-                    {% for key,value in item.structured_details.highlights.items() %}
-
-                    <li>
-
-                        <strong>
-                            {{ key|replace("_"," ")|title }}
-                        </strong>
-
-                        {{ value }}
-
-                    </li>
-
-                    {% endfor %}
-
-                </ul>
-
-            </div>
-            {% endif %}
 
             {# ── Left-column bottom: specifications (always below gallery) ── #}
             {% if item.quick_details and item.quick_details|length > 0 %}
@@ -230,6 +188,24 @@ product
             <div class="detail-page__content">
                 <div class="item-content">
 
+                    {# Highlights card — key features above the description #}
+                    {% if item.structured_details and item.structured_details.highlights %}
+                    <div class="item-highlights item-details-card">
+                        <h3 class="item-details-card__title flex items-center">
+                            <span class="item-details-card__bar"></span>
+                            Highlights
+                        </h3>
+                        <ul class="item-highlights__list">
+                            {% for key, value in item.structured_details.highlights.items() %}
+                            <li class="item-highlight-row">
+                                <strong class="item-highlight-row__key">{{ key|replace('_',' ')|title }}</strong>
+                                <span class="item-highlight-row__val">{{ value }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
                     {{ item.description or '' }}
 
                     {% block category_content %}
@@ -242,7 +218,7 @@ product
                 </div>
             </div>
 
-            <!-- Extra (Moved inside Main) -->
+            {# ── Interactions + comments — full-width row below content ── #}
             <div class="detail-page__extra">
                 {% include "components/interactions/interactions.html" %}
                 {% include "components/interactions/comments.html" %}
@@ -256,15 +232,13 @@ product
     {% if related_items %}
 
     <section class="related-items-section">
+        <div class="container">
 
-        <h2 class="section-title">
+            <h2 class="section-title">You may also like</h2>
 
-            You may also like
+            {% include "commercial/features/item-grid.html" %}
 
-        </h2>
-
-        {% include "commercial/features/item-grid.html" %}
-
+        </div>
     </section>
 
     {% endif %}

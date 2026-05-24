@@ -56,9 +56,9 @@ def sections(section_slug):
 
 @bp.route("/contents/<int:content_id>")
 def content_page(content_id):
-    from app.application.content.get_article_page import (
-        record_article_view,
-        get_article_page_data,
+    from app.application.content.get_content_page import (
+        record_content_view,
+        get_content_page_data,
     )
     from app.core.extensions import db
 
@@ -68,7 +68,7 @@ def content_page(content_id):
     ip_address = None if user else get_client_ip()
 
     try:
-        data = get_article_page_data(content_id)
+        data = get_content_page_data(content_id)
         if not data:
             logger.warning("[ROUTE][/contents/%d] no data returned — 404", content_id)
             abort(404)
@@ -78,7 +78,7 @@ def content_page(content_id):
         data.setdefault("related_contents", [])
         data.setdefault("trending_contents", [])
 
-        record_article_view(content_id, user, ip_address)
+        record_content_view(content_id, user, ip_address)
         db.session.commit()
 
         log_route_success(logger, f"/contents/{content_id}", template="page.html")

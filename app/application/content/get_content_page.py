@@ -7,7 +7,7 @@ from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
 
 
-def get_article_page_data(content_id):
+def get_content_page_data(content_id):
     """
     Orchestrates data for a single content/article page.
     """
@@ -33,7 +33,7 @@ def get_article_page_data(content_id):
     }
 
 
-def record_article_view(content_id, user, ip_address):
+def record_content_view(content_id, user, ip_address):
     """
     Records an article/content view interaction.
     """
