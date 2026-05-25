@@ -36,7 +36,8 @@
         <!-- Search -->
         {{ button(variant=v,
         class=class ~ "search-toggle",
-        icon="fas fa-search") }}
+        icon="fas fa-search",
+        attrs={"aria-label": "Open search", "aria-expanded": "false", "aria-controls": "header-search-panel"}) }}
 
         <!-- Theme -->
         {{ button(variant=v,
@@ -118,15 +119,17 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="header-search">
-      {% call form("header-search__form", variant="", method="GET", include_csrf=False) %}
+    <div class="header-search" id="header-search-panel">
+      {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET", include_csrf=False) %}
       <div class="header-search__wrapper">
         <i class="fas fa-search header-search__icon"></i>
         {{ input(
         name="query", type="search",
         placeholder="Search contents and products...",
-        class="header-search__input"
+        class="header-search__input",
+        attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
+        {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right", attrs={"aria-label": "Search"}) }}
       </div>
       {% endcall %}
     </div>

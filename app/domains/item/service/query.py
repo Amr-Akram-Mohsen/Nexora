@@ -2,7 +2,7 @@ from sqlalchemy import or_, select
 
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, Store, ItemStoreLink
-from app.domains.system.models import Category, Brand
+from app.domains.system.models import Category, Brand, Topic
 from app.shared.parsing import safe_float
 from app.infrastructure import cache
 
@@ -40,12 +40,25 @@ def _apply_catalog_sort(query, sort_type, needs_variant_join):
     return query.order_by(order)
 
 
-def get_search_items(query_str):
+def get_search_items(query_str, limit=80):
+    term = f"%{query_str}%"
     return (
         Item.query.options(*get_item_card_load_options())
-        .filter(Item.name.ilike(f"%{query_str}%"))
-        .order_by(Item.created_at.desc())
-        .limit(50)
+        .filter(
+            or_(
+                Item.name.ilike(term),
+                Item.description.ilike(term),
+                Item.slug.ilike(term),
+                Item.item_type.ilike(term),
+                Item.brand.has(or_(Brand.name.ilike(term), Brand.slug.ilike(term))),
+                Item.category.has(
+                    or_(Category.name.ilike(term), Category.slug.ilike(term))
+                ),
+                Item.topics.any(or_(Topic.name.ilike(term), Topic.slug.ilike(term))),
+            )
+        )
+        .order_by(Item.view_count.desc(), Item.created_at.desc())
+        .limit(limit)
         .all()
     )
 

@@ -4,7 +4,10 @@ async function handleSearch(form) {
 
     if (!query.trim()) return;
 
-    const res = await fetch(`/search?query=${encodeURIComponent(query)}`, {
+    const action = form.getAttribute("action") || "/search";
+    const url = `${action}?query=${encodeURIComponent(query)}`;
+
+    const res = await fetch(url, {
         method: "GET",
         headers: { "X-Requested-With": "XMLHttpRequest" } // lets Flask know it's AJAX
     });
@@ -16,8 +19,12 @@ async function handleSearch(form) {
         const mainContent = document.querySelector('#main-content');
         if (mainContent) {
             mainContent.innerHTML = data.html;
-
+            window.history.pushState({}, "", url);
+            document.querySelector(".header-search")?.classList.remove("active");
+            document.querySelector(".search-toggle")?.setAttribute("aria-expanded", "false");
         }
+    } else if (data.error) {
+        showInlineTooltip(form, data.error);
     }
 }
 

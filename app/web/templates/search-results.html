@@ -6,53 +6,97 @@
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/input.html" import input %}
 
+{% set tab_labels = {
+"all": "All",
+"articles": "Articles",
+"posts": "Posts",
+"videos": "Videos",
+"products": "Products"
+} %}
+
 {% block title %}Search Results | Nexora{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/catalog-page.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/search.css') }}" />
+{% endblock %}
 
 {% block content %}
 
-{% call(slot) listing_page("search-results-page") %}
+{% call(slot) listing_page("search-results-page", domain_type="search", include_sidebar=False) %}
 
 {% if slot == 'sidebar' %}
-{# Optional: We could add search filters here later #}
-<div class="sidebar-info">
-  <h3 class="filter-section__title flex items-center">New Discovery</h3>
-  <p class="text-xs color-muted">Refine your search to find the exact tech reviews or deals you need.</p>
+<div class="search-sidebar">
+  <h3 class="filter-section__title flex items-center">Result Types</h3>
+  <div class="search-type-list flex flex-col">
+    {% for search_type in search_types %}
+    <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}"
+      class="search-type-link {{ 'is-active' if active_type == search_type else '' }}">
+      <span>{{ tab_labels[search_type] }}</span>
+      <span class="search-type-count">{{ result_counts.get(search_type, 0) }}</span>
+    </a>
+    {% endfor %}
+  </div>
 </div>
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-summary">
-  <h1 class="listing-title">Search Results</h1>
-  {% if query %}
-  <p class="listing-count">
-    Found {{ search_results|length }} results for "{{ query }}"
-  </p>
-  {% endif %}
-</div>
+<div class="listing-header__inner flex items-center justify-between">
+  <div class="listing-summary">
+    <h1 class="listing-title">Search Results</h1>
+    <p class="listing-count">
+      <span class="listing-count__num">{{ search_results|length }}</span>
+      {% if query %}results for "{{ query }}"{% else %}results{% endif %}
+    </p>
+  </div>
 
-<div class="listing-search-form">
-  {% call form("search-form", variant="", method="GET", include_csrf=False) %}
-  <div class="listing-search-wrapper flex">
+  {% call form("search-form", variant="", form_action=url_for('recommendation.search'), method="GET",
+  include_csrf=False) %}
+  <div class="listing-search-wrapper search-page-form flex">
     {{ input(
-    name="query", type="search",
-    placeholder="Search tech news or products...",
+    name="query",
+    type="search",
+    placeholder="Search articles, videos, posts, and products...",
     value=query,
     class="input-search"
     ) }}
-    {{ button(type="submit", icon="fas fa-search") }}
+    {% if active_type and active_type != 'all' %}
+    <input type="hidden" name="type" value="{{ active_type }}">
+    {% endif %}
+    {{ button(type="submit", icon="fas fa-search", attrs={"aria-label": "Search"}) }}
   </div>
   {% endcall %}
 </div>
+
+<nav class="search-tabs" aria-label="Search result filters">
+  {% for search_type in search_types %}
+  <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}"
+    class="search-tab {{ 'is-active' if active_type == search_type else '' }}">
+    <span>{{ tab_labels[search_type] }}</span>
+    <span class="search-tab__count">{{ result_counts.get(search_type, 0) }}</span>
+  </a>
+  {% endfor %}
+</nav>
 {% endif %}
 
-{% if slot == 'content' %}
+{% if slot == 'active_filters' %}
+{% if active_type != 'all' %}
+<span class="filter-tag">
+  <span>{{ tab_labels[active_type] }}</span>
+  <a href="{{ url_for('recommendation.search', query=query, type='all') }}" class="remove-tag"
+    aria-label="Clear result type">&times;</a>
+</span>
+{% endif %}
+{% endif %}
+
+{% if slot == 'results' %}
 {% if search_results %}
 {{ grid(search_results) }}
 {% else %}
 <div class="no-results flex flex-col items-center">
   <i class="fas fa-search-minus icon-empty"></i>
   <h3>No results found</h3>
-  <p>Try different keywords or browse our latest deals.</p>
+  <p>Try different keywords or browse the latest deals and guides.</p>
 </div>
 {% endif %}
 {% endif %}

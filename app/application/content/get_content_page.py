@@ -4,16 +4,22 @@ from app.application.content.query_service import (
     get_trending_contents_cached,
 )
 from app.domains.interaction.service import record_view
+from app.infrastructure import cache
 from app.shared.constants.core import TargetType
+
+
+@cache.memoize(timeout=1800)
+def get_content_page_static_data(content_id):
+    from app.core.extensions import db
+
+    return get_content_by_id(db.session, content_id)
 
 
 def get_content_page_data(content_id):
     """
     Orchestrates data for a single content/article page.
     """
-    from app.core.extensions import db
-
-    content = get_content_by_id(db.session, content_id)
+    content = get_content_page_static_data(content_id)
     # content is now a serialized dictionary
     if not content:
         return None

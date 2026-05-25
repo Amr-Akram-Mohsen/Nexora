@@ -120,6 +120,21 @@ def get_filtered_contents(
         query = query.order_by(Content.published_at.desc())
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-    pagination.items = assign_target_to_contents(pagination.items, session)
+    # pagination.items = assign_target_to_contents(pagination.items, session)
 
-    return pagination
+    # return pagination
+
+    items = assign_target_to_contents(
+        pagination.items,
+        session
+    )
+
+    return {
+        "items": items,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
+        "per_page": pagination.per_page,
+        "has_next": pagination.has_next,
+        "has_prev": pagination.has_prev,
+    }

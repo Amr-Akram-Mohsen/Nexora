@@ -131,8 +131,12 @@ function handleGlobalClicks(e) {
     const searchToggleBtn = e.target.closest('.search-toggle');
     if (searchToggleBtn) {
         const siteHeader = searchToggleBtn.closest('.site-header');
-        siteHeader.querySelector('.header-search')
-            .classList.toggle('active');
+        const searchPanel = siteHeader.querySelector('.header-search');
+        const isActive = searchPanel.classList.toggle('active');
+        searchToggleBtn.setAttribute('aria-expanded', String(isActive));
+        if (isActive) {
+            searchPanel.querySelector('.header-search__input')?.focus();
+        }
     }
 
     const user = e.target.closest(".nav-user");
@@ -200,12 +204,6 @@ function handleGlobalSubmits(e) {
         return;
     }
 
-    const searchForm = e.target.closest(".header-search__form");
-    if (searchForm) {
-        e.preventDefault();
-        handleSearch(searchForm);
-        return;
-    }
 }
 
 function handleGlobalChanges(e) {
@@ -256,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Search Highlighting
     if (window.SEARCH_QUERY) {
         const cards = document.querySelectorAll('.card__title, .card__excerpt, .item-card__name, .item-card__description');
-        const regex = new RegExp(`(${window.SEARCH_QUERY})`, 'gi');
+        const escapedQuery = String(window.SEARCH_QUERY).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
         cards.forEach(card => {
             card.innerHTML = card.innerHTML.replace(regex, '<mark class="search-highlight">$1</mark>');
         });

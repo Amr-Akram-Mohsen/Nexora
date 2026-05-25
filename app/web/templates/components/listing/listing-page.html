@@ -1,4 +1,4 @@
-{% macro listing_page(class_name="",domain_type="") %}
+{% macro listing_page(class_name="",domain_type="", include_sidebar=True) %}
 <section class="listing-page {{ class_name }}" data-domain-type="{{ domain_type }}">
 
   {# ── Mobile filter drawer overlay ── #}
@@ -7,6 +7,7 @@
   <div class="listing-layout">
 
     {# ── Left Sidebar ── #}
+    {% if include_sidebar %}
     <aside class="listing-sidebar" id="listingSidebar" aria-label="Filters">
       <div class="listing-sidebar__inner">
         {# Sidebar header (mobile close) #}
@@ -19,7 +20,7 @@
         {{ caller('sidebar') }}
       </div>
     </aside>
-
+    {% endif %}
     {# ── Main Results Area ── #}
     <main class="listing-main flex flex-col">
 

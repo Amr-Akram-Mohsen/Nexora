@@ -7,11 +7,11 @@ Uses the same Flask-Caching backend as app.infrastructure.cache.memoize.
 
 def invalidate_item_page(item_id):
     """Drop cached static payload for one item detail page."""
-    from app.application.item.get_item_page import get_item_static_data
+    from app.application.item.get_item_page import get_item_page_data
 
     from app.core.extensions import cache
 
-    cache.delete_memoized(get_item_static_data, item_id)
+    cache.delete_memoized(get_item_page_data, item_id)
 
 
 def invalidate_item_catalog_caches():
@@ -25,6 +25,7 @@ def invalidate_item_catalog_caches():
 
     cache.delete_memoized(get_filtered_items)
     cache.delete_memoized(get_filtered_items_for_home)
+    cache.delete("home_page_data")
 
 
 def invalidate_item_filter_options():
@@ -53,3 +54,4 @@ def invalidate_item_after_write(item_id=None):
     if item_id is not None:
         invalidate_item_page(item_id)
     invalidate_item_catalog_caches()
+    invalidate_item_filter_options()

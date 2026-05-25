@@ -83,7 +83,9 @@
   {% include 'partials/header.html' %}
   {% endblock %}
 
-  {% block content %}{% endblock %}
+  <main id="main-content">
+    {% block content %}{% endblock %}
+  </main>
 
   {% block footer %}
   {% include 'partials/footer.html' %}

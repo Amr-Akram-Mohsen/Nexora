@@ -1,5 +1,7 @@
 from app.core.extensions import cache
 
+_ITERABLE_FILTER_TYPES = (list, tuple, set)
+
 def memoize(timeout=300):
     """
     Decorator to cache the result of a function with arguments.
@@ -33,3 +35,30 @@ def clear():
 def delete_memoized(fn, *args, **kwargs):
     """Invalidate a single memoized function result (optionally scoped by args)."""
     return cache.delete_memoized(fn, *args, **kwargs)
+
+
+def normalize_filters(filters):
+    """Return a stable tuple representation for cache keys and memoized args."""
+    if not filters:
+        return ()
+
+    normalized = []
+    for key, value in sorted(filters.items()):
+        if value is None or value == "":
+            continue
+        if isinstance(value, _ITERABLE_FILTER_TYPES):
+            values = tuple(sorted(str(v).strip() for v in value if str(v).strip()))
+            if values:
+                normalized.append((key, values))
+        else:
+            normalized.append((key, str(value).strip()))
+
+    return tuple(normalized)
+
+
+def filters_from_normalized(normalized):
+    """Rebuild a filter dict from normalize_filters output."""
+    return {
+        key: list(value) if isinstance(value, tuple) else value
+        for key, value in normalized
+    }

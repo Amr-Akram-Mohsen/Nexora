@@ -182,10 +182,10 @@
 }
 
 .header-search {
-  padding: 1rem 0;
+  padding: .875rem 0 1rem;
   border-top: 1px solid var(--border);
   display: none;
-  background: transparent;
+  background: var(--background);
 }
 
 .header-search.active {
@@ -199,12 +199,14 @@
 .header-search__wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .header-search__input {
   width: 100%;
-  height: 2.75rem; /* 44px height is highly professional and ergonomic */
-  padding: 0.6rem 1rem 0.6rem 2.75rem; /* leaves perfect room for left-side icon */
+  height: 2.75rem;
+  padding: 0.6rem 3.25rem 0.6rem 2.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--background);
@@ -233,9 +235,23 @@
   transition: color 0.15s ease;
 }
 
-  .header-search__wrapper:focus-within .header-search__icon {
-    color: var(--brand-blue);
-  }
+.header-search__submit {
+  position: absolute;
+  right: .375rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: var(--radius-md);
+  padding: 0;
+}
+
+.header-search__submit i {
+  font-size: var(--text-sm);
+}
+
+.header-search__wrapper:focus-within .header-search__icon {
+  color: var(--brand-blue);
+}
 
 .group:hover .logo__icon {
   transform: scale(1.1);
@@ -356,5 +372,9 @@ body.dark-mode .site-header {
 
   .mobile-menu-btn {
     display: flex;
+  }
+
+  .header-search {
+    padding-inline: .25rem;
   }
 }

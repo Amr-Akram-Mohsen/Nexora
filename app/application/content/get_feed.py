@@ -4,7 +4,8 @@ from app.domains.system.service import (
     get_types_for_section,
     get_attributes_for_section,
 )
-from app.application.content.query_service import get_filtered_contents
+from app.application.content.query_service import get_filtered_contents_cached
+from app.infrastructure.cache import normalize_filters
 
 
 def get_feed_data(section_slug, active_filters, page=1):
@@ -18,8 +19,11 @@ def get_feed_data(section_slug, active_filters, page=1):
     from app.domains.serializers import serialize_model
 
     allowed_filters = section.allowed_filters
-    pagination = get_filtered_contents(
-        section.id, active_filters, allowed_filters, page=page
+    pagination = get_filtered_contents_cached(
+        section.id,
+        normalize_filters(active_filters),
+        tuple(allowed_filters or []),
+        page=page,
     )
 
     filter_options = {}
@@ -47,7 +51,7 @@ def get_feed_data(section_slug, active_filters, page=1):
 
     return {
         "section": serialize_model(section),
-        "contents": pagination.items,
+        "contents": pagination["items"],
         "pagination": pagination,
         "allowed_filters": allowed_filters,
         "filter_options": filter_options,

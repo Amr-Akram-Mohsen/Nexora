@@ -15,6 +15,10 @@
   padding-inline: 1.5rem;
 }
 
+[data-domain-type="search"] .listing-layout {
+  grid-template-columns: 1fr;
+}
+
 .listing-sidebar {
   position: sticky;
   top: calc(var(--header-height, 80px) + 1.5rem);

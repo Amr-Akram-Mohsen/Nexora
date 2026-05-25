@@ -386,12 +386,11 @@ class IngestionWorkflow:
 
         if total_stored > 0:
             try:
-                from app.core.extensions import cache
-                from app.domains.system.service.query import get_relationships_for_section, get_types_for_section
-                cache.delete_memoized(get_relationships_for_section)
-                cache.delete_memoized(get_types_for_section)
+                from app.infrastructure.cache.content import invalidate_content_after_write
+
+                invalidate_content_after_write()
                 logger.info(
-                    "[FETCH][%s] Invalidated cached section filter options due to new content ingestion.",
+                    "[FETCH][%s] Invalidated cached content listings and filter options due to new content ingestion.",
                     self.source_name,
                 )
             except Exception as exc:

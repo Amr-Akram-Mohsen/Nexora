@@ -1,4 +1,5 @@
 from app.infrastructure import cache
+from app.infrastructure.cache import filters_from_normalized
 from app.domains.content.service import query as domain_query
 from app.core.extensions import db
 
@@ -16,3 +17,14 @@ def get_trending_contents_cached(limit=6, days=7, section_ids=None):
 
 def get_filtered_contents(section_id, active_filters, allowed_filters, page=1, per_page=24):
     return domain_query.get_filtered_contents(db.session, section_id, active_filters, allowed_filters, page, per_page)
+
+
+@cache.memoize(timeout=300)
+def get_filtered_contents_cached(
+    section_id, active_filters_key, allowed_filters_key, page=1, per_page=24
+):
+    active_filters = filters_from_normalized(active_filters_key)
+    allowed_filters = list(allowed_filters_key)
+    return domain_query.get_filtered_contents(
+        db.session, section_id, active_filters, allowed_filters, page, per_page
+    )
