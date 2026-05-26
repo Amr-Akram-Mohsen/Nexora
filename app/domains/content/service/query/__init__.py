@@ -6,7 +6,6 @@ from ..content_access import assign_target_to_contents
 from .filtering import get_contents_render, get_filtered_contents
 from .trending import get_trending_contents
 from .related import get_related_contents
-from .search import get_search_contents
 
 def count_contents(session):
     return session.query(Content.id).count()

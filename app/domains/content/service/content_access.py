@@ -122,7 +122,12 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
         return existing, changed
 
     content = Content(
-        object_type=object_type, object_id=obj.id, published_at=published_at, **kwargs
+        object_type=object_type,
+        object_id=obj.id,
+        published_at=published_at,
+        title=getattr(obj, "title", ""),
+        preview_text=getattr(obj, "preview_text", ""),
+        **kwargs
     )
 
     session.add(content)

@@ -3,7 +3,7 @@ from app.core.extensions import db
 from app.shared.sanitizer import sanitize_json
 from app.domains.relationships import item_topics, content_items
 # ==================== ASSOCIATION TABLES ====================
-
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 class Store(db.Model):
     __tablename__ = "stores"
@@ -60,6 +60,14 @@ class Item(db.Model):
     click_count = db.Column(db.Integer, default=0)
     card_type = db.Column(db.TEXT, default="item")
     searchable_attributes = db.Column(db.JSON)
+
+    search_text = db.Column(
+        db.Text
+    )
+
+    search_vector = db.Column(
+        TSVECTOR
+    )
 
     category = db.relationship("Category", back_populates="items")
     brand = db.relationship("Brand", back_populates="items")
@@ -289,11 +297,17 @@ class Item(db.Model):
         )
 
 
+
     __table_args__ = (
         db.Index("ix_items_slug", "slug"),
         db.Index("ix_items_brand_category", "brand_id", "category_id"),
         db.Index("ix_items_type_created", "item_type", "created_at"),
         db.Index("ix_items_category_created", "category_id", "created_at"),
+        db.Index(
+            "ix_items_search_vector",
+            "search_vector",
+            postgresql_using="gin"
+        )
     )
 
     def __repr__(self):

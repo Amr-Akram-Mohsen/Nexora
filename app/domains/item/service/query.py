@@ -40,29 +40,6 @@ def _apply_catalog_sort(query, sort_type, needs_variant_join):
     return query.order_by(order)
 
 
-def get_search_items(query_str, limit=80):
-    term = f"%{query_str}%"
-    return (
-        Item.query.options(*get_item_card_load_options())
-        .filter(
-            or_(
-                Item.name.ilike(term),
-                Item.description.ilike(term),
-                Item.slug.ilike(term),
-                Item.item_type.ilike(term),
-                Item.brand.has(or_(Brand.name.ilike(term), Brand.slug.ilike(term))),
-                Item.category.has(
-                    or_(Category.name.ilike(term), Category.slug.ilike(term))
-                ),
-                Item.topics.any(or_(Topic.name.ilike(term), Topic.slug.ilike(term))),
-            )
-        )
-        .order_by(Item.view_count.desc(), Item.created_at.desc())
-        .limit(limit)
-        .all()
-    )
-
-
 @cache.memoize(timeout=300)
 def get_filtered_items(active_filters, page=1, per_page=24):
     """

@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from app.core.extensions import db
 from app.domains.relationships import (content_topics, content_brands, content_items, content_attributes)
 from sqlalchemy.orm import object_session
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 class Content(db.Model):
     __tablename__ = "contents"
@@ -29,6 +30,27 @@ class Content(db.Model):
     ingested_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc)
+    )
+
+    title = db.Column(
+        db.Text,
+        nullable=True,
+        index=True
+    )
+
+    preview_text = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    search_text = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    search_vector = db.Column(
+        TSVECTOR,
+        nullable=True
     )
 
     is_active = db.Column(db.Boolean, default=True)
@@ -137,7 +159,17 @@ class Content(db.Model):
             "object_type IN ('article', 'video', 'post')",
             name="ck_contents_object_type_valid"
         ),
-        
+
+        db.Index(
+            "ix_contents_search_vector",
+            "search_vector",
+            postgresql_using="gin"
+        ),
+
+        db.Index(
+            "ix_contents_title",
+            "title"
+        ),
     )
 
     # -------- Helper --------

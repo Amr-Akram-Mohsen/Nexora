@@ -5,6 +5,7 @@ from app.shared.utils.logging import log_item_skipped
 from .taxonomy import resolve_taxonomy
 from app.domains.content.service.command import apply_relationships
 from app.domains.content.service.content_access import create_content, get_or_create_content
+from app.domains.content.service import populate_content_search_fields
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,12 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
             updated_relationships = {}
             if content:
                 updated_relationships = apply_relationships(session, content, raw_data)
+
+            populate_content_search_fields(
+                content,
+                obj,
+                object_type
+            )
 
             if is_new:
                 return content, "created"
