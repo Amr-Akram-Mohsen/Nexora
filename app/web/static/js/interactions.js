@@ -46,18 +46,30 @@ async function initAllReactions() {
 
     buttons.forEach(btn => {
         const item = btn.closest("[data-id]");
+        if (!item) return;
         if (item.hasAttribute('data-comment-id')) {
             targets.push({ 'type': 'comment', 'id': item.dataset.commentId });
-
+        } else {
+            targets.push({ 'type': item.dataset.type, 'id': item.dataset.id });
         }
-        targets.push({ ...item.dataset });
     });
 
-    if (targets.size === 0) return;
+    // Deduplicate targets
+    const seen = new Set();
+    const uniqueTargets = [];
+    for (const t of targets) {
+        const key = `${t.type}:${t.id}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueTargets.push(t);
+        }
+    }
+
+    if (uniqueTargets.length === 0) return;
 
     // Prepare query parameters
     const params = new URLSearchParams();
-    for (const t of targets) {
+    for (const t of uniqueTargets) {
         params.append("type", t.type);
         params.append("id", t.id);
     }
@@ -71,6 +83,7 @@ async function initAllReactions() {
     // Update UI
     buttons.forEach(btn => {
         const item = btn.closest("[data-id]");
+        if (!item) return;
         let key = null;
         if (item.hasAttribute('data-comment-id')) {
             key = `comment:${item.dataset.commentId}`;
@@ -87,12 +100,25 @@ async function initAllSaves() {
 
     buttons.forEach(btn => {
         const item = btn.closest("[data-id]");
-        targets.push({ ...item.dataset });
+        if (!item) return;
+        targets.push({ 'type': item.dataset.type, 'id': item.dataset.id });
     });
-    if (targets.size === 0) return;
+
+    // Deduplicate targets
+    const seen = new Set();
+    const uniqueTargets = [];
+    for (const t of targets) {
+        const key = `${t.type}:${t.id}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            uniqueTargets.push(t);
+        }
+    }
+
+    if (uniqueTargets.length === 0) return;
 
     const params = new URLSearchParams();
-    for (const t of targets) {
+    for (const t of uniqueTargets) {
         params.append("type", t.type);
         params.append("id", t.id);
     }
@@ -104,10 +130,10 @@ async function initAllSaves() {
 
     buttons.forEach(btn => {
         const item = btn.closest("[data-id]");
+        if (!item) return;
         const key = `${item.dataset.type}:${item.dataset.id}`;
 
         btn.classList.toggle('active', key in data);
-
     });
 }
 

@@ -3,7 +3,7 @@ from app.domains.item.service import get_filtered_items_for_home
 from app.infrastructure import cache
 
 
-@cache.cached(timeout=300, key_prefix="home_page_data")
+@cache.cached(timeout=300)
 def get_home_page_data():
     """
     Orchestrates data for the home page.
@@ -37,3 +37,5 @@ def get_home_page_data():
         "top_deals": top_deals,
         "recently_added": recently_added,
     }
+
+

@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.core.extensions import limiter
 from app.application.user.login import authenticate_user
 from app.application.user.register import register_user_workflow
-from app.application.user.verify import verify_user_email
+from app.application.user.verify import verify_user_email, resend_verification_email_workflow
 from app.application.user.password import request_password_reset, reset_user_password
 from app.domains.user.service import (
     get_user_by_email,
@@ -12,6 +12,12 @@ from app.domains.user.service import (
     update_user_password
 )
 import secrets
+from urllib.parse import urlparse, urljoin
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 bp = Blueprint("user", __name__)
 
@@ -31,6 +37,13 @@ def login():
         password = request.form.get('password', '')
         remember = request.form.get('remember') == 'on'
         
+        # 🛡️ Lockout Check
+        from app.application.user.login import check_login_lockout, record_failed_login, clear_failed_logins
+        is_locked, mins = check_login_lockout(email)
+        if is_locked:
+            flash(f"Too many failed attempts. This account is locked for 15 minutes.", "error")
+            return render_template('login.html')
+            
         user = authenticate_user(email, password)
         
         if user:
@@ -38,7 +51,11 @@ def login():
                 flash('Your account is not verified yet. 📧 Check your inbox for a verification link.', 'warning')
                 return render_template('login.html', show_resend=True, email=email)
             
-            # 🔐 Safe login
+            # Clear lockout attempts on success
+            clear_failed_logins(email)
+            
+            # 🔐 Safe login & Session rotation to prevent session fixation
+            session.clear()
             login_user(user, remember=remember)
             if remember:
                 session.permanent = True
@@ -47,12 +64,14 @@ def login():
                 return redirect(url_for('admin.home'))
             
             next_page = request.args.get('next')
-            if not next_page or not next_page.startswith('/') or next_page.startswith('//'):
+            if not next_page or not is_safe_url(next_page):
                 next_page = url_for('system.home')
                 
             flash(f'Welcome back, {user.name or "Nexora Member"}! 👋', 'success')
             return redirect(next_page)
             
+        # Record failed attempt
+        record_failed_login(email)
         flash('Invalid email or password. Please try again.', 'error')
     
     return render_template('login.html')
@@ -121,21 +140,28 @@ def register():
         password = request.form.get('password', '')
         confirm  = request.form.get('confirm_password', '')
 
-        if not name:
+        from app.shared.validators import validate_email, validate_password_strength
+        from app.shared.sanitizer import sanitize_text
+
+        sanitized_name = sanitize_text(name)
+
+        if not sanitized_name:
             flash('Please enter your full name.', 'error')
             return render_template('register.html')
-        if not email or '@' not in email:
+        if not validate_email(email):
             flash('Please enter a valid email address.', 'error')
             return render_template('register.html')
-        if len(password) < 8:
-            flash('Password must be at least 8 characters long.', 'error')
+        
+        is_strong, pwd_err = validate_password_strength(password)
+        if not is_strong:
+            flash(pwd_err, 'error')
             return render_template('register.html')
         if password != confirm:
             flash('Passwords do not match.', 'error')
             return render_template('register.html')
 
         wants_newsletter = request.form.get('newsletter') == 'on'
-        user, newsletter_msg = register_user_workflow(name, email, password, wants_newsletter)
+        user, newsletter_msg = register_user_workflow(sanitized_name, email, password, wants_newsletter)
 
         if not user:
             flash(newsletter_msg or 'An account with this email already exists.', 'error')
@@ -165,17 +191,8 @@ def verify_email(token):
 @bp.route('/resend-verification', methods=['POST'])
 @limiter.limit("3 per minute")
 def resend_verification():
-    # TODO: Move to Application Layer
     email = request.form.get('email', '').strip().lower()
-    from app.domains.user.service import get_user_by_email, set_reset_token
-    from app.integrations.email.client import send_verification_email
-    from app.core.extensions import db
-    user = get_user_by_email(email)
-    if user and not user.is_verified:
-        token = secrets.token_urlsafe(32)
-        user.verification_token = token
-        db.session.commit()
-        send_verification_email(email, token)
+    resend_verification_email_workflow(email)
     flash('If that email exists and is unverified, a new link has been sent.', 'info')
     return redirect(url_for('user.login'))
 
@@ -198,8 +215,11 @@ def reset_password(token):
     if request.method == 'POST':
         password = request.form.get('password', '')
         confirm  = request.form.get('confirm_password', '')
-        if len(password) < 8:
-            flash('Password must be at least 8 characters.', 'error')
+        
+        from app.shared.validators import validate_password_strength
+        is_strong, pwd_err = validate_password_strength(password)
+        if not is_strong:
+            flash(pwd_err, 'error')
             return render_template('reset-password.html', token=token)
         if password != confirm:
             flash('Passwords do not match.', 'error')
@@ -236,8 +256,14 @@ def profile():
 def update_profile():
     action = request.form.get('action')
     if action == 'name':
-        update_user_name(current_user, request.form.get('name', '').strip())
-        flash('Display name updated successfully.', 'success')
+        name = request.form.get('name', '').strip()
+        from app.shared.sanitizer import sanitize_text
+        sanitized_name = sanitize_text(name)
+        if not sanitized_name:
+            flash('Display name cannot be empty.', 'error')
+        else:
+            update_user_name(current_user, sanitized_name)
+            flash('Display name updated successfully.', 'success')
     elif action == 'password':
         if current_user.provider == 'google':
             flash('Google accounts cannot change password here.', 'error')
@@ -249,11 +275,14 @@ def update_profile():
         
         if not current_user.check_password(current_pwd_input):
             flash('Incorrect current password.', 'error')
-        elif len(new_pwd) < 8:
-            flash('New password must be at least 8 characters.', 'error')
-        elif new_pwd != confirm_pwd:
-            flash('New passwords do not match.', 'error')
         else:
-            update_user_password(current_user, new_pwd)
-            flash('Password changed successfully!', 'success')
+            from app.shared.validators import validate_password_strength
+            is_strong, pwd_err = validate_password_strength(new_pwd)
+            if not is_strong:
+                flash(pwd_err, 'error')
+            elif new_pwd != confirm_pwd:
+                flash('New passwords do not match.', 'error')
+            else:
+                update_user_password(current_user, new_pwd)
+                flash('Password changed successfully!', 'success')
     return redirect(url_for('user.profile'))

@@ -14,7 +14,14 @@ def subscribe_workflow(email, user_id=None):
     if not email:
         return False, "Email is required."
 
+    from app.shared.validators import validate_email
+    email = email.strip().lower()
+    if not validate_email(email):
+        return False, "Invalid email address format."
+
     subscriber = get_newsletter_subscriber_by_email(email)
+
+    from app.core.extensions import db
 
     if subscriber:
         if user_id:
@@ -23,15 +30,14 @@ def subscribe_workflow(email, user_id=None):
         if subscriber.is_active:
             return False, "You are already subscribed."
 
+        # Re-subscribe: reset verification tokens for double opt-in
         subscriber.unsubscribed_at = None
-        if not subscriber.is_confirmed:
-            subscriber.generate_tokens()
+        subscriber.is_confirmed = False
+        subscriber.generate_tokens()
+        db.session.commit()
     else:
         subscriber = create_newsletter_subscriber(email, user_id)
 
-    # Note: DB commit is handled in domain service or here? 
-    # The domain service create_newsletter_subscriber already commits.
-    
     send_confirmation_email(
         subscriber.email,
         subscriber.confirmation_token,

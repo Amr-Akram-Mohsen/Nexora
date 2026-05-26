@@ -29,7 +29,19 @@ def get_active_user_by_email(email):
     return User.query.filter(User.email == email, User.is_active == True).first()
 
 def get_user_by_verification_token(token):
-    return User.query.filter_by(verification_token=token).first()
+    from app.shared.validators import hash_token
+    hashed = hash_token(token)
+    user = User.query.filter_by(verification_token=hashed).first()
+    if not user:
+        # Fallback for older plaintext tokens
+        user = User.query.filter_by(verification_token=token).first()
+    return user
 
 def get_user_by_reset_token(token):
-    return User.query.filter_by(reset_token=token).first()
+    from app.shared.validators import hash_token
+    hashed = hash_token(token)
+    user = User.query.filter_by(reset_token=hashed).first()
+    if not user:
+        # Fallback for older plaintext tokens
+        user = User.query.filter_by(reset_token=token).first()
+    return user

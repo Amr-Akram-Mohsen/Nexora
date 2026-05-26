@@ -9,7 +9,7 @@ def get_comments_html(target_type, target_id, parent_id=None):
     
     comments_html = "".join(
         render_template(
-            'components/features/comment-card.html',
+            'components/interactions/comment-card.html',
             comment=c,
             is_reply=parent_id is not None
         ) for c in comments

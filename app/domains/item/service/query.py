@@ -241,7 +241,6 @@ def get_filtered_items_for_home(filter_type="recent", limit=10):
         items = (
             base.join(Item.variants)
             .filter(ItemVariant.old_price > ItemVariant.price)
-            .distinct(Item.id)
             .order_by(Item.id.desc())
             .limit(limit)
             .all()

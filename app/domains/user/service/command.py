@@ -26,12 +26,13 @@ import secrets
 from app.domains.user.models import NewsletterSubscriber
 
 def create_user(name, email, password):
+    from app.shared.validators import hash_token
     verification_token = secrets.token_urlsafe(32)
     user = User(
         email=email,
         name=name,
         is_verified=False,
-        verification_token=verification_token,
+        verification_token=hash_token(verification_token),
     )
     user.set_password(password)
     db.session.add(user)
@@ -60,7 +61,8 @@ def verify_user(user):
     return user
 
 def set_reset_token(user, token, expires_at):
-    user.reset_token = token
+    from app.shared.validators import hash_token
+    user.reset_token = hash_token(token)
     user.reset_token_expires_at = expires_at
     db.session.commit()
     return user

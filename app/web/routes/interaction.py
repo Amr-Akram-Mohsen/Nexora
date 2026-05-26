@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 bp = Blueprint("interaction", __name__)
 
 @bp.route('/subscribe', methods=['POST'])
+@limiter.limit("5 per minute")
 def subscribe():
     email = current_user.email if current_user.is_authenticated else request.form.get('email')
     user_id = current_user.id if current_user.is_authenticated else None

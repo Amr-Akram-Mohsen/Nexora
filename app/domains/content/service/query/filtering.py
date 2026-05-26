@@ -138,3 +138,6 @@ def get_filtered_contents(
         "has_next": pagination.has_next,
         "has_prev": pagination.has_prev,
     }
+
+
+

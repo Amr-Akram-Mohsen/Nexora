@@ -130,7 +130,7 @@
 
 /* Variants row doubles as the sidebar grid cell */
 .detail-page[data-domain-type="commercial"] .detail-page__variants {
-  grid-area: sidebar;
+  grid-area: variants;
 }
 
 .detail-page[data-domain-type="commercial"] .detail-page__extra {
@@ -171,7 +171,7 @@
     "top"
     "header"
     "gallery"
-    "sidebar"
+    "variants"
     "specs"
     "content"
     "extra";
@@ -225,8 +225,9 @@
     grid-template-areas:
       "top     top"
       "gallery header"
-      "gallery sidebar"
-      "gallery sidebar"
+      /* "gallery sidebar" */
+      /* "gallery sidebar" */
+      "variants header"
       "specs   specs"
       "content content"
       "extra   extra";

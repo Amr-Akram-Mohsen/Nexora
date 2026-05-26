@@ -158,14 +158,16 @@ def post_comment(
     content,
     parent_id
 ):
-    sentiment, confidence = analyze_sentiment(content)
+    from app.shared.sanitizer import sanitize_text
+    sanitized_content = sanitize_text(content)
+    sentiment, confidence = analyze_sentiment(sanitized_content)
     created_at = datetime.now(timezone.utc)
         
     comment = Comment(
         user_id=user.id,
         target_type=target_type,
         target_id=target_id,
-        content=content,
+        content=sanitized_content,
         created_at=created_at,
         sentiment=sentiment,
         confidence=confidence,
@@ -176,7 +178,7 @@ def post_comment(
     return {
         "success": True,
         "sentiment": sentiment,
-        "comment": render_template('components/features/comment-card.html', comment=comment, is_reply=parent_id is not None)
+        "comment": render_template('components/interactions/comment-card.html', comment=comment, is_reply=parent_id is not None)
     }
 
 def delete_comment(comment_id: int) -> bool:
