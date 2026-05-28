@@ -45,9 +45,7 @@
       <span>Saved Products</span>
       <span class="count-badge">({{ saved_items|length }})</span>
     </h2>
-    {% set item_cards = [] %}
-    {% for save in saved_items %}{% set _ = item_cards.append(save.target) %}{% endfor %}
-    {{ grid(item_cards) }}
+    {{ grid(saved_items, target_type='item') }}
   </section>
   {% endif %}
 
@@ -57,9 +55,7 @@
       <span>Saved Articles</span>
       <span class="count-badge">({{ saved_articles|length }})</span>
     </h2>
-    {% set article_cards = [] %}
-    {% for save in saved_articles %}{% set _ = article_cards.append(save.target) %}{% endfor %}
-    {{ grid(article_cards) }}
+    {{ grid(saved_articles) }}
   </section>
   {% endif %}
 </div>

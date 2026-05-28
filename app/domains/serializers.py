@@ -77,24 +77,15 @@ def serialize_target(obj, session=None):
         )
 
     elif type_name == "item":
-        data.update(
-            {
-                "price": getattr(obj, "price", None),
-                "currency": getattr(
-                    obj, "currency", "USD"
-                ),  # fallback if not in default_variant
-                "rating": getattr(obj, "rating", 0.0),
-                "review_count": getattr(obj, "review_count", 0),
-                "brand_name": obj.brand.name
-                if hasattr(obj, "brand") and obj.brand
-                else None,
-                "category_name": obj.category.name
-                if hasattr(obj, "category") and obj.category
-                else None,
-                "item_type": getattr(obj, "item_type", None),
-                "card_type": getattr(obj, "card_type", "item"),
-            }
-        )
+        from app.domains.item.service.serializers import serialize_item
+        
+        item_data = serialize_item(obj)
+        if item_data:
+            data.update(item_data)
+            # Unify basic target keys from item_data
+            data["title"] = item_data.get("name")
+            data["brand_name"] = item_data.get("brand", {}).get("name") if item_data.get("brand") else None
+            data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
 
     return data
 

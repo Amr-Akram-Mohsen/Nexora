@@ -59,41 +59,13 @@ def assign_target_to_contents(contents, session, include_linked_items=False):
         for obj in objs:
             targets_map[(obj_type, obj.id)] = obj
 
-    serialize_linked_item = None
-    if include_linked_items:
-        from app.domains.item.service.serializers import serialize_item
-
-        serialize_linked_item = serialize_item
+    from .serializers import serialize_content
 
     result = []
     # Assign targets back to content objects
     for c in contents:
         target_obj = targets_map.get((c.object_type, c.object_id))
-
-        data = {
-            "id": c.id,
-            "object_type": c.object_type,
-            "section_id": c.section_id,
-            "category_id": c.category_id,
-            "published_at": c.published_at,
-            "is_published": getattr(c, "is_published", True),
-            "is_active": getattr(c, "is_active", True),
-            "category": serialize_model(c.category)
-            if c.category.slug != "uncategorized"
-            else None,
-            "section": serialize_model(c.section),
-            "target": serialize_target(target_obj, session) if target_obj else None,
-            "topics": [serialize_model(t) for t in (c.topics or [])],
-            "brands": [serialize_model(b) for b in (c.brands or [])],
-        }
-
-        if include_linked_items and serialize_linked_item:
-            data["linked_items"] = [
-                serialize_linked_item(item)
-                for item in (getattr(c, "linked_items", None) or [])
-            ]
-
-        result.append(data)
+        result.append(serialize_content(c, target_obj, session, include_linked_items))
 
     return result
 

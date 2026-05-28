@@ -46,7 +46,9 @@ def invalidate_content_filter_options():
 
 def invalidate_content_after_write(content_id=None):
     """Call after content ingest, publish changes, or taxonomy updates."""
+    from app.core.extensions import cache
     if content_id is not None:
         invalidate_content_page(content_id)
     invalidate_content_listing_caches()
     invalidate_content_filter_options()
+    cache.delete("layout_context")

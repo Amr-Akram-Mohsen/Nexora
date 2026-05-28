@@ -162,7 +162,7 @@ def add_view():
     if not target:
         abort(404)
         
-    result = record_view(target, target_type, user, ip)
+    result = record_view(target_id, target_type, user, ip)
     db.session.commit()
     return jsonify(result)
 
@@ -204,17 +204,23 @@ def handle_interaction():
 @bp.route('/saved')
 @login_required
 def saved_items():
+    from app.application.interaction.get_saved import (
+        get_saved_articles_workflow,
+        get_saved_products_workflow,
+    )
+
     log_route_start(logger, "/saved", user_id=current_user.id)
-    saved_contents = get_saved_items(current_user.id, TargetType.ARTICLE)
-    saved_items_list = get_saved_items(current_user.id, TargetType.ITEM)
+    
+    saved_articles = get_saved_articles_workflow(current_user.id)
+    saved_items = get_saved_products_workflow(current_user.id)
 
     log_route_success(
         logger, "/saved",
-        items=(len(saved_contents or []) + len(saved_items_list or [])),
+        items=(len(saved_articles) + len(saved_items)),
         template="saved-items.html",
     )
     return render_template(
         'saved-items.html',
-        saved_contents=saved_contents or [],
-        saved_items=saved_items_list or [],
+        saved_articles=saved_articles,
+        saved_items=saved_items,
     )

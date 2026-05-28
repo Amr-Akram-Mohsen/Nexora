@@ -1,7 +1,7 @@
 import logging
 from flask import current_app
 from app.integrations.ecommerce.amazon import search_products
-from app.application.item.ingestion import store_amazon_item
+from app.application.item.workflows.ingestion import store_amazon_item
 from app.integrations.external.api import mark_fetched, _record_call
 
 logger = logging.getLogger(__name__)

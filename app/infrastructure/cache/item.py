@@ -51,7 +51,9 @@ def invalidate_item_after_write(item_id=None):
     """
     Call after item ingest / admin update / price link change.
     """
+    from app.core.extensions import cache
     if item_id is not None:
         invalidate_item_page(item_id)
     invalidate_item_catalog_caches()
     invalidate_item_filter_options()
+    cache.delete("layout_context")
