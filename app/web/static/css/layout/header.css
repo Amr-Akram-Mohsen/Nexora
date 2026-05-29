@@ -160,6 +160,17 @@
   position: relative;
 }
 
+.initial {
+  width: 2rem;
+  height: 2rem;
+  padding: .25rem .5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+}
+
 .nav-user.active .user-dropdown {
   opacity: 1;
   transform: translateY(0);
@@ -268,10 +279,10 @@
   font-size: var(--text-lg);
 }
 
-  .header-actions .btn--icon:hover {
-    background: rgba(var(--brand-purple-rgb), .1);
-    color: var(--brand-purple);
-  }
+.header-actions .btn--icon:hover {
+  background: rgba(var(--brand-purple-rgb), .1);
+  color: var(--brand-purple);
+}
 
 /* --- Dark Mode Overrides --- */
 
@@ -302,7 +313,8 @@ body.dark-mode .site-header {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-lg);
   font-weight: var(--weight-semibold);
-  font-size: 0.9375rem; /* 15px is extremely readable and modern */
+  font-size: 0.9375rem;
+  /* 15px is extremely readable and modern */
   color: var(--muted-foreground);
   transition: all 0.2s ease-in-out;
   text-decoration: none;
@@ -318,13 +330,14 @@ body.dark-mode .site-header {
 .mobile-nav__link:hover {
   background: var(--accent);
   color: var(--foreground);
-  transform: translateX(4px); /* clean professional responsive translation slide */
+  transform: translateX(4px);
+  /* clean professional responsive translation slide */
 }
 
-  .mobile-nav__link:hover i {
-    color: var(--brand-blue);
-    opacity: 1;
-  }
+.mobile-nav__link:hover i {
+  color: var(--brand-blue);
+  opacity: 1;
+}
 
 /* --- Mobile Menu Toggles --- */
 

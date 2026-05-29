@@ -46,7 +46,8 @@
 
         {% if is_authenticated %}
         <!-- Saved (Shortcut) -->
-        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon btn--ghost" title="Saved Items">
+        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon btn--ghost flex items-center"
+          title="Saved Items">
           <i class="far fa-bookmark"></i>
         </a>
         {% endif %}
@@ -120,7 +121,8 @@
 
     <!-- Search Bar -->
     <div class="header-search" id="header-search-panel">
-      {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET", include_csrf=False) %}
+      {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET",
+      include_csrf=False) %}
       <div class="header-search__wrapper">
         <i class="fas fa-search header-search__icon"></i>
         {{ input(
@@ -129,7 +131,8 @@
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right", attrs={"aria-label": "Search"}) }}
+        {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
+        attrs={"aria-label": "Search"}) }}
       </div>
       {% endcall %}
     </div>
