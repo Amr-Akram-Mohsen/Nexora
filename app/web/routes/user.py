@@ -1,4 +1,5 @@
-from flask import Blueprint, request, redirect, flash, render_template, current_app, url_for, abort, session
+import logging
+from flask import Blueprint, request, redirect, flash, render_template, current_app, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.core.extensions import limiter
 from app.application.user.login import (
@@ -15,11 +16,14 @@ from app.domains.user.service import (
     get_newsletter_subscriber_by_email,
     update_user_name,
     update_user_password,
+    record_login,
 )
 from app.shared.validators import validate_email, validate_password_strength
 from app.shared.sanitizer import sanitize_text
 import secrets
 from urllib.parse import urlparse, urljoin
+
+logger = logging.getLogger(__name__)
 
 
 def is_safe_url(target: str) -> bool:
@@ -70,6 +74,9 @@ def login():
             if remember:
                 session.permanent = True
 
+            # Track last login
+            record_login(user)
+
             if user.is_admin:
                 return redirect(url_for('admin.home'))
 
@@ -80,10 +87,13 @@ def login():
             flash(f"Welcome back, {user.name or 'Nexora Member'}! 👋", "success")
             return redirect(next_page)
 
-        attempts = record_failed_login(email)
+        attempts  = record_failed_login(email)
         remaining = max(0, 5 - (attempts or 0))
         if remaining > 0:
-            flash(f"Invalid email or password. {remaining} attempt{'s' if remaining != 1 else ''} remaining.", "error")
+            flash(
+                f"Invalid email or password. {remaining} attempt{'s' if remaining != 1 else ''} remaining.",
+                "error",
+            )
         else:
             flash("Too many failed attempts. Your account is locked for 15 minutes.", "error")
 
@@ -105,7 +115,7 @@ def google_authorize():
         token     = current_app.google.authorize_access_token()
         user_info = current_app.google.parse_id_token(token, nonce=None)
     except Exception as e:
-        current_app.logger.error("Google OAuth error: %s", e)
+        logger.error("[AUTH] Google OAuth error: %s", e)
         flash("Google sign-in failed. Please try again.", "error")
         return redirect(url_for("user.login"))
 
@@ -116,15 +126,19 @@ def google_authorize():
 
     from app.core.extensions import db
     from app.domains.user.models import User
+    from app.domains.user.service import mark_user_verified
 
     user = get_user_by_email(email)
     if user:
         if not user.google_id:
             user.google_id  = user_info.get('sub')
             user.provider   = 'google'
-            user.is_verified = True
-            db.session.commit()
+            if not user.is_verified:
+                mark_user_verified(user)
+            else:
+                db.session.commit()
     else:
+        from app.domains.user.service import create_user, mark_user_verified as _mv
         user = User(
             email=email,
             name=user_info.get('name'),
@@ -135,9 +149,11 @@ def google_authorize():
         user.set_password(secrets.token_urlsafe(24))
         db.session.add(user)
         db.session.commit()
+        _mv(user)
 
     session.clear()
     login_user(user)
+    record_login(user)
     flash("Signed in with Google!", "success")
     return redirect(url_for('system.home'))
 
@@ -197,13 +213,23 @@ def register():
 # ────────────────────────────────────────────────────────────────────
 @bp.route('/verify-email/<token>')
 def verify_email(token: str):
-    user = verify_user_email(token)
-    if not user:
+    user, error = verify_user_email(token)
+
+    if error == 'expired':
+        flash(
+            "This verification link has expired (valid for 24 hours). "
+            "Please request a new one below.",
+            "warning",
+        )
+        return redirect(url_for('user.login'))
+
+    if error == 'invalid':
         flash("This verification link is invalid or has already been used.", "error")
         return redirect(url_for('user.login'))
 
     session.clear()
     login_user(user)
+    record_login(user)
     flash("Your email has been verified! Welcome to Nexora 🎉", "success")
     return redirect(url_for('system.home'))
 
@@ -215,8 +241,8 @@ def resend_verification():
     if email:
         resend_verification_email_workflow(email)
     flash(
-        "If that email exists and is unverified, a new verification link has been sent. "
-        "Check your spam folder if you don't see it.",
+        "If that email exists and is unverified, a new link has been sent. "
+        "Check your spam folder if you don't see it within a few minutes.",
         "info",
     )
     return redirect(url_for('user.login'))
@@ -261,7 +287,10 @@ def reset_password(token: str):
             return redirect(url_for('user.login'))
         else:
             flash(msg, "error")
-            return redirect(url_for('user.forgot_password'))
+            # Redirect expired/used tokens to forgot-password; invalid tokens back to login
+            if "expired" in msg.lower() or "already been used" in msg.lower():
+                return redirect(url_for('user.forgot_password'))
+            return redirect(url_for('user.login'))
 
     return render_template('reset-password.html', token=token)
 

@@ -1,6 +1,28 @@
+from datetime import datetime, timezone
 from app.domains.user.models import User, NewsletterSubscriber
 from app.core.extensions import db
-import secrets
+
+
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+# ── User Lifecycle ─────────────────────────────────────────────────────────────
+
+def create_user(name: str, email: str, password: str) -> 'User':
+    """
+    Creates and persists a new local user.
+    Returns the User instance. Token generation is handled by the application layer.
+    """
+    user = User(
+        email=email,
+        name=name,
+        is_verified=False,
+    )
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    return user
 
 
 def deactivate_user(id: int) -> bool:
@@ -21,70 +43,64 @@ def activate_user(id: int) -> bool:
     return True
 
 
-def create_user(name: str, email: str, password: str):
-    from app.shared.validators import hash_token
-    verification_token = secrets.token_urlsafe(32)
-    user = User(
-        email=email,
-        name=name,
-        is_verified=False,
-        verification_token=hash_token(verification_token),
-    )
-    user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-    return user, verification_token
+# ── Auth Event Tracking ────────────────────────────────────────────────────────
 
-
-def set_verification_token(user, token: str):
-    """
-    Stores a new hashed verification token on the user and commits.
-    Called when resending a verification email.
-    """
-    from app.shared.validators import hash_token
-    user.verification_token = hash_token(token)
+def mark_user_verified(user) -> 'User':
+    """Sets is_verified=True and records verified_at timestamp."""
+    user.is_verified  = True
+    user.verified_at  = _now()
     db.session.commit()
     return user
 
 
-def verify_user(user):
-    user.is_verified = True
-    user.verification_token = None
+def set_verification_sent(user) -> 'User':
+    """Records that a verification email was just sent."""
+    user.verification_sent_at = _now()
     db.session.commit()
     return user
 
 
-def set_reset_token(user, token: str, expires_at):
-    from app.shared.validators import hash_token
-    user.reset_token = hash_token(token)
-    user.reset_token_expires_at = expires_at
+def record_login(user) -> 'User':
+    """Records a successful login timestamp."""
+    user.last_login_at = _now()
     db.session.commit()
     return user
 
 
-def reset_password(user, new_password: str):
+def mark_password_changed(user) -> 'User':
+    """Records that the user's password was just changed or reset."""
+    user.password_changed_at = _now()
+    db.session.commit()
+    return user
+
+
+# ── Password ───────────────────────────────────────────────────────────────────
+
+def reset_password(user, new_password: str) -> 'User':
+    """Resets the user's password and records the change timestamp."""
     user.set_password(new_password)
-    user.reset_token = None
-    user.reset_token_expires_at = None
+    user.password_changed_at = _now()
     db.session.commit()
     return user
 
 
-def update_user_name(user, name: str):
+def update_user_name(user, name: str) -> 'User':
     user.name = name[:120]
     db.session.commit()
     return user
 
 
-def update_user_password(user, new_password: str):
+def update_user_password(user, new_password: str) -> 'User':
+    """Updates the user's password and records the change timestamp."""
     user.set_password(new_password)
+    user.password_changed_at = _now()
     db.session.commit()
     return user
 
 
 # ── Newsletter ─────────────────────────────────────────────────────────────────
 
-def create_newsletter_subscriber(email: str, user_id=None):
+def create_newsletter_subscriber(email: str, user_id=None) -> NewsletterSubscriber:
     subscriber = NewsletterSubscriber(email=email, user_id=user_id)
     subscriber.generate_tokens()
     db.session.add(subscriber)
@@ -92,7 +108,7 @@ def create_newsletter_subscriber(email: str, user_id=None):
     return subscriber
 
 
-def link_newsletter_subscriber_to_user(subscriber, user_id: int):
+def link_newsletter_subscriber_to_user(subscriber, user_id: int) -> NewsletterSubscriber:
     subscriber.user_id = user_id
     db.session.commit()
     return subscriber
@@ -102,9 +118,9 @@ def confirm_newsletter_subscriber(token: str) -> bool:
     subscriber = NewsletterSubscriber.query.filter_by(confirmation_token=token).first()
     if not subscriber:
         return False
-    subscriber.is_confirmed = True
+    subscriber.is_confirmed      = True
     subscriber.confirmation_token = None
-    subscriber.unsubscribed_at = None
+    subscriber.unsubscribed_at   = None
     db.session.commit()
     return True
 
@@ -114,8 +130,7 @@ def unsubscribe_newsletter_subscriber(token=None, subscriber=None) -> bool:
         subscriber = NewsletterSubscriber.query.filter_by(unsubscribe_token=token).first()
     if not subscriber:
         return False
-    from datetime import datetime, timezone
-    subscriber.unsubscribed_at = datetime.now(timezone.utc)
+    subscriber.unsubscribed_at = _now()
     db.session.commit()
     return True
 

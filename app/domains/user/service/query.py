@@ -23,32 +23,17 @@ def get_users(search=None, role=None, rows_count=10):
     return query.all()
 
 
+def get_user_by_id(user_id: int):
+    """Returns a User by primary key, or None."""
+    return db.session.get(User, user_id)
+
+
 def get_user_by_email(email: str):
     return User.query.filter_by(email=email).first()
 
 
 def get_active_user_by_email(email: str):
     return User.query.filter(User.email == email, User.is_active == True).first()
-
-
-def get_user_by_verification_token(token: str):
-    from app.shared.validators import hash_token
-    hashed = hash_token(token)
-    user = User.query.filter_by(verification_token=hashed).first()
-    if not user:
-        # Fallback for legacy plaintext tokens (migration safety)
-        user = User.query.filter_by(verification_token=token).first()
-    return user
-
-
-def get_user_by_reset_token(token: str):
-    from app.shared.validators import hash_token
-    hashed = hash_token(token)
-    user = User.query.filter_by(reset_token=hashed).first()
-    if not user:
-        # Fallback for legacy plaintext tokens (migration safety)
-        user = User.query.filter_by(reset_token=token).first()
-    return user
 
 
 def get_newsletter_subscriber_by_email(email: str):
