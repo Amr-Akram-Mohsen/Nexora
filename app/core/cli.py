@@ -80,7 +80,7 @@ def register_commands(app):
         )
 
         app.logger.info("Starting full-body enrichment for pending articles...")
-        count = reprocess_unscraped_articles(50)
+        count = reprocess_unscraped_articles(100)
         app.logger.info("Done! Successfully published %d articles.", count)
 
     @app.cli.command("init-content-status")

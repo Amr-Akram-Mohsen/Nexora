@@ -195,6 +195,14 @@ def handle_interaction():
         if not result.get("success"):
             return jsonify(result), 400
 
+        if interaction_type == "comment" and "comment_data" in result:
+            result["comment"] = render_template(
+                'components/interactions/comment-card.html',
+                comment=result["comment_data"],
+                is_reply=request.form.get('comment_id', type=int) is not None
+            )
+            del result["comment_data"]
+
         log_route_success(logger, "/handle-interaction")
         return jsonify(result)
     except Exception:

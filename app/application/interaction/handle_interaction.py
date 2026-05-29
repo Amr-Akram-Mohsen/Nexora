@@ -41,6 +41,9 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
             comment_id
         )
 
+    if not result:
+        return {"success": False, "error": "Invalid interaction type"}
+
     if not result.get("success"):
         return result
 

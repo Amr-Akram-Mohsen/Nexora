@@ -1,7 +1,7 @@
 from functools import cached_property
 from app.core.extensions import db
 from app.shared.sanitizer import sanitize_json
-from app.domains.relationships import item_topics, content_items
+from app.domains.relationships import content_items
 # ==================== ASSOCIATION TABLES ====================
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
@@ -71,7 +71,6 @@ class Item(db.Model):
 
     category = db.relationship("Category", back_populates="items")
     brand = db.relationship("Brand", back_populates="items")
-    topics = db.relationship("Topic", secondary=item_topics, back_populates="items")
 
     linked_contents = db.relationship(
         "Content", secondary=content_items, back_populates="linked_items"

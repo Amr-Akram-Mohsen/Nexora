@@ -18,13 +18,13 @@ content_brands = db.Table(
     db.Index("ix_content_brands_content", "content_id"),
 )
 
-item_topics = db.Table(
-    "item_topics",
-    db.Column("item_id", db.Integer, db.ForeignKey("items.id"), primary_key=True),
-    db.Column("topic_id", db.Integer, db.ForeignKey("topics.id"), primary_key=True),
-    db.Index("ix_item_topics_topic", "topic_id"),
-    db.Index("ix_item_topics_item", "item_id"),
-)
+# item_topics = db.Table(
+#     "item_topics",
+#     db.Column("item_id", db.Integer, db.ForeignKey("items.id"), primary_key=True),
+#     db.Column("topic_id", db.Integer, db.ForeignKey("topics.id"), primary_key=True),
+#     db.Index("ix_item_topics_topic", "topic_id"),
+#     db.Index("ix_item_topics_item", "item_id"),
+# )
 
 # Links a review/content directly to the product(s) it covers
 content_items = db.Table(

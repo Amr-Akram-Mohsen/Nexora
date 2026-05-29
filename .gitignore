@@ -38,3 +38,6 @@ stores_programs_terms/
 data/
 raw_html/
 aliexpress/
+
+sql_commands.txt
+nexora_public.sql

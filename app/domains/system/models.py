@@ -2,7 +2,6 @@ from app.core.extensions import db
 from app.domains.relationships import (
     content_topics,
     content_brands,
-    item_topics,
     content_attributes,
 )
 from app.shared.utils.slug import generate_slug, normalize_name
@@ -83,7 +82,6 @@ class Topic(db.Model):
     contents = db.relationship(
         "Content", secondary=content_topics, back_populates="topics"
     )
-    items = db.relationship("Item", secondary=item_topics, back_populates="topics")
 
     def __repr__(self):
         return f"<Topic {self.slug}>"

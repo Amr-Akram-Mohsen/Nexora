@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from flask import render_template
+
 from app.core.extensions import db
 from ..models import View, Reaction, Comment, Save
 from app.domains.recommendation.sentiment import analyze_sentiment
@@ -178,7 +178,7 @@ def post_comment(
     return {
         "success": True,
         "sentiment": sentiment,
-        "comment": render_template('components/interactions/comment-card.html', comment=comment, is_reply=parent_id is not None)
+        "comment_data": comment
     }
 
 def delete_comment(comment_id: int) -> bool:
