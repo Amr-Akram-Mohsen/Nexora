@@ -10,119 +10,77 @@
   <div class="profile-container container">
     
     <!-- Profile Page Header -->
-    <div class="profile-header glass animate-fade-in">
-      <div class="profile-header-details">
-        <h1 class="profile-header-title">Account Settings</h1>
-        <p class="profile-header-subtitle">Update your profile details, secure your account, and manage your email digest subscriptions.</p>
-      </div>
-      <div class="profile-header-badge">
-        {% if current_user.is_verified %}
-        <span class="status-badge verified"><i class="fas fa-check-circle"></i> Verified Account</span>
-        {% else %}
-        <span class="status-badge unverified"><i class="fas fa-exclamation-triangle"></i> Action Required</span>
-        {% endif %}
-      </div>
+    <div class="profile-page-header">
+      <h1 class="profile-page-title">Profile Settings</h1>
+      <p class="profile-page-subtitle">Manage your personal details, security preferences, and subscription options.</p>
     </div>
 
     <div class="profile-grid">
-      <!-- Sidebar: Profile Overview -->
-      <aside class="profile-sidebar animate-fade-in">
+      <!-- Sidebar: User Summary -->
+      <aside class="profile-sidebar">
         <div class="profile-card profile-user-card glass">
-          <!-- Decorative card header background -->
-          <div class="profile-card-decor"></div>
-          
           <div class="profile-user-info flex flex-col items-center">
-            <div class="profile-avatar-container">
-              <div class="profile-avatar-initials flex items-center justify-center">
-                {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
-              </div>
-              {% if current_user.is_verified %}
-              <div class="avatar-status-indicator verified" title="Verified Member">
-                <i class="fas fa-check"></i>
-              </div>
-              {% else %}
-              <div class="avatar-status-indicator unverified" title="Email Unverified">
-                <i class="fas fa-times"></i>
-              </div>
-              {% endif %}
+            <div class="profile-avatar flex items-center justify-center">
+              {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
             </div>
             <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
-            <p class="profile-email-label">{{ current_user.email }}</p>
+            <p class="profile-email">{{ current_user.email }}</p>
+            
+            <div class="profile-verification-status">
+              {% if current_user.is_verified %}
+              <span class="badge badge--verified"><i class="fas fa-check-circle"></i> Verified Account</span>
+              {% else %}
+              <span class="badge badge--unverified"><i class="fas fa-exclamation-circle"></i> Unverified Account</span>
+              {% endif %}
+            </div>
           </div>
 
           <div class="profile-meta-list">
             <div class="meta-item flex items-center justify-between">
-              <span class="meta-label"><i class="fas fa-user-shield"></i> Verification</span>
-              {% if current_user.is_verified %}
-              <span class="meta-value text-green">Verified</span>
-              {% else %}
-              <span class="meta-value text-yellow">Unverified</span>
-              {% endif %}
-            </div>
-
-            <div class="meta-item flex items-center justify-between">
-              <span class="meta-label"><i class="fas fa-key"></i> Provider</span>
+              <span class="meta-label">Provider</span>
               <span class="meta-value capitalize">{{ current_user.provider or 'Local' }}</span>
             </div>
 
             <div class="meta-item flex items-center justify-between">
-              <span class="meta-label"><i class="fas fa-calendar-alt"></i> Joined</span>
+              <span class="meta-label">Member Since</span>
               <span class="meta-value">{{ current_user.created_at.strftime('%Y-%m-%d') }}</span>
             </div>
           </div>
         </div>
 
         {% if not current_user.is_verified and current_user.provider != 'google' %}
-        <div class="profile-card alert-card glass animate-pulse">
-          <div class="alert-card-header flex items-center gap-3">
-            <div class="alert-icon-wrapper">
-              <i class="fas fa-envelope-open-text"></i>
-            </div>
-            <div>
-              <h4 class="alert-title">Verify Your Email</h4>
-              <p class="alert-subtitle">Please verify your account to unlock all features.</p>
-            </div>
-          </div>
-          <form action="{{ url_for('user.resend_verification') }}" method="POST" class="mt-4">
+        <div class="profile-card verification-alert-card glass">
+          <h3 class="alert-card-title">Verify Your Email</h3>
+          <p class="alert-card-desc">Please verify your account to access all features. We've sent a verification link to your email.</p>
+          <form action="{{ url_for('user.resend_verification') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="email" value="{{ current_user.email }}">
-            <button type="submit" class="btn btn-verify w-full">
-              <i class="fas fa-paper-plane mr-2"></i> Resend Verification Link
-            </button>
+            <button type="submit" class="btn variant--primary w-full text-center">Resend Link</button>
           </form>
         </div>
         {% endif %}
       </aside>
 
-      <!-- Main Content Settings -->
-      <main class="profile-main animate-fade-in" style="animation-delay: 0.1s;">
+      <!-- Main Content Area -->
+      <main class="profile-main">
+        
         <!-- Card: Personal Information -->
         <div class="profile-card glass settings-card">
-          <div class="settings-card-header flex items-center gap-3">
-            <div class="card-icon-circle"><i class="fas fa-id-card"></i></div>
-            <div>
-              <h3 class="card-title">Personal Details</h3>
-              <p class="card-subtitle">Manage your public presence on Nexora</p>
-            </div>
-          </div>
+          <h3 class="card-section-title">Personal Details</h3>
+          <p class="card-section-desc">Update your display name for public interactions.</p>
           
-          <form action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form mt-6">
+          <form action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action" value="name">
             
             <div class="profile-form-grid">
               <div class="form-field">
-                <label class="form-label" for="display_name">Display Name</label>
-                <div class="input-wrapper">
-                  <i class="fas fa-user input-icon"></i>
-                  <input type="text" id="display_name" name="name" class="input input-with-icon" value="{{ current_user.name or '' }}" placeholder="Enter your name">
-                </div>
-                <span class="form-hint">This name will appear on your comments and interactions.</span>
+                <label class="label" for="name">Display Name</label>
+                <input type="text" id="name" name="name" class="input" value="{{ current_user.name or '' }}" placeholder="Enter your name">
+                <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
               </div>
-              <div class="form-actions flex items-end">
-                <button type="submit" class="btn btn-save">
-                  <i class="fas fa-save mr-2"></i> Update Name
-                </button>
+              <div class="form-actions">
+                <button type="submit" class="btn variant--primary">Save Changes</button>
               </div>
             </div>
           </form>
@@ -130,46 +88,30 @@
 
         <!-- Card: Newsletters -->
         <div class="profile-card glass settings-card">
-          <div class="settings-card-header flex items-center gap-3">
-            <div class="card-icon-circle"><i class="fas fa-mail-bulk"></i></div>
-            <div>
-              <h3 class="card-title">Newsletter Preferences</h3>
-              <p class="card-subtitle">Control the updates you receive from Nexora</p>
-            </div>
-          </div>
+          <h3 class="card-section-title">Email Preferences</h3>
+          <p class="card-section-desc">Manage your email communications and digest updates.</p>
           
-          <div class="newsletter-wrapper mt-6">
+          <div class="newsletter-settings-box">
             {% if subscriber and subscriber.is_active %}
-            <div class="newsletter-active-card flex items-center justify-between flex-wrap gap-4">
-              <div class="newsletter-info flex items-center gap-4">
-                <div class="newsletter-status-icon">
-                  <i class="fas fa-envelope-open-text"></i>
-                </div>
-                <div>
-                  <h4 class="newsletter-heading">Weekly Tech Digest Active</h4>
-                  <p class="newsletter-text">You are currently subscribed to trending tech deals, news, and reviews.</p>
-                </div>
+            <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+                <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals, and tech updates.</p>
               </div>
               <form action="{{ url_for('interaction.unsubscribe_auth') }}" method="POST" class="ajax-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-unsubscribe flex items-center gap-2">
-                  <span>Unsubscribe</span>
-                  <i class="fas fa-arrow-right"></i>
-                </button>
+                <button type="submit" class="btn variant--outline text-xs">Unsubscribe</button>
               </form>
             </div>
             {% else %}
-            <div class="newsletter-inactive-card flex flex-col items-center text-center p-8">
-              <div class="newsletter-promo-icon">
-                <i class="fas fa-rocket"></i>
+            <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+                <p class="newsletter-status-subtitle text-muted-foreground">Stay updated with Saudi Arabia & UAE tech reviews, deals, and insights.</p>
               </div>
-              <h4 class="newsletter-promo-title">Join the Nexora Digest</h4>
-              <p class="newsletter-promo-desc">Stay ahead of the curve with our weekly curated tech news, insights, and exclusive deals.</p>
-              <form action="{{ url_for('interaction.subscribe') }}" method="POST" class="ajax-form w-full max-w-sm mt-4">
+              <form action="{{ url_for('interaction.subscribe') }}" method="POST" class="ajax-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn btn-subscribe-promo w-full">
-                  Subscribe to Newsletter
-                </button>
+                <button type="submit" class="btn variant--primary text-xs">Subscribe</button>
               </form>
             </div>
             {% endif %}
@@ -178,55 +120,41 @@
 
         <!-- Card: Security & Password -->
         {% if current_user.provider != 'google' %}
-        <div class="profile-card glass settings-card password-card-wrapper">
-          <div class="settings-card-header flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="card-icon-circle"><i class="fas fa-shield-alt"></i></div>
-              <div>
-                <h3 class="card-title">Security & Password</h3>
-                <p class="card-subtitle">Keep your account secure with regular updates</p>
-              </div>
+        <div class="profile-card glass settings-card">
+          <div class="settings-card-header flex items-center justify-between" onclick="togglePasswordForm()" style="cursor: pointer;">
+            <div>
+              <h3 class="card-section-title" style="margin-bottom: 0;">Security & Password</h3>
+              <p class="card-section-desc" style="margin-top: 0.25rem;">Change your password to ensure your account security.</p>
             </div>
-            <button type="button" class="btn btn-accordion flex items-center justify-center" id="password-toggle-btn" onclick="togglePasswordForm()">
+            <button type="button" class="btn variant--ghost btn--icon" id="password-toggle-btn" aria-label="Toggle Password Form">
               <i class="fas fa-chevron-down transition-transform duration-300" id="accordion-arrow"></i>
             </button>
           </div>
           
           <div class="password-form-collapsible collapsed" id="password-collapsible">
-            <form id="password-form" action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form border-t border-border/50 pt-6 mt-6">
+            <form id="password-form" action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form border-t-separator">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="action" value="password">
               
               <div class="form-row-grid">
                 <div class="form-field full-width">
-                  <label class="form-label" for="current_password">Current Password</label>
-                  <div class="input-wrapper">
-                    <i class="fas fa-unlock input-icon"></i>
-                    <input type="password" id="current_password" name="current_password" class="input input-with-icon" required placeholder="Enter current password">
-                  </div>
+                  <label class="label" for="current_password">Current Password</label>
+                  <input type="password" id="current_password" name="current_password" class="input" required placeholder="Enter your current password">
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label" for="new_password">New Password</label>
-                  <div class="input-wrapper">
-                    <i class="fas fa-lock input-icon"></i>
-                    <input type="password" id="new_password" name="new_password" class="input input-with-icon" minlength="8" required placeholder="Min. 8 characters">
-                  </div>
+                  <label class="label" for="new_password">New Password</label>
+                  <input type="password" id="new_password" name="new_password" class="input" minlength="8" required placeholder="Enter new password (min. 8 chars)">
                 </div>
                 
                 <div class="form-field">
-                  <label class="form-label" for="confirm_new_password">Confirm New Password</label>
-                  <div class="input-wrapper">
-                    <i class="fas fa-lock-open input-icon"></i>
-                    <input type="password" id="confirm_new_password" name="confirm_new_password" class="input input-with-icon" minlength="8" required placeholder="Verify new password">
-                  </div>
+                  <label class="label" for="confirm_new_password">Confirm New Password</label>
+                  <input type="password" id="confirm_new_password" name="confirm_new_password" class="input" minlength="8" required placeholder="Confirm your new password">
                 </div>
               </div>
               
-              <div class="form-actions flex justify-end mt-6">
-                <button type="submit" class="btn btn-save">
-                  <i class="fas fa-key mr-2"></i> Update Password
-                </button>
+              <div class="form-actions flex justify-end">
+                <button type="submit" class="btn variant--primary">Update Password</button>
               </div>
             </form>
           </div>
