@@ -3,7 +3,7 @@
 .auth-section {
   min-height: calc(100vh - var(--header-height, 80px));
   padding: 4rem 1.5rem;
-  background: var(--background); /* clean, solid background color */
+  background: var(--background);
 }
 
 .auth-wrapper {
@@ -13,7 +13,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 3rem 2.5rem;
-  box-shadow: var(--shadow-sm); /* extremely soft, professional shadow */
+  box-shadow: var(--shadow-sm);
 }
 
 /* --- Auth Header --- */
@@ -22,7 +22,7 @@
 }
 
 .auth-title {
-  font-size: 1.75rem; /* modern scale title */
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--foreground);
   margin-bottom: 0.5rem;
@@ -51,17 +51,41 @@
   border-radius: var(--radius-lg);
   margin-top: 0.5rem;
   width: 100%;
+  position: relative;
+}
+
+/* Loading state for submit button */
+.auth-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.auth-btn.is-loading::after {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: auth-spin 0.6s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes auth-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* --- Vertical Field Spacing & Labels --- */
 .field-wrapper {
-  gap: 0.45rem; /* perfect professional spacing between label and input */
+  gap: 0.45rem;
   width: 100%;
 }
 
 .field-wrapper .label {
-  font-size: 0.8125rem; /* 13px - highly professional label size */
-  font-weight: 600; /* semi-bold prominence */
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: var(--foreground);
   letter-spacing: -0.01em;
   margin: 0;
@@ -96,11 +120,125 @@
   opacity: 0.6;
 }
 
+/* Field error state */
+.field-wrapper.has-error input {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 2px rgba(var(--destructive-rgb, 239, 68, 68), 0.1);
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: var(--destructive);
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1.4;
+}
+
+.field-error::before {
+  content: "⚠";
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
 .field-hint {
   font-size: 0.75rem;
   color: var(--muted-foreground);
   margin-top: 0.35rem;
 }
+
+/* --- Password Input Wrapper --- */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 2.75rem !important;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 4px;
+}
+
+.password-toggle:hover {
+  color: var(--foreground);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--domain-primary, var(--primary));
+  outline-offset: 2px;
+}
+
+/* --- Password Strength Meter --- */
+.password-strength {
+  margin-top: 0.5rem;
+}
+
+.password-strength-bar {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.3rem;
+}
+
+.strength-segment {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.25s ease;
+}
+
+.strength-segment.active.weak   { background: #ef4444; }
+.strength-segment.active.fair   { background: #f97316; }
+.strength-segment.active.good   { background: #eab308; }
+.strength-segment.active.strong { background: #22c55e; }
+
+.password-strength-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  transition: color 0.25s ease;
+}
+
+.password-strength-label.weak   { color: #ef4444; }
+.password-strength-label.fair   { color: #f97316; }
+.password-strength-label.good   { color: #eab308; }
+.password-strength-label.strong { color: #22c55e; }
+
+/* --- Confirm Match Indicator --- */
+.confirm-match {
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1.4;
+}
+
+.confirm-match.visible { display: flex; }
+.confirm-match.match   { color: #22c55e; }
+.confirm-match.no-match { color: #ef4444; }
 
 /* --- Social login Button --- */
 .google-auth-btn {
@@ -173,10 +311,10 @@
 
 /* --- High-Fidelity Professional Auth Footer --- */
 .auth-footer {
-  margin-top: 2rem; /* overrides inline tailwind mt classes */
+  margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(var(--border-rgb), 0.5); /* extremely thin and soft line */
-  font-size: 0.8125rem; /* 13px - perfectly balanced */
+  border-top: 1px solid rgba(var(--border-rgb), 0.5);
+  font-size: 0.8125rem;
   text-align: center;
   line-height: 1.5;
 }
@@ -200,7 +338,7 @@
   text-decoration: underline;
 }
 
-/* --- Alert Box --- */
+/* --- Alert / Resend Box --- */
 .resend-alert {
   margin-top: 1.25rem;
   padding: 1rem;

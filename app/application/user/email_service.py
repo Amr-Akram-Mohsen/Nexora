@@ -1,89 +1,98 @@
-# app/utils/email.py
 """
+app/application/user/email_service.py
 Centralised email sending using Flask-Mail.
-All mail goes through the mail extension from app.extensions.
+All mail goes through the mail extension from app.core.extensions.
 Falls back gracefully when MAIL_ENABLED=False.
 """
 import logging
-from flask import current_app, url_for, render_template_string
+from flask import current_app, url_for
 from flask_mail import Message
 from app.core.extensions import mail
 
 logger = logging.getLogger(__name__)
 
 
-def _enabled():
-    return current_app.config.get("MAIL_ENABLED", False)
+def _enabled() -> bool:
+    """Returns True if mail sending is enabled in config."""
+    return current_app.config.get("MAIL_ENABLED", True)
 
 
-def _send(msg: Message):
+def _send(msg: Message) -> bool:
+    """
+    Sends a Flask-Mail Message. Returns True on success, False on failure.
+    Skips silently when MAIL_ENABLED=False.
+    """
     if not _enabled():
-        logger.info("MAIL_ENABLED=False — skipping email to %s", msg.recipients)
-        return
+        logger.info("MAIL_ENABLED=False — skipping email to %s | subject: %s", msg.recipients, msg.subject)
+        return False
     try:
         mail.send(msg)
-        logger.info("Email sent to %s: %s", msg.recipients, msg.subject)
+        logger.info("Email sent to %s | subject: %s", msg.recipients, msg.subject)
+        return True
     except Exception as e:
-        logger.error("Failed to send email to %s: %s", msg.recipients, e)
+        logger.error("Failed to send email to %s | subject: %s | error: %s", msg.recipients, msg.subject, e)
+        return False
 
 
-# ── Newsletter confirmation ───────────────────────────────────────────────────
-def send_confirmation_email(email: str, token: str, unsubscribe_token: str):
+def _build_message(subject: str, recipients: list[str], html: str, text: str) -> Message:
+    """Builds a Flask-Mail Message with HTML + plain-text fallback."""
+    return Message(
+        subject=subject,
+        sender=current_app.config.get("MAIL_DEFAULT_SENDER"),
+        recipients=recipients,
+        html=html,
+        body=text,
+    )
+
+
+# ── Newsletter confirmation ────────────────────────────────────────────────────
+def send_confirmation_email(email: str, token: str, unsubscribe_token: str) -> bool:
     confirm_url = url_for(
         'interaction.confirm_subscription', token=token, _external=True
     )
     unsubscribe_url = url_for(
         'interaction.unsubscribe_token', token=unsubscribe_token, _external=True
     )
-
-    body = _newsletter_html(confirm_url, unsubscribe_url)
-    msg = Message(
+    msg = _build_message(
         subject="Confirm your Nexora newsletter subscription",
-        sender=current_app.config.get('MAIL_DEFAULT_SENDER'),
         recipients=[email],
-        html=body,
-        body=(
+        html=_newsletter_html(confirm_url, unsubscribe_url),
+        text=(
             f"Please confirm your subscription:\n{confirm_url}\n\n"
             f"Unsubscribe anytime:\n{unsubscribe_url}"
         ),
     )
-    _send(msg)
+    return _send(msg)
 
 
-# ── Email verification (account) ─────────────────────────────────────────────
-def send_verification_email(email: str, token: str):
+# ── Email verification (account) ──────────────────────────────────────────────
+def send_verification_email(email: str, token: str) -> bool:
     verify_url = url_for('user.verify_email', token=token, _external=True)
-
-    body = _verification_html(verify_url, email)
-    msg = Message(
+    msg = _build_message(
         subject="Verify your Nexora account",
-        sender=current_app.config.get('MAIL_DEFAULT_SENDER'),
         recipients=[email],
-        html=body,
-        body=f"Verify your email:\n{verify_url}\n\nThis link expires in 24 hours.",
+        html=_verification_html(verify_url, email),
+        text=f"Verify your email:\n{verify_url}\n\nThis link expires in 24 hours.",
     )
-    _send(msg)
+    return _send(msg)
 
 
-# ── Password reset ────────────────────────────────────────────────────────────
-def send_password_reset_email(email: str, token: str):
+# ── Password reset ─────────────────────────────────────────────────────────────
+def send_password_reset_email(email: str, token: str) -> bool:
     reset_url = url_for('user.reset_password', token=token, _external=True)
-
-    body = _reset_html(reset_url)
-    msg = Message(
+    msg = _build_message(
         subject="Reset your Nexora password",
-        sender=current_app.config.get('MAIL_DEFAULT_SENDER'),
         recipients=[email],
-        html=body,
-        body=(
+        html=_reset_html(reset_url),
+        text=(
             f"Reset your password here:\n{reset_url}\n\n"
             "This link expires in 1 hour. If you did not request this, ignore this email."
         ),
     )
-    _send(msg)
+    return _send(msg)
 
 
-# ── HTML Templates ────────────────────────────────────────────────────────────
+# ── HTML Templates ─────────────────────────────────────────────────────────────
 def _base_email(title: str, preheader: str, body_html: str) -> str:
     return f"""<!DOCTYPE html>
 <html>

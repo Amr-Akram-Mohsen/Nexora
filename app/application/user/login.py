@@ -1,46 +1,55 @@
 from app.domains.user.service import get_active_user_by_email
 from app.core.extensions import cache
 
-def authenticate_user(email, password):
+
+def authenticate_user(email: str, password: str):
     """
-    Authenticates a user and returns the user object if successful.
+    Authenticates a user and returns the user object if credentials are valid.
+    Returns None on failure.
     """
     user = get_active_user_by_email(email)
     if user and user.check_password(password):
         return user
     return None
 
+
 def check_login_lockout(email: str) -> tuple[bool, int]:
     """
-    Checks if an email is locked out due to too many failed login attempts.
+    Checks if an email is currently locked out due to too many failed login attempts.
     Returns (is_locked_out, minutes_remaining).
     """
     lockout_key = f"login_lockout:{email}"
-    if cache.get(lockout_key):
+    locked = cache.get(lockout_key)
+    if locked:
+        # Return a conservative estimate; cache TTL not directly accessible
         return True, 15
     return False, 0
 
-def record_failed_login(email: str):
-    """
-    Records a failed login attempt. After 5 attempts, locks out for 15 minutes.
-    """
-    attempts_key = f"login_attempts:{email}"
-    lockout_key = f"login_lockout:{email}"
-    
-    attempts = cache.get(attempts_key) or 0
-    attempts += 1
-    
-    if attempts >= 5:
-        cache.set(lockout_key, True, timeout=900)  # 15 minutes lockout
-        cache.delete(attempts_key)
-    else:
-        cache.set(attempts_key, attempts, timeout=900)  # 15 minutes window
 
-def clear_failed_logins(email: str):
+def record_failed_login(email: str) -> int:
     """
-    Clears failed login attempts after a successful login.
+    Records a failed login attempt for the given email.
+    Locks the account for 15 minutes after 5 consecutive failures.
+    Returns the current attempt count (0 once locked).
     """
     attempts_key = f"login_attempts:{email}"
-    lockout_key = f"login_lockout:{email}"
-    cache.delete(attempts_key)
-    cache.delete(lockout_key)
+    lockout_key  = f"login_lockout:{email}"
+    window       = 900  # 15 minutes in seconds
+
+    attempts = (cache.get(attempts_key) or 0) + 1
+
+    if attempts >= 5:
+        cache.set(lockout_key, True, timeout=window)
+        cache.delete(attempts_key)
+        return 0
+    else:
+        cache.set(attempts_key, attempts, timeout=window)
+        return attempts
+
+
+def clear_failed_logins(email: str) -> None:
+    """
+    Clears all failed login state for an email after a successful login.
+    """
+    cache.delete(f"login_attempts:{email}")
+    cache.delete(f"login_lockout:{email}")
