@@ -341,9 +341,15 @@ body.dark-mode .site-header {
 
 /* --- Mobile Menu Toggles --- */
 
-.mobile-menu-toggle {
-  display: block;
+/* .mobile-menu-toggle {
+  display: none;
 }
+
+@media(max-width:767px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+} */
 
 .mobile-menu-btn {
   display: none;
@@ -361,7 +367,7 @@ body.dark-mode .site-header {
   }
 
   .mobile-menu-toggle {
-    display: none;
+    display: none !important;
   }
 }
 

@@ -2,8 +2,8 @@ from app.shared.constants.core import TargetType
 from app.domains.interaction.constants import INTERACTION_TYPE
 
 def parse_target_type(value: str) -> str:
-    if value == TargetType.ITEM: 
-        return value
+    if value in (TargetType.ELECTRONICS, TargetType.PERFUMES, TargetType.ACCESSORIES): 
+        return TargetType.ITEM
     elif value in (TargetType.ARTICLE, TargetType.VIDEO, TargetType.POST): 
         return TargetType.CONTENT
     else: 

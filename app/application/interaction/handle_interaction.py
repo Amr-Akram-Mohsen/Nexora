@@ -13,7 +13,7 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
     target = None
     if comment_id:
         target = get_comment_by_id(comment_id)
-    elif target_type == TargetType.ARTICLE:
+    elif target_type == TargetType.CONTENT:
         target = get_content_by_id(db.session, target_id)
     elif target_type == TargetType.ITEM:
         target = get_item_by_id(target_id, load="minimal")

@@ -5,7 +5,7 @@ class TargetType:
     POST = "post"
     ITEM = "item"
     ELECTRONICS = "electronics"
-    PERFUMEs = "perfumes"
+    PERFUMES = "perfumes"
     ACCESSORIES = "accessories"
 
 
