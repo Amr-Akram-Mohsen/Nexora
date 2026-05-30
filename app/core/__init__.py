@@ -1,5 +1,8 @@
 # app/core/__init__.py
-from flask import Flask
+from dotenv import load_dotenv
+load_dotenv()
+
+from flask import Flask, request, render_template
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
 from pathlib import Path
@@ -11,7 +14,6 @@ from logging.handlers import RotatingFileHandler
 import os
 import warnings
 
-from dotenv import load_dotenv
 
 # Register every ORM model before admin/routes import eager-load or mapper setup.
 from app import domains  # noqa: F401
@@ -23,6 +25,7 @@ from app.admin import (
     api_interaction_bp,
     api_dashboard_bp,
     api_ingestion_bp,
+    api_system_bp,
 )
 
 from app.domains.user.models import User
@@ -185,9 +188,28 @@ def create_app():
     app.register_blueprint(api_interaction_bp)
     app.register_blueprint(api_dashboard_bp)
     app.register_blueprint(api_ingestion_bp)
+    app.register_blueprint(api_system_bp)
 
     # app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)
+
+    @app.before_request
+    def check_maintenance():
+        # Exclude admin routes, static files, and login/logout endpoints
+        if (request.path.startswith("/admin") or 
+            request.path.startswith("/static") or 
+            "login" in request.path or 
+            "logout" in request.path):
+            return
+            
+        # Allow logged in admins to bypass maintenance mode
+        from flask_login import current_user
+        if current_user.is_authenticated and getattr(current_user, "is_admin", False):
+            return
+
+        lock_file = os.path.join(app.instance_path, "maintenance.lock")
+        if os.path.exists(lock_file):
+            return render_template("maintenance.html"), 503
 
     # ── Register CLI Commands ────────────────────────────────────
     from .cli import register_commands

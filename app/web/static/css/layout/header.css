@@ -63,7 +63,7 @@
   padding: .5rem 1rem;
   border-radius: var(--radius-md);
   font-weight: var(--weight-md);
-  color: var(--overlay-dark-70);
+  color: var(--muted-foreground);
   transition: all .2s;
 }
 

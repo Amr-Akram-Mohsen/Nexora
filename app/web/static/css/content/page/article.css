@@ -1,4 +1,5 @@
 @import "style.css";
+@import "article_content.css";
 
 .article-header {
   gap: 1.5rem;
@@ -98,7 +99,8 @@
 .article-cta-box {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 2rem 0; /* clean vertical border separation, no box containers or shadows */
+  padding: 2rem 0;
+  /* clean vertical border separation, no box containers or shadows */
   gap: 2rem;
   margin-top: 4rem;
   background: transparent;
@@ -131,15 +133,16 @@
 @media (max-width: 640px) {
   .article-cta-box {
     flex-direction: column;
-    align-items: flex-start; /* high-fidelity left-alignment on compact viewports */
+    align-items: flex-start;
+    /* high-fidelity left-alignment on compact viewports */
     gap: 1.5rem;
     padding-block: 1.5rem;
   }
-  
+
   .cta-button-link {
     width: 100%;
   }
-  
+
   .cta-button-link .btn {
     width: 100%;
     justify-content: center;

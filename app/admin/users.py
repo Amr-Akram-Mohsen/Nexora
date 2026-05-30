@@ -4,7 +4,14 @@ from app.domains.user.models import User
 from app.core.decorators import admin_required
 from app.core.extensions import db
 
-bp = Blueprint("api_user", __name__, url_prefix="/api/users")
+bp = Blueprint("api_user", __name__, url_prefix="/admin/users")
+
+
+# @bp.before_request
+# @admin_required
+# def require_admin():
+#     """Ensure all users endpoints require admin privilege."""
+#     pass
 
 
 @bp.route("/", methods=["GET"])

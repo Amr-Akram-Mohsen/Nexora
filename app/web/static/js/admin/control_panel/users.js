@@ -60,7 +60,7 @@ function fetchUsers(search = "", role = "") {
   if (role) params.append("role", role);
   const qs = params.toString() ? `?${params.toString()}` : "";
 
-  fetch(`/api/users/${qs}`)
+  fetch(`/admin/users/${qs}`)
     .then(res => {
       if (!res.ok) throw new Error("Failed to fetch users");
       return res.json();
@@ -167,7 +167,7 @@ function handleToggleAdmin(id, name) {
   const label = document.querySelector(`#user-row-${id} .user-action-toggle-admin`);
   if (label) { label.disabled = true; label.textContent = "…"; }
 
-  fetch(`/api/users/${id}/toggle-admin`, { method: "POST" })
+  fetch(`/admin/users/${id}/toggle-admin`, { method: "POST" })
     .then(res => {
       if (!res.ok) throw new Error("Toggle admin failed");
       return res.json();
@@ -188,7 +188,7 @@ function handleToggleAdmin(id, name) {
  * Toggle active status.
  */
 function handleToggleActive(id, isCurrentlyActive, name) {
-  const endpoint = isCurrentlyActive ? `/api/users/${id}` : `/api/users/${id}/activate`;
+  const endpoint = isCurrentlyActive ? `/admin/users/${id}` : `/admin/users/${id}/activate`;
   const method = isCurrentlyActive ? "DELETE" : "POST";
 
   const btn = document.querySelector(`#user-row-${id} .user-action-toggle-active`);
@@ -228,7 +228,7 @@ function confirmDeleteUser(id, name) {
 }
 
 function performDeleteUser(id, name) {
-  fetch(`/api/users/${id}`, { method: "DELETE" })
+  fetch(`/admin/users/${id}`, { method: "DELETE" })
     .then(res => {
       if (!res.ok) throw new Error("Delete failed");
       return res.json();

@@ -23,26 +23,27 @@ function loadSystemInfo() {
   const container = document.getElementById("system-info");
   if (!container) return;
 
-  // Simulated — replace with real /api/system/info when available
-  const info = [
-    { label: "Backend Status", value: `<span class="status-dot online">● Online</span>` },
-    { label: "Version", value: "1.3.0" },
-    { label: "Environment", value: "Development" },
-    { label: "Python", value: "3.x / Flask" },
-    { label: "Database", value: "PostgreSQL (SQLAlchemy)" },
-  ];
-
-  container.innerHTML = `
-    <ul class="system-info-list">
-      ${info.map(row => `
-        <li class="system-info-row">
-          <span class="system-info-label">${row.label}</span>
-          <span class="system-info-value">${row.value}</span>
-        </li>
-      `).join("")}
-    </ul>
-    <p class="hint" style="margin-top:1rem;">Live metrics endpoint is pending backend implementation.</p>
-  `;
+  fetch('/admin/system/info')
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch system info");
+      return res.json();
+    })
+    .then(info => {
+      container.innerHTML = `
+        <ul class="system-info-list">
+          ${info.map(row => `
+            <li class="system-info-row">
+              <span class="system-info-label">${row.label}</span>
+              <span class="system-info-value">${row.value}</span>
+            </li>
+          `).join("")}
+        </ul>
+      `;
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = `<p class="hint error-text">Failed to load system info.</p>`;
+    });
 }
 
 
@@ -57,12 +58,22 @@ function bindCacheControls() {
     btn.disabled = true;
     btn.textContent = "Clearing…";
 
-    // TODO: replace with fetch('/api/system/cache', { method: 'DELETE' }) when ready
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = "Clear Cache";
-      showSettingsToast("Cache cleared successfully.", "success");
-    }, 900);
+    fetch('/admin/system/cache', { method: 'DELETE' })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to clear cache");
+        return res.json();
+      })
+      .then(data => {
+        showSettingsToast(data.message || "Cache cleared successfully.", "success");
+      })
+      .catch(err => {
+        console.error(err);
+        showSettingsToast("Failed to clear cache.", "error");
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = "Clear Cache";
+      });
   });
 }
 
@@ -75,18 +86,48 @@ function bindMaintenanceMode() {
   const hint = document.getElementById("maintenance-status-hint");
   if (!toggle) return;
 
+  // Fetch current status from backend
+  fetch('/admin/system/maintenance')
+    .then(res => res.json())
+    .then(data => {
+      toggle.checked = data.enabled;
+      if (hint) {
+        hint.innerHTML = `Maintenance mode is currently <strong>${data.enabled ? "enabled" : "disabled"}</strong>.`;
+      }
+    })
+    .catch(err => console.error("Failed to load maintenance status", err));
+
   toggle.addEventListener("change", (e) => {
     const on = e.target.checked;
     const status = on ? "enabled" : "disabled";
 
-    if (hint) {
-      hint.innerHTML = `Maintenance mode is currently <strong>${status}</strong>.`;
-    }
+    toggle.disabled = true;
 
-    showSettingsToast(`Maintenance mode ${status}. (Backend connection pending)`, on ? "warning" : "success");
-
-    // TODO: fetch('/api/system/maintenance', { method: 'POST', body: JSON.stringify({enabled: on}) })
-    console.log(`[Settings] Maintenance mode ${status}`);
+    fetch('/admin/system/maintenance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ enabled: on })
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to update maintenance mode");
+        return res.json();
+      })
+      .then(data => {
+        if (hint) {
+          hint.innerHTML = `Maintenance mode is currently <strong>${status}</strong>.`;
+        }
+        showSettingsToast(`Maintenance mode ${status}.`, on ? "warning" : "success");
+      })
+      .catch(err => {
+        console.error(err);
+        toggle.checked = !on;
+        showSettingsToast("Failed to update maintenance mode.", "error");
+      })
+      .finally(() => {
+        toggle.disabled = false;
+      });
   });
 }
 
@@ -102,14 +143,28 @@ function bindDangerZone() {
     if (typeof showModal === "function") {
       showModal(
         "⚠️ Reset System",
-        "WARNING: This will reset all system configurations. This action is irreversible. Are you absolutely sure?",
+        "WARNING: This will clear all ingestion logs, API usage stats, and system cache. This action is irreversible. Are you absolutely sure?",
         () => {
-          showSettingsToast("System reset requested. (Backend connection pending)", "error");
-          console.warn("[Settings] System reset requested");
+          resetBtn.disabled = true;
+          fetch('/admin/system/reset', { method: 'POST' })
+            .then(res => {
+              if (!res.ok) throw new Error("Reset failed");
+              return res.json();
+            })
+            .then(data => {
+              showSettingsToast(data.message || "System reset completed.", "success");
+              loadIntegrationsStatus();
+              loadIngestionLogs();
+            })
+            .catch(err => {
+              console.error(err);
+              showSettingsToast("System reset failed.", "error");
+            })
+            .finally(() => {
+              resetBtn.disabled = false;
+            });
         }
       );
-    } else if (confirm("DANGER: Are you sure you want to reset the system?")) {
-      showSettingsToast("System reset requested. (Backend connection pending)", "error");
     }
   });
 }
@@ -123,7 +178,7 @@ function loadIntegrationsStatus() {
   const template = document.getElementById("integration-row-template");
   if (!container || !template) return;
 
-  fetch('/api/ingestions/status')
+  fetch('/admin/ingestions/status')
     .then(res => res.json())
     .then(data => {
       container.innerHTML = "";
@@ -173,7 +228,7 @@ function loadIngestionLogs() {
   const container = document.getElementById("ingestion-log-container");
   if (!container) return;
 
-  fetch('/api/ingestions/logs')
+  fetch('/admin/ingestions/logs')
     .then(res => res.json())
     .then(logs => {
       allIngestionLogs = logs || [];

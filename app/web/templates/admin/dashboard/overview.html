@@ -11,8 +11,62 @@
 <!-- Stats Cards -->
 <div id="dashboard-overview-container"></div>
 
-<!-- Top Content Section -->
+<!-- New Moderation Queue & Ingestion Hub -->
 <div class="overview-top-grid">
+
+  <!-- Catalog Health & Review Queue -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🛡️ Catalog Health & Moderation</h3>
+      <span class="overview-panel-sub">Queue Status</span>
+    </div>
+    <div id="catalog-health-container" class="panel-body-padded">
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading health indicators…</p></div>
+    </div>
+  </div>
+
+  <!-- Real-time Ingestion Activities -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">⚡ Real-time Ingest Log</h3>
+      <span class="overview-panel-sub">Latest Aggregations</span>
+    </div>
+    <div id="recent-ingest-container" class="panel-body-list">
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading ingest logs…</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- New Ingestion Distributions Section -->
+<div class="overview-top-grid mt-6">
+
+  <!-- Categories Distribution -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🏷️ Top Categories</h3>
+      <span class="overview-panel-sub">Volume Breakdown</span>
+    </div>
+    <div id="categories-distribution-container" class="panel-body-padded">
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading category stats…</p></div>
+    </div>
+  </div>
+
+  <!-- Sources Distribution -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📡 Top Content Sources</h3>
+      <span class="overview-panel-sub">Volume Breakdown</span>
+    </div>
+    <div id="sources-distribution-container" class="panel-body-padded">
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading source stats…</p></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Top Content Section -->
+<div class="overview-top-grid mt-6">
 
   <!-- Top Articles by views -->
   <div class="overview-panel">
@@ -21,7 +75,7 @@
       <span class="overview-panel-sub">by view count</span>
     </div>
     <div id="top-articles-container">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading articles…</p></div>
     </div>
   </div>
 
@@ -32,20 +86,20 @@
       <span class="overview-panel-sub">by click count</span>
     </div>
     <div id="top-items-container">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading items…</p></div>
     </div>
   </div>
 
 </div>
 
 <!-- Interaction Breakdown -->
-<div class="overview-panel" style="margin-top: 2rem;">
+<div class="overview-panel mt-6">
   <div class="overview-panel-header">
     <h3 class="overview-panel-title">📊 Interaction Breakdown</h3>
     <span class="overview-panel-sub">all time</span>
   </div>
   <div id="overview-interactions-container">
-    <div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>
+    <div class="dashboard-loading"><div class="spinner"></div><p>Loading breakdown…</p></div>
   </div>
 </div>
 

@@ -1,6 +1,15 @@
 from flask import Blueprint, jsonify
+from app.core.decorators import admin_required
 
-bp = Blueprint("api_ingestion", __name__, url_prefix="/api/ingestions")
+bp = Blueprint("api_ingestion", __name__, url_prefix="/admin/ingestions")
+
+
+# @bp.before_request
+# @admin_required
+# def require_admin():
+#     """Ensure all ingestion/integration endpoints require admin privilege."""
+#     pass
+
 
 @bp.route("/status", methods=["GET"])
 def integrations_status():

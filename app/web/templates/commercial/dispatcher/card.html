@@ -1,7 +1,7 @@
-{% if item.item_type == "electronics" %}
+{% if item.type == "electronics" %}
 {% include "commercial/card/electronics.html" %}
-{% elif item.item_type == "perfume" %}
+{% elif item.type == "perfume" %}
 {% include "commercial/card/perfume.html" %}
-{% elif item.item_type == "accessory" %}
+{% elif item.type == "accessory" %}
 {% include "commercial/card/accessory.html" %}
 {% endif %}

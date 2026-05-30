@@ -47,7 +47,7 @@
     <tbody id="users-table-body">
       <tr>
         <td colspan="5" class="table-loading-cell">
-          <div class="dashboard-loading" style="min-height:160px;">
+          <div class="dashboard-loading loading-height-md">
             <div class="spinner"></div>
             <p>Loading users…</p>
           </div>
@@ -60,5 +60,6 @@
 {% endblock %}
 
 {% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/control_panel/users.js') }}"></script>
 {% endblock %}

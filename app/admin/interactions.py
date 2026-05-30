@@ -11,7 +11,15 @@ from app.domains.interaction.service import (
     delete_comment as delete_comment_service
 )
 
-bp = Blueprint("api_interaction", __name__, url_prefix="/api/interactions")
+bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
+
+
+# @bp.before_request
+# @admin_required
+# def require_admin():
+#     """Ensure all interactions endpoints require admin privilege."""
+#     pass
+
 
 
 # ---------------------------

@@ -29,7 +29,7 @@ function initApp() {
     initHeroSlider();
     initTheme();
 
-    // applyMode();
+    applyMode();
     handleFlashMessages();
 }
 

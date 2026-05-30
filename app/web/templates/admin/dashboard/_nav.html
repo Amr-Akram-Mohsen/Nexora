@@ -27,30 +27,9 @@
       class="nav-link {% if (domain|default('')) == 'interactions' %}active{% endif %}">
       <span class="nav-icon">📈</span> Analytics
     </a>
-  </div>
-
-  <div class="nav-section">
-    <p class="nav-title">Control Panel</p>
-    <a href="{{ url_for('admin.control_users') }}"
-      class="nav-link {% if (domain|default('')) == 'control_users' %}active{% endif %}">
-      <span class="nav-icon">🔧</span> Users
-    </a>
-    <a href="{{ url_for('admin.control_settings') }}"
-      class="nav-link {% if (domain|default('')) == 'control_settings' %}active{% endif %}">
+    <a href="{{ url_for('admin.settings') }}"
+      class="nav-link {% if (domain|default('')) == 'settings' %}active{% endif %}">
       <span class="nav-icon">⚙️</span> Settings
     </a>
   </div>
-
-  <div class="nav-section">
-    <p class="nav-title">
-      Integrations
-    </p>
-    <a href="{{ url_for('admin.control_settings') }}#integrations" class="nav-link">
-      <span class="nav-icon">🔌</span> API Sources
-    </a>
-    <a href="#" class="nav-link nav-link-disabled" title="Coming soon">
-      <span class="nav-icon">🕒</span> Ingestion Log
-    </a>
-  </div>
-
 </nav>

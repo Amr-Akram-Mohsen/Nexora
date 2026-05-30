@@ -1,7 +1,14 @@
 from flask import Blueprint, jsonify, request
 from app.domains.item.service import get_items, delete_item as delete_item_service
 from app.core.decorators import admin_required
-bp = Blueprint("api_item", __name__, url_prefix="/api/items")
+bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
+
+
+# @bp.before_request
+# @admin_required
+# def require_admin():
+#     """Ensure all items endpoints require admin privilege."""
+#     pass
 
 
 @bp.route("/", methods=["GET"])

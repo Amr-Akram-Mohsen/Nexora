@@ -4,4 +4,5 @@ from .users import bp as api_user_bp
 from .interactions import bp as api_interaction_bp
 from .stats import bp as api_dashboard_bp
 from .ingestions import bp as api_ingestion_bp
+from .system import bp as api_system_bp
 

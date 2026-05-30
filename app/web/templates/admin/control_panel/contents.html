@@ -1,0 +1,221 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Content Management — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <div class="admin-page-header-row">
+    <div>
+      <h1>Content Moderation & Management</h1>
+      <p>Clean up, categorize, inspect quality, and perform bulk operations on aggregated content</p>
+    </div>
+    <div class="admin-page-header-actions">
+      <button id="refresh-contents-btn" class="admin-btn-secondary">↺ Refresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- Advanced Filters -->
+<div class="admin-toolbar-advanced flex flex-col">
+  
+  <!-- Row 1: Search & Basic Filters -->
+  <div class="admin-toolbar-row">
+    <div class="admin-toolbar-search admin-search-grow">
+      <span class="admin-toolbar-search-icon-inside">🔍</span>
+      <input type="text" id="content-search" placeholder="Search title or ID…" />
+    </div>
+    
+    <select id="filter-type" class="dashboard-filter-select filter-select-item">
+      <option value="">All Content Types</option>
+      <option value="article">Articles</option>
+      <option value="video">Videos</option>
+      <option value="post">Posts</option>
+    </select>
+    
+    <select id="filter-section" class="dashboard-filter-select filter-select-item">
+      <option value="">All Sections</option>
+      <!-- Populated dynamically -->
+    </select>
+
+    <select id="filter-category" class="dashboard-filter-select filter-select-item">
+      <option value="">All Categories</option>
+      <option value="uncategorized">Uncategorized</option>
+      <!-- Populated dynamically -->
+    </select>
+  </div>
+
+  <!-- Row 2: Ingest Details & Compliance -->
+  <div class="admin-toolbar-row">
+    <select id="filter-source" class="dashboard-filter-select filter-select-item">
+      <option value="">All Sources / Platforms</option>
+      <!-- Populated dynamically -->
+    </select>
+
+    <select id="filter-status" class="dashboard-filter-select filter-select-item">
+      <option value="">All Processing States</option>
+      <option value="pending">Pending</option>
+      <option value="enriching">Enriching</option>
+      <option value="complete">Complete</option>
+      <option value="failed">Failed</option>
+    </select>
+
+    <select id="filter-active" class="dashboard-filter-select filter-select-item">
+      <option value="">Active & Inactive</option>
+      <option value="true">Active Only</option>
+      <option value="false">Inactive Only</option>
+    </select>
+
+    <select id="filter-published" class="dashboard-filter-select filter-select-item">
+      <option value="">All Visibility</option>
+      <option value="true">Published Only</option>
+      <option value="false">Draft / Review Only</option>
+    </select>
+
+    <select id="filter-quality" class="dashboard-filter-select filter-select-warning">
+      <option value="">All Health Statuses</option>
+      <option value="missing_category">⚠️ Missing Category</option>
+      <option value="missing_metadata">📝 Missing Metadata</option>
+      <option value="duplicate">👯 Duplicate Title</option>
+    </select>
+  </div>
+
+  <!-- Row 3: Date Filters & Sorting -->
+  <div class="admin-toolbar-row items-center">
+    <span class="filter-label-xs">Date Range:</span>
+    <select id="filter-date-type" class="dashboard-filter-select filter-input-auto">
+      <option value="published_at">Published At</option>
+      <option value="ingested_at">Ingested At</option>
+    </select>
+    
+    <input type="date" id="filter-start-date" class="dashboard-filter-input filter-input-auto" />
+    <span class="filter-text-divider">to</span>
+    <input type="date" id="filter-end-date" class="dashboard-filter-input filter-input-auto" />
+
+    <div class="filter-sort-group">
+      <span class="filter-label-xs">Sort:</span>
+      <select id="sort-by" class="dashboard-filter-select filter-input-auto">
+        <option value="published_at">Publish Date</option>
+        <option value="ingested_at">Ingest Date</option>
+        <option value="view_count">Views</option>
+        <option value="comment_count">Comments</option>
+        <option value="title">Title</option>
+      </select>
+      <select id="sort-dir" class="dashboard-filter-select filter-input-auto">
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+      
+      <button id="clear-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bulk Actions Toolbar (hidden by default) -->
+<div id="bulk-actions-toolbar" class="bulk-actions-toolbar">
+  <div class="flex items-center gap-2">
+    <span class="text-lg">⚡</span>
+    <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
+  </div>
+  
+  <div class="bulk-controls-group">
+    <select id="bulk-action-select" class="dashboard-filter-select">
+      <option value="">Choose Bulk Action...</option>
+      <option value="activate">Activate Selected</option>
+      <option value="deactivate">Deactivate Selected</option>
+      <option value="review">Mark for Review (Draft)</option>
+      <option value="recategorize">Recategorize Content</option>
+      <option value="delete">Safe Delete Selected</option>
+    </select>
+    
+    <!-- Bulk Category Dropdown (Shown only when recategorize is selected) -->
+    <select id="bulk-category-select" class="dashboard-filter-select">
+      <option value="">Select Category...</option>
+      <!-- Populated dynamically -->
+    </select>
+    
+    <button id="bulk-apply-btn" class="admin-btn-primary" disabled>Apply Action</button>
+  </div>
+</div>
+
+<!-- Summary bar -->
+<div class="flex justify-between items-center mb-3">
+  <div id="contents-summary" class="admin-summary-bar">
+    Showing <strong id="contents-count">—</strong> items
+  </div>
+  <div class="tip-text">
+    💡 Double-click any category to quick recategorize
+  </div>
+</div>
+
+<!-- Main Contents Table -->
+<div class="admin-table-wrapper">
+  <table class="admin-table" id="contents-table">
+    <thead>
+      <tr>
+        <th class="col-check"><input type="checkbox" id="select-all-contents" /></th>
+        <th class="col-type">Type & ID</th>
+        <th>Title / Source / Category</th>
+        <th class="col-engagement">Engagement</th>
+        <th class="col-dates">Ingested / Published</th>
+        <th class="col-engagement">Flags</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="contents-table-body">
+      <tr>
+        <td colspan="7" class="table-loading-cell">
+          <div class="dashboard-loading loading-height-lg">
+            <div class="spinner"></div>
+            <p>Loading catalog contents…</p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination Controls -->
+<div class="pagination-container">
+  <div id="pagination-info" class="pagination-info-text">
+    Showing 0 to 0 of 0 contents
+  </div>
+  
+  <div class="pagination-controls-group">
+    <select id="pagination-per-page" class="dashboard-filter-select pagination-per-page-select">
+      <option value="10">10 per page</option>
+      <option value="20" selected>20 per page</option>
+      <option value="50">50 per page</option>
+      <option value="100">100 per page</option>
+    </select>
+    
+    <button id="prev-page-btn" class="user-action-btn" disabled>← Previous</button>
+    <span id="page-num-indicator" class="pagination-page-indicator">Page 1 of 1</span>
+    <button id="next-page-btn" class="user-action-btn" disabled>Next →</button>
+  </div>
+</div>
+
+<!-- Dedicated Inline Modal for Recategorization -->
+<div id="quick-category-modal" class="dashboard-modal-overlay">
+  <div class="dashboard-modal-content modal-content-sm">
+    <div class="dashboard-modal-icon modal-icon-purple">🏷️</div>
+    <h3 class="dashboard-modal-title">Quick Recategorize</h3>
+    <p class="dashboard-modal-body">Move this item to a different content category:</p>
+    <input type="hidden" id="quick-cat-content-id" />
+    <select id="quick-cat-select" class="dashboard-filter-select modal-select-full">
+      <!-- Dynamic list -->
+    </select>
+    <div class="dashboard-modal-actions">
+      <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
+      <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/control_panel/contents.js') }}"></script>
+{% endblock %}

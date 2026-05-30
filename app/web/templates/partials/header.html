@@ -96,6 +96,14 @@
             type="submit", icon="fas fa-sign-out-alt",
             class=item_class ~ " logout-btn")}}
             {% endcall %}
+
+            {% if is_admin %}
+            <a href="{{ url_for('admin.home') }}" class="{{ item_class }}">
+              <i class="fas fa-sign-out-alt"></i>
+              Admin Panel
+            </a>
+            {% endif %}
+
             {% else %}
             <a href="{{ url_for('user.login') }}" class="{{ item_class }}">
               <i class="fas fa-sign-in-alt"></i>
