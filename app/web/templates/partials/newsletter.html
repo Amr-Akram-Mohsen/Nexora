@@ -2,43 +2,101 @@
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/input.html" import input %}
 
-<p class="newsletter-description">
-  {% if is_subscribed %}
-  You are currently subscribed to our newsletter.
+{% set newsletter_placement = newsletter_placement|default('default') %}
+{% set newsletter_title = newsletter_title|default('Stay Updated', true) %}
+{% set newsletter_description = newsletter_description|default(
+  'Get the latest tech news and reviews delivered to your inbox weekly.',
+  true
+) %}
+{% set show_title = show_title|default(true) %}
+{% set show_icon = show_icon|default(true) %}
+{% set status = newsletter_status|default('anonymous') %}
+
+<div class="newsletter-inner newsletter-inner--{{ newsletter_placement }}" data-newsletter-state="{{ status }}">
+  {% if show_icon %}
+  <div class="newsletter-icon" aria-hidden="true">
+    <i class="fas fa-envelope"></i>
+  </div>
+  {% endif %}
+
+  {% if show_title %}
+  <h3 class="newsletter-title">
+    {{ newsletter_title }}
+  </h3>
+  {% endif %}
+
+  <p class="newsletter-description">
+    {% if is_subscribed %}
+    You are subscribed to the Nexora newsletter.
+    {% elif is_pending %}
+    Your subscription is pending confirmation.
+    {% else %}
+    {{ newsletter_description }}
+    {% endif %}
+  </p>
+
+  <div class="newsletter-status" role="status" aria-live="polite" data-newsletter-status>
+    {% if is_subscribed %}
+    <p class="newsletter-status__title">Subscribed</p>
+    {% if newsletter_email %}
+    <p class="newsletter-status__detail">Updates are being sent to {{ newsletter_email }}.</p>
+    {% else %}
+    <p class="newsletter-status__detail">You will continue receiving Nexora updates.</p>
+    {% endif %}
+    {% elif is_pending %}
+    <p class="newsletter-status__title">Confirmation needed</p>
+    <p class="newsletter-status__detail">
+      Check your inbox{% if newsletter_email %} at {{ newsletter_email }}{% endif %} to finish subscribing.
+    </p>
+    {% endif %}
+  </div>
+
+  {% if is_subscribed and not is_authenticated %}
+  <p class="newsletter-info">Use the unsubscribe link in any newsletter email to manage this subscription.</p>
   {% else %}
-  Get the latest tech news and reviews delivered to your inbox weekly.
+  {% set action = url_for('interaction.unsubscribe_auth') if is_subscribed else url_for('interaction.subscribe') %}
+  {% set action_label = 'Unsubscribe' if is_subscribed else ('Resend confirmation' if is_pending else 'Subscribe') %}
+
+  {% call form("newsletter-form", form_action=action, attrs={"data-newsletter-form": "", "data-newsletter-placement": newsletter_placement}) %}
+  <input type="hidden" name="newsletter_placement" value="{{ newsletter_placement }}">
+  <input type="hidden" name="newsletter_title" value="{{ newsletter_title }}">
+  <input type="hidden" name="newsletter_description" value="{{ newsletter_description }}">
+  {% if newsletter_email and not is_authenticated %}
+  <input type="hidden" name="email" value="{{ newsletter_email }}">
   {% endif %}
-</p>
 
-{% set action = url_for('interaction.unsubscribe_auth') if is_subscribed
-else url_for('interaction.subscribe') %}
-
-{% if is_subscribed %}
-<p class="newsletter-success">
-  You are subscribed 🎉
-</p>
-{% endif %}
-
-{% call form("flex justify-center newsletter-form", form_action=action, attrs={"data-newsletter-form": ""}) %}
-{% if not is_authenticated %}
-{{ input(
-name='email',
-type='email',
-placeholder="Enter your email"
-) }}
-{% else %}
-<p class="newsletter-info">
-  {% if is_pending %}
-  Check your email to confirm your subscription 📬
-  {% elif not is_subscribed %}
-  Subscribing as <strong>{{ current_user.email }}</strong>
+  {% if not is_authenticated and not is_subscribed and not is_pending %}
+  <label class="sr-only" for="newsletter-email-{{ newsletter_placement }}">Email address</label>
+  {{ input(
+    name='email',
+    id='newsletter-email-' ~ newsletter_placement,
+    type='email',
+    placeholder='Enter your email',
+    attrs={
+      "autocomplete": "email",
+      "aria-describedby": "newsletter-help-" ~ newsletter_placement
+    }
+  ) }}
+  {% elif is_authenticated and not is_subscribed %}
+  <p class="newsletter-info" id="newsletter-help-{{ newsletter_placement }}">
+    {% if is_pending %}
+    Waiting for confirmation from <strong>{{ current_user.email }}</strong>.
+    {% else %}
+    Subscribing as <strong>{{ current_user.email }}</strong>.
+    {% endif %}
+  </p>
   {% endif %}
-</p>
-{% endif %}
 
-{{ button(
-text="Unsubscribe" if is_subscribed else "Subscribe",
-type='submit'
-) }}
+  {% if not is_authenticated and not is_subscribed and not is_pending %}
+  <p class="newsletter-info" id="newsletter-help-{{ newsletter_placement }}">No spam. Confirm your email before updates begin.</p>
+  {% endif %}
 
-{% endcall %}
+  {{ button(
+    text=action_label,
+    type='submit',
+    variant='outline' if is_subscribed else 'primary',
+    attrs={"data-newsletter-submit": ""}
+  ) }}
+  {% endcall %}
+  {% endif %}
+</div>

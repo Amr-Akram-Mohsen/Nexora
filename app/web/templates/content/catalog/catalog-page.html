@@ -84,13 +84,12 @@ SLOT: header
 {% if filter_options.get('topic') %}
 <div class="topics-ribbon">
   {% for opt in filter_options.get('topic', []) %}
-    {% set slug = opt.slug if opt.slug is defined else opt %}
-    {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
-    {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-    <a href="{{ get_filter_url('topic', slug, multi=True) }}" 
-       class="topic-pill {{ 'is-active' if is_active }}">
-       {{ name }}
-    </a>
+  {% set slug = opt.slug if opt.slug is defined else opt %}
+  {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
+  {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
+  <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="topic-pill {{ 'is-active' if is_active }}">
+    {{ name }}
+  </a>
   {% endfor %}
 </div>
 {% endif %}
@@ -167,7 +166,7 @@ SLOT: footer (pagination)
 ═══════════════════════════════════════ #}
 {% if slot == 'footer' %}
 {% if pagination and pagination.pages > 1 %}
-<nav class="pagination flex items-center justify-center" aria-label="Pagination">
+<nav class="pagination flex-center" aria-label="Pagination">
 
   {# Previous #}
   {% if pagination.has_prev %}

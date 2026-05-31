@@ -4,13 +4,13 @@
 {% from "components/ui/badge.html" import badge %}
 
 {% macro render_content_card(item) %}
-    {% if item.object_type == "article" %}
-        {{ render_article_card(item) }}
-    {% elif item.object_type == "video" %}
-        {{ render_video_card(item) }}
-    {% elif item.object_type == "post" %}
-        {{ render_post_card(item) }}
-    {% endif %}
+{% if item.object_type == "article" %}
+{{ render_article_card(item) }}
+{% elif item.object_type == "video" %}
+{{ render_video_card(item) }}
+{% elif item.object_type == "post" %}
+{{ render_post_card(item) }}
+{% endif %}
 {% endmacro %}
 
 {% macro render_article_card(item) %}
@@ -29,7 +29,7 @@
         <div class="card__top-meta flex items-center">
             {{ badge(item.category.name, 'badge--category') }}
             {% for topic in item.topics[:1] %}
-                {{ badge(topic.name, 'badge--topic', 'secondary') }}
+            {{ badge(topic.name, 'badge--topic', 'secondary') }}
             {% endfor %}
         </div>
 
@@ -46,11 +46,11 @@
             </div>
             <div class="card__footer-divider"></div>
             {% if item.target.read_time_minutes %}
-                <div class="card__footer-item">
-                    <i class="far fa-clock"></i>
-                    <span>{{ item.target.read_time_minutes }}m</span>
-                </div>
-                <div class="card__footer-divider"></div>
+            <div class="card__footer-item">
+                <i class="far fa-clock"></i>
+                <span>{{ item.target.read_time_minutes }}m</span>
+            </div>
+            <div class="card__footer-divider"></div>
             {% endif %}
             <time class="card__date">
                 {{ item.published_at.strftime('%b %d') if item.published_at else 'Recent' }}
@@ -63,7 +63,8 @@
 {% macro render_video_card(item) %}
 <article class="card flex flex-col" data-type="video" data-id="{{ item.id }}" data-domain-type="content">
     <div class="card__img-container">
-        {{ render_video_thumbnail(item.target.thumbnail_url, item.target.title, item.target.url or item.target.external_id, platform=item.target.platform) }}
+        {{ render_video_thumbnail(item.target.thumbnail_url, item.target.title, item.target.url or
+        item.target.external_id, platform=item.target.platform) }}
         <div class="card__type-indicator flex items-center">
             <i class="fas fa-video"></i>
             <span>Video</span>
@@ -73,7 +74,7 @@
     <div class="card__body flex flex-col">
         <div class="card__top-meta flex items-center">
             {{ badge(item.category.name, 'badge--category') }}
-            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex items-center justify-center">
+            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex-center">
                 <i class="fab fa-{{ item.target.platform }}"></i>
             </span>
         </div>
@@ -102,9 +103,9 @@
         <div class="card__top-meta flex items-center">
             {{ badge('Community', 'badge--post-type') }}
             {% if item.target.subreddit %}
-                {{ badge('r/' ~ item.target.subreddit, 'badge--topic', 'secondary') }}
+            {{ badge('r/' ~ item.target.subreddit, 'badge--topic', 'secondary') }}
             {% endif %}
-            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex items-center justify-center">
+            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex-center">
                 <i class="fab fa-{{ item.target.platform }}"></i>
             </span>
         </div>
@@ -122,11 +123,11 @@
             </div>
             <div class="card__footer-divider"></div>
             {% if item.target.upvotes %}
-                <div class="card__footer-item">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>{{ item.target.upvotes }}</span>
-                </div>
-                <div class="card__footer-divider"></div>
+            <div class="card__footer-item">
+                <i class="fas fa-arrow-up"></i>
+                <span>{{ item.target.upvotes }}</span>
+            </div>
+            <div class="card__footer-divider"></div>
             {% endif %}
             <time class="card__date">
                 {{ item.published_at.strftime('%b %d') if item.published_at else 'Recent' }}

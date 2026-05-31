@@ -59,6 +59,20 @@
 
     </div>
 
+    <section class="detail-page__newsletter article-newsletter">
+
+      {% with
+      newsletter_placement='article',
+      newsletter_title='Enjoyed This Article?',
+      newsletter_description='Get the next useful read, review, or product insight in your inbox.'
+      %}
+      <div class="newsletter newsletter--article" data-newsletter data-newsletter-placement="article">
+        {% include "partials/newsletter.html" %}
+      </div>
+      {% endwith %}
+
+    </section>
+
     <!-- Sidebar -->
     <aside class="detail-page__sidebar">
       {% block base_sidebar %}

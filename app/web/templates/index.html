@@ -3,7 +3,6 @@
 {% block title %}Nexora | Home{% endblock %}
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/hero-slider.css') }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/newsletter.css') }}" />
 {% endblock %}
 
 {% block content %}
@@ -27,23 +26,24 @@
   {% endfor %}
 
   {# ── Newsletter strip — footer places it, component fills it ── #}
-  <div class="footer-newsletter">
-    <div class="newsletter-block flex flex-col items-center justify-center">
-
-      <div class="newsletter-icon" aria-hidden="true">
-        <i class="fas fa-envelope"></i>
-      </div>
-
-      <h3 class="newsletter-title">Stay Updated</h3>
-
-      {# .newsletter is the component root; newsletter-block.html is reusable #}
-      <div class="newsletter" data-newsletter>
+  <div class="newsletter-subscription">
+    <div class="newsletter-block newsletter-block--home flex-center flex-col">
+      {% with
+      newsletter_placement='home',
+      newsletter_title='Stay in the Loop',
+      newsletter_description='A concise weekly digest of Nexora articles, reviews, and standout deals.'
+      %}
+      <div class="newsletter newsletter--home" data-newsletter data-newsletter-placement="home">
         {% include "partials/newsletter.html" %}
       </div>
-
+      {% endwith %}
+      <p class="newsletter-more">
+        <a href="{{ url_for('system.newsletter') }}">
+          Learn more about our newsletter
+        </a>
+      </p>
     </div>
   </div>
-
 </div>
 
 {% endblock %}

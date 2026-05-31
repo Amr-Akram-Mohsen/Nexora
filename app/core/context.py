@@ -12,6 +12,7 @@ def get_global_context():
     """
     return {
         **get_user_context(current_user.id if current_user.is_authenticated else None),
+        **get_newsletter_context(),
         **get_layout_context(),
         "get_filter_url": get_filter_url,
         "get_sort_url": get_sort_url,

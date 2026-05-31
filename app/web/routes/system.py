@@ -90,6 +90,10 @@ def terms():
 def affiliate():
     return render_template("affiliate.html", content=PAGES_CONTENT.get("affiliate"))
 
+@bp.route("/newsletter")
+def newsletter():
+    return render_template("newsletter.html")
+
 
 @bp.route("/sitemap.xml")
 def sitemap():

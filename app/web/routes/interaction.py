@@ -19,6 +19,37 @@ logger = logging.getLogger(__name__)
 
 bp = Blueprint("interaction", __name__)
 
+
+def _newsletter_component_context(email=None):
+    placement = request.form.get("newsletter_placement") or "default"
+    if placement not in {"default", "home", "article", "landing", "profile"}:
+        placement = "default"
+    return {
+        **get_newsletter_context(email=email),
+        "newsletter_title": request.form.get("newsletter_title") or None,
+        "newsletter_description": request.form.get("newsletter_description") or None,
+        "newsletter_placement": placement,
+    }
+
+
+def _newsletter_response(success, message, email=None, status_code=200):
+    context = _newsletter_component_context(email=email)
+    payload = {
+        "success": success,
+        "message": message if success else None,
+        "error": None if success else message,
+        "state": {
+            "status": context.get("newsletter_status"),
+            "is_subscribed": bool(context.get("is_subscribed")),
+            "is_pending": bool(context.get("is_pending")),
+            "email": context.get("newsletter_email"),
+        },
+    }
+    if success:
+        payload["html"] = render_template("partials/newsletter.html", **context)
+    return jsonify(payload), status_code
+
+
 @bp.route('/subscribe', methods=['POST'])
 @limiter.limit("5 per minute")
 def subscribe():
@@ -26,42 +57,26 @@ def subscribe():
     user_id = current_user.id if current_user.is_authenticated else None
 
     success, message = subscribe_workflow(email, user_id)
-    
-    if not success:
-        return jsonify({'success': False, 'error': message})
-
-    return jsonify({
-        'success': True,
-        'message': message,
-        'html': render_template(
-            'partials/newsletter.html',
-            **get_newsletter_context()
-        )            
-    })
+    return _newsletter_response(success, message, email=email, status_code=400 if not success else 200)
 
 @bp.route('/confirm-subscription/<token>')
 def confirm_subscription(token):
     if confirm_subscription_workflow(token):
-        flash("Your subscription has been confirmed 🎉", "success")
+        flash("Your subscription has been confirmed.", "success")
     else:
         flash("Invalid or expired confirmation link.", "error")
-    return redirect(url_for('system.home'))
+    return redirect(url_for('system.newsletter'))
 
 @bp.route('/unsubscribe-auth', methods=['POST'])
 @login_required
 def unsubscribe_auth():
     success, message = unsubscribe_workflow(user=current_user)
-    if not success:
-        return jsonify({'success': False, 'error': message})
-
-    return jsonify({
-        'success': True,
-        'message': message,
-        'html': render_template(
-            'partials/newsletter.html',
-            **get_newsletter_context()
-        )
-    })
+    return _newsletter_response(
+        success,
+        message,
+        email=current_user.email,
+        status_code=400 if not success else 200,
+    )
 
 @bp.route('/unsubscribe/<token>')
 def unsubscribe_token(token):
@@ -69,7 +84,7 @@ def unsubscribe_token(token):
         flash("You have been unsubscribed successfully.", "success")
     else:
         flash("Invalid unsubscribe link.", "error")
-    return redirect(url_for('system.home'))    
+    return redirect(url_for('system.newsletter'))
 
 @bp.route("/check-react-batch")
 @login_required

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<section class="auth-section flex items-center justify-center">
+<section class="auth-section flex-center">
   <div class="auth-wrapper animate-fade-in">
 
     <div class="auth-header text-center">
@@ -14,23 +14,23 @@
       <p class="auth-text">{{ auth_text or "Please enter your details to continue" }}</p>
     </div>
 
-    {% from "components/ui/form.html"   import form %}
-    {% from "components/ui/input.html"  import input %}
+    {% from "components/ui/form.html" import form %}
+    {% from "components/ui/input.html" import input %}
     {% from "components/ui/button.html" import button %}
-    {% from "components/ui/field.html"  import field %}
-    {% from "components/ui/label.html"  import label %}
+    {% from "components/ui/field.html" import field %}
+    {% from "components/ui/label.html" import label %}
 
     <div class="auth-methods">
 
       {# ── Google OAuth ── #}
       {% set google_url = url_for('user.google_login') %}
       {{ button(
-        text="Continue with Google",
-        type="button",
-        variant="outline",
-        class="google-auth-btn w-full inline-flex items-center justify-center",
-        icon="fa-brands fa-google",
-        attrs={"onclick": "window.location.href='" ~ google_url ~ "'"}
+      text="Continue with Google",
+      type="button",
+      variant="outline",
+      class="google-auth-btn w-full inline-flex-center",
+      icon="fa-brands fa-google",
+      attrs={"onclick": "window.location.href='" ~ google_url ~ "'"}
       ) }}
 
       <div class="auth-divider"><span>or</span></div>
@@ -38,96 +38,96 @@
       {# ── Main Form ── #}
       {% call form("auth-form", attrs={"id": "auth-form"}) %}
 
-        {# Full Name — register only #}
-        {% if is_new_user %}
-          {% call field(label_text="Full Name", for_id="name") %}
-            {{ input(name="name", id="name", placeholder="e.g. John Doe", required=True) }}
-          {% endcall %}
-        {% endif %}
+      {# Full Name — register only #}
+      {% if is_new_user %}
+      {% call field(label_text="Full Name", for_id="name") %}
+      {{ input(name="name", id="name", placeholder="e.g. John Doe", required=True) }}
+      {% endcall %}
+      {% endif %}
 
-        {# Email #}
-        {% call field(label_text="Email Address", for_id="email") %}
-          {{ input(name="email", id="email", type="email",
-                   placeholder="you@example.com",
-                   value=email if email else "",
-                   required=True) }}
-        {% endcall %}
+      {# Email #}
+      {% call field(label_text="Email Address", for_id="email") %}
+      {{ input(name="email", id="email", type="email",
+      placeholder="you@example.com",
+      value=email if email else "",
+      required=True) }}
+      {% endcall %}
 
-        {# Password with visibility toggle #}
-        {% call field(label_text="Password", for_id="password") %}
-          <div class="password-wrapper">
-            {{ input(
-              name="password", id="password", type="password",
-              placeholder="••••••••",
-              attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
-              required=True
-            ) }}
-            <button type="button" class="password-toggle" aria-label="Show password">
-              <i class="fa-regular fa-eye"></i>
-            </button>
-          </div>
-          {# Strength meter — register only #}
-          {% if is_new_user %}
-            <div class="password-strength" style="display:none;">
-              <div class="password-strength-bar">
-                <div class="strength-segment"></div>
-                <div class="strength-segment"></div>
-                <div class="strength-segment"></div>
-                <div class="strength-segment"></div>
-              </div>
-              <span class="password-strength-label"></span>
-            </div>
-            <p class="field-hint">Use 8+ characters — mixing letters, numbers, or symbols makes it stronger.</p>
-          {% endif %}
-        {% endcall %}
-
-        {# Confirm Password — register only #}
-        {% if is_new_user %}
-          {% call field(label_text="Confirm Password", for_id="confirm_password") %}
-            <div class="password-wrapper">
-              {{ input(
-                name="confirm_password", id="confirm_password", type="password",
-                placeholder="••••••••",
-                attrs={"autocomplete": "new-password"},
-                required=True
-              ) }}
-              <button type="button" class="password-toggle" aria-label="Show password">
-                <i class="fa-regular fa-eye"></i>
-              </button>
-            </div>
-            <span class="confirm-match"></span>
-          {% endcall %}
-        {% endif %}
-
-        {# Extras row: remember-me / forgot-password #}
-        <div class="auth-extras flex items-center justify-between">
-          {# Newsletter checkbox (register) or Remember-me (login) — available to re-enable #}
-          <div class="checkbox-group flex items-center gap-2">
-            {# Uncomment to re-enable:
-            {% set check_name = "newsletter" if is_new_user else "remember" %}
-            {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
-            {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
-            {{ label(check_text, check_name, class="text-sm cursor-pointer") }}
-            #}
-          </div>
-          {% if not is_new_user %}
-            <a href="{{ url_for('user.forgot_password') }}" class="redirect-link text-sm">Forgot password?</a>
-          {% endif %}
+      {# Password with visibility toggle #}
+      {% call field(label_text="Password", for_id="password") %}
+      <div class="password-wrapper">
+        {{ input(
+        name="password", id="password", type="password",
+        placeholder="••••••••",
+        attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
+        required=True
+        ) }}
+        <button type="button" class="password-toggle" aria-label="Show password">
+          <i class="fa-regular fa-eye"></i>
+        </button>
+      </div>
+      {# Strength meter — register only #}
+      {% if is_new_user %}
+      <div class="password-strength" style="display:none;">
+        <div class="password-strength-bar">
+          <div class="strength-segment"></div>
+          <div class="strength-segment"></div>
+          <div class="strength-segment"></div>
+          <div class="strength-segment"></div>
         </div>
+        <span class="password-strength-label"></span>
+      </div>
+      <p class="field-hint">Use 8+ characters — mixing letters, numbers, or symbols makes it stronger.</p>
+      {% endif %}
+      {% endcall %}
 
-        {# Resend-verification alert — shown when login is blocked on unverified account #}
-        {% if show_resend and email %}
-          <div class="resend-alert mt-4 text-center">
-            <p class="field-hint mb-2">Haven't received the verification email?</p>
-            <form action="{{ url_for('user.resend_verification') }}" method="POST">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="email" value="{{ email }}">
-              <button type="submit" class="btn variant--outline text-xs">Resend Verification Email</button>
-            </form>
-          </div>
+      {# Confirm Password — register only #}
+      {% if is_new_user %}
+      {% call field(label_text="Confirm Password", for_id="confirm_password") %}
+      <div class="password-wrapper">
+        {{ input(
+        name="confirm_password", id="confirm_password", type="password",
+        placeholder="••••••••",
+        attrs={"autocomplete": "new-password"},
+        required=True
+        ) }}
+        <button type="button" class="password-toggle" aria-label="Show password">
+          <i class="fa-regular fa-eye"></i>
+        </button>
+      </div>
+      <span class="confirm-match"></span>
+      {% endcall %}
+      {% endif %}
+
+      {# Extras row: remember-me / forgot-password #}
+      <div class="auth-extras flex items-center justify-between">
+        {# Newsletter checkbox (register) or Remember-me (login) — available to re-enable #}
+        <div class="checkbox-group flex items-center gap-2">
+          {# Uncomment to re-enable:
+          {% set check_name = "newsletter" if is_new_user else "remember" %}
+          {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
+          {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
+          {{ label(check_text, check_name, class="text-sm cursor-pointer") }}
+          #}
+        </div>
+        {% if not is_new_user %}
+        <a href="{{ url_for('user.forgot_password') }}" class="redirect-link text-sm">Forgot password?</a>
         {% endif %}
+      </div>
 
-        {{ button(text=title, type="submit", variant="primary", class="auth-btn w-full mt-4") }}
+      {# Resend-verification alert — shown when login is blocked on unverified account #}
+      {% if show_resend and email %}
+      <div class="resend-alert mt-4 text-center">
+        <p class="field-hint mb-2">Haven't received the verification email?</p>
+        <form action="{{ url_for('user.resend_verification') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="email" value="{{ email }}">
+          <button type="submit" class="btn variant--outline text-xs">Resend Verification Email</button>
+        </form>
+      </div>
+      {% endif %}
+
+      {{ button(text=title, type="submit", variant="primary", class="auth-btn w-full mt-4") }}
 
       {% endcall %}
     </div>
@@ -137,7 +137,7 @@
         {{ "Already have an account?" if is_new_user else "New to Nexora?" }}
       </span>
       <a href="{{ url_for('user.login') if is_new_user else url_for('user.register') }}"
-         class="redirect-link font-bold">
+        class="redirect-link font-bold">
         {{ "Login" if is_new_user else "Join now" }}
       </a>
     </div>

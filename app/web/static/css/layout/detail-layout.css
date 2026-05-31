@@ -14,19 +14,9 @@
   grid-template-areas:
     "top"
     "main"
+    "newsletter"
     "sidebar";
 }
-
-/* @media (min-width: 1024px) {
-  .detail-page .container {
-    grid-template-areas:
-      "top top"
-      "main sidebar";
-    grid-template-columns: 1fr var(--sidebar-width, 340px);
-    column-gap: 4rem;
-    align-items: start;
-  }
-} */
 
 /* --- Area Positioning --- */
 .detail-page__top {
@@ -51,6 +41,11 @@
   grid-area: main;
 
   min-width: 0;
+}
+
+.detail-page__newsletter {
+  grid-area: newsletter;
+  margin-bottom: 1rem;
 }
 
 .detail-page__sidebar {

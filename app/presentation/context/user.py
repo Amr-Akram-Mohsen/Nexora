@@ -8,7 +8,7 @@ def get_user_context(user_id=None):
     user = db.session.get(User, user_id) if user_id else current_user
     
     is_authenticated = user.is_authenticated
-    is_admin = user.is_admin
+    is_admin = bool(getattr(user, "is_admin", False))
     user_email = None
     is_subscribed = False
 
@@ -16,7 +16,7 @@ def get_user_context(user_id=None):
         user_email = user.email
 
         sub = getattr(user, "newsletter_subscription", None)
-        if sub and not sub.unsubscribed_at:
+        if sub and sub.is_active:
             is_subscribed = True
 
     return {

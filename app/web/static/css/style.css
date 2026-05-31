@@ -21,6 +21,7 @@
 @import "components/ui/button.css";
 @import "components/ui/form.css";
 @import "components/ui/badge.css";
+@import "components/newsletter.css";
 @import "content/cards/shared.css";
 
 @import "content/cards/article.css";

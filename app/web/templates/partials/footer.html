@@ -6,11 +6,11 @@
     <div class="footer-grid">
 
       <!-- Brand -->
-      <div class="footer-column footer-brand">
+      <div class="footer-column footer-brand flex flex-col">
 
         <a href="/" class="footer-logo flex items-center group">
 
-          <div class="footer-logo__icon flex items-center justify-center">
+          <div class="footer-logo__icon flex-center">
             <i class="fas fa-newspaper"></i>
           </div>
 
@@ -27,8 +27,8 @@
         <div class="footer-socials flex">
 
           {% for name, url in social_links %}
-          <a href="{{ url }}" target="_blank" rel="noopener"
-            class="footer-social flex items-center justify-center {{ name }}" aria-label="{{ name }}">
+          <a href="{{ url }}" target="_blank" rel="noopener" class="footer-social flex-center {{ name }}"
+            aria-label="{{ name }}">
 
             <i class="fab fa-{{ name }}{% if name == 'facebook' %}-f{% endif %}"></i>
 
@@ -37,33 +37,43 @@
 
         </div>
 
+        <div class="newsletter-footer">
+          <h4>Stay Updated</h4>
+          <a href="{{ url_for('system.newsletter') }}">
+            Subscribe to our newsletter
+          </a>
+        </div>
+
       </div>
 
-      {% set footer_cols = [
-      {'title': 'Sections', 'items': main_sections},
-      {'title': 'Topics', 'items': footer_topics},
-      {'title': 'Legal', 'items': footer_pages},
-      ]%}
+      <div class="footer-body flex flex-wrap">
+        {% set footer_cols = [
+        {'title': 'Sections', 'items': main_sections},
+        {'title': 'Topics', 'items': footer_topics},
+        {'title': 'Legal', 'items': footer_pages},
+        ]%}
 
-      {% for col in footer_cols %}
-      <div class="footer-column">
-        <h4 class="footer-title">{{ col.title }}</h4>
-        <ul class="footer-items flex flex-col">
-          {% for item in col['items'] %}
-          {% set url = url_for('content.sections', section_slug=item.slug) if col['title'] == 'Sections'
-          else url_for('content.sections', section_slug='reviews', topic_slug=item.slug) if col['title'] == 'Topics'
-          else url_for('system.' ~ item.slug)
-          %}
+        {% for col in footer_cols %}
+        <div class="footer-column">
+          <h4 class="footer-title">{{ col.title }}</h4>
+          <ul class="footer-items flex flex-wrap">
+            {% for item in col['items'] %}
+            {% set url = url_for('content.sections', section_slug=item.slug) if col['title'] == 'Sections'
+            else url_for('content.sections', section_slug='reviews', topic_slug=item.slug) if col['title'] == 'Topics'
+            else url_for('system.' ~ item.slug)
+            %}
 
-          <li class="footer-item">
-            <a href="{{ url }}" class="footer-link">
-              {{ item.name }}
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
+            <li class="footer-item">
+              <a href="{{ url }}" class="footer-link">
+                {{ item.name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+
 
     </div>
 
@@ -73,7 +83,7 @@
 
       <p class="footer-copy">
         © {{ current_year }}
-        <span class="footer-brand">Nexora</span>.
+        <a href="/" class="footer-brand">Nexora</a>.
         All rights reserved.
       </p>
 

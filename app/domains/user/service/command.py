@@ -121,6 +121,9 @@ def confirm_newsletter_subscriber(token: str) -> bool:
     subscriber.is_confirmed      = True
     subscriber.confirmation_token = None
     subscriber.unsubscribed_at   = None
+    if not subscriber.unsubscribe_token:
+        subscriber.generate_tokens()
+        subscriber.confirmation_token = None
     db.session.commit()
     return True
 
@@ -131,6 +134,8 @@ def unsubscribe_newsletter_subscriber(token=None, subscriber=None) -> bool:
     if not subscriber:
         return False
     subscriber.unsubscribed_at = _now()
+    subscriber.is_confirmed = False
+    subscriber.confirmation_token = None
     db.session.commit()
     return True
 

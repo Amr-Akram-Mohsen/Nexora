@@ -8,7 +8,7 @@
 {% block content %}
 <section class="profile-section">
   <div class="profile-container container">
-    
+
     <!-- Profile Page Header -->
     <div class="profile-page-header">
       <h1 class="profile-page-title">Profile Settings</h1>
@@ -20,12 +20,12 @@
       <aside class="profile-sidebar">
         <div class="profile-card profile-user-card glass">
           <div class="profile-user-info flex flex-col items-center">
-            <div class="profile-avatar flex items-center justify-center">
+            <div class="profile-avatar flex-center">
               {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
             </div>
             <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
             <p class="profile-email">{{ current_user.email }}</p>
-            
+
             <div class="profile-verification-status">
               {% if current_user.is_verified %}
               <span class="badge badge--verified"><i class="fas fa-check-circle"></i> Verified Account</span>
@@ -51,7 +51,8 @@
         {% if not current_user.is_verified and current_user.provider != 'google' %}
         <div class="profile-card verification-alert-card glass">
           <h3 class="alert-card-title">Verify Your Email</h3>
-          <p class="alert-card-desc">Please verify your account to access all features. We've sent a verification link to your email.</p>
+          <p class="alert-card-desc">Please verify your account to access all features. We've sent a verification link
+            to your email.</p>
           <form action="{{ url_for('user.resend_verification') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="email" value="{{ current_user.email }}">
@@ -63,20 +64,21 @@
 
       <!-- Main Content Area -->
       <main class="profile-main">
-        
+
         <!-- Card: Personal Information -->
         <div class="profile-card glass settings-card">
           <h3 class="card-section-title">Personal Details</h3>
           <p class="card-section-desc">Update your display name for public interactions.</p>
-          
+
           <form action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action" value="name">
-            
+
             <div class="profile-form-grid">
               <div class="form-field">
                 <label class="label" for="name">Display Name</label>
-                <input type="text" id="name" name="name" class="input" value="{{ current_user.name or '' }}" placeholder="Enter your name">
+                <input type="text" id="name" name="name" class="input" value="{{ current_user.name or '' }}"
+                  placeholder="Enter your name">
                 <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
               </div>
               <div class="form-actions">
@@ -90,16 +92,20 @@
         <div class="profile-card glass settings-card">
           <h3 class="card-section-title">Email Preferences</h3>
           <p class="card-section-desc">Manage your email communications and digest updates.</p>
-          
-          <div class="newsletter-settings-box">
+
+          <div class="newsletter-settings-box" data-newsletter data-newsletter-placement="profile">
             {% if subscriber and subscriber.is_active %}
             <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
               <div>
                 <p class="newsletter-status-title">Weekly Digest Ingestion</p>
-                <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals, and tech updates.</p>
+                <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals,
+                  and tech updates.</p>
               </div>
-              <form action="{{ url_for('interaction.unsubscribe_auth') }}" method="POST" class="ajax-form">
+              <form action="{{ url_for('interaction.unsubscribe_auth') }}" method="POST" data-newsletter-form data-newsletter-placement="profile">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="newsletter_placement" value="profile">
+                <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
+                <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
                 <button type="submit" class="btn variant--outline text-xs">Unsubscribe</button>
               </form>
             </div>
@@ -107,11 +113,23 @@
             <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
               <div>
                 <p class="newsletter-status-title">Weekly Digest Ingestion</p>
-                <p class="newsletter-status-subtitle text-muted-foreground">Stay updated with Saudi Arabia & UAE tech reviews, deals, and insights.</p>
+                <p class="newsletter-status-subtitle text-muted-foreground">
+                  {% if subscriber and subscriber.unsubscribed_at is none %}
+                  Check your email to confirm your subscription.
+                  {% else %}
+                  Stay updated with Saudi Arabia & UAE tech
+                  reviews, deals, and insights.
+                  {% endif %}
+                </p>
               </div>
-              <form action="{{ url_for('interaction.subscribe') }}" method="POST" class="ajax-form">
+              <form action="{{ url_for('interaction.subscribe') }}" method="POST" data-newsletter-form data-newsletter-placement="profile">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn variant--primary text-xs">Subscribe</button>
+                <input type="hidden" name="newsletter_placement" value="profile">
+                <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
+                <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
+                <button type="submit" class="btn variant--primary text-xs">
+                  {% if subscriber and subscriber.unsubscribed_at is none %}Resend confirmation{% else %}Subscribe{% endif %}
+                </button>
               </form>
             </div>
             {% endif %}
@@ -121,38 +139,45 @@
         <!-- Card: Security & Password -->
         {% if current_user.provider != 'google' %}
         <div class="profile-card glass settings-card">
-          <div class="settings-card-header flex items-center justify-between" onclick="togglePasswordForm()" style="cursor: pointer;">
+          <div class="settings-card-header flex items-center justify-between" onclick="togglePasswordForm()"
+            style="cursor: pointer;">
             <div>
               <h3 class="card-section-title" style="margin-bottom: 0;">Security & Password</h3>
-              <p class="card-section-desc" style="margin-top: 0.25rem;">Change your password to ensure your account security.</p>
+              <p class="card-section-desc" style="margin-top: 0.25rem;">Change your password to ensure your account
+                security.</p>
             </div>
-            <button type="button" class="btn variant--ghost btn--icon" id="password-toggle-btn" aria-label="Toggle Password Form">
+            <button type="button" class="btn variant--ghost btn--icon" id="password-toggle-btn"
+              aria-label="Toggle Password Form">
               <i class="fas fa-chevron-down transition-transform duration-300" id="accordion-arrow"></i>
             </button>
           </div>
-          
+
           <div class="password-form-collapsible collapsed" id="password-collapsible">
-            <form id="password-form" action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form border-t-separator">
+            <form id="password-form" action="{{ url_for('user.update_profile') }}" method="POST"
+              class="profile-form border-t-separator">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <input type="hidden" name="action" value="password">
-              
+
               <div class="form-row-grid">
                 <div class="form-field full-width">
                   <label class="label" for="current_password">Current Password</label>
-                  <input type="password" id="current_password" name="current_password" class="input" required placeholder="Enter your current password">
+                  <input type="password" id="current_password" name="current_password" class="input" required
+                    placeholder="Enter your current password">
                 </div>
-                
+
                 <div class="form-field">
                   <label class="label" for="new_password">New Password</label>
-                  <input type="password" id="new_password" name="new_password" class="input" minlength="8" required placeholder="Enter new password (min. 8 chars)">
+                  <input type="password" id="new_password" name="new_password" class="input" minlength="8" required
+                    placeholder="Enter new password (min. 8 chars)">
                 </div>
-                
+
                 <div class="form-field">
                   <label class="label" for="confirm_new_password">Confirm New Password</label>
-                  <input type="password" id="confirm_new_password" name="confirm_new_password" class="input" minlength="8" required placeholder="Confirm your new password">
+                  <input type="password" id="confirm_new_password" name="confirm_new_password" class="input"
+                    minlength="8" required placeholder="Confirm your new password">
                 </div>
               </div>
-              
+
               <div class="form-actions flex justify-end">
                 <button type="submit" class="btn variant--primary">Update Password</button>
               </div>
@@ -170,7 +195,7 @@
     const collapsible = document.getElementById('password-collapsible');
     const arrow = document.getElementById('accordion-arrow');
     const btn = document.getElementById('password-toggle-btn');
-    
+
     if (collapsible.classList.contains('collapsed')) {
       collapsible.classList.remove('collapsed');
       arrow.style.transform = 'rotate(180deg)';
