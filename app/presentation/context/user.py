@@ -8,6 +8,7 @@ def get_user_context(user_id=None):
     user = db.session.get(User, user_id) if user_id else current_user
     
     is_authenticated = user.is_authenticated
+    is_admin = user.is_admin
     user_email = None
     is_subscribed = False
 
@@ -20,6 +21,7 @@ def get_user_context(user_id=None):
 
     return {
         "is_authenticated": is_authenticated,
+        "is_admin": is_admin,
         "user_email": user_email,
         "is_subscribed": is_subscribed,
     }

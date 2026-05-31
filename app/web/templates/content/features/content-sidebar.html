@@ -1,5 +1,6 @@
 {# catalog-sidebar.html #}
 {% from "components/ui/button.html" import button %}
+{% from "components/ui/badge.html" import badge %}
 
 {# ── Canonical filter priority order ── #}
 {% set filter_priority = ['category', 'brand', 'intent', 'price_tier', 'store', 'type'] %}
@@ -81,7 +82,8 @@
         </span>
         <span class="filter-section__meta flex items-center">
           {% if group_active.count > 0 %}
-          <span class="filter-section__badge">{{ group_active.count }}</span>
+          {{ badge(group_active.count, class="filter-section__badge", variant=none) }}
+          <!-- <span class="filter-section__badge flex items-center justify-center">{{ group_active.count }}</span> -->
           {% endif %}
           <i class="fas fa-chevron-down filter-section__chevron"></i>
         </span>
@@ -94,11 +96,15 @@
         {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
         {% set render_extra = (loop.index > 8) and not is_active %}
 
-        <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}"
-            {% if render_extra %}style="display: none;"{% endif %}>
-          <a href="{{ get_filter_url(filter_name, slug, multi=True) }}"
-            class="filter-item__link flex items-center" title="{{ name }}">
-            <span class="checkbox-box inline-flex items-center justify-center {{ 'checked' if is_active }}" aria-hidden="true"></span>
+        <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}" {% if
+          render_extra %}style="display: none;" {% endif %}>
+          <a href="{{ get_filter_url(filter_name, slug, multi=True) }}" class="filter-item__link flex items-center"
+            title="{{ name }}">
+            <span class="filter-checkbox" aria-hidden="true">
+              {% if is_active %}
+              <i class="fa-solid fa-check"></i>
+              {% endif %}
+            </span>
             <span class="filter-item__name truncate">{{ name }}</span>
           </a>
         </li>
@@ -122,14 +128,14 @@
         const section = btn.closest('.filter-section');
         const extras = section.querySelectorAll('.filter-item--extra');
         const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-        
+
         extras.forEach(el => {
           el.style.display = isExpanded ? 'none' : 'flex';
         });
-        
+
         btn.setAttribute('aria-expanded', !isExpanded);
-        btn.innerHTML = isExpanded 
-          ? '<i class="fas fa-plus"></i> Show more (+' + extras.length + ')' 
+        btn.innerHTML = isExpanded
+          ? '<i class="fas fa-plus"></i> Show more (+' + extras.length + ')'
           : '<i class="fas fa-minus"></i> Show less';
       }
     </script>
