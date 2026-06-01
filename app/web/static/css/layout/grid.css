@@ -17,7 +17,7 @@
   margin-bottom: 4.5rem;
 }
 
-.section + .section {
+.section+.section {
   margin-top: 4.5rem;
 }
 
@@ -26,13 +26,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  margin-bottom: 1.75rem; /* perfect balanced spacing above grid cards */
+  margin-bottom: 1.75rem;
+  /* perfect balanced spacing above grid cards */
 }
 
 /* Editorial Title with Left Brand Accent Pill */
 .section__header .title {
-  font-size: 1.5rem; /* 24px - perfect readable header scale */
-  font-weight: 800; /* strong premium weight */
+  font-size: 1.5rem;
+  /* 24px - perfect readable header scale */
+  font-weight: 800;
+  /* strong premium weight */
   line-height: 1.2;
   color: var(--foreground);
   letter-spacing: -0.02em;
@@ -64,7 +67,8 @@
 }
 
 .view-all:hover i {
-  transform: translateX(3px); /* elegant horizontal shift on hover */
+  transform: translateX(3px);
+  /* elegant horizontal shift on hover */
 }
 
 /* --- Responsive Auto Grids --- */
@@ -91,7 +95,7 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
   }
-  
+
   .contents-listing .grid-auto {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
@@ -99,14 +103,16 @@
 
 @media (max-width: 580px) {
   .grid-auto {
-    grid-template-columns: 1fr 1fr; /* Space-efficient dual-column grid on mobile */
+    grid-template-columns: 1fr 1fr;
+    /* Space-efficient dual-column grid on mobile */
     gap: 0.75rem;
   }
 }
 
 @media (max-width: 360px) {
   .grid-auto {
-    grid-template-columns: 1fr; /* single full-width column on very narrow viewports */
+    grid-template-columns: 1fr;
+    /* single full-width column on very narrow viewports */
   }
 }
 
@@ -119,14 +125,72 @@
   margin-bottom: 0.5rem;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Hide default scrollbar on Firefox */
+  scrollbar-width: none;
+  /* Hide default scrollbar on Firefox */
 }
 
 .grid-carousel::-webkit-scrollbar {
-  display: none; /* Hide default scrollbars on Chrome/Safari for scrollbarless organic touch */
+  display: none;
+  /* Hide default scrollbars on Chrome/Safari for scrollbarless organic touch */
 }
 
-.grid-carousel > .card {
+.grid-item-hidden {
+  display: none !important;
+}
+
+.section-toggle {
+  --toggle-bg: var(--surface, #fff);
+  --toggle-border: var(--border-color, rgba(0, 0, 0, .08));
+  --toggle-text: var(--text-color, #111);
+
+  display: block;
+  margin: 2rem auto 0;
+  padding: .9rem 1.4rem;
+
+  border: 1px solid var(--toggle-border);
+  border-radius: 999px;
+
+  background: var(--toggle-bg);
+  color: var(--toggle-text);
+
+  font-size: .95rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+
+  cursor: pointer;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease,
+    background-color .2s ease;
+}
+
+.section-toggle i {
+  font-size: .9rem;
+  transition: transform .25s ease;
+}
+
+.section-toggle:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--accent-color);
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, .08),
+    0 2px 8px rgba(0, 0, 0, .05);
+}
+
+.section-toggle:active {
+  transform: translateY(0);
+}
+
+.section-toggle:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 3px;
+}
+
+.grid-carousel>.card {
   min-width: 290px;
   max-width: 320px;
   flex-shrink: 0;
@@ -138,8 +202,8 @@
     gap: 1rem;
     padding-bottom: 0.25rem;
   }
-  
-  .grid-carousel > .card {
+
+  .grid-carousel>.card {
     min-width: 260px;
     max-width: 280px;
   }

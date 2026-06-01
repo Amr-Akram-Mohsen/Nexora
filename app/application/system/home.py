@@ -10,15 +10,15 @@ def get_home_page_data():
     """
     hero_contents = get_contents_render_cached(filter_values=("trends",), rows_count=5)
     latest_reviews = get_contents_render_cached(
-        filter_values=("reviews",), rows_count=10
+        filter_values=("reviews",), rows_count=24
     )
-    tech_news = get_contents_render_cached(filter_values=("news",), rows_count=10)
-    tutorials = get_contents_render_cached(filter_values=("tutorials",), rows_count=10)
+    tech_news = get_contents_render_cached(filter_values=("news",), rows_count=24)
+    tutorials = get_contents_render_cached(filter_values=("tutorials",), rows_count=24)
 
     # Base item data for sliders/sections
-    top_deals = get_filtered_items_for_home(filter_type="deals", limit=10)
-    recently_added = get_filtered_items_for_home(filter_type="recent", limit=10)
-    interleave_pool = get_filtered_items_for_home(filter_type="random", limit=10)
+    top_deals = get_filtered_items_for_home(filter_type="deals")
+    recently_added = get_filtered_items_for_home(filter_type="recent")
+    interleave_pool = get_filtered_items_for_home(filter_type="random")
 
     def interleave(contents, items_pool):
         result = []

@@ -42,7 +42,7 @@ bp = Blueprint("user", __name__)
 @limiter.limit("10 per minute")
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('admin.home') if current_user.is_admin else url_for('system.home'))
+        return redirect(url_for('system.home') if current_user.is_admin else url_for('system.home'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '').strip().lower()
@@ -78,7 +78,7 @@ def login():
             record_login(user)
 
             if user.is_admin:
-                return redirect(url_for('admin.home'))
+                return redirect(url_for('system.home'))
 
             next_page = request.args.get('next')
             if not next_page or not is_safe_url(next_page):

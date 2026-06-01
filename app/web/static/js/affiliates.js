@@ -26,3 +26,11 @@ async function handleAffiliateClick(li) {
         li.classList.remove("is-loading");
     }
 }
+
+function handleAffiliateClickEvent(e) {
+    const itemBuyBtn = e.target.closest(".item-buy-link");
+    if (!itemBuyBtn) return false;
+    e.preventDefault();
+    handleAffiliateClick(itemBuyBtn);
+    return true;
+}

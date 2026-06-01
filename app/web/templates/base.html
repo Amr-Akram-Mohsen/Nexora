@@ -91,16 +91,33 @@
   {% endblock %}
 
   {% block scripts %}
-  <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/ui.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/core/utils.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='js/features/tooltip.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/csrf_token.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='js/features/theme.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/navigation.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/search.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/location.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='js/features/password.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/forms.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/comments.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/interactions.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='js/features/newsletter.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/user_messages.js') }}" defer></script>
+
+  <script src="{{ url_for('static', filename='js/features/hero-slider.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/tracking.js') }}" defer></script>
+
+
   <script src="{{ url_for('static', filename='js/affiliates.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/tracking.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/compare.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/commercial/page/compare.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/commercial/page/item-page.js') }}" defer></script>
+
   <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/core.js') }}" defer></script>
+
   {% endblock %}
 
   {% block additional_content %}
