@@ -114,3 +114,8 @@
 </section>
 
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/commercial/page/compare.js') }}" defer></script>
+{% endblock %}

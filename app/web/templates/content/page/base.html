@@ -91,9 +91,6 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/features/reactions.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/features/saves.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/features/interactions.js') }}" defer></script>
 
 <script src="{{ url_for('static', filename='js/features/comments.js') }}" defer></script>
 {% endblock %}
