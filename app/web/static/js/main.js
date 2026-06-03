@@ -1,5 +1,4 @@
 function handleGlobalClicks(e) {
-
     if (handleThemeClick(e)) return;
 
     if (handleGalleryClick(e)) return;

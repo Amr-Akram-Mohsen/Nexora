@@ -1,10 +1,96 @@
 from datetime import datetime, timedelta, timezone
+from sqlalchemy import update
+from functools import lru_cache
+from app.domains.content.models import Content
+from app.domains.item.models import Item
 
 from app.core.extensions import db
-from ..models import View, Reaction, Comment, Save
+from ..models import View, Reaction, Comment, Save, Share
 from app.domains.recommendation.sentiment import analyze_sentiment
 from app.shared.constants.core import TargetType
-from .target_access import resolve_target
+
+@lru_cache
+def get_model_map():
+    return {
+        "content": Content,
+        "item": Item,
+        "comment": Comment,
+    }
+
+
+ALLOWED_COUNTER_COLUMNS = {
+    "like_count",
+    "dislike_count",
+    "view_count",
+    "save_count",
+    "share_count",
+    "comment_count",
+    "click_count",
+    "replies_count",
+}
+
+def update_counter_atomic(db, model_class, model_id, column, action="inc", amount=1):
+    """
+    column_attr should be actual ORM attribute, not string.
+    """
+    if not hasattr(model_class, column):
+        raise ValueError(f"{model_class.__name__} has no column '{column}'")
+
+    column_attr = getattr(model_class, column)
+
+    if action == "inc":
+        expr = column_attr + amount
+    elif action == "dec":
+        expr = column_attr - amount
+    else:
+        raise ValueError("action must be 'inc' or 'dec'")
+
+    stmt = (
+        update(model_class)
+        .where(model_class.id == model_id)
+        .values({column_attr.key: expr})
+    )
+
+    db.session.execute(stmt)
+
+def execute_counter_update(
+    db,
+    model_type: str,
+    model_id: int,
+    column: str,
+    action: str = "inc",
+    amount: int = 1,
+):
+    """
+    Centralized safe executor for all counter updates.
+    Handles:
+    - model resolution
+    - atomic update
+    - error handling
+    """
+
+    model_class = get_model_map().get(model_type)
+
+    if not model_class:
+        raise ValueError(f"Unknown model type: {model_type}")
+
+    if column not in ALLOWED_COUNTER_COLUMNS:
+        raise ValueError("Invalid counter column")
+
+    try:
+        update_counter_atomic(
+            db=db,
+            model_class=model_class,
+            model_id=model_id,
+            column=column,
+            action=action,
+            amount=amount
+        )
+        db.session.commit()
+        db.session.flush()
+    except Exception as e:
+        db.rollback()
+        raise e
 
 def viewer_filter(query, user, ip_address):
     if user:
@@ -50,22 +136,24 @@ def record_view(
     )
     db.session.add(view)
 
-    if target_type == TargetType.ITEM:
-        from app.domains.item.models import Item
-
-        db.session.query(Item).filter_by(id=target_id).update(
-            {Item.view_count: db.func.coalesce(Item.view_count, 0) + 1},
-            synchronize_session=False,
-        )
-    else:
-        target = resolve_target(db.session, target_type, target_id)
-        if target:
-            target.view_count = (target.view_count or 0) + 1
+    execute_counter_update(
+        db=db,
+        model_type=target_type,
+        model_id=target_id,
+        column="view_count"
+    )
 
     return {
         'success': True,
         'status' : "viewed"
     }
+
+def get_inverse_reaction(reaction_type):
+    return "dislike" if reaction_type == "like" else "like"
+
+
+def get_reaction_count_column(reaction_type):
+    return "like_count" if reaction_type == "like" else "dislike_count"
 
 def react(
     user,
@@ -88,25 +176,14 @@ def react(
 
     status = None
 
+    column = get_reaction_count_column(reaction_type)
+
     if reaction:
         if reaction.type == reaction_type:
-            db.session.delete(reaction)
-            if target:
-                if reaction_type == "like":
-                    target.likes_count -= 1
-                else:
-                    target.dislikes_count -= 1
-            
+            db.session.delete(reaction)            
             status = 'removed'
         else:
             reaction.type = reaction_type
-            if target:
-                if reaction_type == "like":
-                    target.likes_count += 1
-                    target.dislikes_count -= 1
-                else:
-                    target.dislikes_count += 1
-                    target.likes_count -= 1
             status = 'changed'
     else:
         reaction = Reaction(
@@ -116,13 +193,33 @@ def react(
             type=reaction_type
         )
         db.session.add(reaction)
-        if target:
-            if reaction_type == "like":
-                target.likes_count += 1
-            else:
-                target.dislikes_count += 1
         status = 'added'
-    db.session.flush()
+
+    action = None
+
+    if status in ('added', 'changed'):
+        action = "inc"
+    elif status == 'removed':
+        action = "dec"
+
+    execute_counter_update(
+        db=db,
+        model_type=target_type,
+        model_id=target_id,
+        column=column,
+        action=action
+    )
+    
+
+    if status == 'changed':
+        execute_counter_update(
+            db=db,
+            model_type=target_type,
+            model_id=target_id,
+            column=get_reaction_count_column(get_inverse_reaction(reaction_type)),
+            action="dec"
+        )
+
     return {
         "success": True,
         "status": status,
@@ -149,7 +246,33 @@ def save_item(user, target_type, target_id):
         )
         db.session.add(save)
 
+    action = 'inc' if status == 'saved' else 'dec'
+
+    execute_counter_update(
+        db=db,
+        model_type=target_type,
+        model_id=target_id,
+        column="save_count",
+        action=action
+    )
+
     return {"success": True, "status": status}
+
+def record_share(user, target_type, target_id, channel=None):
+    share = Share(
+        user_id=user.id,
+        target_type=target_type,
+        target_id=target_id,
+        channel=(channel or "web")[:50],
+    )
+    db.session.add(share)
+    execute_counter_update(
+        db=db,
+        model_type=target_type,
+        model_id=target_id,
+        column="share_count"
+    )
+    return {"success": True, "status": "shared"}
 
 def post_comment(
     user,
@@ -160,6 +283,20 @@ def post_comment(
 ):
     from app.shared.sanitizer import sanitize_text
     sanitized_content = sanitize_text(content)
+    if not sanitized_content:
+        return {
+            "success": False,
+            "error": "Comment cannot be empty"
+        }
+
+    if parent_id:
+        parent = db.session.get(Comment, parent_id)
+        if not parent or parent.target_type != target_type or parent.target_id != target_id:
+            return {
+                "success": False,
+                "error": "Parent comment not found"
+            }
+
     sentiment, confidence = analyze_sentiment(sanitized_content)
     created_at = datetime.now(timezone.utc)
         
@@ -174,7 +311,22 @@ def post_comment(
         parent_id=parent_id
     )
     db.session.add(comment)
-    db.session.flush()
+
+    if parent_id:
+        execute_counter_update(
+            db=db,
+            model_type="comment",
+            model_id=parent_id,
+            column="replies_count"
+        )
+    else:
+        execute_counter_update(
+            db=db,
+            model_type=target_type,
+            model_id=target_id,
+            column="comment_count"
+        )
+
     return {
         "success": True,
         "sentiment": sentiment,

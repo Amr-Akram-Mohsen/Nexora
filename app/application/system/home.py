@@ -31,9 +31,9 @@ def get_home_page_data():
 
     return {
         "hero_sliders": hero_contents,
-        "latest_reviews": interleave(latest_reviews, interleave_pool),
-        "tech_news": interleave(tech_news, interleave_pool),
-        "tutorials": interleave(tutorials, interleave_pool),
+        "latest_reviews": latest_reviews,
+        "tech_news": tech_news,
+        "tutorials": tutorials,
         "top_deals": top_deals,
         "recently_added": recently_added,
     }

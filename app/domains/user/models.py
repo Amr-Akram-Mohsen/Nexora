@@ -39,6 +39,11 @@ class User(db.Model, UserMixin):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+    shares = db.relationship(
+        "Share",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
     user_interests = db.relationship(
         "UserInterest",
         back_populates="user",

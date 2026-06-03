@@ -1,5 +1,5 @@
 from app.core.extensions import db
-from ..models import View, Reaction, Comment, Save, ItemClick
+from ..models import View, Reaction, Comment, Save, Share, ItemClick
 from sqlalchemy import func
 
 def get_comment_by_id(comment_id):
@@ -57,6 +57,9 @@ def count_comments():
 def count_saves():
     return db.session.query(Save.id).count()
 
+def count_shares():
+    return db.session.query(Share.id).count()
+
 def count_item_clicks():
     return db.session.query(ItemClick.id).count()
 
@@ -66,6 +69,7 @@ def get_interactions_breakdown():
         "reactions": count_likes() + count_dislikes(),
         "views": count_views(),
         "saves": count_saves(),
+        "shares": count_shares(),
         "clicks": count_item_clicks(),
     }
 
@@ -80,6 +84,9 @@ def get_view_stats():
 
 def get_save_stats():
     return {"total": count_saves()}
+
+def get_share_stats():
+    return {"total": count_shares()}
 
 def get_click_stats():
     return {"total": count_item_clicks()}

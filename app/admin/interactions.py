@@ -7,6 +7,7 @@ from app.domains.interaction.service import (
     get_reaction_stats,
     get_view_stats,
     get_save_stats,
+    get_share_stats,
     get_click_stats,
     delete_comment as delete_comment_service
 )
@@ -74,6 +75,7 @@ def interactions_stats():
         "reactions":  breakdown.get("reactions", 0),
         "views":      breakdown.get("views", 0),
         "saves":      breakdown.get("saves", 0),
+        "shares":     breakdown.get("shares", 0),
         "item_clicks": breakdown.get("clicks", 0),
         # Reaction split
         "likes":      reaction_stats.get("likes", 0),
@@ -96,6 +98,11 @@ def views_stats():
 @bp.route("/saves/stats", methods=["GET"])
 def saves_stats():
     return jsonify(get_save_stats())
+
+
+@bp.route("/shares/stats", methods=["GET"])
+def shares_stats():
+    return jsonify(get_share_stats())
 
 
 @bp.route("/clicks/stats", methods=["GET"])

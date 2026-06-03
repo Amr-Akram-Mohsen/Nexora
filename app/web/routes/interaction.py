@@ -9,6 +9,7 @@ from app.application.interaction.newsletter import subscribe_workflow, confirm_s
 from app.application.interaction.handle_interaction import handle_interaction_workflow
 from app.application.interaction.item_click import record_item_click_workflow
 from app.application.interaction.get_comments import get_comments_html
+from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items, record_view
 from app.domains.content.service import get_content_by_id
 from app.domains.item.service import get_item_by_id
@@ -97,7 +98,7 @@ def check_react_batch():
     result = {}
     for t_str, id_str in zip(target_types, target_ids):
         try:
-            target_type = parse_target_type(t_str)
+            target_type = "comment" if t_str == "comment" else parse_target_type(t_str)
             target_id = int(id_str)
         except (ValueError, TypeError):
             continue
@@ -183,7 +184,7 @@ def add_view():
 
 @bp.route("/handle-interaction", methods=["POST"])
 @login_required
-@limiter.limit("5 per minute")
+@limiter.limit("30 per minute")
 def handle_interaction():
     try:
         target_type = parse_target_type(request.form.get("type"))
@@ -210,7 +211,7 @@ def handle_interaction():
         if not result.get("success"):
             return jsonify(result), 400
 
-        if interaction_type == "comment" and "comment_data" in result:
+        if interaction_type == INTERACTION_TYPE.COMMENT and "comment_data" in result:
             result["comment"] = render_template(
                 'components/interactions/comment-card.html',
                 comment=result["comment_data"],
@@ -220,9 +221,13 @@ def handle_interaction():
 
         log_route_success(logger, "/handle-interaction")
         return jsonify(result)
+    except (ValueError, TypeError):
+        db.session.rollback()
+        return jsonify({"success": False, "error": "Invalid interaction request"}), 400
     except Exception:
+        db.session.rollback()
         current_app.logger.exception("Interaction failed")
-        abort(500, "Interaction failed")
+        return jsonify({"success": False, "error": "Interaction failed"}), 500
 
 @bp.route('/saved')
 @login_required

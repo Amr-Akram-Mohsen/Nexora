@@ -10,11 +10,14 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
     data = {
         "id": content_obj.id,
         "object_type": content_obj.object_type,
+        "type": content_obj.object_type,
         "section_id": content_obj.section_id,
         "category_id": content_obj.category_id,
         "published_at": content_obj.published_at,
         "is_published": getattr(content_obj, "is_published", True),
         "is_active": getattr(content_obj, "is_active", True),
+        "view_count": getattr(content_obj, "view_count", 0),
+        "comment_count": getattr(content_obj, "comment_count", 0),
         "category": serialize_model(content_obj.category)
         if getattr(content_obj, "category", None) and content_obj.category.slug != "uncategorized"
         else None,

@@ -6,53 +6,55 @@ async function submitUserInteraction(
     context = {}
 ) {
 
-    // Turn the button the user clicked into a spinner!
+    const formButton = context.form?.querySelector('button[type="submit"]');
+
     if (targetBtn) setLoading(targetBtn, true);
-    if (context.form) setLoading(context.form.querySelector('button[type="submit"]'), true);
+    if (formButton) setLoading(formButton, true);
 
-    const targetType = targetItem.dataset.type;
-    const targetId = targetItem.dataset.id;
-    // const targetId = targetItem.dataset.commentId;
+    try {
+        const targetType = targetItem.dataset.type;
+        const targetId = targetItem.dataset.id;
+        const reactionType = targetBtn?.dataset.reaction;
 
-    const reactionType = targetBtn?.dataset.reaction;
+        const fd = new FormData();
+        fd.append("type", targetType);
+        fd.append("id", targetId);
+        fd.append("interaction_type", interactionType);
 
-    const fd = new FormData();
+        if (interactionType === "react") {
+            fd.append("reaction", reactionType);
+            if (targetItem.dataset.commentId) fd.append("comment_id", targetItem.dataset.commentId);
+        }
 
-    fd.append("type", targetType);
-    fd.append("id", targetId);
-    fd.append("interaction_type", interactionType);
+        if (interactionType === "comment") {
+            fd.append("comment", content);
+            if (context.formType === "reply" && targetItem.dataset.commentId) {
+                fd.append("comment_id", targetItem.dataset.commentId);
+            }
+        }
 
+        const res = await fetch("/handle-interaction", {
+            method: "POST",
+            body: fd
+        });
 
-    if (interactionType === "react") {
-        fd.append("reaction", reactionType);
-        fd.append("comment_id", targetItem.dataset.commentId);
-    }
+        const result = await parseInteractionResponse(res);
 
-    if (interactionType === "comment") {
-        fd.append("comment", content);
-        if (context.formType === "reply") fd.append("comment_id", targetItem.dataset.commentId);
-    }
+        if (!res.ok || !result?.success) {
+            showInlineTooltip(
+                context.form || targetBtn || targetItem,
+                result?.error || "Interaction failed. Please try again."
+            );
+            return result;
+        }
 
-    const res = await fetch("/handle-interaction", {
-        method: "POST",
-        body: fd
-    });
-
-    const result = await res.json();
-
-    if (!res.ok) {
-        showInlineTooltip(
-            context.form,
-            res.error
-        );
-    } else {
         if (interactionType === 'react') {
             updateReactionUI(targetItem, reactionType, result.status);
         } else if (interactionType === 'save') {
             targetBtn.classList.toggle('active', result.status == 'saved');
 
             // Special behavior for Saved Items page: remove card if unsaved
-            if (result.status === 'removed' && window.location.pathname.includes('/saved')) {
+            if (result.status === 'unsaved' && window.location.pathname.includes('/saved')) {
                 const card = targetItem.closest('.card, .article-card, .item-card');
                 if (card) {
                     card.style.opacity = '0';
@@ -67,13 +69,17 @@ async function submitUserInteraction(
                     }, 400);
                 }
             }
+        } else if (interactionType === 'share') {
+            showInlineTooltip(targetBtn || targetItem, "Share tracked");
         }
         else if (interactionType === "comment" && result?.success) {
             const list = context.formType === "reply"
                 ? context.wrapper.querySelector('.comment__replies-list')
                 : context.wrapper.querySelector(".comments__list");
 
-            list.insertAdjacentHTML("afterbegin", result.comment);
+            if (list && result.comment) {
+                list.insertAdjacentHTML("afterbegin", result.comment);
+            }
 
             if (context.formType === 'comment')
                 incrementCommentCount(context.wrapper, 1);
@@ -84,25 +90,56 @@ async function submitUserInteraction(
                 `${context.formType} added`
             );
         }
+        return result;
+    } catch (error) {
+        console.error("Interaction request failed", error);
+        showInlineTooltip(
+            context.form || targetBtn || targetItem,
+            "Interaction failed. Please try again."
+        );
+        return { success: false, error: error.message };
+    } finally {
+        if (targetBtn) setLoading(targetBtn, false);
+        if (formButton) setLoading(formButton, false);
     }
-    // Turn it off when finished!
-    if (targetBtn) setLoading(targetBtn, false);
-    if (context.form) setLoading(context.form.querySelector('button[type="submit"]'), false);
+}
 
+async function parseInteractionResponse(res) {
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return res.json();
+    }
+
+    const text = await res.text();
+    return {
+        success: false,
+        error: text ? "Server returned an unexpected response." : "Empty server response."
+    };
 }
 
 function handleInteractionClick(e) {
-    const interactionBtn = e.target.closest(".react-btn, .save-btn");
+    const interactionBtn = e.target.closest(".react-btn, .save-btn, .share-btn");
     if (!interactionBtn) return false;
 
-    interactionType = interactionBtn.classList.contains('react-btn') ? 'react' : 'save';
+    const interactionType = interactionBtn.classList.contains('react-btn')
+        ? 'react'
+        : interactionBtn.classList.contains('save-btn')
+            ? 'save'
+            : 'share';
+
+    if (interactionType === 'share') {
+        handleShareInteraction(interactionBtn);
+        return true;
+    }
+
     if (!ensureAuthenticated(e, interactionBtn, generalMsg + interactionType)) return false;
 
     const item = interactionBtn.closest("[data-id]");
+    if (!item) return false;
 
     if (item.hasAttribute('data-comment-id')) {
         // const parentComment = e.target.closest('.comment');
-        const commentAuthor = item.querySelector('.comment__author').textContent;
+        const commentAuthor = item.querySelector('.comment__author').textContent.trim();
 
         if (commentAuthor === userEmail) {
             showInlineTooltip(interactionBtn, "You can't react on your own comment");
@@ -117,4 +154,35 @@ function handleInteractionClick(e) {
         interactionBtn || null
     );
     return true;
+}
+
+async function handleShareInteraction(shareBtn) {
+    const item = shareBtn.closest("[data-id]");
+    if (!item) return;
+
+    const shareData = {
+        title: document.title,
+        url: window.location.href
+    };
+
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+            showInlineTooltip(shareBtn, "Shared");
+        } else if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(shareData.url);
+            showInlineTooltip(shareBtn, "Link copied");
+        } else {
+            showInlineTooltip(shareBtn, shareData.url);
+        }
+
+        if (isAuthenticated) {
+            submitUserInteraction(item, "share", shareBtn);
+        }
+    } catch (error) {
+        if (error?.name !== "AbortError") {
+            console.error("Share failed", error);
+            showInlineTooltip(shareBtn, "Could not share this item");
+        }
+    }
 }

@@ -24,7 +24,7 @@ bp = Blueprint("api_dashboard", __name__, url_prefix="/admin/dashboard")
 def dashboard_stats():
     """Enhanced dashboard metrics, aggregates, distributions, and trends."""
     # Unified Interaction Stats
-    breakdown = get_interactions_breakdown()   # {comments, reactions, views, saves, clicks}
+    breakdown = get_interactions_breakdown()   # {comments, reactions, views, saves, shares, clicks}
     reaction_stats = get_reaction_stats()      # {likes, dislikes}
     total_interactions = sum(breakdown.values())
 
@@ -146,6 +146,7 @@ def dashboard_stats():
             "comments":  breakdown.get("comments", 0),
             "reactions": breakdown.get("reactions", 0),
             "saves":     breakdown.get("saves", 0),
+            "shares":    breakdown.get("shares", 0),
             "clicks":    breakdown.get("clicks", 0),
             "likes":     reaction_stats.get("likes", 0),
             "dislikes":  reaction_stats.get("dislikes", 0),

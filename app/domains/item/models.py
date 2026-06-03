@@ -46,6 +46,7 @@ class Item(db.Model):
     slug = db.Column(db.String(220), nullable=False, unique=True)
     description = db.Column(db.Text)
     rating = db.Column(db.Float)
+
     review_count = db.Column(db.Integer)
 
     item_type = db.Column(db.String(50), nullable=True)
@@ -55,9 +56,16 @@ class Item(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey("brands.id"), nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), index=True)
+    
+    like_count = db.Column(db.Integer, nullable=False, default=0)
+    dislike_count = db.Column(db.Integer, nullable=False, default=0)
+    share_count = db.Column(db.Integer, nullable=False, default=0)
+    save_count = db.Column(db.Integer, nullable=False, default=0)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
     click_count = db.Column(db.Integer, default=0)
+
+
     card_type = db.Column(db.TEXT, default="item")
     searchable_attributes = db.Column(db.JSON)
 

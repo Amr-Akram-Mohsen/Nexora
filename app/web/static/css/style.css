@@ -22,6 +22,9 @@
 @import "components/ui/form.css";
 @import "components/ui/badge.css";
 @import "components/newsletter.css";
+
+@import "components/interactions/interaction.css";
+
 @import "content/cards/shared.css";
 
 @import "content/cards/article.css";

@@ -1,6 +1,6 @@
-from app.domains.interaction.service import react, save_item, post_comment, get_comment_by_id
+from app.domains.interaction.service import react, save_item, post_comment, record_share, get_comment_by_id
 from app.domains.interaction.constants import INTERACTION_TYPE
-from app.domains.content.service import get_content_by_id
+from app.domains.content.models import Content
 from app.domains.item.service import get_item_by_id
 from app.domains.recommendation.interest_service import handle_interaction_interest, handle_comment_interaction
 from app.shared.constants.core import TargetType
@@ -8,13 +8,13 @@ from app.core.extensions import db
 
 def handle_interaction_workflow(user, target_type, target_id, interaction_type, reaction_type=None, comment_content=None, comment_id=None):
     """
-    Orchestrates a user interaction (react, save, comment).
+    Orchestrates a user interaction (react, save, comment, share).
     """
     target = None
     if comment_id:
         target = get_comment_by_id(comment_id)
     elif target_type == TargetType.CONTENT:
-        target = get_content_by_id(db.session, target_id)
+        target = db.session.get(Content, target_id)
     elif target_type == TargetType.ITEM:
         target = get_item_by_id(target_id, load="minimal")
 
@@ -40,6 +40,8 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
             comment_content,
             comment_id
         )
+    elif interaction_type == INTERACTION_TYPE.SHARE:
+        result = record_share(user, target_type, target_id)
 
     if not result:
         return {"success": False, "error": "Invalid interaction type"}
@@ -51,7 +53,6 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
     if not comment_id:
         handle_interaction_interest(user=user, target=target, action=action)
         if interaction_type == INTERACTION_TYPE.COMMENT:
-            target.comment_count = (target.comment_count or 0) + 1
             handle_comment_interaction(user=user, target=target, comment_sentiment=result.get("sentiment"))
     
     db.session.commit()

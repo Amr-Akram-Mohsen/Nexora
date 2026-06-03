@@ -25,8 +25,8 @@ function initApp() {
 // Run on page load and when coming back via back/forward buttons
 function initUserInteractions() {
     if (isAuthenticated) {
-        if (initAllReactions) initAllReactions();
-        if (initAllSaves) initAllSaves();
+        if (typeof initAllReactions === "function") initAllReactions();
+        if (typeof initAllSaves === "function") initAllSaves();
     }
 }
 

@@ -1,6 +1,7 @@
 {% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}) %}
-<button type="{{ type }}" class="btn variant--{{ variant }} btn--{{ variant }} {{ class }} inline-flex-center" {% for
-  key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+<button type="{{ type }}"
+  class="btn{% if variant is not none %} variant--{{ variant }} btn--{{ variant }}{% endif %} {{ class }} inline-flex-center"
+  {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
   {% if icon %}
   <i class="{{ icon }}"></i>
   {% endif %}

@@ -1,9 +1,11 @@
 function incrementCommentCount(wrapper, delta = 1) {
-    const countEl = document.querySelector(`.comments-toggle-content`);
+    const target = wrapper?.closest?.("[data-id]") || wrapper;
+    const countEl = target?.querySelector?.(`.interaction-panel .comments-toggle-content`);
     if (!countEl) return;
 
     const current = parseInt(countEl.textContent.replace(/\D/g, ""), 10) || 0;
-    countEl.textContent = `(${current + delta})`;
+    const next = Math.max(0, current + delta);
+    countEl.textContent = `${next} ${next === 1 ? "comment" : "comments"}`;
 }
 
 async function showComments(btn) {
@@ -24,41 +26,48 @@ async function showComments(btn) {
 
 
     if (isReply) {
-        wrapper = wrapper.querySelector(".comment__replies");
-        opening = wrapper.classList.contains("comment__replies--open")
+        const comment = wrapper;
+        wrapper = comment.querySelector(".comment__replies");
         wrapper.classList.toggle("comment__replies--open");
+        opening = wrapper.classList.contains("comment__replies--open");
         list = wrapper.querySelector(".comment__replies-list");
-        list.classList.toggle('flex');
-        params.append("parent_id", wrapper.dataset.commentId);
+        list?.classList.toggle('flex', opening);
+        params.append("parent_id", comment.dataset.commentId);
     }
     else {
         const parent = wrapper.closest(".detail-page__extra")
         wrapper = parent.querySelector(".comments");
-        opening = !wrapper.classList.contains("comments--collapsed")
         wrapper.classList.toggle("comments--collapsed");
+        opening = !wrapper.classList.contains("comments--collapsed");
         list = wrapper.querySelector(".comments__list");
     }
     const icon = btn.querySelector(".comments-toggle-icon");
-    icon.classList.toggle("fa-chevron-down", !opening);
-    icon.classList.toggle("fa-chevron-up", opening);
+    if (icon) {
+        icon.classList.toggle("fa-chevron-down", !opening);
+        icon.classList.toggle("fa-chevron-up", opening);
+    }
     // Load ONLY the first time it's opened
     // if (!opening) return;
     if (wrapper.dataset.loaded === "true") return;
 
-    const res = await fetch(
-        `/get-comments?${params.toString()}`
-    );
+    try {
+        const res = await fetch(`/get-comments?${params.toString()}`);
 
-    if (!res.ok) return null;
+        if (!res.ok) {
+            showInlineTooltip(btn, "Could not load comments");
+            return null;
+        }
 
-    const result = await res.text();
+        const result = await res.text();
+        list.innerHTML = result;
 
+        if (typeof initAllReactions === "function") initAllReactions();
 
-    list.innerHTML = result;
-
-    initAllReactions();
-
-    wrapper.dataset.loaded = "true";
+        wrapper.dataset.loaded = "true";
+    } catch (error) {
+        console.error("Could not load comments", error);
+        showInlineTooltip(btn, "Could not load comments");
+    }
 }
 
 async function handleCommentPosting(form, formType) {
@@ -97,8 +106,9 @@ function handleCommentsClick(e) {
     const commentsToggleBtn = e.target.closest(".comments-toggle-btn");
     if (commentsToggleBtn) {
         showComments(commentsToggleBtn);
-        return;
+        return true;
     }
+    return false;
 }
 
 function handleCommentSubmit(e) {

@@ -55,8 +55,14 @@ class Content(db.Model):
 
     is_active = db.Column(db.Boolean, default=True)
     is_published = db.Column(db.Boolean, default=False, index=True)
+
+    like_count = db.Column(db.Integer, nullable=False, default=0)
+    dislike_count = db.Column(db.Integer, nullable=False, default=0)
+    share_count = db.Column(db.Integer, nullable=False, default=0)
+    save_count = db.Column(db.Integer, nullable=False, default=0)
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
+
     
 
     # Optional (future-proofing)
@@ -109,7 +115,7 @@ class Content(db.Model):
     comments = db.relationship(
         "Comment",
         primaryjoin="and_(foreign(Comment.target_id)==Content.id, Comment.target_type=='content')",
-        back_populates="content",
+        back_populates="content_target",
         viewonly=True,
         lazy="selectin"
     )
@@ -213,4 +219,3 @@ class Content(db.Model):
 
     def __repr__(self):
         return f"<Content {self.object_type}:{self.object_id}>"
-

@@ -1,5 +1,6 @@
 {% from "content/features/content-image.html" import render_image_url %}
 {% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
 
 {% set content = item %}
 
@@ -39,6 +40,8 @@
       {% block meta_bottom %}
       {% endblock %}
     </div>
+
+    {% include "components/interactions/interactions-compact.html" %}
 
   </div>
 </article>

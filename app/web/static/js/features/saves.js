@@ -27,16 +27,20 @@ async function initAllSaves() {
         params.append("id", t.id);
     }
 
-    const res = await fetch(`/check-save-batch?${params.toString()}`);
-    if (!res.ok) return;
+    try {
+        const res = await fetch(`/check-save-batch?${params.toString()}`);
+        if (!res.ok) return;
 
-    const data = await res.json(); // expect: { "article:1": true, "article:2": false }
+        const data = await res.json();
 
-    buttons.forEach(btn => {
-        const item = btn.closest("[data-id]");
-        if (!item) return;
-        const key = `${item.dataset.type}:${item.dataset.id}`;
+        buttons.forEach(btn => {
+            const item = btn.closest("[data-id]");
+            if (!item) return;
+            const key = `${item.dataset.type}:${item.dataset.id}`;
 
-        btn.classList.toggle('active', key in data);
-    });
+            btn.classList.toggle('active', key in data);
+        });
+    } catch (error) {
+        console.error("Could not initialize saves", error);
+    }
 }

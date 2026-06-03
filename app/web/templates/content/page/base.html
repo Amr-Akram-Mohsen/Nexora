@@ -88,9 +88,3 @@
   </div>
 </section>
 {% endblock %}
-
-{% block scripts %}
-{{ super() }}
-
-<script src="{{ url_for('static', filename='js/features/comments.js') }}" defer></script>
-{% endblock %}

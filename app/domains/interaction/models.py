@@ -61,23 +61,27 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item'
     target_id = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False, default="")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     parent_id = db.Column(db.Integer, db.ForeignKey("comments.id", ondelete="CASCADE"), nullable=True)
     sentiment = db.Column(db.String(20), nullable=True)
     confidence = db.Column(db.Float, nullable=True)
-    likes_count = db.Column(db.Integer, default=0)
-    dislikes_count = db.Column(db.Integer, default=0)
+
+    like_count = db.Column(db.Integer, nullable=False, default=0)
+    dislike_count = db.Column(db.Integer, nullable=False, default=0)
+
+    share_count = db.Column(db.Integer, nullable=False, default=0)
+    replies_count = db.Column(db.Integer, nullable=False, default=0)
 
     @property
     def target(self):
-        return self.content or self.item
+        return self.content_target or self.item
 
     user = db.relationship("User", back_populates="comments")
     parent = db.relationship("Comment", remote_side=[id], back_populates="replies")
     replies = db.relationship("Comment", back_populates="parent", cascade="all, delete-orphan")
     
-    content = db.relationship(
+    content_target = db.relationship(
         "Content",
         primaryjoin="and_(foreign(Comment.target_id) == Content.id, Comment.target_type == 'content')",
         back_populates="comments",
@@ -187,6 +191,42 @@ class Save(db.Model):
 
     def __repr__(self):
         return f"<Save user={self.user_id} {self.target_type}:{self.target_id}>"
+
+class Share(db.Model):
+    __tablename__ = "shares"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    target_type = db.Column(db.String(50), nullable=False)
+    target_id = db.Column(db.Integer, nullable=False)
+    channel = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship("User", back_populates="shares")
+    content = db.relationship(
+        "Content",
+        primaryjoin="and_(foreign(Share.target_id) == Content.id, Share.target_type == 'content')",
+        viewonly=True,
+        lazy="selectin"
+    )
+    item = db.relationship(
+        "Item",
+        primaryjoin="and_(foreign(Share.target_id) == Item.id, Share.target_type == 'item')",
+        viewonly=True,
+        lazy="selectin"
+    )
+
+    @property
+    def target(self):
+        return self.content or self.item
+
+    __table_args__ = (
+        db.Index("ix_share_target", "target_type", "target_id"),
+        db.Index("ix_share_user_created", "user_id", "created_at"),
+        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_share_target_type"),
+    )
+
+    def __repr__(self):
+        return f"<Share user={self.user_id} {self.target_type}:{self.target_id}>"
 
 class ItemClick(db.Model):
     __tablename__ = "item_clicks"

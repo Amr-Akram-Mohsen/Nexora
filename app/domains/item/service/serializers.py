@@ -129,9 +129,12 @@ def serialize_item(item, include_variant_images=False):
         "slug": item.slug,
         # Single canonical key — templates use item.item_type
         "item_type": item.item_type,
+        "type": item.item_type,
         "card_type": item.card_type,
         "brand": serialize_model(item.brand),
         "category": serialize_model(item.category),
+        "view_count": getattr(item, "view_count", 0),
+        "comment_count": getattr(item, "comment_count", 0),
         # Single canonical image key
         "image_url": item.image_url,
         "price": float(item.price) if item.price is not None else None,
@@ -166,7 +169,6 @@ def serialize_item(item, include_variant_images=False):
         ],
         "rating": item.rating,
         "review_count": item.review_count,
-        "view_count": item.view_count,
         "created_at": item.created_at.isoformat() if item.created_at else None,
         "badges": (
             item.pick_keys(item.searchable_attributes, ["badge", "tag"])

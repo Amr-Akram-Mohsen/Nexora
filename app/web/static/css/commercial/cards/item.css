@@ -231,3 +231,12 @@
   color: #fff;
   border-color: var(--domain-primary);
 }
+
+
+.card__meta-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
