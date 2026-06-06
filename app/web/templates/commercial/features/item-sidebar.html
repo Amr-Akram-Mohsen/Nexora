@@ -3,13 +3,13 @@
 {% from "components/ui/badge.html" import badge %}
 
 {# ── Canonical filter priority order ── #}
-{% set filter_priority = ['category', 'topic', 'brand', 'store', 'type'] %}
+{% set filter_priority = ['category', 'brand', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
   {# ── Sidebar brand accent strip ── #}
   <div
-    class="sidebar-accent {{ 'sidebar-accent--articles' if target_type == 'articles' else 'sidebar-accent--products' }}">
+    class="sidebar-accent sidebar-accent--product">
   </div>
 
   {# ── Sidebar title row ── #}
