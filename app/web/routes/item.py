@@ -54,7 +54,7 @@ def deals():
     return render_template(
         "commercial/catalog/catalog-page.html",
         target_type="commercial",
-        allowed_filters=["category", "brand", "store"],
+        allowed_filters=["category", "brand", "store", ”type”],
         active_filters=active_filters,
         **data,
     )
