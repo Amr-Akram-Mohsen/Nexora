@@ -16,6 +16,12 @@
   height: 64px;
 }
 
+.site-logo {
+    height: 42px;
+    width: auto;
+    display: block;
+}
+
 .logo {
   gap: .5rem;
   transition: all .2s;
