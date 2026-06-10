@@ -59,8 +59,8 @@ def backfill_contents():
         for content in contents:
 
             target = resolve_content_object(
-                db.session,
-                content
+                content,
+                session=db.session
             )
 
             if not target:

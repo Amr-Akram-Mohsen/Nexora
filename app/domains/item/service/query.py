@@ -243,9 +243,9 @@ def get_related_items(item, limit=8, session=None):
 
     return fetch_items(stmt, session)
 
-def get_item_spec_groups(item_id):
+def get_item_spec_groups(item_id, session=None):
     """Lightweight spec payload for AJAX full-specs partial."""
-    item = get_item_by_id(item_id, load="detail")
+    item = get_item_by_id(item_id, load="detail", session=session)
     if not item:
         return None
     structured = item.structured_details

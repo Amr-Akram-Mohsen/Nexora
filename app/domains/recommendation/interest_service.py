@@ -5,6 +5,7 @@ from app.domains.item.models import Item
 from app.domains.content.models import Article
 from .interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
+from sqlalchemy import select
 
 def extract_entities_from_target(target):
     if isinstance(target, Item):
@@ -35,16 +36,21 @@ def update_user_interest(
     target_id,
     action,
     increment_interaction=False,
-    entities=None
+    entities=None,
+    session=None
 ):
+    if session is None:
+        session = db.session
+
     entities = entities or {}
     weight = INTEREST_WEIGHTS.get(action)
 
-    user_interest = UserInterest.query.filter_by(
-        user_id=user_id,
-        target_type=target_type,
-        target_id=target_id
-    ).first()
+    stmt_interest = select(UserInterest).where(
+        UserInterest.user_id == user_id,
+        UserInterest.target_type == target_type,
+        UserInterest.target_id == target_id
+    )
+    user_interest = session.execute(stmt_interest).scalars().first()
 
     if not user_interest:
         user_interest = UserInterest(
@@ -54,23 +60,24 @@ def update_user_interest(
             interaction_count=0,
             last_interaction_at=datetime.utcnow()
         )
-        db.session.add(user_interest)
-        db.session.flush()
+        session.add(user_interest)
+        session.flush()
 
     if increment_interaction:
         user_interest.interaction_count += 1
         user_interest.last_interaction_at = datetime.utcnow()
 
     if weight is not None and entities:
-        entity_interest = UserEntityInterest.query.filter_by(
+        stmt_entity = select(UserEntityInterest).filter_by(
             user_interest_id=user_interest.id,
             **entities
-        ).first()
+        )
+        entity_interest = session.execute(stmt_entity).scalars().first()
 
         if entity_interest:
             entity_interest.score += weight
         else:
-            db.session.add(
+            session.add(
                 UserEntityInterest(
                     user_interest_id=user_interest.id,
                     score=weight,
@@ -78,7 +85,7 @@ def update_user_interest(
                 )
             )
 
-def handle_interaction_interest(user, target, action):
+def handle_interaction_interest(user, target, action, session=None):
     if not user or not target:
         return
 
@@ -93,7 +100,8 @@ def handle_interaction_interest(user, target, action):
         target_type=target_type,
         target_id=target.id,
         action=action,
-        increment_interaction=True
+        increment_interaction=True,
+        session=session
     )
 
     # 2️⃣ Entity-level scoring
@@ -103,10 +111,11 @@ def handle_interaction_interest(user, target, action):
             target_type=target_type,
             target_id=target.id,
             action=action,
-            entities=entity
+            entities=entity,
+            session=session
         )
     
-def handle_comment_interaction(user, target, comment_sentiment):
+def handle_comment_interaction(user, target, comment_sentiment, session=None):
     if not user or not target:
         return
 
@@ -127,7 +136,6 @@ def handle_comment_interaction(user, target, comment_sentiment):
             target_type=target_type,
             target_id=target.id,
             action=sentiment_action,
-            entities=entity
+            entities=entity,
+            session=session
         )
-    
-

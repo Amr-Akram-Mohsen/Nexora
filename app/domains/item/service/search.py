@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, select
 from app.domains.item.models import Item
 from app.domains.item.service import get_item_card_load_options
 
@@ -77,7 +77,7 @@ def populate_item_search_fields(item):
 
     item.search_vector = build_item_search_vector(item)
 
-from sqlalchemy import select
+
 
 def get_search_items(
     query_str,

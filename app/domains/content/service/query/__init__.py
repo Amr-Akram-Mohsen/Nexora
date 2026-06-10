@@ -31,7 +31,7 @@ def get_contents(search=None, source=None, rows_count=10, session=None):
     return fetch_contents(stmt, session)
 
 
-def get_content_by_id(content_id=None, session=None):
+def get_content_by_id(content_id, session=None):
     from .utils import build_content_stmt, fetch_contents
     from ..content_access import assign_target_to_contents
     
@@ -46,7 +46,7 @@ def get_content_by_id(content_id=None, session=None):
     if not contents:
         return None
         
-    serialized = assign_target_to_contents(contents, session, include_linked_items=True)
+    serialized = assign_target_to_contents(contents, include_linked_items=True, session=session)
     return serialized[0] if serialized else None
 
 def get_latest_contents(limit=100, session=None):

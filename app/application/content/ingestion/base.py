@@ -18,12 +18,12 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
         with session.begin_nested():
             # 1. Deduplication and Model Creation
             obj, is_new = get_or_create_content(
-                session,
                 object_type=object_type,
                 external_id=raw_data.get("external_id"),
                 obj_factory=lambda: factory_func(raw_data),
                 title_fallback=raw_data.get("title"),
                 url_fallback=raw_data.get("url"),
+                session=session,
                 canonical_url=raw_data.get("canonical_url")
             )
 
@@ -35,10 +35,10 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
 
             # 3. Create/Link to Content Wrapper
             content, was_content_updated = create_content(
-                session,
                 obj=obj,
                 object_type=object_type,
                 published_at=raw_data.get("published_at"),
+                session=session,
                 category_id=category.id,
                 section_id=section.id,
                 is_published=raw_data.get("is_published", False)
@@ -47,7 +47,7 @@ def generic_ingest(session, object_type, raw_data, model_class, factory_func):
             # 4. Apply Relationships (Topics, Brands, Facets)
             updated_relationships = {}
             if content:
-                updated_relationships = apply_relationships(session, content, raw_data)
+                updated_relationships = apply_relationships(content, raw_data, session=session)
 
             populate_content_search_fields(
                 content,

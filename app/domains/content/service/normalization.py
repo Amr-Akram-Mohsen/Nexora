@@ -181,16 +181,4 @@ def normalize_content_shaping(html: str | None, text: str | None) -> dict:
         "word_count": len(content_text.split()) if content_text else 0
     }
 
-def serialize_content_preview(content, session):
-    """Used for catalog/feed serialization."""
-    obj = content.resolve(session)
-    if not obj:
-        return None
 
-    return {
-        "id": content.id,
-        "type": content.object_type,
-        "title": getattr(obj, "title", None),
-        "preview": getattr(obj, "preview_text", None),
-        "published_at": content.published_at,
-    }

@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy import select
 from app.core.extensions import db
 from app.domains.interaction.service.query import get_saved_items
 from app.shared.constants.core import TargetType
@@ -21,19 +22,19 @@ def get_saved_articles_workflow(user_id):
     content_ids = [s.target_id for s in saves]
     
     # Load all contents with eager loads in a single query
-    contents = (
-        db.session.query(Content)
+    stmt = (
+        select(Content)
         .options(*CONTENT_LIST_EAGER_LOADS)
-        .filter(Content.id.in_(content_ids))
-        .all()
+        .where(Content.id.in_(content_ids))
     )
+    contents = db.session.execute(stmt).scalars().all()
     
     # Sort contents to match the order of saves (newest saved first)
     content_map = {c.id: c for c in contents}
     sorted_contents = [content_map[cid] for cid in content_ids if cid in content_map]
     
     # Batch resolve polymorphic targets
-    return assign_target_to_contents(sorted_contents, db.session)
+    return assign_target_to_contents(sorted_contents, session=db.session)
 
 def get_saved_products_workflow(user_id):
     """

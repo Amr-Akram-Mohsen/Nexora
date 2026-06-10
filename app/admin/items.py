@@ -31,9 +31,11 @@ def list_items():
 @bp.route("/<int:id>", methods=["DELETE"])
 @admin_required
 def delete_item(id):
+    from app.core.extensions import db
     success = delete_item_service(id)
 
     if not success:
         return jsonify({"error": "Item not found"}), 404
 
+    db.session.commit()
     return jsonify({"success": True})

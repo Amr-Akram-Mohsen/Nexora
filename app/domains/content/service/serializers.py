@@ -1,4 +1,5 @@
 from app.domains.serializers import serialize_model, serialize_target
+from app.domains.item.service.serializers import serialize_item
 
 def serialize_content(content_obj, target_obj=None, session=None, include_linked_items=False):
     """
@@ -25,13 +26,7 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         "target": serialize_target(target_obj, session) if target_obj else None,
         "topics": [serialize_model(t) for t in (content_obj.topics or [])],
         "brands": [serialize_model(b) for b in (content_obj.brands or [])],
+        "linked_items": [serialize_item(i) for i in (content_obj.linked_items or [])] if include_linked_items else None,
     }
-
-    if include_linked_items:
-        from app.domains.item.service.serializers import serialize_item
-        data["linked_items"] = [
-            serialize_item(item)
-            for item in (getattr(content_obj, "linked_items", None) or [])
-        ]
 
     return data

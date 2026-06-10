@@ -208,3 +208,89 @@ def score_item_relevance(
     score += weights.popularity * _log_popularity(item.view_count)
 
     return score
+
+
+@dataclass
+class ContentItemLinkWeights:
+    """
+    Configurable weights for the Content ↔ Item periodic matching workflow.
+    """
+    category_match: float = 3.0
+    parent_category_match: float = 1.5
+    brand_match: float = 4.0
+    brand_name_in_title: float = 2.0
+    topic_match: float = 1.5  # per matching topic in item name/description
+    text_overlap: float = 2.5  # item name contained in content title
+
+
+def score_content_item_link(
+    content: "Content",
+    item: "Item",
+    weights: ContentItemLinkWeights | None = None,
+) -> float:
+    """
+    Score the match strength between a Content object and an Item object.
+
+    Signals:
+      - Category Match: Same category (category_match)
+      - Parent Category Match: Share parent category (parent_category_match)
+      - Brand Match: Item brand matches one of Content's brands (brand_match)
+      - Brand Name in Title: Item brand name is mentioned in Content title (brand_name_in_title)
+      - Topic Match: Content's topic name is mentioned in Item's name/description (topic_match per topic)
+      - Text Overlap: Item's name is a substring of the Content's title (text_overlap)
+    """
+    if weights is None:
+        weights = ContentItemLinkWeights()
+
+    score = 0.0
+
+    # 1. Category Match
+    if content.category_id and item.category_id:
+        if content.category_id == item.category_id:
+            score += weights.category_match
+        elif content.category and item.category:
+            # Check if they share the same parent category
+            if content.category.parent_id and content.category.parent_id == item.category.parent_id:
+                score += weights.parent_category_match
+            # Or if one is parent of the other
+            elif content.category.parent_id == item.category_id or item.category.parent_id == content.category_id:
+                score += weights.parent_category_match
+
+    # 2. Brand Match
+    content_brand_ids = {b.id for b in (content.brands or [])}
+    if item.brand_id and item.brand_id in content_brand_ids:
+        score += weights.brand_match
+    # Soft Brand name match in Content title (if brand ID doesn't match directly)
+    elif item.brand and item.brand.name:
+        brand_name_lower = item.brand.name.lower()
+        content_title_lower = (content.title or "").lower()
+        if brand_name_lower in content_title_lower:
+            score += weights.brand_name_in_title
+
+    # 3. Topic Match
+    item_name_lower = (item.name or "").lower()
+    item_desc_lower = (item.description or "").lower()
+    for topic in (content.topics or []):
+        if topic.name:
+            topic_name_lower = topic.name.lower()
+            if topic_name_lower in item_name_lower or topic_name_lower in item_desc_lower:
+                score += weights.topic_match
+
+    # 4. Text Overlap / Substring Match
+    if item.name:
+        content_title_lower = (content.title or "").lower()
+        if item_name_lower in content_title_lower:
+            score += weights.text_overlap
+        else:
+            # Check if significant name words are present in title (token match)
+            # Filter out short or extremely common words to avoid false positives
+            stop_words = {"with", "and", "the", "for", "pro", "max", "ultra", "plus", "new"}
+            item_tokens = [w for w in item_name_lower.split() if len(w) > 2 and w not in stop_words]
+            if item_tokens:
+                title_words = set(content_title_lower.split())
+                overlap = len(title_words.intersection(item_tokens))
+                if overlap >= 2:
+                    score += weights.text_overlap * (overlap / len(item_tokens))
+
+    return score
+

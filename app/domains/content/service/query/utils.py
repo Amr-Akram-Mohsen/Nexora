@@ -85,13 +85,7 @@ def fetch_contents(stmt, session=None):
         from app.core.extensions import db
         session = db.session
         
-    result = session.execute(stmt)
-    rows = result.all()
-    if not rows:
-        return []
-        
-    # Extract the Content entity (first element in each row tuple)
-    return [row[0] for row in rows]
+    return list(session.execute(stmt).scalars().all())
 
 def fetch_serialized_contents(stmt, session=None, include_linked_items=False):
     """
@@ -103,4 +97,4 @@ def fetch_serialized_contents(stmt, session=None, include_linked_items=False):
         
     contents = fetch_contents(stmt, session)
     from ..content_access import assign_target_to_contents
-    return assign_target_to_contents(contents, session, include_linked_items=include_linked_items)
+    return assign_target_to_contents(contents, include_linked_items=include_linked_items, session=session)

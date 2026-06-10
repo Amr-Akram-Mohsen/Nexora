@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, select
 from app.domains.content.models import Content
 from .content_access import assign_target_to_contents
 
@@ -189,21 +189,13 @@ def populate_content_search_fields(content, obj, object_type):
 #     )
 
 def get_search_contents(
-    session_or_query,
-    query=None,
-    limit=80
+    query,
+    limit=80,
+    session=None
 ):
-
-    if query is None:
-
+    if session is None:
         from app.core.extensions import db
-
         session = db.session
-        query = session_or_query
-
-    else:
-
-        session = session_or_query
 
     query = (query or "").strip()
 
@@ -222,43 +214,26 @@ def get_search_contents(
         search_query
     )
 
-    contents = (
-
-        session.query(Content)
-
-        .options(
-            *CONTENT_LIST_EAGER_LOADS
-        )
-
-        .filter(
+    stmt = (
+        select(Content)
+        .options(*CONTENT_LIST_EAGER_LOADS)
+        .where(
             Content.is_active,
-            Content.is_published
+            Content.is_published,
+            Content.search_vector.op("@@")(search_query)
         )
-
-        .filter(
-            Content.search_vector.op("@@")(
-                search_query
-            )
-        )
-
         .order_by(
-
             rank.desc(),
-
             Content.view_count.desc(),
-
             Content.score.desc(),
-
             Content.published_at.desc()
-
         )
-
         .limit(limit)
-
-        .all()
     )
+
+    contents = session.execute(stmt).scalars().all()
 
     return assign_target_to_contents(
         contents,
-        session
+        session=session
     )

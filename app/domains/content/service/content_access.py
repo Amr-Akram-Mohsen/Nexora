@@ -3,6 +3,7 @@ from app.domains.serializers import (
     serialize_model,
     serialize_target,
 )
+from sqlalchemy import select, func
 
 
 def get_model_map():
@@ -15,20 +16,25 @@ def get_model_map():
     }
 
 
-def resolve_content_object(session, content):
+def resolve_content_object(content, session=None):
+    if session is None:
+        session = db.session
     model = get_model_map().get(content.object_type)
     if not model:
         return None
     return session.get(model, content.object_id)
 
 
-def resolve(content, session):
-    return resolve_content_object(session, content)
+def resolve(content, session=None):
+    return resolve_content_object(content, session=session)
 
 
-def assign_target_to_contents(contents, session, include_linked_items=False):
+def assign_target_to_contents(contents, include_linked_items=False, session=None):
     if not contents:
         return contents
+
+    if session is None:
+        session = db.session
 
     # Group IDs by object type
     ids_by_type = {}
@@ -44,18 +50,18 @@ def assign_target_to_contents(contents, session, include_linked_items=False):
             continue
 
         # Batch fetch for this type
-        query = session.query(model).filter(model.id.in_(list(ids)))
+        stmt = select(model).where(model.id.in_(list(ids)))
         if obj_type == "article":
             from app.domains.relationships import ArticleSource
 
-            query = query.options(
+            stmt = stmt.options(
                 db.joinedload(model.primary_source).joinedload(ArticleSource.source),
                 db.selectinload(model.article_sources).selectinload(
                     ArticleSource.source
                 ),
             )
 
-        objs = query.all()
+        objs = session.execute(stmt).scalars().all()
         for obj in objs:
             targets_map[(obj_type, obj.id)] = obj
 
@@ -70,15 +76,17 @@ def assign_target_to_contents(contents, session, include_linked_items=False):
     return result
 
 
-def create_content(session, *, obj, object_type, published_at, **kwargs):
+def create_content(obj, object_type, published_at, session=None, **kwargs):
     from ..models import Content
 
+    if session is None:
+        session = db.session
+
     # 🔹 Simple deduplication: Check if this object is already linked to a Content entry
-    existing = (
-        session.query(Content)
-        .filter_by(object_type=object_type, object_id=obj.id)
-        .first()
+    stmt = select(Content).where(
+        Content.object_type == object_type, Content.object_id == obj.id
     )
+    existing = session.execute(stmt).scalars().first()
 
     if existing:
         changed = False
@@ -108,24 +116,28 @@ def create_content(session, *, obj, object_type, published_at, **kwargs):
 
 
 def get_or_create_content(
-    session,
     object_type,
     external_id,
     obj_factory,
     title_fallback=None,
     url_fallback=None,
+    session=None,
     **kwargs,
 ):
     model = get_model_map().get(object_type)
     if not model:
         return None, False
 
+    if session is None:
+        session = db.session
+
     obj = None
     is_new = False
 
     # 1. Try Deduplication by external_id (Videos, Posts)
     if external_id and hasattr(model, "external_id"):
-        obj = session.query(model).filter_by(external_id=external_id).first()
+        stmt = select(model).where(model.external_id == external_id)
+        obj = session.execute(stmt).scalars().first()
 
     # 2. Try Deduplication by url (Articles or models with url)
     if not obj and url_fallback:
@@ -135,37 +147,32 @@ def get_or_create_content(
             from app.domains.relationships import ArticleSource
 
             # Check primary URL
-            res = session.query(ArticleSource).filter_by(url=url_fallback).first()
+            stmt_url = select(ArticleSource).where(ArticleSource.url == url_fallback)
+            res = session.execute(stmt_url).scalars().first()
 
             # If not found, check if canonical_url matches an existing article's canonical or primary source URL
             if not res and canonical_url:
                 # Does canonical_url match any Source URL?
-                res = session.query(ArticleSource).filter_by(url=canonical_url).first()
+                stmt_canon = select(ArticleSource).where(ArticleSource.url == canonical_url)
+                res = session.execute(stmt_canon).scalars().first()
 
                 # Or does it match any Article's stored canonical_url?
                 if not res:
-                    obj = (
-                        session.query(model)
-                        .filter_by(canonical_url=canonical_url)
-                        .first()
-                    )
+                    stmt_art = select(model).where(model.canonical_url == canonical_url)
+                    obj = session.execute(stmt_art).scalars().first()
 
             if res and not obj:
                 obj = session.get(model, res.article_id)
         elif hasattr(model, "url"):
-            obj = session.query(model).filter_by(url=url_fallback).first()
+            stmt_url = select(model).where(model.url == url_fallback)
+            obj = session.execute(stmt_url).scalars().first()
 
     # 3. Fallback to Title-based deduplication (If missing ID and URL)
     if not obj and title_fallback and hasattr(model, "title"):
-        from sqlalchemy import func
-
         # Normalize title for better matching
         normalized_title = title_fallback.lower().strip()
-        obj = (
-            session.query(model)
-            .filter(func.lower(model.title) == normalized_title)
-            .first()
-        )
+        stmt_title = select(model).where(func.lower(model.title) == normalized_title)
+        obj = session.execute(stmt_title).scalars().first()
 
     # 4. Create if still not found
     if not obj:

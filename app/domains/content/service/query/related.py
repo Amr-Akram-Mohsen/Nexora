@@ -12,7 +12,7 @@ from ...models import Content
 from sqlalchemy import case, func, literal_column, cast
 
 
-def get_related_contents(content_id=None, limit=6, session=None):
+def get_related_contents(content_id, limit=6, session=None):
     """
     Return top-N content items most relevant to ``content_id``.
 
