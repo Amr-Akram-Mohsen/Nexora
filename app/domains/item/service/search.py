@@ -77,40 +77,18 @@ def populate_item_search_fields(item):
 
     item.search_vector = build_item_search_vector(item)
 
-
-
-# def get_search_items(query_str, limit=80):
-#     term = f"%{query_str}%"
-#     return (
-#         Item.query.options(*get_item_card_load_options())
-#         .filter(
-#             or_(
-#                 Item.name.ilike(term),
-#                 Item.description.ilike(term),
-#                 Item.slug.ilike(term),
-#                 Item.item_type.ilike(term),
-#                 Item.brand.has(or_(Brand.name.ilike(term), Brand.slug.ilike(term))),
-#                 Item.category.has(
-#                     or_(Category.name.ilike(term), Category.slug.ilike(term))
-#                 ),
-#                 Item.topics.any(or_(Topic.name.ilike(term), Topic.slug.ilike(term))),
-#             )
-#         )
-#         .order_by(Item.view_count.desc(), Item.created_at.desc())
-#         .limit(limit)
-#         .all()
-#     )
-
+from sqlalchemy import select
 
 def get_search_items(
     query_str,
-    limit=80
+    limit=80,
+    session=None
 ):
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
 
-    query_str = (
-        query_str or ""
-    ).strip()
-
+    query_str = (query_str or "").strip()
     if not query_str:
         return []
 
@@ -124,37 +102,22 @@ def get_search_items(
         search_query
     )
 
-    items = (
-
-        Item.query
-
-        .options(
-            *get_item_card_load_options()
+    stmt = (
+        select(Item)
+        .options(*get_item_card_load_options())
+        .where(
+            Item.search_vector.op("@@")(search_query)
         )
-
-        .filter(
-            Item.search_vector.op("@@")(
-                search_query
-            )
-        )
-
         .order_by(
-
             rank.desc(),
-
-            # Item.review_score.desc(),
-
             Item.review_count.desc(),
-
             Item.view_count.desc(),
-
             Item.created_at.desc()
-
         )
-
-        .limit(limit)
-
-        .all()
     )
+    
+    if limit:
+        stmt = stmt.limit(limit)
 
-    return items
+    return session.execute(stmt).scalars().all()
+

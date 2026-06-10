@@ -1,5 +1,5 @@
 from app.infrastructure import cache
-from app.domains.system.service import (
+from app.domains.taxonomy.service import (
     get_popular_general_topics,
     get_popular_brands,
     get_active_sections,

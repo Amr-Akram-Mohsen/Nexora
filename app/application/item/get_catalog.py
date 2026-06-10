@@ -1,5 +1,5 @@
 from app.domains.item.service import get_filtered_items, get_distinct_item_types, get_distinct_stores
-from app.domains.system.service import get_distinct_item_categories, get_distinct_item_brands
+from app.domains.taxonomy.service import get_distinct_item_categories, get_distinct_item_brands
 from app.infrastructure.cache import filters_from_normalized, normalize_filters
 
 def get_catalog_data(active_filters, page=1):

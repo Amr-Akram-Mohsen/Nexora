@@ -60,6 +60,8 @@
       <span class="item-reviews-count">{{ item.review_count or 0 }} reviews</span>
     </div>
 
+
+    {% set content = item %}
     {% include "components/interactions/interactions-compact.html" %}
 
     {# ── Price + Store + CTA ── #}

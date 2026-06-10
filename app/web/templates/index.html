@@ -7,25 +7,95 @@
 
 {% block content %}
 {% from"components/ui/section.html" import section %}
+{% from"components/ui/grid.html" import grid %}
+{% from"components/ui/badge.html" import badge %}
 {% include "components/hero-sliders.html" %}
 <div class="container">
 
-  {% from"components/ui/grid.html" import grid %}
-  {% set sections = [
-  {"section":"deals","section_title":"top deals", "cards": top_deals, target_type: 'item', "carousel": true },
-  {"section":"reviews","section_title":"latest reviews" ,"cards": latest_reviews },
-  {"section":"news","section_title":"tech news & trends", "cards": tech_news },
-  {"section":"recent","section_title":"recently added", "cards": recently_added, target_type: 'item', "carousel": true
-  },
-  {"section":"tutorials","section_title":"how-to guides & tutorials", "cards": tutorials } ] %}
+  {# ── Core editorial sections (existing) ─────────────────────────────── #}
+  {% set core_sections = [
+  {"section": "deals", "section_title": "top deals", "cards": top_deals, "target_type": "item", "carousel": true },
+  {"section": "reviews", "section_title": "latest reviews", "cards": latest_reviews },
+  {"section": "news", "section_title": "tech news & trends", "cards": tech_news },
+  {"section": "recent", "section_title": "recently added", "cards": recently_added, "target_type": "item", "carousel":
+  true },
+  {"section": "tutorials", "section_title": "how-to guides & tutorials","cards": tutorials }
+  ] %}
 
-  {% for s in sections if s.cards %}
-  {% call section(s.section_title, s.section ) %}
+  {% for s in core_sections if s.cards %}
+  {% call section(s.section_title, s.section) %}
   {{ grid(s.cards, target_type=s.get('target_type', 'content'), carousel=s.get('carousel', false)) }}
   {% endcall %}
   {% endfor %}
 
-  {# ── Newsletter strip — footer places it, component fills it ── #}
+  {# ── Popular This Week ────────────────────────────────────────────────
+  Cross-section trending: all content types, ranked by views (7 days).
+  #}
+  {% if popular_this_week %}
+  {% call section("Popular This Week", more_url=false) %}
+  {{ grid(popular_this_week, carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
+  {# ── Recommended Articles ─────────────────────────────────────────────
+  Article-type trending feed (14-day window).
+  #}
+  {% if recommended_articles %}
+  {% call section("Recommended Articles", more_url=false) %}
+  {{ grid(recommended_articles, carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
+  {# ── Recommended Videos ───────────────────────────────────────────────
+  Video-type trending feed (14-day window).
+  #}
+  {% if recommended_videos %}
+  {% call section("Recommended Videos", more_url=false) %}
+  {{ grid(recommended_videos, carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
+  {# ── Featured Products ────────────────────────────────────────────────
+  Items ranked by recent views + clicks (7-day window).
+  #}
+  {% if featured_products %}
+  {% call section("Featured Products", more_url=false) %}
+  {{ grid(featured_products, target_type='item', carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
+  {# ── Editor's Picks ───────────────────────────────────────────────────
+  Content with the highest editorial score (Content.score > 0).
+  #}
+  {% if editors_picks %}
+  {% call section("Editor's Picks", more_url=false) %}
+  {{ grid(editors_picks) }}
+  {% endcall %}
+  {% endif %}
+
+  {# ── Trending Brands ──────────────────────────────────────────────────
+  Brands ranked by recent content view-count (7-day window).
+  Each brand links to its section/catalog page.
+  #}
+  {% if trending_brands %}
+  {% call section("Trending Brands", more_url=false) %}
+  <div class="brands-strip flex flex-wrap">
+    {% for brand in trending_brands %}
+    <a href="{{ url_for('content.sections', section_slug='reviews') }}?brand={{ brand.slug }}"
+      class="brand-chip flex items-center hover-lift" aria-label="Browse {{ brand.name }} content">
+      <span class="brand-chip__dot"></span>
+      <span class="brand-chip__name">{{ brand.name }}</span>
+      {% if brand.recent_views %}
+      {{ badge(brand.recent_views | int | string + ' views', variant='secondary', class='brand-chip__views badge--xs')
+      }}
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% endcall %}
+  {% endif %}
+
+  {# ── Newsletter strip ─────────────────────────────────────────────── #}
   <div class="newsletter-subscription">
     <div class="newsletter-block newsletter-block--home flex-center flex-col">
       {% with

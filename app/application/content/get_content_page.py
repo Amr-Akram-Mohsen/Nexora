@@ -10,9 +10,7 @@ from app.shared.constants.core import TargetType
 
 @cache.memoize(timeout=1800)
 def get_content_page_static_data(content_id):
-    from app.core.extensions import db
-
-    return get_content_by_id(db.session, content_id)
+    return get_content_by_id(content_id)
 
 
 def get_content_page_data(content_id):

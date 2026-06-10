@@ -1,8 +1,10 @@
 /* --- Premium Informational & Static Pages --- */
 
 .page__title {
-  font-size: 2.5rem; /* modern scale title */
-  font-weight: 800; /* extra bold premium */
+  font-size: 2.5rem;
+  /* modern scale title */
+  font-weight: 800;
+  /* extra bold premium */
   color: var(--foreground);
   letter-spacing: -0.02em;
   line-height: 1.25;
@@ -21,7 +23,8 @@
 }
 
 .page__body p {
-  font-size: 1.0625rem; /* 17px - high-fidelity editorial scale */
+  font-size: 1.0625rem;
+  /* 17px - high-fidelity editorial scale */
   color: var(--foreground);
   margin-bottom: 0.5rem;
 }
@@ -44,11 +47,13 @@
 
 /* Section Subtitles */
 .page__subtitle {
-  font-size: 1.5rem; /* 24px - perfect header */
+  font-size: 1.5rem;
+  /* 24px - perfect header */
   color: var(--foreground);
   margin-top: 2.5rem;
   margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border); /* thin, crisp divider line */
+  border-bottom: 1px solid var(--border);
+  /* thin, crisp divider line */
   padding-bottom: 0.6rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -69,7 +74,8 @@
 }
 
 .page__items li {
-  font-size: 1rem; /* 16px standard list */
+  font-size: 1rem;
+  /* 16px standard list */
   color: var(--muted-foreground);
   line-height: 1.6;
 }
@@ -84,7 +90,8 @@
   margin-top: 3rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
-  font-size: 0.8125rem; /* 13px */
+  font-size: 0.8125rem;
+  /* 13px */
   color: var(--muted-foreground);
   text-align: right;
   font-weight: 500;

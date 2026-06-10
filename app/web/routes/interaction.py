@@ -171,7 +171,7 @@ def add_view():
     
     target = None
     if target_type == TargetType.ARTICLE:
-        target = get_content_by_id(db.session, target_id)
+        target = get_content_by_id(target_id)
     else:
         target = get_item_by_id(target_id, load="minimal")
         

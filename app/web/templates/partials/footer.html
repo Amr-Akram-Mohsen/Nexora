@@ -9,15 +9,8 @@
       <div class="footer-column footer-brand flex flex-col">
 
         <a href="/" class="footer-logo flex items-center group">
-
-          <div class="footer-logo__icon flex-center">
-            <i class="fas fa-newspaper"></i>
-          </div>
-
-          <span class="footer-logo__text">
-            Nexora
-          </span>
-
+          <img src="{{ url_for('static', filename='images/public/nexora-logo.svg') }}" alt="Nexora" height="40"
+            class="site-logo">
         </a>
 
         <p class="footer-description">
@@ -83,7 +76,7 @@
 
       <p class="footer-copy">
         © {{ current_year }}
-        <a href="/" class="footer-brand">Nexora</a>.
+        <a href="/" class="footer-brand">Nexora</a>
         All rights reserved.
       </p>
 

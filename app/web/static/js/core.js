@@ -16,6 +16,7 @@ function initApp() {
     initHeroSlider();
     initTheme();
     initHeaderScroll();
+    initSearch();
     initSearchHighlighting();
 
     applyMode();

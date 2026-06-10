@@ -34,7 +34,7 @@ def invalidate_item_filter_options():
         get_distinct_item_types,
         get_distinct_stores,
     )
-    from app.domains.system.service.query import (
+    from app.domains.taxonomy.service.query import (
         get_distinct_item_brands,
         get_distinct_item_categories,
     )

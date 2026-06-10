@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify
 from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
-from app.domains.system.models import Category, Section, Source
+from app.domains.taxonomy.models import Category, Section, Source
 from app.domains.relationships import ArticleSource
 from app.domains.item.models import Item
 from app.domains.user.models import User

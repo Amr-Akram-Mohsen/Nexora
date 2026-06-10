@@ -16,10 +16,10 @@
   height: 64px;
 }
 
-.logo {
+/* .logo {
   gap: .5rem;
   transition: all .2s;
-}
+} */
 
 .logo:hover {
   opacity: .8;
@@ -193,14 +193,26 @@
 }
 
 .header-search {
-  padding: .875rem 0 1rem;
-  border-top: 1px solid var(--border);
-  display: none;
+  padding: 0;
+  border-top: 1px solid transparent;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s ease,
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease;
   background: var(--background);
 }
 
 .header-search.active {
-  display: block;
+  padding: .875rem 0 1rem;
+  border-top: 1px solid var(--border);
+  max-height: 80px; /* Safe height limit to allow animation */
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .header-search__form {
@@ -217,7 +229,7 @@
 .header-search__input {
   width: 100%;
   height: 2.75rem;
-  padding: 0.6rem 3.25rem 0.6rem 2.75rem;
+  padding: 0.6rem 4.5rem 0.6rem 2.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--background);
@@ -230,7 +242,7 @@
 .header-search__input:focus {
   outline: none;
   border-color: var(--brand-blue);
-  box-shadow: 0 0 0 2px rgba(var(--brand-blue-rgb), 0.12);
+  box-shadow: 0 0 0 var(--ring-size) rgba(var(--brand-blue-rgb), var(--focus-opacity));
   background: var(--card);
 }
 
@@ -244,6 +256,40 @@
   pointer-events: none;
   z-index: 5;
   transition: color 0.15s ease;
+}
+
+.header-search__clear {
+  position: absolute;
+  right: 2.625rem;
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  z-index: 5;
+}
+
+.header-search__clear.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.header-search__clear:hover {
+  background-color: var(--accent);
+  color: var(--foreground);
+}
+
+.header-search__clear:focus-visible {
+  outline: 2px solid var(--brand-blue);
 }
 
 .header-search__submit {

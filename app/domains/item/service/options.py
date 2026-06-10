@@ -14,6 +14,11 @@ def _item_models():
 
 
 def get_item_load_options(profile="detail"):
+    if profile is None or profile == "none":
+        return []
+    if isinstance(profile, (list, tuple)):
+        return list(profile)
+
     Item, ItemVariant, ItemStoreLink = _item_models()
 
     minimal = [
@@ -42,3 +47,4 @@ def get_item_load_options(profile="detail"):
 
 def get_item_card_load_options():
     return get_item_load_options("card")
+

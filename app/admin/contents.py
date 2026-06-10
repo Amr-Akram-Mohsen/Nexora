@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
-from app.domains.system.models import Category, Section, Source
+from app.domains.taxonomy.models import Category, Section, Source
 from app.domains.relationships import ArticleSource
 from app.domains.interaction.models import Comment, Reaction, View
 from sqlalchemy import func, or_, and_

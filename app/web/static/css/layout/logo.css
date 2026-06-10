@@ -1,0 +1,17 @@
+/* currentColor adapts automatically to your context */
+.accent {
+  --text-color: #7c6ef5;
+}
+
+/* branded tint  */
+
+.site-logo {
+  color: var(--text-color);
+  height: 40px;
+}
+
+/* Embed as <img> — respects CSS color on supporting browsers */
+/* <img src="/nexora-logo.svg" alt="Nexora" height="40" /> */
+
+/* Inline SVG gives full currentColor control */
+/* <svg style="color: currentColor"> … </svg> */

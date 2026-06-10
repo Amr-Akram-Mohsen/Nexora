@@ -27,7 +27,7 @@ from app.domains.item.models import (
     ItemVariant,
     Store,
 )
-from app.domains.system.models import Brand, Category
+from app.domains.taxonomy.models import Brand, Category
 from app.shared.utils.slug import generate_slug
 from app.integrations.commercial.schema import ParsedProduct, ParsedVariant
 

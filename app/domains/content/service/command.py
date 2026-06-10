@@ -1,7 +1,7 @@
 from collections import defaultdict
 from app.core.extensions import db
 from ..models import Article, Content
-from ...system.models import (
+from ...taxonomy.models import (
     Topic, Brand, AttributeFacet,
     GenderFacet, IntentFacet, PriceTierFacet, Source
 )

@@ -1,4 +1,4 @@
-{% macro section(title, section_slug=None) %}
+{% macro section(title, section_slug=None, more_url=True) %}
 {% from "components/ui/button.html" import button %}
 {% set header_classes = ' flex items-center justify-between' %}
 <section class="section">
@@ -18,10 +18,12 @@
 
   {{ caller() }}
 
+  {% if more_url is not false %}
   <button type="button" class="section-toggle" data-section-toggle hidden>
     <span>Show More</span>
     <i class="fas fa-arrow-down"></i>
   </button>
+  {% endif %}
 
 </section>
 {% endmacro %}

@@ -1,33 +1,63 @@
-async function handleSearch(form) {
-    const formData = new FormData(form);
-    const query = formData.get('query') || "";
+function initSearch() {
+    // Header search elements
+    const headerSearchPanel = document.getElementById('header-search-panel');
+    const headerInput = headerSearchPanel?.querySelector('.header-search__input');
+    const headerClearBtn = headerSearchPanel?.querySelector('.header-search__clear');
+    const searchToggleBtn = document.querySelector('.search-toggle');
 
-    if (!query.trim()) return;
+    // Search results page elements
+    const resultsForm = document.querySelector('.search-form');
+    const resultsInput = resultsForm?.querySelector('.input-search');
+    const resultsClearBtn = resultsForm?.querySelector('.search-page-form__clear');
 
-    const action = form.getAttribute("action") || "/search";
-    const url = `${action}?query=${encodeURIComponent(query)}`;
+    function toggleClearButton(input, btn) {
+        if (!input || !btn) return;
+        btn.classList.toggle('is-visible', input.value.trim().length > 0);
+    }
 
-    const res = await fetch(url, {
-        method: "GET",
-        headers: { "X-Requested-With": "XMLHttpRequest" } // lets Flask know it's AJAX
+    // Initialize state on load
+    if (headerInput && headerClearBtn) {
+        toggleClearButton(headerInput, headerClearBtn);
+        headerInput.addEventListener('input', () => toggleClearButton(headerInput, headerClearBtn));
+        headerClearBtn.addEventListener('click', () => {
+            headerInput.value = '';
+            toggleClearButton(headerInput, headerClearBtn);
+            headerInput.focus();
+        });
+    }
+
+    if (resultsInput && resultsClearBtn) {
+        toggleClearButton(resultsInput, resultsClearBtn);
+        resultsInput.addEventListener('input', () => toggleClearButton(resultsInput, resultsClearBtn));
+        resultsClearBtn.addEventListener('click', () => {
+            resultsInput.value = '';
+            toggleClearButton(resultsInput, resultsClearBtn);
+            resultsInput.focus();
+        });
+    }
+
+    // Dismiss search panel on clicking outside
+    document.addEventListener('click', (e) => {
+        if (!headerSearchPanel || !headerSearchPanel.classList.contains('active')) return;
+
+        const clickedInsidePanel = headerSearchPanel.contains(e.target);
+        const clickedToggleBtn = searchToggleBtn?.contains(e.target);
+
+        if (!clickedInsidePanel && !clickedToggleBtn) {
+            headerSearchPanel.classList.remove('active');
+            searchToggleBtn?.setAttribute('aria-expanded', 'false');
+        }
     });
 
-    const data = await res.json();
-
-    if (data.success) {
-        // Replace main content only
-        const mainContent = document.querySelector('#main-content');
-        if (mainContent) {
-            mainContent.innerHTML = data.html;
-            window.history.pushState({}, "", url);
-            document.querySelector(".header-search")?.classList.remove("active");
-            document.querySelector(".search-toggle")?.setAttribute("aria-expanded", "false");
+    // Dismiss search panel on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && headerSearchPanel?.classList.contains('active')) {
+            headerSearchPanel.classList.remove('active');
+            searchToggleBtn?.setAttribute('aria-expanded', 'false');
+            searchToggleBtn?.focus();
         }
-    } else if (data.error) {
-        showInlineTooltip(form, data.error);
-    }
+    });
 }
-
 
 function filterContent(chip) {
     chip.classList.toggle("active");
@@ -48,8 +78,6 @@ function filterContent(chip) {
     window.location.search = params.toString();
 }
 
-// let newsletterHandled = false;
-
 function handleFilterClick(e) {
     const filterChip = e.target.closest(".filter-chip");
     if (!filterChip) return false;
@@ -66,10 +94,16 @@ function handleSearchClick(e) {
     const isActive = searchPanel.classList.toggle('active');
     searchToggleBtn.setAttribute('aria-expanded', String(isActive));
     if (isActive) {
-        searchPanel.querySelector('.header-search__input')?.focus();
+        const input = searchPanel.querySelector('.header-search__input');
+        const clearBtn = searchPanel.querySelector('.header-search__clear');
+        if (input) {
+            input.focus();
+            if (clearBtn) {
+                clearBtn.classList.toggle('is-visible', input.value.trim().length > 0);
+            }
+        }
     }
     return true;
-
 }
 
 function handleSortChange(e) {

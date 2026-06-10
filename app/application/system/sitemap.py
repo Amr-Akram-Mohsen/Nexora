@@ -4,7 +4,7 @@ from flask import url_for
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
-from app.domains.system.models import Section
+from app.domains.taxonomy.models import Section
 
 
 def generate_static_sitemap(app):

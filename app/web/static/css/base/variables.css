@@ -126,6 +126,9 @@ body.dark-mode {
   --border: rgba(var(--border-rgb), 0.25);
   --input-background: rgb(var(--input-background-rgb));
   --focus-border-color: rgb(var(--ring-rgb));
+
+  --text-color: rgb(var(var(--text-color-rgb)));
+
 }
 
 body.light-mode {
@@ -152,6 +155,9 @@ body.light-mode {
   --badge-opacity-hover: 0.18;
   --theme-icon-foreground: #0f172a;
   --error-opacity: 0.15;
+
+
+  --text-color-rgb: 26, 30, 46;
 }
 
 body.dark-mode {
@@ -187,4 +193,6 @@ body.dark-mode {
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
   --shadow-premium: 0 20px 25px -5px rgba(var(--domain-primary-rgb), 0.15), 0 8px 10px -6px rgba(var(--domain-primary-rgb), 0.15);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.65);
+
+  --text-color-rgb: 255, 255, 255;
 }

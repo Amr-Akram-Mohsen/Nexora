@@ -1,6 +1,6 @@
 import logging
 from app.core.extensions import db
-from app.domains.system.models import Section, Category
+from app.domains.taxonomy.models import Section, Category
 
 logger = logging.getLogger(__name__)
 

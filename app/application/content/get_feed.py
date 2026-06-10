@@ -1,4 +1,4 @@
-from app.domains.system.service import (
+from app.domains.taxonomy.service import (
     get_section_by_slug,
     get_relationships_for_section,
     get_types_for_section,

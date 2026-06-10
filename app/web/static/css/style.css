@@ -13,7 +13,9 @@
 @import "components/theme-variants.css";
 
 /* 2. Layout - Site Structure */
+@import "layout/logo.css";
 @import "layout/header.css";
+@import "content/catalog/search.css";
 @import "layout/footer.css";
 @import "layout/grid.css";
 
@@ -21,6 +23,7 @@
 @import "components/ui/button.css";
 @import "components/ui/form.css";
 @import "components/ui/badge.css";
+@import "components/ui/brand-chip.css";
 @import "components/newsletter.css";
 
 @import "components/interactions/interaction.css";
