@@ -200,17 +200,18 @@
   opacity: 0;
   transform: translateY(-8px);
   transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.2s ease,
-              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.25s ease;
+    opacity 0.2s ease,
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s ease;
   background: var(--background);
 }
 
 .header-search.active {
   padding: .875rem 0 1rem;
   border-top: 1px solid var(--border);
-  max-height: 80px; /* Safe height limit to allow animation */
+  max-height: 80px;
+  /* Safe height limit to allow animation */
   opacity: 1;
   transform: translateY(0);
 }
