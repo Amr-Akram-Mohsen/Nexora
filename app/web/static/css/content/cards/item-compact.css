@@ -1,32 +1,29 @@
-/* --- Inline Product Card (Enhanced) --- */
+/* --- Inline Product Card (Compact Vertical) --- */
 .inline-product-card {
-  display: grid;
-  grid-template-columns: 80px 1fr auto;
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 1.25rem;
-  align-items: center;
+  border-radius: var(--radius-lg);
+  padding: 0 0.5rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
-  text-decoration: none;
+  /* text-decoration: none; */
 }
 
 .inline-product-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
   border-color: rgba(var(--domain-primary-rgb), var(--alpha-medium));
   background: rgba(var(--domain-primary-rgb), var(--alpha-ghost));
 }
 
 .inline-product__image {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-lg);
   overflow: hidden;
+  width: calc(100% + 1rem);
+  translate: -0.5rem;
   background: var(--muted);
-  border: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -34,33 +31,32 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 0.5rem;
+  padding: 0.2rem;
   transition: transform 0.5s ease;
 }
 
 .inline-product-card:hover .inline-product__image img {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .inline-product__info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.1rem;
   min-width: 0;
+  width: 100%;
 }
 
 .inline-product__title {
   font-weight: var(--weight-bold);
-  font-size: var(--text-base);
+  font-size: var(--text-xs);
   color: var(--foreground);
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .inline-product__price {
   font-weight: var(--weight-bold);
   color: var(--domain-primary);
-  font-size: var(--text-sm);
+  font-size: 0.7rem;
 }

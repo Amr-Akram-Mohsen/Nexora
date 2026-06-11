@@ -3,6 +3,7 @@ from app.application.content.query_service import (
     get_related_contents_cached,
     get_trending_contents_cached,
 )
+from app.application.recommendation.query_service import get_items_for_content_cached
 from app.domains.interaction.service import record_view
 from app.infrastructure import cache
 from app.shared.constants.core import TargetType
@@ -16,6 +17,12 @@ def get_content_page_static_data(content_id):
 def get_content_page_data(content_id):
     """
     Orchestrates data for a single content/article page.
+
+    Returns:
+        content          — serialized content dict
+        related_contents — scored related content items
+        trending_contents— trending content in the same section
+        matched_items    — items matched by the Article↔Item matcher (affil. CTA)
     """
     content = get_content_page_static_data(content_id)
     # content is now a serialized dictionary
@@ -30,10 +37,14 @@ def get_content_page_data(content_id):
         limit=6, days=7, section_ids=section_ids
     )
 
+    # Items matched via the Content↔Item matcher — primary affiliate signal
+    matched_items = get_items_for_content_cached(content["id"], limit=6)
+
     return {
         "content": content,
         "related_contents": related_contents,
         "trending_contents": trending_contents,
+        "matched_items": matched_items,
     }
 
 

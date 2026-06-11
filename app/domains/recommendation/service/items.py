@@ -149,3 +149,88 @@ def get_popular_items_by_brand(
 
     items = fetch_items(stmt, session)
     return [serialize_item(item) for item in items]
+
+
+def get_contents_for_item(
+    item_id: int,
+    limit: int = 6,
+    session=None,
+) -> list[dict]:
+    """
+    Return content items (articles, reviews, posts) that reference a given item.
+
+    Strategy (two-phase):
+    1. Content directly linked to the item via the ``content_items`` association
+       table (curated by the Article↔Item matcher) — highest confidence.
+    2. Supplement with same-brand/category content to fill the remaining slots.
+
+    Returns serialized content dicts ready for template rendering.
+    """
+    from sqlalchemy import or_
+
+    from app.domains.content.models import Content
+    from app.domains.content.service.query.utils import (
+        build_content_stmt,
+        fetch_serialized_contents,
+    )
+
+    if session is None:
+        session = db.session
+
+    # Load reference item to extract taxonomy signals
+    ref_item = session.get(Item, item_id)
+    if not ref_item:
+        return []
+
+    # 1. Directly linked content (via association table)
+    directly_linked = [
+        c for c in (ref_item.linked_contents or [])
+    ]
+    directly_linked_ids = {c.id for c in directly_linked}
+
+    # Serialize directly linked content first (highest confidence)
+    linked_results = []
+    if directly_linked_ids:
+        stmt = (
+            build_content_stmt(active_only=True, published_only=True, eager_load="default")
+            .where(Content.id.in_(list(directly_linked_ids)))
+            .order_by(Content.view_count.desc(), Content.published_at.desc())
+            .limit(limit)
+        )
+        linked_results = fetch_serialized_contents(stmt, session)
+
+    if len(linked_results) >= limit:
+        return linked_results[:limit]
+
+    # 2. Supplement: same-brand or same-category content
+    remaining = limit - len(linked_results)
+    conditions = []
+
+    if ref_item.brand_id:
+        from app.domains.relationships import content_brands
+        conditions.append(
+            Content.id.in_(
+                session.query(content_brands.c.content_id)
+                .filter(content_brands.c.brand_id == ref_item.brand_id)
+                .scalar_subquery()
+            )
+        )
+
+    if ref_item.category_id:
+        conditions.append(Content.category_id == ref_item.category_id)
+
+    if conditions:
+        exclude_ids = directly_linked_ids
+        stmt = (
+            build_content_stmt(active_only=True, published_only=True, eager_load="default")
+            .where(or_(*conditions))
+            .where(Content.id.notin_(list(exclude_ids)) if exclude_ids else True)
+            .order_by(Content.view_count.desc(), Content.published_at.desc())
+            .limit(remaining)
+        )
+        supplement = fetch_serialized_contents(stmt, session)
+    else:
+        supplement = []
+
+    return linked_results + supplement
+

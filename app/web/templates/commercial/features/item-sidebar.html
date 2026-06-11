@@ -8,8 +8,7 @@
 <div class="filter-sidebar flex flex-col">
 
   {# ── Sidebar brand accent strip ── #}
-  <div
-    class="sidebar-accent sidebar-accent--product">
+  <div class="sidebar-accent">
   </div>
 
   {# ── Sidebar title row ── #}
@@ -70,92 +69,10 @@
   {% endfor %}
 
   {# Render each filter group #}
+  {% from "components/listing/filter-section.html" import filter_section %}
   {% for filter_name in filters_to_render %}
-  {% set options = filter_options.get(filter_name, []) %}
-
-  {# Determine if ANY option in this group is active #}
-  {% set group_active = namespace(count=0) %}
-  {% for opt in options %}
-  {% set slug = opt.slug if opt.slug is defined else opt %}
-  {% if slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
-  {% set group_active.count = group_active.count + 1 %}
-  {% endif %}
+    {{ filter_section(filter_name, filter_options.get(filter_name, []), active_filters, get_filter_url) }}
   {% endfor %}
-
-  {# Collapse groups with many options by default, open short ones and active ones #}
-  {% set is_open = (options | length <= 8) or (group_active.count> 0) %}
-
-    <details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open
-      }}>
-      <summary class="filter-section__summary flex items-center justify-between">
-        <span class="filter-section__title">
-          {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
-          {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
-          {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics
-          {%- elif filter_name == 'store' -%}<i class="fas fa-store"></i> Stores
-          {%- elif filter_name == 'type' -%}<i class="fas fa-shapes"></i> Type
-          {%- else -%}<i class="fas fa-filter"></i> {{ filter_name | title }}
-          {%- endif -%}
-        </span>
-        <span class="filter-section__meta flex items-center">
-          {% if group_active.count > 0 %}
-          {{ badge(group_active.count, class="filter-section__badge", variant=none)}}
-          <!-- <span class="filter-section__badge">{{ group_active.count }}</span> -->
-          {% endif %}
-          <i class="fas fa-chevron-down filter-section__chevron"></i>
-        </span>
-      </summary>
-
-      <ul class="filter-list flex flex-col">
-        {% for opt in options %}
-        {% set slug = opt.slug if opt.slug is defined else opt %}
-        {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
-        {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
-        {% set render_extra = (loop.index > 8) and not is_active %}
-
-        <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}" {% if
-          render_extra %}style="display: none;" {% endif %}>
-          <a href="{{ get_filter_url(filter_name, slug, multi=True) }}" class="filter-item__link flex items-center"
-            title="{{ name }}">
-            <span class="filter-checkbox" aria-hidden="true">
-              {% if is_active %}
-              <i class="fa-solid fa-check"></i>
-              {% endif %}
-            </span>
-            <span class="filter-item__name truncate">{{ name }}</span>
-          </a>
-        </li>
-        {% endfor %}
-
-        {# Clickable "Show more" toggle if list is long (>8) #}
-        {% if options | length > 8 %}
-        <li class="filter-item filter-item--more-toggle">
-          <button type="button" class="filter-item__more-link" onclick="toggleMoreFilters(this)" aria-expanded="false">
-            <i class="fas fa-plus"></i> Show more (+{{ options | length - 8 }})
-          </button>
-        </li>
-        {% endif %}
-      </ul>
-    </details>
-    {% endfor %}
-
-    {# Light-weight inline script to handle collapsible filters #}
-    <script>
-      function toggleMoreFilters(btn) {
-        const section = btn.closest('.filter-section');
-        const extras = section.querySelectorAll('.filter-item--extra');
-        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-
-        extras.forEach(el => {
-          el.style.display = isExpanded ? 'none' : 'flex';
-        });
-
-        btn.setAttribute('aria-expanded', !isExpanded);
-        btn.innerHTML = isExpanded
-          ? '<i class="fas fa-plus"></i> Show more (+' + extras.length + ')'
-          : '<i class="fas fa-minus"></i> Show less';
-      }
-    </script>
 
     {# ── Price Range (products only) ── #}
     {% if target_type == 'item' %}

@@ -82,6 +82,18 @@ def get_trending_items_cached(limit: int = 8, days: int = 7) -> list:
     return get_trending_items(limit=limit, days=days, session=db.session)
 
 
+@cache.memoize(timeout=3600)
+def get_contents_for_item_cached(item_id: int, limit: int = 6) -> list:
+    """
+    Cached wrapper: content (articles, reviews, posts) relevant to an item.
+
+    Combines directly linked content (content_items association) with
+    taxonomy-matched content (brand/category overlap).
+    """
+    from app.domains.recommendation.service import get_contents_for_item
+    return get_contents_for_item(item_id=item_id, limit=limit, session=db.session)
+
+
 # ---------------------------------------------------------------------------
 # Brand recommendations
 # ---------------------------------------------------------------------------
@@ -95,3 +107,4 @@ def get_trending_brands_cached(limit: int = 6, days: int = 7) -> list:
     """
     from app.domains.taxonomy.service.query import get_trending_brands
     return get_trending_brands(limit=limit, days=days)
+

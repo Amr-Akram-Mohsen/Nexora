@@ -79,6 +79,9 @@ def item_page(item_id):
     data.setdefault("item", None)
     data.setdefault("related_items", [])
     data.setdefault("related_contents", [])
+    data.setdefault("related_articles", [])
+    data.setdefault("related_videos", [])
+    data.setdefault("buying_guides", [])
 
     record_item_view(item_id, user, ip_address)
     db.session.commit()

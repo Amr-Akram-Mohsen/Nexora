@@ -1,5 +1,6 @@
+{% from "components/ui/badge.html" import badge %}
 {% macro render_item_compact_card(item) %}
-<div class="inline-product-card">
+<a href="{{ url_for('item.item_page', item_id=item.id) }}" class="inline-product-card" data-domain-type="commercial">
   <div class="inline-product__image">
     {% if item.image_url %}
     <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
@@ -19,9 +20,7 @@
   </div>
 
   <div class="inline-product__action">
-    <a href="{{ url_for('item.item_page', item_id=item.id) }}">
-      <button class="btn btn--primary btn--sm">View Deal</button>
-    </a>
+    <button class="btn btn--primary btn--sm" tabindex="-1">View Deal</button>
   </div>
-</div>
+</a>
 {% endmacro %}

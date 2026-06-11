@@ -1,0 +1,43 @@
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ul class="flex items-center">
+
+    <li>
+      <a href="/" class="breadcrumb-link">
+        <i class="fas fa-home"></i>
+      </a>
+    </li>
+
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+
+    <li>
+      <a href="{{ url_for('item.deals') }}" class="breadcrumb-link">
+        Deals
+      </a>
+    </li>
+
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+
+    {% if item.category %}
+    <li>
+      <a href="{{ url_for('item.deals', category=item.category.slug) }}" class="breadcrumb-link">
+        {{ item.category.name }}
+      </a>
+    </li>
+
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+    {% endif %}
+
+    <li>
+      <span class="breadcrumb-current">
+        {{ item.name | truncate(35) }}
+      </span>
+    </li>
+
+  </ul>
+</nav>

@@ -1,0 +1,66 @@
+{% from "components/ui/badge.html" import badge %}
+
+{% macro filter_section(filter_name, options, active_filters, get_filter_url) %}
+{# Determine if ANY option in this group is active #}
+{% set group_active = namespace(count=0) %}
+{% for opt in options %}
+  {% set slug = opt.slug if opt.slug is defined else opt %}
+  {% if slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
+    {% set group_active.count = group_active.count + 1 %}
+  {% endif %}
+{% endfor %}
+
+{# Collapse groups with many options by default, open short ones and active ones #}
+{% set is_open = (options | length <= 8) or (group_active.count > 0) %}
+
+<details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open }}>
+  <summary class="filter-section__summary flex items-center justify-between">
+    <span class="filter-section__title flex items-center">
+      {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
+      {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
+      {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics
+      {%- elif filter_name == 'store' -%}<i class="fas fa-store"></i> Stores
+      {%- elif filter_name == 'type' -%}<i class="fas fa-shapes"></i> Type
+      {%- elif filter_name == 'attributes' -%}<i class="fas fa-sliders-h"></i> Attributes
+      {%- elif filter_name == 'intent' -%}<i class="fas fa-lightbulb"></i> Intent
+      {%- else -%}<i class="fas fa-filter"></i> {{ filter_name | title }}
+      {%- endif -%}
+    </span>
+    <span class="filter-section__meta flex items-center">
+      {% if group_active.count > 0 %}
+        {{ badge(group_active.count, class="filter-section__badge", variant=none) }}
+      {% endif %}
+      <i class="fas fa-chevron-down filter-section__chevron"></i>
+    </span>
+  </summary>
+
+  <ul class="filter-list flex flex-col">
+    {% for opt in options %}
+      {% set slug = opt.slug if opt.slug is defined else opt %}
+      {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
+      {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
+      {% set render_extra = (loop.index > 8) and not is_active %}
+
+      <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}" {% if render_extra %}style="display: none;" {% endif %}>
+        <a href="{{ get_filter_url(filter_name, slug, multi=True) }}" class="filter-item__link flex items-center" title="{{ name }}">
+          <span class="filter-checkbox" aria-hidden="true">
+            {% if is_active %}
+              <i class="fa-solid fa-check"></i>
+            {% endif %}
+          </span>
+          <span class="filter-item__name truncate">{{ name }}</span>
+        </a>
+      </li>
+    {% endfor %}
+
+    {# Clickable "Show more" toggle if list is long (>8) #}
+    {% if options | length > 8 %}
+      <li class="filter-item filter-item--more-toggle">
+        <button type="button" class="filter-item__more-link" onclick="toggleMoreFilters(this)" aria-expanded="false">
+          <i class="fas fa-plus"></i> Show more (+{{ options | length - 8 }})
+        </button>
+      </li>
+    {% endif %}
+  </ul>
+</details>
+{% endmacro %}

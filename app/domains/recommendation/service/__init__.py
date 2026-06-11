@@ -12,6 +12,7 @@ from .items import (
     get_items_for_content,
     get_trending_items,
     get_popular_items_by_brand,
+    get_contents_for_item,
 )
 
 __all__ = [
@@ -21,4 +22,5 @@ __all__ = [
     "get_items_for_content",
     "get_trending_items",
     "get_popular_items_by_brand",
+    "get_contents_for_item",
 ]

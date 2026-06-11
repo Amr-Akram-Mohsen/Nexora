@@ -195,14 +195,3 @@
   border-color: var(--domain-primary);
   box-shadow: 0 4px 10px rgba(var(--domain-primary-rgb), var(--alpha-soft));
 }
-
-/* Sidebar accent states */
-.sidebar-accent--articles {
-  /* Use type tokens for article accents (content types) */
-  background: linear-gradient(135deg, rgb(var(--type-article-rgb)) 0%, rgb(var(--type-video-rgb)) 100%);
-}
-
-.sidebar-accent--products {
-  /* Use commercial domain primary/secondary for product accents */
-  background: linear-gradient(135deg, var(--domain-primary), var(--domain-secondary));
-}

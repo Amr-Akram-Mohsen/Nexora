@@ -77,6 +77,7 @@ def content_page(content_id):
         data.setdefault("content", None)
         data.setdefault("related_contents", [])
         data.setdefault("trending_contents", [])
+        data.setdefault("matched_items", [])
 
         record_content_view(content_id, user, ip_address)
         db.session.commit()

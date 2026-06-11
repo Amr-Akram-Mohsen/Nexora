@@ -68,7 +68,7 @@ product
         {# ══ Breadcrumbs — full width top row ══ #}
         <div class="detail-page__top flex items-center justify-between">
             <div class="detail-page__breadcrumbs-wrapper">
-                {% include "content/features/breadcrumbs.html" %}
+                {% include "commercial/features/breadcrumbs.html" %}
             </div>
         </div>
 
@@ -227,21 +227,72 @@ product
         </div>
         {# end .detail-page__main #}
 
+        {# ── Related Items ── #}
+        {% if related_items %}
+        {% from "components/ui/grid.html" import grid %}
+        <section class="section recommendation-section recommendation-section--products" id="related-products">
+            <div class="section__header">
+                <h2 class="title">You May Also Like</h2>
+            </div>
+            {{ grid(related_items[:4], target_type='item') }}
+        </section>
+        {% endif %}
+
+        {# ── Related Content — Articles, Videos, and Buying Guides ── #}
+        {% if related_articles or related_videos or buying_guides %}
+        {% from "components/ui/grid.html" import grid %}
+        <section class="section recommendation-section recommendation-section--content" id="related-content">
+
+            {# ── Related Articles ── #}
+            {% if related_articles %}
+            <div class="recommendation-group">
+                <div class="section__header">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-newspaper" aria-hidden="true"></i> Articles & Reviews
+                        </h2>
+                        <p class="section__subtitle">Deep dives, news, and insights featuring this product</p>
+                    </div>
+                </div>
+                {{ grid(related_articles[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+            {# ── Related Videos ── #}
+            {% if related_videos %}
+            <div class="recommendation-group">
+                <div class="section__header">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-video" aria-hidden="true"></i> Related Videos
+                        </h2>
+                        <p class="section__subtitle">Video reviews, hands-on, and tutorials</p>
+                    </div>
+                </div>
+                {{ grid(related_videos[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+            {# ── Buying Guides ── #}
+            {% if buying_guides %}
+            <div class="recommendation-group">
+                <div class="section__header">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-book-open" aria-hidden="true"></i> Buying Guides & Tutorials
+                        </h2>
+                        <p class="section__subtitle">Guides to help you choose and make the most of this product</p>
+                    </div>
+                </div>
+                {{ grid(buying_guides[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+        </section>
+        {% endif %}
+
     </div>
 
-    {% if related_items %}
-
-    <section class="related-items-section">
-        <div class="container">
-
-            <h2 class="section-title">You may also like</h2>
-
-            {% include "commercial/features/item-grid.html" %}
-
-        </div>
-    </section>
-
-    {% endif %}
 </section>
 
 <script type="application/json" id="variant-data">

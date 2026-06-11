@@ -1,0 +1,171 @@
+{# listing-widgets.html #}
+
+{% macro listing_header(title, count, label, active_filters, get_sort_url) %}
+{# Mobile filter toggle button #}
+<div class="listing-mobile-bar flex items-center justify-between">
+  <button type="button" class="filter-toggle-btn flex items-center" id="filterToggleBtn" aria-label="Open filters">
+    <i class="fas fa-sliders-h"></i>
+    <span>Filters</span>
+    {% set active_count = namespace(n=0) %}
+    {% for k, v in active_filters.items() if k not in ['sort'] %}
+      {% if v %}{% set active_count.n = active_count.n + 1 %}{% endif %}
+    {% endfor %}
+    {% if active_count.n > 0 %}
+      <span class="filter-toggle-badge">{{ active_count.n }}</span>
+    {% endif %}
+  </button>
+
+  {# Inline sort (mobile) #}
+  <div class="listing-sort-compact flex items-center">
+    <select id="sort-select-mobile" class="sort-select sort-select--compact" aria-label="Sort results">
+      <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
+      <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
+      <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Popular</option>
+    </select>
+  </div>
+</div>
+
+{# Desktop header row #}
+<div class="listing-header__inner flex items-center justify-between">
+  <div class="listing-summary">
+    <h1 class="listing-title">{{ title }}</h1>
+    <p class="listing-count">
+      <span class="listing-count__num">{{ count }}</span>
+      {{ label }} found
+    </p>
+  </div>
+
+  <div class="listing-sort flex items-center">
+    <label for="sort-select" class="sort-label">Sort by</label>
+    <div class="sort-select-wrapper">
+      <i class="fas fa-sort sort-select-icon"></i>
+      <select id="sort-select" class="sort-select" aria-label="Sort results">
+        <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First</option>
+        <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest First</option>
+        <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular</option>
+      </select>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
+{% macro active_filter_chips(active_filters, get_filter_url, reset_url) %}
+{% set has_filters = namespace(value=false) %}
+{% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+  {% if values %}{% set has_filters.value = true %}{% endif %}
+{% endfor %}
+{# Also count price as active #}
+{% if active_filters.min_price or active_filters.max_price %}
+  {% set has_filters.value = true %}
+{% endif %}
+
+{% if has_filters.value %}
+  <span class="active-label">
+    <i class="fas fa-filter"></i> Active:
+  </span>
+
+  {# Regular filter chips #}
+  {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+    {% if values %}
+      {% set vals = values if values is iterable and values is not string else [values] %}
+      {% for val in vals %}
+        <div class="filter-tag flex items-center">
+          <span>{{ val | replace('-', ' ') | title }}</span>
+          <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag"
+            aria-label="Remove {{ val }} filter">&times;</a>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+
+  {# Price range chip #}
+  {% if active_filters.min_price or active_filters.max_price %}
+    <div class="filter-tag filter-tag--price flex items-center">
+      <i class="fas fa-dollar-sign" style="font-size:9px;opacity:.8;"></i>
+      <span>
+        {%- if active_filters.min_price and active_filters.max_price -%}
+          {{ active_filters.min_price }}–{{ active_filters.max_price }}
+        {%- elif active_filters.min_price -%}
+          From {{ active_filters.min_price }}
+        {%- else -%}
+          Up to {{ active_filters.max_price }}
+        {%- endif -%}
+      </span>
+      <a href="{{ reset_url }}" class="remove-tag" aria-label="Remove price filter">&times;</a>
+    </div>
+  {% endif %}
+
+  <a href="{{ reset_url }}" class="clear-all-link" aria-label="Clear all filters">
+    <i class="fas fa-times-circle"></i> Clear All
+  </a>
+{% endif %}
+{% endmacro %}
+
+
+{% macro listing_pagination(pagination, get_page_url) %}
+{% if pagination and pagination.pages > 1 %}
+<nav class="pagination flex-center" aria-label="Pagination">
+
+  {# Previous #}
+  {% if pagination.has_prev %}
+    <a href="{{ get_page_url(pagination.prev_num) }}" class="pagination__btn pagination__btn--prev"
+      aria-label="Previous page">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+  {% else %}
+    <span class="pagination__btn pagination__btn--prev is-disabled" aria-disabled="true">
+      <i class="fas fa-chevron-left"></i>
+    </span>
+  {% endif %}
+
+  {# Page numbers #}
+  <div class="pagination__pages flex items-center">
+    {% for p in range(1, pagination.pages + 1) %}
+      {% if p == pagination.page %}
+        <span class="pagination__page is-active" aria-current="page">{{ p }}</span>
+      {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
+        <a href="{{ get_page_url(p) }}" class="pagination__page">{{ p }}</a>
+      {% elif p == pagination.page - 3 or p == pagination.page + 3 %}
+        <span class="pagination__ellipsis">…</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {# Next #}
+  {% if pagination.has_next %}
+    <a href="{{ get_page_url(pagination.next_num) }}" class="pagination__btn pagination__btn--next"
+      aria-label="Next page">
+      <i class="fas fa-chevron-right"></i>
+    </a>
+  {% else %}
+    <span class="pagination__btn pagination__btn--next is-disabled" aria-disabled="true">
+      <i class="fas fa-chevron-right"></i>
+    </span>
+  {% endif %}
+
+</nav>
+{% endif %}
+{% endmacro %}
+
+
+{% macro listing_sort_script() %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Desktop sort
+    const sortSelect = document.getElementById('sort-select');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function () {
+        window.location.href = this.value;
+      });
+    }
+    // Mobile sort
+    const sortSelectMobile = document.getElementById('sort-select-mobile');
+    if (sortSelectMobile) {
+      sortSelectMobile.addEventListener('change', function () {
+        window.location.href = this.value;
+      });
+    }
+  });
+</script>
+{% endmacro %}

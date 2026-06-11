@@ -57,8 +57,30 @@
 
   {# ── Featured Products ────────────────────────────────────────────────
   Items ranked by recent views + clicks (7-day window).
+  Shown after a cross-domain "Shop What You Read" bridge strip.
   #}
   {% if featured_products %}
+
+  {# ── Cross-domain bridge strip ── #}
+  <div class="cross-domain-bridge" aria-label="Shop editorial picks">
+    <div class="cross-domain-bridge__inner flex items-center justify-between">
+      <div class="cross-domain-bridge__text flex flex-col">
+        <span class="cross-domain-bridge__eyebrow">
+          <i class="fas fa-link" aria-hidden="true"></i>
+          From Articles to Products
+        </span>
+        <h2 class="cross-domain-bridge__title">Shop What You Read</h2>
+        <p class="cross-domain-bridge__desc">
+          Every review and article is matched to hand-picked deals — find the products behind the stories.
+        </p>
+      </div>
+      <a href="{{ url_for('item.deals') }}" class="cross-domain-bridge__cta">
+        {% from "components/ui/button.html" import button %}
+        {{ button(text="Browse All Deals", variant="primary", icon="fas fa-arrow-right") }}
+      </a>
+    </div>
+  </div>
+
   {% call section("Featured Products", more_url=false) %}
   {{ grid(featured_products, target_type='item', carousel=true) }}
   {% endcall %}

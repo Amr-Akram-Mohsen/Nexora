@@ -64,3 +64,126 @@
     font-size: var(--text-xs);
   }
 }
+
+/* ── Cross-Domain Bridge Strip ───────────────────────────────────────────
+   "Shop What You Read" — homepage conversion bridge between editorial
+   content sections and commercial item sections.
+   Uses the full-width gradient to visually mark the domain transition.
+────────────────────────────────────────────────────────────────────────── */
+
+.cross-domain-bridge {
+  margin: 2rem 0;
+  padding: 2.5rem;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--brand-blue-rgb), 0.06) 0%,
+    rgba(var(--brand-green-rgb), 0.06) 100%
+  );
+  border: 1px solid rgba(var(--brand-green-rgb), 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.cross-domain-bridge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--brand-blue-rgb), 0.03),
+    rgba(var(--brand-purple-rgb), 0.03),
+    rgba(var(--brand-green-rgb), 0.03)
+  );
+  pointer-events: none;
+}
+
+.cross-domain-bridge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgb(var(--brand-blue-rgb)) 0%,
+    rgb(var(--brand-purple-rgb)) 50%,
+    rgb(var(--brand-green-rgb)) 100%
+  );
+}
+
+.cross-domain-bridge__inner {
+  gap: 2rem;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.cross-domain-bridge__text {
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.cross-domain-bridge__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgb(var(--brand-green-rgb));
+}
+
+.cross-domain-bridge__eyebrow i {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.cross-domain-bridge__title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-xbold);
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cross-domain-bridge__desc {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 480px;
+}
+
+.cross-domain-bridge__cta {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .cross-domain-bridge {
+    padding: 1.75rem 1.5rem;
+  }
+
+  .cross-domain-bridge__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cross-domain-bridge__title {
+    font-size: var(--text-xl);
+  }
+
+  .cross-domain-bridge__cta {
+    width: 100%;
+  }
+
+  .cross-domain-bridge__cta .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
