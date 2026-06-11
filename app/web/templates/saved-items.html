@@ -6,6 +6,12 @@
 
 {% block title %}Nexora | Saved Items{% endblock %}
 
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/catalog-page.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/commercial/catalog/saved-items.css') }}" />
+{% endblock %}
+
+
 {% block content %}
 
 {% call(slot) listing_page("saved-items-page") %}
@@ -26,7 +32,7 @@
 </div>
 {% endif %}
 
-{% if slot == 'content' %}
+{% if slot == 'results' %}
 {% if not saved_articles and not saved_items %}
 <div class="no-results flex flex-col items-center">
   <i class="far fa-bookmark icon-empty"></i>
@@ -45,7 +51,7 @@
       <span>Saved Products</span>
       <span class="count-badge">({{ saved_items|length }})</span>
     </h2>
-    {{ grid(saved_items) }}
+    {{ grid(saved_items, "item") }}
   </section>
   {% endif %}
 
@@ -65,5 +71,4 @@
 
 {% endcall %}
 
-{% endblock %}
 {% endblock %}

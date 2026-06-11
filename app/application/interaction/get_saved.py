@@ -15,7 +15,7 @@ def get_saved_articles_workflow(user_id):
     Retrieves and serializes all saved contents for a user.
     Uses batch loading to avoid N+1 queries.
     """
-    saves = get_saved_items(user_id, TargetType.ARTICLE)
+    saves = get_saved_items(user_id, TargetType.CONTENT)
     if not saves:
         return []
     

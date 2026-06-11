@@ -1,0 +1,70 @@
+/* saved-items.css - Styling for Saved Items Page layout & grid sections */
+
+.saved-collections {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
+}
+
+.saved-collection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.saved-collection .section-title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+}
+
+.saved-collection .count-badge {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  color: var(--muted-foreground);
+  background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  margin-inline: auto;
+  width: 100%;
+  max-width: 600px;
+}
+
+.no-results h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.no-results p {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  max-width: 350px;
+  text-align: center;
+  margin: 0;
+}
+
+.sidebar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
