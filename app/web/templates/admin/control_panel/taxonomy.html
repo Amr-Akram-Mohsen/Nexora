@@ -1,0 +1,201 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Taxonomy Management — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <div class="admin-page-header-row">
+    <div>
+      <h1>Taxonomy Management</h1>
+      <p>Manage categories, brands, topics, and sections used across content and products</p>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="admin-tabs" id="taxonomy-tabs">
+  <button class="admin-tab-btn active" data-tab="categories">🗂️ Categories</button>
+  <button class="admin-tab-btn" data-tab="brands">🏭 Brands</button>
+  <button class="admin-tab-btn" data-tab="topics">🏷️ Topics</button>
+  <button class="admin-tab-btn" data-tab="sections">📋 Sections</button>
+</div>
+
+<!-- ======== CATEGORIES TAB ======== -->
+<div class="admin-tab-panel" id="tab-panel-categories">
+  <!-- Create Form -->
+  <div class="admin-inline-form" id="category-create-form">
+    <h3 class="admin-inline-form-title">Add New Category</h3>
+    <div class="admin-inline-form-row">
+      <input type="text" id="new-category-name" placeholder="Category name…" class="dashboard-filter-input admin-inline-input" />
+      <div class="admin-inline-slug-preview">
+        Slug: <code id="new-category-slug-preview">—</code>
+      </div>
+      <button id="create-category-btn" class="admin-btn-primary">+ Add Category</button>
+    </div>
+  </div>
+
+  <!-- Filter -->
+  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
+    <div class="admin-toolbar-row">
+      <div class="admin-toolbar-search admin-search-grow">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="category-search" placeholder="Search categories…" />
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="categories-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th class="col-engagement">Status</th>
+          <th class="col-engagement">Leaf</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="categories-table-body">
+        <tr>
+          <td colspan="6" class="table-loading-cell">
+            <div class="dashboard-loading loading-height-md">
+              <div class="spinner"></div><p>Loading categories…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ======== BRANDS TAB ======== -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-brands">
+  <div class="admin-inline-form" id="brand-create-form">
+    <h3 class="admin-inline-form-title">Add New Brand</h3>
+    <div class="admin-inline-form-row">
+      <input type="text" id="new-brand-name" placeholder="Brand name…" class="dashboard-filter-input admin-inline-input" />
+      <input type="text" id="new-brand-industry" placeholder="Industry (optional)…" class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
+      <div class="admin-inline-slug-preview">
+        Slug: <code id="new-brand-slug-preview">—</code>
+      </div>
+      <button id="create-brand-btn" class="admin-btn-primary">+ Add Brand</button>
+    </div>
+  </div>
+
+  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
+    <div class="admin-toolbar-row">
+      <div class="admin-toolbar-search admin-search-grow">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="brand-search" placeholder="Search brands…" />
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="brands-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th class="col-engagement">Industry</th>
+          <th class="col-engagement">Status</th>
+          <th class="col-engagement">Featured</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="brands-table-body">
+        <tr>
+          <td colspan="7" class="table-loading-cell">
+            <div class="dashboard-loading loading-height-md">
+              <div class="spinner"></div><p>Loading brands…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ======== TOPICS TAB ======== -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-topics">
+  <div class="admin-inline-form" id="topic-create-form">
+    <h3 class="admin-inline-form-title">Add New Topic</h3>
+    <div class="admin-inline-form-row">
+      <input type="text" id="new-topic-name" placeholder="Topic name…" class="dashboard-filter-input admin-inline-input" />
+      <div class="admin-inline-slug-preview">
+        Slug: <code id="new-topic-slug-preview">—</code>
+      </div>
+      <button id="create-topic-btn" class="admin-btn-primary">+ Add Topic</button>
+    </div>
+  </div>
+
+  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
+    <div class="admin-toolbar-row">
+      <div class="admin-toolbar-search admin-search-grow">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="topic-search" placeholder="Search topics…" />
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="topics-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th class="col-engagement">Status</th>
+          <th class="col-engagement">Featured</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="topics-table-body">
+        <tr>
+          <td colspan="6" class="table-loading-cell">
+            <div class="dashboard-loading loading-height-md">
+              <div class="spinner"></div><p>Loading topics…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ======== SECTIONS TAB ======== -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-sections">
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="sections-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">ID</th>
+          <th>Name</th>
+          <th>Slug</th>
+          <th>Description</th>
+          <th class="col-engagement">Status</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="sections-table-body">
+        <tr>
+          <td colspan="6" class="table-loading-cell">
+            <div class="dashboard-loading loading-height-md">
+              <div class="spinner"></div><p>Loading sections…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/control_panel/taxonomy.js') }}"></script>
+{% endblock %}

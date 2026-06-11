@@ -8,7 +8,7 @@ def count_users() -> int:
 
 
 def get_users(search=None, role=None, rows_count=10):
-    query = User.query.order_by(User.created_at.desc())
+    query = User.query.order_by(User.id.desc())
     if search and search.strip():
         query = query.filter(
             or_(User.name.ilike(f'%{search}%'), User.email.ilike(f'%{search}%'))

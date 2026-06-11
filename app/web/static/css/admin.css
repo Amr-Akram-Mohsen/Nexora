@@ -2270,3 +2270,253 @@ body.dark-mode .bulk-actions-toolbar {
 .mt-3 {
   margin-top: 1.25rem !important;
 }
+
+/* ==========================================
+   ADMIN TABS — shared across taxonomy,
+   interactions, and recommendations pages
+   ========================================== */
+
+.admin-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.admin-tab-btn {
+  padding: 0.6rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.admin-tab-btn:hover {
+  color: var(--foreground);
+  background: var(--secondary);
+}
+
+.admin-tab-btn.active {
+  color: var(--brand-blue);
+  border-bottom-color: var(--brand-blue);
+  background: linear-gradient(to top, rgba(var(--brand-blue-rgb), 0.06), transparent);
+  font-weight: var(--weight-bold);
+}
+
+.admin-tab-panel {
+  animation: fadeInPanel 0.2s ease;
+}
+
+.admin-tab-panel.is-hidden {
+  display: none;
+}
+
+@keyframes fadeInPanel {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   INLINE CREATE FORM
+   ========================================== */
+
+.admin-inline-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-inline-form-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.admin-inline-form-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-inline-input {
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.admin-inline-slug-preview {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.admin-inline-slug-preview code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  background: var(--secondary);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--brand-blue);
+}
+
+/* ==========================================
+   SLUG CODE — used in taxonomy tables
+   ========================================== */
+
+.admin-slug-code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.72rem;
+  background: var(--secondary);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ==========================================
+   NAV SECTION LABELS — grouped sidebar
+   ========================================== */
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+  margin-bottom: 2px;
+}
+
+.nav-link:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.nav-link.active {
+  background: linear-gradient(90deg, rgba(var(--brand-blue-rgb), 0.08), transparent);
+  color: var(--brand-blue);
+  border-left-color: var(--brand-blue);
+  font-weight: var(--weight-bold);
+}
+
+.nav-icon {
+  font-size: 1rem;
+  width: 1.25rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   ADMIN SUMMARY BAR
+   ========================================== */
+
+.admin-summary-bar {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  padding: 0.25rem 0;
+}
+
+/* ==========================================
+   TABLE LOADING CELL
+   ========================================== */
+
+.table-loading-cell {
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ==========================================
+   ADMIN TOGGLE (checkbox styled as toggle)
+   ========================================== */
+
+.admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.admin-toggle-input {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+/* ==========================================
+   FLEX & SPACING UTILITIES (admin-only)
+   ========================================== */
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+/* ==========================================
+   RESPONSIVE: Tabs collapse on small screens
+   ========================================== */
+
+@media (max-width: 640px) {
+  .admin-tabs {
+    gap: 0;
+  }
+
+  .admin-tab-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: var(--text-xs);
+  }
+
+  .admin-inline-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-inline-input {
+    max-width: 100%;
+  }
+}

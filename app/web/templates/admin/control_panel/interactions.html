@@ -1,0 +1,171 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <div class="admin-page-header-row">
+    <div>
+      <h1>Interactions & Moderation</h1>
+      <p>Review user comments, reactions, and engagement metrics</p>
+    </div>
+  </div>
+</div>
+
+<!-- Interaction Stats Row -->
+<div id="interactions-stats-row" class="dashboard-stats-grid" style="margin-bottom:2rem;">
+  <div class="dashboard-loading" style="grid-column:1/-1; min-height:80px;">
+    <div class="spinner"></div><p>Loading stats…</p>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="admin-tabs" id="interactions-tabs">
+  <button class="admin-tab-btn active" data-tab="comments">
+    💬 Comments
+  </button>
+  <button class="admin-tab-btn" data-tab="reactions">
+    👍 Reactions
+  </button>
+</div>
+
+<!-- Comments Tab -->
+<div class="admin-tab-panel" id="tab-panel-comments">
+  <!-- Comment Filters -->
+  <div class="admin-toolbar-advanced flex flex-col">
+    <div class="admin-toolbar-row">
+      <div class="admin-toolbar-search admin-search-grow">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="comment-search" placeholder="Search comment text…" />
+      </div>
+      <select id="filter-comment-sentiment" class="dashboard-filter-select filter-select-item">
+        <option value="">All Sentiments</option>
+        <option value="positive">Positive</option>
+        <option value="neutral">Neutral</option>
+        <option value="negative">Negative</option>
+        <option value="spam">Spam</option>
+      </select>
+      <select id="filter-comment-target" class="dashboard-filter-select filter-select-item">
+        <option value="">All Targets</option>
+        <option value="content">Content</option>
+        <option value="item">Item</option>
+      </select>
+      <button id="clear-comment-filters-btn" class="dashboard-filter-clear">Reset</button>
+    </div>
+  </div>
+
+  <!-- Comment Summary -->
+  <div class="flex justify-between items-center mb-3">
+    <div id="comments-summary" class="admin-summary-bar">
+      Showing <strong id="comments-count">—</strong> comments
+    </div>
+  </div>
+
+  <!-- Comment Table -->
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="comments-table">
+      <thead>
+        <tr>
+          <th class="col-type">ID</th>
+          <th>Comment Preview</th>
+          <th class="col-engagement">User</th>
+          <th class="col-engagement">Target</th>
+          <th class="col-engagement">Sentiment</th>
+          <th class="col-dates">Date</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="comments-table-body">
+        <tr>
+          <td colspan="7" class="table-loading-cell">
+            <div class="dashboard-loading loading-height-lg">
+              <div class="spinner"></div><p>Loading comments…</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Comment Pagination -->
+  <div class="pagination-container">
+    <div id="comments-pagination-info" class="pagination-info-text">Showing 0 to 0 of 0 comments</div>
+    <div class="pagination-controls-group">
+      <select id="comments-per-page" class="dashboard-filter-select pagination-per-page-select">
+        <option value="25" selected>25 per page</option>
+        <option value="50">50 per page</option>
+      </select>
+      <button id="comments-prev-btn" class="user-action-btn" disabled>← Previous</button>
+      <span id="comments-page-indicator" class="pagination-page-indicator">Page 1 of 1</span>
+      <button id="comments-next-btn" class="user-action-btn" disabled>Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reactions Tab -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-reactions">
+  <!-- Reactions Breakdown Panel -->
+  <div class="overview-panel mt-6">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📊 Interaction Breakdown</h3>
+      <span class="overview-panel-sub">all time</span>
+    </div>
+    <div id="moderation-interactions-breakdown">
+      <div class="dashboard-loading"><div class="spinner"></div><p>Loading breakdown…</p></div>
+    </div>
+  </div>
+
+  <!-- Reactions Table -->
+  <div style="margin-top:2rem;">
+    <div class="admin-toolbar-advanced flex flex-col">
+      <div class="admin-toolbar-row">
+        <select id="filter-reaction-type" class="dashboard-filter-select filter-select-item">
+          <option value="">All Reaction Types</option>
+          <option value="like">Likes</option>
+          <option value="dislike">Dislikes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table" id="reactions-table">
+        <thead>
+          <tr>
+            <th class="col-type">ID</th>
+            <th>User</th>
+            <th class="col-engagement">Type</th>
+            <th class="col-engagement">Target Type</th>
+            <th class="col-engagement">Target ID</th>
+            <th class="col-dates">Date</th>
+          </tr>
+        </thead>
+        <tbody id="reactions-table-body">
+          <tr>
+            <td colspan="6" class="table-loading-cell">
+              <div class="dashboard-loading loading-height-md">
+                <div class="spinner"></div><p>Loading reactions…</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination-container">
+      <div id="reactions-pagination-info" class="pagination-info-text">Showing 0 to 0 of 0 reactions</div>
+      <div class="pagination-controls-group">
+        <button id="reactions-prev-btn" class="user-action-btn" disabled>← Previous</button>
+        <span id="reactions-page-indicator" class="pagination-page-indicator">Page 1 of 1</span>
+        <button id="reactions-next-btn" class="user-action-btn" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/control_panel/interactions.js') }}"></script>
+{% endblock %}

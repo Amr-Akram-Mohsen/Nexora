@@ -8,7 +8,7 @@ from app.domains.item.models import Item
 from app.domains.user.models import User
 from app.domains.interaction.service.query import get_interactions_breakdown, get_reaction_stats
 from app.core.decorators import admin_required
-from sqlalchemy import func
+from sqlalchemy import func, select
 from datetime import datetime, timedelta
 
 bp = Blueprint("api_dashboard", __name__, url_prefix="/admin/dashboard")
@@ -152,3 +152,36 @@ def dashboard_stats():
             "dislikes":  reaction_stats.get("dislikes", 0),
         }
     })
+
+
+@bp.route("/top-contents", methods=["GET"])
+def top_contents():
+    """Top 5 content items by view count for the overview panel."""
+    rows = db.session.execute(
+        select(Content.id, Content.title, Content.object_type, Content.view_count)
+        .order_by(Content.view_count.desc())
+        .limit(5)
+    ).mappings().all()
+    return jsonify([{
+        "id": r["id"],
+        "title": r["title"] or f"{r['object_type'].capitalize()} #{r['id']}",
+        "type": r["object_type"],
+        "view_count": r["view_count"] or 0,
+    } for r in rows])
+
+
+@bp.route("/top-items", methods=["GET"])
+def top_items():
+    """Top 5 items by click count for the overview panel."""
+    rows = db.session.execute(
+        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
+        .order_by(Item.click_count.desc())
+        .limit(5)
+    ).mappings().all()
+    return jsonify([{
+        "id": r["id"],
+        "name": r["name"],
+        "item_type": r["item_type"],
+        "click_count": r["click_count"] or 0,
+        "rating": r["rating"],
+    } for r in rows])

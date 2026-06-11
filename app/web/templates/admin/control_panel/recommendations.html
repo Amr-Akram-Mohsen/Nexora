@@ -1,0 +1,89 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Recommendations — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-page-header">
+  <div class="admin-page-header-row">
+    <div>
+      <h1>Content–Product Recommendations</h1>
+      <p>Inspect and manage content-item associations powering recommendations</p>
+    </div>
+    <div class="admin-page-header-actions">
+      <button id="refresh-recs-btn" class="admin-btn-secondary">↺ Refresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div id="rec-stats-row" class="dashboard-stats-grid" style="margin-bottom:2rem;">
+  <div class="dashboard-loading" style="grid-column:1/-1; min-height:80px;">
+    <div class="spinner"></div><p>Loading stats…</p>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="admin-toolbar-advanced flex flex-col">
+  <div class="admin-toolbar-row">
+    <div class="admin-toolbar-search admin-search-grow">
+      <span class="admin-toolbar-search-icon-inside">🔍</span>
+      <input type="text" id="rec-search" placeholder="Search by content title or item name…" />
+    </div>
+    <button id="clear-rec-filters-btn" class="dashboard-filter-clear">Reset</button>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="flex justify-between items-center mb-3">
+  <div id="rec-summary" class="admin-summary-bar">
+    Showing <strong id="rec-count">—</strong> matches
+  </div>
+</div>
+
+<!-- Table -->
+<div class="admin-table-wrapper">
+  <table class="admin-table" id="recs-table">
+    <thead>
+      <tr>
+        <th>Content Title</th>
+        <th class="col-type">Content Type</th>
+        <th class="col-engagement">Views</th>
+        <th>Item Name</th>
+        <th class="col-type">Item Type</th>
+        <th class="col-engagement">Clicks</th>
+        <th class="col-actions">Unlink</th>
+      </tr>
+    </thead>
+    <tbody id="recs-table-body">
+      <tr>
+        <td colspan="7" class="table-loading-cell">
+          <div class="dashboard-loading loading-height-lg">
+            <div class="spinner"></div><p>Loading matches…</p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-container">
+  <div id="rec-pagination-info" class="pagination-info-text">Showing 0 to 0 of 0 matches</div>
+  <div class="pagination-controls-group">
+    <select id="rec-per-page" class="dashboard-filter-select pagination-per-page-select">
+      <option value="25" selected>25 per page</option>
+      <option value="50">50 per page</option>
+    </select>
+    <button id="rec-prev-btn" class="user-action-btn" disabled>← Previous</button>
+    <span id="rec-page-indicator" class="pagination-page-indicator">Page 1 of 1</span>
+    <button id="rec-next-btn" class="user-action-btn" disabled>Next →</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/control_panel/recommendations.js') }}"></script>
+{% endblock %}

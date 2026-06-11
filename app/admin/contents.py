@@ -43,7 +43,7 @@ def list_contents():
     per_page = request.args.get("per_page", 20, type=int)
     
     # Sorting params
-    sort_by = request.args.get("sort_by", "published_at")
+    sort_by = request.args.get("sort_by", "id")
     sort_dir = request.args.get("sort_dir", "desc")
     
     # Filters

@@ -491,32 +491,45 @@ function renderInteractionBreakdown(containerId) {
 
 
 // ==============================
+// ==============================
+// SHARED TOP LIST RENDERER
+// ==============================
+function renderTopList(containerId, items, valueKey, valueLabel) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (!items || !items.length) {
+    container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No data yet.</p></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <ol class="overview-top-list">
+      ${items.map((item, i) => `
+        <li class="overview-top-item">
+          <span class="overview-top-rank">${i + 1}</span>
+          <span class="overview-top-name" title="${(item.title || item.name || '').replace(/"/g, '&quot;')}">
+            ${item.title || item.name || '—'}
+          </span>
+          <span class="overview-top-value">${Number(item[valueKey] || 0).toLocaleString()} ${valueLabel}</span>
+        </li>
+      `).join("")}
+    </ol>
+  `;
+}
+
+
+// ==============================
 // TOP ARTICLES (by views)
 // ==============================
 function renderTopArticles(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  fetch('/admin/contents/?limit=5')
-    .then(res => res.json())
-    .then(data => {
-      const sorted = [...data].sort((a, b) => (b.view_count || 0) - (a.view_count || 0)).slice(0, 5);
-      if (!sorted.length) {
-        container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No contents yet.</p></div>`;
-        return;
-      }
-      container.innerHTML = `
-        <ol class="overview-top-list">
-          ${sorted.map((a, i) => `
-            <li class="overview-top-item">
-              <span class="overview-top-rank">${i + 1}</span>
-              <span class="overview-top-name" title="${a.title}">${a.title}</span>
-              <span class="overview-top-value">${(a.view_count || 0).toLocaleString()} views</span>
-            </li>
-          `).join("")}
-        </ol>
-      `;
-    })
+  container.innerHTML = `<div class="dashboard-loading" style="min-height:100px;"><div class="spinner"></div><p>Loading…</p></div>`;
+
+  fetch('/admin/dashboard/top-contents')
+    .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    .then(data => renderTopList(containerId, data, 'view_count', 'views'))
     .catch(() => {
       container.innerHTML = `<div class="dashboard-error"><p>Could not load top contents.</p></div>`;
     });
@@ -530,27 +543,11 @@ function renderTopItems(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  fetch('/admin/items/')
-    .then(res => res.json())
-    .then(data => {
-      // Sort by click_count if available, else rating
-      const sorted = [...data].sort((a, b) => (b.click_count || b.rating || 0) - (a.click_count || a.rating || 0)).slice(0, 5);
-      if (!sorted.length) {
-        container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No items yet.</p></div>`;
-        return;
-      }
-      container.innerHTML = `
-        <ol class="overview-top-list">
-          ${sorted.map((item, i) => `
-            <li class="overview-top-item">
-              <span class="overview-top-rank">${i + 1}</span>
-              <span class="overview-top-name" title="${item.name}">${item.name}</span>
-              <span class="overview-top-value">⭐ ${item.rating || "—"}</span>
-            </li>
-          `).join("")}
-        </ol>
-      `;
-    })
+  container.innerHTML = `<div class="dashboard-loading" style="min-height:100px;"><div class="spinner"></div><p>Loading…</p></div>`;
+
+  fetch('/admin/dashboard/top-items')
+    .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    .then(data => renderTopList(containerId, data, 'click_count', 'clicks'))
     .catch(() => {
       container.innerHTML = `<div class="dashboard-error"><p>Could not load top items.</p></div>`;
     });

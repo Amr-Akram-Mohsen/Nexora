@@ -597,7 +597,7 @@
       dateTypeSelect.value = "published_at";
       startDateInput.value = "";
       endDateInput.value = "";
-      sortBy.value = "published_at";
+      sortBy.value = "id";
       sortDir.value = "desc";
       currentPage = 1;
       selectedIds.clear();

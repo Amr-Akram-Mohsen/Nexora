@@ -24,7 +24,12 @@ def dashboard_contents():
 
 @bp.route("/items")
 def dashboard_items():
-    return render_template("admin/dashboard/domain.html", title="Items", domain="items")
+    return render_template("admin/control_panel/items.html", title="Product Management", domain="items")
+
+
+@bp.route("/taxonomy")
+def dashboard_taxonomy():
+    return render_template("admin/control_panel/taxonomy.html", title="Taxonomy Management", domain="taxonomy")
 
 
 @bp.route("/users")
@@ -32,9 +37,14 @@ def dashboard_users():
     return render_template("admin/control_panel/users.html", title="Users", domain="users")
 
 
-@bp.route("/interactions")
-def dashboard_interactions():
-    return render_template("admin/dashboard/domain.html", title="Interactions Analytics", domain="interactions")
+@bp.route("/moderation")
+def dashboard_moderation():
+    return render_template("admin/control_panel/interactions.html", title="Moderation & Interactions", domain="moderation")
+
+
+@bp.route("/recommendations")
+def dashboard_recommendations():
+    return render_template("admin/control_panel/recommendations.html", title="Recommendations", domain="recommendations")
 
 
 @bp.route("/settings")
