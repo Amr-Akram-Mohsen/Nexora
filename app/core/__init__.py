@@ -99,17 +99,28 @@ def setup_logging(app):
     # 3. Web Routes log
     class RouteFilter(logging.Filter):
         def filter(self, record):
-            return "[ROUTE]" in record.getMessage()
+            msg = record.getMessage()
+            return "[ROUTE]" in msg or "[AUTH]" in msg
 
     route_h = RotatingFileHandler("logs/routes.log", **log_cfg)
     route_h.setFormatter(formatter)
     route_h.setLevel(logging.INFO)
     route_h.addFilter(RouteFilter())
 
+    # 4. Auth log
+    class AuthFilter(logging.Filter):
+        def filter(self, record):
+            return "[AUTH]" in record.getMessage()
+
+    auth_h = RotatingFileHandler("logs/auth.log", **log_cfg)
+    auth_h.setFormatter(formatter)
+    auth_h.setLevel(logging.INFO)
+    auth_h.addFilter(AuthFilter())
+
     # Apply handlers to the 'app' logger (where our custom logs go)
     app_logger = logging.getLogger("app")
     app_logger.setLevel(logging.INFO)
-    app_logger.handlers = [ingest_h, enrich_h, route_h]
+    app_logger.handlers = [ingest_h, enrich_h, route_h, auth_h]
     app_logger.propagate = False
 
     # Apply route handler to Flask's logger (for request logs)

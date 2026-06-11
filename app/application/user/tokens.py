@@ -27,7 +27,7 @@ def _serializer() -> URLSafeTimedSerializer:
 def generate_verification_token(user_id: int) -> str:
     """Returns a signed, time-limited email verification token for a user ID."""
     token = _serializer().dumps(user_id, salt=_VERIFY_SALT)
-    logger.debug("[AUTH] Generated verification token for user_id=%s", user_id)
+    logger.info("[AUTH] Generated verification token for user_id=%s", user_id)
     return token
 
 

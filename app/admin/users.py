@@ -41,6 +41,7 @@ def delete_user(id):
     if not success:
         return jsonify({"error": "User not found"}), 404
 
+    db.session.commit()
     return jsonify({"success": True})
 
 
@@ -52,6 +53,7 @@ def activate_user(id):
     if not success:
         return jsonify({"error": "User not found"}), 404
 
+    db.session.commit()
     return jsonify({"success": True})
 
 

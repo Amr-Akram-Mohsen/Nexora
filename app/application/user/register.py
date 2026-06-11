@@ -25,20 +25,25 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
     Returns (user, newsletter_message | None).
     Returns (None, error_message) on failure.
     """
+    logger.info("[AUTH] Registration workflow start for email: %s", email)
     if get_user_by_email(email):
+        logger.info("[AUTH] Registration aborted: account with email %s already exists.", email)
         return None, "An account with this email already exists."
 
     user = create_user(name, email, password)
+    logger.info("[AUTH] User created in DB with user_id=%s for email: %s", user.id, email)
 
     # Newsletter opt-in
     newsletter_msg = None
     if wants_newsletter:
+        logger.info("[AUTH] User opted into newsletter for user_id=%s", user.id)
         success, msg = subscribe_workflow(email, user.id)
         newsletter_msg = msg if success else f"Account created, but newsletter signup failed: {msg}"
     else:
         # Link pre-existing anonymous subscription
         subscriber = get_newsletter_subscriber_by_email(email)
         if subscriber:
+            logger.info("[AUTH] Linking existing newsletter subscription to user_id=%s", user.id)
             link_newsletter_subscriber_to_user(subscriber, user.id)
 
     # Generate stateless signed verification token and send email
@@ -49,6 +54,6 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
         set_verification_sent(user)
         logger.info("[AUTH] Verification email sent to %s (user_id=%s)", email, user.id)
     else:
-        logger.warning("[AUTH] Verification email FAILED for %s (user_id=%s)", email, user.id)
+        logger.warning("[AUTH] Verification email FAILED to send to %s (user_id=%s)", email, user.id)
 
     return user, newsletter_msg
