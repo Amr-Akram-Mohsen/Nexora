@@ -1,26 +1,23 @@
 {% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_spinner, admin_table_spinner %}
 
 {% block title %}Recommendations — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-<div class="admin-page-header">
-  <div class="admin-page-header-row">
-    <div>
-      <h1>Content–Product Recommendations</h1>
-      <p>Inspect and manage content-item associations powering recommendations</p>
-    </div>
-    <div class="admin-page-header-actions">
-      <button id="refresh-recs-btn" class="admin-btn-secondary">↺ Refresh</button>
-    </div>
-  </div>
-</div>
+{% set header_actions %}
+  <button id="refresh-recs-btn" class="admin-btn-secondary">↺ Refresh</button>
+{% endset %}
+
+{{ admin_page_header(
+    "Content–Product Recommendations",
+    "Inspect and manage content-item associations powering recommendations",
+    actions=header_actions
+) }}
 
 <!-- Stats Row -->
 <div id="rec-stats-row" class="dashboard-stats-grid" style="margin-bottom:2rem;">
-  <div class="dashboard-loading" style="grid-column:1/-1; min-height:80px;">
-    <div class="spinner"></div><p>Loading stats…</p>
-  </div>
+  {{ admin_spinner("Loading stats…", "system-loading full-width-card") }}
 </div>
 
 <!-- Filters -->
@@ -56,34 +53,23 @@
       </tr>
     </thead>
     <tbody id="recs-table-body">
-      <tr>
-        <td colspan="7" class="table-loading-cell">
-          <div class="dashboard-loading loading-height-lg">
-            <div class="spinner"></div><p>Loading matches…</p>
-          </div>
-        </td>
-      </tr>
+      {{ admin_table_spinner(7, "Loading matches…") }}
     </tbody>
   </table>
 </div>
 
-<!-- Pagination -->
-<div class="pagination-container">
-  <div id="rec-pagination-info" class="pagination-info-text">Showing 0 to 0 of 0 matches</div>
-  <div class="pagination-controls-group">
-    <select id="rec-per-page" class="dashboard-filter-select pagination-per-page-select">
-      <option value="25" selected>25 per page</option>
-      <option value="50">50 per page</option>
-    </select>
-    <button id="rec-prev-btn" class="user-action-btn" disabled>← Previous</button>
-    <span id="rec-page-indicator" class="pagination-page-indicator">Page 1 of 1</span>
-    <button id="rec-next-btn" class="user-action-btn" disabled>Next →</button>
-  </div>
-</div>
+{{ admin_pagination(
+    info_id="rec-pagination-info",
+    per_page_id="rec-per-page",
+    prev_id="rec-prev-btn",
+    indicator_id="rec-page-indicator",
+    next_id="rec-next-btn",
+    per_page_options=[25, 50],
+    current_per_page=25
+) }}
 
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/control_panel/recommendations.js') }}"></script>
 {% endblock %}

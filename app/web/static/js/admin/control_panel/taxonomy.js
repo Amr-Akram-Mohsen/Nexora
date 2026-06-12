@@ -20,11 +20,7 @@
       .replace(/^-+|-+$/g, '');
   }
 
-  function escapeHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str || '—';
-    return d.innerHTML;
-  }
+  // Exposes global escapeHtml from core.js
 
   // ── Tab Switching ─────────────────────────────────────────────
   function initTabs() {
@@ -64,23 +60,17 @@
   function loadCategories(search) {
     const url = search ? `/admin/taxonomy/categories?search=${encodeURIComponent(search)}` : '/admin/taxonomy/categories';
     const tbody = document.getElementById('categories-table-body');
-    tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-sm"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
 
     fetchList(url, data => renderCategories(data), () => {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-error"><span>⚠️</span><p>Failed to load categories.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load categories.");
     });
   }
 
   function renderCategories(items) {
     const tbody = document.getElementById('categories-table-body');
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-empty"><span style="font-size:2rem;margin-bottom:0.5rem">📭</span><p>No categories yet.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(6, "No categories yet.", "", "loading-height-sm");
       return;
     }
     tbody.innerHTML = '';
@@ -172,23 +162,17 @@
   function loadBrands(search) {
     const url = search ? `/admin/taxonomy/brands?search=${encodeURIComponent(search)}` : '/admin/taxonomy/brands';
     const tbody = document.getElementById('brands-table-body');
-    tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-sm"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(7, "Loading…", "loading-height-sm");
 
     fetchList(url, data => renderBrands(data), () => {
-      tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-        <div class="dashboard-error"><span>⚠️</span><p>Failed to load brands.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load brands.");
     });
   }
 
   function renderBrands(items) {
     const tbody = document.getElementById('brands-table-body');
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-        <div class="dashboard-empty"><span style="font-size:2rem;margin-bottom:0.5rem">📭</span><p>No brands yet.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(7, "No brands yet.", "", "loading-height-sm");
       return;
     }
     tbody.innerHTML = '';
@@ -282,23 +266,17 @@
   function loadTopics(search) {
     const url = search ? `/admin/taxonomy/topics?search=${encodeURIComponent(search)}` : '/admin/taxonomy/topics';
     const tbody = document.getElementById('topics-table-body');
-    tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-sm"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
 
     fetchList(url, data => renderTopics(data), () => {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-error"><span>⚠️</span><p>Failed to load topics.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load topics.");
     });
   }
 
   function renderTopics(items) {
     const tbody = document.getElementById('topics-table-body');
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-empty"><span style="font-size:2rem;margin-bottom:0.5rem">📭</span><p>No topics yet.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(6, "No topics yet.", "", "loading-height-sm");
       return;
     }
     tbody.innerHTML = '';
@@ -388,23 +366,17 @@
   // ────────────────────────────────────────────
   function loadSections() {
     const tbody = document.getElementById('sections-table-body');
-    tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-sm"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
 
     fetchList('/admin/taxonomy/sections', data => renderSections(data), () => {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-error"><span>⚠️</span><p>Failed to load sections.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load sections.");
     });
   }
 
   function renderSections(items) {
     const tbody = document.getElementById('sections-table-body');
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-        <div class="dashboard-empty"><span style="font-size:2rem;margin-bottom:0.5rem">📭</span><p>No sections found.</p></div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(6, "No sections found.", "", "loading-height-sm");
       return;
     }
     tbody.innerHTML = '';

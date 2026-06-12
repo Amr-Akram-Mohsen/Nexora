@@ -2,6 +2,7 @@ from .ports import (
     DiscoveryPort,
     QuotaPort,
     EnrichmentPort,
+    TaxonomyEnrichmentPort,
     CooldownPort,
     ClassificationPort,
 )
@@ -37,6 +38,41 @@ class ClassificationService(ClassificationPort):
 
     def __call__(self, raw_data, section, category, query_obj):
         return classify_content_metadata(raw_data, section, category, query_obj)
+
+
+class TaxonomyEnrichmentService(TaxonomyEnrichmentPort):
+    """
+    Application-layer wrapper for the integration-layer taxonomy enrichment
+    engine.
+
+    Sits between normalization (EnrichmentService) and persistence so that
+    taxonomy assignments are refined using full content signals before the
+    item is written to the database.
+
+    Design contract
+    ---------------
+    * Accepts a plain dict (the ``enriched_dict`` from the workflow).
+    * Returns a plain dict with the same shape, with updated taxonomy fields.
+    * Never raises — any internal failure logs a warning and returns the
+      original dict unchanged, preserving backward compatibility.
+    """
+
+    def __call__(self, enriched_data: dict) -> dict:
+        from app.integrations.content.enrichment.taxonomy_enrichment import (
+            enrich_taxonomy,
+        )
+        from app.shared.dto.ingestion import EnrichedItemDTO
+
+        try:
+            dto = EnrichedItemDTO(**enriched_data)
+            refined = enrich_taxonomy(dto)
+            return refined.model_dump()
+        except Exception as exc:
+            import logging
+            logging.getLogger(__name__).warning(
+                "[taxonomy_enrichment] failed — returning original data  err=%s", exc
+            )
+            return enriched_data
 
 
 class EnrichmentService(EnrichmentPort):

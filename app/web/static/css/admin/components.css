@@ -1,0 +1,504 @@
+/* --- Button Architecture & Variants ---
+   All admin buttons share padding: 0.5rem 1rem / height: 36px for visual alignment.
+   Primary action uses 0.625rem 1.25rem for slightly more presence.
+--- */
+
+.admin-btn-primary {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-primary:hover {
+  background: var(--brand-blue-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-btn-secondary,
+.dashboard-btn-secondary {
+  padding: 0.5rem 1rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--secondary);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-secondary:hover,
+.dashboard-btn-secondary:hover {
+  background: var(--accent);
+  border-color: rgba(var(--brand-blue-rgb), 0.2);
+}
+
+.admin-btn-danger,
+.dashboard-btn-danger,
+.dashboard-delete-btn {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-red);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-danger:hover,
+.dashboard-btn-danger:hover,
+.dashboard-delete-btn:hover {
+  opacity: 0.88;
+}
+
+/* Align admin-toolbar buttons with form inputs */
+.admin-toolbar button {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-toolbar button:hover {
+  background: var(--brand-blue-dark);
+}
+
+.btn-purple {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-purple);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-purple:hover {
+  background: #7c3aed;
+}
+
+/* --- Row Action Buttons (In-Table Controls) --- */
+
+.user-action-btn {
+  padding: 0.3rem 0.625rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.user-action-btn:hover {
+  background: var(--secondary);
+}
+
+.user-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.user-action-toggle-admin {
+  border-color: rgba(var(--brand-blue-rgb), 0.3);
+  color: var(--brand-blue);
+}
+
+.user-action-toggle-admin:hover {
+  background: rgba(var(--brand-blue-rgb), 0.08);
+}
+
+.user-action-toggle-active {
+  border-color: rgba(var(--brand-green-rgb), 0.3);
+  color: var(--brand-green-dark);
+}
+
+.user-action-toggle-active:hover {
+  background: rgba(var(--brand-green-rgb), 0.08);
+}
+
+.user-action-delete {
+  border-color: rgba(var(--destructive-rgb), 0.3);
+  color: var(--brand-red);
+}
+
+.user-action-delete:hover {
+  background: rgba(var(--destructive-rgb), 0.08);
+}
+
+.user-action-inspect {
+  background: var(--brand-purple);
+  color: white;
+  border: none;
+}
+
+.user-action-inspect:hover {
+  background: #7c3aed;
+}
+
+/* --- Status Badges --- */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.status-badge.admin {
+  background: rgba(var(--brand-blue-rgb), 0.1);
+  color: var(--brand-blue);
+}
+
+.status-badge.purple {
+  background: rgba(var(--brand-purple-rgb), 0.1);
+  color: var(--brand-purple);
+}
+
+.status-badge.user {
+  background: var(--secondary);
+  color: var(--muted-foreground);
+}
+
+.status-badge.active {
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.status-badge.inactive {
+  background: rgba(var(--destructive-rgb), 0.08);
+  color: var(--brand-red);
+}
+
+/* Compact badge modifier */
+.badge-compact {
+  padding: 0.15rem 0.4rem;
+  font-size: var(--text-xs);
+}
+
+/* Semantic color variants */
+.badge-blue {
+  background: rgba(var(--brand-blue-rgb), 0.08);
+  color: var(--brand-blue);
+}
+
+.badge-purple {
+  background: rgba(var(--brand-purple-rgb), 0.08);
+  color: var(--brand-purple);
+}
+
+.badge-orange {
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--brand-orange);
+}
+
+.badge-green {
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.badge-indigo {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+}
+
+.badge-slate {
+  background: rgba(100, 116, 139, 0.08);
+  color: #64748b;
+}
+
+.badge-pending {
+  background: rgba(var(--brand-purple-rgb), 0.1);
+  color: var(--brand-purple);
+}
+
+.badge-margin {
+  margin: 0.125rem 0;
+}
+
+/* Smaller type compact variant */
+.badge-type-compact {
+  padding: 0.1rem 0.3rem;
+  font-size: var(--text-xs);
+}
+
+/* --- Bulk Actions Toolbar Widget --- */
+
+.bulk-actions-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1px solid rgba(var(--brand-blue-rgb), 0.3);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  animation: slideDown 0.2s ease;
+}
+
+body.dark-mode .bulk-actions-toolbar {
+  border-color: rgba(var(--brand-blue-rgb), 0.4);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bulk-selection-count {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  color: var(--brand-blue);
+}
+
+.bulk-controls-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* --- Pagination Controls --- */
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.25rem;
+  background: var(--card);
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-info-text {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.pagination-controls-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pagination-per-page-select {
+  width: auto;
+  margin-right: 0.375rem;
+}
+
+.pagination-page-indicator {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  padding: 0 0.5rem;
+  color: var(--foreground);
+}
+
+/* --- Ingest Log Items --- */
+
+.ingest-log-item {
+  padding: 0.5rem 1.25rem;
+}
+
+.ingest-log-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+  font-size: 0.8rem;
+  background: var(--secondary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ingest-log-text {
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.ingest-log-title {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.1rem;
+  color: var(--foreground);
+}
+
+.ingest-log-meta {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 0.1rem;
+  opacity: 0.8;
+}
+
+/* --- Accessibility: Base Focus Ring --- */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--brand-blue);
+  outline-offset: 2px;
+}
+
+/* --- Shared Utility Helpers (Admin-scoped) ---
+   Minimal set — prefer reusing flex.css utilities from the global layer.
+--- */
+
+.is-hidden {
+  display: none !important;
+}
+
+.align-middle {
+  vertical-align: middle;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.divider {
+  color: var(--border);
+  font-size: var(--text-sm);
+  margin: 0 0.25rem;
+}
+
+.text-deco-none {
+  text-decoration: none;
+}
+
+.font-bold {
+  font-weight: var(--weight-bold);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.text-brand-blue {
+  color: var(--brand-blue);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.text-sm {
+  font-size: var(--text-sm);
+}
+
+.text-xs-sub {
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.clickable-purple-link {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-md);
+  color: var(--brand-purple);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.grid-full-width {
+  grid-column: 1 / -1;
+}
+
+.flex-align-center {
+  display: flex;
+  align-items: center;
+}
+
+/* Spacing: use a consistent 4-step scale: 0.25 / 0.5 / 1 / 1.5 / 2rem */
+.mt-1  { margin-top: 0.25rem; }
+.mt-2  { margin-top: 0.5rem; }
+.mt-3  { margin-top: 1rem; }
+.mt-6  { margin-top: 2rem; }
+.mb-1  { margin-bottom: 0.25rem; }
+.mb-2  { margin-bottom: 0.5rem; }
+.mb-3  { margin-bottom: 1rem; }
+.ml-1  { margin-left: 0.25rem; }
+.gap-sm { gap: 0.5rem; }
+.p-4   { padding: 1.5rem; }
+.text-lg-icon { font-size: 1.25rem; }
+
+/* --- Responsive Layout for Components --- */
+
+@media (max-width: 768px) {
+  .user-actions-group {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .user-actions-group button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .pagination-container {
+    flex-direction: column;
+    gap: 0.875rem;
+    align-items: center;
+    text-align: center;
+  }
+}

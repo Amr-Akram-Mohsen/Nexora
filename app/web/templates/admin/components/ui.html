@@ -1,0 +1,66 @@
+{# app/web/templates/admin/components/ui.html #}
+
+{% macro admin_page_header(title, description, actions=None) %}
+<div class="admin-page-header">
+  <div class="admin-page-header-row">
+    <div>
+      <h1>{{ title }}</h1>
+      {% if description %}
+      <p>{{ description }}</p>
+      {% endif %}
+    </div>
+    {% if actions %}
+    <div class="admin-page-header-actions">
+      {{ actions }}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
+<div class="pagination-container">
+  <div id="{{ info_id }}" class="pagination-info-text">
+    Showing 0 to 0 of 0 items
+  </div>
+  <div class="pagination-controls-group">
+    <select id="{{ per_page_id }}" class="dashboard-filter-select pagination-per-page-select">
+      {% for opt in per_page_options %}
+      <option value="{{ opt }}" {% if opt == current_per_page %}selected{% endif %}>{{ opt }} per page</option>
+      {% endfor %}
+    </select>
+    <button id="{{ prev_id }}" class="user-action-btn" disabled>← Previous</button>
+    <span id="{{ indicator_id }}" class="pagination-page-indicator">Page 1 of 1</span>
+    <button id="{{ next_id }}" class="user-action-btn" disabled>Next →</button>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro admin_spinner(text="Loading...", extra_class="") %}
+<div class="dashboard-loading {{ extra_class }}">
+  <div class="spinner"></div>
+  <p>{{ text }}</p>
+</div>
+{% endmacro %}
+
+{% macro admin_table_spinner(colspan, text="Loading...", height_class="loading-height-lg") %}
+<tr>
+  <td colspan="{{ colspan }}" class="table-loading-cell">
+    <div class="dashboard-loading {{ height_class }}">
+      <div class="spinner"></div>
+      <p>{{ text }}</p>
+    </div>
+  </td>
+</tr>
+{% endmacro %}
+
+{% macro admin_empty_state(message="No records found matching filters.", submessage="Adjust your filters or search terms.") %}
+<div class="dashboard-empty">
+  <span style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</span>
+  <p>{{ message }}</p>
+  {% if submessage %}
+  <p style="font-size: 0.8rem; margin-top: 0.25rem; opacity: 0.7;">{{ submessage }}</p>
+  {% endif %}
+</div>
+{% endmacro %}
+

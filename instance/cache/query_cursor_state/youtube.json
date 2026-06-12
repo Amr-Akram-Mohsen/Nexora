@@ -4,7 +4,7 @@
     "electronics:laptops": 7,
     "accessories:watches": 6,
     "accessories:bags": 6,
-    "perfumes:niche-artisanal": 6,
+    "perfumes:niche-artisanal": 4,
     "accessories:sunglasses": 6,
     "accessories:jewelry": 6,
     "electronics:tablets": 0,
@@ -12,7 +12,7 @@
     "electronics:earbuds": 1,
     "electronics:headphones": 2,
     "electronics:cameras": 1,
-    "perfumes:oud-oriental": 6
+    "perfumes:oud-oriental": 3
   },
   "news": {
     "perfumes:niche-artisanal": 0,
@@ -34,7 +34,7 @@
     "electronics:laptops": 3
   },
   "trends": {
-    "perfumes:niche-artisanal": 3,
-    "perfumes:oud-oriental": 3
+    "perfumes:niche-artisanal": 0,
+    "perfumes:oud-oriental": 1
   }
 }

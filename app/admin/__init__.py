@@ -7,3 +7,5 @@ from .ingestions import bp as api_ingestion_bp
 from .system import bp as api_system_bp
 from .taxonomy import bp as api_taxonomy_bp
 from .recommendations import bp as api_recommendation_bp
+from .providers import bp as api_provider_bp
+

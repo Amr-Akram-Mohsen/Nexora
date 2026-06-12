@@ -23,6 +23,14 @@
       class="nav-link {% if (domain|default('')) == 'items' %}active{% endif %}">
       <span class="nav-icon">🛍️</span> Products
     </a>
+    <a href="{{ url_for('admin.dashboard_sources') }}"
+      class="nav-link {% if (domain|default('')) == 'sources' %}active{% endif %}">
+      <span class="nav-icon">📡</span> Sources
+    </a>
+    <a href="{{ url_for('admin.dashboard_stores') }}"
+      class="nav-link {% if (domain|default('')) == 'stores' %}active{% endif %}">
+      <span class="nav-icon">🏪</span> Stores
+    </a>
     <a href="{{ url_for('admin.dashboard_taxonomy') }}"
       class="nav-link {% if (domain|default('')) == 'taxonomy' %}active{% endif %}">
       <span class="nav-icon">🏷️</span> Taxonomy

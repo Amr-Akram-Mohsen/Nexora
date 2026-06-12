@@ -1,20 +1,19 @@
 {% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
 
 {% block title %}Content Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-<div class="admin-page-header">
-  <div class="admin-page-header-row">
-    <div>
-      <h1>Content Moderation & Management</h1>
-      <p>Clean up, categorize, inspect quality, and perform bulk operations on aggregated content</p>
-    </div>
-    <div class="admin-page-header-actions">
-      <button id="refresh-contents-btn" class="admin-btn-secondary">↺ Refresh</button>
-    </div>
-  </div>
-</div>
+{% set header_actions %}
+  <button id="refresh-contents-btn" class="admin-btn-secondary">↺ Refresh</button>
+{% endset %}
+
+{{ admin_page_header(
+    "Content Moderation & Management",
+    "Clean up, categorize, inspect quality, and perform bulk operations on aggregated content",
+    actions=header_actions
+) }}
 
 <!-- Advanced Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
@@ -114,7 +113,7 @@
 </div>
 
 <!-- Bulk Actions Toolbar (hidden by default) -->
-<div id="bulk-actions-toolbar" class="bulk-actions-toolbar">
+<div id="bulk-actions-toolbar" class="bulk-actions-toolbar is-hidden">
   <div class="flex items-center gap-2">
     <span class="text-lg">⚡</span>
     <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
@@ -131,7 +130,7 @@
     </select>
     
     <!-- Bulk Category Dropdown (Shown only when recategorize is selected) -->
-    <select id="bulk-category-select" class="dashboard-filter-select">
+    <select id="bulk-category-select" class="dashboard-filter-select is-hidden">
       <option value="">Select Category...</option>
       <!-- Populated dynamically -->
     </select>
@@ -165,37 +164,20 @@
       </tr>
     </thead>
     <tbody id="contents-table-body">
-      <tr>
-        <td colspan="7" class="table-loading-cell">
-          <div class="dashboard-loading loading-height-lg">
-            <div class="spinner"></div>
-            <p>Loading catalog contents…</p>
-          </div>
-        </td>
-      </tr>
+      {{ admin_table_spinner(7, "Loading catalog contents…") }}
     </tbody>
   </table>
 </div>
 
-<!-- Pagination Controls -->
-<div class="pagination-container">
-  <div id="pagination-info" class="pagination-info-text">
-    Showing 0 to 0 of 0 contents
-  </div>
-  
-  <div class="pagination-controls-group">
-    <select id="pagination-per-page" class="dashboard-filter-select pagination-per-page-select">
-      <option value="10">10 per page</option>
-      <option value="20" selected>20 per page</option>
-      <option value="50">50 per page</option>
-      <option value="100">100 per page</option>
-    </select>
-    
-    <button id="prev-page-btn" class="user-action-btn" disabled>← Previous</button>
-    <span id="page-num-indicator" class="pagination-page-indicator">Page 1 of 1</span>
-    <button id="next-page-btn" class="user-action-btn" disabled>Next →</button>
-  </div>
-</div>
+{{ admin_pagination(
+    info_id="pagination-info",
+    per_page_id="pagination-per-page",
+    prev_id="prev-page-btn",
+    indicator_id="page-num-indicator",
+    next_id="next-page-btn",
+    per_page_options=[10, 20, 50, 100],
+    current_per_page=20
+) }}
 
 <!-- Dedicated Inline Modal for Recategorization -->
 <div id="quick-category-modal" class="dashboard-modal-overlay">
@@ -214,9 +196,22 @@
   </div>
 </div>
 
+<!-- Dedicated Modal for Ingest/Provider Inspection -->
+<div id="inspect-provider-modal" class="dashboard-modal-overlay">
+  <div class="dashboard-modal-content" style="max-width: 550px;">
+    <div class="dashboard-modal-icon modal-icon-purple">📡</div>
+    <h3 class="dashboard-modal-title" id="inspect-modal-title">Source Details</h3>
+    <div class="dashboard-modal-body" id="inspect-modal-body" style="text-align: left; max-height: 400px; overflow-y: auto; font-size: var(--text-sm);">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="dashboard-modal-actions">
+      <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/control_panel/contents.js') }}"></script>
 {% endblock %}

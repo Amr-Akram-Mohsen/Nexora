@@ -146,8 +146,30 @@ def apply_relationships(content, data, session=None) -> dict:
     if content.object_type == "article":
         obj = resolve(content, session=session)
         if obj:
-            if link_article_sources(obj, data, session=session):
+            link_article_sources(obj, data, session=session)
+            if obj.preferred_source_relation and obj.preferred_source_relation.source:
+                content.source_id = obj.preferred_source_relation.source.id
                 updated_relationships["sources"] = [s.source.slug for s in obj.article_sources]
-                updated_relationships["sources"].append(data.get("source_name").lower())
+                if data.get("source_name"):
+                    updated_relationships["sources"].append(data.get("source_name").lower())
     
+    # For video and post, get-or-create their platform source
+    elif content.object_type in ("video", "post"):
+        platform_name = data.get("platform") or content.object_type
+        slug = generate_slug(platform_name)
+        source = Source.get_by_slug(slug, session)
+        if not source:
+            domain = f"{slug}.com"
+            source = Source(
+                name=platform_name.capitalize(),
+                slug=slug,
+                domain=domain,
+                authority_score=100, # maximum authority for first-party/direct platforms
+                is_active=True
+            )
+            session.add(source)
+            session.flush()
+        content.source_id = source.id
+        updated_relationships["sources"] = [slug]
+
     return updated_relationships

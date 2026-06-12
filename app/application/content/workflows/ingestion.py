@@ -4,6 +4,7 @@ from typing import List, Dict, Optional, Callable
 from ..ingestion.services import (
     DiscoveryService,
     EnrichmentService,
+    TaxonomyEnrichmentService,
     GenericQuotaService,
     GNewsQuotaService,
     YouTubeQuotaService,
@@ -69,6 +70,7 @@ class IngestionWorkflow:
         self.discovery = None if source_name == "rss" else DiscoveryService()
         self.quota_service = QUOTA_SERVICE_MAP.get(source_name, GenericQuotaService)()
         self.enrichment_service = EnrichmentService()
+        self.taxonomy_enrichment_service = TaxonomyEnrichmentService()
         self.cooldown_service = CooldownService()
         self.classification_service = ClassificationService()
         self.profile = SOURCE_PROFILES[source_name]
@@ -520,6 +522,15 @@ class IngestionWorkflow:
             else:
                 enriched_dict = enriched
 
+            # ── Taxonomy Enrichment (post-normalization, pre-persistence) ──
+            # Refines category, topics, brands, and facets using content
+            # signals.  Runs after normalization so it can see the final
+            # content text; runs before persistence so DB records are correct.
+            # Failures are caught internally and fall back silently.
+            enriched_dict = self.taxonomy_enrichment_service(enriched_dict)
+
+            enriched_dict["ingestion_origin"] = self.source_name
+
             missing = [k for k in ("url", "title") if not enriched_dict.get(k)]
             if missing:
                 log_item_skipped(
@@ -561,17 +572,17 @@ class IngestionWorkflow:
                             status="stored",
                             published=enriched_dict.get("is_published"),
                         )
-                    elif status == "updated":
-                        query_updated += 1
-                        log_item_ingested(
-                            logger, self.source_name, item_title, status="updated"
-                        )
-                    else:
+                    elif status == "skipped":
                         log_item_skipped(
                             logger,
                             self.source_name,
                             item_title,
                             reason="duplicate_no_changes",
+                        )
+                    else:
+                        query_updated += 1
+                        log_item_ingested(
+                            logger, self.source_name, item_title, status="updated", updated_relationships=status
                         )
                 else:
                     log_item_skipped(

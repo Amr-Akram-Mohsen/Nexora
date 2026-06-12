@@ -1,13 +1,11 @@
 {% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_spinner %}
 
 {% block title %}Settings — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-<div class="admin-page-header">
-  <h1>Settings</h1>
-  <p>System configuration and administrative controls</p>
-</div>
+{{ admin_page_header("Settings", "System configuration and administrative controls") }}
 
 <!-- Toast notification -->
 <div id="settings-toast" class="settings-toast" role="alert" aria-live="polite"></div>
@@ -24,10 +22,7 @@
       </div>
     </div>
     <div id="system-info" class="settings-card-body">
-      <div class="dashboard-loading">
-        <div class="spinner"></div>
-        <p>Loading…</p>
-      </div>
+      {{ admin_spinner("Loading…") }}
     </div>
   </div>
 
@@ -89,10 +84,7 @@
     </div>
     <div class="settings-card-body">
       <div id="integrations-monitor" class="integrations-monitor-list">
-        <div class="dashboard-loading">
-          <div class="spinner"></div>
-          <p>Loading status...</p>
-        </div>
+        {{ admin_spinner("Loading status...") }}
       </div>
       <p class="hint">
         Data ingestion is handled via scheduled jobs or CLI commands.
@@ -122,10 +114,7 @@
         <button class="settings-tab" id="filter-item-logs">Items</button>
       </div>
       <div id="ingestion-log-container" class="settings-log-container">
-        <div class="dashboard-loading">
-          <div class="spinner"></div>
-          <p>Loading logs...</p>
-        </div>
+        {{ admin_spinner("Loading logs...") }}
       </div>
     </div>
   </div>
@@ -207,6 +196,5 @@
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/control_panel/settings.js') }}"></script>
 {% endblock %}

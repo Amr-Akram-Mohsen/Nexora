@@ -9,6 +9,13 @@ from sqlalchemy import select, func
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
 
 
+@bp.before_request
+@admin_required
+def require_admin():
+    """Ensure all taxonomy management endpoints require admin privilege."""
+    pass
+
+
 # ─────────────────────────────────────────────
 # CATEGORIES
 # ─────────────────────────────────────────────

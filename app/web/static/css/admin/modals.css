@@ -1,0 +1,283 @@
+/* --- Confirm Dialog & Modal System --- */
+
+.dashboard-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 11, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.dashboard-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dashboard-modal-content {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  max-width: 460px;
+  width: 90%;
+  text-align: center;
+  transform: scale(0.97);
+  transition: transform 0.2s ease;
+}
+
+.dashboard-modal-overlay.active .dashboard-modal-content {
+  transform: scale(1);
+}
+
+.dashboard-modal-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.dashboard-modal-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin: 0 0 0.75rem 0;
+  color: var(--foreground);
+}
+
+.dashboard-modal-body {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
+
+.dashboard-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* --- Modal Size Modifiers --- */
+
+.modal-content-sm {
+  max-width: 420px;
+}
+
+.modal-icon-purple {
+  background: rgba(var(--brand-purple-rgb), 0.1);
+  color: var(--brand-purple);
+}
+
+.modal-select-full {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* --- Toast Notifications --- */
+
+.settings-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  max-width: 320px;
+}
+
+.settings-toast-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.settings-toast-success {
+  background: #166534;
+  color: #dcfce7;
+  border: 1px solid #16a34a;
+}
+
+.settings-toast-error {
+  background: #7f1d1d;
+  color: #fee2e2;
+  border: 1px solid var(--brand-red);
+}
+
+.settings-toast-warning {
+  background: #713f12;
+  color: #fef9c3;
+  border: 1px solid #ca8a04;
+}
+
+@media (max-width: 768px) {
+  .settings-toast {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+  }
+}
+
+/* --- Metadata / Provider Inspect Dialog --- */
+
+.inspect-details-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  text-align: left;
+}
+
+.inspect-details-title {
+  color: var(--muted-foreground);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--weight-bold);
+  display: block;
+}
+
+.inspect-details-row {
+  margin-top: 0.2rem;
+  font-size: var(--text-sm);
+  color: var(--foreground);
+}
+
+.inspect-details-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0.375rem 0;
+}
+
+/* --- Inspect Badge Variants (use status-badge as base where possible) --- */
+
+.inspect-badge-secondary {
+  text-transform: capitalize;
+  padding: 0.15rem 0.45rem;
+  font-size: var(--text-xs);
+  background: var(--secondary);
+  color: var(--foreground);
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-bold);
+}
+
+.inspect-badge-blue {
+  padding: 0.15rem 0.45rem;
+  font-size: var(--text-xs);
+  background: rgba(var(--brand-blue-rgb), 0.1);
+  color: var(--brand-blue);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+}
+
+.inspect-badge-complete {
+  text-transform: capitalize;
+  padding: 0.15rem 0.45rem;
+  font-size: var(--text-xs);
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-bold);
+}
+
+.inspect-badge-pending {
+  text-transform: capitalize;
+  padding: 0.15rem 0.45rem;
+  font-size: var(--text-xs);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--brand-orange);
+  border-radius: var(--radius-full);
+  font-weight: var(--weight-bold);
+}
+
+.inspect-brand-purple {
+  font-weight: var(--weight-bold);
+  color: var(--brand-purple);
+}
+
+.inspect-link {
+  text-decoration: underline;
+}
+
+.inspect-link i {
+  font-size: var(--text-xs);
+}
+
+/* --- Store Cards in Product Inspector --- */
+
+.inspect-store-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 0.625rem;
+  background: var(--card);
+}
+
+.inspect-store-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.inspect-store-card-name {
+  font-size: var(--text-sm);
+  color: var(--brand-purple);
+  font-weight: var(--weight-bold);
+}
+
+.inspect-store-card-badge-net {
+  font-size: var(--text-xs);
+  margin-left: 0.5rem;
+  text-transform: uppercase;
+}
+
+.inspect-store-card-grid {
+  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: var(--text-xs);
+}
+
+.inspect-store-card-links {
+  margin-top: 0.5rem;
+  font-size: var(--text-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.inspect-store-card-meta-label {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  font-weight: var(--weight-bold);
+}
+
+.inspect-store-card-meta-box {
+  margin-top: 0.375rem;
+  padding: 0.5rem;
+  background: var(--secondary);
+  border-radius: var(--radius-sm);
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: var(--text-xs);
+}
+
+.inspect-store-card-meta-empty {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}

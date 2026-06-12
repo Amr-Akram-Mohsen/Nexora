@@ -80,6 +80,8 @@ class Content(db.Model):
     gender_id = db.Column(db.Integer, db.ForeignKey("gender_facets.id"))
     intent_id = db.Column(db.Integer, db.ForeignKey("intent_facets.id"))
     price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier_facets.id"))
+    source_id = db.Column(db.Integer, db.ForeignKey("sources.id"), nullable=True)
+    ingestion_origin = db.Column(db.String(50), nullable=True, index=True)
 
     category = db.relationship("Category", back_populates="contents")
     section = db.relationship("Section", back_populates="contents")
@@ -87,6 +89,7 @@ class Content(db.Model):
     gender = db.relationship("GenderFacet", back_populates="contents")
     intent = db.relationship("IntentFacet", back_populates="contents")
     price_tier = db.relationship("PriceTierFacet", back_populates="contents")
+    source = db.relationship("Source", backref="contents")
 
 
     topics = db.relationship("Topic", secondary=content_topics, back_populates="contents")
@@ -148,6 +151,7 @@ class Content(db.Model):
         db.Index("ix_contents_gender_id", "gender_id"),
         db.Index("ix_contents_intent_id", "intent_id"),
         db.Index("ix_contents_price_tier_id", "price_tier_id"),
+        db.Index("ix_contents_source_id", "source_id"),
 
         # Advanced filtering
         db.Index("ix_contents_category_intent_published_at",

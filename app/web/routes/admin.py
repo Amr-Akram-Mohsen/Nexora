@@ -7,11 +7,11 @@ bp = Blueprint(
     url_prefix="/admin"
 )
 
-# @bp.before_request
-# @admin_required
-# def require_admin():
-#     """Ensure all routes under /admin are strictly admin-only."""
-#     pass
+@bp.before_request
+@admin_required
+def require_admin():
+    """Ensure all routes under /admin are strictly admin-only."""
+    pass
 
 @bp.route("/")
 def home():
@@ -25,6 +25,16 @@ def dashboard_contents():
 @bp.route("/items")
 def dashboard_items():
     return render_template("admin/control_panel/items.html", title="Product Management", domain="items")
+
+
+@bp.route("/sources")
+def dashboard_sources():
+    return render_template("admin/control_panel/sources.html", title="Sources Management", domain="sources")
+
+
+@bp.route("/stores")
+def dashboard_stores():
+    return render_template("admin/control_panel/stores.html", title="Stores Management", domain="stores")
 
 
 @bp.route("/taxonomy")

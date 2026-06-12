@@ -27,7 +27,7 @@ from app.domains.item.models import (
     ItemVariant,
     Store,
 )
-from app.domains.taxonomy.models import Brand, Category
+from app.domains.taxonomy.models import Brand, Category, Source
 from app.shared.utils.slug import generate_slug
 from app.integrations.commercial.schema import ParsedProduct, ParsedVariant
 
@@ -107,6 +107,20 @@ class ProductInserter:
         brand = self._resolve_brand(product.brand_name)
         slug = self._unique_slug(product.name)
 
+        source = None
+        if product.source_type:
+            source_slug = generate_slug(product.source_type)
+            source = self._session.query(Source).filter_by(slug=source_slug).first()
+            if not source:
+                source = Source(
+                    name=product.source_type.capitalize(),
+                    slug=source_slug,
+                    domain=f"{source_slug}.com",
+                    is_active=True
+                )
+                self._session.add(source)
+                self._session.flush()
+
         item = Item(
             name=product.name,
             slug=slug,
@@ -115,6 +129,7 @@ class ProductInserter:
             review_count=product.review_count,
             item_type=product.item_type,
             source_type=product.source_type,
+            source_id=source.id if source else None,
             category=category,
             brand=brand,
         )

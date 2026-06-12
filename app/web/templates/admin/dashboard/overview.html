@@ -1,12 +1,11 @@
 {% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_spinner %}
 
 {% block title %}Dashboard Overview — Nexora Admin{% endblock %}
 
 {% block admin_content %}
-<div class="admin-page-header">
-  <h1>Dashboard Overview</h1>
-  <p>Platform-wide metrics and at-a-glance system health</p>
-</div>
+
+{{ admin_page_header("Dashboard Overview", "Platform-wide metrics and at-a-glance system health") }}
 
 <!-- Stats Cards -->
 <div id="dashboard-overview-container"></div>
@@ -21,7 +20,7 @@
       <span class="overview-panel-sub">Queue Status</span>
     </div>
     <div id="catalog-health-container" class="panel-body-padded">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading health indicators…</p></div>
+      {{ admin_spinner("Loading health indicators…") }}
     </div>
   </div>
 
@@ -32,7 +31,7 @@
       <span class="overview-panel-sub">Latest Aggregations</span>
     </div>
     <div id="recent-ingest-container" class="panel-body-list">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading ingest logs…</p></div>
+      {{ admin_spinner("Loading ingest logs…") }}
     </div>
   </div>
 
@@ -48,7 +47,7 @@
       <span class="overview-panel-sub">Volume Breakdown</span>
     </div>
     <div id="categories-distribution-container" class="panel-body-padded">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading category stats…</p></div>
+      {{ admin_spinner("Loading category stats…") }}
     </div>
   </div>
 
@@ -59,7 +58,7 @@
       <span class="overview-panel-sub">Volume Breakdown</span>
     </div>
     <div id="sources-distribution-container" class="panel-body-padded">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading source stats…</p></div>
+      {{ admin_spinner("Loading source stats…") }}
     </div>
   </div>
 
@@ -75,7 +74,7 @@
       <span class="overview-panel-sub">by view count</span>
     </div>
     <div id="top-articles-container">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading articles…</p></div>
+      {{ admin_spinner("Loading articles…") }}
     </div>
   </div>
 
@@ -86,10 +85,58 @@
       <span class="overview-panel-sub">by click count</span>
     </div>
     <div id="top-items-container">
-      <div class="dashboard-loading"><div class="spinner"></div><p>Loading items…</p></div>
+      {{ admin_spinner("Loading items…") }}
     </div>
   </div>
 
+</div>
+
+<!-- Provider Performance & Activity Hub -->
+<div class="overview-top-grid mt-6">
+  <!-- Top Performing Providers -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📈 Top Content Providers</h3>
+      <span class="overview-panel-sub">By Total Views</span>
+    </div>
+    <div id="top-content-providers-container" class="panel-body-padded">
+      {{ admin_spinner("Loading provider performance…") }}
+    </div>
+  </div>
+
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🛒 Top Merchant Sources</h3>
+      <span class="overview-panel-sub">By Affiliate Clicks</span>
+    </div>
+    <div id="top-product-providers-container" class="panel-body-padded">
+      {{ admin_spinner("Loading marketplace performance…") }}
+    </div>
+  </div>
+</div>
+
+<div class="overview-top-grid mt-6">
+  <!-- Product Sources Distribution -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🛍️ Product Sources</h3>
+      <span class="overview-panel-sub">Marketplace Volume</span>
+    </div>
+    <div id="product-sources-distribution-container" class="panel-body-padded">
+      {{ admin_spinner("Loading product sources…") }}
+    </div>
+  </div>
+
+  <!-- Provider Activity Summary -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📡 Active Provider Ingest Status</h3>
+      <span class="overview-panel-sub">Live Ingestion & Metadata Tracking</span>
+    </div>
+    <div id="provider-activities-container" class="panel-body-list">
+      {{ admin_spinner("Loading provider status…") }}
+    </div>
+  </div>
 </div>
 
 <!-- Interaction Breakdown -->
@@ -99,14 +146,14 @@
     <span class="overview-panel-sub">all time</span>
   </div>
   <div id="overview-interactions-container">
-    <div class="dashboard-loading"><div class="spinner"></div><p>Loading breakdown…</p></div>
+    {{ admin_spinner("Loading breakdown…") }}
   </div>
 </div>
+
 
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/dashboard/core.js') }}"></script>
 <script>
   renderDashboardOverview("dashboard-overview-container");
   renderTopArticles("top-articles-container");

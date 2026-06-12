@@ -12,22 +12,29 @@
   let commentDebounce = null;
 
   // ── Tab switching ───────────────────────
+  function switchTab(tabName) {
+    const btn = document.querySelector(`#interactions-tabs .admin-tab-btn[data-tab="${tabName}"]`);
+    if (!btn) return;
+
+    document.querySelectorAll('#interactions-tabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('is-hidden'));
+
+    btn.classList.add('active');
+    const panelId = `tab-panel-${btn.dataset.tab}`;
+    const panel = document.getElementById(panelId);
+    if (panel) panel.classList.remove('is-hidden');
+
+    if (btn.dataset.tab === 'reactions') {
+      loadInteractionBreakdown();
+      loadReactions(1);
+    }
+  }
+
   function initTabs() {
     document.getElementById('interactions-tabs').addEventListener('click', e => {
       const btn = e.target.closest('.admin-tab-btn');
       if (!btn) return;
-
-      document.querySelectorAll('#interactions-tabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('is-hidden'));
-
-      btn.classList.add('active');
-      const panelId = `tab-panel-${btn.dataset.tab}`;
-      document.getElementById(panelId).classList.remove('is-hidden');
-
-      if (btn.dataset.tab === 'reactions' && reactionsPage === 1) {
-        loadInteractionBreakdown();
-        loadReactions(1);
-      }
+      switchTab(btn.dataset.tab);
     });
   }
 
@@ -56,7 +63,7 @@
       })
       .catch(() => {
         document.getElementById('interactions-stats-row').innerHTML =
-          '<p class="hint" style="grid-column:1/-1;padding:1rem;">Could not load stats.</p>';
+          '<p class="hint grid-full-width">Could not load stats.</p>';
       });
   }
 
@@ -81,17 +88,13 @@
     Object.entries(filters).forEach(([k, v]) => { if (v) params.set(k, v); });
 
     const tbody = document.getElementById('comments-table-body');
-    tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-md"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(7, "Loading…", "loading-height-md");
 
     fetch(`/admin/interactions/comments?${params}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => renderComments(data))
       .catch(() => {
-        tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-          <div class="dashboard-error"><span style="font-size:2rem">⚠️</span><p>Failed to load comments.</p></div>
-        </td></tr>`;
+        tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load comments.");
       });
   }
 
@@ -112,12 +115,7 @@
     document.getElementById('comments-next-btn').disabled = commentsPage >= commentsTotalPages;
 
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-        <div class="dashboard-empty">
-          <span style="font-size:2.5rem;margin-bottom:1rem">📭</span>
-          <p>No comments found. Try adjusting filters.</p>
-        </div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(7, "No comments found.", "Try adjusting filters.", "loading-height-md");
       return;
     }
 
@@ -151,7 +149,6 @@
               data-action="delete-comment"
               data-comment-id="${c.id}">🗑</button>
             <button class="user-action-btn"
-              style="font-size:0.75rem;"
               data-action="flag-comment"
               data-comment-id="${c.id}">🚩 Flag</button>
           </div>
@@ -197,9 +194,7 @@
     if (type) params.set('type', type);
 
     const tbody = document.getElementById('reactions-table-body');
-    tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-md"><div class="spinner"></div><p>Loading…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-md");
 
     fetch(`/admin/interactions/reactions?${params}`)
       .then(r => r.json())
@@ -218,9 +213,7 @@
         document.getElementById('reactions-next-btn').disabled = reactionsPage >= reactionsTotalPages;
 
         if (!items.length) {
-          tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-            <div class="dashboard-empty"><span style="font-size:2.5rem;margin-bottom:1rem">📭</span><p>No reactions found.</p></div>
-          </td></tr>`;
+          tbody.innerHTML = getTableEmptyStateHtml(6, "No reactions found.", "", "loading-height-md");
           return;
         }
 
@@ -243,30 +236,48 @@
         });
       })
       .catch(() => {
-        tbody.innerHTML = `<tr><td colspan="6" class="table-loading-cell">
-          <div class="dashboard-error"><span style="font-size:2rem">⚠️</span><p>Failed to load reactions.</p></div>
-        </td></tr>`;
+        tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load reactions.");
       });
   }
 
   // ── Utilities ────────────────────────────
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str || '—';
-    return div.innerHTML;
-  }
+  // Exposes global escapeHtml and formatDate from core.js
 
-  function formatDate(str) {
-    if (!str) return '—';
-    try { return new Date(str).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }); }
-    catch { return str; }
+  function applyUrlFilters() {
+    if (typeof getUrlQueryParams !== "function") return;
+    const params = getUrlQueryParams();
+    
+    // Switch to active tab if specified
+    if (params.tab) {
+      switchTab(params.tab);
+    }
+    
+    const filterMap = {
+      search: "comment-search",
+      sentiment: "filter-comment-sentiment",
+      target_type: "filter-comment-target"
+    };
+
+    for (const [paramKey, elementId] of Object.entries(filterMap)) {
+      if (params[paramKey] !== undefined) {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.value = params[paramKey];
+        }
+      }
+    }
   }
 
   // ── Init ─────────────────────────────────
   function init() {
     initTabs();
     loadStatsRow();
-    loadComments(1);
+    applyUrlFilters();
+
+    const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
+    if (params.tab !== 'reactions') {
+      loadComments(1);
+    }
 
     // Comment filters
     document.getElementById('comment-search').addEventListener('input', () => {

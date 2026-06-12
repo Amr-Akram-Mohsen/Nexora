@@ -33,7 +33,7 @@
       })
       .catch(() => {
         document.getElementById('rec-stats-row').innerHTML =
-          '<p class="hint" style="grid-column:1/-1;padding:1rem;">Could not load stats.</p>';
+          '<p class="hint grid-full-width">Could not load stats.</p>';
       });
   }
 
@@ -45,17 +45,13 @@
     if (search) params.set('search', search);
 
     const tbody = document.getElementById('recs-table-body');
-    tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-      <div class="dashboard-loading loading-height-lg"><div class="spinner"></div><p>Loading matches…</p></div>
-    </td></tr>`;
+    tbody.innerHTML = getTableSpinnerHtml(7, "Loading matches…", "loading-height-lg");
 
     fetch(`/admin/recommendations/matches?${params}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => renderMatches(data))
       .catch(() => {
-        tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-          <div class="dashboard-error"><span style="font-size:2rem">⚠️</span><p>Failed to load matches.</p></div>
-        </td></tr>`;
+        tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load matches.");
       });
   }
 
@@ -76,13 +72,7 @@
     document.getElementById('rec-next-btn').disabled = currentPage >= totalPages;
 
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="table-loading-cell">
-        <div class="dashboard-empty">
-          <span style="font-size:2.5rem;margin-bottom:1rem">🔗</span>
-          <p>No content-product matches found.</p>
-          <p style="font-size:0.8rem;opacity:0.7;">Run the article-item matcher to generate associations.</p>
-        </div>
-      </td></tr>`;
+      tbody.innerHTML = getTableEmptyStateHtml(7, "No content-product matches found.", "Run the article-item matcher to generate associations.", "loading-height-md", "🔗");
       return;
     }
 
@@ -95,7 +85,7 @@
           <div class="user-cell-email">#${m.content_id}</div>
         </td>
         <td>
-          <span class="status-badge user" style="text-transform:capitalize;">${m.content_type || '—'}</span>
+          <span class="status-badge user text-capitalize">${m.content_type || '—'}</span>
         </td>
         <td>${(m.content_views || 0).toLocaleString()}</td>
         <td>
@@ -103,7 +93,7 @@
           <div class="user-cell-email">#${m.item_id}</div>
         </td>
         <td>
-          <span class="status-badge user" style="text-transform:capitalize;">${m.item_type || '—'}</span>
+          <span class="status-badge user text-capitalize">${m.item_type || '—'}</span>
         </td>
         <td>${(m.item_clicks || 0).toLocaleString()}</td>
         <td>
@@ -145,11 +135,7 @@
   }
 
   // ── Utilities ────────────────────────────
-  function escapeHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str || '—';
-    return d.innerHTML;
-  }
+  // Exposes global escapeHtml from core.js
 
   // ── Init ─────────────────────────────────
   function init() {

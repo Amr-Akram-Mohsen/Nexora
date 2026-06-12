@@ -52,6 +52,7 @@ class Item(db.Model):
     item_type = db.Column(db.String(50), nullable=True)
 
     source_type = db.Column(db.String(50), nullable=True, index=True)
+    source_id = db.Column(db.Integer, db.ForeignKey("sources.id"), nullable=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey("brands.id"), nullable=True)
@@ -79,6 +80,7 @@ class Item(db.Model):
 
     category = db.relationship("Category", back_populates="items")
     brand = db.relationship("Brand", back_populates="items")
+    source = db.relationship("Source", backref="items")
 
     linked_contents = db.relationship(
         "Content", secondary=content_items, back_populates="linked_items"
@@ -310,6 +312,7 @@ class Item(db.Model):
         db.Index("ix_items_brand_category", "brand_id", "category_id"),
         db.Index("ix_items_type_created", "item_type", "created_at"),
         db.Index("ix_items_category_created", "category_id", "created_at"),
+        db.Index("ix_items_source_id", "source_id"),
         db.Index(
             "ix_items_search_vector",
             "search_vector",

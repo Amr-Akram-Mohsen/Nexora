@@ -10,7 +10,7 @@ load_dotenv()
 
 from main import app
 from app.core.extensions import db
-from app.domains.system.models import Source
+from app.domains.taxonomy.models import Source
 from app.domains.content.models import Article
 from app.shared.constants.taxonomy import TRUSTED_SOURCES
 

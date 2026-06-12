@@ -49,6 +49,15 @@ const domainConfig = {
 // ==============================
 // UTILITIES
 // ==============================
+function getUrlQueryParams() {
+  const params = {};
+  const searchParams = new URLSearchParams(window.location.search);
+  for (const [key, value] of searchParams.entries()) {
+    params[key] = value;
+  }
+  return params;
+}
+
 function formatFieldName(str) {
   return str
     .split('_')
@@ -56,24 +65,92 @@ function formatFieldName(str) {
     .join(' ');
 }
 
-function formatDate(str) {
+function formatDate(str, includeTime = false) {
   if (!str) return "—";
   try {
-    return new Date(str).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    const d = new Date(str);
+    const dateStr = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    if (includeTime) {
+      return dateStr + ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    }
+    return dateStr;
   } catch {
     return str;
   }
 }
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "—";
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+
+// ==============================
+// STATE TEMPLATE HELPERS
+// ==============================
+function getSpinnerHtml(text = "Loading…", extraClass = "") {
+  return `
+    <div class="dashboard-loading ${extraClass}">
+      <div class="spinner"></div>
+      <p>${escapeHtml(text)}</p>
+    </div>
+  `;
+}
+
+function getTableSpinnerHtml(colspan, text = "Loading…", extraClass = "") {
+  return `
+    <tr>
+      <td colspan="${colspan}" class="table-loading-cell">
+        ${getSpinnerHtml(text, extraClass)}
+      </td>
+    </tr>
+  `;
+}
+
+function getEmptyStateHtml(message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
+  return `
+    <div class="dashboard-empty ${extraClass}">
+      <span class="dashboard-state-icon">${icon}</span>
+      <p>${escapeHtml(message)}</p>
+      ${submessage ? `<p class="dashboard-empty-subtext">${escapeHtml(submessage)}</p>` : ""}
+    </div>
+  `;
+}
+
+function getTableEmptyStateHtml(colspan, message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
+  return `
+    <tr>
+      <td colspan="${colspan}">
+        ${getEmptyStateHtml(message, submessage, extraClass, icon)}
+      </td>
+    </tr>
+  `;
+}
+
+function getErrorStateHtml(message = "Failed to load data. Please try again.", extraClass = "") {
+  return `
+    <div class="dashboard-error ${extraClass}">
+      <span class="dashboard-error-icon">⚠️</span>
+      <p>${escapeHtml(message)}</p>
+    </div>
+  `;
+}
+
+function getTableErrorStateHtml(colspan, message = "Failed to load data. Please try again.", extraClass = "") {
+  return `
+    <tr>
+      <td colspan="${colspan}">
+        ${getErrorStateHtml(message, extraClass)}
+      </td>
+    </tr>
+  `;
+}
+
 function showToast(msg, type = "success") {
-  const toast = document.getElementById("settings-toast") || (() => {
-    const t = document.createElement("div");
-    t.id = "settings-toast";
-    t.className = "settings-toast";
-    t.setAttribute("role", "alert");
-    document.body.appendChild(t);
-    return t;
-  })();
+  const toast = document.getElementById("settings-toast");
+  if (!toast) return;
 
   toast.textContent = msg;
   toast.className = `settings-toast settings-toast-${type} settings-toast-show`;
@@ -184,12 +261,7 @@ function fetchList(domain, containerId) {
   const container = document.getElementById(containerId);
 
   container.className = "dashboard-list";
-  container.innerHTML = `
-    <div class="dashboard-loading">
-      <div class="spinner"></div>
-      <p>Loading ${domain}…</p>
-    </div>
-  `;
+  container.innerHTML = getSpinnerHtml(`Loading ${domain}…`);
 
   const params = new URLSearchParams();
   for (const [key, val] of Object.entries(currentFilters)) {
@@ -207,12 +279,7 @@ function fetchList(domain, containerId) {
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `
-        <div class="dashboard-error">
-          <span style="font-size:2rem;">⚠️</span>
-          <p>Failed to load ${domain}. Please try again.</p>
-        </div>
-      `;
+      container.innerHTML = getErrorStateHtml(`Failed to load ${domain}. Please try again.`);
     });
 }
 
@@ -225,13 +292,7 @@ function renderList(containerId, items, config) {
   container.innerHTML = "";
 
   if (!items || items.length === 0) {
-    container.innerHTML = `
-      <div class="dashboard-empty">
-        <span style="font-size:2.5rem;margin-bottom:1rem;">📭</span>
-        <p>No ${config.domain} found.</p>
-        <p style="font-size:0.8rem;margin-top:0.5rem;opacity:0.7;">Try adjusting your filters or search terms.</p>
-      </div>
-    `;
+    container.innerHTML = getEmptyStateHtml(`No ${config.domain} found.`, `Try adjusting your filters or search terms.`);
     return;
   }
 
@@ -308,17 +369,11 @@ function renderDelete(domain, id, btn) {
 
 
 // ==============================
-// INTERACTIONS ANALYTICS
-// ==============================
+// INTERACTIONS ANALYTIC
 function renderInteractionAnalytics(containerId) {
   const container = document.getElementById(containerId);
   container.className = "dashboard-analytics";
-  container.innerHTML = `
-    <div class="dashboard-loading">
-      <div class="spinner"></div>
-      <p>Loading analytics…</p>
-    </div>
-  `;
+  container.innerHTML = getSpinnerHtml("Loading analytics…");
 
   fetch('/admin/interactions/stats')
     .then(res => {
@@ -336,7 +391,7 @@ function renderInteractionAnalytics(containerId) {
          <h2 class="dashboard-hero-title">Total Interactions</h2>
          <div class="dashboard-hero-value">${total.toLocaleString()}</div>
          <p class="dashboard-hero-meta">Comprehensive engagement across all content</p>
-      `;
+       `;
       container.appendChild(hero);
 
       const grid = document.createElement("div");
@@ -373,11 +428,7 @@ function renderInteractionAnalytics(containerId) {
 
       // Add Recent Activity Feed Header
       const activityHeader = document.createElement("div");
-      activityHeader.className = "overview-panel-header";
-      activityHeader.style.marginTop = "2rem";
-      activityHeader.style.borderRadius = "var(--radius-lg) var(--radius-lg) 0 0";
-      activityHeader.style.border = "1px solid var(--border)";
-      activityHeader.style.borderBottom = "none";
+      activityHeader.className = "overview-panel-header analytics-activity-header";
       activityHeader.innerHTML = `
         <h3 class="overview-panel-title">💬 Recent Comments Activity</h3>
       `;
@@ -385,10 +436,8 @@ function renderInteractionAnalytics(containerId) {
 
       // Activity Feed Container
       const activityContainer = document.createElement("div");
-      activityContainer.className = "overview-panel";
-      activityContainer.style.borderRadius = "0 0 var(--radius-lg) var(--radius-lg)";
-      activityContainer.style.borderTop = "none";
-      activityContainer.innerHTML = `<div class="dashboard-loading"><div class="spinner"></div><p>Loading activity…</p></div>`;
+      activityContainer.className = "overview-panel analytics-activity-container";
+      activityContainer.innerHTML = getSpinnerHtml("Loading activity…");
       container.appendChild(activityContainer);
 
       // Fetch comments for recent activity
@@ -397,7 +446,7 @@ function renderInteractionAnalytics(containerId) {
         .then(comments => {
           activityContainer.innerHTML = "";
           if (!comments || comments.length === 0) {
-            activityContainer.innerHTML = `<div class="dashboard-empty"><p>No recent activity.</p></div>`;
+            activityContainer.innerHTML = getEmptyStateHtml("No recent activity.", "");
             return;
           }
 
@@ -418,7 +467,7 @@ function renderInteractionAnalytics(containerId) {
                 <p class="activity-text">
                   User commented on <span class="activity-target">${targetName} #${c.target_id || ''}</span>
                 </p>
-                <p class="activity-meta" style="margin-bottom:0.25rem;">"${c.content}"</p>
+                <p class="activity-meta activity-meta-comment">"${c.content}"</p>
                 <p class="activity-meta">${timeAgo} • Sentiment: ${c.sentiment || 'neutral'}</p>
               </div>
             `;
@@ -428,21 +477,16 @@ function renderInteractionAnalytics(containerId) {
           activityContainer.appendChild(ul);
         })
         .catch(() => {
-          activityContainer.innerHTML = `<p class="hint" style="padding:1rem;">Could not load recent activity.</p>`;
+          activityContainer.innerHTML = getErrorStateHtml("Could not load recent activity.");
         });
 
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `
-        <div class="dashboard-error">
-          <span style="font-size:2rem;">⚠️</span>
-          <p>Failed to load interaction analytics. Please try again.</p>
-        </div>
-      `;
+      container.innerHTML = getErrorStateHtml("Failed to load interaction analytics. Please try again.");
     });
-}
 
+}
 
 // ==============================
 // INTERACTION BREAKDOWN (overview page)
@@ -485,7 +529,7 @@ function renderInteractionBreakdown(containerId) {
       `;
     })
     .catch(() => {
-      container.innerHTML = `<div class="dashboard-error"><p>Could not load interaction data.</p></div>`;
+      container.innerHTML = getErrorStateHtml("Could not load interaction data.");
     });
 }
 
@@ -499,16 +543,21 @@ function renderTopList(containerId, items, valueKey, valueLabel) {
   if (!container) return;
 
   if (!items || !items.length) {
-    container.innerHTML = `<div class="dashboard-empty" style="min-height:100px;"><p>No data yet.</p></div>`;
+    container.innerHTML = getEmptyStateHtml("No data yet.", "", "loading-height-sm");
     return;
   }
+
+  const linkPrefix = valueLabel === 'views' ? '/admin/contents?search=' : '/admin/items?search=';
+
   container.innerHTML = `
     <ol class="overview-top-list">
       ${items.map((item, i) => `
         <li class="overview-top-item">
           <span class="overview-top-rank">${i + 1}</span>
           <span class="overview-top-name" title="${(item.title || item.name || '').replace(/"/g, '&quot;')}">
-            ${item.title || item.name || '—'}
+            <a href="${linkPrefix}${item.id}" class="overview-top-link-title">
+              ${item.title || item.name || '—'}
+            </a>
           </span>
           <span class="overview-top-value">${Number(item[valueKey] || 0).toLocaleString()} ${valueLabel}</span>
         </li>
@@ -525,13 +574,13 @@ function renderTopArticles(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = `<div class="dashboard-loading" style="min-height:100px;"><div class="spinner"></div><p>Loading…</p></div>`;
+  container.innerHTML = getSpinnerHtml("Loading…", "loading-height-sm");
 
   fetch('/admin/dashboard/top-contents')
     .then(res => { if (!res.ok) throw new Error(); return res.json(); })
     .then(data => renderTopList(containerId, data, 'view_count', 'views'))
     .catch(() => {
-      container.innerHTML = `<div class="dashboard-error"><p>Could not load top contents.</p></div>`;
+      container.innerHTML = getErrorStateHtml("Could not load top contents.", "loading-height-sm");
     });
 }
 
@@ -543,13 +592,13 @@ function renderTopItems(containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = `<div class="dashboard-loading" style="min-height:100px;"><div class="spinner"></div><p>Loading…</p></div>`;
+  container.innerHTML = getSpinnerHtml("Loading…", "loading-height-sm");
 
   fetch('/admin/dashboard/top-items')
     .then(res => { if (!res.ok) throw new Error(); return res.json(); })
     .then(data => renderTopList(containerId, data, 'click_count', 'clicks'))
     .catch(() => {
-      container.innerHTML = `<div class="dashboard-error"><p>Could not load top items.</p></div>`;
+      container.innerHTML = getErrorStateHtml("Could not load top items.", "loading-height-sm");
     });
 }
 
@@ -559,32 +608,20 @@ function renderTopItems(containerId) {
 // ==============================
 let activeModalCallback = null;
 
-function createModalSystem() {
-  if (document.getElementById("dashboard-modal-overlay")) return;
+function initModalSystem() {
+  const overlay = document.getElementById("dashboard-modal-overlay");
+  if (!overlay || overlay._initialized) return;
 
-  const overlay = document.createElement("div");
-  overlay.id = "dashboard-modal-overlay";
-  overlay.className = "dashboard-modal-overlay";
+  const cancelBtn = document.getElementById("modal-cancel");
+  const confirmBtn = document.getElementById("modal-confirm");
 
-  overlay.innerHTML = `
-    <div class="dashboard-modal-content">
-      <div class="dashboard-modal-icon">⚠️</div>
-      <h3 id="modal-title" class="dashboard-modal-title">Confirm</h3>
-      <p id="modal-body" class="dashboard-modal-body"></p>
-      <div class="dashboard-modal-actions">
-        <button id="modal-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
-        <button id="modal-confirm" class="dashboard-btn dashboard-btn-danger">Confirm</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-
-  document.getElementById("modal-cancel").onclick = closeModal;
-  document.getElementById("modal-confirm").onclick = () => {
-    if (activeModalCallback) activeModalCallback();
-    closeModal();
-  };
+  if (cancelBtn) cancelBtn.onclick = closeModal;
+  if (confirmBtn) {
+    confirmBtn.onclick = () => {
+      if (activeModalCallback) activeModalCallback();
+      closeModal();
+    };
+  }
 
   overlay.onclick = (e) => {
     if (e.target === overlay) closeModal();
@@ -593,14 +630,19 @@ function createModalSystem() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeModal();
   });
+
+  overlay._initialized = true;
 }
 
 function showModal(title, body, callback) {
-  createModalSystem();
-  document.getElementById("modal-title").textContent = title;
-  document.getElementById("modal-body").textContent = body;
+  initModalSystem();
+  const titleEl = document.getElementById("modal-title");
+  const bodyEl = document.getElementById("modal-body");
+  const overlay = document.getElementById("dashboard-modal-overlay");
+  if (titleEl) titleEl.textContent = title;
+  if (bodyEl) bodyEl.textContent = body;
   activeModalCallback = callback;
-  document.getElementById("dashboard-modal-overlay").classList.add("active");
+  if (overlay) overlay.classList.add("active");
 }
 
 function closeModal() {
@@ -653,9 +695,9 @@ function renderStatsGrid(containerId, stats) {
     { label: "Total Contents", key: "contents_count", link: "/admin/contents", icon: "📰", color: "blue" },
     { label: "Total Items", key: "items_count", link: "/admin/items", icon: "🛍️", color: "purple" },
     { label: "Total Users", key: "users_count", link: "/admin/users", icon: "👥", color: "green" },
-    { label: "Interactions", key: "interactions", link: "/admin/interactions", icon: "📊", color: "orange", subKey: "total" },
-    { label: "Total Views", key: "interactions", icon: "👁️", color: "cyan", subKey: "views" },
-    { label: "Total Comments", key: "interactions", icon: "💬", color: "indigo", subKey: "comments" },
+    { label: "Interactions", key: "interactions", link: "/admin/moderation", icon: "📊", color: "orange", subKey: "total" },
+    { label: "Total Views", key: "interactions", link: "/admin/contents?sort_by=view_count&sort_dir=desc", icon: "👁️", color: "cyan", subKey: "views" },
+    { label: "Total Comments", key: "interactions", link: "/admin/moderation?tab=comments", icon: "💬", color: "indigo", subKey: "comments" },
   ];
 
   statConfig.forEach(stat => {
@@ -697,12 +739,7 @@ function renderStatsGrid(containerId, stats) {
 
 function renderDashboardOverview(containerId) {
   const container = document.getElementById(containerId);
-  container.innerHTML = `
-    <div class="dashboard-loading">
-      <div class="spinner"></div>
-      <p>Loading platform metrics…</p>
-    </div>
-  `;
+  container.innerHTML = getSpinnerHtml("Loading platform metrics…");
 
   fetch('/admin/dashboard/stats')
     .then(res => {
@@ -719,7 +756,7 @@ function renderDashboardOverview(containerId) {
         const total = data.contents_count || 1;
         const activePct = Math.round(((data.active_contents || 0) / total) * 100);
         const inactivePct = Math.round(((data.inactive_contents || 0) / total) * 100);
-        
+
         let growthHtml = "";
         if (data.growth_trends && data.growth_trends.length > 0) {
           const maxTrend = Math.max(...data.growth_trends.map(t => t.count), 1);
@@ -727,8 +764,8 @@ function renderDashboardOverview(containerId) {
             <h4 class="filter-label-xs mt-3 mb-1">7-Day Ingestion Growth</h4>
             <div class="trend-chart-list">
               ${data.growth_trends.map(t => {
-                const pct = Math.round((t.count / maxTrend) * 100);
-                return `
+            const pct = Math.round((t.count / maxTrend) * 100);
+            return `
                   <div class="trend-chart-item">
                     <span class="trend-chart-date">${t.date}</span>
                     <div class="overview-breakdown-bar-track bar-track-trend">
@@ -737,45 +774,45 @@ function renderDashboardOverview(containerId) {
                     <span class="trend-chart-value">${t.count}</span>
                   </div>
                 `;
-              }).join("")}
+          }).join("")}
             </div>
           `;
         }
 
         healthContainer.innerHTML = `
-          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div class="health-list">
             <!-- Active Items row -->
             <div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size: var(--text-sm);">
-                <span style="font-weight: var(--weight-bold);"><span class="status-badge active" style="padding: 0.15rem 0.45rem; font-size: 0.65rem;">Active</span> Live Index</span>
-                <span style="color: var(--muted-foreground);">${data.active_contents.toLocaleString()} (${activePct}%)</span>
+              <div class="health-row">
+                <span class="font-bold"><span class="status-badge active badge-compact">Active</span> Live Index</span>
+                <span class="text-muted">${data.active_contents.toLocaleString()} (${activePct}%)</span>
               </div>
-              <div class="overview-breakdown-bar-track" style="height: 6px; background: var(--border);">
-                <div class="overview-breakdown-bar" style="width: ${activePct}%; height: 100%; background: #16a34a;"></div>
+              <div class="overview-breakdown-bar-track bar-track-health">
+                <div class="overview-breakdown-bar bar-active" style="width: ${activePct}%;"></div>
               </div>
             </div>
 
             <!-- Inactive Items row -->
             <div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size: var(--text-sm);">
-                <span style="font-weight: var(--weight-bold);"><span class="status-badge inactive" style="padding: 0.15rem 0.45rem; font-size: 0.65rem;">Inactive</span> Hidden Archive</span>
-                <span style="color: var(--muted-foreground);">${data.inactive_contents.toLocaleString()} (${inactivePct}%)</span>
+              <div class="health-row">
+                <span class="font-bold"><span class="status-badge inactive badge-compact">Inactive</span> Hidden Archive</span>
+                <span class="text-muted">${data.inactive_contents.toLocaleString()} (${inactivePct}%)</span>
               </div>
-              <div class="overview-breakdown-bar-track" style="height: 6px; background: var(--border);">
-                <div class="overview-breakdown-bar" style="width: ${inactivePct}%; height: 100%; background: var(--brand-red);"></div>
+              <div class="overview-breakdown-bar-track bar-track-health">
+                <div class="overview-breakdown-bar bar-inactive" style="width: ${inactivePct}%;"></div>
               </div>
             </div>
 
             <!-- Pending Review / Drafts alert -->
-            <a href="/admin/contents?published=false" class="dashboard-stat-card clickable-card" style="padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; border-color: rgba(var(--brand-purple-rgb), 0.25); text-decoration: none; margin-top: 0.25rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.25rem;">⏳</span>
+            <a href="/admin/contents?published=false" class="dashboard-stat-card clickable-card moderation-queue-link">
+              <div class="flex-align-center gap-sm">
+                <span class="text-lg-icon">⏳</span>
                 <div>
-                  <div style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--foreground);">Moderation Queue</div>
-                  <div style="font-size: var(--text-xs); color: var(--muted-foreground);">Unpublished aggregator drafts</div>
+                  <div class="font-bold text-sm text-foreground">Moderation Queue</div>
+                  <div class="text-xs text-muted">Unpublished aggregator drafts</div>
                 </div>
               </div>
-              <span class="status-badge admin" style="background: rgba(var(--brand-purple-rgb), 0.1); color: var(--brand-purple); font-size: var(--text-xs); font-weight: var(--weight-xbold);">${data.review_queue_count} pending</span>
+              <span class="status-badge badge-pending">${data.review_queue_count} pending</span>
             </a>
 
             ${growthHtml}
@@ -787,32 +824,32 @@ function renderDashboardOverview(containerId) {
       const ingestContainer = document.getElementById("recent-ingest-container");
       if (ingestContainer) {
         if (!data.recent_ingested || data.recent_ingested.length === 0) {
-          ingestContainer.innerHTML = `<div class="dashboard-empty" style="min-height: 120px;"><p>No recent ingestions.</p></div>`;
+          ingestContainer.innerHTML = getEmptyStateHtml("No recent ingestions.", "", "loading-height-sm");
         } else {
           ingestContainer.innerHTML = `
             <ul class="activity-feed">
               ${data.recent_ingested.map(r => {
-                let badgeClass = "user";
-                let badgeIcon = "📰";
-                if (r.type === "video") { badgeClass = "active"; badgeIcon = "🎥"; }
-                else if (r.type === "post") { badgeClass = "admin"; badgeIcon = "💬"; }
-                
-                return `
-                  <li class="activity-item" style="padding: 0.65rem 1.25rem;">
-                    <div class="activity-icon icon-save" style="width: 1.75rem; height: 1.75rem; font-size: 0.85rem; background: var(--secondary);">
+            let badgeClass = "user";
+            let badgeIcon = "📰";
+            if (r.type === "video") { badgeClass = "active"; badgeIcon = "🎥"; }
+            else if (r.type === "post") { badgeClass = "admin"; badgeIcon = "💬"; }
+
+            return `
+                  <li class="activity-item ingest-log-item">
+                    <div class="activity-icon icon-save ingest-log-icon">
                       ${badgeIcon}
                     </div>
                     <div class="activity-content">
-                      <p class="activity-text" style="font-size: var(--text-xs); line-height: 1.3;">
-                        Successfully ingested <span class="status-badge ${badgeClass}" style="padding: 0.1rem 0.3rem; font-size: 0.55rem;">${r.type}</span>
-                        <a href="/admin/contents?search=${r.id}" class="activity-target" style="text-decoration:none; margin-left:0.25rem;">#${r.id}</a>
+                      <p class="activity-text ingest-log-text">
+                        Successfully ingested <span class="status-badge ${badgeClass} badge-type-compact">${r.type}</span>
+                        <a href="/admin/contents?search=${r.id}" class="activity-target text-deco-none ml-1">#${r.id}</a>
                       </p>
-                      <p class="activity-meta" style="font-weight: var(--weight-bold); font-size: var(--text-xs); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.1rem; color: var(--foreground);">${r.title}</p>
-                      <p class="activity-meta" style="font-size: 0.65rem; color: var(--muted-foreground); margin-top: 0.1rem;">${r.time}</p>
+                      <p class="activity-meta ingest-log-title">${r.title}</p>
+                      <p class="activity-meta ingest-log-meta">${r.time}</p>
                     </div>
                   </li>
                 `;
-              }).join("")}
+          }).join("")}
             </ul>
           `;
         }
@@ -822,25 +859,25 @@ function renderDashboardOverview(containerId) {
       const categoriesContainer = document.getElementById("categories-distribution-container");
       if (categoriesContainer) {
         if (!data.by_category || data.by_category.length === 0) {
-          categoriesContainer.innerHTML = `<div class="dashboard-empty" style="min-height: 120px;"><p>No categories mapped.</p></div>`;
+          categoriesContainer.innerHTML = getEmptyStateHtml("No categories mapped.", "", "loading-height-sm");
         } else {
           const maxVal = Math.max(...data.by_category.map(c => c.count), 1);
           categoriesContainer.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="dist-list">
               ${data.by_category.map(c => {
-                const pct = Math.round((c.count / maxVal) * 100);
-                return `
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: var(--text-xs); margin-bottom: 0.25rem;">
-                      <span style="font-weight: var(--weight-bold); color: var(--foreground);">${c.name}</span>
-                      <span style="color: var(--muted-foreground);">${c.count.toLocaleString()} items</span>
+            const pct = Math.round((c.count / maxVal) * 100);
+            return `
+                  <a href="/admin/contents?category=${c.slug}" class="dist-row-link">
+                    <div class="dist-row">
+                      <span class="dist-row-name font-bold text-foreground">${c.name}</span>
+                      <span class="text-muted">${c.count.toLocaleString()} items</span>
                     </div>
-                    <div class="overview-breakdown-bar-track" style="height: 6px; background: var(--border);">
-                      <div class="overview-breakdown-bar" style="width: ${pct}%; height: 100%; background: var(--brand-purple);"></div>
+                    <div class="overview-breakdown-bar-track bar-track-health">
+                      <div class="overview-breakdown-bar bar-purple" style="width: ${pct}%;"></div>
                     </div>
-                  </div>
+                  </a>
                 `;
-              }).join("")}
+          }).join("")}
             </div>
           `;
         }
@@ -850,26 +887,147 @@ function renderDashboardOverview(containerId) {
       const sourcesContainer = document.getElementById("sources-distribution-container");
       if (sourcesContainer) {
         if (!data.by_source || data.by_source.length === 0) {
-          sourcesContainer.innerHTML = `<div class="dashboard-empty" style="min-height: 120px;"><p>No source statistics.</p></div>`;
+          sourcesContainer.innerHTML = getEmptyStateHtml("No source statistics.", "", "loading-height-sm");
         } else {
           const maxVal = Math.max(...data.by_source.map(s => s.count), 1);
           sourcesContainer.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="dist-list">
               ${data.by_source.map(s => {
-                const pct = Math.round((s.count / maxVal) * 100);
-                return `
-                  <div>
-                    <div style="display: flex; justify-content: space-between; font-size: var(--text-xs); margin-bottom: 0.25rem;">
-                      <span style="font-weight: var(--weight-bold); color: var(--foreground);">${s.name}</span>
-                      <span style="color: var(--muted-foreground);">${s.count.toLocaleString()} items</span>
+            const pct = Math.round((s.count / maxVal) * 100);
+            return `
+                  <a href="/admin/contents?source=${s.slug}" class="dist-row-link">
+                    <div class="dist-row">
+                      <span class="dist-row-name font-bold text-foreground">${s.name}</span>
+                      <span class="text-muted">${s.count.toLocaleString()} items</span>
                     </div>
-                    <div class="overview-breakdown-bar-track" style="height: 6px; background: var(--border);">
-                      <div class="overview-breakdown-bar" style="width: ${pct}%; height: 100%; background: var(--brand-teal);"></div>
+                    <div class="overview-breakdown-bar-track bar-track-health">
+                      <div class="overview-breakdown-bar bar-teal" style="width: ${pct}%;"></div>
                     </div>
-                  </div>
+                  </a>
                 `;
-              }).join("")}
+          }).join("")}
             </div>
+          `;
+        }
+      }
+
+      // 5b. Render Product Sources Distribution
+      const productSourcesContainer = document.getElementById("product-sources-distribution-container");
+      if (productSourcesContainer) {
+        if (!data.product_by_source || data.product_by_source.length === 0) {
+          productSourcesContainer.innerHTML = getEmptyStateHtml("No product source statistics.", "", "loading-height-sm");
+        } else {
+          const maxVal = Math.max(...data.product_by_source.map(s => s.count), 1);
+          productSourcesContainer.innerHTML = `
+            <div class="dist-list">
+              ${data.product_by_source.map(s => {
+            const pct = Math.round((s.count / maxVal) * 100);
+            return `
+                  <a href="/admin/items?source=${s.slug}" class="dist-row-link">
+                    <div class="dist-row">
+                      <span class="dist-row-name font-bold text-foreground">${s.name}</span>
+                      <span class="text-muted">${s.count.toLocaleString()} products</span>
+                    </div>
+                    <div class="overview-breakdown-bar-track bar-track-health">
+                      <div class="overview-breakdown-bar bar-purple" style="width: ${pct}%;"></div>
+                    </div>
+                  </a>
+                `;
+          }).join("")}
+            </div>
+          `;
+        }
+      }
+
+      // 5c. Render Top Content Providers Performance
+      const topContentProvidersContainer = document.getElementById("top-content-providers-container");
+      if (topContentProvidersContainer) {
+        if (!data.top_performing_content || data.top_performing_content.length === 0) {
+          topContentProvidersContainer.innerHTML = getEmptyStateHtml("No provider data.", "", "loading-height-sm");
+        } else {
+          const maxVal = Math.max(...data.top_performing_content.map(s => s.views), 1);
+          topContentProvidersContainer.innerHTML = `
+            <div class="dist-list">
+              ${data.top_performing_content.map(s => {
+            const pct = Math.round((s.views / maxVal) * 100);
+            return `
+                  <a href="/admin/contents?source=${s.slug}&sort_by=view_count&sort_dir=desc" class="dist-row-link">
+                    <div class="dist-row">
+                      <span class="dist-row-name font-bold text-foreground">${s.name}</span>
+                      <span class="text-muted">${s.views.toLocaleString()} views</span>
+                    </div>
+                    <div class="overview-breakdown-bar-track bar-track-health">
+                      <div class="overview-breakdown-bar bar-trend" style="width: ${pct}%;"></div>
+                    </div>
+                  </a>
+                `;
+          }).join("")}
+            </div>
+          `;
+        }
+      }
+
+      // 5d. Render Top Product Providers Performance
+      const topProductProvidersContainer = document.getElementById("top-product-providers-container");
+      if (topProductProvidersContainer) {
+        if (!data.top_performing_product || data.top_performing_product.length === 0) {
+          topProductProvidersContainer.innerHTML = getEmptyStateHtml("No merchant data.", "", "loading-height-sm");
+        } else {
+          const maxVal = Math.max(...data.top_performing_product.map(s => s.clicks), 1);
+          topProductProvidersContainer.innerHTML = `
+            <div class="dist-list">
+              ${data.top_performing_product.map(s => {
+            const pct = Math.round((s.clicks / maxVal) * 100);
+            return `
+                  <a href="/admin/items?source=${s.slug}&sort_by=click_count&sort_dir=desc" class="dist-row-link">
+                    <div class="dist-row">
+                      <span class="dist-row-name font-bold text-foreground">${s.name}</span>
+                      <span class="text-muted">${s.clicks.toLocaleString()} clicks</span>
+                    </div>
+                    <div class="overview-breakdown-bar-track bar-track-health">
+                      <div class="overview-breakdown-bar bar-trend bar-orange" style="width: ${pct}%;"></div>
+                    </div>
+                  </a>
+                `;
+          }).join("")}
+            </div>
+          `;
+        }
+      }
+
+      // 5e. Render Provider Activity Summary
+      const providerActivitiesContainer = document.getElementById("provider-activities-container");
+      if (providerActivitiesContainer) {
+        if (!data.provider_activities || data.provider_activities.length === 0) {
+          providerActivitiesContainer.innerHTML = getEmptyStateHtml("No active providers.", "", "loading-height-sm");
+        } else {
+          providerActivitiesContainer.innerHTML = `
+            <ul class="activity-feed">
+              ${data.provider_activities.map(s => {
+            const totalRecords = s.content_count + s.product_count;
+            const activityTime = s.latest_activity ? formatDate(s.latest_activity) : "No activity";
+
+            return `
+                  <li class="activity-item ingest-log-item">
+                    <div class="activity-icon icon-comment ingest-log-icon">
+                      📡
+                    </div>
+                    <div class="activity-content">
+                      <p class="activity-text ingest-log-text">
+                        <strong class="text-foreground">${s.name}</strong> 
+                        <span class="status-badge active badge-type-compact badge-indigo">slug: ${s.slug}</span>
+                      </p>
+                      <p class="activity-meta ingest-log-text mt-1 text-muted">
+                        Volume: <strong>${s.content_count.toLocaleString()}</strong> content items & <strong>${s.product_count.toLocaleString()}</strong> products
+                      </p>
+                      <p class="activity-meta ingest-log-meta mt-1">
+                        Last Ingest Activity: <strong>${activityTime}</strong>
+                      </p>
+                    </div>
+                  </li>
+                `;
+          }).join("")}
+            </ul>
           `;
         }
       }
@@ -877,11 +1035,6 @@ function renderDashboardOverview(containerId) {
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `
-        <div class="dashboard-error">
-          <span style="font-size:2rem;">⚠️</span>
-          <p>Unable to load dashboard metrics. Please try again later.</p>
-        </div>
-      `;
+      container.innerHTML = getErrorStateHtml("Unable to load dashboard metrics. Please try again later.");
     });
 }

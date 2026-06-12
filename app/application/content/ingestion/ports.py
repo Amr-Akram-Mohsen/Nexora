@@ -9,6 +9,15 @@ class FetcherPort(Protocol):
 class EnrichmentPort(Protocol):
     def __call__(self, raw_data: Dict, section: str, category: str, query_obj: Dict) -> Dict: ...
 
+class TaxonomyEnrichmentPort(Protocol):
+    """
+    Post-normalization taxonomy enrichment.
+    Accepts a normalized item dict and returns a dict with refined
+    taxonomy assignments (category, topics, brands, facets).
+    Does NOT perform scraping or network calls.
+    """
+    def __call__(self, enriched_data: Dict) -> Dict: ...
+
 class ClassificationPort(Protocol):
     def __call__(self, raw_data: Dict, section: str, category: str, query_obj: Dict) -> Dict: ...
 

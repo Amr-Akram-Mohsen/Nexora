@@ -1,0 +1,70 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
+
+{% block title %}Sources Management — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{% set header_actions %}
+  <button id="refresh-sources-btn" class="admin-btn-secondary">↺ Refresh</button>
+{% endset %}
+
+{{ admin_page_header(
+    "Sources & Content Providers",
+    "Monitor content sources, imported volumes, authority rankings, and latest activities",
+    actions=header_actions
+) }}
+
+<!-- Filters -->
+<div class="admin-toolbar-advanced flex flex-col">
+  <div class="admin-toolbar-row">
+    <div class="admin-toolbar-search admin-search-grow">
+      <span class="admin-toolbar-search-icon-inside">🔍</span>
+      <input type="text" id="sources-search" placeholder="Search by name, slug, or domain…" />
+    </div>
+    <button id="clear-sources-filters-btn" class="dashboard-filter-clear">Reset</button>
+  </div>
+</div>
+
+<!-- Summary Bar -->
+<div class="flex justify-between items-center mb-3">
+  <div id="sources-summary" class="admin-summary-bar">
+    Showing <strong id="sources-count">—</strong> sources
+  </div>
+</div>
+
+<!-- Sources Table -->
+<div class="admin-table-wrapper">
+  <table class="admin-table" id="sources-table">
+    <thead>
+      <tr>
+        <th class="col-type">ID</th>
+        <th>Source Name / Domain</th>
+        <th class="col-engagement">Rank / Authority</th>
+        <th class="col-engagement">Content Count</th>
+        <th>Latest Ingest Activity</th>
+        <th>Latest Article Title</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="sources-table-body">
+      {{ admin_table_spinner(7, "Loading sources list…") }}
+    </tbody>
+  </table>
+</div>
+
+{{ admin_pagination(
+    info_id="sources-pagination-info",
+    per_page_id="sources-per-page",
+    prev_id="sources-prev-btn",
+    indicator_id="sources-page-indicator",
+    next_id="sources-next-btn",
+    per_page_options=[10, 20, 50],
+    current_per_page=20
+) }}
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/control_panel/sources.js') }}"></script>
+{% endblock %}

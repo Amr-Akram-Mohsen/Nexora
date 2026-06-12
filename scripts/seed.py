@@ -12,7 +12,7 @@ from app.core.extensions import db
 from app.shared.utils.slug import generate_slug, normalize_name
 from app.shared.constants.taxonomy import TAXONOMY
 
-from app.domains.system.models import (
+from app.domains.taxonomy.models import (
     Section, Category, Topic, Brand, Source,
     GenderFacet, IntentFacet, PriceTierFacet, AttributeFacet
 )

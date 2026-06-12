@@ -73,6 +73,9 @@
           sourceSelect.appendChild(opt);
         });
 
+        // Parse and pre-fill filters from URL parameters
+        applyUrlFilters();
+
         // Once metadata is ready, load first list of contents
         fetchContents();
       })
@@ -88,16 +91,7 @@
   // ==============================
   function fetchContents() {
     const tableBody = document.getElementById("contents-table-body");
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="table-loading-cell">
-          <div class="dashboard-loading" style="min-height:240px;">
-            <div class="spinner"></div>
-            <p>Loading contents catalog...</p>
-          </div>
-        </td>
-      </tr>
-    `;
+    tableBody.innerHTML = getTableSpinnerHtml(7, "Loading contents catalog...", "loading-height-md");
 
     // Construct URL with query parameters
     const params = new URLSearchParams();
@@ -159,10 +153,9 @@
         tableBody.innerHTML = `
           <tr>
             <td colspan="7" class="table-loading-cell">
-              <div class="dashboard-error" style="min-height:160px; padding: 2rem; text-align: center;">
-                <span style="font-size:2.5rem;">⚠️</span>
-                <p style="margin-top: 0.5rem; font-weight: var(--weight-bold);">Failed to load catalog contents.</p>
-                <button class="user-action-btn" onclick="window.location.reload()" style="margin-top: 0.75rem;">Retry Loading</button>
+              ${getErrorStateHtml("Failed to load catalog contents.", "loading-height-sm")}
+              <div class="state-action-wrap">
+                <button class="user-action-btn" onclick="window.location.reload()">Retry Loading</button>
               </div>
             </td>
           </tr>
@@ -182,23 +175,13 @@
     selectAllCheckbox.checked = false;
 
     if (items.length === 0) {
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="7" class="table-loading-cell">
-            <div class="dashboard-empty" style="min-height:200px;">
-              <span style="font-size:2.5rem; margin-bottom:0.75rem;">📭</span>
-              <p>No content records found matching filters.</p>
-              <p style="font-size:0.8rem; margin-top:0.25rem; opacity:0.7;">Adjust your keywords, categories, or health flags.</p>
-            </div>
-          </td>
-        </tr>
-      `;
+      tableBody.innerHTML = getTableEmptyStateHtml(7, "No content records found matching filters.", "Adjust your keywords, categories, or health flags.", "loading-height-md");
       return;
     }
 
     items.forEach((item) => {
       const tr = document.createElement("tr");
-      tr.style.cursor = "pointer";
+      tr.classList.add("clickable-row");
 
       // Bind row clicks (excluding actions, checkboxes, or double-clicks)
       tr.addEventListener("click", (e) => {
@@ -214,6 +197,7 @@
         if (checkbox) {
           checkbox.checked = !checkbox.checked;
           toggleItemSelection(item.id, checkbox.checked);
+          tr.classList.toggle("is-selected", checkbox.checked);
         }
       });
 
@@ -233,11 +217,11 @@
       if (item.quality_issues && item.quality_issues.length > 0) {
         item.quality_issues.forEach((flag) => {
           if (flag === "missing_category") {
-            flagsHtml += `<span class="status-badge inactive" style="margin: 0.125rem 0;" title="Content belongs to uncategorized and requires clean routing.">⚠️ Category</span> `;
+            flagsHtml += `<span class="status-badge inactive badge-margin" title="Content belongs to uncategorized and requires clean routing.">⚠️ Category</span> `;
           } else if (flag === "missing_metadata") {
-            flagsHtml += `<span class="status-badge inactive" style="margin: 0.125rem 0; background: rgba(245,158,11,0.1); color: var(--brand-orange);" title="Missing essential title or preview details.">📝 Metadata</span> `;
+            flagsHtml += `<span class="status-badge inactive badge-orange badge-margin" title="Missing essential title or preview details.">📝 Metadata</span> `;
           } else if (flag === "duplicate") {
-            flagsHtml += `<span class="status-badge inactive" style="margin: 0.125rem 0; background: rgba(99,102,241,0.1); color: #6366f1;" title="Duplicate titles matching other aggregates.">👯 Duplicate</span> `;
+            flagsHtml += `<span class="status-badge inactive badge-indigo badge-margin" title="Duplicate titles matching other aggregates.">👯 Duplicate</span> `;
           }
         });
       } else {
@@ -246,6 +230,9 @@
 
       // Checkbox checked state
       const isChecked = selectedIds.has(item.id) ? "checked" : "";
+      if (selectedIds.has(item.id)) {
+        tr.classList.add("is-selected");
+      }
 
       // Active / Inactive Badge
       const statusBadge = item.is_active
@@ -257,48 +244,55 @@
       const publishTime = item.published_at ? new Date(item.published_at).toLocaleDateString() : "—";
 
       tr.innerHTML = `
-        <td style="text-align: center; vertical-align: middle;">
+        <td class="text-center align-middle">
           <input type="checkbox" class="row-select-checkbox" data-id="${item.id}" ${isChecked} />
         </td>
         <td>
-          <span class="status-badge ${typeClass}" style="text-transform: capitalize;">${item.object_type}</span>
-          <div style="font-size: 0.7rem; color: var(--muted-foreground); margin-top: 0.25rem;">ID: #${item.id}</div>
+          <span class="status-badge ${typeClass} text-capitalize">${item.object_type}</span>
+          <div class="user-cell-id">ID: #${item.id}</div>
         </td>
         <td>
-          <div style="font-weight: var(--weight-bold); font-size: var(--text-sm); line-height: 1.4;">
-            ${item.url ? `<a href="${item.url}" target="_blank" class="activity-target" style="text-decoration: none;">${item.title} <i class="fas fa-external-link-alt" style="font-size: 0.65rem;"></i></a>` : item.title}
+          <div class="content-cell-title">
+            ${item.url ? `<a href="${item.url}" target="_blank" class="activity-target text-deco-none">${item.title} <i class="fas fa-external-link-alt text-xs-sub"></i></a>` : item.title}
           </div>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.35rem; align-items: center;">
-            <span style="font-size: 0.75rem; color: var(--muted-foreground);"><i class="fas fa-rss" style="margin-right: 0.25rem;"></i> ${item.source_name}</span>
-            <span style="color: var(--border); font-size: 0.75rem;">|</span>
-            <span class="quick-cat-trigger" style="font-size: 0.75rem; font-weight: var(--weight-md); color: var(--brand-purple); text-decoration: underline; cursor: pointer;" title="Double-click row to quickly move content.">
+          <div class="content-cell-meta-group">
+            <span class="content-cell-meta" title="Source/Provider"><i class="fas fa-rss ml-1"></i> ${item.source_name}</span>
+            <span class="divider">|</span>
+            <span class="content-cell-meta" title="Source Slug"><i class="fas fa-code ml-1"></i> <code>${item.source_slug}</code></span>
+            <span class="divider">|</span>
+            <span class="quick-cat-trigger clickable-purple-link" title="Double-click row to quickly move content.">
               <i class="fas fa-tag"></i> ${item.category_name}
             </span>
-            <span style="color: var(--border); font-size: 0.75rem;">|</span>
-            <span style="font-size: 0.75rem; color: var(--muted-foreground); font-weight: var(--weight-md);">${item.section_name}</span>
+            <span class="divider">|</span>
+            <span class="content-cell-meta font-bold">${item.section_name}</span>
           </div>
         </td>
         <td>
-          <div style="font-size: var(--text-sm);"><i class="far fa-eye" style="color: var(--muted-foreground);"></i> ${item.view_count.toLocaleString()}</div>
-          <div style="font-size: var(--text-xs); color: var(--muted-foreground); margin-top: 0.25rem;"><i class="far fa-comment"></i> ${item.comment_count}</div>
+          <div class="text-sm"><i class="far fa-eye text-muted"></i> ${item.view_count.toLocaleString()}</div>
+          <div class="content-engagement-sub"><i class="far fa-comment"></i> ${item.comment_count}</div>
         </td>
         <td>
-          <div style="font-size: 0.75rem;"><strong>Ingested:</strong> ${ingestTime}</div>
-          <div style="font-size: 0.75rem; margin-top: 0.2rem;"><strong>Published:</strong> ${publishTime}</div>
-          <div style="margin-top: 0.35rem; display: flex; gap: 0.35rem; align-items: center;">
+          <div class="content-date-row"><strong>Ingested:</strong> ${ingestTime}</div>
+          <div class="content-date-row mt-1"><strong>Published:</strong> ${publishTime}</div>
+          <div class="content-status-group">
             ${statusBadge}
-            ${item.is_published ? `<span class="status-badge active" style="background: rgba(59,130,246,0.1); color: var(--brand-blue);">Published</span>` : `<span class="status-badge inactive" style="background:rgba(100,116,139,0.1); color: #64748b;">Draft (Review)</span>`}
+            ${item.is_published ? `<span class="status-badge active badge-blue">Published</span>` : `<span class="status-badge inactive badge-slate">Draft (Review)</span>`}
           </div>
         </td>
         <td>
-          <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem;">
+          <div class="content-flags-group">
             ${flagsHtml}
           </div>
         </td>
-        <td style="text-align: center; vertical-align: middle;">
-          <button class="user-action-btn user-action-delete delete-btn" data-id="${item.id}" data-title="${item.title.replace(/"/g, '&quot;')}" title="Delete catalog and generic targets">
-            🗑 Delete
-          </button>
+        <td class="text-center align-middle">
+          <div class="actions-cell-group">
+            <button class="user-action-btn user-action-inspect inspect-btn" data-id="${item.id}" title="Inspect source and ingestion metadata">
+              👁️ Inspect
+            </button>
+            <button class="user-action-btn user-action-delete delete-btn" data-id="${item.id}" data-title="${item.title.replace(/"/g, '&quot;')}" title="Delete catalog and generic targets">
+              🗑 Delete
+            </button>
+          </div>
         </td>
       `;
 
@@ -306,6 +300,7 @@
       const checkbox = tr.querySelector(".row-select-checkbox");
       checkbox.addEventListener("change", (e) => {
         toggleItemSelection(item.id, e.target.checked);
+        tr.classList.toggle("is-selected", e.target.checked);
       });
 
       // Attach single delete click
@@ -319,6 +314,13 @@
           `Are you sure you want to completely delete "${title}"? This will safely wipe the database record, its polymorphic references (Article/Video/Post entries), reactions, logs, and comments. This is permanent.`,
           () => performSingleDelete(cid)
         );
+      });
+
+      // Attach single inspect click
+      const inspectBtn = tr.querySelector(".inspect-btn");
+      inspectBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showInspectModal(item);
       });
 
       tableBody.appendChild(tr);
@@ -363,11 +365,11 @@
     const actionSelect = document.getElementById("bulk-action-select");
 
     if (selectedIds.size > 0) {
-      toolbar.style.display = "flex";
+      toolbar.classList.remove("is-hidden");
       countSpan.textContent = `${selectedIds.size.toLocaleString()} content items selected`;
       applyBtn.disabled = !actionSelect.value;
     } else {
-      toolbar.style.display = "none";
+      toolbar.classList.add("is-hidden");
       applyBtn.disabled = true;
     }
   }
@@ -440,7 +442,7 @@
               selectedIds.clear();
               document.getElementById("bulk-action-select").value = "";
               document.getElementById("bulk-category-select").value = "";
-              document.getElementById("bulk-category-select").style.display = "none";
+              document.getElementById("bulk-category-select").classList.add("is-hidden");
               updateBulkToolbar();
               fetchContents();
             } else {
@@ -465,11 +467,11 @@
 
     idInput.value = contentId;
     select.value = currentCategoryId || "";
-    modal.style.display = "flex";
+    modal.classList.add("active");
   }
 
   function hideQuickCategoryModal() {
-    document.getElementById("quick-category-modal").style.display = "none";
+    document.getElementById("quick-category-modal").classList.remove("active");
   }
 
   function saveQuickCategory() {
@@ -504,6 +506,37 @@
         console.error(err);
         showToast("Error moving content.", "error");
       });
+  }
+
+  function applyUrlFilters() {
+    if (typeof getUrlQueryParams !== "function") return;
+    const params = getUrlQueryParams();
+    
+    const filterMap = {
+      search: "content-search",
+      type: "filter-type",
+      section: "filter-section",
+      category: "filter-category",
+      source: "filter-source",
+      status: "filter-status",
+      active: "filter-active",
+      published: "filter-published",
+      quality: "filter-quality",
+      date_type: "filter-date-type",
+      start_date: "filter-start-date",
+      end_date: "filter-end-date",
+      sort_by: "sort-by",
+      sort_dir: "sort-dir"
+    };
+
+    for (const [paramKey, elementId] of Object.entries(filterMap)) {
+      if (params[paramKey] !== undefined) {
+        const el = document.getElementById(elementId);
+        if (el) {
+          el.value = params[paramKey];
+        }
+      }
+    }
   }
 
   // ==============================
@@ -617,6 +650,10 @@
         } else {
           selectedIds.delete(cid);
         }
+        const r = checkbox.closest("tr");
+        if (r) {
+          r.classList.toggle("is-selected", isChecked);
+        }
       });
       updateBulkToolbar();
     });
@@ -627,9 +664,9 @@
       const bulkCategorySelect = document.getElementById("bulk-category-select");
 
       if (action === "recategorize") {
-        bulkCategorySelect.style.display = "inline-block";
+        bulkCategorySelect.classList.remove("is-hidden");
       } else {
-        bulkCategorySelect.style.display = "none";
+        bulkCategorySelect.classList.add("is-hidden");
         bulkCategorySelect.value = "";
       }
       bulkApplyBtn.disabled = !action;
@@ -670,5 +707,69 @@
     quickModalOverlay.addEventListener("click", (e) => {
       if (e.target === quickModalOverlay) hideQuickCategoryModal();
     });
+
+    // Close inspect modal overlay
+    const inspectCloseBtn = document.getElementById("inspect-close-btn");
+    if (inspectCloseBtn) {
+      inspectCloseBtn.addEventListener("click", () => {
+        document.getElementById("inspect-provider-modal").classList.remove("active");
+      });
+    }
+
+    const inspectModalOverlay = document.getElementById("inspect-provider-modal");
+    if (inspectModalOverlay) {
+      inspectModalOverlay.addEventListener("click", (e) => {
+        if (e.target === inspectModalOverlay) {
+          inspectModalOverlay.classList.remove("active");
+        }
+      });
+    }
+  }
+
+  // ==============================
+  // SOURCE/PROVIDER DETAILS INSPECTOR
+  // ==============================
+  function showInspectModal(item) {
+    const modal = document.getElementById("inspect-provider-modal");
+    const body = document.getElementById("inspect-modal-body");
+    const titleEl = document.getElementById("inspect-modal-title");
+    
+    titleEl.textContent = `Inspect: ${item.title}`;
+    
+    const statusClass = item.status === 'complete' ? 'inspect-badge-complete' : 'inspect-badge-pending';
+    
+    body.innerHTML = `
+      <div class="inspect-details-group">
+        <div>
+          <strong class="inspect-details-title">Content Metadata</strong>
+          <div class="inspect-details-row"><strong>ID:</strong> #${item.id}</div>
+          <div class="inspect-details-row"><strong>Type:</strong> <span class="status-badge inspect-badge-secondary">${item.object_type}</span></div>
+          <div class="inspect-details-row"><strong>Category:</strong> ${item.category_name}</div>
+          <div class="inspect-details-row"><strong>Section:</strong> ${item.section_name}</div>
+        </div>
+        
+        <hr class="inspect-details-divider" />
+        
+        <div>
+          <strong class="inspect-details-title">Provider & Source Info</strong>
+          <div class="inspect-details-row"><strong>Source Name:</strong> ${item.source_name}</div>
+          <div class="inspect-details-row"><strong>Source Slug:</strong> <code>${item.source_slug}</code></div>
+          <div class="inspect-details-row"><strong>Source Link:</strong> ${item.url ? `<a href="${item.url}" target="_blank" class="activity-target inspect-link">View Original Link <i class="fas fa-external-link-alt"></i></a>` : "—"}</div>
+        </div>
+
+        <hr class="inspect-details-divider" />
+
+        <div>
+          <strong class="inspect-details-title">System Tracking</strong>
+          <div class="inspect-details-row"><strong>Ingested At:</strong> ${item.ingested_at ? new Date(item.ingested_at).toLocaleString() : "—"}</div>
+          <div class="inspect-details-row"><strong>Published At:</strong> ${item.published_at ? new Date(item.published_at).toLocaleString() : "—"}</div>
+          <div class="inspect-details-row"><strong>Enrichment Status:</strong> <span class="status-badge ${statusClass}">${item.status}</span></div>
+          <div class="inspect-details-row"><strong>Visibility:</strong> ${item.is_published ? "Live Index" : "Draft (Moderation Review)"}</div>
+          <div class="inspect-details-row"><strong>Record Status:</strong> ${item.is_active ? "Active" : "Inactive / Hidden"}</div>
+        </div>
+      </div>
+    `;
+    
+    modal.classList.add("active");
   }
 })();

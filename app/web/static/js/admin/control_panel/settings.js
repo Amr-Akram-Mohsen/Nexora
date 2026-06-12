@@ -2,9 +2,12 @@
  * Nexora Control Panel — Settings Management
  */
 
-document.addEventListener("DOMContentLoaded", () => {
-  initSettings();
-});
+(function () {
+  'use strict';
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initSettings();
+  });
 
 function initSettings() {
   loadSystemInfo();
@@ -31,12 +34,23 @@ function loadSystemInfo() {
     .then(info => {
       container.innerHTML = `
         <ul class="system-info-list">
-          ${info.map(row => `
-            <li class="system-info-row">
-              <span class="system-info-label">${row.label}</span>
-              <span class="system-info-value">${row.value}</span>
-            </li>
-          `).join("")}
+          ${info.map(row => {
+            // Backend now returns a plain `status` string (no HTML).
+            // Apply a visual class locally based on the value (R-11).
+            let valueHtml = escapeHtml(row.value);
+            if (row.status) {
+              const cls = row.status === 'online' ? 'status-ok'
+                        : row.status === 'error'  ? 'status-error'
+                        : 'status-pending';
+              valueHtml = `<span class="integration-status ${cls}">${escapeHtml(row.value)}</span>`;
+            }
+            return `
+              <li class="system-info-row">
+                <span class="system-info-label">${escapeHtml(row.label)}</span>
+                <span class="system-info-value">${valueHtml}</span>
+              </li>
+            `;
+          }).join('')}
         </ul>
       `;
     })
@@ -353,28 +367,16 @@ function bindLogFilters() {
 
 function updateActiveTab(btns, activeBtn) {
   btns.forEach(b => {
-    b.style.borderColor = "var(--border)";
-    b.style.color = "var(--foreground)";
+    b.classList.remove("active");
   });
-  activeBtn.style.borderColor = "rgba(var(--brand-blue-rgb), 0.3)";
-  activeBtn.style.color = "var(--brand-blue)";
+  activeBtn.classList.add("active");
 }
 
 // ==============================
 // TOAST
 // ==============================
 function showSettingsToast(msg, type = "success") {
-  // Delegate to core.js if available
-  if (typeof showToast === "function") {
-    showToast(msg, type);
-    return;
-  }
-
-  const toast = document.getElementById("settings-toast");
-  if (!toast) return;
-
-  toast.textContent = msg;
-  toast.className = `settings-toast settings-toast-${type} settings-toast-show`;
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove("settings-toast-show"), 3200);
+  showToast(msg, type);
 }
+
+})();

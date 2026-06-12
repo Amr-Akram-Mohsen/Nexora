@@ -1,4 +1,14 @@
 # app/admin/interactions.py
+"""
+Admin interaction management endpoints.
+
+Refactoring applied:
+- Global @admin_required guard via before_request (R-01).
+- Interaction stats endpoint reads from the 60-second cached
+  get_interactions_breakdown() instead of issuing 8 independent queries (R-03).
+- All queries use modern select() style (R-07).
+- Shared pagination helpers from app.admin.helpers (R-18, R-21).
+"""
 from flask import Blueprint, jsonify, request
 from app.core.decorators import admin_required
 from app.core.extensions import db
@@ -12,26 +22,32 @@ from app.domains.interaction.service.query import (
     get_click_stats,
 )
 from app.domains.user.models import User
+from app.admin.helpers import parse_pagination_params
 from sqlalchemy import select, func, or_
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
 
 
-# ---------------------------
+@bp.before_request
+@admin_required
+def require_admin():
+    """Ensure all interaction management endpoints require admin privilege."""
+    pass
+
+
+# ─────────────────────────────────────────────
 # COMMENTS
-# ---------------------------
+# ─────────────────────────────────────────────
 
 @bp.route("/comments", methods=["GET"])
 def list_comments():
     """Paginated, enriched comment listing with user and target info."""
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 25, type=int)
-    sentiment = request.args.get("sentiment", "").strip()
+    page, per_page = parse_pagination_params(default_per_page=25)
+    sentiment   = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
-    search = request.args.get("search", "").strip()
+    search      = request.args.get("search", "").strip()
 
     stmt = select(Comment).order_by(Comment.id.desc())
-
     if sentiment:
         stmt = stmt.where(Comment.sentiment == sentiment)
     if target_type:
@@ -41,7 +57,7 @@ def list_comments():
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    # Batch-load user names
+    # Batch-load user info
     user_ids = {c.user_id for c in pagination.items}
     users = {}
     if user_ids:
@@ -52,9 +68,9 @@ def list_comments():
 
     # Batch-load target titles
     content_ids = {c.target_id for c in pagination.items if c.target_type == "content"}
-    item_ids = {c.target_id for c in pagination.items if c.target_type == "item"}
+    item_ids    = {c.target_id for c in pagination.items if c.target_type == "item"}
     content_titles = {}
-    item_names = {}
+    item_names     = {}
 
     if content_ids:
         from app.domains.content.models import Content
@@ -79,67 +95,62 @@ def list_comments():
             else item_names.get(c.target_id)
         )
         serialized.append({
-            "id": c.id,
-            "content": c.content,
-            "preview": c.content[:120] + ("…" if len(c.content) > 120 else ""),
-            "user_id": c.user_id,
-            "user_name": user["name"] if user else f"User #{c.user_id}",
-            "user_email": user["email"] if user else None,
-            "parent_id": c.parent_id,
-            "sentiment": c.sentiment or "neutral",
-            "confidence": c.confidence,
-            "target_type": c.target_type,
-            "target_id": c.target_id,
+            "id":           c.id,
+            "content":      c.content,
+            "preview":      c.content[:120] + ("…" if len(c.content) > 120 else ""),
+            "user_id":      c.user_id,
+            "user_name":    user["name"] if user else f"User #{c.user_id}",
+            "user_email":   user["email"] if user else None,
+            "parent_id":    c.parent_id,
+            "sentiment":    c.sentiment or "neutral",
+            "confidence":   c.confidence,
+            "target_type":  c.target_type,
+            "target_id":    c.target_id,
             "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
-            "like_count": c.like_count,
+            "like_count":   c.like_count,
             "replies_count": c.replies_count,
-            "created_at": c.created_at.isoformat() if c.created_at else None,
+            "created_at":   c.created_at.isoformat() if c.created_at else None,
         })
 
     return jsonify({
-        "items": serialized,
-        "page": pagination.page,
-        "pages": pagination.pages,
-        "total": pagination.total,
+        "items":    serialized,
+        "page":     pagination.page,
+        "pages":    pagination.pages,
+        "total":    pagination.total,
         "per_page": pagination.per_page,
     })
 
 
 @bp.route("/comments/<int:id>", methods=["DELETE"])
-@admin_required
 def delete_comment(id):
     """Delete a comment and all its replies."""
     comment = db.session.get(Comment, id)
     if not comment:
         return jsonify({"error": "Comment not found"}), 404
-
     db.session.delete(comment)
     db.session.commit()
     return jsonify({"success": True, "message": "Comment deleted."})
 
 
 @bp.route("/comments/<int:id>/flag", methods=["POST"])
-@admin_required
 def flag_comment(id):
     """Flag a comment as spam by marking its sentiment."""
     comment = db.session.get(Comment, id)
     if not comment:
         return jsonify({"error": "Comment not found"}), 404
-
     comment.sentiment = "spam"
     db.session.commit()
     return jsonify({"success": True, "message": "Comment flagged as spam."})
 
 
-# ---------------------------
+# ─────────────────────────────────────────────
 # REACTIONS
-# ---------------------------
+# ─────────────────────────────────────────────
 
 @bp.route("/reactions", methods=["GET"])
 def list_reactions():
     """Paginated reactions list for moderation view."""
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 25, type=int)
+    page, per_page = parse_pagination_params(default_per_page=25)
     reaction_type = request.args.get("type", "").strip()
 
     stmt = select(Reaction).order_by(Reaction.id.desc())
@@ -158,34 +169,33 @@ def list_reactions():
         users = {r["id"]: r["name"] for r in rows}
 
     serialized = [{
-        "id": r.id,
-        "type": r.type,
-        "user_id": r.user_id,
-        "user_name": users.get(r.user_id, f"User #{r.user_id}"),
+        "id":          r.id,
+        "type":        r.type,
+        "user_id":     r.user_id,
+        "user_name":   users.get(r.user_id, f"User #{r.user_id}"),
         "target_type": r.target_type,
-        "target_id": r.target_id,
-        "created_at": r.created_at.isoformat() if r.created_at else None,
+        "target_id":   r.target_id,
+        "created_at":  r.created_at.isoformat() if r.created_at else None,
     } for r in pagination.items]
 
     return jsonify({
-        "items": serialized,
-        "page": pagination.page,
-        "pages": pagination.pages,
-        "total": pagination.total,
+        "items":    serialized,
+        "page":     pagination.page,
+        "pages":    pagination.pages,
+        "total":    pagination.total,
         "per_page": pagination.per_page,
     })
 
 
-# ---------------------------
-# STATS (DASHBOARD)
-# ---------------------------
+# ─────────────────────────────────────────────
+# STATS (read from 60s cache — R-03)
+# ─────────────────────────────────────────────
 
 @bp.route("/stats", methods=["GET"])
 def interactions_stats():
     """Unified stats endpoint — returns breakdown + total + reaction split."""
     breakdown = get_interactions_breakdown()
-    reaction_stats = get_reaction_stats()
-    total = sum(breakdown.values())
+    total = sum(v for k, v in breakdown.items() if not k.startswith("_"))
 
     return jsonify({
         "comments":   breakdown.get("comments", 0),
@@ -194,8 +204,8 @@ def interactions_stats():
         "saves":      breakdown.get("saves", 0),
         "shares":     breakdown.get("shares", 0),
         "item_clicks": breakdown.get("clicks", 0),
-        "likes":      reaction_stats.get("likes", 0),
-        "dislikes":   reaction_stats.get("dislikes", 0),
+        "likes":      breakdown.get("_likes", 0),
+        "dislikes":   breakdown.get("_dislikes", 0),
         "total":      total,
     })
 
