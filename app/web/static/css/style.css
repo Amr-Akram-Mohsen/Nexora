@@ -13,11 +13,11 @@
 @import "components/theme-variants.css";
 
 /* 2. Layout - Site Structure */
-@import "layout/logo.css";
 @import "layout/header.css";
 @import "content/catalog/search.css";
 @import "layout/footer.css";
 @import "layout/grid.css";
+@import "layout/logo.css";
 
 /* 3. Components - Reusable UI Elements */
 @import "components/ui/button.css";

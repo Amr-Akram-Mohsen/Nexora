@@ -7,7 +7,9 @@
 
 .site-logo {
   color: var(--text-color);
+  display: block;
   height: 40px;
+  width: auto;
 }
 
 /* Embed as <img> — respects CSS color on supporting browsers */

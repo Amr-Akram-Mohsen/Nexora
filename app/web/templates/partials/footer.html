@@ -6,11 +6,10 @@
     <div class="footer-grid">
 
       <!-- Brand -->
-      <div class="footer-column footer-brand flex flex-col">
+      <div class="footer-column footer-brand flex flex-col items-start">
 
-        <a href="/" class="footer-logo flex items-center group">
-          <img src="{{ url_for('static', filename='images/public/nexora-logo.svg') }}" alt="Nexora" height="40"
-            class="site-logo">
+        <a href="/" class="logo group flex items-center main-nav__link site-logo">
+          {% include "logos/nexora-logo.html" %}
         </a>
 
         <p class="footer-description">

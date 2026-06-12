@@ -127,7 +127,7 @@ body.dark-mode {
   --input-background: rgb(var(--input-background-rgb));
   --focus-border-color: rgb(var(--ring-rgb));
 
-  --text-color: rgb(var(var(--text-color-rgb)));
+  --text-color: rgb(var(--text-color-rgb));
 
 }
 

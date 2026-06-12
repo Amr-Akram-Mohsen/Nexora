@@ -9,8 +9,8 @@
     <div class="header flex items-center justify-between">
 
       <!-- Logo -->
-      <a href="/" class="logo group flex items-center">
-        <img src="{{ url_for('static', filename='images/public/nexora-logo.svg') }}" alt="Nexora" class="site-logo">
+      <a href="/" class="logo group flex items-center main-nav__link site-logo">
+        {% include "logos/nexora-logo.html" %}
       </a>
 
       <!-- Desktop Navigation -->
