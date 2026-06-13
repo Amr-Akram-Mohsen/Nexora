@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_table_spinner %}
+admin_spinner, admin_table_spinner, admin_filter_select %}
 
 {% block title %}Product Management — Nexora Admin{% endblock %}
 
@@ -25,42 +25,18 @@ actions=header_actions
       <input type="text" id="item-search" placeholder="Search by name or ID…" />
     </div>
 
-    <select id="filter-item-brand" class="dashboard-filter-select filter-select-item">
-      <option value="">All Brands</option>
-      <!-- Populated dynamically -->
-    </select>
-
-    <select id="filter-item-category" class="dashboard-filter-select filter-select-item">
-      <option value="">All Categories</option>
-      <!-- Populated dynamically -->
-    </select>
-
-    <select id="filter-item-source" class="dashboard-filter-select filter-select-item">
-      <option value="">All Sources</option>
-      <!-- Populated dynamically -->
-    </select>
-
-    <select id="filter-item-type" class="dashboard-filter-select filter-select-item">
-      <option value="">All Types</option>
-      <!-- Populated dynamically -->
-    </select>
+    {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-item-source", None, [], default_val="", default_text="All Sources", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-item-type", None, [], default_val="", default_text="All Types", extra_class="filter-select-item") }}
   </div>
 
   <!-- Row 2: Sorting & Reset -->
   <div class="admin-toolbar-row flex items-center flex-wrap">
     <div class="filter-sort-group" style="margin-left:0;">
       <span class="filter-label-xs">Sort:</span>
-      <select id="item-sort-by" class="dashboard-filter-select filter-input-auto">
-        <option value="id" selected>ID / Newest</option>
-        <option value="created_at">Date Added</option>
-        <option value="name">Name</option>
-        <option value="click_count">Clicks</option>
-        <option value="view_count">Views</option>
-      </select>
-      <select id="item-sort-dir" class="dashboard-filter-select filter-input-auto">
-        <option value="desc">Descending</option>
-        <option value="asc">Ascending</option>
-      </select>
+      {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"), ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
+      {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
       <button id="clear-item-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
     </div>
   </div>
@@ -98,7 +74,7 @@ actions=header_actions
 
 {% call admin_modal("inspect-item-modal", "Product Provider & Store Links", "📡", "modal-content-lg") %}
 <div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-item-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+  <button id="inspect-item-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
 </div>
 {% endcall %}
 
@@ -189,5 +165,5 @@ actions=header_actions
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/control_panel/items.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/items.js') }}"></script>
 {% endblock %}

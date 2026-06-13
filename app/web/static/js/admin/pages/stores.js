@@ -27,13 +27,20 @@
     clone.querySelector('.store-cell-time').textContent = st.latest_activity ? formatDate(st.latest_activity, true) : '—';
 
     const statusCell = clone.querySelector('.store-cell-status');
+    statusCell.innerHTML = "";
+    const badge = document.createElement("span");
+    badge.className = "status-badge";
     if (st.status === 'healthy') {
-      statusCell.innerHTML = `<span class="status-badge active">Healthy</span>`;
+      badge.classList.add("active");
+      badge.textContent = "Healthy";
     } else if (st.status === 'warning') {
-      statusCell.innerHTML = `<span class="status-badge inactive badge-orange">Warning</span>`;
+      badge.classList.add("inactive", "badge-orange");
+      badge.textContent = "Warning";
     } else {
-      statusCell.innerHTML = `<span class="status-badge inactive">Failed</span>`;
+      badge.classList.add("inactive");
+      badge.textContent = "Failed";
     }
+    statusCell.appendChild(badge);
 
     const inspectBtn = clone.querySelector('.store-cell-inspect');
     if (inspectBtn) {

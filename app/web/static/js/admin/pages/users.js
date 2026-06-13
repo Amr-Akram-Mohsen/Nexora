@@ -14,19 +14,22 @@
     const tr = clone.querySelector("tr");
     tr.id = `user-row-${user.id}`;
 
-    clone.querySelector(".user-cell-name").innerHTML = user.name ? escapeHtml(user.name) : '<em>No name</em>';
+    const nameEl = clone.querySelector(".user-cell-name");
+    if (user.name) {
+      nameEl.textContent = user.name;
+    } else {
+      nameEl.innerHTML = '<em>No name</em>';
+    }
     clone.querySelector(".user-cell-email").textContent = user.email;
 
     // Badges
-    const roleCell = clone.querySelector(".user-role-cell");
-    roleCell.innerHTML = user.is_admin
-      ? `<span class="status-badge admin">Admin</span>`
-      : `<span class="status-badge user">User</span>`;
+    const roleBadge = clone.querySelector(".user-role-badge");
+    roleBadge.textContent = user.is_admin ? "Admin" : "User";
+    roleBadge.className = `user-role-badge status-badge ${user.is_admin ? 'admin' : 'user'}`;
 
-    const statusCell = clone.querySelector(".user-status-cell");
-    statusCell.innerHTML = user.is_active
-      ? `<span class="status-badge active">Active</span>`
-      : `<span class="status-badge inactive">Inactive</span>`;
+    const statusBadge = clone.querySelector(".user-status-badge");
+    statusBadge.textContent = user.is_active ? "Active" : "Inactive";
+    statusBadge.className = `user-status-badge status-badge ${user.is_active ? 'active' : 'inactive'}`;
 
     const joinedCell = clone.querySelector(".user-joined-cell");
     joinedCell.textContent = user.created_at ? formatDate(user.created_at) : "—";
@@ -37,6 +40,7 @@
 
     return tr;
   }
+
 
   // Action logic
   function handleToggleAdmin(id, name, btn, modal) {
@@ -210,23 +214,6 @@
           if (user) {
             showInspectModal(user);
           }
-        }
-      });
-    }
-
-    // Close inspect user modal overlay
-    const inspectCloseBtn = document.getElementById("inspect-user-close-btn");
-    if (inspectCloseBtn) {
-      inspectCloseBtn.addEventListener("click", () => {
-        document.getElementById("inspect-user-modal").classList.remove("active");
-      });
-    }
-
-    const inspectModalOverlay = document.getElementById("inspect-user-modal");
-    if (inspectModalOverlay) {
-      inspectModalOverlay.addEventListener("click", (e) => {
-        if (e.target === inspectModalOverlay) {
-          inspectModalOverlay.classList.remove("active");
         }
       });
     }

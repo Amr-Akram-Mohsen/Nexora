@@ -61,7 +61,7 @@ actions=header_actions
 
 {% call admin_modal("inspect-rec-modal", "Content–Product Recommendation Details", "📡") %}
 <div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-rec-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+  <button id="inspect-rec-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
 </div>
 {% endcall %}
 
@@ -141,5 +141,5 @@ actions=header_actions
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/control_panel/recommendations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/recommendations.js') }}"></script>
 {% endblock %}

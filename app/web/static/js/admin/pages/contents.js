@@ -69,7 +69,7 @@
           sourceSelect.appendChild(opt);
         });
 
-        applyUrlFilters();
+        applyContentsUrlFilters();
 
         // Once metadata is ready, init contents controller
         contentsController.init();
@@ -138,25 +138,41 @@
 
     // Status / Quality issues badge
     const statusCell = clone.querySelector(".content-cell-status");
-    const statusBadge = item.is_active
-      ? `<span class="status-badge active">Active</span>`
-      : `<span class="status-badge inactive">Inactive</span>`;
+    statusCell.innerHTML = "";
 
-    let flagsHtml = "";
+    const statusBadge = document.createElement("span");
+    statusBadge.className = `status-badge ${item.is_active ? 'active' : 'inactive'}`;
+    statusBadge.textContent = item.is_active ? "Active" : "Inactive";
+    statusCell.appendChild(statusBadge);
+
     if (item.quality_issues && item.quality_issues.length > 0) {
       item.quality_issues.forEach((flag) => {
+        const flagBadge = document.createElement("span");
+        flagBadge.className = "status-badge inactive badge-margin";
         if (flag === "missing_category") {
-          flagsHtml += `<span class="status-badge inactive badge-margin" title="Content belongs to uncategorized and requires clean routing.">⚠️ Category</span> `;
+          flagBadge.textContent = "⚠️ Category";
+          flagBadge.title = "Content belongs to uncategorized and requires clean routing.";
         } else if (flag === "missing_metadata") {
-          flagsHtml += `<span class="status-badge inactive badge-orange badge-margin" title="Missing essential title or preview details.">📝 Metadata</span> `;
+          flagBadge.className += " badge-orange";
+          flagBadge.textContent = "📝 Metadata";
+          flagBadge.title = "Missing essential title or preview details.";
         } else if (flag === "duplicate") {
-          flagsHtml += `<span class="status-badge inactive badge-indigo badge-margin" title="Duplicate titles matching other aggregates.">👯 Duplicate</span> `;
+          flagBadge.className += " badge-indigo";
+          flagBadge.textContent = "👯 Duplicate";
+          flagBadge.title = "Duplicate titles matching other aggregates.";
         }
+        statusCell.appendChild(document.createTextNode(" "));
+        statusCell.appendChild(flagBadge);
       });
     } else {
-      flagsHtml = `<span class="status-badge active" title="No critical catalog/enrichment issues.">✓ Clean</span>`;
+      const cleanBadge = document.createElement("span");
+      cleanBadge.className = "status-badge active";
+      cleanBadge.title = "No critical catalog/enrichment issues.";
+      cleanBadge.textContent = "✓ Clean";
+      statusCell.appendChild(document.createTextNode(" "));
+      statusCell.appendChild(cleanBadge);
     }
-    statusCell.innerHTML = statusBadge;
+
 
     // Inspect datasets
     const inspectBtn = clone.querySelector(".inspect-btn");
@@ -326,11 +342,9 @@
       });
   }
 
-  function applyUrlFilters() {
-    if (typeof getUrlQueryParams !== "function") return;
-    const params = getUrlQueryParams();
-
-    const filterMap = {
+  function applyContentsUrlFilters() {
+    if (typeof applyUrlFilters !== "function") return;
+    applyUrlFilters({
       search: "content-search",
       type: "filter-type",
       section: "filter-section",
@@ -345,17 +359,9 @@
       end_date: "filter-end-date",
       sort_by: "sort-by",
       sort_dir: "sort-dir"
-    };
-
-    for (const [paramKey, elementId] of Object.entries(filterMap)) {
-      if (params[paramKey] !== undefined) {
-        const el = document.getElementById(elementId);
-        if (el) {
-          el.value = params[paramKey];
-        }
-      }
-    }
+    });
   }
+
 
   // ==============================
   // SOURCE/PROVIDER DETAILS INSPECTOR
@@ -379,10 +385,21 @@
 
     const linkContainer = clone.querySelector(".inspect-source-link");
     if (item.url) {
-      linkContainer.innerHTML = `<a href="${item.url}" target="_blank" class="activity-target inspect-link">View Original Link <i class="fas fa-external-link-alt"></i></a>`;
+      linkContainer.innerHTML = "";
+      const a = document.createElement("a");
+      a.href = item.url;
+      a.target = "_blank";
+      a.className = "activity-target inspect-link";
+      a.textContent = "View Original Link ";
+      
+      const icon = document.createElement("i");
+      icon.className = "fas fa-external-link-alt";
+      a.appendChild(icon);
+      linkContainer.appendChild(a);
     } else {
       linkContainer.textContent = "—";
     }
+
 
     clone.querySelector(".inspect-ingested-at").textContent = item.ingested_at ? new Date(item.ingested_at).toLocaleString() : "—";
     clone.querySelector(".inspect-published-at").textContent = item.published_at ? new Date(item.published_at).toLocaleString() : "—";
@@ -491,31 +508,7 @@
     });
 
     // Quick Category modal triggers
-    modalCancel.addEventListener("click", hideQuickCategoryModal);
     modalConfirm.addEventListener("click", saveQuickCategory);
-
-    // Close quick modal on clicking background
-    const quickModalOverlay = document.getElementById("quick-category-modal");
-    quickModalOverlay.addEventListener("click", (e) => {
-      if (e.target === quickModalOverlay) hideQuickCategoryModal();
-    });
-
-    // Close inspect modal overlay
-    const inspectCloseBtn = document.getElementById("inspect-close-btn");
-    if (inspectCloseBtn) {
-      inspectCloseBtn.addEventListener("click", () => {
-        document.getElementById("inspect-modal").classList.remove("active");
-      });
-    }
-
-    const inspectModalOverlay = document.getElementById("inspect-modal");
-    if (inspectModalOverlay) {
-      inspectModalOverlay.addEventListener("click", (e) => {
-        if (e.target === inspectModalOverlay) {
-          inspectModalOverlay.classList.remove("active");
-        }
-      });
-    }
 
     // Table body event delegation
     const tableBody = document.getElementById("contents-table-body");

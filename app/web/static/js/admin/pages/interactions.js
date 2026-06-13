@@ -298,22 +298,10 @@
     return tr;
   }
 
-  function applyUrlFilters() {
-    if (typeof getUrlQueryParams !== "function") return;
+  function applyInteractionsUrlFilters() {
+    if (typeof applyUrlFilters !== "function") return;
     const params = getUrlQueryParams();
-    
     const activeTab = params.tab || 'comments';
-    
-    const filterMap = {
-      sentiment: "filter-comment-sentiment",
-      target_type: "filter-comment-target",
-      reactions_type: "filter-reaction-type",
-      reactions_user: "filter-reactions-user",
-      views_start_date: "filter-views-start-date",
-      views_end_date: "filter-views-end-date",
-      clicks_destination: "filter-clicks-destination",
-      saves_user: "filter-saves-user"
-    };
 
     // Map generic 'search' query param to active tab search input
     if (params.search !== undefined) {
@@ -329,15 +317,18 @@
       }
     }
 
-    for (const [paramKey, elementId] of Object.entries(filterMap)) {
-      if (params[paramKey] !== undefined) {
-        const el = document.getElementById(elementId);
-        if (el) {
-          el.value = params[paramKey];
-        }
-      }
-    }
+    applyUrlFilters({
+      sentiment: "filter-comment-sentiment",
+      target_type: "filter-comment-target",
+      reactions_type: "filter-reaction-type",
+      reactions_user: "filter-reactions-user",
+      views_start_date: "filter-views-start-date",
+      views_end_date: "filter-views-end-date",
+      clicks_destination: "filter-clicks-destination",
+      saves_user: "filter-saves-user"
+    });
   }
+
 
   // ── Init ─────────────────────────────────
   function init() {
@@ -451,7 +442,7 @@
 
     initTabs();
     loadStatsRow();
-    applyUrlFilters();
+    applyInteractionsUrlFilters();
 
     // Bind events for all controllers
     commentsController.bindEvents();
@@ -476,23 +467,6 @@
         }
       }
     });
-
-    // Close inspect comment modal overlay
-    const inspectCloseBtn = document.getElementById("inspect-comment-close-btn");
-    if (inspectCloseBtn) {
-      inspectCloseBtn.addEventListener("click", () => {
-        document.getElementById("inspect-comment-modal").classList.remove("active");
-      });
-    }
-
-    const inspectModalOverlay = document.getElementById("inspect-comment-modal");
-    if (inspectModalOverlay) {
-      inspectModalOverlay.addEventListener("click", (e) => {
-        if (e.target === inspectModalOverlay) {
-          inspectModalOverlay.classList.remove("active");
-        }
-      });
-    }
   }
 
   document.addEventListener('DOMContentLoaded', init);

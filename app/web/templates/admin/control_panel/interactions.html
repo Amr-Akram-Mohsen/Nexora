@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_table_spinner %}
+admin_spinner, admin_table_spinner, admin_filter_select %}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
 
@@ -44,18 +44,8 @@ admin_spinner, admin_table_spinner %}
         <span class="admin-toolbar-search-icon-inside">🔍</span>
         <input type="text" id="comment-search" placeholder="Search comment text…" />
       </div>
-      <select id="filter-comment-sentiment" class="dashboard-filter-select filter-select-item">
-        <option value="">All Sentiments</option>
-        <option value="positive">Positive</option>
-        <option value="neutral">Neutral</option>
-        <option value="negative">Negative</option>
-        <option value="spam">Spam</option>
-      </select>
-      <select id="filter-comment-target" class="dashboard-filter-select filter-select-item">
-        <option value="">All Targets</option>
-        <option value="content">Content</option>
-        <option value="item">Item</option>
-      </select>
+      {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"), ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments", extra_class="filter-select-item") }}
+      {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="", default_text="All Targets", extra_class="filter-select-item") }}
       <button id="clear-comment-filters-btn" class="dashboard-filter-clear">Reset</button>
     </div>
   </div>
@@ -110,11 +100,7 @@ admin_spinner, admin_table_spinner %}
           <span class="admin-toolbar-search-icon-inside">🔍</span>
           <input type="text" id="reactions-search" placeholder="Search target title…" />
         </div>
-        <select id="filter-reaction-type" class="dashboard-filter-select filter-select-item">
-          <option value="">All Reaction Types</option>
-          <option value="like">Likes</option>
-          <option value="dislike">Dislikes</option>
-        </select>
+        {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")], default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
         <div class="admin-toolbar-search admin-search-grow flex items-center">
           <span class="admin-toolbar-search-icon-inside">👤</span>
           <input type="text" id="filter-reactions-user" placeholder="Search user name/email…" />
@@ -291,7 +277,7 @@ admin_spinner, admin_table_spinner %}
 
 {% call admin_modal("inspect-comment-modal", "Comment Details & Moderation", "💬") %}
 <div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-comment-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+  <button id="inspect-comment-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
 </div>
 {% endcall %}
 
@@ -444,5 +430,5 @@ admin_spinner, admin_table_spinner %}
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/control_panel/interactions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/interactions.js') }}"></script>
 {% endblock %}

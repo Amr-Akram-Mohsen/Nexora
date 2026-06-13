@@ -158,22 +158,6 @@
         }
       }
     });
-
-    // Close inspect rec modal overlay
-    const inspectCloseBtn = document.getElementById("inspect-rec-close-btn");
-    if (inspectCloseBtn) {
-      inspectCloseBtn.addEventListener("click", () => {
-        document.getElementById("inspect-rec-modal").classList.remove("active");
-      });
-    }
-
-    const inspectModalOverlay = document.getElementById("inspect-rec-modal");
-    if (inspectModalOverlay) {
-      inspectModalOverlay.addEventListener("click", (e) => {
-        if (e.target === inspectModalOverlay) {
-          inspectModalOverlay.classList.remove("active");
-        }
-      });
-    }
   });
 })();
+

@@ -193,8 +193,19 @@
   </li>
 </template>
 
+<template id="system-info-list-template">
+  <ul class="system-info-list"></ul>
+</template>
+
+<template id="system-info-row-template">
+  <li class="system-info-row flex justify-between items-center">
+    <span class="system-info-label"></span>
+    <span class="system-info-value"></span>
+  </li>
+</template>
+
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/control_panel/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/settings.js') }}"></script>
 {% endblock %}

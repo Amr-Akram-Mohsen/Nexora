@@ -92,11 +92,9 @@
     );
   }
 
-  function applyUrlFilters() {
-    if (typeof getUrlQueryParams !== "function") return;
-    const params = getUrlQueryParams();
-
-    const filterMap = {
+  function applyItemUrlFilters() {
+    if (typeof applyUrlFilters !== "function") return;
+    applyUrlFilters({
       search: "item-search",
       brand: "filter-item-brand",
       category: "filter-item-category",
@@ -104,17 +102,9 @@
       item_type: "filter-item-type",
       sort_by: "item-sort-by",
       sort_dir: "item-sort-dir"
-    };
-
-    for (const [paramKey, elementId] of Object.entries(filterMap)) {
-      if (params[paramKey] !== undefined) {
-        const el = document.getElementById(elementId);
-        if (el) {
-          el.value = params[paramKey];
-        }
-      }
-    }
+    });
   }
+
 
   // ── Event Wiring ─────────────────────────
   function init() {
@@ -149,7 +139,7 @@
 
     loadMeta()
       .then(() => {
-        applyUrlFilters();
+        applyItemUrlFilters();
         itemsController.init();
       })
       .catch(() => {
@@ -168,23 +158,6 @@
         }
       }
     });
-
-    // Close inspect modal overlay
-    const inspectCloseBtn = document.getElementById("inspect-item-close-btn");
-    if (inspectCloseBtn) {
-      inspectCloseBtn.addEventListener("click", () => {
-        document.getElementById("inspect-item-modal").classList.remove("active");
-      });
-    }
-
-    const inspectModalOverlay = document.getElementById("inspect-item-modal");
-    if (inspectModalOverlay) {
-      inspectModalOverlay.addEventListener("click", (e) => {
-        if (e.target === inspectModalOverlay) {
-          inspectModalOverlay.classList.remove("active");
-        }
-      });
-    }
   }
 
   // ── Source/Provider Detail Inspection Modal ──────
@@ -257,11 +230,15 @@
         const metaBox = cardClone.querySelector('.inspect-store-metadata-box');
         if (lnk.metadata && Object.keys(lnk.metadata).length > 0) {
           metaBox.className = "inspect-store-card-meta-box";
-          let metaHtml = "";
+          metaBox.innerHTML = "";
           for (const [k, v] of Object.entries(lnk.metadata)) {
-            metaHtml += `<div><strong>${k}:</strong> ${JSON.stringify(v)}</div>`;
+            const rowDiv = document.createElement("div");
+            const strong = document.createElement("strong");
+            strong.textContent = `${k}: `;
+            rowDiv.appendChild(strong);
+            rowDiv.appendChild(document.createTextNode(JSON.stringify(v)));
+            metaBox.appendChild(rowDiv);
           }
-          metaBox.innerHTML = metaHtml;
         } else {
           metaBox.className = "inspect-store-card-meta-empty";
           metaBox.textContent = "No raw network tracking metadata.";
@@ -270,8 +247,13 @@
         linksContainer.appendChild(card);
       });
     } else {
-      linksContainer.innerHTML = `<div class="text-center text-muted p-4">No store links or variant providers mapped for this product.</div>`;
+      linksContainer.innerHTML = "";
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "text-center text-muted p-4";
+      emptyDiv.textContent = "No store links or variant providers mapped for this product.";
+      linksContainer.appendChild(emptyDiv);
     }
+
 
     const deleteBtn = clone.querySelector('.inspect-delete-btn');
     if (deleteBtn) {

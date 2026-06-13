@@ -87,7 +87,7 @@ current_per_page=current_per_page
 {% macro admin_modal(id, title, icon, size_class="") %}
 <div id="{{ id }}" class="dashboard-modal-overlay flex-center">
   <div class="dashboard-modal-content {{ size_class }}">
-    <button class="dashboard-modal-close-x" aria-label="Close modal" type="button" onclick="document.getElementById('{{ id }}').classList.remove('active')">×</button>
+    <button class="dashboard-modal-close-x" aria-label="Close modal" type="button" data-dismiss="modal">×</button>
     <div class="dashboard-modal-icon">{{ icon }}</div>
     <h3 class="dashboard-modal-title" id="{{ id }}-title">{{ title }}</h3>
     <div class="dashboard-modal-body" id="{{ id }}-body">
@@ -95,4 +95,19 @@ current_per_page=current_per_page
     </div>
   </div>
 </div>
+{% endmacro %}
+
+{% macro admin_filter_select(id, name, options, default_val="", default_text="All", extra_class="", attrs="") %}
+<select id="{{ id }}" {% if name %}name="{{ name }}"{% endif %} class="dashboard-filter-select {{ extra_class }}" data-default-value="{{ default_val }}" {{ attrs }}>
+  {% if default_text %}
+  <option value="{{ default_val }}">{{ default_text }}</option>
+  {% endif %}
+  {% for opt in options %}
+    {% if opt is string or opt is number %}
+      <option value="{{ opt }}">{{ opt }}</option>
+    {% else %}
+      <option value="{{ opt[0] }}">{{ opt[1] }}</option>
+    {% endif %}
+  {% endfor %}
+</select>
 {% endmacro %}

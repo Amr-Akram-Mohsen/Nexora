@@ -151,10 +151,133 @@
 </div>
 
 
+<!-- HTML Templates for Overview Hydration -->
+<template id="overview-stat-card-template">
+  <div class="dashboard-stat-icon inline-flex-center"></div>
+  <h3 class="dashboard-stat-value"></h3>
+  <p class="dashboard-stat-label"></p>
+</template>
+
+<template id="overview-top-list-template">
+  <ol class="overview-top-list"></ol>
+</template>
+
+<template id="overview-top-item-template">
+  <li class="overview-top-item flex items-center">
+    <span class="overview-top-rank"></span>
+    <span class="overview-top-name">
+      <a class="overview-top-link-title"></a>
+    </span>
+    <span class="overview-top-value"></span>
+  </li>
+</template>
+
+<template id="overview-breakdown-template">
+  <div class="overview-breakdown-grid"></div>
+</template>
+
+<template id="overview-breakdown-row-template">
+  <div class="overview-breakdown-row flex items-center">
+    <span class="overview-breakdown-icon"></span>
+    <span class="overview-breakdown-label"></span>
+    <div class="overview-breakdown-bar-track">
+      <div class="overview-breakdown-bar"></div>
+    </div>
+    <span class="overview-breakdown-val"></span>
+    <span class="overview-breakdown-pct"></span>
+  </div>
+</template>
+
+<template id="overview-health-row-template">
+  <div>
+    <div class="health-row flex justify-between">
+      <span class="font-bold"><span class="status-badge badge-compact"></span> <span class="health-label-text"></span></span>
+      <span class="health-value-text text-muted"></span>
+    </div>
+    <div class="overview-breakdown-bar-track bar-track-health">
+      <div class="overview-breakdown-bar"></div>
+    </div>
+  </div>
+</template>
+
+<template id="overview-moderation-queue-template">
+  <a class="dashboard-stat-card clickable-card moderation-queue-link flex items-center justify-between">
+    <div class="flex items-center gap-sm">
+      <span class="text-lg-icon">⏳</span>
+      <div>
+        <div class="font-bold text-sm text-foreground">Moderation Queue</div>
+        <div class="text-xs text-muted">Unpublished aggregator drafts</div>
+      </div>
+    </div>
+    <span class="status-badge badge-pending"></span>
+  </a>
+</template>
+
+<template id="overview-growth-trend-template">
+  <div>
+    <h4 class="filter-label-xs mt-3 mb-1">7-Day Ingestion Growth</h4>
+    <div class="trend-chart-list"></div>
+  </div>
+</template>
+
+<template id="overview-growth-trend-item-template">
+  <div class="trend-chart-item flex items-center">
+    <span class="trend-chart-date"></span>
+    <div class="overview-breakdown-bar-track bar-track-trend">
+      <div class="overview-breakdown-bar bar-trend"></div>
+    </div>
+    <span class="trend-chart-value"></span>
+  </div>
+</template>
+
+<template id="overview-ingest-log-item-template">
+  <li class="activity-item ingest-log-item flex items-start">
+    <div class="activity-icon icon-save ingest-log-icon flex-center"></div>
+    <div class="activity-content">
+      <p class="activity-text ingest-log-text">
+        Successfully ingested <span class="status-badge badge-type-compact"></span>
+        <a class="activity-target text-deco-none ml-1"></a>
+      </p>
+      <p class="activity-meta ingest-log-title"></p>
+      <p class="activity-meta ingest-log-meta"></p>
+    </div>
+  </li>
+</template>
+
+<template id="overview-dist-row-template">
+  <a class="dist-row-link">
+    <div class="dist-row flex justify-between">
+      <span class="dist-row-name font-bold text-foreground"></span>
+      <span class="dist-row-count text-muted"></span>
+    </div>
+    <div class="overview-breakdown-bar-track bar-track-health">
+      <div class="overview-breakdown-bar"></div>
+    </div>
+  </a>
+</template>
+
+<template id="overview-provider-activity-item-template">
+  <li class="activity-item ingest-log-item flex items-start">
+    <div class="activity-icon icon-comment ingest-log-icon flex-center">📡</div>
+    <div class="activity-content">
+      <p class="activity-text ingest-log-text">
+        <strong class="text-foreground provider-name"></strong> 
+        <span class="status-badge active badge-type-compact badge-indigo provider-slug"></span>
+      </p>
+      <p class="activity-meta ingest-log-text mt-1 text-muted">
+        Volume: <strong class="provider-content-count"></strong> content items &amp; <strong class="provider-product-count"></strong> products
+      </p>
+      <p class="activity-meta ingest-log-meta mt-1">
+        Last Ingest Activity: <strong class="provider-activity-time"></strong>
+      </p>
+    </div>
+  </li>
+</template>
+
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/dashboard/overview.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/overview.js') }}"></script>
 <script>
   renderDashboardOverview("dashboard-overview-container");
   renderTopArticles("top-articles-container");

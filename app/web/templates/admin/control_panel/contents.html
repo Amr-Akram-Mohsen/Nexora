@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_table_spinner %}
+admin_table_spinner, admin_filter_select %}
 
 {% block title %}Content Management — Nexora Admin{% endblock %}
 
@@ -26,67 +26,24 @@ actions=header_actions
       <input type="text" id="content-search" placeholder="Search title or ID…" />
     </div>
 
-    <select id="filter-type" class="dashboard-filter-select filter-select-item">
-      <option value="">All Content Types</option>
-      <option value="article">Articles</option>
-      <option value="video">Videos</option>
-      <option value="post">Posts</option>
-    </select>
-
-    <select id="filter-section" class="dashboard-filter-select filter-select-item">
-      <option value="">All Sections</option>
-      <!-- Populated dynamically -->
-    </select>
-
-    <select id="filter-category" class="dashboard-filter-select filter-select-item">
-      <option value="">All Categories</option>
-      <option value="uncategorized">Uncategorized</option>
-      <!-- Populated dynamically -->
-    </select>
+    {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")], default_val="", default_text="All Content Types", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-section", None, [], default_val="", default_text="All Sections", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-category", None, [("uncategorized", "Uncategorized")], default_val="", default_text="All Categories", extra_class="filter-select-item") }}
   </div>
 
   <!-- Row 2: Ingest Details & Compliance -->
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <select id="filter-source" class="dashboard-filter-select filter-select-item">
-      <option value="">All Sources / Platforms</option>
-      <!-- Populated dynamically -->
-    </select>
-
-    <select id="filter-status" class="dashboard-filter-select filter-select-item">
-      <option value="">All Processing States</option>
-      <option value="pending">Pending</option>
-      <option value="enriching">Enriching</option>
-      <option value="complete">Complete</option>
-      <option value="failed">Failed</option>
-    </select>
-
-    <select id="filter-active" class="dashboard-filter-select filter-select-item">
-      <option value="">Active & Inactive</option>
-      <option value="true">Active Only</option>
-      <option value="false">Inactive Only</option>
-    </select>
-
-    <select id="filter-published" class="dashboard-filter-select filter-select-item">
-      <option value="">All Visibility</option>
-      <option value="true">Published Only</option>
-      <option value="false">Draft / Review Only</option>
-    </select>
-
-    <select id="filter-quality" class="dashboard-filter-select filter-select-warning">
-      <option value="">All Health Statuses</option>
-      <option value="missing_category">⚠️ Missing Category</option>
-      <option value="missing_metadata">📝 Missing Metadata</option>
-      <option value="duplicate">👯 Duplicate Title</option>
-    </select>
+    {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-status", None, [("pending", "Pending"), ("enriching", "Enriching"), ("complete", "Complete"), ("failed", "Failed")], default_val="", default_text="All Processing States", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-active", None, [("true", "Active Only"), ("false", "Inactive Only")], default_val="", default_text="Active & Inactive", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-published", None, [("true", "Published Only"), ("false", "Draft / Review Only")], default_val="", default_text="All Visibility", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-quality", None, [("missing_category", "⚠️ Missing Category"), ("missing_metadata", "📝 Missing Metadata"), ("duplicate", "👯 Duplicate Title")], default_val="", default_text="All Health Statuses", extra_class="filter-select-warning") }}
   </div>
 
   <!-- Row 3: Date Filters & Sorting -->
   <div class="admin-toolbar-row flex items-center flex-wrap">
     <span class="filter-label-xs">Date Range:</span>
-    <select id="filter-date-type" class="dashboard-filter-select filter-input-auto">
-      <option value="published_at">Published At</option>
-      <option value="ingested_at">Ingested At</option>
-    </select>
+    {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")], default_val="published_at", default_text=None, extra_class="filter-input-auto") }}
 
     <input type="date" id="filter-start-date" class="dashboard-filter-input filter-input-auto" />
     <span class="filter-text-divider">to</span>
@@ -94,18 +51,8 @@ actions=header_actions
 
     <div class="filter-sort-group flex items-center">
       <span class="filter-label-xs">Sort:</span>
-      <select id="sort-by" class="dashboard-filter-select filter-input-auto">
-        <option value="id" selected>ID / Newest</option>
-        <option value="published_at">Publish Date</option>
-        <option value="ingested_at">Ingest Date</option>
-        <option value="view_count">Views</option>
-        <option value="comment_count">Comments</option>
-        <option value="title">Title</option>
-      </select>
-      <select id="sort-dir" class="dashboard-filter-select filter-input-auto">
-        <option value="desc">Descending</option>
-        <option value="asc">Ascending</option>
-      </select>
+      {{ admin_filter_select("sort-by", None, [("id", "ID / Newest"), ("published_at", "Publish Date"), ("ingested_at", "Ingest Date"), ("view_count", "Views"), ("comment_count", "Comments"), ("title", "Title")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
+      {{ admin_filter_select("sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
 
       <button id="clear-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
     </div>
@@ -121,14 +68,7 @@ actions=header_actions
   </div>
 
   <div class="bulk-controls-group flex items-center gap-sm">
-    <select id="bulk-action-select" class="dashboard-filter-select">
-      <option value="">Choose Bulk Action...</option>
-      <option value="activate">Activate Selected</option>
-      <option value="deactivate">Deactivate Selected</option>
-      <option value="review">Mark for Review (Draft)</option>
-      <option value="recategorize">Recategorize Content</option>
-      <option value="delete">Safe Delete Selected</option>
-    </select>
+    {{ admin_filter_select("bulk-action-select", None, [("activate", "Activate Selected"), ("deactivate", "Deactivate Selected"), ("review", "Mark for Review (Draft)"), ("recategorize", "Recategorize Content"), ("delete", "Safe Delete Selected")], default_val="", default_text="Choose Bulk Action...") }}
 
     <!-- Bulk Category Dropdown (Shown only when recategorize is selected) -->
     <select id="bulk-category-select" class="dashboard-filter-select is-hidden">
@@ -177,18 +117,16 @@ actions=header_actions
 {% call admin_modal("quick-category-modal", "Quick Recategorize", "🏷️", "modal-content-sm") %}
 <p class="dashboard-modal-body">Move this item to a different content category:</p>
 <input type="hidden" id="quick-cat-content-id" />
-<select id="quick-cat-select" class="dashboard-filter-select modal-select-full">
-  <!-- Dynamic list -->
-</select>
+{{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None, extra_class="modal-select-full") }}
 <div class="dashboard-modal-actions flex justify-center">
-  <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
+  <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Cancel</button>
   <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
 </div>
 {% endcall %}
 
 {% call admin_modal("inspect-modal", "Source Details", "📡") %}
 <div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+  <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
 </div>
 {% endcall %}
 
@@ -287,5 +225,5 @@ actions=header_actions
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/control_panel/contents.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/contents.js') }}"></script>
 {% endblock %}

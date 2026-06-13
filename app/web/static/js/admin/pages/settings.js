@@ -32,31 +32,40 @@ function loadSystemInfo() {
       return res.json();
     })
     .then(info => {
-      container.innerHTML = `
-        <ul class="system-info-list">
-          ${info.map(row => {
-            // Backend now returns a plain `status` string (no HTML).
-            // Apply a visual class locally based on the value (R-11).
-            let valueHtml = escapeHtml(row.value);
-            if (row.status) {
-              const cls = row.status === 'online' ? 'status-ok'
-                        : row.status === 'error'  ? 'status-error'
-                        : 'status-pending';
-              valueHtml = `<span class="integration-status ${cls}">${escapeHtml(row.value)}</span>`;
-            }
-            return `
-              <li class="system-info-row flex justify-between items-center">
-                <span class="system-info-label">${escapeHtml(row.label)}</span>
-                <span class="system-info-value">${valueHtml}</span>
-              </li>
-            `;
-          }).join('')}
-        </ul>
-      `;
+      container.innerHTML = "";
+      const templateList = document.getElementById("system-info-list-template");
+      const templateRow = document.getElementById("system-info-row-template");
+      if (!templateList || !templateRow) return;
+
+      const list = templateList.content.cloneNode(true).querySelector(".system-info-list");
+      info.forEach(row => {
+        const clone = templateRow.content.cloneNode(true);
+        clone.querySelector(".system-info-label").textContent = row.label;
+        
+        const valueEl = clone.querySelector(".system-info-value");
+        if (row.status) {
+          const cls = row.status === 'online' ? 'status-ok'
+                    : row.status === 'error'  ? 'status-error'
+                    : 'status-pending';
+          const span = document.createElement("span");
+          span.className = `integration-status ${cls}`;
+          span.textContent = row.value;
+          valueEl.appendChild(span);
+        } else {
+          valueEl.textContent = row.value || "—";
+        }
+        
+        list.appendChild(clone);
+      });
+      container.appendChild(list);
     })
     .catch(err => {
       console.error(err);
-      container.innerHTML = `<p class="hint error-text">Failed to load system info.</p>`;
+      container.innerHTML = "";
+      const p = document.createElement("p");
+      p.className = "hint error-text";
+      p.textContent = "Failed to load system info.";
+      container.appendChild(p);
     });
 }
 

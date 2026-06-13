@@ -10,6 +10,18 @@ function getUrlQueryParams() {
   return params;
 }
 
+function applyUrlFilters(filterMap) {
+  const params = getUrlQueryParams();
+  for (const [paramKey, elementId] of Object.entries(filterMap)) {
+    if (params[paramKey] !== undefined) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.value = params[paramKey];
+      }
+    }
+  }
+}
+
 function formatDate(str, includeTime = false) {
   if (!str) return "—";
   try {
@@ -30,6 +42,7 @@ function escapeHtml(str) {
   div.textContent = String(str);
   return div.innerHTML;
 }
+
 
 
 // ==============================
@@ -379,3 +392,34 @@ function closeModal() {
   if (overlay) overlay.classList.remove("active");
   activeModalCallback = null;
 }
+
+// ==============================
+// GLOBAL MODAL EVENT DELEGATION
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("click", (e) => {
+    // Backdrop click
+    if (e.target.classList.contains("dashboard-modal-overlay")) {
+      e.target.classList.remove("active");
+      return;
+    }
+    // Dismiss button click
+    const dismissBtn = e.target.closest("[data-dismiss='modal'], .dashboard-modal-close-x");
+    if (dismissBtn) {
+      const modal = dismissBtn.closest(".dashboard-modal-overlay");
+      if (modal) {
+        modal.classList.remove("active");
+      }
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const activeModal = document.querySelector(".dashboard-modal-overlay.active");
+      if (activeModal) {
+        activeModal.classList.remove("active");
+      }
+    }
+  });
+});
+

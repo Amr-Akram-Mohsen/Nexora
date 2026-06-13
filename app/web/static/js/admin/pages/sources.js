@@ -22,13 +22,20 @@
     clone.querySelector('.source-cell-time').textContent = src.latest_activity ? formatDate(src.latest_activity, true) : '—';
 
     const statusCell = clone.querySelector('.source-cell-status');
+    statusCell.innerHTML = "";
+    const badge = document.createElement("span");
+    badge.className = "status-badge";
     if (src.status === 'healthy') {
-      statusCell.innerHTML = `<span class="status-badge active">Healthy</span>`;
+      badge.classList.add("active");
+      badge.textContent = "Healthy";
     } else if (src.status === 'warning') {
-      statusCell.innerHTML = `<span class="status-badge inactive badge-orange">Warning</span>`;
+      badge.classList.add("inactive", "badge-orange");
+      badge.textContent = "Warning";
     } else {
-      statusCell.innerHTML = `<span class="status-badge inactive">Failed</span>`;
+      badge.classList.add("inactive");
+      badge.textContent = "Failed";
     }
+    statusCell.appendChild(badge);
 
     clone.querySelector('.source-cell-inspect').href = `/admin/contents?source=${src.slug}`;
 
