@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% from "components/listing/listing-page.html" import listing_page %}
-{% from "components/listing/listing-widgets.html" import listing_header, active_filter_chips, listing_pagination, listing_sort_script %}
+{% from "components/listing/listing-widgets.html" import listing_header, active_filter_chips, listing_pagination,
+listing_sort_script %}
 {% from "components/ui/grid.html" import grid %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/empty-state.html" import empty_state %}
@@ -61,6 +62,18 @@ SLOT: results
 {% if results %}
 {% if slot == 'results' %}
 {{ grid(results) }}
+
+{% if recommendations %}
+<div class="catalog-recommendations"
+  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+  {% for block in recommendations %}
+  {% from "components/ui/section.html" import section %}
+  {% call section(block['title'], more_url=false) %}
+  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endif %}
 {% endif %}
 
 {# ═══════════════════════════════════════
@@ -79,6 +92,18 @@ message="We couldn't find any match for your current filters or search query. Tr
 action_text="Reset All Filters",
 action_url=url_for(request.endpoint, **request.view_args)
 ) }}
+
+{% if recommendations %}
+<div class="catalog-recommendations"
+  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+  {% for block in recommendations %}
+  {% from "components/ui/section.html" import section %}
+  {% call section(block['title'], more_url=false) %}
+  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endif %}
 {% endif %}
 {% endif %}
 

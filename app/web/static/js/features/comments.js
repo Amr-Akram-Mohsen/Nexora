@@ -35,8 +35,9 @@ async function showComments(btn) {
         params.append("parent_id", comment.dataset.commentId);
     }
     else {
-        const parent = wrapper.closest(".detail-page__extra")
-        wrapper = parent.querySelector(".comments");
+        // const parent = wrapper.closest(".detail-page__extra")
+        // wrapper = parent.querySelector(".comments");
+        wrapper = wrapper.querySelector(".comments");
         wrapper.classList.toggle("comments--collapsed");
         opening = !wrapper.classList.contains("comments--collapsed");
         list = wrapper.querySelector(".comments__list");

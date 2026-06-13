@@ -108,3 +108,73 @@ def get_trending_brands_cached(limit: int = 6, days: int = 7) -> list:
     from app.domains.taxonomy.service.query import get_trending_brands
     return get_trending_brands(limit=limit, days=days)
 
+
+# ---------------------------------------------------------------------------
+# Filter-aware context recommendations
+# ---------------------------------------------------------------------------
+
+@cache.memoize(timeout=300)
+def get_popular_contents_cached(
+    section_id: int | None = None,
+    category_slugs: tuple | None = None,
+    brand_slugs: tuple | None = None,
+    intent_slugs: tuple | None = None,
+    limit: int = 6,
+) -> list[dict]:
+    """
+    Cached filter-aware query for popular content matching active filters.
+    """
+    from app.domains.content.models import Content
+    from app.domains.taxonomy.models import Category, Brand, IntentFacet
+    from app.domains.content.service.query.utils import build_content_stmt, fetch_serialized_contents
+
+    session = db.session
+
+    stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
+    
+    if section_id:
+        stmt = stmt.where(Content.section_id == section_id)
+    if category_slugs:
+        stmt = stmt.join(Content.category).where(Category.slug.in_(list(category_slugs)))
+    if brand_slugs:
+        stmt = stmt.join(Content.brands).where(Brand.slug.in_(list(brand_slugs)))
+    if intent_slugs:
+        stmt = stmt.join(Content.intent).where(IntentFacet.slug.in_(list(intent_slugs)))
+
+    stmt = stmt.order_by(Content.view_count.desc(), Content.published_at.desc())
+    if limit:
+        stmt = stmt.limit(limit)
+
+    return fetch_serialized_contents(stmt, session)
+
+
+@cache.memoize(timeout=300)
+def get_popular_items_cached(
+    category_slugs: tuple | None = None,
+    brand_slugs: tuple | None = None,
+    limit: int = 6,
+) -> list[dict]:
+    """
+    Cached filter-aware query for popular items/deals matching active filters.
+    """
+    from app.domains.item.models import Item
+    from app.domains.taxonomy.models import Category, Brand
+    from app.domains.item.service.utils import build_item_stmt, fetch_items
+    from app.domains.item.service.serializers import serialize_item
+    
+    session = db.session
+    
+    stmt = build_item_stmt(eager_load="card")
+    if category_slugs:
+        stmt = stmt.join(Item.category).where(Category.slug.in_(list(category_slugs)))
+    if brand_slugs:
+        stmt = stmt.join(Item.brand).where(Brand.slug.in_(list(brand_slugs)))
+        
+    stmt = stmt.order_by(Item.view_count.desc(), Item.created_at.desc())
+    if limit:
+        stmt = stmt.limit(limit)
+        
+    items = fetch_items(stmt, session)
+    return [serialize_item(i) for i in items]
+
+

@@ -1,7 +1,7 @@
 {% set like_count = content.like_count or 0 %}
 {% set comment_count = content.comment_count or 0 %}
 {% from"components/ui/button.html" import button %}
-<div class="interaction-panel" data-type="{{ content.object_type }}" data-id="{{ content.id }}">
+<div class="interaction-panel">
 
   <!-- Left actions -->
   <div class="interaction-panel__actions flex items-center">

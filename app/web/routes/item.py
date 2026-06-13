@@ -47,6 +47,7 @@ def deals():
     data = get_catalog_data(active_filters, page=page)
     data.setdefault("items", [])
     data.setdefault("pagination", None)
+    data.setdefault("recommendations", [])
 
     item_count = len(data.get("items") or [])
     log_route_success(logger, "/deals", items=item_count, template="catalog-page.html")

@@ -34,6 +34,7 @@ def sections(section_slug):
         data.setdefault("pagination", None)
         data.setdefault("section", None)
         data.setdefault("trending_contents", [])
+        data.setdefault("recommendations", [])
 
         item_count = len(data.get("items") or [])
         log_route_success(
