@@ -34,10 +34,8 @@
 /* --- Filter & Search Bars --- */
 
 .dashboard-filter-bar {
-  display: flex;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
-  align-items: center;
 }
 
 .dashboard-search-container {
@@ -50,8 +48,6 @@
 
 .dashboard-filter-search-wrap {
   position: relative;
-  display: flex;
-  align-items: center;
   flex: 1;
 }
 
@@ -90,15 +86,9 @@
 /* --- Admin Layout Toolbars --- */
 
 .admin-toolbar {
-  display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  background: var(--card);
   padding: 1rem 1.25rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  align-items: center;
 }
 
 .admin-toolbar input {
@@ -107,8 +97,6 @@
 
 .admin-toolbar-search {
   position: relative;
-  display: flex;
-  align-items: center;
   flex: 1;
 }
 
@@ -127,24 +115,15 @@
 /* --- Advanced Filters Toolbar --- */
 
 .admin-toolbar-advanced {
-  display: flex;
-  flex-direction: column;
   gap: 0.75rem;
   align-items: stretch;
-  background: var(--card);
   padding: 1rem 1.25rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
   margin-bottom: 1.25rem;
-  box-shadow: var(--shadow-sm);
 }
 
 .admin-toolbar-row {
-  display: flex;
   gap: 0.75rem;
-  flex-wrap: wrap;
   width: 100%;
-  align-items: center;
 }
 
 .admin-search-grow {
@@ -209,9 +188,7 @@
 
 .filter-sort-group {
   margin-left: auto;
-  display: flex;
   gap: 0.5rem;
-  align-items: center;
 }
 
 /* --- Summary Bar --- */
@@ -237,10 +214,6 @@
 
 .admin-inline-form {
   padding: 1rem 1.25rem;
-  border-radius: var(--radius-lg);
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
   margin-bottom: 0;
 }
 
@@ -255,10 +228,7 @@
 }
 
 .admin-inline-form-row {
-  display: flex;
   gap: 0.75rem;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .admin-inline-input {
@@ -270,8 +240,6 @@
 .admin-inline-slug-preview {
   font-size: var(--text-xs);
   color: var(--muted-foreground);
-  display: flex;
-  align-items: center;
   gap: 0.3rem;
   white-space: nowrap;
 }
@@ -288,8 +256,6 @@
 /* --- Generic Checkbox / Toggles --- */
 
 .admin-toggle {
-  display: inline-flex;
-  align-items: center;
   gap: 0.4rem;
   cursor: pointer;
 }

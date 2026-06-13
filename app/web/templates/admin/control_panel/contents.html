@@ -1,37 +1,38 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_table_spinner %}
 
 {% block title %}Content Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {% set header_actions %}
-  <button id="refresh-contents-btn" class="admin-btn-secondary">↺ Refresh</button>
+<button id="refresh-contents-btn" class="admin-btn-secondary">↺ Refresh</button>
 {% endset %}
 
 {{ admin_page_header(
-    "Content Moderation & Management",
-    "Clean up, categorize, inspect quality, and perform bulk operations on aggregated content",
-    actions=header_actions
+"Content Moderation & Management",
+"Clean up, categorize, inspect quality, and perform bulk operations on aggregated content",
+actions=header_actions
 ) }}
 
 <!-- Advanced Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
-  
+
   <!-- Row 1: Search & Basic Filters -->
-  <div class="admin-toolbar-row">
-    <div class="admin-toolbar-search admin-search-grow">
+  <div class="admin-toolbar-row flex items-center flex-wrap">
+    <div class="admin-toolbar-search admin-search-grow flex items-center">
       <span class="admin-toolbar-search-icon-inside">🔍</span>
       <input type="text" id="content-search" placeholder="Search title or ID…" />
     </div>
-    
+
     <select id="filter-type" class="dashboard-filter-select filter-select-item">
       <option value="">All Content Types</option>
       <option value="article">Articles</option>
       <option value="video">Videos</option>
       <option value="post">Posts</option>
     </select>
-    
+
     <select id="filter-section" class="dashboard-filter-select filter-select-item">
       <option value="">All Sections</option>
       <!-- Populated dynamically -->
@@ -45,7 +46,7 @@
   </div>
 
   <!-- Row 2: Ingest Details & Compliance -->
-  <div class="admin-toolbar-row">
+  <div class="admin-toolbar-row flex items-center flex-wrap">
     <select id="filter-source" class="dashboard-filter-select filter-select-item">
       <option value="">All Sources / Platforms</option>
       <!-- Populated dynamically -->
@@ -80,18 +81,18 @@
   </div>
 
   <!-- Row 3: Date Filters & Sorting -->
-  <div class="admin-toolbar-row items-center">
+  <div class="admin-toolbar-row flex items-center flex-wrap">
     <span class="filter-label-xs">Date Range:</span>
     <select id="filter-date-type" class="dashboard-filter-select filter-input-auto">
       <option value="published_at">Published At</option>
       <option value="ingested_at">Ingested At</option>
     </select>
-    
+
     <input type="date" id="filter-start-date" class="dashboard-filter-input filter-input-auto" />
     <span class="filter-text-divider">to</span>
     <input type="date" id="filter-end-date" class="dashboard-filter-input filter-input-auto" />
 
-    <div class="filter-sort-group">
+    <div class="filter-sort-group flex items-center">
       <span class="filter-label-xs">Sort:</span>
       <select id="sort-by" class="dashboard-filter-select filter-input-auto">
         <option value="id" selected>ID / Newest</option>
@@ -105,7 +106,7 @@
         <option value="desc">Descending</option>
         <option value="asc">Ascending</option>
       </select>
-      
+
       <button id="clear-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
     </div>
   </div>
@@ -113,13 +114,13 @@
 </div>
 
 <!-- Bulk Actions Toolbar (hidden by default) -->
-<div id="bulk-actions-toolbar" class="bulk-actions-toolbar is-hidden">
+<div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
   <div class="flex items-center gap-2">
     <span class="text-lg">⚡</span>
     <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
   </div>
-  
-  <div class="bulk-controls-group">
+
+  <div class="bulk-controls-group flex items-center gap-sm">
     <select id="bulk-action-select" class="dashboard-filter-select">
       <option value="">Choose Bulk Action...</option>
       <option value="activate">Activate Selected</option>
@@ -128,13 +129,13 @@
       <option value="recategorize">Recategorize Content</option>
       <option value="delete">Safe Delete Selected</option>
     </select>
-    
+
     <!-- Bulk Category Dropdown (Shown only when recategorize is selected) -->
     <select id="bulk-category-select" class="dashboard-filter-select is-hidden">
       <option value="">Select Category...</option>
       <!-- Populated dynamically -->
     </select>
-    
+
     <button id="bulk-apply-btn" class="admin-btn-primary" disabled>Apply Action</button>
   </div>
 </div>
@@ -155,61 +156,134 @@
     <thead>
       <tr>
         <th class="col-check"><input type="checkbox" id="select-all-contents" /></th>
-        <th class="col-type">Type & ID</th>
-        <th>Title / Source / Category</th>
-        <th class="col-engagement">Engagement</th>
-        <th class="col-dates">Ingested / Published</th>
-        <th class="col-engagement">Flags</th>
+        <th class="col-type">Type</th>
+        <th class="col-primary">Title</th>
+        <th>Category</th>
+        <th>Sources</th>
+        <th class="col-metric">Engagement</th>
+        <th class="col-date">Published</th>
+        <th class="col-status">Status</th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="contents-table-body">
-      {{ admin_table_spinner(7, "Loading catalog contents…") }}
+      {{ admin_table_spinner(9, "Loading catalog contents…") }}
     </tbody>
   </table>
 </div>
 
-{{ admin_pagination(
-    info_id="pagination-info",
-    per_page_id="pagination-per-page",
-    prev_id="prev-page-btn",
-    indicator_id="page-num-indicator",
-    next_id="next-page-btn",
-    per_page_options=[10, 20, 50, 100],
-    current_per_page=20
-) }}
+{{ admin_paginator(domain="contents", per_page_options=[10, 20, 50, 100], current_per_page=20) }}
 
-<!-- Dedicated Inline Modal for Recategorization -->
-<div id="quick-category-modal" class="dashboard-modal-overlay">
-  <div class="dashboard-modal-content modal-content-sm">
-    <div class="dashboard-modal-icon modal-icon-purple">🏷️</div>
-    <h3 class="dashboard-modal-title">Quick Recategorize</h3>
-    <p class="dashboard-modal-body">Move this item to a different content category:</p>
-    <input type="hidden" id="quick-cat-content-id" />
-    <select id="quick-cat-select" class="dashboard-filter-select modal-select-full">
-      <!-- Dynamic list -->
-    </select>
-    <div class="dashboard-modal-actions">
-      <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
-      <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
+{% call admin_modal("quick-category-modal", "Quick Recategorize", "🏷️", "modal-content-sm") %}
+<p class="dashboard-modal-body">Move this item to a different content category:</p>
+<input type="hidden" id="quick-cat-content-id" />
+<select id="quick-cat-select" class="dashboard-filter-select modal-select-full">
+  <!-- Dynamic list -->
+</select>
+<div class="dashboard-modal-actions flex justify-center">
+  <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
+  <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
+</div>
+{% endcall %}
+
+{% call admin_modal("inspect-modal", "Source Details", "📡") %}
+<div class="dashboard-modal-actions flex justify-center">
+  <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+</div>
+{% endcall %}
+
+<template id="contents-row-template">
+  <tr class="clickable-row">
+    <td class="text-center align-middle">
+      <input type="checkbox" class="row-select-checkbox" />
+    </td>
+    <td>
+      <span class="content-cell-type status-badge text-capitalize"></span>
+    </td>
+    <td>
+      <div class="content-cell-title">
+        <span class="content-cell-title-text"></span>
+        <a class="content-cell-title-link activity-target text-deco-none" target="_blank" href="">
+          <span class="content-cell-title-link-text"></span>
+          <i class="fas fa-external-link-alt text-xs-sub"></i>
+        </a>
+      </div>
+    </td>
+    <td>
+      <span class="content-cell-category status-badge badge-purple quick-cat-trigger clickable-purple-link ml-1"
+        title="Double-click row to quickly move content.">
+        <i class="fas fa-tag"></i> <span class="content-cell-category-name"></span>
+      </span>
+    </td>
+    <td>
+      <span class="content-cell-source user-cell-name"></span>
+    </td>
+    <td>
+      <div class="text-sm"><i class="far fa-eye text-muted"></i> <span class="content-cell-views"></span></div>
+      <div class="content-engagement-sub"><i class="far fa-comment"></i> <span class="content-cell-comments"></span>
+      </div>
+    </td>
+    <td>
+      <div class="content-cell-date content-date-row mt-1"></div>
+    </td>
+    <td>
+      <div class="content-cell-status content-status-group flex items-center">
+      </div>
+    </td>
+    <td class="text-center align-middle">
+      <div class="actions-cell-group flex justify-center">
+        <button class="user-action-btn user-action-inspect inspect-btn" title="Inspect source and ingestion metadata">
+          👁️ Inspect
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template id="content-inspect-template">
+  <div class="inspect-details-group flex flex-col">
+    <div>
+      <strong class="inspect-details-title">Content Metadata</strong>
+      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
+      <div class="inspect-details-row"><strong>Type:</strong> <span
+          class="inspect-type status-badge inspect-badge-secondary"></span></div>
+      <div class="inspect-details-row"><strong>Category:</strong> <span class="inspect-category"></span></div>
+      <div class="inspect-details-row"><strong>Section:</strong> <span class="inspect-section"></span></div>
+    </div>
+
+    <hr class="inspect-details-divider" />
+
+    <div>
+      <strong class="inspect-details-title">Provider & Source Info</strong>
+      <div class="inspect-details-row"><strong>Source Name:</strong> <span class="inspect-source-name"></span></div>
+      <div class="inspect-details-row"><strong>Source Slug:</strong> <code class="inspect-source-slug"></code></div>
+      <div class="inspect-details-row"><strong>Source Link:</strong> <span class="inspect-source-link"></span></div>
+    </div>
+
+    <hr class="inspect-details-divider" />
+
+    <div>
+      <strong class="inspect-details-title">System Tracking</strong>
+      <div class="inspect-details-row"><strong>Ingested At:</strong> <span class="inspect-ingested-at"></span></div>
+      <div class="inspect-details-row"><strong>Published At:</strong> <span class="inspect-published-at"></span></div>
+      <div class="inspect-details-row"><strong>Enrichment Status:</strong> <span
+          class="inspect-status status-badge"></span></div>
+      <div class="inspect-details-row"><strong>Visibility:</strong> <span class="inspect-visibility"></span></div>
+      <div class="inspect-details-row"><strong>Record Status:</strong> <span class="inspect-record-status"></span></div>
+    </div>
+
+    <hr class="inspect-details-divider" />
+
+    <div>
+      <strong class="inspect-details-title">Management Actions</strong>
+      <div class="flex gap-2 mt-2">
+        <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="" data-title="">
+          🗑 Delete Content
+        </button>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- Dedicated Modal for Ingest/Provider Inspection -->
-<div id="inspect-provider-modal" class="dashboard-modal-overlay">
-  <div class="dashboard-modal-content" style="max-width: 550px;">
-    <div class="dashboard-modal-icon modal-icon-purple">📡</div>
-    <h3 class="dashboard-modal-title" id="inspect-modal-title">Source Details</h3>
-    <div class="dashboard-modal-body" id="inspect-modal-body" style="text-align: left; max-height: 400px; overflow-y: auto; font-size: var(--text-sm);">
-      <!-- Populated dynamically -->
-    </div>
-    <div class="dashboard-modal-actions">
-      <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
-    </div>
-  </div>
-</div>
-
+</template>
 {% endblock %}
 
 {% block admin_scripts %}

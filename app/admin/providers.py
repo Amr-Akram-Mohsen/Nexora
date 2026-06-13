@@ -70,44 +70,19 @@ def list_sources():
     ).all()
     content_agg_map = {r.source_id: r for r in content_agg}
 
-    # ── Latest content title per source ───────────────────────────────────
-    # One query per page using a subquery per source_id to get the most
-    # recently ingested content title.
-    from sqlalchemy.orm import aliased
-    c_sub = aliased(Content)
-
-    latest_content_rows = db.session.execute(
-        select(
-            Content.source_id,
-            Content.id,
-            Content.title,
-            Content.ingested_at,
-        )
-        .where(
-            Content.source_id.in_(page_source_ids),
-            Content.ingested_at == (
-                select(func.max(c_sub.ingested_at))
-                .where(c_sub.source_id == Content.source_id)
-                .scalar_subquery()
-            ),
-        )
-    ).all()
-    latest_content_map = {r.source_id: r for r in latest_content_rows}
-
     serialized = []
     for s in pagination.items:
         agg = content_agg_map.get(s.id)
-        latest = latest_content_map.get(s.id)
 
         content_count   = agg.content_count if agg else 0
         latest_activity = agg.latest_ingested_at.isoformat() if agg and agg.latest_ingested_at else None
-        latest_content_data = None
-        if latest:
-            latest_content_data = {
-                "id":          latest.id,
-                "title":       latest.title,
-                "ingested_at": latest.ingested_at.isoformat() if latest.ingested_at else None,
-            }
+
+        if not s.is_active:
+            status_val = "failed"
+        elif content_count == 0:
+            status_val = "warning"
+        else:
+            status_val = "healthy"
 
         serialized.append({
             "id":              s.id,
@@ -119,7 +94,7 @@ def list_sources():
             "authority_score": s.authority_score,
             "content_count":   content_count,
             "latest_activity": latest_activity,
-            "latest_content":  latest_content_data,
+            "status":          status_val,
         })
 
     return jsonify({
@@ -172,50 +147,43 @@ def list_stores():
         .group_by(ItemStoreLink.store_id)
     ).all()
     product_count_map = {r.store_id: r.product_count for r in product_count_rows}
-
-    # ── Latest item per store ─────────────────────────────────────────────
-    latest_item_rows = db.session.execute(
+    # ── Latest activity per store ─────────────────────────────────────────
+    latest_activity_rows = db.session.execute(
         select(
             ItemStoreLink.store_id,
-            Item.id,
-            Item.name,
-            Item.created_at,
+            func.max(Item.created_at).label("latest_created_at"),
         )
         .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
         .join(Item, Item.id == ItemVariant.item_id)
         .where(ItemStoreLink.store_id.in_(page_store_ids))
-        .order_by(ItemStoreLink.store_id, Item.created_at.desc())
-        .distinct(ItemStoreLink.store_id)
+        .group_by(ItemStoreLink.store_id)
     ).all()
-    latest_item_map = {r.store_id: r for r in latest_item_rows}
+    latest_activity_map = {r.store_id: r.latest_created_at for r in latest_activity_rows}
 
     serialized = []
     for st in pagination.items:
         product_count = product_count_map.get(st.id, 0)
-        latest        = latest_item_map.get(st.id)
+        latest_activity = latest_activity_map.get(st.id)
+        latest_activity_str = latest_activity.isoformat() if latest_activity else None
 
-        latest_activity     = latest.created_at.isoformat() if latest and latest.created_at else None
-        latest_product_data = None
-        if latest:
-            latest_product_data = {
-                "id":         latest.id,
-                "name":       latest.name,
-                "created_at": latest.created_at.isoformat() if latest.created_at else None,
-            }
+        if not st.is_active:
+            status_val = "failed"
+        elif product_count == 0:
+            status_val = "warning"
+        else:
+            status_val = "healthy"
 
         serialized.append({
             "id":                st.id,
             "name":              st.name,
             "slug":              st.slug,
             "website":           st.website,
-            "country":           st.country,
-            "currency":          st.currency,
             "affiliate_network": st.affiliate_network,
             "logo_url":          st.logo_url,
             "is_active":         st.is_active,
             "product_count":     product_count,
-            "latest_activity":   latest_activity,
-            "latest_product":    latest_product_data,
+            "latest_activity":   latest_activity_str,
+            "status":            status_val,
         })
 
     return jsonify({

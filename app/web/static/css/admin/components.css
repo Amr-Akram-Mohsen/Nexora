@@ -3,7 +3,8 @@
    Primary action uses 0.625rem 1.25rem for slightly more presence.
 --- */
 
-.admin-btn-primary {
+.admin-btn-primary,
+.admin-toolbar button {
   padding: 0.5rem 1.25rem;
   height: 36px;
   box-sizing: border-box;
@@ -18,7 +19,8 @@
   white-space: nowrap;
 }
 
-.admin-btn-primary:hover {
+.admin-btn-primary:hover,
+.admin-toolbar button:hover {
   background: var(--brand-blue-dark);
   box-shadow: var(--shadow-sm);
 }
@@ -66,26 +68,6 @@
 .dashboard-btn-danger:hover,
 .dashboard-delete-btn:hover {
   opacity: 0.88;
-}
-
-/* Align admin-toolbar buttons with form inputs */
-.admin-toolbar button {
-  padding: 0.5rem 1.25rem;
-  height: 36px;
-  box-sizing: border-box;
-  background: var(--brand-blue);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-  white-space: nowrap;
-}
-
-.admin-toolbar button:hover {
-  background: var(--brand-blue-dark);
 }
 
 .btn-purple {
@@ -158,6 +140,20 @@
   background: rgba(var(--destructive-rgb), 0.08);
 }
 
+.btn-text-subtle-danger {
+  background: transparent !important;
+  border: none !important;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.btn-text-subtle-danger:hover {
+  color: var(--brand-red) !important;
+}
+
 .user-action-inspect {
   background: var(--brand-purple);
   color: white;
@@ -171,16 +167,15 @@
 /* --- Status Badges --- */
 
 .status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: var(--weight-bold);
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
+  padding: 2px 6px;
+  border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
+  display: inline-block;
+  line-height: 1.2;
 }
 
 .status-badge.admin {
@@ -260,18 +255,37 @@
   font-size: var(--text-xs);
 }
 
+/* Status badge extensions (moved from modals.css) */
+.status-badge.inspect-badge-secondary {
+  text-transform: capitalize;
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.status-badge.inspect-badge-blue {
+  background: rgba(var(--brand-blue-rgb), 0.1);
+  color: var(--brand-blue);
+  letter-spacing: 0.04em;
+}
+
+.status-badge.inspect-badge-complete {
+  text-transform: capitalize;
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.status-badge.inspect-badge-pending {
+  text-transform: capitalize;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--brand-orange);
+}
+
 /* --- Bulk Actions Toolbar Widget --- */
 
 .bulk-actions-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--card);
   border: 1px solid rgba(var(--brand-blue-rgb), 0.3);
   padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-lg);
   margin-bottom: 1rem;
-  box-shadow: var(--shadow-sm);
   animation: slideDown 0.2s ease;
 }
 
@@ -297,24 +311,14 @@ body.dark-mode .bulk-actions-toolbar {
 }
 
 .bulk-controls-group {
-  display: flex;
   gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 /* --- Pagination Controls --- */
 
 .pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-top: 1.25rem;
-  background: var(--card);
   padding: 0.875rem 1.25rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
 }
 
 .pagination-info-text {
@@ -323,9 +327,7 @@ body.dark-mode .bulk-actions-toolbar {
 }
 
 .pagination-controls-group {
-  display: flex;
   gap: 0.5rem;
-  align-items: center;
 }
 
 .pagination-per-page-select {
@@ -352,9 +354,6 @@ body.dark-mode .bulk-actions-toolbar {
   font-size: 0.8rem;
   background: var(--secondary);
   border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -380,7 +379,7 @@ body.dark-mode .bulk-actions-toolbar {
   opacity: 0.8;
 }
 
-/* --- Accessibility: Base Focus Ring --- */
+/* --- Accessibility: Focus Ring --- */
 
 a:focus-visible,
 button:focus-visible,
@@ -391,9 +390,7 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* --- Shared Utility Helpers (Admin-scoped) ---
-   Minimal set — prefer reusing flex.css utilities from the global layer.
---- */
+/* --- Shared Utility Helpers (Admin-scoped) --- */
 
 .is-hidden {
   display: none !important;
@@ -447,7 +444,7 @@ textarea:focus-visible {
 }
 
 .clickable-purple-link {
-  font-size: var(--text-xs);
+  /* font-size: var(--text-xs); */
   font-weight: var(--weight-md);
   color: var(--brand-purple);
   text-decoration: underline;
@@ -462,10 +459,6 @@ textarea:focus-visible {
   grid-column: 1 / -1;
 }
 
-.flex-align-center {
-  display: flex;
-  align-items: center;
-}
 
 /* Spacing: use a consistent 4-step scale: 0.25 / 0.5 / 1 / 1.5 / 2rem */
 .mt-1  { margin-top: 0.25rem; }

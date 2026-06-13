@@ -45,7 +45,7 @@ function loadSystemInfo() {
               valueHtml = `<span class="integration-status ${cls}">${escapeHtml(row.value)}</span>`;
             }
             return `
-              <li class="system-info-row">
+              <li class="system-info-row flex justify-between items-center">
                 <span class="system-info-label">${escapeHtml(row.label)}</span>
                 <span class="system-info-value">${valueHtml}</span>
               </li>

@@ -17,8 +17,10 @@ from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Section, Source
 from app.domains.interaction.models import Comment, Reaction, View
+from app.domains.relationships import ArticleSource
 from app.admin.helpers import parse_pagination_params, parse_sort_params
 from sqlalchemy import func, or_, select
+from sqlalchemy.orm import joinedload, selectinload
 from datetime import datetime
 
 bp = Blueprint("api_content", __name__, url_prefix="/admin/contents")
@@ -66,8 +68,11 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
     if c.object_type == "article" and target:
         status_val    = target.status
         canonical_url = target.canonical_url
-    elif target:
-        canonical_url = target.url
+        sources = [s.source.name for s in target.article_sources if s.source]
+    else:
+        if target:
+            canonical_url = target.url
+        sources = [c.source.name] if c.source else []
 
     # Quality flags
     issues = []
@@ -93,6 +98,7 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
         "section_name":  c.section.name if c.section else "Unassigned",
         "source_name":   source_name,
         "source_slug":   source_slug,
+        "sources":   sources,
         "status":        status_val,
         "url":           canonical_url,
         "quality_issues": issues,
@@ -170,7 +176,11 @@ def list_contents():
     end_date      = request.args.get("end_date")
     quality       = request.args.get("quality")
 
-    query = db.session.query(Content)
+    query = db.session.query(Content).options(
+        joinedload(Content.source),
+        joinedload(Content.category),
+        joinedload(Content.section),
+    )
 
     # 1. Search filter
     if search and search.strip():
@@ -269,9 +279,10 @@ def list_contents():
     for obj_type, ids in ids_by_type.items():
         model = {"article": Article, "video": Video, "post": Post}.get(obj_type)
         if model:
-            objs = db.session.execute(
-                select(model).where(model.id.in_(list(ids)))
-            ).scalars().all()
+            stmt = select(model).where(model.id.in_(list(ids)))
+            if model == Article:
+                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
+            objs = db.session.execute(stmt).scalars().all()
             for obj in objs:
                 targets_map[(obj_type, obj.id)] = obj
 

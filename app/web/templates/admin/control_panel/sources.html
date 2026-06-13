@@ -1,24 +1,25 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_spinner, admin_table_spinner %}
 
 {% block title %}Sources Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {% set header_actions %}
-  <button id="refresh-sources-btn" class="admin-btn-secondary">↺ Refresh</button>
+<button id="refresh-sources-btn" class="admin-btn-secondary">↺ Refresh</button>
 {% endset %}
 
 {{ admin_page_header(
-    "Sources & Content Providers",
-    "Monitor content sources, imported volumes, authority rankings, and latest activities",
-    actions=header_actions
+"Sources & Content Providers",
+"Monitor content sources, imported volumes, authority rankings, and latest activities",
+actions=header_actions
 ) }}
 
 <!-- Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
-  <div class="admin-toolbar-row">
-    <div class="admin-toolbar-search admin-search-grow">
+  <div class="admin-toolbar-row flex items-center flex-wrap">
+    <div class="admin-toolbar-search admin-search-grow flex items-center">
       <span class="admin-toolbar-search-icon-inside">🔍</span>
       <input type="text" id="sources-search" placeholder="Search by name, slug, or domain…" />
     </div>
@@ -38,30 +39,49 @@
   <table class="admin-table" id="sources-table">
     <thead>
       <tr>
-        <th class="col-type">ID</th>
-        <th>Source Name / Domain</th>
-        <th class="col-engagement">Rank / Authority</th>
-        <th class="col-engagement">Content Count</th>
-        <th>Latest Ingest Activity</th>
-        <th>Latest Article Title</th>
+        <th class="col-primary">Name</th>
+        <th class="col-metric">Rank / Authority</th>
+        <th class="col-metric">Count</th>
+        <th class="col-date">Latest Ingest Activity</th>
+        <th class="col-status">Status</th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="sources-table-body">
-      {{ admin_table_spinner(7, "Loading sources list…") }}
+      {{ admin_table_spinner(6, "Loading sources list…") }}
     </tbody>
   </table>
 </div>
 
-{{ admin_pagination(
-    info_id="sources-pagination-info",
-    per_page_id="sources-per-page",
-    prev_id="sources-prev-btn",
-    indicator_id="sources-page-indicator",
-    next_id="sources-next-btn",
-    per_page_options=[10, 20, 50],
-    current_per_page=20
-) }}
+{{ admin_paginator(domain="sources", per_page_options=[10, 20, 50], current_per_page=20) }}
+
+<template id="sources-row-template">
+  <tr>
+    <td>
+      <div class="source-cell-name"><a class="source-cell-link text-muted" target="_blank" href=""></a></div>
+    </td>
+    <td>
+      <span class="source-cell-score status-badge admin"></span>
+    </td>
+    <td>
+      <strong class="source-cell-count inspect-brand-purple"></strong>
+    </td>
+    <td>
+      <span class="source-cell-time text-foreground"></span>
+    </td>
+    <td class="source-cell-status">
+    </td>
+    <td>
+      <div class="user-actions-group">
+        <a class="source-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
+          href="">
+          👁️ View Content
+        </a>
+      </div>
+    </td>
+  </tr>
+</template>
+
 
 {% endblock %}
 

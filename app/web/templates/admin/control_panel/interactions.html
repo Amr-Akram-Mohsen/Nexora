@@ -1,13 +1,14 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_spinner, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_spinner, admin_table_spinner %}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {{ admin_page_header(
-    "Interactions & Moderation",
-    "Review user comments, reactions, and engagement metrics"
+"Interactions & Moderation",
+"Review user comments, reactions, and engagement metrics"
 ) }}
 
 <!-- Interaction Stats Row -->
@@ -16,12 +17,21 @@
 </div>
 
 <!-- Tab Navigation -->
-<div class="admin-tabs" id="interactions-tabs">
+<div class="admin-tabs flex" id="interactions-tabs">
   <button class="admin-tab-btn active" data-tab="comments">
     💬 Comments
   </button>
   <button class="admin-tab-btn" data-tab="reactions">
     👍 Reactions
+  </button>
+  <button class="admin-tab-btn" data-tab="views">
+    👁️ Views
+  </button>
+  <button class="admin-tab-btn" data-tab="clicks">
+    🛒 Clicks
+  </button>
+  <button class="admin-tab-btn" data-tab="saves">
+    🔖 Saves
   </button>
 </div>
 
@@ -29,8 +39,8 @@
 <div class="admin-tab-panel" id="tab-panel-comments">
   <!-- Comment Filters -->
   <div class="admin-toolbar-advanced flex flex-col">
-    <div class="admin-toolbar-row">
-      <div class="admin-toolbar-search admin-search-grow">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
         <span class="admin-toolbar-search-icon-inside">🔍</span>
         <input type="text" id="comment-search" placeholder="Search comment text…" />
       </div>
@@ -62,37 +72,28 @@
     <table class="admin-table" id="comments-table">
       <thead>
         <tr>
-          <th class="col-type">ID</th>
-          <th>Comment Preview</th>
-          <th class="col-engagement">User</th>
-          <th class="col-engagement">Target</th>
-          <th class="col-engagement">Sentiment</th>
-          <th class="col-dates">Date</th>
+          <th class="col-primary">Comment Preview</th>
+          <th>User</th>
+          <th>Target</th>
+          <th class="col-status">Sentiment</th>
+          <th class="col-date">Date</th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody id="comments-table-body">
-        {{ admin_table_spinner(7, "Loading comments…") }}
+        {{ admin_table_spinner(6, "Loading comments…") }}
       </tbody>
     </table>
   </div>
 
-  {{ admin_pagination(
-      info_id="comments-pagination-info",
-      per_page_id="comments-per-page",
-      prev_id="comments-prev-btn",
-      indicator_id="comments-page-indicator",
-      next_id="comments-next-btn",
-      per_page_options=[25, 50],
-      current_per_page=25
-  ) }}
+  {{ admin_paginator(domain="comments", per_page_options=[25, 50], current_per_page=25) }}
 </div>
 
 <!-- Reactions Tab -->
 <div class="admin-tab-panel is-hidden" id="tab-panel-reactions">
   <!-- Reactions Breakdown Panel -->
   <div class="overview-panel mt-6">
-    <div class="overview-panel-header">
+    <div class="overview-panel-header flex items-center justify-between">
       <h3 class="overview-panel-title">📊 Interaction Breakdown</h3>
       <span class="overview-panel-sub">all time</span>
     </div>
@@ -104,12 +105,28 @@
   <!-- Reactions Table -->
   <div style="margin-top:2rem;">
     <div class="admin-toolbar-advanced flex flex-col">
-      <div class="admin-toolbar-row">
+      <div class="admin-toolbar-row flex items-center flex-wrap">
+        <div class="admin-toolbar-search admin-search-grow flex items-center">
+          <span class="admin-toolbar-search-icon-inside">🔍</span>
+          <input type="text" id="reactions-search" placeholder="Search target title…" />
+        </div>
         <select id="filter-reaction-type" class="dashboard-filter-select filter-select-item">
           <option value="">All Reaction Types</option>
           <option value="like">Likes</option>
           <option value="dislike">Dislikes</option>
         </select>
+        <div class="admin-toolbar-search admin-search-grow flex items-center">
+          <span class="admin-toolbar-search-icon-inside">👤</span>
+          <input type="text" id="filter-reactions-user" placeholder="Search user name/email…" />
+        </div>
+        <button id="clear-reactions-filters-btn" class="dashboard-filter-clear">Reset</button>
+      </div>
+    </div>
+
+    <!-- Reactions Summary -->
+    <div class="flex justify-between items-center mb-3">
+      <div id="reactions-summary" class="admin-summary-bar">
+        Showing <strong id="reactions-count">—</strong> reactions
       </div>
     </div>
 
@@ -117,31 +134,312 @@
       <table class="admin-table" id="reactions-table">
         <thead>
           <tr>
-            <th class="col-type">ID</th>
-            <th>User</th>
-            <th class="col-engagement">Type</th>
-            <th class="col-engagement">Target Type</th>
-            <th class="col-engagement">Target ID</th>
-            <th class="col-dates">Date</th>
+            <th class="col-id">ID</th>
+            <th class="col-primary">Target</th>
+            <th class="col-status">Type</th>
+            <th class="col-primary">User</th>
+            <th class="col-date">Date</th>
           </tr>
         </thead>
         <tbody id="reactions-table-body">
-          {{ admin_table_spinner(6, "Loading reactions…", "loading-height-md") }}
+          {{ admin_table_spinner(5, "Loading reactions…", "loading-height-md") }}
         </tbody>
       </table>
     </div>
 
-    {{ admin_pagination(
-        info_id="reactions-pagination-info",
-        per_page_id="reactions-per-page",
-        prev_id="reactions-prev-btn",
-        indicator_id="reactions-page-indicator",
-        next_id="reactions-next-btn",
-        per_page_options=[25, 50],
-        current_per_page=25
-    ) }}
+    {{ admin_paginator(domain="reactions", per_page_options=[25, 50], current_per_page=25) }}
   </div>
 </div>
+
+<!-- Views Tab -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-views">
+  <!-- Views Filters -->
+  <div class="admin-toolbar-advanced flex flex-col">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="views-search" placeholder="Search target title…" />
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-muted">From:</span>
+        <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item"
+          style="padding: 0.35rem 0.5rem;" />
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-muted">To:</span>
+        <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item"
+          style="padding: 0.35rem 0.5rem;" />
+      </div>
+      <button id="clear-views-filters-btn" class="dashboard-filter-clear">Reset</button>
+    </div>
+  </div>
+
+  <!-- Views Summary -->
+  <div class="flex justify-between items-center mb-3">
+    <div id="views-summary" class="admin-summary-bar">
+      Showing <strong id="views-count">—</strong> view targets
+    </div>
+  </div>
+
+  <!-- Views Table -->
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="views-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Target</th>
+          <th class="col-status">Target Type</th>
+          <th class="col-metric">Views Count</th>
+          <th class="col-date">Latest View</th>
+        </tr>
+      </thead>
+      <tbody id="views-table-body">
+        {{ admin_table_spinner(4, "Loading views…") }}
+      </tbody>
+    </table>
+  </div>
+
+  {{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
+</div>
+
+<!-- Clicks Tab -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-clicks">
+  <!-- Clicks Filters -->
+  <div class="admin-toolbar-advanced flex flex-col">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="clicks-search" placeholder="Search item name…" />
+      </div>
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
+        <span class="admin-toolbar-search-icon-inside">🏪</span>
+        <input type="text" id="filter-clicks-destination" placeholder="Search destination/store…" />
+      </div>
+      <button id="clear-clicks-filters-btn" class="dashboard-filter-clear">Reset</button>
+    </div>
+  </div>
+
+  <!-- Clicks Summary -->
+  <div class="flex justify-between items-center mb-3">
+    <div id="clicks-summary" class="admin-summary-bar">
+      Showing <strong id="clicks-count">—</strong> click logs
+    </div>
+  </div>
+
+  <!-- Clicks Table -->
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="clicks-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Item</th>
+          <th class="col-primary">Destination</th>
+          <th class="col-metric">Click Count</th>
+          <th class="col-date">Latest Click</th>
+        </tr>
+      </thead>
+      <tbody id="clicks-table-body">
+        {{ admin_table_spinner(4, "Loading clicks…") }}
+      </tbody>
+    </table>
+  </div>
+
+  {{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
+</div>
+
+<!-- Saves Tab -->
+<div class="admin-tab-panel is-hidden" id="tab-panel-saves">
+  <!-- Saves Filters -->
+  <div class="admin-toolbar-advanced flex flex-col">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
+        <span class="admin-toolbar-search-icon-inside">🔍</span>
+        <input type="text" id="saves-search" placeholder="Search target title…" />
+      </div>
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
+        <span class="admin-toolbar-search-icon-inside">👤</span>
+        <input type="text" id="filter-saves-user" placeholder="Search user name/email…" />
+      </div>
+      <button id="clear-saves-filters-btn" class="dashboard-filter-clear">Reset</button>
+    </div>
+  </div>
+
+  <!-- Saves Summary -->
+  <div class="flex justify-between items-center mb-3">
+    <div id="saves-summary" class="admin-summary-bar">
+      Showing <strong id="saves-count">—</strong> saves
+    </div>
+  </div>
+
+  <!-- Saves Table -->
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="saves-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Target</th>
+          <th class="col-status">Target Type</th>
+          <th class="col-primary">User</th>
+          <th class="col-date">Save Date</th>
+        </tr>
+      </thead>
+      <tbody id="saves-table-body">
+        {{ admin_table_spinner(4, "Loading saves…") }}
+      </tbody>
+    </table>
+  </div>
+
+  {{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
+</div>
+
+{% call admin_modal("inspect-comment-modal", "Comment Details & Moderation", "💬") %}
+<div class="dashboard-modal-actions flex justify-center">
+  <button id="inspect-comment-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+</div>
+{% endcall %}
+
+<template id="comments-row-template">
+  <tr>
+    <td>
+      <span class="comment-cell-preview user-cell-name"></span>
+      <div class="comment-cell-reply user-cell-email">↩ Reply</div>
+    </td>
+    <td>
+      <span class="comment-cell-username user-cell-name"></span>
+      <div class="comment-cell-userid user-cell-email"></div>
+    </td>
+    <td>
+      <span class="comment-cell-target user-cell-name"></span>
+      <div class="mt-1">
+        <span class="comment-cell-targettype status-badge text-capitalize"></span>
+      </div>
+    </td>
+    <td>
+      <span class="comment-cell-sentiment status-badge"></span>
+    </td>
+    <td>
+      <span class="comment-cell-date user-cell-email"></span>
+    </td>
+    <td>
+      <div class="user-actions-group">
+        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-comment">
+          👁️ Inspect
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template id="comment-inspect-template">
+  <div class="inspect-details-group flex flex-col">
+    <div>
+      <strong class="inspect-details-title">Comment Metadata</strong>
+      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
+      <div class="inspect-details-row"><strong>Author:</strong> <span class="inspect-username"></span> (email: <span class="inspect-useremail"></span>, ID: <span class="inspect-userid"></span>)</div>
+      <div class="inspect-details-row"><strong>Target Title:</strong> <span class="inspect-target-title"></span></div>
+      <div class="inspect-details-row"><strong>Target Type:</strong> <span class="inspect-target-type status-badge inspect-badge-secondary"></span></div>
+      <div class="inspect-details-row"><strong>Created At:</strong> <span class="inspect-date"></span></div>
+      <div class="inspect-details-row"><strong>AI Sentiment:</strong> <span class="inspect-sentiment status-badge"></span></div>
+    </div>
+    
+    <hr class="inspect-details-divider" />
+    
+    <div>
+      <strong class="inspect-details-title">Comment Body</strong>
+      <div class="inspect-comment-body-text" style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 6px; font-style: italic; white-space: pre-wrap; margin-top: 0.5rem; word-break: break-word;"></div>
+    </div>
+    
+    <hr class="inspect-details-divider" />
+    
+    <div>
+      <strong class="inspect-details-title">Moderation Actions</strong>
+      <div class="flex gap-2 mt-2 flex-wrap">
+        <button class="user-action-btn user-action-toggle-active inspect-flag-btn">
+          🚩 Flag as Spam
+        </button>
+        <button class="user-action-btn user-action-delete inspect-delete-btn">
+          🗑 Delete Comment
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="reactions-row-template">
+  <tr>
+    <td><span class="reaction-cell-id user-cell-name"></span></td>
+    <td>
+      <span class="reaction-cell-target user-cell-name"></span>
+      <div class="mt-1">
+        <span class="reaction-cell-targettype status-badge text-capitalize"></span>
+      </div>
+    </td>
+    <td><span class="reaction-cell-type status-badge"></span></td>
+    <td>
+      <span class="reaction-cell-username user-cell-name"></span>
+      <div class="reaction-cell-useremail user-cell-email"></div>
+    </td>
+    <td><span class="reaction-cell-date user-cell-email"></span></td>
+  </tr>
+</template>
+
+<template id="views-row-template">
+  <tr>
+    <td>
+      <span class="views-cell-target user-cell-name"></span>
+    </td>
+    <td>
+      <span class="views-cell-targettype status-badge text-capitalize"></span>
+    </td>
+    <td class="col-metric">
+      <span class="views-cell-count font-mono font-medium"></span>
+    </td>
+    <td>
+      <span class="views-cell-date user-cell-email"></span>
+    </td>
+  </tr>
+</template>
+
+<template id="clicks-row-template">
+  <tr>
+    <td>
+      <span class="clicks-cell-item user-cell-name"></span>
+    </td>
+    <td>
+      <a class="clicks-cell-destination user-cell-name link-external" target="_blank" rel="noopener noreferrer"></a>
+    </td>
+    <td class="col-metric">
+      <span class="clicks-cell-count font-mono font-medium"></span>
+    </td>
+    <td>
+      <span class="clicks-cell-date user-cell-email"></span>
+    </td>
+  </tr>
+</template>
+
+<template id="saves-row-template">
+  <tr>
+    <td>
+      <span class="saves-cell-target user-cell-name"></span>
+    </td>
+    <td>
+      <span class="saves-cell-targettype status-badge text-capitalize"></span>
+    </td>
+    <td>
+      <span class="saves-cell-username user-cell-name"></span>
+      <div class="saves-cell-useremail user-cell-email"></div>
+    </td>
+    <td>
+      <span class="saves-cell-date user-cell-email"></span>
+    </td>
+  </tr>
+</template>
+
+<template id="interactions-stat-card-template">
+  <div class="dashboard-stat-card">
+    <div class="dashboard-stat-icon inline-flex-center"></div>
+    <h3 class="dashboard-stat-value"></h3>
+    <p class="dashboard-stat-label"></p>
+  </div>
+</template>
+
 
 {% endblock %}
 

@@ -1,209 +1,46 @@
 /**
  * Nexora Control Panel — Users Management
- *
- * Updated to handle the paginated API response envelope
- * {items, page, pages, total, per_page} (R-09).
  */
 
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────────────────
-  let currentPage = 1;
-  let totalPages  = 1;
-  let perPage     = 25;
+  let listController;
+  let loadedUsers = [];
 
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchUsers(1);
+  function renderUserRow(user) {
+    const template = document.getElementById("users-row-template");
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector("tr");
+    tr.id = `user-row-${user.id}`;
 
-    // Search
-    const searchInput = document.getElementById("user-search");
-    if (searchInput) {
-      let debounce;
-      searchInput.addEventListener("input", (e) => {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => fetchUsers(1), 400);
-      });
-    }
+    clone.querySelector(".user-cell-name").innerHTML = user.name ? escapeHtml(user.name) : '<em>No name</em>';
+    clone.querySelector(".user-cell-email").textContent = user.email;
 
-    // Role filter
-    const roleFilter = document.getElementById("user-role-filter");
-    if (roleFilter) {
-      roleFilter.addEventListener("change", () => fetchUsers(1));
-    }
+    // Badges
+    const roleCell = clone.querySelector(".user-role-cell");
+    roleCell.innerHTML = user.is_admin
+      ? `<span class="status-badge admin">Admin</span>`
+      : `<span class="status-badge user">User</span>`;
 
-    // Refresh
-    const refreshBtn = document.getElementById("refresh-users-btn");
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", () => fetchUsers(currentPage));
-    }
+    const statusCell = clone.querySelector(".user-status-cell");
+    statusCell.innerHTML = user.is_active
+      ? `<span class="status-badge active">Active</span>`
+      : `<span class="status-badge inactive">Inactive</span>`;
 
-    // Pagination controls
-    const prevBtn = document.getElementById("users-prev-btn");
-    const nextBtn = document.getElementById("users-next-btn");
-    if (prevBtn) prevBtn.addEventListener("click", () => { if (currentPage > 1) fetchUsers(currentPage - 1); });
-    if (nextBtn) nextBtn.addEventListener("click", () => { if (currentPage < totalPages) fetchUsers(currentPage + 1); });
+    const joinedCell = clone.querySelector(".user-joined-cell");
+    joinedCell.textContent = user.created_at ? formatDate(user.created_at) : "—";
 
-    // Table click event delegation
-    const tableBody = document.getElementById("users-table-body");
-    if (tableBody) {
-      tableBody.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-action]");
-        if (!btn) return;
-        const { action, id, name } = btn.dataset;
-        const userId = parseInt(id, 10);
+    // Buttons
+    const inspectBtn = clone.querySelector(".user-action-inspect");
+    inspectBtn.dataset.id = user.id;
 
-        if (action === "toggle-admin") {
-          handleToggleAdmin(userId, name);
-        } else if (action === "toggle-active") {
-          const isCurrentlyActive = btn.dataset.active === "true";
-          handleToggleActive(userId, isCurrentlyActive, name);
-        } else if (action === "delete-user") {
-          confirmDeleteUser(userId, name);
-        }
-      });
-    }
-  });
-
-  function getSearchValue() {
-    return document.getElementById("user-search")?.value || "";
+    return tr;
   }
 
-  function getRoleFilter() {
-    return document.getElementById("user-role-filter")?.value || "";
-  }
-
-
-  /**
-   * Fetch users from the API (paginated).
-   */
-  function fetchUsers(page) {
-    currentPage = page || 1;
-    const tableBody = document.getElementById("users-table-body");
-    if (!tableBody) return;
-
-    tableBody.innerHTML = getTableSpinnerHtml(5, "Loading users…", "loading-height-sm");
-
-    const params = new URLSearchParams({ page: currentPage, per_page: perPage });
-    const search = getSearchValue();
-    const role   = getRoleFilter();
-    if (search.trim()) params.append("search", search.trim());
-    if (role)          params.append("role", role);
-
-    fetch(`/admin/users/?${params}`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch users");
-        return res.json();
-      })
-      .then(data => {
-        // data = {items, page, pages, total, per_page}
-        const users = data.items || [];
-        totalPages  = data.pages || 1;
-        const total = data.total || 0;
-        const from  = ((currentPage - 1) * perPage) + 1;
-        const to    = Math.min(currentPage * perPage, total);
-
-        renderUsersTable(users);
-        updatePagination(total, from, to);
-      })
-      .catch(err => {
-        console.error(err);
-        tableBody.innerHTML = getTableErrorStateHtml(5, "Error loading users. Please try again.", "loading-height-sm");
-      });
-  }
-
-  function updatePagination(total, from, to) {
-    const countEl = document.getElementById("users-count");
-    const infoEl  = document.getElementById("users-pagination-info");
-    const pageEl  = document.getElementById("users-page-indicator");
-    const prevBtn = document.getElementById("users-prev-btn");
-    const nextBtn = document.getElementById("users-next-btn");
-
-    if (countEl) countEl.textContent = total.toLocaleString();
-    if (infoEl)  infoEl.textContent  = `Showing ${total ? from : 0} to ${to} of ${total.toLocaleString()} users`;
-    if (pageEl)  pageEl.textContent  = `Page ${currentPage} of ${totalPages}`;
-    if (prevBtn) prevBtn.disabled    = currentPage <= 1;
-    if (nextBtn) nextBtn.disabled    = currentPage >= totalPages;
-  }
-
-
-  /**
-   * Render user rows into the table.
-   */
-  function renderUsersTable(users) {
-    const tableBody = document.getElementById("users-table-body");
-    if (!tableBody) return;
-
-    tableBody.innerHTML = "";
-
-    if (users.length === 0) {
-      tableBody.innerHTML = getTableEmptyStateHtml(5, "No users found.", "Try adjusting your filters.", "loading-height-sm");
-      return;
-    }
-
-    users.forEach(user => {
-      const row = document.createElement("tr");
-      row.id = `user-row-${user.id}`;
-
-      const isActiveLabel = user.is_active
-        ? `<span class="status-badge active">Active</span>`
-        : `<span class="status-badge inactive">Inactive</span>`;
-
-      const roleLabel = user.is_admin
-        ? `<span class="status-badge admin">Admin</span>`
-        : `<span class="status-badge user">User</span>`;
-
-      const joinDate = user.created_at
-        ? new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-        : "—";
-
-      row.innerHTML = `
-        <td>
-          <div class="user-cell-name">${user.name || '<em>No name</em>'}</div>
-          <div class="user-cell-email">${user.email}</div>
-        </td>
-        <td>${roleLabel}</td>
-        <td>${isActiveLabel}</td>
-        <td>${joinDate}</td>
-        <td>
-          <div class="user-actions-group">
-            <button class="user-action-btn user-action-toggle-admin"
-              data-action="toggle-admin"
-              data-id="${user.id}"
-              data-name="${(user.name || user.email).replace(/"/g, '&quot;')}"
-              title="${user.is_admin ? 'Remove Admin' : 'Make Admin'}">
-              ${user.is_admin ? '⬇ Demote' : '⬆ Promote'}
-            </button>
-            <button class="user-action-btn user-action-toggle-active"
-              data-action="toggle-active"
-              data-id="${user.id}"
-              data-active="${user.is_active}"
-              data-name="${(user.name || user.email).replace(/"/g, '&quot;')}"
-              title="${user.is_active ? 'Deactivate' : 'Activate'}">
-              ${user.is_active ? '🚫 Deactivate' : '✅ Activate'}
-            </button>
-            <button class="user-action-btn user-action-delete"
-              data-action="delete-user"
-              data-id="${user.id}"
-              data-name="${(user.name || user.email).replace(/"/g, '&quot;')}"
-              title="Delete user">
-              🗑 Delete
-            </button>
-          </div>
-        </td>
-      `;
-
-      tableBody.appendChild(row);
-    });
-  }
-
-
-  /**
-   * Toggle admin role.
-   */
-  function handleToggleAdmin(id, name) {
-    const label = document.querySelector(`#user-row-${id} .user-action-toggle-admin`);
-    if (label) { label.disabled = true; label.textContent = "…"; }
+  // Action logic
+  function handleToggleAdmin(id, name, btn, modal) {
+    if (btn) { btn.disabled = true; btn.textContent = "…"; }
 
     fetch(`/admin/users/${id}/toggle-admin`, { method: "POST" })
       .then(res => {
@@ -211,25 +48,22 @@
         return res.json();
       })
       .then(data => {
-        showToastFeedback(data.is_admin ? `${name} is now an Admin` : `${name} is now a User`);
-        fetchUsers(currentPage);
+        showToast(data.is_admin ? `${name} is now an Admin` : `${name} is now a User`);
+        listController.load(listController.currentPage);
+        if (modal) modal.classList.remove("active");
       })
       .catch(err => {
         console.error(err);
-        showToastFeedback("Failed to update role.", "error");
-        fetchUsers(currentPage);
+        showToast("Failed to update role.", "error");
+        listController.load(listController.currentPage);
+        if (modal) modal.classList.remove("active");
       });
   }
 
-
-  /**
-   * Toggle active status.
-   */
-  function handleToggleActive(id, isCurrentlyActive, name) {
+  function handleToggleActive(id, isCurrentlyActive, name, btn, modal) {
     const endpoint = isCurrentlyActive ? `/admin/users/${id}` : `/admin/users/${id}/activate`;
     const method   = isCurrentlyActive ? "DELETE" : "POST";
 
-    const btn = document.querySelector(`#user-row-${id} .user-action-toggle-active`);
     if (btn) { btn.disabled = true; btn.textContent = "…"; }
 
     fetch(endpoint, { method })
@@ -239,47 +73,162 @@
       })
       .then(() => {
         const action = isCurrentlyActive ? "deactivated" : "activated";
-        showToastFeedback(`${name} has been ${action}.`);
-        fetchUsers(currentPage);
+        showToast(`${name} has been ${action}.`);
+        listController.load(listController.currentPage);
+        if (modal) modal.classList.remove("active");
       })
       .catch(err => {
         console.error(err);
-        showToastFeedback("Failed to update status.", "error");
-        fetchUsers(currentPage);
+        showToast("Failed to update status.", "error");
+        listController.load(listController.currentPage);
+        if (modal) modal.classList.remove("active");
       });
   }
 
-
-  /**
-   * Confirm and delete a user.
-   */
-  function confirmDeleteUser(id, name) {
+  function confirmDeleteUser(id, name, btn, modal) {
     showModal(
       "Delete User",
       `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`,
-      () => performDeleteUser(id, name)
+      () => performDeleteUser(id, name, btn, modal)
     );
   }
 
-  function performDeleteUser(id, name) {
+  function performDeleteUser(id, name, btn, modal) {
+    if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
     fetch(`/admin/users/${id}`, { method: "DELETE" })
       .then(res => {
         if (!res.ok) throw new Error("Delete failed");
         return res.json();
       })
       .then(() => {
-        showToastFeedback(`${name} has been removed.`);
-        fetchUsers(currentPage);
+        showToast(`${name} has been removed.`);
+        listController.load(listController.currentPage);
+        if (modal) modal.classList.remove("active");
       })
       .catch(err => {
         console.error(err);
-        showToastFeedback("Failed to delete user.", "error");
+        showToast("Failed to delete user.", "error");
+        if (btn) { btn.disabled = false; btn.textContent = "🗑 Delete User"; }
       });
   }
 
+  function showInspectModal(user) {
+    const modal = document.getElementById("inspect-user-modal");
+    const body = document.getElementById("inspect-user-modal-body");
+    const titleEl = document.getElementById("inspect-user-modal-title");
 
-  function showToastFeedback(msg, type = "success") {
-    showToast(msg, type);
+    titleEl.textContent = `Inspect User: ${user.name || user.email}`;
+
+    const template = document.getElementById("user-inspect-template");
+    const clone = template.content.cloneNode(true);
+
+    clone.querySelector(".inspect-id").textContent = `#${user.id}`;
+    clone.querySelector(".inspect-name").textContent = user.name || "—";
+    clone.querySelector(".inspect-email").textContent = user.email;
+
+    const roleBadge = clone.querySelector(".inspect-role");
+    roleBadge.textContent = user.is_admin ? "Admin" : "User";
+    roleBadge.className = `inspect-role status-badge ${user.is_admin ? 'admin' : 'user'}`;
+
+    const statusBadge = clone.querySelector(".inspect-status");
+    statusBadge.textContent = user.is_active ? "Active" : "Inactive";
+    statusBadge.className = `inspect-status status-badge ${user.is_active ? 'active' : 'inactive'}`;
+
+    clone.querySelector(".inspect-joined").textContent = user.created_at ? formatDate(user.created_at) : "—";
+
+    const nameAttr = (user.name || user.email).replace(/"/g, '&quot;');
+
+    const adminBtn = clone.querySelector(".inspect-toggle-admin-btn");
+    if (adminBtn) {
+      adminBtn.dataset.id = user.id;
+      adminBtn.dataset.name = nameAttr;
+      adminBtn.textContent = user.is_admin ? 'Demote to User' : 'Promote to Admin';
+      adminBtn.addEventListener("click", () => {
+        handleToggleAdmin(user.id, user.name || user.email, adminBtn, modal);
+      });
+    }
+
+    const activeBtn = clone.querySelector(".inspect-toggle-active-btn");
+    if (activeBtn) {
+      activeBtn.dataset.id = user.id;
+      activeBtn.dataset.name = nameAttr;
+      activeBtn.textContent = user.is_active ? 'Deactivate Account' : 'Activate Account';
+      activeBtn.addEventListener("click", () => {
+        handleToggleActive(user.id, user.is_active, user.name || user.email, activeBtn, modal);
+      });
+    }
+
+    const deleteBtn = clone.querySelector(".inspect-delete-btn");
+    if (deleteBtn) {
+      deleteBtn.dataset.id = user.id;
+      deleteBtn.dataset.name = nameAttr;
+      deleteBtn.addEventListener("click", () => {
+        confirmDeleteUser(user.id, user.name || user.email, deleteBtn, modal);
+      });
+    }
+
+    body.innerHTML = "";
+    body.appendChild(clone);
+    modal.classList.add("active");
   }
 
+  // Setup Event Delegation
+  document.addEventListener("DOMContentLoaded", () => {
+    listController = new AdminListController({
+      domain: "users",
+      endpoint: "/admin/users/",
+      tbodyId: "users-table-body",
+      searchId: "user-search",
+      filterIds: ["user-role-filter"],
+      perPageId: "users-per-page",
+      prevBtnId: "users-prev-btn",
+      nextBtnId: "users-next-btn",
+      indicatorId: "users-page-indicator",
+      infoId: "users-pagination-info",
+      countId: "users-count",
+      rowTemplateId: "users-row-template",
+      defaultPerPage: 25,
+      colspan: 5,
+      renderRow: renderUserRow,
+      onLoaded: (data) => {
+        loadedUsers = data.items || [];
+      },
+      autoInit: false
+    });
+    listController.init();
+
+    const tableBody = document.getElementById("users-table-body");
+    if (tableBody) {
+      tableBody.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action]");
+        if (!btn) return;
+        const { action, id } = btn.dataset;
+        const userId = parseInt(id, 10);
+
+        if (action === "inspect-user") {
+          const user = loadedUsers.find(u => u.id === userId);
+          if (user) {
+            showInspectModal(user);
+          }
+        }
+      });
+    }
+
+    // Close inspect user modal overlay
+    const inspectCloseBtn = document.getElementById("inspect-user-close-btn");
+    if (inspectCloseBtn) {
+      inspectCloseBtn.addEventListener("click", () => {
+        document.getElementById("inspect-user-modal").classList.remove("active");
+      });
+    }
+
+    const inspectModalOverlay = document.getElementById("inspect-user-modal");
+    if (inspectModalOverlay) {
+      inspectModalOverlay.addEventListener("click", (e) => {
+        if (e.target === inspectModalOverlay) {
+          inspectModalOverlay.classList.remove("active");
+        }
+      });
+    }
+  });
 })();

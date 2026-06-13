@@ -1,17 +1,18 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_spinner, admin_table_spinner %}
 
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {{ admin_page_header(
-    "Taxonomy Management",
-    "Manage categories, brands, topics, and sections used across content and products"
+"Taxonomy Management",
+"Manage categories, brands, topics, and sections used across content and products"
 ) }}
 
 <!-- Tab Navigation -->
-<div class="admin-tabs" id="taxonomy-tabs">
+<div class="admin-tabs flex" id="taxonomy-tabs">
   <button class="admin-tab-btn active" data-tab="categories">🗂️ Categories</button>
   <button class="admin-tab-btn" data-tab="brands">🏭 Brands</button>
   <button class="admin-tab-btn" data-tab="topics">🏷️ Topics</button>
@@ -23,9 +24,10 @@
   <!-- Create Form -->
   <div class="admin-inline-form" id="category-create-form">
     <h3 class="admin-inline-form-title">Add New Category</h3>
-    <div class="admin-inline-form-row">
-      <input type="text" id="new-category-name" placeholder="Category name…" class="dashboard-filter-input admin-inline-input" />
-      <div class="admin-inline-slug-preview">
+    <div class="admin-inline-form-row flex items-center flex-wrap">
+      <input type="text" id="new-category-name" placeholder="Category name…"
+        class="dashboard-filter-input admin-inline-input" />
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-category-slug-preview">—</code>
       </div>
       <button id="create-category-btn" class="admin-btn-primary">+ Add Category</button>
@@ -34,8 +36,8 @@
 
   <!-- Filter -->
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row">
-      <div class="admin-toolbar-search admin-search-grow">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
         <span class="admin-toolbar-search-icon-inside">🔍</span>
         <input type="text" id="category-search" placeholder="Search categories…" />
       </div>
@@ -46,16 +48,14 @@
     <table class="admin-table" id="categories-table">
       <thead>
         <tr>
-          <th style="width:60px;">ID</th>
-          <th>Name</th>
-          <th>Slug</th>
-          <th class="col-engagement">Status</th>
-          <th class="col-engagement">Leaf</th>
+          <th class="col-primary">Name</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Leaf</th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody id="categories-table-body">
-        {{ admin_table_spinner(6, "Loading categories…", "loading-height-md") }}
+        {{ admin_table_spinner(4, "Loading categories…", "loading-height-md") }}
       </tbody>
     </table>
   </div>
@@ -65,10 +65,12 @@
 <div class="admin-tab-panel is-hidden" id="tab-panel-brands">
   <div class="admin-inline-form" id="brand-create-form">
     <h3 class="admin-inline-form-title">Add New Brand</h3>
-    <div class="admin-inline-form-row">
-      <input type="text" id="new-brand-name" placeholder="Brand name…" class="dashboard-filter-input admin-inline-input" />
-      <input type="text" id="new-brand-industry" placeholder="Industry (optional)…" class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
-      <div class="admin-inline-slug-preview">
+    <div class="admin-inline-form-row flex items-center flex-wrap">
+      <input type="text" id="new-brand-name" placeholder="Brand name…"
+        class="dashboard-filter-input admin-inline-input" />
+      <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
+        class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-brand-slug-preview">—</code>
       </div>
       <button id="create-brand-btn" class="admin-btn-primary">+ Add Brand</button>
@@ -76,8 +78,8 @@
   </div>
 
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row">
-      <div class="admin-toolbar-search admin-search-grow">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
         <span class="admin-toolbar-search-icon-inside">🔍</span>
         <input type="text" id="brand-search" placeholder="Search brands…" />
       </div>
@@ -88,17 +90,15 @@
     <table class="admin-table" id="brands-table">
       <thead>
         <tr>
-          <th style="width:60px;">ID</th>
-          <th>Name</th>
-          <th>Slug</th>
-          <th class="col-engagement">Industry</th>
-          <th class="col-engagement">Status</th>
-          <th class="col-engagement">Featured</th>
+          <th class="col-primary">Name</th>
+          <th>Industry</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Featured</th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody id="brands-table-body">
-        {{ admin_table_spinner(7, "Loading brands…", "loading-height-md") }}
+        {{ admin_table_spinner(5, "Loading brands…", "loading-height-md") }}
       </tbody>
     </table>
   </div>
@@ -108,9 +108,10 @@
 <div class="admin-tab-panel is-hidden" id="tab-panel-topics">
   <div class="admin-inline-form" id="topic-create-form">
     <h3 class="admin-inline-form-title">Add New Topic</h3>
-    <div class="admin-inline-form-row">
-      <input type="text" id="new-topic-name" placeholder="Topic name…" class="dashboard-filter-input admin-inline-input" />
-      <div class="admin-inline-slug-preview">
+    <div class="admin-inline-form-row flex items-center flex-wrap">
+      <input type="text" id="new-topic-name" placeholder="Topic name…"
+        class="dashboard-filter-input admin-inline-input" />
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-topic-slug-preview">—</code>
       </div>
       <button id="create-topic-btn" class="admin-btn-primary">+ Add Topic</button>
@@ -118,8 +119,8 @@
   </div>
 
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row">
-      <div class="admin-toolbar-search admin-search-grow">
+    <div class="admin-toolbar-row flex items-center flex-wrap">
+      <div class="admin-toolbar-search admin-search-grow flex items-center">
         <span class="admin-toolbar-search-icon-inside">🔍</span>
         <input type="text" id="topic-search" placeholder="Search topics…" />
       </div>
@@ -130,16 +131,14 @@
     <table class="admin-table" id="topics-table">
       <thead>
         <tr>
-          <th style="width:60px;">ID</th>
-          <th>Name</th>
-          <th>Slug</th>
-          <th class="col-engagement">Status</th>
-          <th class="col-engagement">Featured</th>
+          <th class="col-primary">Name</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Featured</th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody id="topics-table-body">
-        {{ admin_table_spinner(6, "Loading topics…", "loading-height-md") }}
+        {{ admin_table_spinner(4, "Loading topics…", "loading-height-md") }}
       </tbody>
     </table>
   </div>
@@ -151,21 +150,87 @@
     <table class="admin-table" id="sections-table">
       <thead>
         <tr>
-          <th style="width:60px;">ID</th>
-          <th>Name</th>
-          <th>Slug</th>
+          <th class="col-primary">Name</th>
           <th>Description</th>
-          <th class="col-engagement">Status</th>
+          <th class="col-status">Status</th>
           <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody id="sections-table-body">
-        {{ admin_table_spinner(6, "Loading sections…", "loading-height-md") }}
+        {{ admin_table_spinner(4, "Loading sections…", "loading-height-md") }}
       </tbody>
     </table>
   </div>
 </div>
 
+<template id="categories-row-template">
+  <tr>
+    <td><span class="cat-cell-name user-cell-name"></span></td>
+    <td>
+      <label class="admin-toggle" title="Toggle active">
+        <input type="checkbox" class="cat-cell-checkbox admin-toggle-input" data-action="toggle-category" />
+        <span class="cat-cell-badge status-badge"></span>
+      </label>
+    </td>
+    <td>
+      <span class="cat-cell-leaf status-badge"></span>
+    </td>
+    <td>
+      <button class="cat-cell-delete btn-text-subtle-danger" data-action="delete-category">🗑</button>
+    </td>
+  </tr>
+</template>
+
+<template id="brands-row-template">
+  <tr>
+    <td><span class="brand-cell-name user-cell-name"></span></td>
+    <td class="brand-cell-industry"></td>
+    <td>
+      <label class="admin-toggle">
+        <input type="checkbox" class="brand-cell-checkbox admin-toggle-input" data-action="toggle-brand" />
+        <span class="brand-cell-badge status-badge"></span>
+      </label>
+    </td>
+    <td>
+      <span class="brand-cell-featured status-badge"></span>
+    </td>
+    <td>
+      <button class="brand-cell-delete btn-text-subtle-danger" data-action="delete-brand">🗑</button>
+    </td>
+  </tr>
+</template>
+
+<template id="topics-row-template">
+  <tr>
+    <td><span class="topic-cell-name user-cell-name"></span></td>
+    <td>
+      <label class="admin-toggle">
+        <input type="checkbox" class="topic-cell-checkbox admin-toggle-input" data-action="toggle-topic" />
+        <span class="topic-cell-badge status-badge"></span>
+      </label>
+    </td>
+    <td>
+      <span class="topic-cell-featured status-badge"></span>
+    </td>
+    <td>
+      <button class="topic-cell-delete btn-text-subtle-danger" data-action="delete-topic">🗑</button>
+    </td>
+  </tr>
+</template>
+
+<template id="sections-row-template">
+  <tr>
+    <td><span class="section-cell-name user-cell-name"></span></td>
+    <td class="section-cell-desc text-muted" style="max-width:260px;white-space:normal;"></td>
+    <td>
+      <label class="admin-toggle">
+        <input type="checkbox" class="section-cell-checkbox admin-toggle-input" data-action="toggle-section" />
+        <span class="section-cell-badge status-badge"></span>
+      </label>
+    </td>
+    <td></td>
+  </tr>
+</template>
 {% endblock %}
 
 {% block admin_scripts %}

@@ -6,9 +6,11 @@
 (function () {
   'use strict';
 
-  const TABS = ['categories', 'brands', 'topics', 'sections'];
   const loadedTabs = new Set();
-  let searchDebounce = null;
+  let categoriesController;
+  let brandsController;
+  let topicsController;
+  let sectionsController;
 
   // ── Slug helper (mirrors Python's generate_slug) ─────────────
   function slugify(str) {
@@ -20,8 +22,6 @@
       .replace(/^-+|-+$/g, '');
   }
 
-  // Exposes global escapeHtml from core.js
-
   // ── Tab Switching ─────────────────────────────────────────────
   function initTabs() {
     document.getElementById('taxonomy-tabs').addEventListener('click', e => {
@@ -32,79 +32,50 @@
       document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('is-hidden'));
       btn.classList.add('active');
       document.getElementById(`tab-panel-${tab}`).classList.remove('is-hidden');
-      if (!loadedTabs.has(tab)) { loadTab(tab); }
+      loadTab(tab);
     });
   }
 
   function loadTab(tab) {
-    loadedTabs.add(tab);
-    switch (tab) {
-      case 'categories': return loadCategories();
-      case 'brands':     return loadBrands();
-      case 'topics':     return loadTopics();
-      case 'sections':   return loadSections();
+    if (!loadedTabs.has(tab)) {
+      loadedTabs.add(tab);
+      if (tab === 'categories') categoriesController.init();
+      if (tab === 'brands')     brandsController.init();
+      if (tab === 'topics')     topicsController.init();
+      if (tab === 'sections')   sectionsController.init();
+    } else {
+      if (tab === 'categories') categoriesController.load(1);
+      if (tab === 'brands')     brandsController.load(1);
+      if (tab === 'topics')     topicsController.load(1);
+      if (tab === 'sections')   sectionsController.load(1);
     }
   }
 
-  // ── Generic Fetch ─────────────────────────────────────────────
-  function fetchList(endpoint, onSuccess, onError) {
-    return fetch(endpoint)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(onSuccess)
-      .catch(onError || (() => {}));
-  }
+  // ── CATEGORIES RENDER ──────────────────────
+  function renderCategoryRow(cat) {
+    const template = document.getElementById('categories-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-  // ────────────────────────────────────────────
-  // CATEGORIES
-  // ────────────────────────────────────────────
-  function loadCategories(search) {
-    const url = search ? `/admin/taxonomy/categories?search=${encodeURIComponent(search)}` : '/admin/taxonomy/categories';
-    const tbody = document.getElementById('categories-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
+    clone.querySelector('.cat-cell-name').textContent = cat.name;
 
-    fetchList(url, data => renderCategories(data), () => {
-      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load categories.");
-    });
-  }
+    const cb = clone.querySelector('.cat-cell-checkbox');
+    cb.dataset.id = cat.id;
+    cb.checked = cat.is_active;
 
-  function renderCategories(items) {
-    const tbody = document.getElementById('categories-table-body');
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(6, "No categories yet.", "", "loading-height-sm");
-      return;
-    }
-    tbody.innerHTML = '';
-    items.forEach(cat => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><span class="user-cell-name">#${cat.id}</span></td>
-        <td><span class="user-cell-name">${escapeHtml(cat.name)}</span></td>
-        <td><code class="admin-slug-code">${escapeHtml(cat.slug)}</code></td>
-        <td>
-          <label class="admin-toggle" title="Toggle active">
-            <input type="checkbox" class="admin-toggle-input"
-              data-action="toggle-category"
-              data-id="${cat.id}"
-              ${cat.is_active ? 'checked' : ''} />
-            <span class="status-badge ${cat.is_active ? 'active' : 'inactive'}">
-              ${cat.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </label>
-        </td>
-        <td>
-          <span class="status-badge ${cat.is_leaf ? 'user' : 'admin'}">
-            ${cat.is_leaf ? 'Leaf' : 'Parent'}
-          </span>
-        </td>
-        <td>
-          <button class="user-action-btn user-action-delete"
-            data-action="delete-category"
-            data-id="${cat.id}"
-            data-name="${escapeHtml(cat.name)}">🗑</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    const badge = clone.querySelector('.cat-cell-badge');
+    badge.className = `status-badge ${cat.is_active ? 'active' : 'inactive'}`;
+    badge.textContent = cat.is_active ? 'Active' : 'Inactive';
+
+    const leaf = clone.querySelector('.cat-cell-leaf');
+    leaf.className = `status-badge ${cat.is_leaf ? 'user' : 'admin'}`;
+    leaf.textContent = cat.is_leaf ? 'Leaf' : 'Parent';
+
+    const delBtn = clone.querySelector('.cat-cell-delete');
+    delBtn.dataset.id = cat.id;
+    delBtn.dataset.name = cat.name;
+
+    return tr;
   }
 
   function createCategory() {
@@ -123,7 +94,7 @@
         showToast(`Category "${name}" created.`, 'success');
         nameInput.value = '';
         document.getElementById('new-category-slug-preview').textContent = '—';
-        loadCategories();
+        categoriesController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -134,7 +105,7 @@
       fetch(`/admin/taxonomy/categories/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); loadCategories(); }
+          if (d.success) { showToast(d.message, 'success'); categoriesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -151,63 +122,37 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Category ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        loadCategories();
+        categoriesController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ────────────────────────────────────────────
-  // BRANDS
-  // ────────────────────────────────────────────
-  function loadBrands(search) {
-    const url = search ? `/admin/taxonomy/brands?search=${encodeURIComponent(search)}` : '/admin/taxonomy/brands';
-    const tbody = document.getElementById('brands-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(7, "Loading…", "loading-height-sm");
+  // ── BRANDS RENDER ─────────────────────────
+  function renderBrandRow(b) {
+    const template = document.getElementById('brands-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-    fetchList(url, data => renderBrands(data), () => {
-      tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load brands.");
-    });
-  }
+    clone.querySelector('.brand-cell-name').textContent = b.name;
+    clone.querySelector('.brand-cell-industry').textContent = b.industry || '—';
 
-  function renderBrands(items) {
-    const tbody = document.getElementById('brands-table-body');
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(7, "No brands yet.", "", "loading-height-sm");
-      return;
-    }
-    tbody.innerHTML = '';
-    items.forEach(b => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><span class="user-cell-name">#${b.id}</span></td>
-        <td><span class="user-cell-name">${escapeHtml(b.name)}</span></td>
-        <td><code class="admin-slug-code">${escapeHtml(b.slug)}</code></td>
-        <td>${escapeHtml(b.industry) || '—'}</td>
-        <td>
-          <label class="admin-toggle">
-            <input type="checkbox" class="admin-toggle-input"
-              data-action="toggle-brand"
-              data-id="${b.id}"
-              ${b.is_active ? 'checked' : ''} />
-            <span class="status-badge ${b.is_active ? 'active' : 'inactive'}">
-              ${b.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </label>
-        </td>
-        <td>
-          <span class="status-badge ${b.is_featured ? 'admin' : 'user'}">
-            ${b.is_featured ? 'Featured' : '—'}
-          </span>
-        </td>
-        <td>
-          <button class="user-action-btn user-action-delete"
-            data-action="delete-brand"
-            data-id="${b.id}"
-            data-name="${escapeHtml(b.name)}">🗑</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    const cb = clone.querySelector('.brand-cell-checkbox');
+    cb.dataset.id = b.id;
+    cb.checked = b.is_active;
+
+    const badge = clone.querySelector('.brand-cell-badge');
+    badge.className = `status-badge ${b.is_active ? 'active' : 'inactive'}`;
+    badge.textContent = b.is_active ? 'Active' : 'Inactive';
+
+    const feat = clone.querySelector('.brand-cell-featured');
+    feat.className = `status-badge ${b.is_featured ? 'admin' : 'user'}`;
+    feat.textContent = b.is_featured ? 'Featured' : '—';
+
+    const delBtn = clone.querySelector('.brand-cell-delete');
+    delBtn.dataset.id = b.id;
+    delBtn.dataset.name = b.name;
+
+    return tr;
   }
 
   function createBrand() {
@@ -227,18 +172,19 @@
         document.getElementById('new-brand-name').value = '';
         document.getElementById('new-brand-industry').value = '';
         document.getElementById('new-brand-slug-preview').textContent = '—';
-        loadBrands();
+        brandsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
 
+  // Delete brand
   function deleteBrand(id, name, btn) {
     showModal('Delete Brand', `Delete "${name}"? Items and content tagged with this brand will lose the association.`, () => {
       if (btn) btn.disabled = true;
       fetch(`/admin/taxonomy/brands/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); loadBrands(); }
+          if (d.success) { showToast(d.message, 'success'); brandsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -255,62 +201,36 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Brand ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        loadBrands();
+        brandsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ────────────────────────────────────────────
-  // TOPICS
-  // ────────────────────────────────────────────
-  function loadTopics(search) {
-    const url = search ? `/admin/taxonomy/topics?search=${encodeURIComponent(search)}` : '/admin/taxonomy/topics';
-    const tbody = document.getElementById('topics-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
+  // ── TOPICS RENDER ─────────────────────────
+  function renderTopicRow(t) {
+    const template = document.getElementById('topics-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-    fetchList(url, data => renderTopics(data), () => {
-      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load topics.");
-    });
-  }
+    clone.querySelector('.topic-cell-name').textContent = t.name;
 
-  function renderTopics(items) {
-    const tbody = document.getElementById('topics-table-body');
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(6, "No topics yet.", "", "loading-height-sm");
-      return;
-    }
-    tbody.innerHTML = '';
-    items.forEach(t => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><span class="user-cell-name">#${t.id}</span></td>
-        <td><span class="user-cell-name">${escapeHtml(t.name)}</span></td>
-        <td><code class="admin-slug-code">${escapeHtml(t.slug)}</code></td>
-        <td>
-          <label class="admin-toggle">
-            <input type="checkbox" class="admin-toggle-input"
-              data-action="toggle-topic"
-              data-id="${t.id}"
-              ${t.is_active ? 'checked' : ''} />
-            <span class="status-badge ${t.is_active ? 'active' : 'inactive'}">
-              ${t.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </label>
-        </td>
-        <td>
-          <span class="status-badge ${t.is_featured ? 'admin' : 'user'}">
-            ${t.is_featured ? 'Featured' : '—'}
-          </span>
-        </td>
-        <td>
-          <button class="user-action-btn user-action-delete"
-            data-action="delete-topic"
-            data-id="${t.id}"
-            data-name="${escapeHtml(t.name)}">🗑</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    const cb = clone.querySelector('.topic-cell-checkbox');
+    cb.dataset.id = t.id;
+    cb.checked = t.is_active;
+
+    const badge = clone.querySelector('.topic-cell-badge');
+    badge.className = `status-badge ${t.is_active ? 'active' : 'inactive'}`;
+    badge.textContent = t.is_active ? 'Active' : 'Inactive';
+
+    const feat = clone.querySelector('.topic-cell-featured');
+    feat.className = `status-badge ${t.is_featured ? 'admin' : 'user'}`;
+    feat.textContent = t.is_featured ? 'Featured' : '—';
+
+    const delBtn = clone.querySelector('.topic-cell-delete');
+    delBtn.dataset.id = t.id;
+    delBtn.dataset.name = t.name;
+
+    return tr;
   }
 
   function createTopic() {
@@ -328,7 +248,7 @@
         showToast(`Topic "${name}" created.`, 'success');
         document.getElementById('new-topic-name').value = '';
         document.getElementById('new-topic-slug-preview').textContent = '—';
-        loadTopics();
+        topicsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -339,7 +259,7 @@
       fetch(`/admin/taxonomy/topics/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); loadTopics(); }
+          if (d.success) { showToast(d.message, 'success'); topicsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -356,52 +276,29 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Topic ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        loadTopics();
+        topicsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ────────────────────────────────────────────
-  // SECTIONS
-  // ────────────────────────────────────────────
-  function loadSections() {
-    const tbody = document.getElementById('sections-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-sm");
+  // ── SECTIONS RENDER ───────────────────────
+  function renderSectionRow(s) {
+    const template = document.getElementById('sections-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-    fetchList('/admin/taxonomy/sections', data => renderSections(data), () => {
-      tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load sections.");
-    });
-  }
+    clone.querySelector('.section-cell-name').textContent = s.name;
+    clone.querySelector('.section-cell-desc').textContent = s.description;
 
-  function renderSections(items) {
-    const tbody = document.getElementById('sections-table-body');
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(6, "No sections found.", "", "loading-height-sm");
-      return;
-    }
-    tbody.innerHTML = '';
-    items.forEach(s => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><span class="user-cell-name">#${s.id}</span></td>
-        <td><span class="user-cell-name">${escapeHtml(s.name)}</span></td>
-        <td><code class="admin-slug-code">${escapeHtml(s.slug)}</code></td>
-        <td class="text-muted" style="max-width:260px;white-space:normal;">${escapeHtml(s.description)}</td>
-        <td>
-          <label class="admin-toggle">
-            <input type="checkbox" class="admin-toggle-input"
-              data-action="toggle-section"
-              data-id="${s.id}"
-              ${s.is_active ? 'checked' : ''} />
-            <span class="status-badge ${s.is_active ? 'active' : 'inactive'}">
-              ${s.is_active ? 'Active' : 'Inactive'}
-            </span>
-          </label>
-        </td>
-        <td></td>
-      `;
-      tbody.appendChild(tr);
-    });
+    const cb = clone.querySelector('.section-cell-checkbox');
+    cb.dataset.id = s.id;
+    cb.checked = s.is_active;
+
+    const badge = clone.querySelector('.section-cell-badge');
+    badge.className = `status-badge ${s.is_active ? 'active' : 'inactive'}`;
+    badge.textContent = s.is_active ? 'Active' : 'Inactive';
+
+    return tr;
   }
 
   function toggleSectionActive(id, isActive, el) {
@@ -414,7 +311,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Section ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        loadSections();
+        sectionsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -464,23 +361,6 @@
     });
   }
 
-  // ── Search Wiring ────────────────────────
-  function initSearch() {
-    const searchMap = {
-      'category-search': s => loadCategories(s),
-      'brand-search':    s => loadBrands(s),
-      'topic-search':    s => loadTopics(s),
-    };
-    Object.entries(searchMap).forEach(([inputId, fn]) => {
-      const el = document.getElementById(inputId);
-      if (!el) return;
-      el.addEventListener('input', () => {
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => fn(el.value.trim()), 400);
-      });
-    });
-  }
-
   // ── Create Buttons ───────────────────────
   function initCreateButtons() {
     document.getElementById('create-category-btn').addEventListener('click', createCategory);
@@ -502,14 +382,61 @@
 
   // ── Init ─────────────────────────────────
   function init() {
+    categoriesController = new AdminListController({
+      domain: 'categories',
+      endpoint: '/admin/taxonomy/categories',
+      tbodyId: 'categories-table-body',
+      searchId: 'category-search',
+      filterIds: [],
+      colspan: 4,
+      rowTemplateId: 'categories-row-template',
+      renderRow: renderCategoryRow,
+      autoInit: false
+    });
+
+    brandsController = new AdminListController({
+      domain: 'brands',
+      endpoint: '/admin/taxonomy/brands',
+      tbodyId: 'brands-table-body',
+      searchId: 'brand-search',
+      filterIds: [],
+      colspan: 5,
+      rowTemplateId: 'brands-row-template',
+      renderRow: renderBrandRow,
+      autoInit: false
+    });
+
+    topicsController = new AdminListController({
+      domain: 'topics',
+      endpoint: '/admin/taxonomy/topics',
+      tbodyId: 'topics-table-body',
+      searchId: 'topic-search',
+      filterIds: [],
+      colspan: 4,
+      rowTemplateId: 'topics-row-template',
+      renderRow: renderTopicRow,
+      autoInit: false
+    });
+
+    sectionsController = new AdminListController({
+      domain: 'sections',
+      endpoint: '/admin/taxonomy/sections',
+      tbodyId: 'sections-table-body',
+      searchId: '',
+      filterIds: [],
+      colspan: 4,
+      rowTemplateId: 'sections-row-template',
+      renderRow: renderSectionRow,
+      autoInit: false
+    });
+
     initTabs();
     initTableDelegation();
     initSlugPreviews();
-    initSearch();
     initCreateButtons();
 
     // Load first tab (categories)
-    loadCategories();
+    categoriesController.init();
     loadedTabs.add('categories');
   }
 

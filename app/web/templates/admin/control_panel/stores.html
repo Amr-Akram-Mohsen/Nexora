@@ -1,24 +1,25 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_spinner, admin_table_spinner %}
 
 {% block title %}Stores Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {% set header_actions %}
-  <button id="refresh-stores-btn" class="admin-btn-secondary">↺ Refresh</button>
+<button id="refresh-stores-btn" class="admin-btn-secondary">↺ Refresh</button>
 {% endset %}
 
 {{ admin_page_header(
-    "Stores & Commercial Providers",
-    "Monitor merchant portals, affiliate network setups, product index volumes, and merchant sync status",
-    actions=header_actions
+"Stores & Commercial Providers",
+"Monitor merchant portals, affiliate network setups, product index volumes, and merchant sync status",
+actions=header_actions
 ) }}
 
 <!-- Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
-  <div class="admin-toolbar-row">
-    <div class="admin-toolbar-search admin-search-grow">
+  <div class="admin-toolbar-row flex items-center flex-wrap">
+    <div class="admin-toolbar-search admin-search-grow flex items-center">
       <span class="admin-toolbar-search-icon-inside">🔍</span>
       <input type="text" id="stores-search" placeholder="Search by name, slug, or website…" />
     </div>
@@ -38,31 +39,51 @@
   <table class="admin-table" id="stores-table">
     <thead>
       <tr>
-        <th class="col-type">ID</th>
-        <th>Merchant Name / Domain</th>
-        <th class="col-engagement">Affiliate Network</th>
-        <th class="col-engagement">Product Volume</th>
-        <th class="col-engagement">Currency / Code</th>
-        <th>Latest Ingest Activity</th>
-        <th>Latest Product Name</th>
+        <th class="col-primary">Merchant Name</th>
+        <th>Affiliate Network</th>
+        <th class="col-metric">Volume</th>
+        <th class="col-date">Latest Ingest Activity</th>
+        <th class="col-status">Status</th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="stores-table-body">
-      {{ admin_table_spinner(8, "Loading stores list…") }}
+      {{ admin_table_spinner(6, "Loading stores list…") }}
     </tbody>
   </table>
 </div>
 
-{{ admin_pagination(
-    info_id="stores-pagination-info",
-    per_page_id="stores-per-page",
-    prev_id="stores-prev-btn",
-    indicator_id="stores-page-indicator",
-    next_id="stores-next-btn",
-    per_page_options=[10, 20, 50],
-    current_per_page=20
-) }}
+{{ admin_paginator(domain="stores", per_page_options=[10, 20, 50], current_per_page=20) }}
+
+<template id="stores-row-template">
+  <tr>
+    <td>
+      <div class="store-cell-name">
+        <a class="store-cell-link text-muted" target="_blank" href=""></a>
+      </div>
+    </td>
+    <td>
+      <span class="store-cell-network status-badge purple"></span>
+    </td>
+    <td>
+      <strong class="store-cell-count inspect-brand-purple"></strong>
+    </td>
+    <td>
+      <span class="store-cell-time text-foreground"></span>
+    </td>
+    <td class="store-cell-status">
+    </td>
+    <td>
+      <div class="user-actions-group">
+        <a class="store-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
+          href="">
+          👁️ View Products
+        </a>
+      </div>
+    </td>
+  </tr>
+</template>
+
 
 {% endblock %}
 

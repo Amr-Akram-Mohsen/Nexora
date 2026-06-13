@@ -8,14 +8,7 @@
 
 .dashboard-stat-card {
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   min-height: 100px;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
   cursor: default;
@@ -73,9 +66,6 @@ a.clickable-card:hover .dashboard-stat-value {
   height: 2rem;
   font-size: 1rem;
   border-radius: var(--radius-md);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   background: var(--secondary);
   color: var(--muted-foreground);
   transition: background-color 0.15s ease, color 0.15s ease;
@@ -109,12 +99,8 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .dashboard-analytics-hero {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
   padding: 2.5rem 2rem;
   text-align: center;
-  box-shadow: var(--shadow-sm);
 }
 
 .dashboard-hero-title {
@@ -159,9 +145,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .overview-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border);
   background: var(--secondary);
@@ -200,8 +183,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .overview-top-item {
-  display: flex;
-  align-items: center;
   gap: 0.875rem;
   padding: 0.625rem 1.25rem;
   transition: background-color 0.15s ease;
@@ -263,8 +244,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .overview-breakdown-row {
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
 }
 
@@ -325,8 +304,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .trend-chart-item {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
 }
 
@@ -397,8 +374,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .health-row {
-  display: flex;
-  justify-content: space-between;
   margin-bottom: 0.25rem;
   font-size: var(--text-sm);
 }
@@ -410,8 +385,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .dist-row {
-  display: flex;
-  justify-content: space-between;
   font-size: var(--text-xs);
   margin-bottom: 0.25rem;
 }
@@ -435,9 +408,6 @@ a.clickable-card:hover .dashboard-stat-value {
 
 .moderation-queue-link {
   padding: 0.75rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   border-color: rgba(var(--brand-purple-rgb), 0.2);
   text-decoration: none;
   margin-top: 0.25rem;
@@ -452,8 +422,6 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .activity-item {
-  display: flex;
-  align-items: flex-start;
   gap: 0.875rem;
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border);
@@ -468,9 +436,6 @@ a.clickable-card:hover .dashboard-stat-value {
   width: 2rem;
   height: 2rem;
   border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 0.875rem;
   flex-shrink: 0;
 }

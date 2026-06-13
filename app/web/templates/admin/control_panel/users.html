@@ -1,22 +1,23 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
+admin_spinner, admin_table_spinner %}
 
 {% block title %}User Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
 {% set header_actions %}
-  <button id="refresh-users-btn" class="admin-btn-secondary">↺ Refresh</button>
+<button id="refresh-users-btn" class="admin-btn-secondary">↺ Refresh</button>
 {% endset %}
 
 {{ admin_page_header(
-    "Users",
-    "Manage registered users, roles, and access",
-    actions=header_actions
+"Users",
+"Manage registered users, roles, and access",
+actions=header_actions
 ) }}
 
-<div class="admin-toolbar">
-  <div class="admin-toolbar-search">
+<div class="admin-toolbar flex items-center">
+  <div class="admin-toolbar-search flex items-center">
     <span class="admin-toolbar-search-icon">🔍</span>
     <input type="text" id="user-search" placeholder="Search by name or email…" />
   </div>
@@ -38,11 +39,11 @@
   <table class="admin-table" id="users-table">
     <thead>
       <tr>
-        <th>User</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Joined</th>
-        <th>Actions</th>
+        <th class="col-primary">User</th>
+        <th class="col-status">Role</th>
+        <th class="col-status">Status</th>
+        <th class="col-date">Joined</th>
+        <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="users-table-body">
@@ -51,16 +52,61 @@
   </table>
 </div>
 
-{{ admin_pagination(
-    info_id="users-pagination-info",
-    per_page_id="users-per-page",
-    prev_id="users-prev-btn",
-    indicator_id="users-page-indicator",
-    next_id="users-next-btn",
-    per_page_options=[10, 25, 50],
-    current_per_page=25
-) }}
+{{ admin_paginator(domain="users", per_page_options=[10, 25, 50], current_per_page=25) }}
 
+{% call admin_modal("inspect-user-modal", "User Details & Access Control", "👤") %}
+<div class="dashboard-modal-actions flex justify-center">
+  <button id="inspect-user-close-btn" class="dashboard-btn dashboard-btn-secondary">Close Details</button>
+</div>
+{% endcall %}
+
+<template id="users-row-template">
+  <tr>
+    <td>
+      <div class="user-cell-name"></div>
+      <div class="user-cell-email"></div>
+    </td>
+    <td class="user-role-cell"></td>
+    <td class="user-status-cell"></td>
+    <td class="user-joined-cell"></td>
+    <td>
+      <div class="user-actions-group">
+        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-user">
+          👁️ Inspect
+        </button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template id="user-inspect-template">
+  <div class="inspect-details-group flex flex-col">
+    <div>
+      <strong class="inspect-details-title">User Account Details</strong>
+      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
+      <div class="inspect-details-row"><strong>Name:</strong> <span class="inspect-name"></span></div>
+      <div class="inspect-details-row"><strong>Email:</strong> <span class="inspect-email"></span></div>
+      <div class="inspect-details-row"><strong>Role:</strong> <span class="inspect-role status-badge"></span></div>
+      <div class="inspect-details-row"><strong>Status:</strong> <span class="inspect-status status-badge"></span></div>
+      <div class="inspect-details-row"><strong>Joined Date:</strong> <span class="inspect-joined"></span></div>
+    </div>
+    <hr class="inspect-details-divider" />
+    <div>
+      <strong class="inspect-details-title">Access Control Actions</strong>
+      <div class="flex gap-2 mt-2 flex-wrap">
+        <button class="user-action-btn user-action-toggle-admin inspect-toggle-admin-btn" data-id="">
+          Change Role
+        </button>
+        <button class="user-action-btn user-action-toggle-active inspect-toggle-active-btn" data-id="">
+          Change Status
+        </button>
+        <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="">
+          🗑 Delete User
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
 {% endblock %}
 
 {% block admin_scripts %}

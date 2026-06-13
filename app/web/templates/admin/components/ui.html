@@ -2,7 +2,7 @@
 
 {% macro admin_page_header(title, description, actions=None) %}
 <div class="admin-page-header">
-  <div class="admin-page-header-row">
+  <div class="admin-page-header-row flex justify-between items-center">
     <div>
       <h1>{{ title }}</h1>
       {% if description %}
@@ -10,7 +10,7 @@
       {% endif %}
     </div>
     {% if actions %}
-    <div class="admin-page-header-actions">
+    <div class="admin-page-header-actions flex items-center">
       {{ actions }}
     </div>
     {% endif %}
@@ -18,7 +18,8 @@
 </div>
 {% endmacro %}
 
-{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
+{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100],
+current_per_page=20) %}
 <div class="pagination-container">
   <div id="{{ info_id }}" class="pagination-info-text">
     Showing 0 to 0 of 0 items
@@ -26,7 +27,7 @@
   <div class="pagination-controls-group">
     <select id="{{ per_page_id }}" class="dashboard-filter-select pagination-per-page-select">
       {% for opt in per_page_options %}
-      <option value="{{ opt }}" {% if opt == current_per_page %}selected{% endif %}>{{ opt }} per page</option>
+      <option value="{{ opt }}" {% if opt==current_per_page %}selected{% endif %}>{{ opt }} per page</option>
       {% endfor %}
     </select>
     <button id="{{ prev_id }}" class="user-action-btn" disabled>← Previous</button>
@@ -54,7 +55,8 @@
 </tr>
 {% endmacro %}
 
-{% macro admin_empty_state(message="No records found matching filters.", submessage="Adjust your filters or search terms.") %}
+{% macro admin_empty_state(message="No records found matching filters.", submessage="Adjust your filters or search
+terms.") %}
 <div class="dashboard-empty">
   <span style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</span>
   <p>{{ message }}</p>
@@ -63,4 +65,34 @@
   {% endif %}
 </div>
 {% endmacro %}
+{% macro admin_paginator(domain, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
+{{ admin_pagination(
+info_id=domain ~ "-pagination-info",
+per_page_id=domain ~ "-per-page",
+prev_id=domain ~ "-prev-btn",
+indicator_id=domain ~ "-page-indicator",
+next_id=domain ~ "-next-btn",
+per_page_options=per_page_options,
+current_per_page=current_per_page
+) }}
+{% endmacro %}
 
+{% macro admin_search_bar(id, placeholder="Search…") %}
+<div class="admin-toolbar-search flex items-center">
+  <span class="admin-toolbar-search-icon">🔍</span>
+  <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" />
+</div>
+{% endmacro %}
+
+{% macro admin_modal(id, title, icon, size_class="") %}
+<div id="{{ id }}" class="dashboard-modal-overlay flex-center">
+  <div class="dashboard-modal-content {{ size_class }}">
+    <button class="dashboard-modal-close-x" aria-label="Close modal" type="button" onclick="document.getElementById('{{ id }}').classList.remove('active')">×</button>
+    <div class="dashboard-modal-icon">{{ icon }}</div>
+    <h3 class="dashboard-modal-title" id="{{ id }}-title">{{ title }}</h3>
+    <div class="dashboard-modal-body" id="{{ id }}-body">
+      {{ caller() }}
+    </div>
+  </div>
+</div>
+{% endmacro %}

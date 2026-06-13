@@ -1,5 +1,22 @@
 /* --- Admin Base Layout & Structural Containers --- */
 
+/* --- Shared Structural Panel / Card Baseline --- */
+.overview-panel,
+.dashboard-stat-card,
+.admin-inline-form,
+.admin-toolbar,
+.admin-toolbar-advanced,
+.admin-table-wrapper,
+.pagination-container,
+.settings-card,
+.dashboard-item,
+.dashboard-analytics-hero {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
 .dashboard-wrapper {
   max-width: var(--container-max-width, 1000px);
   margin: 0 auto;
@@ -7,23 +24,13 @@
 }
 
 .dashboard-list {
-  display: flex;
-  flex-direction: column;
   gap: var(--card-gap, 1.5rem);
   width: 100%;
 }
 
 .dashboard-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 1.25rem 1.5rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
-  box-shadow: var(--shadow-sm);
-  flex-wrap: wrap;
 }
 
 .dashboard-item:hover {
@@ -32,9 +39,6 @@
 }
 
 .dashboard-top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 1.5rem;
 }
 
@@ -46,8 +50,6 @@
 }
 
 .dashboard-meta-container {
-  display: flex;
-  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 0.25rem;
 }
@@ -55,8 +57,6 @@
 .dashboard-meta {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
-  display: flex;
-  align-items: center;
   margin: 0;
 }
 
@@ -67,8 +67,6 @@
 }
 
 .dashboard-actions {
-  display: flex;
-  align-items: center;
   margin-left: 1rem;
 }
 
@@ -76,9 +74,14 @@
 
 .admin-layout {
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-columns: var(--sidebar-width, 280px) 1fr;
   min-height: 100vh;
   background: var(--background);
+  transition: grid-template-columns 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-layout.collapsed {
+  --sidebar-width: 70px;
 }
 
 .admin-sidebar {
@@ -89,7 +92,9 @@
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
 }
+
 
 .admin-content {
   padding: var(--listing-gap);
@@ -120,17 +125,11 @@
 }
 
 .admin-page-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .admin-page-header-actions {
-  display: flex;
   gap: 0.75rem;
-  align-items: center;
 }
 
 /* --- Shared Loading / Empty / Error States --- */
@@ -145,10 +144,6 @@
   border-radius: var(--radius-lg);
   color: var(--muted-foreground);
   font-size: var(--text-sm);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 220px;
 }
 
@@ -163,9 +158,17 @@
 }
 
 @keyframes pulse {
-  0%   { opacity: 0.4; }
-  50%  { opacity: 1; }
-  100% { opacity: 0.4; }
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
 }
 
 .spinner {
@@ -180,32 +183,58 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* --- Layout Responsiveness --- */
+/* --- Layout Responsiveness & Sidebar Overlay --- */
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.3s ease;
+}
 
 @media (max-width: 768px) {
+  /* Layout grid maintains collapsed sidebar space on mobile */
   .admin-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 70px 1fr !important;
   }
 
-  .admin-sidebar {
+  /* Overlay sidebar when expanded on mobile (NOT .collapsed) */
+  .admin-layout:not(.collapsed) .sidebar-overlay {
+    display: block;
+  }
+
+  .admin-layout:not(.collapsed) .admin-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px !important;
+    height: 100vh;
+    z-index: 100;
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+  }
+
+  /* Keep sidebar vertical sticky and collapsed to 70px when collapsed on mobile */
+  .admin-layout.collapsed .admin-sidebar {
     position: sticky;
     top: 0;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 0;
-    z-index: 40;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .admin-sidebar::-webkit-scrollbar {
-    display: none;
+    width: 70px !important;
+    height: 100vh;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    padding: 2rem 0;
   }
 
   .admin-content {

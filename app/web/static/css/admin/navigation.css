@@ -1,7 +1,6 @@
 /* --- Horizontal Dashboard Navigation --- */
 
 .dashboard-nav {
-  display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--border);
@@ -79,8 +78,6 @@
 /* --- Sidebar Branding Header --- */
 
 .nav-brand {
-  display: flex;
-  align-items: center;
   gap: 0.625rem;
   padding: 1.25rem 1.5rem 1.5rem;
   border-bottom: 1px solid var(--border);
@@ -112,8 +109,6 @@
 /* --- Navigation Links & Icons --- */
 
 .nav-link {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   width: 100%;
   padding: 0.5rem 0.875rem;
@@ -167,7 +162,6 @@
 /* --- Admin Tab Bar (Page-level Tab Navigation) --- */
 
 .admin-tabs {
-  display: flex;
   gap: 0.25rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
@@ -207,56 +201,67 @@
   display: none;
 }
 
-/* --- Navigation Responsiveness --- */
+/* --- Collapsible Sidebar Styles & Transitions --- */
 
-@media (max-width: 768px) {
-  .dashboard-nav {
-    padding: 0.5rem 1rem 0;
-  }
-
-  .nav-section {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 0;
-    padding: 0;
-    gap: 0.5rem;
-  }
-
-  .nav-section::after {
-    content: "";
-    width: 1px;
-    height: 1.25rem;
-    background: var(--border);
-    margin: 0 0.375rem;
-  }
-
-  .nav-section:last-child::after {
-    display: none;
-  }
-
-  .nav-title {
-    display: none;
-  }
-
-  .dashboard-nav a {
-    width: auto;
-    margin-bottom: 0;
-    border-left: none;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-  }
-
-  .dashboard-nav a.active {
-    border-left: none;
-    border-bottom: 2px solid var(--brand-blue);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    padding-left: 0.75rem;
-  }
-
-  .nav-brand {
-    padding-right: 1rem;
-    margin-right: 0.5rem;
-    margin-bottom: 0;
-  }
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.35rem;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--secondary);
+  color: var(--foreground);
+}
+
+.sidebar-toggle-btn .toggle-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* Collapsed classes */
+.collapsed .nav-brand-name,
+.collapsed .nav-brand-badge,
+.collapsed .nav-title,
+.collapsed .nav-link-text {
+  display: none !important;
+}
+
+.collapsed .nav-brand {
+  padding: 1.25rem 0.5rem;
+  justify-content: center;
+}
+
+.collapsed .brand-wrapper {
+  justify-content: center;
+}
+
+.collapsed .sidebar-toggle-btn .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.collapsed .admin-sidebar .dashboard-nav a {
+  width: 100%;
+  padding: 0.75rem 0;
+  display: flex;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.collapsed .admin-sidebar .dashboard-nav a.active {
+  border-left: 3px solid var(--brand-blue);
+  padding-left: 0;
+}
+
+.collapsed .nav-section {
+  padding: 0;
+}
+

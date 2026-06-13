@@ -13,10 +13,11 @@ Refactoring applied:
 from flask import Blueprint, jsonify, request
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.domains.item.models import Item, ItemVariant, ItemStoreLink
+from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
 from app.domains.taxonomy.models import Category, Brand, Source
 from app.admin.helpers import parse_pagination_params, parse_sort_params
 from sqlalchemy import select, func, or_
+from sqlalchemy.orm import joinedload
 
 bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
 
@@ -36,7 +37,6 @@ _ITEM_SORT_MAP = {
     "id":          Item.id,
     "created_at":  Item.created_at,
     "name":        Item.name,
-    "rating":      Item.rating,
     "click_count": Item.click_count,
     "view_count":  Item.view_count,
 }
@@ -88,7 +88,6 @@ def list_items():
     search        = request.args.get("search", "").strip()
     brand_slug    = request.args.get("brand")
     category_slug = request.args.get("category")
-    item_type     = request.args.get("item_type")
     source_slug   = request.args.get("source")
 
     # ── Build base query with SQL subqueries for aggregated fields (R-15) ─
@@ -111,7 +110,7 @@ def list_items():
         .scalar_subquery()
     )
 
-    stmt = select(Item)
+    stmt = select(Item).options(joinedload(Item.brand), joinedload(Item.category))
 
     if search:
         term = f"%{search}%"
@@ -125,9 +124,6 @@ def list_items():
 
     if category_slug:
         stmt = stmt.join(Item.category).where(Category.slug == category_slug)
-
-    if item_type:
-        stmt = stmt.where(Item.item_type == item_type)
 
     if source_slug:
         stmt = stmt.join(Item.source).where(Source.slug == source_slug)
@@ -158,41 +154,57 @@ def list_items():
             min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
 
     # Fetch active store link counts per item
-    store_count_rows = db.session.execute(
+    # store_count_rows = db.session.execute(
+    #     select(
+    #         ItemVariant.item_id,
+    #         func.count(ItemStoreLink.id).label("active_links"),
+    #     )
+    #     .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+    #     .where(ItemVariant.item_id.in_(page_ids), ItemStoreLink.is_active == True)
+    #     .group_by(ItemVariant.item_id)
+    # ).all()
+
+    # Fetch active store link counts per item
+    store_rows = db.session.execute(
         select(
             ItemVariant.item_id,
             func.count(ItemStoreLink.id).label("active_links"),
         )
         .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .where(ItemVariant.item_id.in_(page_ids), ItemStoreLink.is_active == True)
+        .where(
+            ItemVariant.item_id.in_(page_ids),
+            ItemStoreLink.is_active.is_(True),
+        )
         .group_by(ItemVariant.item_id)
     ).all()
-    store_count_map: dict[int, int] = {r.item_id: r.active_links for r in store_count_rows}
+
+    store_info_map: dict[int, dict] = {
+        r.item_id: {
+            "active_links": int(r.active_links),
+        }
+        for r in store_rows
+    }
 
     # ── Serialize (no ORM relationship traversal needed for list view) ────
     serialized = []
     for item in pagination.items:
         price_info  = min_price_map.get(item.id, {})
-        store_count = store_count_map.get(item.id, 0)
+        store_info  = store_info_map.get(item.id, {})
+        store_count = store_info.get("active_links", 0)
 
         serialized.append({
             "id":          item.id,
             "name":        item.name,
             "slug":        item.slug,
-            "item_type":   item.item_type or "—",
             "brand":       item.brand.name if item.brand else "—",
             "brand_slug":  item.brand.slug if item.brand else None,
             "category":    item.category.name if item.category else "—",
             "category_slug": item.category.slug if item.category else None,
-            "rating":      item.rating,
             "min_price":   price_info.get("price"),
             "currency":    price_info.get("currency"),
             "store_count": store_count,
             "click_count": item.click_count or 0,
             "view_count":  item.view_count or 0,
-            "source_name": item.source.name if item.source else "—",
-            "source_slug": item.source.slug if item.source else None,
-            "source_type": item.source_type or "—",
             "created_at":  item.created_at.isoformat() if item.created_at else None,
         })
 

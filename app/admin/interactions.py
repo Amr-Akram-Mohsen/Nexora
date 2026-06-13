@@ -12,7 +12,7 @@ Refactoring applied:
 from flask import Blueprint, jsonify, request
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick
 from app.domains.interaction.service.query import (
     get_interactions_breakdown,
     get_reaction_stats,
@@ -24,6 +24,7 @@ from app.domains.interaction.service.query import (
 from app.domains.user.models import User
 from app.admin.helpers import parse_pagination_params
 from sqlalchemy import select, func, or_
+from datetime import datetime
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
 
@@ -152,10 +153,34 @@ def list_reactions():
     """Paginated reactions list for moderation view."""
     page, per_page = parse_pagination_params(default_per_page=25)
     reaction_type = request.args.get("type", "").strip()
+    target = request.args.get("search", "").strip()
+    user_search = request.args.get("reactions_user", request.args.get("user", "")).strip()
 
     stmt = select(Reaction).order_by(Reaction.id.desc())
     if reaction_type:
         stmt = stmt.where(Reaction.type == reaction_type)
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (Reaction.target_id == Content.id) & (Reaction.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (Reaction.target_id == Item.id) & (Reaction.target_type == "item"))
+    stmt = stmt.join(User, Reaction.user_id == User.id)
+
+    if target:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{target}%"),
+                Item.name.ilike(f"%{target}%")
+            )
+        )
+    if user_search:
+        stmt = stmt.where(
+            or_(
+                User.name.ilike(f"%{user_search}%"),
+                User.email.ilike(f"%{user_search}%")
+            )
+        )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
@@ -164,19 +189,310 @@ def list_reactions():
     users = {}
     if user_ids:
         rows = db.session.execute(
-            select(User.id, User.name).where(User.id.in_(user_ids))
+            select(User.id, User.name, User.email).where(User.id.in_(user_ids))
         ).mappings().all()
-        users = {r["id"]: r["name"] for r in rows}
+        users = {r["id"]: r for r in rows}
 
-    serialized = [{
-        "id":          r.id,
-        "type":        r.type,
-        "user_id":     r.user_id,
-        "user_name":   users.get(r.user_id, f"User #{r.user_id}"),
-        "target_type": r.target_type,
-        "target_id":   r.target_id,
-        "created_at":  r.created_at.isoformat() if r.created_at else None,
-    } for r in pagination.items]
+    content_ids = {r.target_id for r in pagination.items if r.target_type == "content"}
+    item_ids = {r.target_id for r in pagination.items if r.target_type == "item"}
+    comment_ids = {r.target_id for r in pagination.items if r.target_type == "comment"}
+    content_titles = {}
+    item_names = {}
+    comment_previews = {}
+
+    if content_ids:
+        rows = db.session.execute(
+            select(Content.id, Content.title).where(Content.id.in_(content_ids))
+        ).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+
+    if item_ids:
+        rows = db.session.execute(
+            select(Item.id, Item.name).where(Item.id.in_(item_ids))
+        ).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    if comment_ids:
+        rows = db.session.execute(
+            select(Comment.id, Comment.content).where(Comment.id.in_(comment_ids))
+        ).mappings().all()
+        comment_previews = {r["id"]: r["content"][:60] + ("…" if len(r["content"]) > 60 else "") for r in rows}
+
+    serialized = []
+    for r in pagination.items:
+        user = users.get(r.user_id)
+        if r.target_type == "content":
+            target_title = content_titles.get(r.target_id)
+        elif r.target_type == "item":
+            target_title = item_names.get(r.target_id)
+        else:
+            target_title = comment_previews.get(r.target_id)
+
+        serialized.append({
+            "id":          r.id,
+            "type":        r.type,
+            "user_id":     r.user_id,
+            "user_name":   user["name"] if user else f"User #{r.user_id}",
+            "user_email":  user["email"] if user else None,
+            "target_type": r.target_type,
+            "target_id":   r.target_id,
+            "target_title": target_title or f"{r.target_type.capitalize()} #{r.target_id}",
+            "created_at":  r.created_at.isoformat() if r.created_at else None,
+        })
+
+    return jsonify({
+        "items":    serialized,
+        "page":     pagination.page,
+        "pages":    pagination.pages,
+        "total":    pagination.total,
+        "per_page": pagination.per_page,
+    })
+
+
+@bp.route("/views", methods=["GET"])
+def list_views():
+    """Paginated list of views aggregated by target."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    target = request.args.get("search", "").strip()
+    start_date = request.args.get("views_start_date", request.args.get("start_date", "")).strip()
+    end_date = request.args.get("views_end_date", request.args.get("end_date", "")).strip()
+
+    stmt = (
+        select(
+            View.target_type,
+            View.target_id,
+            func.count(View.id).label("view_count"),
+            func.max(View.created_at).label("latest_view")
+        )
+        .select_from(View)
+    )
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (View.target_id == Content.id) & (View.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (View.target_id == Item.id) & (View.target_type == "item"))
+
+    if target:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{target}%"),
+                Item.name.ilike(f"%{target}%")
+            )
+        )
+
+    if start_date:
+        try:
+            from datetime import date
+            stmt = stmt.where(View.created_at >= datetime.combine(date.fromisoformat(start_date), datetime.min.time()))
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            from datetime import date
+            stmt = stmt.where(View.created_at <= datetime.combine(date.fromisoformat(end_date), datetime.max.time()))
+        except ValueError:
+            pass
+
+    stmt = stmt.group_by(View.target_type, View.target_id).order_by(func.max(View.created_at).desc())
+
+    # Manual pagination to prevent scalar mapping issue
+    total = db.session.execute(select(func.count()).select_from(stmt.subquery())).scalar() or 0
+    paginated_stmt = stmt.limit(per_page).offset((page - 1) * per_page)
+    items = db.session.execute(paginated_stmt).all()
+
+    content_ids = {v.target_id for v in items if v.target_type == "content"}
+    item_ids = {v.target_id for v in items if v.target_type == "item"}
+    content_titles = {}
+    item_names = {}
+
+    if content_ids:
+        rows = db.session.execute(
+            select(Content.id, Content.title).where(Content.id.in_(content_ids))
+        ).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+
+    if item_ids:
+        rows = db.session.execute(
+            select(Item.id, Item.name).where(Item.id.in_(item_ids))
+        ).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    import math
+    pages = math.ceil(total / per_page) if per_page > 0 else 1
+
+    serialized = []
+    for v in items:
+        target_title = (
+            content_titles.get(v.target_id)
+            if v.target_type == "content"
+            else item_names.get(v.target_id)
+        )
+        serialized.append({
+            "target_type": v.target_type,
+            "target_id": v.target_id,
+            "target_title": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
+            "view_count": v.view_count,
+            "created_at": v.latest_view.isoformat() if v.latest_view else None
+        })
+
+    return jsonify({
+        "items":    serialized,
+        "page":     page,
+        "pages":    pages,
+        "total":    total,
+        "per_page": per_page,
+    })
+
+
+@bp.route("/clicks", methods=["GET"])
+def list_clicks():
+    """Paginated click logs aggregated by external link."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    target = request.args.get("search", "").strip()
+    destination = request.args.get("clicks_destination", request.args.get("destination", "")).strip()
+
+    from app.domains.item.models import ItemStoreLink, ItemVariant, Item, Store
+
+    stmt = (
+        select(
+            ItemStoreLink.id.label("link_id"),
+            ItemStoreLink.affiliate_url,
+            Store.name.label("store_name"),
+            Item.id.label("item_id"),
+            Item.name.label("item_name"),
+            func.count(ItemClick.id).label("click_count"),
+            func.max(ItemClick.created_at).label("latest_click")
+        )
+        .select_from(ItemClick)
+        .join(ItemStoreLink, ItemClick.item_store_link_id == ItemStoreLink.id)
+        .join(Store, ItemStoreLink.store_id == Store.id)
+        .join(ItemVariant, ItemStoreLink.variant_id == ItemVariant.id)
+        .join(Item, ItemVariant.item_id == Item.id)
+    )
+
+    if target:
+        stmt = stmt.where(Item.name.ilike(f"%{target}%"))
+    if destination:
+        if destination.isdigit():
+            stmt = stmt.where(Store.id == int(destination))
+        else:
+            stmt = stmt.where(Store.name.ilike(f"%{destination}%"))
+
+    stmt = stmt.group_by(
+        ItemStoreLink.id,
+        ItemStoreLink.affiliate_url,
+        Store.name,
+        Item.id,
+        Item.name
+    ).order_by(func.max(ItemClick.created_at).desc())
+
+    # Manual pagination to prevent scalar mapping issue
+    total = db.session.execute(select(func.count()).select_from(stmt.subquery())).scalar() or 0
+    paginated_stmt = stmt.limit(per_page).offset((page - 1) * per_page)
+    items = db.session.execute(paginated_stmt).all()
+
+    import math
+    pages = math.ceil(total / per_page) if per_page > 0 else 1
+
+    serialized = []
+    for row in items:
+        serialized.append({
+            "link_id": row.link_id,
+            "affiliate_url": row.affiliate_url,
+            "store_name": row.store_name,
+            "item_id": row.item_id,
+            "item_name": row.item_name,
+            "click_count": row.click_count,
+            "created_at": row.latest_click.isoformat() if row.latest_click else None
+        })
+
+    return jsonify({
+        "items":    serialized,
+        "page":     page,
+        "pages":    pages,
+        "total":    total,
+        "per_page": per_page,
+    })
+
+
+
+@bp.route("/saves", methods=["GET"])
+def list_saves():
+    """Paginated list of saves with user and target details."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    target = request.args.get("search", "").strip()
+    user_search = request.args.get("saves_user", request.args.get("user", "")).strip()
+
+    stmt = select(Save).order_by(Save.id.desc())
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (Save.target_id == Content.id) & (Save.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (Save.target_id == Item.id) & (Save.target_type == "item"))
+    stmt = stmt.join(User, Save.user_id == User.id)
+
+    if target:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{target}%"),
+                Item.name.ilike(f"%{target}%")
+            )
+        )
+    if user_search:
+        stmt = stmt.where(
+            or_(
+                User.name.ilike(f"%{user_search}%"),
+                User.email.ilike(f"%{user_search}%")
+            )
+        )
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    user_ids = {s.user_id for s in pagination.items}
+    users = {}
+    if user_ids:
+        rows = db.session.execute(
+            select(User.id, User.name, User.email).where(User.id.in_(user_ids))
+        ).mappings().all()
+        users = {r["id"]: r for r in rows}
+
+    content_ids = {s.target_id for s in pagination.items if s.target_type == "content"}
+    item_ids = {s.target_id for s in pagination.items if s.target_type == "item"}
+    content_titles = {}
+    item_names = {}
+
+    if content_ids:
+        rows = db.session.execute(
+            select(Content.id, Content.title).where(Content.id.in_(content_ids))
+        ).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+
+    if item_ids:
+        rows = db.session.execute(
+            select(Item.id, Item.name).where(Item.id.in_(item_ids))
+        ).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    serialized = []
+    for s in pagination.items:
+        user = users.get(s.user_id)
+        target_title = (
+            content_titles.get(s.target_id)
+            if s.target_type == "content"
+            else item_names.get(s.target_id)
+        )
+        serialized.append({
+            "id": s.id,
+            "user_id": s.user_id,
+            "user_name": user["name"] if user else f"User #{s.user_id}",
+            "user_email": user["email"] if user else None,
+            "target_type": s.target_type,
+            "target_id": s.target_id,
+            "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
+            "created_at": s.created_at.isoformat() if s.created_at else None
+        })
 
     return jsonify({
         "items":    serialized,

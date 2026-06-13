@@ -14,7 +14,7 @@
 
   <!-- System Info -->
   <div class="settings-card">
-    <div class="settings-card-header">
+    <div class="settings-card-header flex items-start">
       <span class="settings-card-icon">🖥️</span>
       <div>
         <h3>System Info</h3>
@@ -28,7 +28,7 @@
 
   <!-- Cache Controls -->
   <div class="settings-card">
-    <div class="settings-card-header">
+    <div class="settings-card-header flex items-start">
       <span class="settings-card-icon">🗄️</span>
       <div>
         <h3>Cache</h3>
@@ -45,7 +45,7 @@
 
   <!-- Maintenance Mode -->
   <div class="settings-card">
-    <div class="settings-card-header">
+    <div class="settings-card-header flex items-start">
       <span class="settings-card-icon">🔧</span>
       <div>
         <h3>Maintenance Mode</h3>
@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="settings-card-body">
-      <label class="settings-toggle-row">
+      <label class="settings-toggle-row flex items-center justify-between">
         <span class="settings-toggle-label">Enable maintenance mode</span>
         <span class="settings-toggle-wrapper">
           <input type="checkbox" id="maintenance-toggle" class="settings-toggle-input" />
@@ -66,8 +66,8 @@
 
   <!-- Integrations Monitor -->
   <div class="settings-card" id="integrations">
-    <div class="settings-card-header">
-      <div class="settings-card-icon-wrapper blue">
+    <div class="settings-card-header flex items-start">
+      <div class="settings-card-icon-wrapper blue flex-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m8 10 4 4 4-4" />
@@ -94,8 +94,8 @@
 
   <!-- Ingestion Log -->
   <div class="settings-card" id="ingestion-log-card">
-    <div class="settings-card-header">
-      <div class="settings-card-icon-wrapper purple">
+    <div class="settings-card-header flex items-start">
+      <div class="settings-card-icon-wrapper purple flex-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10" />
@@ -108,7 +108,7 @@
       </div>
     </div>
     <div class="settings-card-body">
-      <div class="settings-tabs-wrapper">
+      <div class="settings-tabs-wrapper flex">
         <button class="settings-tab active" id="filter-all-logs">All Events</button>
         <button class="settings-tab" id="filter-article-logs">Articles</button>
         <button class="settings-tab" id="filter-item-logs">Items</button>
@@ -121,8 +121,8 @@
 
   <!-- Danger Zone -->
   <div class="settings-card danger-zone-card">
-    <div class="settings-card-header">
-      <div class="settings-card-icon-wrapper red">
+    <div class="settings-card-header flex items-start">
+      <div class="settings-card-icon-wrapper red flex-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
@@ -136,7 +136,7 @@
       </div>
     </div>
     <div class="settings-card-body">
-      <div class="settings-danger-row">
+      <div class="settings-danger-row flex items-center justify-between flex-wrap">
         <div class="danger-info">
           <strong>Reset System</strong>
           <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action
@@ -159,7 +159,7 @@
 
 </div>
 <template id="integration-row-template">
-  <div class="integration-row">
+  <div class="integration-row flex items-center">
     <span class="integration-name"></span>
     <span class="integration-status"></span>
     <span class="integration-meta">
@@ -172,8 +172,8 @@
 
 
 <template id="log-item-template">
-  <li class="activity-item">
-    <div class="activity-icon"></div>
+  <li class="activity-item flex items-start">
+    <div class="activity-icon flex-center"></div>
 
     <div class="activity-content">
       <p class="activity-text">
@@ -181,7 +181,7 @@
         <span>fetched</span>
         <span class="activity-target log-category"></span>
 
-        <span class="log-badges">
+        <span class="log-badges flex">
           <span class="integration-status log-status"></span>
           <span class="integration-status status-badge admin log-type"></span>
         </span>

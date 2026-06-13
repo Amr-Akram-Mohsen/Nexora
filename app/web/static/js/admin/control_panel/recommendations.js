@@ -6,30 +6,31 @@
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────
-  let currentPage = 1;
-  let totalPages  = 1;
-  let perPage     = 25;
-  let searchDebounce = null;
+  let listController;
+  let loadedMatches = [];
 
-  // ── Stats Row ───────────────────────────
   function loadStats() {
     fetch('/admin/recommendations/stats')
       .then(r => r.json())
       .then(data => {
         const container = document.getElementById('rec-stats-row');
         container.className = 'dashboard-stats-grid';
-        container.innerHTML = [
+        container.innerHTML = '';
+
+        const template = document.getElementById('rec-stat-card-template');
+        const stats = [
           { icon: '🔗', label: 'Total Matches',     value: data.total_matches   },
           { icon: '📰', label: 'Linked Contents',   value: data.linked_contents },
           { icon: '🛍️', label: 'Linked Products',  value: data.linked_items    },
-        ].map(c => `
-          <div class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">${c.icon}</div>
-            <h3 class="dashboard-stat-value">${(c.value || 0).toLocaleString()}</h3>
-            <p class="dashboard-stat-label">${c.label}</p>
-          </div>
-        `).join('');
+        ];
+
+        stats.forEach(c => {
+          const clone = template.content.cloneNode(true);
+          clone.querySelector('.dashboard-stat-icon').textContent = c.icon;
+          clone.querySelector('.dashboard-stat-value').textContent = (c.value || 0).toLocaleString();
+          clone.querySelector('.dashboard-stat-label').textContent = c.label;
+          container.appendChild(clone);
+        });
       })
       .catch(() => {
         document.getElementById('rec-stats-row').innerHTML =
@@ -37,81 +38,28 @@
       });
   }
 
-  // ── Load Matches ────────────────────────
-  function loadMatches(page) {
-    currentPage = page || 1;
-    const search = (document.getElementById('rec-search') || {}).value || '';
-    const params = new URLSearchParams({ page: currentPage, per_page: perPage });
-    if (search) params.set('search', search);
+  function renderRecRow(m) {
+    const template = document.getElementById('rec-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-    const tbody = document.getElementById('recs-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(7, "Loading matches…", "loading-height-lg");
+    clone.querySelector('.rec-content-title').textContent = m.content_title;
+    clone.querySelector('.rec-content-id').textContent = `#${m.content_id}`;
+    clone.querySelector('.rec-content-type').textContent = m.content_type || '—';
+    clone.querySelector('.rec-content-views').textContent = (m.content_views || 0).toLocaleString();
+    clone.querySelector('.rec-item-name').textContent = m.item_name;
+    clone.querySelector('.rec-item-id').textContent = `#${m.item_id}`;
+    clone.querySelector('.rec-item-type').textContent = m.item_type || '—';
+    clone.querySelector('.rec-item-clicks').textContent = (m.item_clicks || 0).toLocaleString();
 
-    fetch(`/admin/recommendations/matches?${params}`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(data => renderMatches(data))
-      .catch(() => {
-        tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load matches.");
-      });
+    const inspectBtn = clone.querySelector('.inspect-btn');
+    inspectBtn.dataset.contentId = m.content_id;
+    inspectBtn.dataset.itemId = m.item_id;
+
+    return tr;
   }
 
-  function renderMatches(data) {
-    const items = data.items || [];
-    totalPages = data.pages || 1;
-    const total = data.total || 0;
-    const from  = ((currentPage - 1) * perPage) + 1;
-    const to    = Math.min(currentPage * perPage, total);
-    const tbody = document.getElementById('recs-table-body');
-
-    document.getElementById('rec-count').textContent = total.toLocaleString();
-    document.getElementById('rec-pagination-info').textContent =
-      `Showing ${total ? from : 0} to ${to} of ${total.toLocaleString()} matches`;
-    document.getElementById('rec-page-indicator').textContent =
-      `Page ${currentPage} of ${totalPages}`;
-    document.getElementById('rec-prev-btn').disabled = currentPage <= 1;
-    document.getElementById('rec-next-btn').disabled = currentPage >= totalPages;
-
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(7, "No content-product matches found.", "Run the article-item matcher to generate associations.", "loading-height-md", "🔗");
-      return;
-    }
-
-    tbody.innerHTML = '';
-    items.forEach(m => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>
-          <span class="user-cell-name">${escapeHtml(m.content_title)}</span>
-          <div class="user-cell-email">#${m.content_id}</div>
-        </td>
-        <td>
-          <span class="status-badge user text-capitalize">${m.content_type || '—'}</span>
-        </td>
-        <td>${(m.content_views || 0).toLocaleString()}</td>
-        <td>
-          <span class="user-cell-name">${escapeHtml(m.item_name)}</span>
-          <div class="user-cell-email">#${m.item_id}</div>
-        </td>
-        <td>
-          <span class="status-badge user text-capitalize">${m.item_type || '—'}</span>
-        </td>
-        <td>${(m.item_clicks || 0).toLocaleString()}</td>
-        <td>
-          <button class="user-action-btn user-action-delete"
-            data-action="unlink-match"
-            data-content-id="${m.content_id}"
-            data-item-id="${m.item_id}"
-            title="Remove this association">
-            🔓 Unlink
-          </button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // ── Unlink ──────────────────────────────
-  function unlinkMatch(contentId, itemId, btn) {
+  function unlinkMatch(contentId, itemId, btn, modal) {
     showModal(
       'Remove Association',
       `Remove the link between this content and product? The association can be re-created by running the matcher.`,
@@ -122,8 +70,9 @@
           .then(d => {
             if (d.success) {
               showToast('Association removed.', 'success');
-              loadMatches(currentPage);
+              listController.load(listController.currentPage);
               loadStats();
+              if (modal) modal.classList.remove("active");
             } else {
               showToast(d.error || 'Unlink failed.', 'error');
               if (btn) btn.disabled = false;
@@ -134,55 +83,97 @@
     );
   }
 
-  // ── Utilities ────────────────────────────
-  // Exposes global escapeHtml from core.js
+  function showInspectModal(match) {
+    const modal = document.getElementById("inspect-rec-modal");
+    const body = document.getElementById("inspect-rec-modal-body");
+    const titleEl = document.getElementById("inspect-rec-modal-title");
 
-  // ── Init ─────────────────────────────────
-  function init() {
+    titleEl.textContent = "Recommendation Association Detail";
+
+    const template = document.getElementById("rec-inspect-template");
+    const clone = template.content.cloneNode(true);
+
+    clone.querySelector(".inspect-content-id").textContent = `#${match.content_id}`;
+    clone.querySelector(".inspect-content-title").textContent = match.content_title;
+    clone.querySelector(".inspect-content-type").textContent = match.content_type || "—";
+    clone.querySelector(".inspect-content-views").textContent = (match.content_views || 0).toLocaleString();
+
+    clone.querySelector(".inspect-item-id").textContent = `#${match.item_id}`;
+    clone.querySelector(".inspect-item-name").textContent = match.item_name;
+    clone.querySelector(".inspect-item-type").textContent = match.item_type || "—";
+    clone.querySelector(".inspect-item-clicks").textContent = (match.item_clicks || 0).toLocaleString();
+
+    // Bind action button inside inspect modal
+    const unlinkBtn = clone.querySelector(".inspect-unlink-btn");
+    if (unlinkBtn) {
+      unlinkBtn.addEventListener("click", () => {
+        unlinkMatch(match.content_id, match.item_id, unlinkBtn, modal);
+      });
+    }
+
+    body.innerHTML = "";
+    body.appendChild(clone);
+    modal.classList.add("active");
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
     loadStats();
-    loadMatches(1);
 
-    // Search
-    document.getElementById('rec-search').addEventListener('input', () => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => loadMatches(1), 400);
+    listController = new AdminListController({
+      domain: 'rec',
+      endpoint: '/admin/recommendations/matches',
+      tbodyId: 'recs-table-body',
+      searchId: 'rec-search',
+      filterIds: [],
+      perPageId: 'rec-per-page',
+      prevBtnId: 'rec-prev-btn',
+      nextBtnId: 'rec-next-btn',
+      indicatorId: 'rec-page-indicator',
+      infoId: 'rec-pagination-info',
+      countId: 'rec-count',
+      clearBtnId: 'clear-rec-filters-btn',
+      refreshBtnId: 'refresh-recs-btn',
+      rowTemplateId: 'rec-row-template',
+      defaultPerPage: 25,
+      colspan: 5,
+      itemsKey: 'items',
+      renderRow: renderRecRow,
+      onLoaded: (data) => {
+        loadedMatches = data.items || [];
+      },
+      autoInit: false
     });
+    listController.init();
 
-    // Filters clear
-    document.getElementById('clear-rec-filters-btn').addEventListener('click', () => {
-      document.getElementById('rec-search').value = '';
-      loadMatches(1);
-    });
-
-    // Per-page
-    document.getElementById('rec-per-page').addEventListener('change', e => {
-      perPage = parseInt(e.target.value, 10);
-      loadMatches(1);
-    });
-
-    // Pagination
-    document.getElementById('rec-prev-btn').addEventListener('click', () => {
-      if (currentPage > 1) loadMatches(currentPage - 1);
-    });
-    document.getElementById('rec-next-btn').addEventListener('click', () => {
-      if (currentPage < totalPages) loadMatches(currentPage + 1);
-    });
-
-    // Refresh
-    document.getElementById('refresh-recs-btn').addEventListener('click', () => {
-      loadStats();
-      loadMatches(currentPage);
-    });
-
-    // Table delegation
+    // Delegate inspect action
     document.getElementById('recs-table-body').addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
-      if (btn.dataset.action === 'unlink-match') {
-        unlinkMatch(btn.dataset.contentId, btn.dataset.itemId, btn);
+      if (btn.dataset.action === 'inspect-rec') {
+        const contentId = parseInt(btn.dataset.contentId, 10);
+        const itemId = parseInt(btn.dataset.itemId, 10);
+        const match = loadedMatches.find(m => m.content_id === contentId && m.item_id === itemId);
+        if (match) {
+          showInspectModal(match);
+        }
       }
     });
-  }
 
-  document.addEventListener('DOMContentLoaded', init);
+    // Close inspect rec modal overlay
+    const inspectCloseBtn = document.getElementById("inspect-rec-close-btn");
+    if (inspectCloseBtn) {
+      inspectCloseBtn.addEventListener("click", () => {
+        document.getElementById("inspect-rec-modal").classList.remove("active");
+      });
+    }
+
+    const inspectModalOverlay = document.getElementById("inspect-rec-modal");
+    if (inspectModalOverlay) {
+      inspectModalOverlay.addEventListener("click", (e) => {
+        if (e.target === inspectModalOverlay) {
+          inspectModalOverlay.classList.remove("active");
+        }
+      });
+    }
+  });
 })();

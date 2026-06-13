@@ -6,10 +6,13 @@
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────
-  let commentsPage = 1, commentsTotalPages = 1, commentsPerPage = 25;
-  let reactionsPage = 1, reactionsTotalPages = 1;
-  let commentDebounce = null;
+  let commentsController;
+  let reactionsController;
+  let viewsController;
+  let clicksController;
+  let savesController;
+
+  let loadedComments = [];
 
   // ── Tab switching ───────────────────────
   function switchTab(tabName) {
@@ -26,7 +29,15 @@
 
     if (btn.dataset.tab === 'reactions') {
       loadInteractionBreakdown();
-      loadReactions(1);
+      reactionsController.load(1);
+    } else if (btn.dataset.tab === 'comments') {
+      commentsController.load(1);
+    } else if (btn.dataset.tab === 'views') {
+      viewsController.load(1);
+    } else if (btn.dataset.tab === 'clicks') {
+      clicksController.load(1);
+    } else if (btn.dataset.tab === 'saves') {
+      savesController.load(1);
     }
   }
 
@@ -44,6 +55,10 @@
       .then(r => r.json())
       .then(data => {
         const container = document.getElementById('interactions-stats-row');
+        container.innerHTML = '';
+        container.className = 'dashboard-stats-grid';
+
+        const template = document.getElementById('interactions-stat-card-template');
         const cards = [
           { icon: '💬', label: 'Comments',  value: data.comments },
           { icon: '👍', label: 'Likes',     value: data.likes },
@@ -52,14 +67,14 @@
           { icon: '🔖', label: 'Saves',     value: data.saves },
           { icon: '🛒', label: 'Clicks',    value: data.item_clicks },
         ];
-        container.className = 'dashboard-stats-grid';
-        container.innerHTML = cards.map(c => `
-          <div class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">${c.icon}</div>
-            <h3 class="dashboard-stat-value">${(c.value || 0).toLocaleString()}</h3>
-            <p class="dashboard-stat-label">${c.label}</p>
-          </div>
-        `).join('');
+
+        cards.forEach(c => {
+          const clone = template.content.cloneNode(true);
+          clone.querySelector('.dashboard-stat-icon').textContent = c.icon;
+          clone.querySelector('.dashboard-stat-value').textContent = (c.value || 0).toLocaleString();
+          clone.querySelector('.dashboard-stat-label').textContent = c.label;
+          container.appendChild(clone);
+        });
       })
       .catch(() => {
         document.getElementById('interactions-stats-row').innerHTML =
@@ -67,196 +82,252 @@
       });
   }
 
-  // ── Interaction Breakdown (reactions tab) ─
   function loadInteractionBreakdown() {
-    renderInteractionBreakdown('moderation-interactions-breakdown');
+    if (typeof renderInteractionBreakdown === 'function') {
+      renderInteractionBreakdown('moderation-interactions-breakdown');
+    }
   }
 
-  // ── COMMENTS ────────────────────────────
-  function getCommentFilters() {
-    return {
-      sentiment:   document.getElementById('filter-comment-sentiment').value,
-      target_type: document.getElementById('filter-comment-target').value,
-      search:      document.getElementById('comment-search').value,
-    };
-  }
+  // ── COMMENTS RENDER ──────────────────────
+  function renderCommentRow(c) {
+    const template = document.getElementById('comments-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
 
-  function loadComments(page) {
-    commentsPage = page || 1;
-    const filters = getCommentFilters();
-    const params = new URLSearchParams({ page: commentsPage, per_page: commentsPerPage });
-    Object.entries(filters).forEach(([k, v]) => { if (v) params.set(k, v); });
+    const previewEl = clone.querySelector('.comment-cell-preview');
+    previewEl.textContent = c.preview;
+    previewEl.title = c.content;
 
-    const tbody = document.getElementById('comments-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(7, "Loading…", "loading-height-md");
-
-    fetch(`/admin/interactions/comments?${params}`)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(data => renderComments(data))
-      .catch(() => {
-        tbody.innerHTML = getTableErrorStateHtml(7, "Failed to load comments.");
-      });
-  }
-
-  function renderComments(data) {
-    const items = data.items || [];
-    commentsTotalPages = data.pages || 1;
-    const total = data.total || 0;
-    const from  = ((commentsPage - 1) * commentsPerPage) + 1;
-    const to    = Math.min(commentsPage * commentsPerPage, total);
-    const tbody = document.getElementById('comments-table-body');
-
-    document.getElementById('comments-count').textContent = total.toLocaleString();
-    document.getElementById('comments-pagination-info').textContent =
-      `Showing ${total ? from : 0} to ${to} of ${total.toLocaleString()} comments`;
-    document.getElementById('comments-page-indicator').textContent =
-      `Page ${commentsPage} of ${commentsTotalPages}`;
-    document.getElementById('comments-prev-btn').disabled = commentsPage <= 1;
-    document.getElementById('comments-next-btn').disabled = commentsPage >= commentsTotalPages;
-
-    if (!items.length) {
-      tbody.innerHTML = getTableEmptyStateHtml(7, "No comments found.", "Try adjusting filters.", "loading-height-md");
-      return;
+    const replyEl = clone.querySelector('.comment-cell-reply');
+    if (!c.parent_id) {
+      replyEl.remove();
     }
 
-    const sentimentClass = { positive: 'active', negative: 'inactive', neutral: 'user', spam: 'admin' };
+    clone.querySelector('.comment-cell-username').textContent = c.user_name;
+    clone.querySelector('.comment-cell-userid').textContent = `#${c.user_id}`;
+    clone.querySelector('.comment-cell-target').textContent = c.target_title;
 
-    tbody.innerHTML = '';
-    items.forEach(c => {
-      const tr = document.createElement('tr');
-      const sentClass = sentimentClass[c.sentiment] || 'user';
-      tr.innerHTML = `
-        <td><span class="user-cell-name">#${c.id}</span></td>
-        <td>
-          <span class="user-cell-name" title="${escapeHtml(c.content)}">${escapeHtml(c.preview)}</span>
-          ${c.parent_id ? '<div class="user-cell-email">↩ Reply</div>' : ''}
-        </td>
-        <td>
-          <span class="user-cell-name">${escapeHtml(c.user_name)}</span>
-          <div class="user-cell-email">#${c.user_id}</div>
-        </td>
-        <td>
-          <span class="user-cell-name">${escapeHtml(c.target_title)}</span>
-          <div class="user-cell-email">${c.target_type}</div>
-        </td>
-        <td>
-          <span class="status-badge ${sentClass}">${c.sentiment}</span>
-        </td>
-        <td><span class="user-cell-email">${formatDate(c.created_at)}</span></td>
-        <td>
-          <div class="user-actions-group">
-            <button class="user-action-btn user-action-delete"
-              data-action="delete-comment"
-              data-comment-id="${c.id}">🗑</button>
-            <button class="user-action-btn"
-              data-action="flag-comment"
-              data-comment-id="${c.id}">🚩 Flag</button>
-          </div>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
+    const targetTypeEl = clone.querySelector('.comment-cell-targettype');
+    targetTypeEl.textContent = c.target_type;
+    targetTypeEl.classList.add(c.target_type === 'content' ? 'badge-blue' : 'badge-purple');
+
+    const sentimentEl = clone.querySelector('.comment-cell-sentiment');
+    sentimentEl.textContent = c.sentiment;
+    const sentimentClass = { positive: 'active', negative: 'inactive', neutral: 'user', spam: 'admin' };
+    sentimentEl.classList.add(sentimentClass[c.sentiment] || 'user');
+
+    clone.querySelector('.comment-cell-date').textContent = formatDate(c.created_at);
+
+    // Buttons dataset
+    const inspectBtn = clone.querySelector('.inspect-btn');
+    inspectBtn.dataset.commentId = c.id;
+
+    return tr;
   }
 
-  function deleteComment(id, btn) {
+  function deleteComment(id, btn, modal) {
     showModal(
       'Delete Comment',
       'Are you sure you want to permanently delete this comment and all its replies?',
       () => {
-        if (btn) { btn.disabled = true; }
+        if (btn) btn.disabled = true;
         fetch(`/admin/interactions/comments/${id}`, { method: 'DELETE' })
           .then(r => r.json())
           .then(d => {
-            if (d.success) { showToast('Comment deleted.', 'success'); loadComments(commentsPage); }
-            else { showToast(d.error || 'Delete failed.', 'error'); if (btn) btn.disabled = false; }
+            if (d.success) {
+              showToast('Comment deleted.', 'success');
+              commentsController.load(commentsController.currentPage);
+              loadStatsRow();
+              if (modal) modal.classList.remove("active");
+            } else {
+              showToast(d.error || 'Delete failed.', 'error');
+              if (btn) btn.disabled = false;
+            }
           })
           .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
       }
     );
   }
 
-  function flagComment(id, btn) {
+  function flagComment(id, btn, modal) {
     if (btn) btn.disabled = true;
     fetch(`/admin/interactions/comments/${id}/flag`, { method: 'POST' })
       .then(r => r.json())
       .then(d => {
-        if (d.success) { showToast('Comment flagged as spam.', 'success'); loadComments(commentsPage); }
-        else { showToast(d.error || 'Flag failed.', 'error'); if (btn) btn.disabled = false; }
+        if (d.success) {
+          showToast('Comment flagged as spam.', 'success');
+          commentsController.load(commentsController.currentPage);
+          if (modal) modal.classList.remove("active");
+        } else {
+          showToast(d.error || 'Flag failed.', 'error');
+          if (btn) btn.disabled = false;
+        }
       })
       .catch(() => { showToast('Flag failed.', 'error'); if (btn) btn.disabled = false; });
   }
 
-  // ── REACTIONS ────────────────────────────
-  function loadReactions(page) {
-    reactionsPage = page || 1;
-    const type = document.getElementById('filter-reaction-type').value;
-    const params = new URLSearchParams({ page: reactionsPage, per_page: 25 });
-    if (type) params.set('type', type);
+  function showInspectModal(comment) {
+    const modal = document.getElementById("inspect-comment-modal");
+    const body = document.getElementById("inspect-comment-modal-body");
+    const titleEl = document.getElementById("inspect-comment-modal-title");
 
-    const tbody = document.getElementById('reactions-table-body');
-    tbody.innerHTML = getTableSpinnerHtml(6, "Loading…", "loading-height-md");
+    titleEl.textContent = `Inspect Comment`;
 
-    fetch(`/admin/interactions/reactions?${params}`)
-      .then(r => r.json())
-      .then(data => {
-        const items = data.items || [];
-        reactionsTotalPages = data.pages || 1;
-        const total = data.total || 0;
-        const from  = ((reactionsPage - 1) * 25) + 1;
-        const to    = Math.min(reactionsPage * 25, total);
+    const template = document.getElementById("comment-inspect-template");
+    const clone = template.content.cloneNode(true);
 
-        document.getElementById('reactions-pagination-info').textContent =
-          `Showing ${total ? from : 0} to ${to} of ${total.toLocaleString()} reactions`;
-        document.getElementById('reactions-page-indicator').textContent =
-          `Page ${reactionsPage} of ${reactionsTotalPages}`;
-        document.getElementById('reactions-prev-btn').disabled = reactionsPage <= 1;
-        document.getElementById('reactions-next-btn').disabled = reactionsPage >= reactionsTotalPages;
+    clone.querySelector(".inspect-id").textContent = `#${comment.id}`;
+    clone.querySelector(".inspect-username").textContent = comment.user_name || "—";
+    clone.querySelector(".inspect-useremail").textContent = comment.user_email || "—";
+    clone.querySelector(".inspect-userid").textContent = comment.user_id || "—";
+    clone.querySelector(".inspect-target-title").textContent = comment.target_title || "—";
 
-        if (!items.length) {
-          tbody.innerHTML = getTableEmptyStateHtml(6, "No reactions found.", "", "loading-height-md");
-          return;
-        }
+    const targetTypeBadge = clone.querySelector(".inspect-target-type");
+    targetTypeBadge.textContent = comment.target_type;
+    targetTypeBadge.className = `inspect-target-type status-badge ${comment.target_type === 'content' ? 'badge-blue' : 'badge-purple'}`;
 
-        tbody.innerHTML = '';
-        items.forEach(r => {
-          const tr = document.createElement('tr');
-          const typeClass = r.type === 'like' ? 'active' : 'inactive';
-          tr.innerHTML = `
-            <td><span class="user-cell-name">#${r.id}</span></td>
-            <td>
-              <span class="user-cell-name">${escapeHtml(r.user_name)}</span>
-              <div class="user-cell-email">#${r.user_id}</div>
-            </td>
-            <td><span class="status-badge ${typeClass}">${r.type}</span></td>
-            <td>${r.target_type}</td>
-            <td>#${r.target_id}</td>
-            <td><span class="user-cell-email">${formatDate(r.created_at)}</span></td>
-          `;
-          tbody.appendChild(tr);
+    clone.querySelector(".inspect-date").textContent = formatDate(comment.created_at);
+
+    const sentimentBadge = clone.querySelector(".inspect-sentiment");
+    sentimentBadge.textContent = comment.sentiment;
+    const sentimentClass = { positive: 'active', negative: 'inactive', neutral: 'user', spam: 'admin' };
+    sentimentBadge.className = `inspect-sentiment status-badge ${sentimentClass[comment.sentiment] || 'user'}`;
+
+    // Comment text
+    clone.querySelector(".inspect-comment-body-text").textContent = comment.content;
+
+    // Bind action buttons inside inspect modal
+    const flagBtn = clone.querySelector(".inspect-flag-btn");
+    if (flagBtn) {
+      if (comment.sentiment === 'spam') {
+        flagBtn.disabled = true;
+        flagBtn.textContent = 'Already Flagged';
+      } else {
+        flagBtn.addEventListener("click", () => {
+          flagComment(comment.id, flagBtn, modal);
         });
-      })
-      .catch(() => {
-        tbody.innerHTML = getTableErrorStateHtml(6, "Failed to load reactions.");
+      }
+    }
+
+    const deleteBtn = clone.querySelector(".inspect-delete-btn");
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", () => {
+        deleteComment(comment.id, deleteBtn, modal);
       });
+    }
+
+    body.innerHTML = "";
+    body.appendChild(clone);
+    modal.classList.add("active");
   }
 
-  // ── Utilities ────────────────────────────
-  // Exposes global escapeHtml and formatDate from core.js
+  // ── REACTIONS RENDER ─────────────────────
+  function renderReactionRow(r) {
+    const template = document.getElementById('reactions-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
+
+    clone.querySelector('.reaction-cell-id').textContent = `#${r.id}`;
+    clone.querySelector('.reaction-cell-target').textContent = r.target_title;
+    
+    const targetTypeEl = clone.querySelector('.reaction-cell-targettype');
+    targetTypeEl.textContent = r.target_type;
+    targetTypeEl.classList.add(r.target_type === 'content' ? 'badge-blue' : r.target_type === 'item' ? 'badge-purple' : 'badge-green');
+
+    const typeEl = clone.querySelector('.reaction-cell-type');
+    typeEl.textContent = r.type;
+    typeEl.classList.add(r.type === 'like' ? 'active' : 'inactive');
+
+    clone.querySelector('.reaction-cell-username').textContent = r.user_name;
+    clone.querySelector('.reaction-cell-useremail').textContent = r.user_email ? `#${r.user_id} • ${r.user_email}` : `#${r.user_id}`;
+    clone.querySelector('.reaction-cell-date').textContent = formatDate(r.created_at);
+
+    return tr;
+  }
+
+  function renderViewRow(v) {
+    const template = document.getElementById('views-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
+
+    clone.querySelector('.views-cell-target').textContent = v.target_title;
+    
+    const typeEl = clone.querySelector('.views-cell-targettype');
+    typeEl.textContent = v.target_type;
+    typeEl.classList.add(v.target_type === 'content' ? 'badge-blue' : 'badge-purple');
+
+    clone.querySelector('.views-cell-count').textContent = v.view_count.toLocaleString();
+    clone.querySelector('.views-cell-date').textContent = formatDate(v.created_at);
+
+    return tr;
+  }
+
+  // Clicks and Saves use manual compound queries, so we display their counts
+  function renderClickRow(c) {
+    const template = document.getElementById('clicks-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
+
+    clone.querySelector('.clicks-cell-item').textContent = c.item_name;
+    
+    const destEl = clone.querySelector('.clicks-cell-destination');
+    destEl.textContent = c.store_name;
+    destEl.href = c.affiliate_url;
+
+    clone.querySelector('.clicks-cell-count').textContent = c.click_count.toLocaleString();
+    clone.querySelector('.clicks-cell-date').textContent = formatDate(c.created_at);
+
+    return tr;
+  }
+
+  function renderSaveRow(s) {
+    const template = document.getElementById('saves-row-template');
+    const clone = template.content.cloneNode(true);
+    const tr = clone.querySelector('tr');
+
+    clone.querySelector('.saves-cell-target').textContent = s.target_title;
+    
+    const typeEl = clone.querySelector('.saves-cell-targettype');
+    typeEl.textContent = s.target_type;
+    typeEl.classList.add(s.target_type === 'content' ? 'badge-blue' : 'badge-purple');
+
+    clone.querySelector('.saves-cell-username').textContent = s.user_name;
+    clone.querySelector('.saves-cell-useremail').textContent = s.user_email ? `#${s.user_id} • ${s.user_email}` : `#${s.user_id}`;
+    clone.querySelector('.saves-cell-date').textContent = formatDate(s.created_at);
+
+    return tr;
+  }
 
   function applyUrlFilters() {
     if (typeof getUrlQueryParams !== "function") return;
     const params = getUrlQueryParams();
     
-    // Switch to active tab if specified
-    if (params.tab) {
-      switchTab(params.tab);
-    }
+    const activeTab = params.tab || 'comments';
     
     const filterMap = {
-      search: "comment-search",
       sentiment: "filter-comment-sentiment",
-      target_type: "filter-comment-target"
+      target_type: "filter-comment-target",
+      reactions_type: "filter-reaction-type",
+      reactions_user: "filter-reactions-user",
+      views_start_date: "filter-views-start-date",
+      views_end_date: "filter-views-end-date",
+      clicks_destination: "filter-clicks-destination",
+      saves_user: "filter-saves-user"
     };
+
+    // Map generic 'search' query param to active tab search input
+    if (params.search !== undefined) {
+      let searchInputId = 'comment-search';
+      if (activeTab === 'reactions') searchInputId = 'reactions-search';
+      else if (activeTab === 'views') searchInputId = 'views-search';
+      else if (activeTab === 'clicks') searchInputId = 'clicks-search';
+      else if (activeTab === 'saves') searchInputId = 'saves-search';
+      
+      const searchEl = document.getElementById(searchInputId);
+      if (searchEl) {
+        searchEl.value = params.search;
+      }
+    }
 
     for (const [paramKey, elementId] of Object.entries(filterMap)) {
       if (params[paramKey] !== undefined) {
@@ -270,58 +341,158 @@
 
   // ── Init ─────────────────────────────────
   function init() {
+    commentsController = new AdminListController({
+      domain: 'comments',
+      endpoint: '/admin/interactions/comments',
+      tbodyId: 'comments-table-body',
+      searchId: 'comment-search',
+      filterIds: ['filter-comment-sentiment', 'filter-comment-target'],
+      perPageId: 'comments-per-page',
+      prevBtnId: 'comments-prev-btn',
+      nextBtnId: 'comments-next-btn',
+      indicatorId: 'comments-page-indicator',
+      infoId: 'comments-pagination-info',
+      countId: 'comments-count',
+      clearBtnId: 'clear-comment-filters-btn',
+      rowTemplateId: 'comments-row-template',
+      defaultPerPage: 25,
+      colspan: 6,
+      itemsKey: 'items',
+      renderRow: renderCommentRow,
+      onLoaded: (data) => {
+        loadedComments = data.items || [];
+      },
+      autoInit: false
+    });
+
+    reactionsController = new AdminListController({
+      domain: 'reactions',
+      endpoint: '/admin/interactions/reactions',
+      tbodyId: 'reactions-table-body',
+      searchId: 'reactions-search',
+      filterIds: ['filter-reaction-type', 'filter-reactions-user'],
+      perPageId: 'reactions-per-page',
+      prevBtnId: 'reactions-prev-btn',
+      nextBtnId: 'reactions-next-btn',
+      indicatorId: 'reactions-page-indicator',
+      infoId: 'reactions-pagination-info',
+      countId: 'reactions-count',
+      clearBtnId: 'clear-reactions-filters-btn',
+      rowTemplateId: 'reactions-row-template',
+      defaultPerPage: 25,
+      colspan: 5,
+      itemsKey: 'items',
+      renderRow: renderReactionRow,
+      autoInit: false
+    });
+
+    viewsController = new AdminListController({
+      domain: 'views',
+      endpoint: '/admin/interactions/views',
+      tbodyId: 'views-table-body',
+      searchId: 'views-search',
+      filterIds: ['filter-views-start-date', 'filter-views-end-date'],
+      perPageId: 'views-per-page',
+      prevBtnId: 'views-prev-btn',
+      nextBtnId: 'views-next-btn',
+      indicatorId: 'views-page-indicator',
+      infoId: 'views-pagination-info',
+      countId: 'views-count',
+      clearBtnId: 'clear-views-filters-btn',
+      rowTemplateId: 'views-row-template',
+      defaultPerPage: 25,
+      colspan: 4,
+      itemsKey: 'items',
+      renderRow: renderViewRow,
+      autoInit: false
+    });
+
+    clicksController = new AdminListController({
+      domain: 'clicks',
+      endpoint: '/admin/interactions/clicks',
+      tbodyId: 'clicks-table-body',
+      searchId: 'clicks-search',
+      filterIds: ['filter-clicks-destination'],
+      perPageId: 'clicks-per-page',
+      prevBtnId: 'clicks-prev-btn',
+      nextBtnId: 'clicks-next-btn',
+      indicatorId: 'clicks-page-indicator',
+      infoId: 'clicks-pagination-info',
+      countId: 'clicks-count',
+      clearBtnId: 'clear-clicks-filters-btn',
+      rowTemplateId: 'clicks-row-template',
+      defaultPerPage: 25,
+      colspan: 4,
+      itemsKey: 'items',
+      renderRow: renderClickRow,
+      autoInit: false
+    });
+
+    savesController = new AdminListController({
+      domain: 'saves',
+      endpoint: '/admin/interactions/saves',
+      tbodyId: 'saves-table-body',
+      searchId: 'saves-search',
+      filterIds: ['filter-saves-user'],
+      perPageId: 'saves-per-page',
+      prevBtnId: 'saves-prev-btn',
+      nextBtnId: 'saves-next-btn',
+      indicatorId: 'saves-page-indicator',
+      infoId: 'saves-pagination-info',
+      countId: 'saves-count',
+      clearBtnId: 'clear-saves-filters-btn',
+      rowTemplateId: 'saves-row-template',
+      defaultPerPage: 25,
+      colspan: 4,
+      itemsKey: 'items',
+      renderRow: renderSaveRow,
+      autoInit: false
+    });
+
     initTabs();
     loadStatsRow();
     applyUrlFilters();
 
+    // Bind events for all controllers
+    commentsController.bindEvents();
+    reactionsController.bindEvents();
+    viewsController.bindEvents();
+    clicksController.bindEvents();
+    savesController.bindEvents();
+
     const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
-    if (params.tab !== 'reactions') {
-      loadComments(1);
-    }
+    const activeTab = params.tab || 'comments';
+    switchTab(activeTab);
 
-    // Comment filters
-    document.getElementById('comment-search').addEventListener('input', () => {
-      clearTimeout(commentDebounce);
-      commentDebounce = setTimeout(() => loadComments(1), 400);
-    });
-    ['filter-comment-sentiment', 'filter-comment-target'].forEach(id => {
-      document.getElementById(id).addEventListener('change', () => loadComments(1));
-    });
-    document.getElementById('clear-comment-filters-btn').addEventListener('click', () => {
-      document.getElementById('comment-search').value = '';
-      document.getElementById('filter-comment-sentiment').value = '';
-      document.getElementById('filter-comment-target').value = '';
-      loadComments(1);
-    });
-
-    // Comment pagination
-    document.getElementById('comments-per-page').addEventListener('change', e => {
-      commentsPerPage = parseInt(e.target.value, 10);
-      loadComments(1);
-    });
-    document.getElementById('comments-prev-btn').addEventListener('click', () => {
-      if (commentsPage > 1) loadComments(commentsPage - 1);
-    });
-    document.getElementById('comments-next-btn').addEventListener('click', () => {
-      if (commentsPage < commentsTotalPages) loadComments(commentsPage + 1);
-    });
-
-    // Comments table delegation
+    // Comments table click delegation
     document.getElementById('comments-table-body').addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
-      if (btn.dataset.action === 'delete-comment') deleteComment(btn.dataset.commentId, btn);
-      if (btn.dataset.action === 'flag-comment') flagComment(btn.dataset.commentId, btn);
+      if (btn.dataset.action === 'inspect-comment') {
+        const commentId = parseInt(btn.dataset.commentId, 10);
+        const comment = loadedComments.find(c => c.id === commentId);
+        if (comment) {
+          showInspectModal(comment);
+        }
+      }
     });
 
-    // Reactions filter
-    document.getElementById('filter-reaction-type').addEventListener('change', () => loadReactions(1));
-    document.getElementById('reactions-prev-btn').addEventListener('click', () => {
-      if (reactionsPage > 1) loadReactions(reactionsPage - 1);
-    });
-    document.getElementById('reactions-next-btn').addEventListener('click', () => {
-      if (reactionsPage < reactionsTotalPages) loadReactions(reactionsPage + 1);
-    });
+    // Close inspect comment modal overlay
+    const inspectCloseBtn = document.getElementById("inspect-comment-close-btn");
+    if (inspectCloseBtn) {
+      inspectCloseBtn.addEventListener("click", () => {
+        document.getElementById("inspect-comment-modal").classList.remove("active");
+      });
+    }
+
+    const inspectModalOverlay = document.getElementById("inspect-comment-modal");
+    if (inspectModalOverlay) {
+      inspectModalOverlay.addEventListener("click", (e) => {
+        if (e.target === inspectModalOverlay) {
+          inspectModalOverlay.classList.remove("active");
+        }
+      });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);
