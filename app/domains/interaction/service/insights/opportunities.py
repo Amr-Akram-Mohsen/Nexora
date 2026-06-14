@@ -1187,3 +1187,50 @@ def get_content_coverage_matrix():
     gap_priority = {"High Gap": 3, "Medium Gap": 2, "Low Gap": 1}
     results.sort(key=lambda x: (gap_priority.get(x["gap_score"], 0), x["demand_score"]), reverse=True)
     return results
+
+
+def get_entity_momentum(name: str, entity_type: str) -> float:
+    """
+    Returns the percentage change in engagement over the last 7 days vs prior 7 days
+    for a given Category or Brand name.
+    """
+    try:
+        if entity_type.lower() == "category":
+            trends = get_trending_categories_data()
+        else:
+            trends = get_trending_brands_data()
+        for t in trends:
+            if t["name"].lower() == name.lower():
+                return float(t["pct_change"])
+    except Exception:
+        pass
+    return 0.0
+
+
+def get_content_decay(content_id: int) -> float:
+    """
+    Calculates the content decay rate (percentage traffic drop in views
+    over the past 30 days compared to the preceding 30 days).
+    Returns a decay factor (percentage drop, e.g. 25.0).
+    """
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    start_a = now - timedelta(days=30)
+    start_b = now - timedelta(days=60)
+    
+    try:
+        views_a = db.session.execute(
+            select(func.count(View.id))
+            .where((View.target_id == content_id) & (View.target_type == "content") & (View.created_at >= start_a))
+        ).scalar() or 0
+        
+        views_b = db.session.execute(
+            select(func.count(View.id))
+            .where((View.target_id == content_id) & (View.target_type == "content") & (View.created_at >= start_b) & (View.created_at < start_a))
+        ).scalar() or 0
+        
+        if views_b > 0 and views_a < views_b:
+            return round(((views_b - views_a) / views_b) * 100.0, 1)
+    except Exception:
+        pass
+    return 0.0

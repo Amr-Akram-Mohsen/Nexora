@@ -405,8 +405,9 @@ export function renderTopOpportunities() {
   let html = "";
   items.forEach((item, index) => {
     const typeBadgeClass = item.type === "Category" ? "info" : "purple";
+    const strategyAttr = item.content_strategy ? `data-content-strategy="${encodeURIComponent(JSON.stringify(item.content_strategy))}"` : '';
     html += `
-      <tr>
+      <tr ${strategyAttr}>
         <td><span class="font-bold">${index + 1}</span></td>
         <td><span class="font-bold text-foreground">${item.entity}</span></td>
         <td><span class="status-badge ${typeBadgeClass} font-bold">${item.type}</span></td>
@@ -432,6 +433,9 @@ export function renderActionQueue() {
   items.forEach(item => {
     const card = document.createElement("div");
     card.className = "insights-opp-card";
+    if (item.content_output) {
+      card.setAttribute("data-content-output", encodeURIComponent(JSON.stringify(item.content_output)));
+    }
 
     let priorityBadgeClass = "badge-secondary";
     if (item.priority === "High") priorityBadgeClass = "badge-danger";

@@ -56,12 +56,21 @@ export function renderContentAssetMapping() {
             ? '<span class="status-badge badge-warning font-bold">CREATE (MED)</span>'
             : '<span class="status-badge badge-secondary font-bold">CREATE (LOW)</span>';
             
+        let metaHtml = "";
+        if (gap.reason) {
+          metaHtml += `<div class="asset-mapping-item-meta mt-1"><strong>Reason:</strong> ${gap.reason}</div>`;
+        }
+        if (gap.priority_justification) {
+          metaHtml += `<div class="asset-mapping-item-meta"><strong>Justification:</strong> ${gap.priority_justification}</div>`;
+        }
+
         missingHtml += `
           <li class="asset-mapping-item">
             <div class="asset-mapping-item-header">
               <div class="asset-mapping-item-title">${typeBadge} ${gap.missing_topic}</div>
               <div>${priorityBadge}</div>
             </div>
+            ${metaHtml}
           </li>
         `;
       });

@@ -10,15 +10,136 @@ from app.domains.interaction.service.insights.autonomous_execution import (
 
 ENABLE_LIVE_EXECUTION = False
 
+# ---------------------------------------------------------
+# Reusable Governance Policies
+# ---------------------------------------------------------
+class BaseGovernancePolicy:
+    """Base interface for governance audit/compliance checks."""
+    def evaluate(self, task, context):
+        """Returns tuple (is_valid: bool, error_reason: str or None)"""
+        raise NotImplementedError()
+
+class FrequencyCapPolicy(BaseGovernancePolicy):
+    def evaluate(self, task, context):
+        entity = task["entity"]
+        scheduled_time = context["scheduled_time"]
+        count = context["entity_week_counts"].get((entity, scheduled_time), 0)
+        if count > 1:
+            return False, "Repeated entity publishing: Multiple posts scheduled in the same week."
+        return True, None
+
+class PlatformPacingPolicy(BaseGovernancePolicy):
+    def evaluate(self, task, context):
+        platform = task["platform"]
+        scheduled_time = context["scheduled_time"]
+        count = context["platform_week_counts"].get((platform, scheduled_time), 0)
+        if count > 1:
+            return False, "Conflicting platform schedules: Same platform scheduled multiple times in the same week."
+        return True, None
+
+class GroundingCheckPolicy(BaseGovernancePolicy):
+    def evaluate(self, task, context):
+        content_id = task.get("content_id", "")
+        is_new = (content_id == "new" or content_id == "")
+        if not is_new:
+            asset_match_quality = context["asset_match_map"].get(task["entity"], 0.0)
+            if asset_match_quality < 0.45:
+                return False, "Weak asset match: relevance score is below 0.45."
+        return True, None
+
+class PerformanceHistoryPolicy(BaseGovernancePolicy):
+    def evaluate(self, task, context):
+        entity = task["entity"]
+        entity_memory = context["memory_map"].get(entity)
+        if entity_memory and entity_memory.get("outcome") == "failure":
+            return False, "Unstable CTR history: historical performance indicates failure."
+        return True, None
+
+class MetadataValidationPolicy(BaseGovernancePolicy):
+    def evaluate(self, task, context):
+        if not task.get("content_type") or not task.get("platform"):
+            return False, "Missing metadata: essential task properties are missing."
+        return True, None
+
+# Register active policy checks
+GOVERNANCE_POLICIES = [
+    FrequencyCapPolicy(),
+    PlatformPacingPolicy(),
+    GroundingCheckPolicy(),
+    PerformanceHistoryPolicy(),
+    MetadataValidationPolicy()
+]
+
+# ---------------------------------------------------------
+# Helper Functions
+# ---------------------------------------------------------
+def parse_scheduled_time(reason):
+    """Parses week schedule name from task reasoning strings."""
+    reason_lower = (reason or "").lower()
+    if "week 2" in reason_lower:
+        return "Week 2"
+    elif "backlog" in reason_lower:
+        return "Backlog"
+    return "Week 1"
+
+def classify_governance_risk(risk_reasons):
+    """Classifies consolidated risk tier and computes associated decision penalty."""
+    is_high = any("Repeated entity" in r or "Unstable CTR" in r for r in risk_reasons)
+    is_medium = any("Conflicting platform" in r or "Weak asset" in r for r in risk_reasons)
+    
+    if is_high:
+        return "HIGH", 0.0
+    elif is_medium:
+        return "MEDIUM", 0.5
+    else:
+        return "LOW", 1.0
+
+def calculate_governance_decision_score(opp_score, strategy_confidence, asset_match_quality, performance_history, risk_penalty):
+    """Calculates decision score considering signal strength, confidence, grounding, and risk."""
+    score = (
+        0.35 * opp_score +
+        0.25 * strategy_confidence +
+        0.20 * asset_match_quality +
+        0.10 * performance_history +
+        0.10 * risk_penalty
+    )
+    return round(max(0.0, min(1.0, score)), 2)
+
+def determine_governance_mode(decision_score, risk_reasons):
+    """Decides execution authorization gating category."""
+    has_blocked_trigger = (
+        decision_score < 0.70 or
+        any("Repeated entity" in r for r in risk_reasons) or
+        any("Unstable CTR" in r for r in risk_reasons) or
+        any("Conflicting platform" in r for r in risk_reasons)
+    )
+    
+    if has_blocked_trigger:
+        return "BLOCKED"
+    elif decision_score >= 0.90 and len(risk_reasons) == 0:
+        return "AUTO_EXECUTE"
+    else:
+        return "NEEDS_APPROVAL"
+
+def evaluate_governance_policies(task, context):
+    """Runs registered policies on task and aggregates failed reason descriptors."""
+    risk_reasons = []
+    for policy in GOVERNANCE_POLICIES:
+        passed, reason = policy.evaluate(task, context)
+        if not passed:
+            risk_reasons.append(reason)
+    return risk_reasons
+
+# ---------------------------------------------------------
+# Core Service Functions
+# ---------------------------------------------------------
 def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_data):
     """
     Implements a production-safe control and risk classification layer over
     autonomous execution tasks. Returns safe, approval-pending, and blocked queues.
     """
-    system_mode = "SAFE_MODE"
-    if globals().get("ENABLE_LIVE_EXECUTION", False):
-        system_mode = "LIVE_MODE"
-        
+    system_mode = "LIVE_MODE" if globals().get("ENABLE_LIVE_EXECUTION", False) else "SAFE_MODE"
+    
     all_plan_tasks = []
     for q_name in ["auto_execute", "needs_review", "blocked"]:
         for task in execution_plan.get(q_name, []):
@@ -43,21 +164,16 @@ def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_
     memory_layer = strategy_data.get("memory_layer", [])
     memory_map = {m["entity"]: m for m in memory_layer}
     
+    # Pre-calculate scheduling volume context maps for policies
     entity_week_counts = {}
     platform_week_counts = {}
     for task in all_plan_tasks:
-        reason_lower = task.get("reason", "").lower()
-        if "week 2" in reason_lower:
-            week = "Week 2"
-        elif "backlog" in reason_lower:
-            week = "Backlog"
-        else:
-            week = "Week 1"
-            
-        key_ent = (task["entity"], week)
+        scheduled_time = parse_scheduled_time(task.get("reason", ""))
+        
+        key_ent = (task["entity"], scheduled_time)
         entity_week_counts[key_ent] = entity_week_counts.get(key_ent, 0) + 1
         
-        key_plat = (task["platform"], week)
+        key_plat = (task["platform"], scheduled_time)
         platform_week_counts[key_plat] = platform_week_counts.get(key_plat, 0) + 1
         
     governed_tasks = []
@@ -67,100 +183,52 @@ def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_
         platform = task["platform"]
         action = task["action"]
         content_id = task.get("content_id", "")
-        
-        reason_lower = task.get("reason", "").lower()
-        if "week 2" in reason_lower:
-            scheduled_time = "Week 2"
-        elif "backlog" in reason_lower:
-            scheduled_time = "Backlog"
-        else:
-            scheduled_time = "Week 1"
-            
+        scheduled_time = parse_scheduled_time(task.get("reason", ""))
         task_key = f"{entity}_{platform}_{action}_{scheduled_time}"
         
         opp_score = opp_score_map.get(entity, 0.5)
-        
         entity_eval = eval_map.get(entity)
-        if entity_eval:
-            strategy_confidence = entity_eval["performance_delta"]["accuracy_score"]
-        else:
-            strategy_confidence = avg_accuracy
-            
+        strategy_confidence = entity_eval["performance_delta"]["accuracy_score"] if entity_eval else avg_accuracy
+        
         is_new = (content_id == "new" or content_id == "")
-        if is_new:
-            asset_match_quality = 0.5
-        else:
-            asset_match_quality = asset_match_map.get(entity, 0.0)
-            
+        asset_match_quality = 0.5 if is_new else asset_match_map.get(entity, 0.0)
+        
         entity_memory = memory_map.get(entity)
-        if entity_memory:
-            performance_history = 1.0 if entity_memory["outcome"] == "success" else 0.0
-        else:
-            performance_history = 0.5
-            
-        risk_reasons = []
+        performance_history = 1.0 if entity_memory and entity_memory.get("outcome") == "success" else (0.5 if not entity_memory else 0.0)
         
-        if entity_week_counts.get((entity, scheduled_time), 0) > 1:
-            risk_reasons.append("Repeated entity publishing: Multiple posts scheduled in the same week.")
-            
-        if platform_week_counts.get((platform, scheduled_time), 0) > 1:
-            risk_reasons.append("Conflicting platform schedules: Same platform scheduled multiple times in the same week.")
-            
-        if not is_new and asset_match_map.get(entity, 0.0) < 0.45:
-            risk_reasons.append("Weak asset match: relevance score is below 0.45.")
-            
-        if entity_memory and entity_memory["outcome"] == "failure":
-            risk_reasons.append("Unstable CTR history: historical performance indicates failure.")
-            
-        if not task.get("content_type") or not task.get("platform"):
-            risk_reasons.append("Missing metadata: essential task properties are missing.")
-            
-        is_high = any("Repeated entity" in r or "Unstable CTR" in r for r in risk_reasons)
-        is_medium = any("Conflicting platform" in r or "Weak asset" in r for r in risk_reasons)
+        # Build policy valuation context
+        context = {
+            "scheduled_time": scheduled_time,
+            "entity_week_counts": entity_week_counts,
+            "platform_week_counts": platform_week_counts,
+            "asset_match_map": asset_match_map,
+            "memory_map": memory_map
+        }
         
-        if is_high:
-            risk_level = "HIGH"
-            risk_penalty = 0.0
-        elif is_medium:
-            risk_level = "MEDIUM"
-            risk_penalty = 0.5
-        else:
-            risk_level = "LOW"
-            risk_penalty = 1.0
-            
-        decision_score = (
-            0.35 * opp_score +
-            0.25 * strategy_confidence +
-            0.20 * asset_match_quality +
-            0.10 * performance_history +
-            0.10 * risk_penalty
-        )
-        decision_score = round(max(0.0, min(1.0, decision_score)), 2)
+        # Evaluate governance policies
+        risk_reasons = evaluate_governance_policies(task, context)
         
-        has_blocked_trigger = (
-            decision_score < 0.70 or
-            any("Repeated entity" in r for r in risk_reasons) or
-            any("Unstable CTR" in r for r in risk_reasons) or
-            any("Conflicting platform" in r for r in risk_reasons)
+        # Risk classification and penalty
+        risk_level, risk_penalty = classify_governance_risk(risk_reasons)
+        
+        # Decision score
+        decision_score = calculate_governance_decision_score(
+            opp_score=opp_score,
+            strategy_confidence=strategy_confidence,
+            asset_match_quality=asset_match_quality,
+            performance_history=performance_history,
+            risk_penalty=risk_penalty
         )
         
-        if has_blocked_trigger:
-            mode = "BLOCKED"
-        elif decision_score >= 0.90 and len(risk_reasons) == 0:
-            mode = "AUTO_EXECUTE"
-        else:
-            mode = "NEEDS_APPROVAL"
-            
+        # Mode
+        mode = determine_governance_mode(decision_score, risk_reasons)
+        
+        # Sync with persisted queues
         if task_key in persisted_map:
             task_status = persisted_map[task_key].get("status", "queued")
             execution_log = persisted_map[task_key].get("execution_log")
         else:
-            if mode == "BLOCKED":
-                task_status = "blocked"
-            elif mode == "AUTO_EXECUTE":
-                task_status = "queued"
-            else:
-                task_status = "queued"
+            task_status = "blocked" if mode == "BLOCKED" else "queued"
             execution_log = None
             
         h = hashlib.md5(task_key.encode('utf-8')).hexdigest()[:8]
@@ -185,6 +253,7 @@ def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_
             
         governed_tasks.append(governed_task)
         
+    # Process queue tasks
     processed_tasks = process_execution_queue(governed_tasks)
     save_execution_tasks(processed_tasks)
     
@@ -195,7 +264,7 @@ def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_
     for t in processed_tasks:
         if t["execution_mode"] == "BLOCKED" or t["status"] == "blocked":
             blocked_tasks.append(t)
-        elif t["status"] == "executed" or t["status"] == "approved":
+        elif t["status"] in ("executed", "approved"):
             approved_tasks.append(t)
         else:
             queued_tasks.append(t)

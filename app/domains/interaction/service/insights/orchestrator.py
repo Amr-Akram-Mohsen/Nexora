@@ -12,6 +12,173 @@ from app.domains.interaction.service.insights.asset_mapping import map_content_s
 from app.domains.interaction.service.insights.publishing_plan import generate_content_publishing_plan
 from app.domains.interaction.service.insights.autonomous_execution import generate_execution_plan
 from app.domains.interaction.service.insights.governance import generate_execution_governance_layer
+def _generate_computed_strategy(name, entity_type, reason, related_content_ctr):
+    prefer_comparisons = related_content_ctr < 5.0
+    
+    reason_lower = reason.lower()
+    if "high demand + low coverage" in reason_lower or "high demand + low coverage gap" in reason_lower:
+        strategic_intent = "priority content creation"
+        content_angle = "guide"
+    elif "high engagement + low content" in reason_lower:
+        strategic_intent = "fast content gap exploitation"
+        content_angle = "comparison"
+    elif "high engagement" in reason_lower:
+        strategic_intent = "reinforcement / expansion content"
+        content_angle = "review"
+    else:
+        strategic_intent = "reinforcement / expansion content"
+        content_angle = "trend analysis"
+
+    # YouTube video ideas (2-3 titles)
+    if entity_type.lower() == "category":
+        if prefer_comparisons:
+            youtube_ideas = [
+                f"Ultimate {name} Comparison: Which One Should You Buy?",
+                f"Top 5 {name} Face-Off & Performance Review",
+                f"Testing the Cheapest vs Most Expensive {name}"
+            ]
+        else:
+            youtube_ideas = [
+                f"Complete {name} Buying Guide: Don't Buy Until You Watch This!",
+                f"Top 10 Best {name} of the Year: The Definitive List",
+                f"How to Choose Your First {name} (Step-by-Step)"
+            ]
+    else: # brand
+        if prefer_comparisons:
+            youtube_ideas = [
+                f"{name} vs The Competition: Is It Worth the Premium Price?",
+                f"Testing {name} Products: Honest Comparison & Review"
+            ]
+        else:
+            youtube_ideas = [
+                f"The Complete Guide to {name} Products: Features & Setup",
+                f"Unboxing & First Look: Newest Releases from {name}"
+            ]
+
+    # Pinterest pin ideas (1-2 concepts)
+    if entity_type.lower() == "category":
+        pinterest_ideas = [
+            f"How to Choose the Perfect {name} (Infographic Guide)",
+            f"The Ultimate {name} Cheat Sheet & Specifications Comparison Checklist"
+        ]
+    else:
+        pinterest_ideas = [
+            f"Visual Guide: Evolution of {name} Top Models",
+            f"{name} Product Selection Cheat Sheet (Infographic)"
+        ]
+
+    # Blog article idea (1 SEO title)
+    if entity_type.lower() == "category":
+        if content_angle == "guide":
+            blog_article_idea = f"The Ultimate {name} Buying Guide & Expert Recommendations"
+        elif content_angle == "comparison":
+            blog_article_idea = f"Direct Comparison: Head-to-Head {name} Review"
+        elif content_angle == "review":
+            blog_article_idea = f"In-Depth Review: Analyzing the Top-Rated {name} in Saudi Arabia"
+        else:
+            blog_article_idea = f"5 Critical Features to Look for in a Modern {name}"
+    else:
+        if content_angle == "review":
+            blog_article_idea = f"Expert Review: Are {name} Products Actually Worth It?"
+        else:
+            blog_article_idea = f"Buying Guide: Top 5 Best {name} Deals & Specifications"
+
+    return {
+        "youtube_ideas": youtube_ideas,
+        "youtube_video_ideas": youtube_ideas,
+        "pinterest_ideas": pinterest_ideas,
+        "pinterest_pin_ideas": pinterest_ideas,
+        "blog_article_idea": blog_article_idea,
+        "content_angle": content_angle,
+        "strategic_intent": strategic_intent
+    }
+
+
+def _generate_computed_action_strategy(target, type_str, action_title, priority, confidence, impact):
+    is_buying_guide = "buying" in action_title.lower() or "guide" in action_title.lower()
+    is_brand_expansion = "brand" in type_str.lower() or "brand" in action_title.lower()
+    is_high_confidence = confidence >= 0.85
+    
+    if is_buying_guide:
+        content_angle = "guide"
+        if is_high_confidence:
+            youtube = [
+                f"Ultimate Video Guide: Best {target} of 2026",
+                f"Watch This Before Buying {target}! (Video Review)"
+            ]
+            blog = f"SEO Guide: The Definitive {target} Analysis & Search Trends"
+            pinterest = [
+                f"Cheat Sheet: {target} Video-First Setup & Specs Guide",
+                f"Step-by-Step {target} Tutorial & Video Tips"
+            ]
+        else:
+            youtube = [
+                f"Best {target} to Buy in 2026: Expert Buying Guide",
+                f"5 Mistakes to Avoid When Buying {target}"
+            ]
+            blog = f"The Ultimate {target} Buying Guide & Selection Tips"
+            pinterest = [
+                f"Infographic: How to Choose the Best {target}",
+                f"{target} Selection Cheat Sheet for Beginners"
+            ]
+    elif is_brand_expansion:
+        content_angle = "comparison"
+        if is_high_confidence:
+            youtube = [
+                f"Hands-On Video Review: Testing {target} Performance",
+                f"Ultimate {target} Brand Comparison (Watch Before Buying)"
+            ]
+            blog = f"SEO Review: Are {target} Products Worth the Investment?"
+            pinterest = [
+                f"Must-Watch Video Guide: {target} Specifications Table",
+                f"Visual comparison: {target} vs Competitors (Infographic)"
+            ]
+        else:
+            youtube = [
+                f"{target} Review: Is It Actually Worth the Premium Price?",
+                f"{target} vs The Competition: Head-to-Head Comparison"
+            ]
+            blog = f"In-Depth Review: Analyzing {target} Products & Alternatives"
+            pinterest = [
+                f"Visual Guide: {target} Brand Specifications Comparison",
+                f"Pros & Cons: Honest {target} Review Checklist"
+            ]
+    else:
+        # Fallback
+        if is_high_confidence:
+            content_angle = "trend analysis"
+            youtube = [
+                f"Ultimate Video Walkthrough: Master {target} Today",
+                f"Market Trends: Future of {target} (Watch Now)"
+            ]
+            blog = f"SEO Trend Report: In-Depth {target} Industry Analysis"
+            pinterest = [
+                f"Visual Guide: Future Trends of {target}",
+                f"Cheat Sheet: Mastering {target} in 2026"
+            ]
+        else:
+            content_angle = "trend analysis"
+            youtube = [
+                f"New Trends in {target}: What's Changing?",
+                f"How to Master {target} in 2026"
+            ]
+            blog = f"Top {target} Trends & Comprehensive Market Analysis"
+            pinterest = [
+                f"{target} Trend Highlights & Style Guide",
+                f"Infographic: {target} Cheat Sheet"
+            ]
+            
+    return {
+        "youtube_ideas": youtube,
+        "youtube_video_ideas": youtube,
+        "blog_article_idea": blog,
+        "seo_blog_article_title": blog,
+        "pinterest_ideas": pinterest,
+        "pinterest_content_ideas": pinterest,
+        "content_angle": content_angle,
+        "suggested_content_angle": content_angle
+    }
+
 
 def get_decision_intelligence_data(lightweight=False):
     """
@@ -21,6 +188,7 @@ def get_decision_intelligence_data(lightweight=False):
     categories_data = get_content_coverage_matrix()
     brands_data = get_brand_opportunity_data()
     intent_data = get_intent_opportunity_data()
+    rec_perf = get_recommendation_performance_data()
     
     # 0. Content Performance Feedback Loop
     if lightweight:
@@ -144,6 +312,16 @@ def get_decision_intelligence_data(lightweight=False):
     top_opportunities.sort(key=lambda x: x["score"], reverse=True)
     top_opportunities = top_opportunities[:15]
 
+    # Compute content strategy for each top opportunity
+    related_content_ctr = rec_perf.get("related_content_ctr", 0.0)
+    for opp in top_opportunities:
+        opp["content_strategy"] = _generate_computed_strategy(
+            opp["entity"],
+            opp["type"],
+            opp["reason"],
+            related_content_ctr
+        )
+
     # 4. Insight Actions Queue
     action_queue = []
     intent_map = {item["category_name"]: item for item in intent_data}
@@ -194,9 +372,16 @@ def get_decision_intelligence_data(lightweight=False):
             
     action_queue.sort(key=lambda x: x["score"], reverse=True)
     for item in action_queue:
+        item["content_output"] = _generate_computed_action_strategy(
+            item["target"],
+            item["type"],
+            item["title"],
+            item["priority"],
+            item["confidence"],
+            item["impact"]
+        )
         item.pop("score", None)
 
-    rec_perf = get_recommendation_performance_data()
     recommendation_metrics = {
         "impressions": rec_perf["impressions"],
         "clicks": rec_perf["clicks"],

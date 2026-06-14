@@ -11,7 +11,9 @@ from app.domains.interaction.service.insights.opportunities import (
     get_intent_opportunity_data,
     get_brand_opportunity_data,
     get_recommendation_performance_data,
-    get_content_coverage_matrix
+    get_content_coverage_matrix,
+    get_entity_momentum,
+    get_content_decay
 )
 from app.domains.interaction.service.insights.orchestrator import get_decision_intelligence_data
 from app.domains.interaction.service.insights.content_strategy import generate_content_strategy

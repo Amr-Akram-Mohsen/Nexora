@@ -51,15 +51,20 @@ export function renderContentPublishingPlan() {
     // Header colors based on Week
     let headerClass = "";
     let statusLabel = "";
+    let columnTitle = weekData.week;
+    
     if (weekData.week === "Week 1") {
       headerClass = "blocked";
       statusLabel = '<span class="status-badge badge-danger font-bold">HIGH URGENCY</span>';
+      columnTitle = "Week 1 (Days 1-7)";
     } else if (weekData.week === "Week 2") {
       headerClass = "needs-review";
       statusLabel = '<span class="status-badge badge-warning font-bold">MEDIUM</span>';
+      columnTitle = "Week 2 (Days 8-14)";
     } else {
       headerClass = "auto-execute";
       statusLabel = '<span class="status-badge badge-secondary font-bold">LOW PRIORITY</span>';
+      columnTitle = "Backlog (Days 15-30)";
     }
     
     let taskCardsHtml = "";
@@ -104,7 +109,7 @@ export function renderContentPublishingPlan() {
     
     column.innerHTML = `
       <div class="publishing-column-header ${headerClass}">
-        <div class="font-bold text-sm">${weekData.week}</div>
+        <div class="font-bold text-sm">${columnTitle}</div>
         <div>${statusLabel}</div>
       </div>
       <div class="kanban-column-body">

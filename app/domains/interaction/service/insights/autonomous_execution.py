@@ -2,48 +2,87 @@
 import os
 import json
 from datetime import datetime, timezone
-from app.domains.interaction.service.insights.learning_memory import load_memory_layer
+from app.domains.interaction.service.insights.learning_memory import load_json_file, save_json_file
+
+# Queue File Path
+QUEUE_FILE_PATH = os.path.join("instance", "execution_governance_queue.json")
 
 def load_execution_tasks():
-    QUEUE_FILE_PATH = os.path.join("instance", "execution_governance_queue.json")
-    if not os.path.exists(QUEUE_FILE_PATH):
-        try:
-            os.makedirs(os.path.dirname(QUEUE_FILE_PATH), exist_ok=True)
-            with open(QUEUE_FILE_PATH, "w", encoding="utf-8") as f:
-                json.dump([], f, indent=2)
-            return []
-        except Exception:
-            return []
-    try:
-        with open(QUEUE_FILE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return []
+    """Loads execution tasks from the centralized persistence queue."""
+    return load_json_file(QUEUE_FILE_PATH, default_factory=list)
 
 def save_execution_tasks(tasks):
-    QUEUE_FILE_PATH = os.path.join("instance", "execution_governance_queue.json")
-    try:
-        os.makedirs(os.path.dirname(QUEUE_FILE_PATH), exist_ok=True)
-        with open(QUEUE_FILE_PATH, "w", encoding="utf-8") as f:
-            json.dump(tasks, f, indent=2)
-    except Exception as e:
-        print(f"Error saving execution tasks queue: {e}")
+    """Saves execution tasks to the centralized persistence queue."""
+    save_json_file(QUEUE_FILE_PATH, tasks)
 
+# ---------------------------------------------------------
+# Execution Adapters System
+# ---------------------------------------------------------
+class BasePlatformAdapter:
+    """Interface / base class for platform execution adapters."""
+    def execute(self, task):
+        raise NotImplementedError("Platform execution not implemented.")
+
+class YouTubeAdapter(BasePlatformAdapter):
+    def execute(self, task):
+        return {
+            "status": "simulated",
+            "platform": "youtube",
+            "entity": task.get("entity", ""),
+            "mock_url": f"/youtube/mock/{task.get('entity', '').lower().replace(' ', '_')}"
+        }
+
+class PinterestAdapter(BasePlatformAdapter):
+    def execute(self, task):
+        # Backward-compatible mock url builder
+        return {
+            "status": "simulated",
+            "platform": "pinterest",
+            "entity": task.get("entity", ""),
+            "mock_url": f"/pinterest/mock/{task.get('entity', '').lower().replace(' ', '_')}"
+        }
+
+class BlogAdapter(BasePlatformAdapter):
+    def execute(self, task):
+        return {
+            "status": "simulated",
+            "platform": "blog",
+            "entity": task.get("entity", ""),
+            "mock_url": f"/blog/mock/{task.get('entity', '').lower().replace(' ', '_')}"
+        }
+
+class DynamicPlatformAdapter(BasePlatformAdapter):
+    """Fallback adapter for easily adding new platforms (e.g. TikTok, X)."""
+    def __init__(self, platform_name):
+        self.platform_name = platform_name.lower()
+        
+    def execute(self, task):
+        return {
+            "status": "simulated",
+            "platform": self.platform_name,
+            "entity": task.get("entity", ""),
+            "mock_url": f"/{self.platform_name}/mock/{task.get('entity', '').lower().replace(' ', '_')}"
+        }
+
+PLATFORM_ADAPTERS = {
+    "youtube": YouTubeAdapter(),
+    "pinterest": PinterestAdapter(),
+    "blog": BlogAdapter()
+}
+
+def get_adapter(platform_name):
+    """Retrieves or creates execution adapter for the given platform name."""
+    name_clean = (platform_name or "").lower().strip()
+    return PLATFORM_ADAPTERS.get(name_clean, DynamicPlatformAdapter(name_clean))
+
+# ---------------------------------------------------------
+# Adapter Functions wrapper for backwards compatibility
+# ---------------------------------------------------------
 def execute_youtube_publish(task):
-    return {
-        "status": "simulated",
-        "platform": "youtube",
-        "entity": task.get("entity", ""),
-        "mock_url": f"/youtube/mock/{task.get('entity', '').lower().replace(' ', '_')}"
-    }
+    return get_adapter("youtube").execute(task)
 
 def execute_pinterest_publish(task):
-    return {
-        "status": "simulated",
-        "platform": "pinterest",
-        "entity": task.get("entity", ""),
-        "mock_url": f"/pinterest/mock/{task.get('entity', '').lower().replace(' ', '_')}"
-    }
+    return get_adapter("pinterest").execute(task)
 
 def execute_pinterest_pin(task):
     res = execute_pinterest_publish(task)
@@ -56,20 +95,70 @@ def execute_pinterest_pin(task):
     }
 
 def execute_blog_publish(task):
-    return {
-        "status": "simulated",
-        "platform": "blog",
-        "entity": task.get("entity", ""),
-        "mock_url": f"/blog/mock/{task.get('entity', '').lower().replace(' ', '_')}"
-    }
+    return get_adapter("blog").execute(task)
 
+# ---------------------------------------------------------
+# Planning & Analytics Helpers
+# ---------------------------------------------------------
+def calculate_execution_confidence(opp_score, strat_acc, asset_match, hist_perf):
+    """Centralized execution confidence calculation logic."""
+    confidence = 0.4 * opp_score + 0.3 * strat_acc + 0.2 * asset_match + 0.1 * hist_perf
+    return round(max(0.0, min(1.0, confidence)), 2)
+
+def detect_execution_risks(task, opp_score, asset_match, entity_memory, week_name, existing_entities, existing_platforms):
+    """Detects operational risk factors for execution planning."""
+    entity = task["entity"]
+    platform = task["platform"]
+    source = task["source"]
+    
+    risk_factors = []
+    
+    # Scheduling conflicts for Week 1
+    if week_name == "Week 1":
+        if entity in existing_entities:
+            risk_factors.append("Duplicate content scheduled for this entity in the same week.")
+            
+        platform_key = f"{week_name}_{platform}"
+        if platform_key in existing_platforms:
+            risk_factors.append(f"Platform scheduling conflict: multiple {platform} tasks queued for {week_name}.")
+            
+    # Weak asset grounding
+    if source != "new" and asset_match < 0.45:
+        risk_factors.append("Weak existing asset mapping grounding (relevance score < 0.45).")
+        
+    # Unstable performance history
+    if entity_memory and entity_memory.get("outcome") == "failure":
+        risk_factors.append("Historical strategy performance in memory layer indicates performance instability.")
+        
+    # Conflicting prioritization signal
+    if opp_score < 0.45:
+        risk_factors.append("Conflicting strategy signals: prioritization opportunity score is too low.")
+        
+    return risk_factors
+
+def determine_execution_mode(confidence, risk_factors):
+    """Decides execution mode (BLOCKED, AUTO_EXECUTE, NEEDS_REVIEW) based on confidence and risks."""
+    has_critical_risks = any(x in risk_factors for x in [
+        "Duplicate content scheduled for this entity in the same week.",
+        "Historical strategy performance in memory layer indicates performance instability."
+    ])
+    
+    if confidence < 0.60 or has_critical_risks:
+        return "BLOCKED"
+    elif confidence >= 0.85 and len(risk_factors) == 0:
+        return "AUTO_EXECUTE"
+    else:
+        return "NEEDS_REVIEW"
+
+# ---------------------------------------------------------
+# Core Service Functions
+# ---------------------------------------------------------
 def generate_execution_plan(content_publishing_plan, content_asset_mapping, strategy_data):
     """
     Evaluates each scheduled task in the content publishing plan, calculates
     execution confidence scores, and determines the execution mode (AUTO_EXECUTE,
     NEEDS_REVIEW, BLOCKED) with safety guardrails.
     """
-    # Extract historical performance memory and evaluations
     memory_layer = strategy_data.get("memory_layer", [])
     memory_map = {m["entity"]: m for m in memory_layer}
     
@@ -82,13 +171,10 @@ def generate_execution_plan(content_publishing_plan, content_asset_mapping, stra
     for mapping in content_asset_mapping:
         entity = mapping["entity"]
         opp_score_map[entity] = mapping["opportunity_score"]
-        
-        # Max relevance score from existing assets
         existing = mapping.get("existing_assets", [])
         max_relevance = max([a["relevance_score"] for a in existing]) if existing else 0.0
         asset_match_map[entity] = max_relevance
 
-    # Accuracy score mapping (overall average or specific entity accuracy)
     avg_accuracy = strategy_data.get("average_accuracy", 85.0) / 100.0
     
     execution_plan = {
@@ -116,63 +202,36 @@ def generate_execution_plan(content_publishing_plan, content_asset_mapping, stra
         content_type = task["content_type"]
         
         opp_score = opp_score_map.get(entity, 0.5)
-        
         entity_eval = eval_map.get(entity)
-        if entity_eval:
-            strat_acc = entity_eval["performance_delta"]["accuracy_score"]
-        else:
-            strat_acc = avg_accuracy
-            
+        strat_acc = entity_eval["performance_delta"]["accuracy_score"] if entity_eval else avg_accuracy
         asset_match = asset_match_map.get(entity, 0.0) if source != "new" else 0.5
         
         entity_memory = memory_map.get(entity)
-        if entity_memory:
-            hist_perf = 1.0 if entity_memory["outcome"] == "success" else 0.0
-        else:
-            hist_perf = 0.5
-            
-        confidence = 0.4 * opp_score + 0.3 * strat_acc + 0.2 * asset_match + 0.1 * hist_perf
-        confidence = round(max(0.0, min(1.0, confidence)), 2)
+        hist_perf = 1.0 if entity_memory and entity_memory.get("outcome") == "success" else (0.5 if not entity_memory else 0.0)
         
-        risk_factors = []
+        # Centralized confidence calculation
+        confidence = calculate_execution_confidence(opp_score, strat_acc, asset_match, hist_perf)
         
-        # Guardrails
+        # Risk checks
+        risk_factors = detect_execution_risks(
+            task=task,
+            opp_score=opp_score,
+            asset_match=asset_match,
+            entity_memory=entity_memory,
+            week_name=week_name,
+            existing_entities=entity_schedule_week1,
+            existing_platforms=platform_schedule_week1
+        )
+        
+        # Track for subsequent checks in this week
         if week_name == "Week 1":
-            if entity in entity_schedule_week1:
-                risk_factors.append("Duplicate content scheduled for this entity in the same week.")
             entity_schedule_week1.add(entity)
-            
-            platform_key = f"{week_name}_{platform}"
-            if platform_key in platform_schedule_week1:
-                risk_factors.append(f"Platform scheduling conflict: multiple {platform} tasks queued for {week_name}.")
-            platform_schedule_week1.add(platform_key)
-            
-        if source != "new" and asset_match_map.get(entity, 0.0) < 0.45:
-            risk_factors.append("Weak existing asset mapping grounding (relevance score < 0.45).")
-            
-        if entity_memory and entity_memory["outcome"] == "failure":
-            risk_factors.append("Historical strategy performance in memory layer indicates performance instability.")
-            
-        if opp_score < 0.45:
-            risk_factors.append("Conflicting strategy signals: prioritization opportunity score is too low.")
+            platform_schedule_week1.add(f"{week_name}_{platform}")
             
         # Determine mode
-        has_critical_risks = any(x in risk_factors for x in [
-            "Duplicate content scheduled for this entity in the same week.",
-            "Historical strategy performance in memory layer indicates performance instability."
-        ])
+        mode = determine_execution_mode(confidence, risk_factors)
         
-        if confidence < 0.60 or has_critical_risks:
-            mode = "BLOCKED"
-        elif confidence >= 0.85 and len(risk_factors) == 0:
-            mode = "AUTO_EXECUTE"
-        else:
-            mode = "NEEDS_REVIEW"
-            
-        if action == "postpone":
-            exec_action = "create"
-        else:
-            exec_action = action
+        exec_action = "create" if action == "postpone" else action
             
         exec_item = {
             "entity": entity,
@@ -191,6 +250,7 @@ def generate_execution_plan(content_publishing_plan, content_asset_mapping, stra
             "risk_factors": risk_factors
         }
         
+        # Autonomous execution logic via adapters
         if mode == "AUTO_EXECUTE":
             if platform == "youtube":
                 adapter_res = execute_youtube_publish(exec_item)
@@ -200,6 +260,7 @@ def generate_execution_plan(content_publishing_plan, content_asset_mapping, stra
                 adapter_res = execute_blog_publish(exec_item)
             exec_item["execution_log"] = adapter_res
             
+        # Distribute into return queues
         if mode == "AUTO_EXECUTE":
             execution_plan["auto_execute"].append(exec_item)
         elif mode == "NEEDS_REVIEW":
@@ -210,6 +271,7 @@ def generate_execution_plan(content_publishing_plan, content_asset_mapping, stra
     return execution_plan
 
 def process_execution_queue(tasks):
+    """Processes task status and executes actions using platform adapters registry."""
     tasks.sort(key=lambda x: x.get("decision_score", 0.0), reverse=True)
     
     executed_entities_week = set()
@@ -220,7 +282,8 @@ def process_execution_queue(tasks):
     for task in tasks:
         key = (task["entity"], task["scheduled_time"])
         
-        if (task.get("status") == "queued" and task.get("execution_mode") == "AUTO_EXECUTE") or (task.get("status") == "approved"):
+        is_ready = (task.get("status") == "queued" and task.get("execution_mode") == "AUTO_EXECUTE") or (task.get("status") == "approved")
+        if is_ready:
             if key in executed_entities_week:
                 print(f"[GOVERNANCE] Prevented duplicate execution for {task['entity']} in {task['scheduled_time']}")
                 continue
