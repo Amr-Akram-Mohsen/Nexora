@@ -1,6 +1,16 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    admin_modal_close_button,
+    action_button,
+    action_group,
+    inspect_section,
+    inspect_detail_row
+%}
 
 {% block title %}Recommendations — Nexora Admin{% endblock %}
 
@@ -24,20 +34,13 @@ actions=header_actions
 <!-- Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="admin-toolbar-search admin-search-grow flex items-center">
-      <span class="admin-toolbar-search-icon-inside">🔍</span>
-      <input type="text" id="rec-search" placeholder="Search by content title or item name…" />
-    </div>
-    <button id="clear-rec-filters-btn" class="dashboard-filter-clear">Reset</button>
+    {{ admin_search_input("rec-search", "Search by content title or item name…") }}
+    {{ admin_reset_button("clear-rec-filters-btn", "Reset") }}
   </div>
 </div>
 
 <!-- Summary -->
-<div class="flex justify-between items-center mb-3">
-  <div id="rec-summary" class="admin-summary-bar">
-    Showing <strong id="rec-count">—</strong> matches
-  </div>
-</div>
+{{ admin_summary_bar("rec-count", "matches", summary_id="rec-summary") }}
 
 <!-- Table -->
 <div class="admin-table-wrapper">
@@ -60,9 +63,7 @@ actions=header_actions
 {{ admin_paginator(domain="rec", per_page_options=[25, 50], current_per_page=25) }}
 
 {% call admin_modal("inspect-rec-modal", "Content–Product Recommendation Details", "📡") %}
-<div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-rec-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
-</div>
+{{ admin_modal_close_button(button_id="inspect-rec-close-btn") }}
 {% endcall %}
 
 <template id="rec-row-template">
@@ -86,45 +87,34 @@ actions=header_actions
     </td>
     <td class="rec-item-clicks"></td>
     <td>
-      <div class="user-actions-group">
-        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-rec">
-          👁️ Inspect
-        </button>
-      </div>
+      {% call action_group() %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-rec", extra_class="inspect-btn") }}
+      {% endcall %}
     </td>
   </tr>
 </template>
 
 <template id="rec-inspect-template">
   <div class="inspect-details-group flex flex-col">
-    <div>
-      <strong class="inspect-details-title">Content Details</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-content-id"></span></div>
-      <div class="inspect-details-row"><strong>Title:</strong> <span class="inspect-content-title"></span></div>
-      <div class="inspect-details-row"><strong>Type:</strong> <span class="inspect-content-type status-badge inspect-badge-secondary"></span></div>
-      <div class="inspect-details-row"><strong>Total Views:</strong> <span class="inspect-content-views"></span></div>
-    </div>
+    {% call inspect_section("Content Details") %}
+      {{ inspect_detail_row("ID", "inspect-content-id") }}
+      {{ inspect_detail_row("Title", "inspect-content-title") }}
+      {{ inspect_detail_row("Type", "inspect-content-type status-badge inspect-badge-secondary") }}
+      {{ inspect_detail_row("Total Views", "inspect-content-views") }}
+    {% endcall %}
     
-    <hr class="inspect-details-divider" />
+    {% call inspect_section("Linked Product Details") %}
+      {{ inspect_detail_row("ID", "inspect-item-id") }}
+      {{ inspect_detail_row("Name", "inspect-item-name") }}
+      {{ inspect_detail_row("Type", "inspect-item-type status-badge inspect-badge-secondary") }}
+      {{ inspect_detail_row("Total Clicks", "inspect-item-clicks") }}
+    {% endcall %}
     
-    <div>
-      <strong class="inspect-details-title">Linked Product Details</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-item-id"></span></div>
-      <div class="inspect-details-row"><strong>Name:</strong> <span class="inspect-item-name"></span></div>
-      <div class="inspect-details-row"><strong>Type:</strong> <span class="inspect-item-type status-badge inspect-badge-secondary"></span></div>
-      <div class="inspect-details-row"><strong>Total Clicks:</strong> <span class="inspect-item-clicks"></span></div>
-    </div>
-    
-    <hr class="inspect-details-divider" />
-    
-    <div>
-      <strong class="inspect-details-title">Management Actions</strong>
+    {% call inspect_section("Management Actions", divider=false) %}
       <div class="flex gap-2 mt-2">
-        <button class="user-action-btn user-action-delete inspect-unlink-btn">
-          🔓 Remove Association (Unlink)
-        </button>
+        {{ action_button("Remove Association (Unlink)", action_type="delete", icon="🔓", extra_class="inspect-unlink-btn") }}
       </div>
-    </div>
+    {% endcall %}
   </div>
 </template>
 

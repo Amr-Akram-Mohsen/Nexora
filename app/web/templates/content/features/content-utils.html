@@ -5,7 +5,7 @@
   <div class="snippet-contents flex">
     {% for item in items %}
     <a href="
-    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex items-start flex-col">
+    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex items-start flex-col" data-id="{{ item.id }}">
       {{ render_image_url(
       item.target.image_url,
       item.target.title,

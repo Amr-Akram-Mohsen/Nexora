@@ -17,9 +17,11 @@
       link.textContent = src.name;
     }
 
-    clone.querySelector('.source-cell-score').textContent = `${src.authority_score} / 100`;
     clone.querySelector('.source-cell-count').textContent = src.content_count.toLocaleString();
-    clone.querySelector('.source-cell-time').textContent = src.latest_activity ? formatDate(src.latest_activity, true) : '—';
+    clone.querySelector('.source-cell-time').textContent = src.last_crawl ? formatDate(src.last_crawl, true) : '—';
+    clone.querySelector('.source-cell-success-rate').textContent = typeof src.success_rate === 'number' ? `${src.success_rate.toFixed(1)}%` : '100.0%';
+    clone.querySelector('.source-cell-failures').textContent = src.failure_count.toLocaleString();
+    clone.querySelector('.source-cell-engagement').textContent = src.engagement.toLocaleString();
 
     const statusCell = clone.querySelector('.source-cell-status');
     statusCell.innerHTML = "";
@@ -59,7 +61,7 @@
       refreshBtnId: 'refresh-sources-btn',
       rowTemplateId: 'sources-row-template',
       defaultPerPage: 20,
-      colspan: 6,
+      colspan: 8,
       itemsKey: 'sources',
       renderRow: renderSourceRow,
       autoInit: false

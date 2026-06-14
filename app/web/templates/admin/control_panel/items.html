@@ -1,6 +1,17 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner, admin_filter_select %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    admin_modal_close_button,
+    action_group,
+    action_button,
+    inspect_section,
+    inspect_detail_row,
+    inspect_custom_row
+%}
 
 {% block title %}Product Management — Nexora Admin{% endblock %}
 
@@ -20,10 +31,7 @@ actions=header_actions
 <div class="admin-toolbar-advanced flex flex-col">
   <!-- Row 1: Search & Basic Filters -->
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="admin-toolbar-search admin-search-grow flex items-center">
-      <span class="admin-toolbar-search-icon-inside">🔍</span>
-      <input type="text" id="item-search" placeholder="Search by name or ID…" />
-    </div>
+    {{ admin_search_input("item-search", "Search by name or ID…") }}
 
     {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories", extra_class="filter-select-item") }}
@@ -37,17 +45,13 @@ actions=header_actions
       <span class="filter-label-xs">Sort:</span>
       {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"), ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
       {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
-      <button id="clear-item-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
+      {{ admin_reset_button("clear-item-filters-btn", "Reset Filters") }}
     </div>
   </div>
 </div>
 
 <!-- Summary Bar -->
-<div class="flex justify-between items-center mb-3">
-  <div id="items-summary" class="admin-summary-bar">
-    Showing <strong id="items-count">—</strong> products
-  </div>
-</div>
+{{ admin_summary_bar("items-count", "products", summary_id="items-summary") }}
 
 <!-- Table -->
 <div class="admin-table-wrapper">
@@ -73,9 +77,7 @@ actions=header_actions
 {{ admin_paginator(domain="items", per_page_options=[10, 20, 50], current_per_page=20) }}
 
 {% call admin_modal("inspect-item-modal", "Product Provider & Store Links", "📡", "modal-content-lg") %}
-<div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-item-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
-</div>
+{{ admin_modal_close_button(button_id="inspect-item-close-btn") }}
 {% endcall %}
 
 <template id="item-row-template">
@@ -96,43 +98,38 @@ actions=header_actions
       <span class="item-cell-date user-cell-email"></span>
     </td>
     <td>
-      <div class="user-actions-group">
-        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-item">
-          👁️ Inspect
-        </button>
-      </div>
+      {% call action_group() %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-item", extra_class="inspect-btn") }}
+      {% endcall %}
     </td>
   </tr>
 </template>
 
 <template id="item-inspect-template">
   <div class="inspect-details-group flex flex-col">
-    <div>
-      <strong class="inspect-details-title">Product Core Mappings</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
-      <div class="inspect-details-row"><strong>Type:</strong> <span
-          class="inspect-type status-badge inspect-badge-secondary"></span></div>
-      <div class="inspect-details-row"><strong>Brand:</strong> <span class="inspect-brand"></span></div>
-      <div class="inspect-details-row"><strong>Category:</strong> <span class="inspect-category"></span></div>
-      <div class="inspect-details-row"><strong>System Source/Provider:</strong> <span
-          class="inspect-source inspect-brand-purple"></span> (slug: <code class="inspect-source-slug"></code>)</div>
-      <div class="inspect-details-row"><strong>Source Type:</strong> <code class="inspect-source-type"></code></div>
-    </div>
-    <hr class="inspect-details-divider" />
-    <div>
-      <strong class="inspect-details-title">Ingested Stores &amp; Affiliate Links (<span
-          class="inspect-links-count"></span>)</strong>
+    {% call inspect_section("Product Core Mappings") %}
+      {{ inspect_detail_row("ID", "inspect-id") }}
+      {{ inspect_detail_row("Type", "inspect-type status-badge inspect-badge-secondary") }}
+      {{ inspect_detail_row("Brand", "inspect-brand") }}
+      {{ inspect_detail_row("Category", "inspect-category") }}
+      {% call inspect_custom_row("System Source/Provider") %}
+        <span class="inspect-source inspect-brand-purple"></span> (slug: <code class="inspect-source-slug"></code>)
+      {% endcall %}
+      {{ inspect_detail_row("Source Type", "inspect-source-type", value_tag="code") }}
+    {% endcall %}
+    
+    {% set links_title %}Ingested Stores &amp; Affiliate Links (<span class="inspect-links-count"></span>){% endset %}
+    {% call inspect_section(links_title) %}
       <div class="inspect-links-container"></div>
-    </div>
-    <hr class="inspect-details-divider" />
-    <div>
-      <strong class="inspect-details-title">Management Actions</strong>
+    {% endcall %}
+    
+    {% call inspect_section("Management Actions", divider=false) %}
       <div class="flex gap-2 mt-2">
         <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="" data-name="">
           🗑 Delete Product
         </button>
       </div>
-    </div>
+    {% endcall %}
   </div>
 </template>
 

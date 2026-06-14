@@ -60,7 +60,7 @@
         {% set linked_ids = content.linked_items | map(attribute='id') | list if content.linked_items else [] %}
         {% set extra_items = matched_items | selectattr('id', 'ne', -1) | list %}
         {% if extra_items %}
-        <div class="recommendation-box recommendation-box--matched">
+        <div class="recommendation-box recommendation-box--matched" data-recommendation-container="shop_product" data-entity-ids="{{ matched_items[:6] | map(attribute='id') | list | tojson | safe }}">
           <h3 class="recommendation-box__title">
             <i class="fas fa-shopping-bag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
             Shop Related Products
@@ -103,7 +103,9 @@
       {{ content_snippet(trending_contents, 'Trending') }}
       {% endif %}
       {% if related_contents %}
-      {{ content_snippet(related_contents, 'Related') }}
+      <div data-recommendation-container="related_content" data-entity-ids="{{ related_contents | map(attribute='id') | list | tojson | safe }}">
+        {{ content_snippet(related_contents, 'Related') }}
+      </div>
       {% endif %}
       {% endblock %}
     </aside>

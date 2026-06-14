@@ -1,6 +1,9 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
+{% from "admin/components/macros.html" import
+    admin_search_input
+%}
 
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
 
@@ -37,10 +40,7 @@ admin_spinner, admin_table_spinner %}
   <!-- Filter -->
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="category-search" placeholder="Search categories…" />
-      </div>
+      {{ admin_search_input("category-search", "Search categories…") }}
     </div>
   </div>
 
@@ -79,10 +79,7 @@ admin_spinner, admin_table_spinner %}
 
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="brand-search" placeholder="Search brands…" />
-      </div>
+      {{ admin_search_input("brand-search", "Search brands…") }}
     </div>
   </div>
 
@@ -120,10 +117,7 @@ admin_spinner, admin_table_spinner %}
 
   <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="topic-search" placeholder="Search topics…" />
-      </div>
+      {{ admin_search_input("topic-search", "Search topics…") }}
     </div>
   </div>
 

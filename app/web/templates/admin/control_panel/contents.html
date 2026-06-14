@@ -1,6 +1,16 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_table_spinner, admin_filter_select %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    admin_modal_close_button,
+    action_group,
+    action_button,
+    inspect_section,
+    inspect_detail_row
+%}
 
 {% block title %}Content Management — Nexora Admin{% endblock %}
 
@@ -21,10 +31,7 @@ actions=header_actions
 
   <!-- Row 1: Search & Basic Filters -->
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="admin-toolbar-search admin-search-grow flex items-center">
-      <span class="admin-toolbar-search-icon-inside">🔍</span>
-      <input type="text" id="content-search" placeholder="Search title or ID…" />
-    </div>
+    {{ admin_search_input("content-search", "Search title or ID…") }}
 
     {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")], default_val="", default_text="All Content Types", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-section", None, [], default_val="", default_text="All Sections", extra_class="filter-select-item") }}
@@ -54,7 +61,7 @@ actions=header_actions
       {{ admin_filter_select("sort-by", None, [("id", "ID / Newest"), ("published_at", "Publish Date"), ("ingested_at", "Ingest Date"), ("view_count", "Views"), ("comment_count", "Comments"), ("title", "Title")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
       {{ admin_filter_select("sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
 
-      <button id="clear-filters-btn" class="dashboard-filter-clear">Reset Filters</button>
+      {{ admin_reset_button("clear-filters-btn", "Reset Filters") }}
     </div>
   </div>
 
@@ -81,14 +88,11 @@ actions=header_actions
 </div>
 
 <!-- Summary bar -->
-<div class="flex justify-between items-center mb-3">
-  <div id="contents-summary" class="admin-summary-bar">
-    Showing <strong id="contents-count">—</strong> items
-  </div>
+{% call admin_summary_bar("contents-count", "items", summary_id="contents-summary") %}
   <div class="tip-text">
     💡 Double-click any category to quick recategorize
   </div>
-</div>
+{% endcall %}
 
 <!-- Main Contents Table -->
 <div class="admin-table-wrapper">
@@ -125,9 +129,7 @@ actions=header_actions
 {% endcall %}
 
 {% call admin_modal("inspect-modal", "Source Details", "📡") %}
-<div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
-</div>
+{{ admin_modal_close_button(button_id="inspect-close-btn") }}
 {% endcall %}
 
 <template id="contents-row-template">
@@ -169,57 +171,43 @@ actions=header_actions
       </div>
     </td>
     <td class="text-center align-middle">
-      <div class="actions-cell-group flex justify-center">
-        <button class="user-action-btn user-action-inspect inspect-btn" title="Inspect source and ingestion metadata">
-          👁️ Inspect
-        </button>
-      </div>
+      {% call action_group(wrapper_class="actions-cell-group flex justify-center") %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", title="Inspect source and ingestion metadata", extra_class="inspect-btn") }}
+      {% endcall %}
     </td>
   </tr>
 </template>
 
 <template id="content-inspect-template">
   <div class="inspect-details-group flex flex-col">
-    <div>
-      <strong class="inspect-details-title">Content Metadata</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
-      <div class="inspect-details-row"><strong>Type:</strong> <span
-          class="inspect-type status-badge inspect-badge-secondary"></span></div>
-      <div class="inspect-details-row"><strong>Category:</strong> <span class="inspect-category"></span></div>
-      <div class="inspect-details-row"><strong>Section:</strong> <span class="inspect-section"></span></div>
-    </div>
+    {% call inspect_section("Content Metadata") %}
+      {{ inspect_detail_row("ID", "inspect-id") }}
+      {{ inspect_detail_row("Type", "inspect-type status-badge inspect-badge-secondary") }}
+      {{ inspect_detail_row("Category", "inspect-category") }}
+      {{ inspect_detail_row("Section", "inspect-section") }}
+    {% endcall %}
 
-    <hr class="inspect-details-divider" />
+    {% call inspect_section("Provider & Source Info") %}
+      {{ inspect_detail_row("Source Name", "inspect-source-name") }}
+      {{ inspect_detail_row("Source Slug", "inspect-source-slug", value_tag="code") }}
+      {{ inspect_detail_row("Source Link", "inspect-source-link") }}
+    {% endcall %}
 
-    <div>
-      <strong class="inspect-details-title">Provider & Source Info</strong>
-      <div class="inspect-details-row"><strong>Source Name:</strong> <span class="inspect-source-name"></span></div>
-      <div class="inspect-details-row"><strong>Source Slug:</strong> <code class="inspect-source-slug"></code></div>
-      <div class="inspect-details-row"><strong>Source Link:</strong> <span class="inspect-source-link"></span></div>
-    </div>
+    {% call inspect_section("System Tracking") %}
+      {{ inspect_detail_row("Ingested At", "inspect-ingested-at") }}
+      {{ inspect_detail_row("Published At", "inspect-published-at") }}
+      {{ inspect_detail_row("Enrichment Status", "inspect-status status-badge") }}
+      {{ inspect_detail_row("Visibility", "inspect-visibility") }}
+      {{ inspect_detail_row("Record Status", "inspect-record-status") }}
+    {% endcall %}
 
-    <hr class="inspect-details-divider" />
-
-    <div>
-      <strong class="inspect-details-title">System Tracking</strong>
-      <div class="inspect-details-row"><strong>Ingested At:</strong> <span class="inspect-ingested-at"></span></div>
-      <div class="inspect-details-row"><strong>Published At:</strong> <span class="inspect-published-at"></span></div>
-      <div class="inspect-details-row"><strong>Enrichment Status:</strong> <span
-          class="inspect-status status-badge"></span></div>
-      <div class="inspect-details-row"><strong>Visibility:</strong> <span class="inspect-visibility"></span></div>
-      <div class="inspect-details-row"><strong>Record Status:</strong> <span class="inspect-record-status"></span></div>
-    </div>
-
-    <hr class="inspect-details-divider" />
-
-    <div>
-      <strong class="inspect-details-title">Management Actions</strong>
+    {% call inspect_section("Management Actions", divider=false) %}
       <div class="flex gap-2 mt-2">
         <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="" data-title="">
           🗑 Delete Content
         </button>
       </div>
-    </div>
+    {% endcall %}
   </div>
 </template>
 {% endblock %}

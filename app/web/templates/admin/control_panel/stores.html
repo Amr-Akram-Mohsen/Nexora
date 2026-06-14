@@ -1,6 +1,12 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    action_group
+%}
 
 {% block title %}Stores Management — Nexora Admin{% endblock %}
 
@@ -19,20 +25,13 @@ actions=header_actions
 <!-- Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="admin-toolbar-search admin-search-grow flex items-center">
-      <span class="admin-toolbar-search-icon-inside">🔍</span>
-      <input type="text" id="stores-search" placeholder="Search by name, slug, or website…" />
-    </div>
-    <button id="clear-stores-filters-btn" class="dashboard-filter-clear">Reset</button>
+    {{ admin_search_input("stores-search", "Search by name, slug, or website…") }}
+    {{ admin_reset_button("clear-stores-filters-btn", "Reset") }}
   </div>
 </div>
 
 <!-- Summary Bar -->
-<div class="flex justify-between items-center mb-3">
-  <div id="stores-summary" class="admin-summary-bar">
-    Showing <strong id="stores-count">—</strong> stores
-  </div>
-</div>
+{{ admin_summary_bar("stores-count", "stores", summary_id="stores-summary") }}
 
 <!-- Stores Table -->
 <div class="admin-table-wrapper">
@@ -41,14 +40,16 @@ actions=header_actions
       <tr>
         <th class="col-primary">Merchant Name</th>
         <th>Affiliate Network</th>
-        <th class="col-metric">Volume</th>
-        <th class="col-date">Latest Ingest Activity</th>
+        <th class="col-metric">Product Count</th>
+        <th class="col-metric">Clicks</th>
+        <th class="col-metric">CTR</th>
+        <th class="col-metric">Conversions</th>
         <th class="col-status">Status</th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="stores-table-body">
-      {{ admin_table_spinner(6, "Loading stores list…") }}
+      {{ admin_table_spinner(8, "Loading stores list…") }}
     </tbody>
   </table>
 </div>
@@ -69,17 +70,23 @@ actions=header_actions
       <strong class="store-cell-count inspect-brand-purple"></strong>
     </td>
     <td>
-      <span class="store-cell-time text-foreground"></span>
+      <span class="store-cell-clicks text-foreground"></span>
+    </td>
+    <td>
+      <span class="store-cell-ctr text-foreground"></span>
+    </td>
+    <td>
+      <span class="store-cell-conversions text-foreground"></span>
     </td>
     <td class="store-cell-status">
     </td>
     <td>
-      <div class="user-actions-group">
+      {% call action_group() %}
         <a class="store-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
           href="">
           👁️ View Products
         </a>
-      </div>
+      {% endcall %}
     </td>
   </tr>
 </template>

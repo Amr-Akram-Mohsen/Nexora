@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, abort, current_app
 from flask_login import current_user, login_required
-from app.core.extensions import limiter, db
+from app.core.extensions import limiter, db, csrf
 from app.shared.constants.core import TargetType
 from app.shared.parsing import parse_target_type, parse_interaction_type
 from app.shared.request import get_client_ip
@@ -11,6 +11,7 @@ from app.application.interaction.item_click import record_item_click_workflow
 from app.application.interaction.get_comments import get_comments_html
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items, record_view
+from app.domains.interaction.models import RecommendationImpression, RecommendationClick
 from app.domains.content.service import get_content_by_id
 from app.domains.item.service import get_item_by_id
 from app.shared.utils.logging import log_route_start, log_route_success
@@ -252,3 +253,61 @@ def saved_items():
         saved_articles=saved_articles,
         saved_items=saved_items,
     )
+
+
+@bp.route("/track/impression", methods=["POST"])
+@csrf.exempt
+def track_impression():
+    data = request.get_json() or {}
+    entity_type = data.get("entity_type")
+    context_id = data.get("context_id")
+    entity_ids = data.get("entity_ids", [])
+    
+    if not entity_type or not entity_ids:
+        return jsonify({"success": False, "error": "Missing parameters"}), 400
+        
+    user_id = current_user.id if current_user.is_authenticated else None
+    
+    try:
+        impression = RecommendationImpression(
+            entity_type=entity_type,
+            context_id=str(context_id) if context_id is not None else None,
+            entity_ids=entity_ids,
+            user_id=user_id
+        )
+        db.session.add(impression)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception("Failed to track recommendation impression")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@bp.route("/track/click", methods=["POST"])
+@csrf.exempt
+def track_click():
+    data = request.get_json() or {}
+    entity_type = data.get("entity_type")
+    entity_id = data.get("entity_id")
+    context_id = data.get("context_id")
+    
+    if not entity_type or not entity_id:
+        return jsonify({"success": False, "error": "Missing parameters"}), 400
+        
+    user_id = current_user.id if current_user.is_authenticated else None
+    
+    try:
+        click = RecommendationClick(
+            entity_type=entity_type,
+            entity_id=str(entity_id),
+            context_id=str(context_id) if context_id is not None else None,
+            user_id=user_id
+        )
+        db.session.add(click)
+        db.session.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception("Failed to track recommendation click")
+        return jsonify({"success": False, "error": str(e)}), 500

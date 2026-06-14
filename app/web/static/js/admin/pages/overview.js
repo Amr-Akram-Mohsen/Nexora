@@ -164,51 +164,6 @@ function renderInteractionAnalytics(containerId) {
 }
 
 
-// ==========================================
-// INTERACTION BREAKDOWN (overview page)
-// ==========================================
-function renderInteractionBreakdown(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  fetch('/admin/interactions/stats')
-    .then(res => res.json())
-    .then(data => {
-      container.innerHTML = "";
-      const templateGrid = document.getElementById("overview-breakdown-template");
-      if (!templateGrid) return;
-      const grid = templateGrid.content.cloneNode(true).querySelector(".overview-breakdown-grid");
-
-      const items = [
-        { label: "Views", key: "views", icon: "👁️" },
-        { label: "Comments", key: "comments", icon: "💬" },
-        { label: "Likes", key: "likes", icon: "👍" },
-        { label: "Dislikes", key: "dislikes", icon: "👎" },
-        { label: "Saves", key: "saves", icon: "🔖" },
-        { label: "Item Clicks", key: "item_clicks", icon: "🛒" },
-      ];
-      const total = data.total || 1;
-      const templateRow = document.getElementById("overview-breakdown-row-template");
-
-      items.forEach(it => {
-        const val = data[it.key] || 0;
-        const pct = Math.round((val / total) * 100);
-
-        const clone = templateRow.content.cloneNode(true);
-        clone.querySelector(".overview-breakdown-icon").textContent = it.icon;
-        clone.querySelector(".overview-breakdown-label").textContent = it.label;
-        clone.querySelector(".overview-breakdown-bar").style.width = `${pct}%`;
-        clone.querySelector(".overview-breakdown-val").textContent = val.toLocaleString();
-        clone.querySelector(".overview-breakdown-pct").textContent = `${pct}%`;
-        grid.appendChild(clone);
-      });
-
-      container.appendChild(grid);
-    })
-    .catch(() => {
-      container.innerHTML = getErrorStateHtml("Could not load interaction data.");
-    });
-}
 
 // ==========================================
 // SHARED TOP LIST RENDERER

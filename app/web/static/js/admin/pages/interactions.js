@@ -60,12 +60,12 @@
 
         const template = document.getElementById('interactions-stat-card-template');
         const cards = [
-          { icon: '💬', label: 'Comments',  value: data.comments },
-          { icon: '👍', label: 'Likes',     value: data.likes },
-          { icon: '👎', label: 'Dislikes',  value: data.dislikes },
-          { icon: '👁️', label: 'Views',     value: data.views },
-          { icon: '🔖', label: 'Saves',     value: data.saves },
-          { icon: '🛒', label: 'Clicks',    value: data.item_clicks },
+          { icon: '💬', label: 'Comments', value: data.comments },
+          { icon: '👍', label: 'Likes', value: data.likes },
+          { icon: '👎', label: 'Dislikes', value: data.dislikes },
+          { icon: '👁️', label: 'Views', value: data.views },
+          { icon: '🔖', label: 'Saves', value: data.saves },
+          { icon: '🛒', label: 'Clicks', value: data.item_clicks },
         ];
 
         cards.forEach(c => {
@@ -104,7 +104,6 @@
     }
 
     clone.querySelector('.comment-cell-username').textContent = c.user_name;
-    clone.querySelector('.comment-cell-userid').textContent = `#${c.user_id}`;
     clone.querySelector('.comment-cell-target').textContent = c.target_title;
 
     const targetTypeEl = clone.querySelector('.comment-cell-targettype');
@@ -229,7 +228,7 @@
 
     clone.querySelector('.reaction-cell-id').textContent = `#${r.id}`;
     clone.querySelector('.reaction-cell-target').textContent = r.target_title;
-    
+
     const targetTypeEl = clone.querySelector('.reaction-cell-targettype');
     targetTypeEl.textContent = r.target_type;
     targetTypeEl.classList.add(r.target_type === 'content' ? 'badge-blue' : r.target_type === 'item' ? 'badge-purple' : 'badge-green');
@@ -239,7 +238,7 @@
     typeEl.classList.add(r.type === 'like' ? 'active' : 'inactive');
 
     clone.querySelector('.reaction-cell-username').textContent = r.user_name;
-    clone.querySelector('.reaction-cell-useremail').textContent = r.user_email ? `#${r.user_id} • ${r.user_email}` : `#${r.user_id}`;
+    clone.querySelector('.reaction-cell-useremail').textContent = `${r.user_email.slice(0, 2)}******${r.user_email.slice(-11)}`;
     clone.querySelector('.reaction-cell-date').textContent = formatDate(r.created_at);
 
     return tr;
@@ -251,7 +250,7 @@
     const tr = clone.querySelector('tr');
 
     clone.querySelector('.views-cell-target').textContent = v.target_title;
-    
+
     const typeEl = clone.querySelector('.views-cell-targettype');
     typeEl.textContent = v.target_type;
     typeEl.classList.add(v.target_type === 'content' ? 'badge-blue' : 'badge-purple');
@@ -269,7 +268,7 @@
     const tr = clone.querySelector('tr');
 
     clone.querySelector('.clicks-cell-item').textContent = c.item_name;
-    
+
     const destEl = clone.querySelector('.clicks-cell-destination');
     destEl.textContent = c.store_name;
     destEl.href = c.affiliate_url;
@@ -286,13 +285,13 @@
     const tr = clone.querySelector('tr');
 
     clone.querySelector('.saves-cell-target').textContent = s.target_title;
-    
+
     const typeEl = clone.querySelector('.saves-cell-targettype');
     typeEl.textContent = s.target_type;
     typeEl.classList.add(s.target_type === 'content' ? 'badge-blue' : 'badge-purple');
 
     clone.querySelector('.saves-cell-username').textContent = s.user_name;
-    clone.querySelector('.saves-cell-useremail').textContent = s.user_email ? `#${s.user_id} • ${s.user_email}` : `#${s.user_id}`;
+    clone.querySelector('.saves-cell-useremail').textContent = `${s.user_email.slice(0, 2)}******${s.user_email.slice(-11)}`;
     clone.querySelector('.saves-cell-date').textContent = formatDate(s.created_at);
 
     return tr;
@@ -310,7 +309,7 @@
       else if (activeTab === 'views') searchInputId = 'views-search';
       else if (activeTab === 'clicks') searchInputId = 'clicks-search';
       else if (activeTab === 'saves') searchInputId = 'saves-search';
-      
+
       const searchEl = document.getElementById(searchInputId);
       if (searchEl) {
         searchEl.value = params.search;

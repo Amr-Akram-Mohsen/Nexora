@@ -15,6 +15,8 @@ from app.core.extensions import db
 from app.domains.taxonomy.models import Source
 from app.domains.content.models import Content
 from app.domains.item.models import Store, Item, ItemVariant, ItemStoreLink
+from app.domains.external.models import LastAPIFetch
+from app.domains.interaction.models import View, ItemClick
 from app.admin.helpers import parse_pagination_params
 from sqlalchemy import select, func, or_
 
@@ -58,17 +60,34 @@ def list_sources():
             "per_page": pagination.per_page,
         })
 
-    # ── Aggregate: content count + latest ingested_at per source ──────────
+    # ── Aggregate: content count + latest ingested_at + engagement per source ──────────
     content_agg = db.session.execute(
         select(
             Content.source_id,
             func.count(Content.id).label("content_count"),
             func.max(Content.ingested_at).label("latest_ingested_at"),
+            func.sum(
+                Content.view_count + Content.like_count + Content.dislike_count + Content.save_count + Content.comment_count
+            ).label("engagement")
         )
         .where(Content.source_id.in_(page_source_ids))
         .group_by(Content.source_id)
     ).all()
     content_agg_map = {r.source_id: r for r in content_agg}
+
+    # ── Fetch API health metrics from LastAPIFetch ─────────────────────
+    page_source_slugs = [s.slug for s in pagination.items]
+    fetch_agg = db.session.execute(
+        select(
+            LastAPIFetch.source,
+            func.max(LastAPIFetch.last_fetched_at).label("last_crawl"),
+            func.sum(LastAPIFetch.success_count).label("success_count"),
+            func.sum(LastAPIFetch.failure_count).label("failure_count")
+        )
+        .where(func.lower(LastAPIFetch.source).in_([slug.lower() for slug in page_source_slugs]))
+        .group_by(LastAPIFetch.source)
+    ).all()
+    fetch_agg_map = {r.source.lower(): r for r in fetch_agg}
 
     serialized = []
     for s in pagination.items:
@@ -76,10 +95,19 @@ def list_sources():
 
         content_count   = agg.content_count if agg else 0
         latest_activity = agg.latest_ingested_at.isoformat() if agg and agg.latest_ingested_at else None
+        engagement      = int(agg.engagement) if agg and agg.engagement is not None else 0
+
+        # Crawl analytics
+        fetch_info = fetch_agg_map.get(s.slug.lower())
+        last_crawl = fetch_info.last_crawl.isoformat() if fetch_info and fetch_info.last_crawl else None
+        success_count = fetch_info.success_count if (fetch_info and fetch_info.success_count is not None) else 0
+        failure_count = fetch_info.failure_count if (fetch_info and fetch_info.failure_count is not None) else 0
+        total_fetches = success_count + failure_count
+        success_rate = round((success_count / total_fetches) * 100.0, 1) if total_fetches > 0 else 100.0
 
         if not s.is_active:
             status_val = "failed"
-        elif content_count == 0:
+        elif content_count == 0 or success_rate < 80.0:
             status_val = "warning"
         else:
             status_val = "healthy"
@@ -94,6 +122,10 @@ def list_sources():
             "authority_score": s.authority_score,
             "content_count":   content_count,
             "latest_activity": latest_activity,
+            "last_crawl":      last_crawl,
+            "success_rate":    success_rate,
+            "failure_count":   failure_count,
+            "engagement":      engagement,
             "status":          status_val,
         })
 
@@ -147,6 +179,32 @@ def list_stores():
         .group_by(ItemStoreLink.store_id)
     ).all()
     product_count_map = {r.store_id: r.product_count for r in product_count_rows}
+
+    # ── Aggregate: total clicks per store ─────────────────────────────────
+    clicks_rows = db.session.execute(
+        select(
+            ItemStoreLink.store_id,
+            func.count(ItemClick.id).label("clicks")
+        )
+        .join(ItemClick, ItemClick.item_store_link_id == ItemStoreLink.id)
+        .where(ItemStoreLink.store_id.in_(page_store_ids))
+        .group_by(ItemStoreLink.store_id)
+    ).all()
+    clicks_map = {r.store_id: r.clicks for r in clicks_rows}
+
+    # ── Aggregate: total views per store ──────────────────────────────────
+    views_rows = db.session.execute(
+        select(
+            ItemStoreLink.store_id,
+            func.count(View.id).label("views")
+        )
+        .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
+        .join(View, (View.target_id == ItemVariant.item_id) & (View.target_type == 'item'))
+        .where(ItemStoreLink.store_id.in_(page_store_ids))
+        .group_by(ItemStoreLink.store_id)
+    ).all()
+    views_map = {r.store_id: r.views for r in views_rows}
+
     # ── Latest activity per store ─────────────────────────────────────────
     latest_activity_rows = db.session.execute(
         select(
@@ -166,6 +224,11 @@ def list_stores():
         latest_activity = latest_activity_map.get(st.id)
         latest_activity_str = latest_activity.isoformat() if latest_activity else None
 
+        clicks = clicks_map.get(st.id, 0)
+        views = views_map.get(st.id, 0)
+        ctr = round((clicks / views) * 100.0, 2) if views > 0 else 0.0
+        conversions = 0
+
         if not st.is_active:
             status_val = "failed"
         elif product_count == 0:
@@ -182,6 +245,9 @@ def list_stores():
             "logo_url":          st.logo_url,
             "is_active":         st.is_active,
             "product_count":     product_count,
+            "clicks":            clicks,
+            "ctr":               ctr,
+            "conversions":       conversions,
             "latest_activity":   latest_activity_str,
             "status":            status_val,
         })

@@ -1,0 +1,596 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_table_spinner %}
+
+{% block title %}Insights & Opportunities — Nexora Admin{% endblock %}
+
+{% block css %}
+{{ super() }}
+<style>
+  /* Premium Aesthetics for Insights Module */
+  .insights-opp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  
+  .insights-opp-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  
+  .insights-opp-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  
+  .insights-opp-card.brand-opp {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(239, 68, 68, 0.04) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+  }
+  
+  .insights-opp-card.brand-opp:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  
+  .opp-tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 10px;
+    font-weight: var(--weight-bold);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+  }
+  
+  .opp-tag.cat {
+    background: rgba(99, 102, 241, 0.12);
+    color: #6366f1;
+  }
+  
+  .opp-tag.brand {
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--brand-orange);
+  }
+  
+  .opp-title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-xbold);
+    margin: 0 0 0.5rem 0;
+    color: var(--foreground);
+    padding-right: 4.5rem;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  
+  .opp-metrics {
+    display: flex;
+    gap: 1rem;
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+    margin-bottom: 0.875rem;
+  }
+  
+  .opp-metric-item strong {
+    color: var(--foreground);
+  }
+  
+  .opp-action {
+    background: var(--card);
+    border: 1px dashed var(--border);
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .trending-sections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .insights-double-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 992px) {
+    .insights-double-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .trend-badge {
+    font-size: 11px;
+    font-weight: var(--weight-bold);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .trend-badge.up {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--brand-green-dark);
+  }
+
+  .trend-badge.down {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--brand-red);
+  }
+
+  .trend-badge.neutral {
+    background: var(--secondary);
+    color: var(--muted-foreground);
+  }
+  
+  .insight-group-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-xbold);
+    color: var(--foreground);
+    margin: 2rem 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .insight-group-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .badge-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+  }
+
+  .badge-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--brand-orange);
+  }
+
+  .badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--brand-green-dark);
+  }
+
+  .badge-secondary {
+    background: var(--secondary);
+    color: var(--muted-foreground);
+  }
+
+  .badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--brand-red);
+  }
+
+  .publishing-summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(99, 102, 241, 0.03);
+    border-bottom: 1px solid var(--border);
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+  }
+
+  .publishing-summary-item strong {
+    color: var(--foreground);
+  }
+
+  .publishing-column-header {
+    padding: 1rem;
+    font-weight: var(--weight-xbold);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+{% set header_actions %}
+<div class="flex items-center gap-sm">
+  <select id="timeframe-select" class="dashboard-filter-select" style="min-width: 140px; height: 36px; padding: 0.375rem 2rem 0.375rem 0.75rem;">
+    <option value="today">Today (24h)</option>
+    <option value="7_days" selected>Last 7 Days</option>
+    <option value="30_days">Last 30 Days</option>
+    <option value="all_time">All Time</option>
+  </select>
+  <button id="refresh-insights-btn" class="admin-btn-secondary">↺ Refresh</button>
+</div>
+{% endset %}
+
+{{ admin_page_header(
+  "Editorial Intelligence Dashboard",
+  "Strategic decision-making intelligence engine. Focus on content gaps, intent distribution, brand opportunities, and recommendation CTR.",
+  actions=header_actions
+) }}
+
+<!-- Section 1: Recommendation CTR Dashboard -->
+<h2 class="insight-group-title">🔗 Recommendation Widget Performance</h2>
+<div class="dashboard-stats-grid mb-6" id="recommendation-ctr-grid">
+  <div class="grid-full-width">
+    {{ admin_table_spinner(1, "Loading recommendation metrics...") }}
+  </div>
+</div>
+
+<!-- Section 1.5: Recommendation Intelligence Summary -->
+<h2 class="insight-group-title">🧠 Recommendation Intelligence Summary</h2>
+<div class="insights-double-grid mb-6" id="recommendation-intelligence-panel" style="display: none;">
+  <!-- Left Side: Quality Scores & Benchmark -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📊 Quality Scores & Benchmarks</h3>
+      <p class="overview-panel-sub">Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.</p>
+    </div>
+    
+    <div class="p-4 flex flex-col gap-lg" style="gap: 1.5rem;">
+      <!-- Cross Category Benchmarking Widget -->
+      <div class="border p-3 rounded-md" style="background: rgba(99, 102, 241, 0.02); border: 1px solid var(--border); border-radius: var(--radius-md);">
+        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-chart-line" style="color: #6366f1;"></i> Cross-Category Benchmarks
+        </h4>
+        <div class="flex flex-col gap-sm" id="category-benchmark-summary" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quality Scores Tabular View -->
+      <div>
+        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-star" style="color: var(--brand-orange);"></i> Quality Score Breakdown
+        </h4>
+        <div class="admin-table-wrapper" style="border: none; box-shadow: none;">
+          <table class="admin-table text-xs" style="margin-bottom: 0; font-size: var(--text-xs);">
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>Type / Name</th>
+                <th class="col-metric">CTR</th>
+                <th class="col-metric">Quality Score</th>
+              </tr>
+            </thead>
+            <tbody id="quality-scores-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Action Suggestions List -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">💡 Action Suggestions Engine</h3>
+      <p class="overview-panel-sub">Behavior-driven diagnoses and recommended actions per recommendation module.</p>
+    </div>
+    <div class="p-3 flex flex-col gap-md" id="rec-action-suggestions-list" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+
+<!-- Decision Engine: Top Opportunities & Actions Queue -->
+<div class="insights-double-grid mb-6">
+  <!-- Top Opportunities Table -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🏆 Top Opportunities</h3>
+      <p class="overview-panel-sub">Unified priority list of categories and brands with the highest growth potential.</p>
+    </div>
+    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+      <table class="admin-table text-sm" id="top-opportunities-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Entity</th>
+            <th>Type</th>
+            <th class="col-metric">Opportunity Score</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="top-opportunities-body">
+          <tr>
+            <td colspan="5" class="text-center">
+              {{ admin_table_spinner(5, "Prioritizing entities...") }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Insight Actions Queue -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">⚡ Insight Actions Queue</h3>
+      <p class="overview-panel-sub">Immediate tactical recommendations sorted by expected impact and priority.</p>
+    </div>
+    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+      <div id="action-queue-list" class="flex flex-col gap-md p-3">
+        {{ admin_table_spinner(1, "Compiling action guidance...") }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1.7: Content Strategy Output -->
+<h2 class="insight-group-title">🚀 Content Strategy Output</h2>
+<div class="overview-panel mb-6" id="content-strategy-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Content Publishing Plan</h3>
+    <p class="overview-panel-sub">Actionable multi-platform content roadmap prioritized by opportunity growth score and behavioral cues.</p>
+  </div>
+  
+  <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 600px; overflow-y: auto;">
+    <table class="admin-table text-sm" id="content-strategy-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">Rank</th>
+          <th>Target Entity</th>
+          <th>YouTube Video Ideas</th>
+          <th>Pinterest Cheat Sheets</th>
+          <th>Blog / SEO Articles</th>
+        </tr>
+      </thead>
+      <tbody id="content-strategy-table-body">
+        <tr>
+          <td colspan="5" class="text-center">
+            {{ admin_table_spinner(5, "Generating content strategies...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 1.9: Content Asset Mapping -->
+<h2 class="insight-group-title">🔗 Content Asset Mapping</h2>
+<div class="overview-panel mb-6" id="content-asset-mapping-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Asset Inventory & Gaps</h3>
+    <p class="overview-panel-sub">Analyzing existing database articles, videos, and product pages against the recommended content strategy.</p>
+  </div>
+  
+  <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 600px; overflow-y: auto;">
+    <table class="admin-table text-sm" id="asset-mapping-table">
+      <thead>
+        <tr>
+          <th style="width: 200px;">Opportunity Entity</th>
+          <th>Existing Reusable Content (DB Assets)</th>
+          <th>Identified Publishing Gaps (Missing Content)</th>
+        </tr>
+      </thead>
+      <tbody id="asset-mapping-table-body">
+        <tr>
+          <td colspan="3" class="text-center">
+            {{ admin_table_spinner(3, "Mapping strategy to assets...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 1.95: Content Publishing Plan -->
+<h2 class="insight-group-title">📅 Content Publishing Plan</h2>
+<div class="overview-panel mb-6" id="content-publishing-plan-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Content Execution Calendar</h3>
+    <p class="overview-panel-sub">Automated schedule showing priority actions, platform channels, and timing based on opportunity potential.</p>
+  </div>
+  
+  <!-- Summary Metrics Bar -->
+  <div class="publishing-summary-bar" id="publishing-plan-summary">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="publishing-plan-grid p-4" id="publishing-plan-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
+    <!-- Three Columns (Week 1, Week 2, Backlog) populated by JS -->
+    <div class="grid-full-width text-center">
+      {{ admin_table_spinner(1, "Orchestrating weekly publishing schedule...") }}
+    </div>
+  </div>
+<!-- Section 1.98: Content Performance Feedback -->
+<h2 class="insight-group-title">📉 Content Performance Feedback</h2>
+<div class="insights-double-grid mb-6" id="content-feedback-panel" style="display: none;">
+  <!-- Left Side: Strategy Accuracy & Failures -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🧠 Strategy Accuracy & Failures</h3>
+      <p class="overview-panel-sub">Platform-weighted accuracy index and root-cause diagnoses of underperforming assets.</p>
+    </div>
+    <div class="p-4 flex flex-col gap-lg" style="gap: 1.5rem; display: flex; flex-direction: column;">
+      <!-- Strategy Accuracy Widget -->
+      <div class="border p-3 rounded-md" style="background: rgba(99, 102, 241, 0.02); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <div>
+          <h4 class="font-bold text-sm mb-1" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.25rem;">
+            Strategy Accuracy Index
+          </h4>
+          <p style="font-size: var(--text-xs); color: var(--muted-foreground); margin: 0;">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest 0.6).</p>
+        </div>
+        <div style="font-size: 2rem; font-weight: var(--weight-xbold); color: #6366f1;" id="strategy-accuracy-index">
+          --%
+        </div>
+      </div>
+      
+      <!-- Failures List -->
+      <div>
+        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-exclamation-triangle" style="color: var(--brand-red);"></i> Failure Diagnostics & Recommendations
+        </h4>
+        <div id="feedback-failures-list" class="flex flex-col gap-md" style="max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Side: Evaluations list -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📋 Content Evaluations Inventory</h3>
+      <p class="overview-panel-sub">Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.</p>
+    </div>
+    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+      <table class="admin-table text-xs" style="margin-bottom: 0; font-size: var(--text-xs);">
+        <thead>
+          <tr>
+            <th>Platform / Title</th>
+            <th class="col-metric">Expected CTR</th>
+            <th class="col-metric">Actual CTR</th>
+            <th>Evaluation Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="feedback-evaluations-body">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1.99: Autonomous Execution Panel -->
+<h2 class="insight-group-title">🤖 Autonomous Execution Panel</h2>
+<div class="overview-panel mb-6" id="autonomous-execution-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Controlled Autonomous Publishing</h3>
+    <p class="overview-panel-sub">Safe execution bridge sorting decisions into automated queues, pending reviews, or safety blocks based on confidence scoring.</p>
+  </div>
+  
+  <!-- Summary Metrics Bar -->
+  <div class="publishing-summary-bar" id="execution-plan-summary">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="publishing-plan-grid p-4" id="execution-plan-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
+    <!-- Three Columns (Auto-Execute, Needs Review, Blocked) populated by JS -->
+    <div class="grid-full-width text-center">
+      {{ admin_table_spinner(1, "Preparing autonomous queues...") }}
+    </div>
+  </div>
+</div>
+
+<!-- Section 1.995: Execution Governance Panel -->
+<h2 class="insight-group-title">🤖 Execution Governance Panel</h2>
+<div class="overview-panel mb-6" id="execution-governance-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Execution Governance & Production Control</h3>
+    <p class="overview-panel-sub">Production control center displaying risk scores, safety modes, and gated execution queues.</p>
+  </div>
+  
+  <!-- Summary / Config Mode Bar -->
+  <div class="publishing-summary-bar" id="execution-governance-summary">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="publishing-plan-grid p-4" id="execution-governance-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
+    <!-- Three Columns (Safe/Executed, Needs Approval, Blocked) populated by JS -->
+    <div class="grid-full-width text-center">
+      {{ admin_table_spinner(1, "Loading governance queues...") }}
+    </div>
+  </div>
+</div>
+
+
+<!-- Section 2: Content Coverage Matrix -->
+<h2 class="insight-group-title">⚖️ Content Coverage Matrix</h2>
+<div class="overview-panel mb-6">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Category Coverage & Demand Gaps</h3>
+    <p class="overview-panel-sub">Analyzing content volume vs user engagement signals to identify content gaps.</p>
+  </div>
+  <div class="admin-table-wrapper">
+    <table class="admin-table" id="coverage-matrix-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th class="col-metric">Demand Level</th>
+          <th class="col-metric">Coverage Level</th>
+          <th>Gap Score / Status</th>
+        </tr>
+      </thead>
+      <tbody id="coverage-matrix-body">
+        <tr>
+          <td colspan="4" class="text-center">
+            {{ admin_table_spinner(4, "Assessing category alignment...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Section 3 & 4: Intent & Brand Opportunities -->
+<div class="insights-double-grid">
+  <!-- Intent Opportunity Analysis -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🎯 Intent Opportunity Analysis</h3>
+      <p class="overview-panel-sub">Content distribution across taxonomy intents and identified coverage gaps.</p>
+    </div>
+    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+      <div id="intent-opportunities-list" class="flex flex-col gap-md p-3">
+        {{ admin_table_spinner(1, "Analyzing intent distributions...") }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Opportunity Analysis -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">⭐ Brand Opportunity Analysis</h3>
+      <p class="overview-panel-sub">User engagement vs content volume to identify brand expansion opportunities.</p>
+    </div>
+    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+      <table class="admin-table text-sm" id="brand-opportunities-table">
+        <thead>
+          <tr>
+            <th>Brand</th>
+            <th class="col-metric">Articles</th>
+            <th class="col-metric">Engagement</th>
+            <th>Expansion Status</th>
+          </tr>
+        </thead>
+        <tbody id="brand-opportunities-body">
+          <tr>
+            <td colspan="4" class="text-center">
+              {{ admin_table_spinner(4, "Calculating brand expansion opportunities...") }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/insights.js') }}"></script>
+{% endblock %}

@@ -1,6 +1,15 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner, admin_filter_select %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_summary_bar,
+    admin_modal_close_button,
+    action_button,
+    action_group,
+    inspect_section,
+    inspect_detail_row
+%}
 
 {% block title %}User Management — Nexora Admin{% endblock %}
 
@@ -17,19 +26,12 @@ actions=header_actions
 ) }}
 
 <div class="admin-toolbar flex items-center">
-  <div class="admin-toolbar-search flex items-center">
-    <span class="admin-toolbar-search-icon">🔍</span>
-    <input type="text" id="user-search" placeholder="Search by name or email…" />
-  </div>
+  {{ admin_search_input("user-search", "Search by name or email…", icon_class="admin-toolbar-search-icon") }}
   {{ admin_filter_select("user-role-filter", None, [("admin", "Admins"), ("user", "Users")], default_val="", default_text="All Roles") }}
 </div>
 
 <!-- Summary bar -->
-<div class="flex justify-between items-center mb-3">
-  <div class="admin-summary-bar">
-    Showing <strong id="users-count">—</strong> users
-  </div>
-</div>
+{{ admin_summary_bar("users-count", "users") }}
 
 <div class="admin-table-wrapper">
   <table class="admin-table" id="users-table">
@@ -51,9 +53,7 @@ actions=header_actions
 {{ admin_paginator(domain="users", per_page_options=[10, 25, 50], current_per_page=25) }}
 
 {% call admin_modal("inspect-user-modal", "User Details & Access Control", "👤") %}
-<div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-user-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
-</div>
+{{ admin_modal_close_button(button_id="inspect-user-close-btn") }}
 {% endcall %}
 
 <template id="users-row-template">
@@ -70,11 +70,9 @@ actions=header_actions
     </td>
     <td class="user-joined-cell"></td>
     <td>
-      <div class="user-actions-group">
-        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-user">
-          👁️ Inspect
-        </button>
-      </div>
+      {% call action_group() %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-user", extra_class="inspect-btn") }}
+      {% endcall %}
     </td>
   </tr>
 </template>
@@ -82,18 +80,15 @@ actions=header_actions
 
 <template id="user-inspect-template">
   <div class="inspect-details-group flex flex-col">
-    <div>
-      <strong class="inspect-details-title">User Account Details</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
-      <div class="inspect-details-row"><strong>Name:</strong> <span class="inspect-name"></span></div>
-      <div class="inspect-details-row"><strong>Email:</strong> <span class="inspect-email"></span></div>
-      <div class="inspect-details-row"><strong>Role:</strong> <span class="inspect-role status-badge"></span></div>
-      <div class="inspect-details-row"><strong>Status:</strong> <span class="inspect-status status-badge"></span></div>
-      <div class="inspect-details-row"><strong>Joined Date:</strong> <span class="inspect-joined"></span></div>
-    </div>
-    <hr class="inspect-details-divider" />
-    <div>
-      <strong class="inspect-details-title">Access Control Actions</strong>
+    {% call inspect_section("User Account Details") %}
+      {{ inspect_detail_row("ID", "inspect-id") }}
+      {{ inspect_detail_row("Name", "inspect-name") }}
+      {{ inspect_detail_row("Email", "inspect-email") }}
+      {{ inspect_detail_row("Role", "inspect-role status-badge") }}
+      {{ inspect_detail_row("Status", "inspect-status status-badge") }}
+      {{ inspect_detail_row("Joined Date", "inspect-joined") }}
+    {% endcall %}
+    {% call inspect_section("Access Control Actions", divider=false) %}
       <div class="flex gap-2 mt-2 flex-wrap">
         <button class="user-action-btn user-action-toggle-admin inspect-toggle-admin-btn" data-id="">
           Change Role
@@ -105,7 +100,7 @@ actions=header_actions
           🗑 Delete User
         </button>
       </div>
-    </div>
+    {% endcall %}
   </div>
 </template>
 {% endblock %}

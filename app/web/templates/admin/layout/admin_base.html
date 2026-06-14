@@ -64,6 +64,22 @@
     <p class="error-message">Failed to load data. Please try again.</p>
   </div>
 </template>
+
+<template id="overview-breakdown-template">
+  <div class="overview-breakdown-grid"></div>
+</template>
+
+<template id="overview-breakdown-row-template">
+  <div class="overview-breakdown-row flex items-center">
+    <span class="overview-breakdown-icon"></span>
+    <span class="overview-breakdown-label"></span>
+    <div class="overview-breakdown-bar-track">
+      <div class="overview-breakdown-bar"></div>
+    </div>
+    <span class="overview-breakdown-val"></span>
+    <span class="overview-breakdown-pct"></span>
+  </div>
+</template>
 {% endblock %}
 
 {% block scripts %}

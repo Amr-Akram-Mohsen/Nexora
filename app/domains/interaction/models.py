@@ -249,3 +249,27 @@ class ItemClick(db.Model):
 
     def __repr__(self):
         return f"<ItemClick id={self.id} link={self.item_store_link_id} user={self.user_id} ip={self.ip_address}>"
+
+class RecommendationImpression(db.Model):
+    __tablename__ = "recommendation_impressions"
+    id = db.Column(db.Integer, primary_key=True)
+    entity_type = db.Column(db.String(50), nullable=False) # 'related_content', 'related_product', 'shop_product'
+    context_id = db.Column(db.String(100), nullable=True)  # article or page id
+    entity_ids = db.Column(db.JSON, nullable=False)        # list of recommendation target ids shown
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), server_default=db.func.now(), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    def __repr__(self):
+        return f"<RecommendationImpression id={self.id} type={self.entity_type} context={self.context_id}>"
+
+class RecommendationClick(db.Model):
+    __tablename__ = "recommendation_clicks"
+    id = db.Column(db.Integer, primary_key=True)
+    entity_type = db.Column(db.String(50), nullable=False) # 'related_content', 'related_product', 'shop_product'
+    entity_id = db.Column(db.String(100), nullable=False)   # the specific clicked item/content id
+    context_id = db.Column(db.String(100), nullable=True)  # article or page id context
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), server_default=db.func.now(), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    def __repr__(self):
+        return f"<RecommendationClick id={self.id} type={self.entity_type} target={self.entity_id} context={self.context_id}>"

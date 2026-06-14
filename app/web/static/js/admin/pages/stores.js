@@ -24,7 +24,9 @@
 
     clone.querySelector('.store-cell-network').textContent = st.affiliate_network || 'Direct';
     clone.querySelector('.store-cell-count').textContent = st.product_count.toLocaleString();
-    clone.querySelector('.store-cell-time').textContent = st.latest_activity ? formatDate(st.latest_activity, true) : '—';
+    clone.querySelector('.store-cell-clicks').textContent = st.clicks.toLocaleString();
+    clone.querySelector('.store-cell-ctr').textContent = typeof st.ctr === 'number' ? `${st.ctr.toFixed(2)}%` : '0.00%';
+    clone.querySelector('.store-cell-conversions').textContent = st.conversions.toLocaleString();
 
     const statusCell = clone.querySelector('.store-cell-status');
     statusCell.innerHTML = "";
@@ -67,7 +69,7 @@
       refreshBtnId: 'refresh-stores-btn',
       rowTemplateId: 'stores-row-template',
       defaultPerPage: 20,
-      colspan: 6,
+      colspan: 8,
       itemsKey: 'stores',
       renderRow: renderStoreRow,
       autoInit: false

@@ -17,6 +17,11 @@ def require_admin():
 def home():
     return render_template("admin/dashboard/overview.html", title="Overview", domain="home")
 
+@bp.route("/insights")
+def dashboard_insights():
+    return render_template("admin/control_panel/insights.html", title="Insights & Opportunities", domain="insights")
+
+
 @bp.route("/contents")
 def dashboard_contents():
     return render_template("admin/control_panel/contents.html", title="Content Management", domain="contents")

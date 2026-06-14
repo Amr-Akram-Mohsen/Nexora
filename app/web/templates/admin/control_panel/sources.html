@@ -1,6 +1,12 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    action_group
+%}
 
 {% block title %}Sources Management — Nexora Admin{% endblock %}
 
@@ -19,20 +25,13 @@ actions=header_actions
 <!-- Filters -->
 <div class="admin-toolbar-advanced flex flex-col">
   <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="admin-toolbar-search admin-search-grow flex items-center">
-      <span class="admin-toolbar-search-icon-inside">🔍</span>
-      <input type="text" id="sources-search" placeholder="Search by name, slug, or domain…" />
-    </div>
-    <button id="clear-sources-filters-btn" class="dashboard-filter-clear">Reset</button>
+    {{ admin_search_input("sources-search", "Search by name, slug, or domain…") }}
+    {{ admin_reset_button("clear-sources-filters-btn", "Reset") }}
   </div>
 </div>
 
 <!-- Summary Bar -->
-<div class="flex justify-between items-center mb-3">
-  <div id="sources-summary" class="admin-summary-bar">
-    Showing <strong id="sources-count">—</strong> sources
-  </div>
-</div>
+{{ admin_summary_bar("sources-count", "sources", summary_id="sources-summary") }}
 
 <!-- Sources Table -->
 <div class="admin-table-wrapper">
@@ -40,15 +39,17 @@ actions=header_actions
     <thead>
       <tr>
         <th class="col-primary">Name</th>
-        <th class="col-metric">Rank / Authority</th>
-        <th class="col-metric">Count</th>
-        <th class="col-date">Latest Ingest Activity</th>
+        <th class="col-metric">Volume (Ingestion)</th>
+        <th class="col-date">Last Crawl</th>
+        <th class="col-metric">Success Rate</th>
+        <th class="col-metric">Failures</th>
+        <th class="col-metric">Engagement</th>
         <th class="col-status">Status</th>
         <th class="col-actions">Actions</th>
       </tr>
     </thead>
     <tbody id="sources-table-body">
-      {{ admin_table_spinner(6, "Loading sources list…") }}
+      {{ admin_table_spinner(8, "Loading sources list…") }}
     </tbody>
   </table>
 </div>
@@ -61,23 +62,29 @@ actions=header_actions
       <div class="source-cell-name"><a class="source-cell-link text-muted" target="_blank" href=""></a></div>
     </td>
     <td>
-      <span class="source-cell-score status-badge admin"></span>
-    </td>
-    <td>
       <strong class="source-cell-count inspect-brand-purple"></strong>
     </td>
     <td>
       <span class="source-cell-time text-foreground"></span>
     </td>
+    <td>
+      <span class="source-cell-success-rate text-foreground"></span>
+    </td>
+    <td>
+      <span class="source-cell-failures text-foreground"></span>
+    </td>
+    <td>
+      <span class="source-cell-engagement text-foreground font-bold"></span>
+    </td>
     <td class="source-cell-status">
     </td>
     <td>
-      <div class="user-actions-group">
+      {% call action_group() %}
         <a class="source-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
           href="">
           👁️ View Content
         </a>
-      </div>
+      {% endcall %}
     </td>
   </tr>
 </template>

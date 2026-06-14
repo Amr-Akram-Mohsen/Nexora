@@ -1,6 +1,17 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner, admin_filter_select %}
+{% from "admin/components/macros.html" import
+    admin_search_input,
+    admin_reset_button,
+    admin_summary_bar,
+    admin_modal_close_button,
+    action_group,
+    action_button,
+    inspect_section,
+    inspect_detail_row,
+    inspect_custom_row
+%}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
 
@@ -40,22 +51,18 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   <!-- Comment Filters -->
   <div class="admin-toolbar-advanced flex flex-col">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="comment-search" placeholder="Search comment text…" />
-      </div>
-      {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"), ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments", extra_class="filter-select-item") }}
-      {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="", default_text="All Targets", extra_class="filter-select-item") }}
-      <button id="clear-comment-filters-btn" class="dashboard-filter-clear">Reset</button>
+      {{ admin_search_input("comment-search", "Search comment text…") }}
+      {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
+      ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
+      extra_class="filter-select-item") }}
+      {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="",
+      default_text="All Targets", extra_class="filter-select-item") }}
+      {{ admin_reset_button("clear-comment-filters-btn", "Reset") }}
     </div>
   </div>
 
   <!-- Comment Summary -->
-  <div class="flex justify-between items-center mb-3">
-    <div id="comments-summary" class="admin-summary-bar">
-      Showing <strong id="comments-count">—</strong> comments
-    </div>
-  </div>
+  {{ admin_summary_bar("comments-count", "comments", summary_id="comments-summary") }}
 
   <!-- Comment Table -->
   <div class="admin-table-wrapper">
@@ -96,25 +103,16 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   <div style="margin-top:2rem;">
     <div class="admin-toolbar-advanced flex flex-col">
       <div class="admin-toolbar-row flex items-center flex-wrap">
-        <div class="admin-toolbar-search admin-search-grow flex items-center">
-          <span class="admin-toolbar-search-icon-inside">🔍</span>
-          <input type="text" id="reactions-search" placeholder="Search target title…" />
-        </div>
-        {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")], default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
-        <div class="admin-toolbar-search admin-search-grow flex items-center">
-          <span class="admin-toolbar-search-icon-inside">👤</span>
-          <input type="text" id="filter-reactions-user" placeholder="Search user name/email…" />
-        </div>
-        <button id="clear-reactions-filters-btn" class="dashboard-filter-clear">Reset</button>
+        {{ admin_search_input("reactions-search", "Search target title…") }}
+        {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
+        default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
+        {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon="👤") }}
+        {{ admin_reset_button("clear-reactions-filters-btn", "Reset") }}
       </div>
     </div>
 
     <!-- Reactions Summary -->
-    <div class="flex justify-between items-center mb-3">
-      <div id="reactions-summary" class="admin-summary-bar">
-        Showing <strong id="reactions-count">—</strong> reactions
-      </div>
-    </div>
+    {{ admin_summary_bar("reactions-count", "reactions", summary_id="reactions-summary") }}
 
     <div class="admin-table-wrapper">
       <table class="admin-table" id="reactions-table">
@@ -140,12 +138,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
 <!-- Views Tab -->
 <div class="admin-tab-panel is-hidden" id="tab-panel-views">
   <!-- Views Filters -->
-  <div class="admin-toolbar-advanced flex flex-col">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="views-search" placeholder="Search target title…" />
-      </div>
+      {{ admin_search_input("views-search", "Search target title…") }}
       <div class="flex items-center gap-2">
         <span class="text-sm text-muted">From:</span>
         <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item"
@@ -156,16 +149,10 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
         <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item"
           style="padding: 0.35rem 0.5rem;" />
       </div>
-      <button id="clear-views-filters-btn" class="dashboard-filter-clear">Reset</button>
-    </div>
-  </div>
+      {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
 
   <!-- Views Summary -->
-  <div class="flex justify-between items-center mb-3">
-    <div id="views-summary" class="admin-summary-bar">
-      Showing <strong id="views-count">—</strong> view targets
-    </div>
-  </div>
+  {{ admin_summary_bar("views-count", "view targets", summary_id="views-summary") }}
 
   <!-- Views Table -->
   <div class="admin-table-wrapper">
@@ -192,24 +179,14 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   <!-- Clicks Filters -->
   <div class="admin-toolbar-advanced flex flex-col">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="clicks-search" placeholder="Search item name…" />
-      </div>
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🏪</span>
-        <input type="text" id="filter-clicks-destination" placeholder="Search destination/store…" />
-      </div>
-      <button id="clear-clicks-filters-btn" class="dashboard-filter-clear">Reset</button>
+      {{ admin_search_input("clicks-search", "Search item name…") }}
+      {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon="🏪") }}
+      {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
     </div>
   </div>
 
   <!-- Clicks Summary -->
-  <div class="flex justify-between items-center mb-3">
-    <div id="clicks-summary" class="admin-summary-bar">
-      Showing <strong id="clicks-count">—</strong> click logs
-    </div>
-  </div>
+  {{ admin_summary_bar("clicks-count", "click logs", summary_id="clicks-summary") }}
 
   <!-- Clicks Table -->
   <div class="admin-table-wrapper">
@@ -236,24 +213,14 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   <!-- Saves Filters -->
   <div class="admin-toolbar-advanced flex flex-col">
     <div class="admin-toolbar-row flex items-center flex-wrap">
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">🔍</span>
-        <input type="text" id="saves-search" placeholder="Search target title…" />
-      </div>
-      <div class="admin-toolbar-search admin-search-grow flex items-center">
-        <span class="admin-toolbar-search-icon-inside">👤</span>
-        <input type="text" id="filter-saves-user" placeholder="Search user name/email…" />
-      </div>
-      <button id="clear-saves-filters-btn" class="dashboard-filter-clear">Reset</button>
+      {{ admin_search_input("saves-search", "Search target title…") }}
+      {{ admin_search_input("filter-saves-user", "Search user name/email…", icon="👤") }}
+      {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
     </div>
   </div>
 
   <!-- Saves Summary -->
-  <div class="flex justify-between items-center mb-3">
-    <div id="saves-summary" class="admin-summary-bar">
-      Showing <strong id="saves-count">—</strong> saves
-    </div>
-  </div>
+  {{ admin_summary_bar("saves-count", "saves", summary_id="saves-summary") }}
 
   <!-- Saves Table -->
   <div class="admin-table-wrapper">
@@ -276,9 +243,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
 </div>
 
 {% call admin_modal("inspect-comment-modal", "Comment Details & Moderation", "💬") %}
-<div class="dashboard-modal-actions flex justify-center">
-  <button id="inspect-comment-close-btn" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Close Details</button>
-</div>
+{{ admin_modal_close_button(button_id="inspect-comment-close-btn") }}
 {% endcall %}
 
 <template id="comments-row-template">
@@ -289,7 +254,6 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
     </td>
     <td>
       <span class="comment-cell-username user-cell-name"></span>
-      <div class="comment-cell-userid user-cell-email"></div>
     </td>
     <td>
       <span class="comment-cell-target user-cell-name"></span>
@@ -304,47 +268,38 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
       <span class="comment-cell-date user-cell-email"></span>
     </td>
     <td>
-      <div class="user-actions-group">
-        <button class="user-action-btn user-action-inspect inspect-btn" data-action="inspect-comment">
-          👁️ Inspect
-        </button>
-      </div>
+      {% call action_group() %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-comment", extra_class="inspect-btn") }}
+      {% endcall %}
     </td>
   </tr>
 </template>
 
 <template id="comment-inspect-template">
   <div class="inspect-details-group flex flex-col">
-    <div>
-      <strong class="inspect-details-title">Comment Metadata</strong>
-      <div class="inspect-details-row"><strong>ID:</strong> <span class="inspect-id"></span></div>
-      <div class="inspect-details-row"><strong>Author:</strong> <span class="inspect-username"></span> (email: <span class="inspect-useremail"></span>, ID: <span class="inspect-userid"></span>)</div>
-      <div class="inspect-details-row"><strong>Target Title:</strong> <span class="inspect-target-title"></span></div>
-      <div class="inspect-details-row"><strong>Target Type:</strong> <span class="inspect-target-type status-badge inspect-badge-secondary"></span></div>
-      <div class="inspect-details-row"><strong>Created At:</strong> <span class="inspect-date"></span></div>
-      <div class="inspect-details-row"><strong>AI Sentiment:</strong> <span class="inspect-sentiment status-badge"></span></div>
-    </div>
-    
-    <hr class="inspect-details-divider" />
-    
-    <div>
-      <strong class="inspect-details-title">Comment Body</strong>
-      <div class="inspect-comment-body-text" style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 6px; font-style: italic; white-space: pre-wrap; margin-top: 0.5rem; word-break: break-word;"></div>
-    </div>
-    
-    <hr class="inspect-details-divider" />
-    
-    <div>
-      <strong class="inspect-details-title">Moderation Actions</strong>
-      <div class="flex gap-2 mt-2 flex-wrap">
-        <button class="user-action-btn user-action-toggle-active inspect-flag-btn">
-          🚩 Flag as Spam
-        </button>
-        <button class="user-action-btn user-action-delete inspect-delete-btn">
-          🗑 Delete Comment
-        </button>
+    {% call inspect_section("Comment Metadata") %}
+      {{ inspect_detail_row("ID", "inspect-id") }}
+      {% call inspect_custom_row("Author") %}
+        <span class="inspect-username"></span> (email: <span class="inspect-useremail"></span>, ID: <span class="inspect-userid"></span>)
+      {% endcall %}
+      {{ inspect_detail_row("Target Title", "inspect-target-title") }}
+      {{ inspect_detail_row("Target Type", "inspect-target-type status-badge inspect-badge-secondary") }}
+      {{ inspect_detail_row("Created At", "inspect-date") }}
+      {{ inspect_detail_row("AI Sentiment", "inspect-sentiment status-badge") }}
+    {% endcall %}
+
+    {% call inspect_section("Comment Body") %}
+      <div class="inspect-comment-body-text"
+        style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 6px; font-style: italic; white-space: pre-wrap; margin-top: 0.5rem; word-break: break-word;">
       </div>
-    </div>
+    {% endcall %}
+
+    {% call inspect_section("Moderation Actions", divider=false) %}
+      <div class="flex gap-2 mt-2 flex-wrap">
+        {{ action_button("Flag as Spam", action_type="toggle-active", icon="🚩", extra_class="inspect-flag-btn") }}
+        {{ action_button("Delete Comment", action_type="delete", icon="🗑", extra_class="inspect-delete-btn") }}
+      </div>
+    {% endcall %}
   </div>
 </template>
 

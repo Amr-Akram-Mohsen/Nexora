@@ -1,0 +1,171 @@
+{# ==========================================================
+SEARCH INPUT
+========================================================== #}
+{% macro admin_search_input(
+id,
+placeholder,
+icon="🔍",
+wrapper_class="",
+input_class="",
+icon_class="admin-toolbar-search-icon-inside",
+value=""
+) %}
+<div class="admin-toolbar-search admin-search-grow flex items-center {{ wrapper_class }}">
+    <span class="{{ icon_class }}">
+        {{ icon }}
+    </span>
+
+    <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" value="{{ value }}" class="{{ input_class }}" />
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
+RESET BUTTON
+========================================================== #}
+{% macro admin_reset_button(
+id,
+text="Reset",
+extra_class=""
+) %}
+<button id="{{ id }}" class="dashboard-filter-clear {{ extra_class }}">
+    {{ text }}
+</button>
+{% endmacro %}
+
+
+{# ==========================================================
+SUMMARY BAR
+========================================================== #}
+{% macro admin_summary_bar(
+count_id,
+label,
+summary_id="",
+wrapper_class="",
+summary_class="admin-summary-bar"
+) %}
+<div class="flex justify-between items-center mb-3 {{ wrapper_class }}">
+    <div {% if summary_id %} id="{{ summary_id }}" {% endif %} class="{{ summary_class }}">
+        Showing <strong id="{{ count_id }}">—</strong> {{ label }}
+    </div>
+
+    {% if caller is defined %}
+    {{ caller() }}
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
+MODAL CLOSE BUTTON
+========================================================== #}
+{% macro admin_modal_close_button(
+button_id="",
+text="Close Details",
+wrapper_class="dashboard-modal-actions flex justify-center",
+button_class="dashboard-btn dashboard-btn-secondary"
+) %}
+<div class="{{ wrapper_class }}">
+    <button {% if button_id %} id="{{ button_id }}" {% endif %} class="{{ button_class }}" data-dismiss="modal">
+        {{ text }}
+    </button>
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
+INSPECT SECTION
+========================================================== #}
+{% macro inspect_section(
+title,
+divider=true,
+wrapper_class=""
+) %}
+<div class="{{ wrapper_class }}">
+    <strong class="inspect-details-title">
+        {{ title }}
+    </strong>
+
+    {{ caller() }}
+</div>
+
+{% if divider %}
+<hr class="inspect-details-divider" />
+{% endif %}
+{% endmacro %}
+
+
+{# ==========================================================
+SIMPLE INSPECT ROW
+========================================================== #}
+{% macro inspect_detail_row(
+label,
+value_class,
+value_tag="span",
+row_class="inspect-details-row",
+value_text=None
+) %}
+<div class="{{ row_class }}">
+    <strong>{{ label }}:</strong>
+
+    {% if value_text is not none %}
+    <{{ value_tag }} class="{{ value_class }}">
+        {{ value_text }}
+    </{{ value_tag }}>
+    {% else %}
+    <{{ value_tag }} class="{{ value_class }}"></{{ value_tag }}>
+    {% endif %}
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
+COMPLEX INSPECT ROW
+For rows like:
+Author: USER (email: EMAIL, ID: ID)
+========================================================== #}
+{% macro inspect_custom_row(
+label,
+row_class="inspect-details-row"
+) %}
+<div class="{{ row_class }}">
+    <strong>{{ label }}:</strong>
+    {{ caller() }}
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
+ACTION BUTTON
+========================================================== #}
+{% macro action_button(
+text,
+action_type="inspect",
+icon="",
+data_action="",
+title="",
+extra_class="",
+button_id="",
+button_type="button"
+) %}
+<button type="{{ button_type }}" {% if button_id %} id="{{ button_id }}" {% endif %} {% if data_action %}
+    data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
+    class="user-action-btn user-action-{{ action_type }} {{ extra_class }}">
+    {% if icon %}
+    {{ icon }}
+    {% endif %}
+    {{ text }}
+</button>
+{% endmacro %}
+
+
+{# ==========================================================
+ACTION GROUP
+========================================================== #}
+{% macro action_group(
+wrapper_class="user-actions-group"
+) %}
+<div class="{{ wrapper_class }}">
+    {{ caller() }}
+</div>
+{% endmacro %}
