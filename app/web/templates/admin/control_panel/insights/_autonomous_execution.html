@@ -1,0 +1,19 @@
+<!-- Section 1.99: Autonomous Execution Panel -->
+<div class="overview-panel" id="autonomous-execution-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Controlled Autonomous Publishing</h3>
+    <p class="overview-panel-sub">Safe execution bridge sorting decisions into automated queues, pending reviews, or safety blocks based on confidence scoring.</p>
+  </div>
+  
+  <!-- Summary Metrics Bar -->
+  <div class="publishing-summary-bar" id="execution-plan-summary">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="insights-kanban-grid" id="execution-plan-grid-container">
+    <!-- Three Columns (Auto-Execute, Needs Review, Blocked) populated by JS -->
+    <div class="grid-full-width text-center">
+      {{ admin_table_spinner(1, "Preparing autonomous queues...") }}
+    </div>
+  </div>
+</div>

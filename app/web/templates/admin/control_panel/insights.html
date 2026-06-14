@@ -7,51 +7,71 @@
 {{ super() }}
 <style>
   /* Premium Aesthetics for Insights Module */
+  :root {
+    --insights-violet: #6366f1;
+    --insights-violet-light: rgba(99, 102, 241, 0.04);
+    --insights-violet-border: rgba(99, 102, 241, 0.15);
+    --insights-orange: #f59e0b;
+    --insights-orange-light: rgba(245, 158, 11, 0.04);
+    --insights-orange-border: rgba(245, 158, 11, 0.15);
+    --insights-gradient-indigo: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%);
+    --insights-gradient-orange: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(239, 68, 68, 0.04) 100%);
+    --insights-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --insights-hover-shadow: 0 10px 25px -3px rgba(99, 102, 241, 0.1), 0 4px 12px -2px rgba(99, 102, 241, 0.05);
+  }
+
+  .insights-section {
+    margin-bottom: 2.5rem;
+  }
+  
   .insights-opp-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
+    gap: 1.5rem;
     margin-bottom: 2rem;
   }
   
   .insights-opp-card {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: var(--insights-gradient-indigo);
+    border: 1px solid var(--insights-violet-border);
     border-radius: var(--radius-lg);
-    padding: 1.25rem;
+    padding: 1.5rem;
     position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: var(--insights-card-shadow);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease;
   }
   
   .insights-opp-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-4px);
+    box-shadow: var(--insights-hover-shadow);
+    border-color: rgba(99, 102, 241, 0.35);
   }
   
   .insights-opp-card.brand-opp {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(239, 68, 68, 0.04) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.15);
+    background: var(--insights-gradient-orange);
+    border: 1px solid var(--insights-orange-border);
   }
   
   .insights-opp-card.brand-opp:hover {
-    border-color: rgba(245, 158, 11, 0.3);
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 10px 25px -3px rgba(245, 158, 11, 0.1), 0 4px 12px -2px rgba(245, 158, 11, 0.05);
   }
   
   .opp-tag {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1.25rem;
+    right: 1.25rem;
     font-size: 10px;
     font-weight: var(--weight-bold);
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.6rem;
     border-radius: var(--radius-full);
     text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   
   .opp-tag.cat {
     background: rgba(99, 102, 241, 0.12);
-    color: #6366f1;
+    color: var(--insights-violet);
   }
   
   .opp-tag.brand {
@@ -62,20 +82,24 @@
   .opp-title {
     font-size: var(--text-base);
     font-weight: var(--weight-xbold);
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.75rem 0;
     color: var(--foreground);
     padding-right: 4.5rem;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    letter-spacing: -0.01em;
   }
   
   .opp-metrics {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 1.25rem;
     font-size: var(--text-xs);
     color: var(--muted-foreground);
-    margin-bottom: 0.875rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
   }
   
   .opp-metric-item strong {
@@ -85,14 +109,15 @@
   .opp-action {
     background: var(--card);
     border: 1px dashed var(--border);
-    padding: 0.625rem 0.875rem;
+    padding: 0.75rem 1rem;
     border-radius: var(--radius-md);
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     color: var(--foreground);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
   .trending-sections-grid {
@@ -105,8 +130,7 @@
   .insights-double-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 1.75rem;
   }
 
   @media (max-width: 992px) {
@@ -118,11 +142,12 @@
   .trend-badge {
     font-size: 11px;
     font-weight: var(--weight-bold);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
+    letter-spacing: 0.02em;
   }
 
   .trend-badge.up {
@@ -141,20 +166,21 @@
   }
   
   .insight-group-title {
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
     font-weight: var(--weight-xbold);
     color: var(--foreground);
-    margin: 2rem 0 1rem 0;
+    margin: 3rem 0 1.5rem 0;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    letter-spacing: -0.02em;
   }
 
   .insight-group-title::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: linear-gradient(90deg, var(--border) 0%, rgba(var(--border-rgb), 0) 100%);
   }
 
   .badge-info {
@@ -185,12 +211,18 @@
   .publishing-summary-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(99, 102, 241, 0.03);
+    gap: 2rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.04) 0%, rgba(99, 102, 241, 0.01) 100%);
     border-bottom: 1px solid var(--border);
     font-size: var(--text-xs);
     color: var(--muted-foreground);
+  }
+
+  .publishing-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .publishing-summary-item strong {
@@ -198,12 +230,455 @@
   }
 
   .publishing-column-header {
-    padding: 1rem;
+    padding: 1.25rem;
     font-weight: var(--weight-xbold);
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    letter-spacing: -0.01em;
+  }
+
+  /* Scoped Styles for Spacing & Spacing Cleanup */
+  .insights-table-scroll {
+    border: none;
+    box-shadow: none;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  .insights-table-scroll-large {
+    border: none;
+    box-shadow: none;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+
+  /* Recommendation performance improvements */
+  .rec-stat-card {
+    background: linear-gradient(180deg, var(--card) 0%, rgba(99, 102, 241, 0.01) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--insights-card-shadow);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+  }
+
+  .rec-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.25);
+    box-shadow: var(--insights-hover-shadow);
+  }
+
+  /* Benchmark widget improvements */
+  .benchmark-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(168, 85, 247, 0.01) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+  }
+
+  .benchmark-header {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--foreground);
+  }
+
+  .benchmark-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .benchmark-text-item {
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .benchmark-divider {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.5rem;
+  }
+
+  /* Quality Scores tabular view */
+  .quality-score-section {
+    margin-top: 1.25rem;
+  }
+
+  .quality-score-header {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--foreground);
+  }
+
+  /* Action Suggestions panel scroll */
+  .suggestions-list-scroll {
+    max-height: 480px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+
+  /* Action suggestion cards */
+  .rec-action-card {
+    background: var(--insights-gradient-indigo);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    position: relative;
+    box-shadow: var(--insights-card-shadow);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .rec-action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--insights-hover-shadow);
+    border-color: rgba(99, 102, 241, 0.25);
+  }
+
+  .rec-action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rec-action-tag-wrap {
+    font-size: 11px;
+    font-weight: var(--weight-bold);
+    border-radius: var(--radius-sm);
+  }
+
+  .rec-action-title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+    margin: 0 0 0.25rem 0;
+    color: var(--foreground);
+  }
+
+  .rec-action-issue {
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+    margin: 0 0 0.5rem 0;
+    font-style: italic;
+  }
+
+  .rec-action-diagnosis {
+    font-size: var(--text-sm);
+    margin: 0 0 1rem 0;
+    color: var(--foreground);
+    line-height: 1.4;
+  }
+
+  .rec-action-box {
+    background: var(--card);
+    border: 1px dashed rgba(99, 102, 241, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    font-size: var(--text-sm);
+    padding: 0.875rem;
+    border-radius: var(--radius-md);
+  }
+
+  .rec-action-box-header {
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: var(--weight-bold);
+  }
+
+  .rec-action-box-recommendation {
+    color: var(--insights-violet);
+    font-weight: var(--weight-bold);
+  }
+
+  .rec-action-box-meta {
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+    border-top: 1px solid var(--border);
+    width: 100%;
+    padding-top: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Kanban board column setups */
+  .insights-kanban-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .kanban-column {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--insights-card-shadow);
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    overflow: hidden;
+  }
+
+  .kanban-column-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .kanban-task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+  }
+
+  .kanban-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+    border-color: var(--border-hover, rgba(0, 0, 0, 0.15));
+  }
+
+  .kanban-task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .kanban-task-platform {
+    font-size: 11px;
+    font-weight: var(--weight-bold);
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .kanban-task-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    margin: 0 0 0.35rem 0;
+    color: var(--foreground);
+    line-height: 1.3;
+  }
+
+  .kanban-task-meta {
+    font-size: 11px;
+    color: var(--muted-foreground);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .kanban-task-reason {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--foreground);
+    padding: 0.6rem;
+    background: rgba(99, 102, 241, 0.02);
+    border-left: 3px solid var(--insights-violet);
+    border-radius: 2px;
+  }
+
+  .kanban-task-risk {
+    margin-top: 0.6rem;
+    font-size: 11px;
+    color: var(--brand-red);
+    font-weight: var(--weight-bold);
+    line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .kanban-task-log {
+    margin-top: 0.6rem;
+    padding: 0.5rem;
+    background: rgba(16, 185, 129, 0.02);
+    border: 1px dashed rgba(16, 185, 129, 0.25);
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: var(--font-mono, monospace);
+    line-height: 1.4;
+    color: var(--brand-green-dark);
+  }
+
+  .kanban-task-log a {
+    text-decoration: underline;
+    color: #10b981;
+  }
+
+  /* Asset mapping lists */
+  .asset-mapping-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .asset-mapping-item {
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.5rem;
+    white-space: normal;
+  }
+
+  .asset-mapping-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .asset-mapping-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+  }
+
+  .asset-mapping-item-title {
+    font-weight: var(--weight-bold);
+  }
+
+  .asset-mapping-item-meta {
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+
+  /* Strategy accuracy feedback */
+  .accuracy-panel-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .insights-accuracy-card {
+    background: rgba(99, 102, 241, 0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .insights-accuracy-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    margin-bottom: 0.25rem;
+    color: var(--foreground);
+  }
+
+  .insights-accuracy-meta {
+    font-size: var(--text-xs);
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .insights-accuracy-score {
+    font-size: 2.25rem;
+    font-weight: var(--weight-xbold);
+    color: var(--insights-violet);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .insights-failures-scroll {
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .failure-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background: var(--card);
+    position: relative;
+    width: 100%;
+    box-shadow: var(--insights-card-shadow);
+  }
+
+  .failure-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .failure-type {
+    font-size: 11px;
+    font-weight: var(--weight-bold);
+    color: var(--brand-red);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .failure-title {
+    font-weight: var(--weight-bold);
+    font-size: 12px;
+    margin-bottom: 0.35rem;
+    color: var(--foreground);
+  }
+
+  .failure-cause {
+    font-size: 11px;
+    color: var(--muted-foreground);
+    margin: 0 0 0.6rem 0;
+    line-height: 1.35;
+  }
+
+  .failure-recommendation {
+    background: rgba(239, 68, 68, 0.02);
+    border: 1px dashed rgba(239, 68, 68, 0.2);
+    font-size: 11px;
+    padding: 0.6rem;
+    border-radius: var(--radius-md);
+    color: var(--foreground);
+    line-height: 1.35;
+  }
+
+  /* Table Rank columns */
+  .strategy-table-rank {
+    font-size: 1.25rem;
+    font-weight: var(--weight-bold);
+    color: var(--insights-violet);
   }
 </style>
 {% endblock %}
@@ -228,81 +703,19 @@
   actions=header_actions
 ) }}
 
-<!-- Section 1: Recommendation CTR Dashboard -->
-<h2 class="insight-group-title">🔗 Recommendation Widget Performance</h2>
-<div class="dashboard-stats-grid mb-6" id="recommendation-ctr-grid">
-  <div class="grid-full-width">
-    {{ admin_table_spinner(1, "Loading recommendation metrics...") }}
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_summary_cards.html" %}
 </div>
-
-<!-- Section 1.5: Recommendation Intelligence Summary -->
-<h2 class="insight-group-title">🧠 Recommendation Intelligence Summary</h2>
-<div class="insights-double-grid mb-6" id="recommendation-intelligence-panel" style="display: none;">
-  <!-- Left Side: Quality Scores & Benchmark -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">📊 Quality Scores & Benchmarks</h3>
-      <p class="overview-panel-sub">Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.</p>
-    </div>
-    
-    <div class="p-4 flex flex-col gap-lg" style="gap: 1.5rem;">
-      <!-- Cross Category Benchmarking Widget -->
-      <div class="border p-3 rounded-md" style="background: rgba(99, 102, 241, 0.02); border: 1px solid var(--border); border-radius: var(--radius-md);">
-        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fas fa-chart-line" style="color: #6366f1;"></i> Cross-Category Benchmarks
-        </h4>
-        <div class="flex flex-col gap-sm" id="category-benchmark-summary" style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- Quality Scores Tabular View -->
-      <div>
-        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fas fa-star" style="color: var(--brand-orange);"></i> Quality Score Breakdown
-        </h4>
-        <div class="admin-table-wrapper" style="border: none; box-shadow: none;">
-          <table class="admin-table text-xs" style="margin-bottom: 0; font-size: var(--text-xs);">
-            <thead>
-              <tr>
-                <th>Segment</th>
-                <th>Type / Name</th>
-                <th class="col-metric">CTR</th>
-                <th class="col-metric">Quality Score</th>
-              </tr>
-            </thead>
-            <tbody id="quality-scores-table-body">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right Side: Action Suggestions List -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">💡 Action Suggestions Engine</h3>
-      <p class="overview-panel-sub">Behavior-driven diagnoses and recommended actions per recommendation module.</p>
-    </div>
-    <div class="p-3 flex flex-col gap-md" id="rec-action-suggestions-list" style="max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-</div>
-
 
 <!-- Decision Engine: Top Opportunities & Actions Queue -->
-<div class="insights-double-grid mb-6">
+<div class="insights-double-grid insights-section">
   <!-- Top Opportunities Table -->
   <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">🏆 Top Opportunities</h3>
       <p class="overview-panel-sub">Unified priority list of categories and brands with the highest growth potential.</p>
     </div>
-    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+    <div class="insights-table-scroll">
       <table class="admin-table text-sm" id="top-opportunities-table">
         <thead>
           <tr>
@@ -330,197 +743,46 @@
       <h3 class="overview-panel-title">⚡ Insight Actions Queue</h3>
       <p class="overview-panel-sub">Immediate tactical recommendations sorted by expected impact and priority.</p>
     </div>
-    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
-      <div id="action-queue-list" class="flex flex-col gap-md p-3">
+    <div class="insights-table-scroll">
+      <div id="action-queue-list" class="suggestions-list-scroll">
         {{ admin_table_spinner(1, "Compiling action guidance...") }}
       </div>
     </div>
   </div>
 </div>
 
-<!-- Section 1.7: Content Strategy Output -->
-<h2 class="insight-group-title">🚀 Content Strategy Output</h2>
-<div class="overview-panel mb-6" id="content-strategy-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Content Publishing Plan</h3>
-    <p class="overview-panel-sub">Actionable multi-platform content roadmap prioritized by opportunity growth score and behavioral cues.</p>
-  </div>
-  
-  <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 600px; overflow-y: auto;">
-    <table class="admin-table text-sm" id="content-strategy-table">
-      <thead>
-        <tr>
-          <th style="width: 80px;">Rank</th>
-          <th>Target Entity</th>
-          <th>YouTube Video Ideas</th>
-          <th>Pinterest Cheat Sheets</th>
-          <th>Blog / SEO Articles</th>
-        </tr>
-      </thead>
-      <tbody id="content-strategy-table-body">
-        <tr>
-          <td colspan="5" class="text-center">
-            {{ admin_table_spinner(5, "Generating content strategies...") }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_content_strategy.html" %}
 </div>
 
-<!-- Section 1.9: Content Asset Mapping -->
-<h2 class="insight-group-title">🔗 Content Asset Mapping</h2>
-<div class="overview-panel mb-6" id="content-asset-mapping-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Asset Inventory & Gaps</h3>
-    <p class="overview-panel-sub">Analyzing existing database articles, videos, and product pages against the recommended content strategy.</p>
-  </div>
-  
-  <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 600px; overflow-y: auto;">
-    <table class="admin-table text-sm" id="asset-mapping-table">
-      <thead>
-        <tr>
-          <th style="width: 200px;">Opportunity Entity</th>
-          <th>Existing Reusable Content (DB Assets)</th>
-          <th>Identified Publishing Gaps (Missing Content)</th>
-        </tr>
-      </thead>
-      <tbody id="asset-mapping-table-body">
-        <tr>
-          <td colspan="3" class="text-center">
-            {{ admin_table_spinner(3, "Mapping strategy to assets...") }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_asset_mapping.html" %}
 </div>
 
-<!-- Section 1.95: Content Publishing Plan -->
-<h2 class="insight-group-title">📅 Content Publishing Plan</h2>
-<div class="overview-panel mb-6" id="content-publishing-plan-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Content Execution Calendar</h3>
-    <p class="overview-panel-sub">Automated schedule showing priority actions, platform channels, and timing based on opportunity potential.</p>
-  </div>
-  
-  <!-- Summary Metrics Bar -->
-  <div class="publishing-summary-bar" id="publishing-plan-summary">
-    <!-- Populated by JS -->
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_publishing_plan.html" %}
+</div>
 
-  <div class="publishing-plan-grid p-4" id="publishing-plan-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
-    <!-- Three Columns (Week 1, Week 2, Backlog) populated by JS -->
-    <div class="grid-full-width text-center">
-      {{ admin_table_spinner(1, "Orchestrating weekly publishing schedule...") }}
-    </div>
-  </div>
-<!-- Section 1.98: Content Performance Feedback -->
-<h2 class="insight-group-title">📉 Content Performance Feedback</h2>
-<div class="insights-double-grid mb-6" id="content-feedback-panel" style="display: none;">
-  <!-- Left Side: Strategy Accuracy & Failures -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">🧠 Strategy Accuracy & Failures</h3>
-      <p class="overview-panel-sub">Platform-weighted accuracy index and root-cause diagnoses of underperforming assets.</p>
-    </div>
-    <div class="p-4 flex flex-col gap-lg" style="gap: 1.5rem; display: flex; flex-direction: column;">
-      <!-- Strategy Accuracy Widget -->
-      <div class="border p-3 rounded-md" style="background: rgba(99, 102, 241, 0.02); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
-        <div>
-          <h4 class="font-bold text-sm mb-1" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.25rem;">
-            Strategy Accuracy Index
-          </h4>
-          <p style="font-size: var(--text-xs); color: var(--muted-foreground); margin: 0;">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest 0.6).</p>
-        </div>
-        <div style="font-size: 2rem; font-weight: var(--weight-xbold); color: #6366f1;" id="strategy-accuracy-index">
-          --%
-        </div>
-      </div>
-      
-      <!-- Failures List -->
-      <div>
-        <h4 class="font-bold text-sm mb-2 flex items-center gap-sm" style="font-size: var(--text-sm); font-weight: var(--weight-bold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fas fa-exclamation-triangle" style="color: var(--brand-red);"></i> Failure Diagnostics & Recommendations
-        </h4>
-        <div id="feedback-failures-list" class="flex flex-col gap-md" style="max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Right Side: Evaluations list -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">📋 Content Evaluations Inventory</h3>
-      <p class="overview-panel-sub">Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.</p>
-    </div>
-    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
-      <table class="admin-table text-xs" style="margin-bottom: 0; font-size: var(--text-xs);">
-        <thead>
-          <tr>
-            <th>Platform / Title</th>
-            <th class="col-metric">Expected CTR</th>
-            <th class="col-metric">Actual CTR</th>
-            <th>Evaluation Status</th>
-            <th>Reason</th>
-          </tr>
-        </thead>
-        <tbody id="feedback-evaluations-body">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_performance_feedback.html" %}
 </div>
 
 <!-- Section 1.99: Autonomous Execution Panel -->
 <h2 class="insight-group-title">🤖 Autonomous Execution Panel</h2>
-<div class="overview-panel mb-6" id="autonomous-execution-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Controlled Autonomous Publishing</h3>
-    <p class="overview-panel-sub">Safe execution bridge sorting decisions into automated queues, pending reviews, or safety blocks based on confidence scoring.</p>
-  </div>
-  
-  <!-- Summary Metrics Bar -->
-  <div class="publishing-summary-bar" id="execution-plan-summary">
-    <!-- Populated by JS -->
-  </div>
-
-  <div class="publishing-plan-grid p-4" id="execution-plan-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
-    <!-- Three Columns (Auto-Execute, Needs Review, Blocked) populated by JS -->
-    <div class="grid-full-width text-center">
-      {{ admin_table_spinner(1, "Preparing autonomous queues...") }}
-    </div>
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_autonomous_execution.html" %}
 </div>
 
 <!-- Section 1.995: Execution Governance Panel -->
 <h2 class="insight-group-title">🤖 Execution Governance Panel</h2>
-<div class="overview-panel mb-6" id="execution-governance-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Execution Governance & Production Control</h3>
-    <p class="overview-panel-sub">Production control center displaying risk scores, safety modes, and gated execution queues.</p>
-  </div>
-  
-  <!-- Summary / Config Mode Bar -->
-  <div class="publishing-summary-bar" id="execution-governance-summary">
-    <!-- Populated by JS -->
-  </div>
-
-  <div class="publishing-plan-grid p-4" id="execution-governance-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
-    <!-- Three Columns (Safe/Executed, Needs Approval, Blocked) populated by JS -->
-    <div class="grid-full-width text-center">
-      {{ admin_table_spinner(1, "Loading governance queues...") }}
-    </div>
-  </div>
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_governance.html" %}
 </div>
 
 
 <!-- Section 2: Content Coverage Matrix -->
 <h2 class="insight-group-title">⚖️ Content Coverage Matrix</h2>
-<div class="overview-panel mb-6">
+<div class="overview-panel insights-section">
   <div class="overview-panel-header">
     <h3 class="overview-panel-title">Category Coverage & Demand Gaps</h3>
     <p class="overview-panel-sub">Analyzing content volume vs user engagement signals to identify content gaps.</p>
@@ -547,15 +809,15 @@
 </div>
 
 <!-- Section 3 & 4: Intent & Brand Opportunities -->
-<div class="insights-double-grid">
+<div class="insights-double-grid insights-section">
   <!-- Intent Opportunity Analysis -->
   <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">🎯 Intent Opportunity Analysis</h3>
       <p class="overview-panel-sub">Content distribution across taxonomy intents and identified coverage gaps.</p>
     </div>
-    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
-      <div id="intent-opportunities-list" class="flex flex-col gap-md p-3">
+    <div class="insights-table-scroll">
+      <div id="intent-opportunities-list" class="suggestions-list-scroll">
         {{ admin_table_spinner(1, "Analyzing intent distributions...") }}
       </div>
     </div>
@@ -567,7 +829,7 @@
       <h3 class="overview-panel-title">⭐ Brand Opportunity Analysis</h3>
       <p class="overview-panel-sub">User engagement vs content volume to identify brand expansion opportunities.</p>
     </div>
-    <div class="admin-table-wrapper" style="border: none; box-shadow: none; max-height: 480px; overflow-y: auto;">
+    <div class="insights-table-scroll">
       <table class="admin-table text-sm" id="brand-opportunities-table">
         <thead>
           <tr>
@@ -592,5 +854,5 @@
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/pages/insights.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/admin/pages/insights/index.js') }}"></script>
 {% endblock %}

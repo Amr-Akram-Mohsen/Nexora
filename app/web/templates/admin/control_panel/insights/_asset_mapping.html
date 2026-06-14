@@ -1,0 +1,27 @@
+<!-- Section 1.9: Content Asset Mapping -->
+<h2 class="insight-group-title">🔗 Content Asset Mapping</h2>
+<div class="overview-panel" id="content-asset-mapping-panel" style="display: none;">
+  <div class="overview-panel-header">
+    <h3 class="overview-panel-title">Asset Inventory & Gaps</h3>
+    <p class="overview-panel-sub">Analyzing existing database articles, videos, and product pages against the recommended content strategy.</p>
+  </div>
+  
+  <div class="insights-table-scroll-large">
+    <table class="admin-table text-sm" id="asset-mapping-table">
+      <thead>
+        <tr>
+          <th class="col-entity">Opportunity Entity</th>
+          <th>Existing Reusable Content (DB Assets)</th>
+          <th>Identified Publishing Gaps (Missing Content)</th>
+        </tr>
+      </thead>
+      <tbody id="asset-mapping-table-body">
+        <tr>
+          <td colspan="3" class="text-center">
+            {{ admin_table_spinner(3, "Mapping strategy to assets...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

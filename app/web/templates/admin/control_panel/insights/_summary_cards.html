@@ -1,0 +1,64 @@
+<!-- Section 1: Recommendation CTR Dashboard -->
+<h2 class="insight-group-title">🔗 Recommendation Widget Performance</h2>
+<div class="dashboard-stats-grid" id="recommendation-ctr-grid">
+  <div class="grid-full-width">
+    {{ admin_table_spinner(1, "Loading recommendation metrics...") }}
+  </div>
+</div>
+
+<!-- Section 1.5: Recommendation Intelligence Summary -->
+<h2 class="insight-group-title">🧠 Recommendation Intelligence Summary</h2>
+<div class="insights-double-grid" id="recommendation-intelligence-panel" style="display: none;">
+  <!-- Left Side: Quality Scores & Benchmark -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📊 Quality Scores & Benchmarks</h3>
+      <p class="overview-panel-sub">Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.</p>
+    </div>
+    
+    <div class="benchmark-list">
+      <!-- Cross Category Benchmarking Widget -->
+      <div class="benchmark-card">
+        <h4 class="benchmark-header">
+          <i class="fas fa-chart-line"></i> Cross-Category Benchmarks
+        </h4>
+        <div id="category-benchmark-summary">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Quality Scores Tabular View -->
+      <div class="quality-score-section">
+        <h4 class="quality-score-header">
+          <i class="fas fa-star"></i> Quality Score Breakdown
+        </h4>
+        <div class="insights-table-scroll">
+          <table class="admin-table text-xs" id="quality-scores-table">
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th>Type / Name</th>
+                <th class="col-metric">CTR</th>
+                <th class="col-metric">Quality Score</th>
+              </tr>
+            </thead>
+            <tbody id="quality-scores-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Action Suggestions List -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">💡 Action Suggestions Engine</h3>
+      <p class="overview-panel-sub">Behavior-driven diagnoses and recommended actions per recommendation module.</p>
+    </div>
+    <div id="rec-action-suggestions-list" class="suggestions-list-scroll">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>

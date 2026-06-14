@@ -1,0 +1,57 @@
+<!-- Section 1.98: Content Performance Feedback -->
+<h2 class="insight-group-title">📉 Content Performance Feedback</h2>
+<div class="insights-double-grid" id="content-feedback-panel" style="display: none;">
+  <!-- Left Side: Strategy Accuracy & Failures -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">🧠 Strategy Accuracy & Failures</h3>
+      <p class="overview-panel-sub">Platform-weighted accuracy index and root-cause diagnoses of underperforming assets.</p>
+    </div>
+    <div class="accuracy-panel-body">
+      <!-- Strategy Accuracy Widget -->
+      <div class="insights-accuracy-card">
+        <div>
+          <h4 class="insights-accuracy-title">Strategy Accuracy Index</h4>
+          <p class="insights-accuracy-meta">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest 0.6).</p>
+        </div>
+        <div class="insights-accuracy-score" id="strategy-accuracy-index">
+          --%
+        </div>
+      </div>
+      
+      <!-- Failures List -->
+      <div>
+        <h4 class="quality-score-header">
+          <i class="fas fa-exclamation-triangle"></i> Failure Diagnostics & Recommendations
+        </h4>
+        <div id="feedback-failures-list" class="insights-failures-scroll">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Right Side: Evaluations list -->
+  <div class="overview-panel">
+    <div class="overview-panel-header">
+      <h3 class="overview-panel-title">📋 Content Evaluations Inventory</h3>
+      <p class="overview-panel-sub">Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.</p>
+    </div>
+    <div class="insights-table-scroll">
+      <table class="admin-table text-xs" id="feedback-evaluations-table">
+        <thead>
+          <tr>
+            <th>Platform / Title</th>
+            <th class="col-metric">Expected CTR</th>
+            <th class="col-metric">Actual CTR</th>
+            <th>Evaluation Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="feedback-evaluations-body">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
