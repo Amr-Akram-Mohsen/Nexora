@@ -175,7 +175,8 @@
 <template id="overview-health-row-template">
   <div>
     <div class="health-row flex justify-between">
-      <span class="font-bold"><span class="status-badge badge-compact"></span> <span class="health-label-text"></span></span>
+      <span class="font-bold"><span class="status-badge badge-compact"></span> <span
+          class="health-label-text"></span></span>
       <span class="health-value-text text-muted"></span>
     </div>
     <div class="overview-breakdown-bar-track bar-track-health">
@@ -221,9 +222,9 @@
       <p class="activity-text ingest-log-text">
         Successfully ingested <span class="status-badge badge-type-compact"></span>
         <a class="activity-target text-deco-none ml-1"></a>
+        <span class="activity-meta ingest-log-meta"></span>
       </p>
       <p class="activity-meta ingest-log-title"></p>
-      <p class="activity-meta ingest-log-meta"></p>
     </div>
   </li>
 </template>
@@ -245,11 +246,12 @@
     <div class="activity-icon icon-comment ingest-log-icon flex-center">📡</div>
     <div class="activity-content">
       <p class="activity-text ingest-log-text">
-        <strong class="text-foreground provider-name"></strong> 
+        <strong class="text-foreground provider-name"></strong>
         <span class="status-badge active badge-type-compact badge-indigo provider-slug"></span>
       </p>
       <p class="activity-meta ingest-log-text mt-1 text-muted">
-        Volume: <strong class="provider-content-count"></strong> content items &amp; <strong class="provider-product-count"></strong> products
+        Volume: <strong class="provider-content-count"></strong> content items &amp; <strong
+          class="provider-product-count"></strong> products
       </p>
       <p class="activity-meta ingest-log-meta mt-1">
         Last Ingest Activity: <strong class="provider-activity-time"></strong>

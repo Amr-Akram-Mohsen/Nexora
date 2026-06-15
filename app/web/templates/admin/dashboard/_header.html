@@ -1,0 +1,90 @@
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/form.html" import form %}
+
+<header class="admin-header">
+
+    <div class="admin-header__inner flex items-center justify-between">
+
+        <div class="admin-header__left flex items-center">
+
+            <button id="sidebar-toggle" class="btn btn--ghost btn--icon admin-sidebar-toggle" type="button"
+                aria-label="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <a href="{{ url_for('admin.home') }}" class="site-logo admin-header__logo">
+                {% include "logos/nexora-logo.html" %}
+            </a>
+
+            <div class="admin-header__divider"></div>
+
+            <div class="admin-header__page">
+                <h1 class="admin-header__title">
+                    {{ admin_page_title|default('Dashboard') }}
+                </h1>
+            </div>
+
+        </div>
+
+        <div class="admin-header__actions flex items-center">
+
+            <a href="/" target="_blank" class="btn btn--ghost admin-header__site-link">
+                <i class="fas fa-external-link-alt"></i>
+                <span>View Site</span>
+            </a>
+
+            {{ button(
+            variant="ghost",
+            class="btn--icon mode-toggle",
+            icon="far fa-sun"
+            ) }}
+
+            <button type="button" class="btn btn--ghost btn--icon" aria-label="Notifications">
+                <i class="far fa-bell"></i>
+            </button>
+
+            <div class="nav-user">
+
+                {{ button(
+                variant="ghost",
+                class="btn--icon user-toggle",
+                text=user_email[0].upper() if user_email else "A",
+                btn_span_class="initial flex-center"
+                ) }}
+
+                <div class="user-dropdown">
+
+                    <div class="user-info dropdown-item">
+                        <span class="user-email">
+                            {{ user_email }}
+                        </span>
+                    </div>
+
+                    <a href="{{ url_for('user.profile') }}" class="dropdown-item flex items-center">
+                        <i class="fas fa-id-card"></i>
+                        Profile
+                    </a>
+
+                    {% call form(
+                    variant="",
+                    form_action=url_for('user.logout'),
+                    class="logout-form"
+                    ) %}
+                    {{ button(
+                    text="Logout",
+                    variant="",
+                    type="submit",
+                    icon="fas fa-sign-out-alt",
+                    class="dropdown-item logout-btn"
+                    ) }}
+                    {% endcall %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>

@@ -20,9 +20,14 @@
     {% include "admin/dashboard/_nav.html" %}
   </aside>
 
-  <main class="admin-content">
-    {% block admin_content %}{% endblock %}
-  </main>
+  <div class="admin-main">
+    {% include "admin/dashboard/_header.html" %}
+
+    <main class="admin-content">
+      {% block admin_content %}{% endblock %}
+    </main>
+
+  </div>
 
 </div>
 {% endblock %}
@@ -31,13 +36,13 @@
 {{ super() }}
 <div id="dashboard-modal-overlay" class="dashboard-modal-overlay flex-center">
   <div class="dashboard-modal-content">
-     <div class="dashboard-modal-icon">⚠️</div>
-     <h3 id="modal-title" class="dashboard-modal-title">Confirm</h3>
-     <p id="modal-body" class="dashboard-modal-body"></p>
-     <div class="dashboard-modal-actions flex justify-center">
-       <button id="modal-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
-       <button id="modal-confirm" class="dashboard-btn dashboard-btn-danger">Confirm</button>
-     </div>
+    <div class="dashboard-modal-icon">⚠️</div>
+    <h3 id="modal-title" class="dashboard-modal-title">Confirm</h3>
+    <p id="modal-body" class="dashboard-modal-body"></p>
+    <div class="dashboard-modal-actions flex justify-center">
+      <button id="modal-cancel" class="dashboard-btn dashboard-btn-secondary">Cancel</button>
+      <button id="modal-confirm" class="dashboard-btn dashboard-btn-danger">Confirm</button>
+    </div>
   </div>
 </div>
 
@@ -83,14 +88,14 @@
 {% endblock %}
 
 {% block scripts %}
-{# {{ super() }} #}
+{{ super() }}
 <script src="{{ url_for('static', filename='js/admin/core/core.js') }}"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const layout = document.querySelector('.admin-layout');
     const isMobile = window.innerWidth <= 768;
     const storedCollapsed = localStorage.getItem('admin-sidebar-collapsed');
-    
+
     // Set initial state
     if (storedCollapsed === 'true' || (storedCollapsed === null && isMobile)) {
       layout.classList.add('collapsed');

@@ -1,0 +1,425 @@
+
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\contents.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="contents-table">
+    <thead>
+      <tr>
+        <th class="col-check"><input type="checkbox" id="select-all-contents" /></th>
+        <th class="col-type">Type</th>
+        <th class="col-primary">Title</th>
+        <th>Category</th>
+        <th>Sources</th>
+        <th class="col-metric">Engagement</th>
+        <th class="col-date">Published</th>
+        <th class="col-status">Status</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="contents-table-body">
+      {{ admin_table_spinner(9, "Loading catalog contents…") }}
+    </tbody>
+  </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights\_asset_mapping.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table text-sm" id="asset-mapping-table">
+      <thead>
+        <tr>
+          <th class="col-entity"><span>Target |</span><span>Entity</span></th>
+          <th>Score</th>
+          <th>Existing Assets</th>
+          <th>Content Gaps</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="asset-mapping-table-body">
+        <tr>
+          <td colspan="5" class="text-center">
+            {{ admin_table_spinner(5, "Mapping strategy to assets...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights\_content_strategy.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table text-sm" id="content-strategy-table">
+      <thead>
+        <tr>
+          <th class="col-rank">Rank</th>
+          <th><span>Target |</span><span>Entity</span></th>
+          <th>YouTube Video Ideas</th>
+          <th>Pinterest Cheat Sheets</th>
+          <th>Blog / SEO Articles</th>
+        </tr>
+      </thead>
+      <tbody id="content-strategy-table-body">
+        <tr>
+          <td colspan="5" class="text-center">
+            {{ admin_table_spinner(5, "Generating content strategies...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights\_performance_feedback.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table text-xs" id="feedback-evaluations-table">
+        <thead>
+          <tr>
+            <th>Platform / Title</th>
+            <th class="col-metric">Expected CTR</th>
+            <th class="col-metric">Actual CTR</th>
+            <th>Evaluation Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="feedback-evaluations-body">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights\_summary_cards.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table text-xs" id="quality-scores-table">
+            <thead>
+              <tr>
+                <th>Segment</th>
+                <th><span>Type /</span><span>Name</span></th>
+                <th class="col-metric">CTR</th>
+                <th class="col-metric"><span>Quality</span><span>Score</span></th>
+              </tr>
+            </thead>
+            <tbody id="quality-scores-table-body">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table text-sm" id="top-opportunities-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Entity</th>
+            <th>Type</th>
+            <th class="col-metric">
+              <div>Opportunity</div>
+              <div>Score</div>
+            </th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody id="top-opportunities-body">
+          <tr>
+            <td colspan="5" class="text-center">
+              {{ admin_table_spinner(5, "Prioritizing entities...") }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights.html
+TABLE #2
+========================================================================================================================
+<table class="admin-table" id="coverage-matrix-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th class="col-metric">Demand Level</th>
+          <th class="col-metric">Coverage Level</th>
+          <th>Gap Score / Status</th>
+        </tr>
+      </thead>
+      <tbody id="coverage-matrix-body">
+        <tr>
+          <td colspan="4" class="text-center">
+            {{ admin_table_spinner(4, "Assessing category alignment...") }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\insights.html
+TABLE #3
+========================================================================================================================
+<table class="admin-table text-sm" id="brand-opportunities-table">
+        <thead>
+          <tr>
+            <th>Brand</th>
+            <th class="col-metric">Articles</th>
+            <th class="col-metric">Engagement</th>
+            <th>Expansion Status</th>
+          </tr>
+        </thead>
+        <tbody id="brand-opportunities-body">
+          <tr>
+            <td colspan="4" class="text-center">
+              {{ admin_table_spinner(4, "Calculating brand expansion opportunities...") }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\interactions.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="comments-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Comment Preview</th>
+          <th>User</th>
+          <th>Target</th>
+          <th class="col-status">Sentiment</th>
+          <th class="col-date">Date</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="comments-table-body">
+        {{ admin_table_spinner(6, "Loading comments…") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\interactions.html
+TABLE #2
+========================================================================================================================
+<table class="admin-table" id="reactions-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th class="col-primary">Target</th>
+            <th class="col-status">Type</th>
+            <th class="col-primary">User</th>
+            <th class="col-date">Date</th>
+          </tr>
+        </thead>
+        <tbody id="reactions-table-body">
+          {{ admin_table_spinner(5, "Loading reactions…", "loading-height-md") }}
+        </tbody>
+      </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\interactions.html
+TABLE #3
+========================================================================================================================
+<table class="admin-table" id="views-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Target</th>
+          <th class="col-status">Target Type</th>
+          <th class="col-metric">Views Count</th>
+          <th class="col-date">Latest View</th>
+        </tr>
+      </thead>
+      <tbody id="views-table-body">
+        {{ admin_table_spinner(4, "Loading views…") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\interactions.html
+TABLE #4
+========================================================================================================================
+<table class="admin-table" id="clicks-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Item</th>
+          <th class="col-primary">Destination</th>
+          <th class="col-metric">Click Count</th>
+          <th class="col-date">Latest Click</th>
+        </tr>
+      </thead>
+      <tbody id="clicks-table-body">
+        {{ admin_table_spinner(4, "Loading clicks…") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\interactions.html
+TABLE #5
+========================================================================================================================
+<table class="admin-table" id="saves-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Target</th>
+          <th class="col-status">Target Type</th>
+          <th class="col-primary">User</th>
+          <th class="col-date">Save Date</th>
+        </tr>
+      </thead>
+      <tbody id="saves-table-body">
+        {{ admin_table_spinner(4, "Loading saves…") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\items.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="items-table">
+    <thead>
+      <tr>
+        <th class="col-primary">Name</th>
+        <th>Brand</th>
+        <th>Category</th>
+        <th class="col-metric">Price</th>
+        <th class="col-metric">Stores Count</th>
+        <th class="col-metric">Clicks</th>
+        <th class="col-date">Added</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="items-table-body">
+      {{ admin_table_spinner(8, "Loading products…") }}
+    </tbody>
+  </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\recommendations.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="recs-table">
+    <thead>
+      <tr>
+        <th class="col-primary">Content</th>
+        <th class="col-metric">Views</th>
+        <th class="col-primary">Linked Item</th>
+        <th class="col-metric">Clicks</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="recs-table-body">
+      {{ admin_table_spinner(5, "Loading matches…") }}
+    </tbody>
+  </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\sources.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="sources-table">
+    <thead>
+      <tr>
+        <th class="col-primary">Name</th>
+        <th class="col-metric">Volume</th>
+        <th class="col-date">Last Crawl</th>
+        <th class="col-metric">Success Rate</th>
+        <th class="col-metric">Failures</th>
+        <th class="col-metric">Engagement</th>
+        <th class="col-status">Status</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="sources-table-body">
+      {{ admin_table_spinner(8, "Loading sources list…") }}
+    </tbody>
+  </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\stores.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="stores-table">
+    <thead>
+      <tr>
+        <th class="col-primary">Merchant Name</th>
+        <th>Affiliate Network</th>
+        <th class="col-metric">Product Count</th>
+        <th class="col-metric">Clicks</th>
+        <th class="col-metric">CTR</th>
+        <th class="col-metric">Conversions</th>
+        <th class="col-status">Status</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="stores-table-body">
+      {{ admin_table_spinner(8, "Loading stores list…") }}
+    </tbody>
+  </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\taxonomy.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="categories-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Name</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Leaf</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="categories-table-body">
+        {{ admin_table_spinner(4, "Loading categories…", "loading-height-md") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\taxonomy.html
+TABLE #2
+========================================================================================================================
+<table class="admin-table" id="brands-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Name</th>
+          <th>Industry</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Featured</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="brands-table-body">
+        {{ admin_table_spinner(5, "Loading brands…", "loading-height-md") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\taxonomy.html
+TABLE #3
+========================================================================================================================
+<table class="admin-table" id="topics-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Name</th>
+          <th class="col-status">Status</th>
+          <th class="col-status">Featured</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="topics-table-body">
+        {{ admin_table_spinner(4, "Loading topics…", "loading-height-md") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\taxonomy.html
+TABLE #4
+========================================================================================================================
+<table class="admin-table" id="sections-table">
+      <thead>
+        <tr>
+          <th class="col-primary">Name</th>
+          <th>Description</th>
+          <th class="col-status">Status</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="sections-table-body">
+        {{ admin_table_spinner(4, "Loading sections…", "loading-height-md") }}
+      </tbody>
+    </table>
+========================================================================================================================
+FILE: app\web\templates\admin\control_panel\users.html
+TABLE #1
+========================================================================================================================
+<table class="admin-table" id="users-table">
+    <thead>
+      <tr>
+        <th class="col-primary">User</th>
+        <th class="col-status">Role</th>
+        <th class="col-status">Status</th>
+        <th class="col-date">Joined</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="users-table-body">
+      {{ admin_table_spinner(5, "Loading users…", "loading-height-md") }}
+    </tbody>
+  </table>

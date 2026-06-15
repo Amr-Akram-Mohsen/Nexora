@@ -28,6 +28,10 @@
   white-space: wrap;
 }
 
+.admin-table th span {
+  display: block;
+}
+
 .admin-table td {
   padding: 0.5rem;
   /* display: inline-block; */
@@ -101,10 +105,8 @@
   white-space: nowrap;
 }
 
-.col-metric {
-  /* width: 110px; */
-  /* text-align: right; */
-  /* white-space: nowrap; */
+.col-metric span {
+  display: block;
 }
 
 .col-status {

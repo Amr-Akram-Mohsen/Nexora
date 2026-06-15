@@ -1,17 +1,17 @@
 {
   "reviews": {
-    "electronics:smartphones": 6,
-    "electronics:laptops": 7,
+    "electronics:smartphones": 3,
+    "electronics:laptops": 4,
     "accessories:watches": 6,
     "accessories:bags": 6,
     "perfumes:niche-artisanal": 3,
     "accessories:sunglasses": 4,
     "accessories:jewelry": 4,
-    "electronics:tablets": 8,
-    "electronics:smartwatches": 0,
-    "electronics:earbuds": 4,
-    "electronics:headphones": 4,
-    "electronics:cameras": 3,
+    "electronics:tablets": 5,
+    "electronics:smartwatches": 6,
+    "electronics:earbuds": 6,
+    "electronics:headphones": 6,
+    "electronics:cameras": 5,
     "perfumes:oud-oriental": 3
   },
   "news": {
@@ -23,15 +23,15 @@
     "accessories:bags": 0,
     "accessories:sunglasses": 2,
     "accessories:jewelry": 2,
-    "electronics:tablets": 4,
+    "electronics:tablets": 1,
     "perfumes:niche-artisanal": 3,
     "perfumes:oud-oriental": 3,
-    "electronics:smartwatches": 4,
-    "electronics:earbuds": 2,
-    "electronics:headphones": 0,
-    "electronics:cameras": 0,
-    "electronics:smartphones": 3,
-    "electronics:laptops": 3
+    "electronics:smartwatches": 1,
+    "electronics:earbuds": 4,
+    "electronics:headphones": 2,
+    "electronics:cameras": 4,
+    "electronics:smartphones": 0,
+    "electronics:laptops": 0
   },
   "trends": {
     "perfumes:niche-artisanal": 6,
