@@ -141,7 +141,8 @@ a.clickable-card:hover .dashboard-stat-value {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
-  padding: 1.25rem;
+  margin-bottom: 1rem;
+  /* padding: 1rem; */
 }
 
 .overview-panel-header {
@@ -149,7 +150,7 @@ a.clickable-card:hover .dashboard-stat-value {
   border-bottom: 1px solid var(--border);
   background: var(--secondary);
   /* Negative margin pulls the header to the padded container's edges */
-  margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+  /* margin: -1.25rem -1.25rem 1.25rem -1.25rem; */
 }
 
 .overview-panel-title {

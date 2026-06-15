@@ -14,30 +14,40 @@
 /* --- Table Headers & Cells --- */
 
 .admin-table th {
-  padding: 0.75rem 1rem;
+  padding: 0.25rem 0.5rem;
+  /* padding-left: 0.75rem; */
   font-size: var(--text-xs);
+  /* text-align: center; */
+  vertical-align: middle;
   font-weight: var(--weight-bold);
   color: var(--muted-foreground);
   background: var(--secondary);
   border-bottom: 1px solid var(--border);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: wrap;
 }
 
 .admin-table td {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem;
+  /* display: inline-block; */
+  /* padding-block: 0.5rem; */
+  /* max-width: 1px; */
+  /* padding-left: 0.75rem; */
   font-size: var(--text-sm);
   border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+  /* vertical-align: middle; */
+  /* text-align: center; */
   transition: background-color 0.15s ease;
-  line-height: 1.4;
+  line-height: 1;
 }
 
 /* --- Row Interaction States & Selection --- */
 
 .admin-table tr {
   transition: background-color 0.15s ease;
+  /* display: block; */
+  /* padding: 5px; */
 }
 
 .admin-table tr:last-child td {
@@ -92,9 +102,9 @@
 }
 
 .col-metric {
-  width: 110px;
-  text-align: right;
-  white-space: nowrap;
+  /* width: 110px; */
+  /* text-align: right; */
+  /* white-space: nowrap; */
 }
 
 .col-status {

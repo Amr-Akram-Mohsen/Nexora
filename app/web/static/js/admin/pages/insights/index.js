@@ -36,7 +36,7 @@ export function showSpinnerPlaceholders() {
   document.getElementById("coverage-matrix-body").innerHTML = `<tr><td colspan="4" class="text-center">${getSpinnerHtml("Assessing category alignment...", "loading-height-xs")}</td></tr>`;
   document.getElementById("intent-opportunities-list").innerHTML = getSpinnerHtml("Analyzing intent distributions...", "loading-height-sm");
   document.getElementById("brand-opportunities-body").innerHTML = `<tr><td colspan="4" class="text-center">${getSpinnerHtml("Calculating brand expansion opportunities...", "loading-height-xs")}</td></tr>`;
-  
+
   const strategyBody = document.getElementById("content-strategy-table-body");
   if (strategyBody) {
     strategyBody.innerHTML = `<tr><td colspan="5" class="text-center">${getSpinnerHtml("Generating content strategies...", "loading-height-xs")}</td></tr>`;
@@ -80,7 +80,7 @@ export function showErrorPlaceholders() {
   document.getElementById("coverage-matrix-body").innerHTML = `<tr><td colspan="4" class="text-center text-danger">⚠️ Failed to assess coverage gaps.</td></tr>`;
   document.getElementById("intent-opportunities-list").innerHTML = errState;
   document.getElementById("brand-opportunities-body").innerHTML = `<tr><td colspan="4" class="text-center text-danger">⚠️ Failed to calculate brand opportunities.</td></tr>`;
-  
+
   const strategyBody = document.getElementById("content-strategy-table-body");
   if (strategyBody) {
     strategyBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">⚠️ Failed to generate content strategies.</td></tr>`;
@@ -139,18 +139,18 @@ export function renderRecommendationIntelligence() {
     panel.style.display = "none";
     return;
   }
-  
+
   panel.style.display = "grid";
 
   // 1. Render Cross-Category Benchmarks
   const benchmarkDiv = document.getElementById("category-benchmark-summary");
   const bench = metrics.benchmarking;
   if (bench) {
-    const bestText = bench.best_category && bench.best_category.name !== "N/A" 
+    const bestText = bench.best_category && bench.best_category.name !== "N/A"
       ? `<span class="status-badge badge-success font-bold">${bench.best_category.name}</span> with <strong>${bench.best_category.ctr.toFixed(2)}%</strong> CTR (+${bench.best_category.deviation.toFixed(2)}% dev)`
       : `<span class="status-badge secondary">N/A</span>`;
 
-    const worstText = bench.worst_category && bench.worst_category.name !== "N/A" 
+    const worstText = bench.worst_category && bench.worst_category.name !== "N/A"
       ? `<span class="status-badge badge-danger font-bold">${bench.worst_category.name}</span> with <strong>${bench.worst_category.ctr.toFixed(2)}%</strong> CTR (${bench.worst_category.deviation.toFixed(2)}% dev)`
       : `<span class="status-badge secondary">N/A</span>`;
 
@@ -169,15 +169,15 @@ export function renderRecommendationIntelligence() {
 
   // 2. Render Quality Scores Breakdown Table
   const scoresTbody = document.getElementById("quality-scores-table-body");
-  
+
   const qScores = metrics.quality_scores;
   if (qScores) {
     let scoresHtml = "";
     // A. Render Recommendation Types
     for (const [rtype, data] of Object.entries(qScores.recommendation_types)) {
-      const typeLabel = rtype === "related_content" ? "Related Content" 
-                      : rtype === "related_product" ? "Related Products" 
-                      : "Shop Products";
+      const typeLabel = rtype === "related_content" ? "Related Content"
+        : rtype === "related_product" ? "Related Products"
+          : "Shop Products";
       scoresHtml += `
         <tr>
           <td><span class="status-badge secondary font-bold badge-type-compact">Rec Type</span></td>
@@ -223,9 +223,9 @@ export function renderRecommendationIntelligence() {
   suggestionsContainer.innerHTML = "";
 
   for (const [rtype, data] of Object.entries(metrics.diagnoses)) {
-    const typeLabel = rtype === "related_content" ? "Related Content" 
-                    : rtype === "related_product" ? "Related Products" 
-                    : "Shop Products";
+    const typeLabel = rtype === "related_content" ? "Related Content"
+      : rtype === "related_product" ? "Related Products"
+        : "Shop Products";
 
     let badgeClass = "badge-secondary";
     if (data.classification === "High") badgeClass = "badge-success";
@@ -234,7 +234,7 @@ export function renderRecommendationIntelligence() {
 
     const card = document.createElement("div");
     card.className = `rec-action-card ${rtype === 'related_product' ? 'product' : rtype === 'shop_product' ? 'shop' : 'content'}`;
-    
+
     const action = data.action_suggestion;
 
     card.innerHTML = `
@@ -280,23 +280,31 @@ export function renderRecommendationPerformance() {
 
   container.innerHTML = `
     <div class="rec-stat-card">
-      <p class="dashboard-stat-label">Overall CTR</p>
-      <p class="dashboard-stat-value">${metrics.overall_ctr.toFixed(2)}%</p>
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Overall CTR</p>
+        <p class="dashboard-stat-value">${metrics.overall_ctr.toFixed(2)}%</p>
+      </div>
       <p class="dashboard-stat-meta">Across all recommendation slots</p>
     </div>
     <div class="rec-stat-card">
-      <p class="dashboard-stat-label">Related Products CTR</p>
-      <p class="dashboard-stat-value">${metrics.related_products_ctr.toFixed(2)}%</p>
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Related Products CTR</p>
+        <p class="dashboard-stat-value">${metrics.related_products_ctr.toFixed(2)}%</p>
+      </div>
       <p class="dashboard-stat-meta">Clicks on related product listings</p>
     </div>
     <div class="rec-stat-card">
-      <p class="dashboard-stat-label">Related Content CTR</p>
-      <p class="dashboard-stat-value">${metrics.related_content_ctr.toFixed(2)}%</p>
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Related Content CTR</p>
+        <p class="dashboard-stat-value">${metrics.related_content_ctr.toFixed(2)}%</p>
+      </div>
       <p class="dashboard-stat-meta">Clicks on suggested articles/guides</p>
     </div>
     <div class="rec-stat-card">
-      <p class="dashboard-stat-label">Shop Products CTR</p>
-      <p class="dashboard-stat-value">${metrics.shop_products_ctr.toFixed(2)}%</p>
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Shop Products CTR</p>
+        <p class="dashboard-stat-value">${metrics.shop_products_ctr.toFixed(2)}%</p>
+      </div>
       <p class="dashboard-stat-meta">Clicks on primary shop links</p>
     </div>
   `;
@@ -341,7 +349,7 @@ export function renderIntentOpportunities() {
   container.innerHTML = "";
   items.forEach(item => {
     const div = document.createElement("div");
-    div.className = "insights-opp-card";
+    div.className = "insights-opp-card flex flex-col";
 
     let distHtml = '<div class="opp-metrics">';
     for (const [intentName, count] of Object.entries(item.distribution)) {
@@ -442,21 +450,15 @@ export function renderActionQueue() {
     else if (item.priority === "Medium") priorityBadgeClass = "badge-warning";
 
     card.innerHTML = `
-      <span class="opp-tag ${item.priority === 'High' ? 'brand' : 'cat'}">
-        Priority: <strong class="status-badge ${priorityBadgeClass}">${item.priority}</strong>
-      </span>
-      <h3 class="opp-title" title="${item.title}">${item.title}</h3>
+    <h3 class="opp-title" title="${item.title}">${item.title}</h3>
+    <div class="opp-metrics">
+      <div class="opp-metric-item">Target<strong>${item.target}</strong></div>
+      <div class="opp-metric-item">Type<strong>${item.type}</strong></div>
+      <div class="opp-metric-item">Priority<strong class="status-badge ${priorityBadgeClass}">${item.priority}</strong></div>
+      <div class="opp-metric-item">Confidence<strong>${(item.confidence * 100).toFixed(0)}%</strong></div>
+    </div>
       
-      <div class="opp-metrics">
-        <div class="opp-metric-item">Target: <strong>${item.target}</strong></div>
-        <div class="opp-metric-item">Type: <strong>${item.type}</strong></div>
-        <div class="opp-metric-item">Confidence: <strong>${(item.confidence * 100).toFixed(0)}%</strong></div>
-      </div>
-      
-      <div class="opp-action">
-        <span>💡</span>
-        <span>Impact: <strong>${item.impact}</strong></span>
-      </div>
+    <div class="opp-action">💡<span>Impact: ${item.impact}</span></div>
     `;
     container.appendChild(card);
   });

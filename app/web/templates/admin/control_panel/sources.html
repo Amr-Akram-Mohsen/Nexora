@@ -2,10 +2,10 @@
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
 {% from "admin/components/macros.html" import
-    admin_search_input,
-    admin_reset_button,
-    admin_summary_bar,
-    action_group
+admin_search_input,
+admin_reset_button,
+admin_summary_bar,
+action_group
 %}
 
 {% block title %}Sources Management — Nexora Admin{% endblock %}
@@ -39,7 +39,7 @@ actions=header_actions
     <thead>
       <tr>
         <th class="col-primary">Name</th>
-        <th class="col-metric">Volume (Ingestion)</th>
+        <th class="col-metric">Volume</th>
         <th class="col-date">Last Crawl</th>
         <th class="col-metric">Success Rate</th>
         <th class="col-metric">Failures</th>
@@ -80,10 +80,10 @@ actions=header_actions
     </td>
     <td>
       {% call action_group() %}
-        <a class="source-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
-          href="">
-          👁️ View Content
-        </a>
+      <a class="source-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
+        href="">
+        👁️ View Content
+      </a>
       {% endcall %}
     </td>
   </tr>

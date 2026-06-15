@@ -2,14 +2,14 @@
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
 admin_spinner, admin_table_spinner %}
 {% from "admin/components/macros.html" import
-    admin_search_input,
-    admin_reset_button,
-    admin_summary_bar,
-    admin_modal_close_button,
-    action_button,
-    action_group,
-    inspect_section,
-    inspect_detail_row
+admin_search_input,
+admin_reset_button,
+admin_summary_bar,
+admin_modal_close_button,
+action_button,
+action_group,
+inspect_section,
+inspect_detail_row
 %}
 
 {% block title %}Recommendations — Nexora Admin{% endblock %}
@@ -88,7 +88,8 @@ actions=header_actions
     <td class="rec-item-clicks"></td>
     <td>
       {% call action_group() %}
-        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-rec", extra_class="inspect-btn") }}
+      {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-rec",
+      extra_class="inspect-btn") }}
       {% endcall %}
     </td>
   </tr>
@@ -97,23 +98,24 @@ actions=header_actions
 <template id="rec-inspect-template">
   <div class="inspect-details-group flex flex-col">
     {% call inspect_section("Content Details") %}
-      {{ inspect_detail_row("ID", "inspect-content-id") }}
-      {{ inspect_detail_row("Title", "inspect-content-title") }}
-      {{ inspect_detail_row("Type", "inspect-content-type status-badge inspect-badge-secondary") }}
-      {{ inspect_detail_row("Total Views", "inspect-content-views") }}
+    {{ inspect_detail_row("ID", "inspect-content-id") }}
+    {{ inspect_detail_row("Title", "inspect-content-title") }}
+    {{ inspect_detail_row("Type", "inspect-content-type status-badge inspect-badge-secondary") }}
+    {{ inspect_detail_row("Total Views", "inspect-content-views") }}
     {% endcall %}
-    
+
     {% call inspect_section("Linked Product Details") %}
-      {{ inspect_detail_row("ID", "inspect-item-id") }}
-      {{ inspect_detail_row("Name", "inspect-item-name") }}
-      {{ inspect_detail_row("Type", "inspect-item-type status-badge inspect-badge-secondary") }}
-      {{ inspect_detail_row("Total Clicks", "inspect-item-clicks") }}
+    {{ inspect_detail_row("ID", "inspect-item-id") }}
+    {{ inspect_detail_row("Name", "inspect-item-name") }}
+    {{ inspect_detail_row("Type", "inspect-item-type status-badge inspect-badge-secondary") }}
+    {{ inspect_detail_row("Total Clicks", "inspect-item-clicks") }}
     {% endcall %}
-    
+
     {% call inspect_section("Management Actions", divider=false) %}
-      <div class="flex gap-2 mt-2">
-        {{ action_button("Remove Association (Unlink)", action_type="delete", icon="🔓", extra_class="inspect-unlink-btn") }}
-      </div>
+    <div class="flex gap-2 mt-2">
+      {{ action_button("Remove Association (U nlink)", action_type="delete", icon="🔓",
+      extra_class="inspect-unlink-btn") }}
+    </div>
     {% endcall %}
   </div>
 </template>
