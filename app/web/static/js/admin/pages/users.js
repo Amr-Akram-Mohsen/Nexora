@@ -103,7 +103,7 @@
       infoId: "users-pagination-info",
       countId: "users-count",
       defaultPerPage: 25,
-      colspan: 5,
+      colspan: 7,
       autoInit: false
     });
     listController.init();

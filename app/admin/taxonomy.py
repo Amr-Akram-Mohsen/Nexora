@@ -1,9 +1,10 @@
 # app/admin/taxonomy.py
-from flask import Blueprint, jsonify, request, render_template, make_response
+from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.taxonomy.models import Category, Brand, Topic, Section
 from app.shared.utils.slug import generate_slug
+from app.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
@@ -286,7 +287,6 @@ def _serialize_section(s):
 @bp.route("/categories/rows", methods=["GET"])
 def categories_rows():
     """Return server-rendered HTML rows partial for categories AJAX injection."""
-    from app.admin.helpers import parse_pagination_params
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
 
@@ -297,17 +297,17 @@ def categories_rows():
     serialized = [_serialize_category(c) for c in pagination.items]
 
     html = render_template("admin/control_panel/taxonomy/categories/_rows.html", items=serialized)
-    resp = make_response(html)
-    resp.headers["X-Total"] = pagination.total
-    resp.headers["X-Pages"] = pagination.pages
-    resp.headers["X-Page"]  = pagination.page
-    return resp
+    return make_rows_response(
+        html,
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+    )
 
 
 @bp.route("/brands/rows", methods=["GET"])
 def brands_rows():
     """Return server-rendered HTML rows partial for brands AJAX injection."""
-    from app.admin.helpers import parse_pagination_params
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
 
@@ -318,17 +318,17 @@ def brands_rows():
     serialized = [_serialize_brand(b) for b in pagination.items]
 
     html = render_template("admin/control_panel/taxonomy/brands/_rows.html", items=serialized)
-    resp = make_response(html)
-    resp.headers["X-Total"] = pagination.total
-    resp.headers["X-Pages"] = pagination.pages
-    resp.headers["X-Page"]  = pagination.page
-    return resp
+    return make_rows_response(
+        html,
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+    )
 
 
 @bp.route("/topics/rows", methods=["GET"])
 def topics_rows():
     """Return server-rendered HTML rows partial for topics AJAX injection."""
-    from app.admin.helpers import parse_pagination_params
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
 
@@ -339,17 +339,17 @@ def topics_rows():
     serialized = [_serialize_topic(t) for t in pagination.items]
 
     html = render_template("admin/control_panel/taxonomy/topics/_rows.html", items=serialized)
-    resp = make_response(html)
-    resp.headers["X-Total"] = pagination.total
-    resp.headers["X-Pages"] = pagination.pages
-    resp.headers["X-Page"]  = pagination.page
-    return resp
+    return make_rows_response(
+        html,
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+    )
 
 
 @bp.route("/sections/rows", methods=["GET"])
 def sections_rows():
     """Return server-rendered HTML rows partial for sections AJAX injection."""
-    from app.admin.helpers import parse_pagination_params
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
 
@@ -360,8 +360,9 @@ def sections_rows():
     serialized = [_serialize_section(s) for s in pagination.items]
 
     html = render_template("admin/control_panel/taxonomy/sections/_rows.html", items=serialized)
-    resp = make_response(html)
-    resp.headers["X-Total"] = pagination.total
-    resp.headers["X-Pages"] = pagination.pages
-    resp.headers["X-Page"]  = pagination.page
-    return resp
+    return make_rows_response(
+        html,
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+    )

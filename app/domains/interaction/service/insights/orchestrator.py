@@ -12,172 +12,205 @@ from app.domains.interaction.service.insights.asset_mapping import map_content_s
 from app.domains.interaction.service.insights.publishing_plan import generate_content_publishing_plan
 from app.domains.interaction.service.insights.autonomous_execution import generate_execution_plan
 from app.domains.interaction.service.insights.governance import generate_execution_governance_layer
-def _generate_computed_strategy(name, entity_type, reason, related_content_ctr):
+from app.domains.interaction.service.insights.shared import score_opportunity_entity, select_primary_platform
+
+def _generate_content_ideas(
+    entity: str,
+    entity_type: str,
+    intent_signal: str,
+    confidence: float = 0.5,
+    related_content_ctr: float = 5.0
+) -> dict:
+    intent_lower = intent_signal.lower()
+    is_buying_guide = "buying" in intent_lower or "guide" in intent_lower or "high demand + low coverage" in intent_lower or "high demand + low coverage gap" in intent_lower
+    is_brand_expansion = "brand" in entity_type.lower() or "brand" in intent_lower or "high engagement + low content" in intent_lower
+    is_high_confidence = confidence >= 0.85
     prefer_comparisons = related_content_ctr < 5.0
     
-    reason_lower = reason.lower()
-    if "high demand + low coverage" in reason_lower or "high demand + low coverage gap" in reason_lower:
-        strategic_intent = "priority content creation"
-        content_angle = "guide"
-    elif "high engagement + low content" in reason_lower:
-        strategic_intent = "fast content gap exploitation"
-        content_angle = "comparison"
-    elif "high engagement" in reason_lower:
-        strategic_intent = "reinforcement / expansion content"
-        content_angle = "review"
-    else:
-        strategic_intent = "reinforcement / expansion content"
-        content_angle = "trend analysis"
-
-    # YouTube video ideas (2-3 titles)
-    if entity_type.lower() == "category":
-        if prefer_comparisons:
-            youtube_ideas = [
-                f"Ultimate {name} Comparison: Which One Should You Buy?",
-                f"Top 5 {name} Face-Off & Performance Review",
-                f"Testing the Cheapest vs Most Expensive {name}"
-            ]
-        else:
-            youtube_ideas = [
-                f"Complete {name} Buying Guide: Don't Buy Until You Watch This!",
-                f"Top 10 Best {name} of the Year: The Definitive List",
-                f"How to Choose Your First {name} (Step-by-Step)"
-            ]
-    else: # brand
-        if prefer_comparisons:
-            youtube_ideas = [
-                f"{name} vs The Competition: Is It Worth the Premium Price?",
-                f"Testing {name} Products: Honest Comparison & Review"
-            ]
-        else:
-            youtube_ideas = [
-                f"The Complete Guide to {name} Products: Features & Setup",
-                f"Unboxing & First Look: Newest Releases from {name}"
-            ]
-
-    # Pinterest pin ideas (1-2 concepts)
-    if entity_type.lower() == "category":
-        pinterest_ideas = [
-            f"How to Choose the Perfect {name} (Infographic Guide)",
-            f"The Ultimate {name} Cheat Sheet & Specifications Comparison Checklist"
-        ]
-    else:
-        pinterest_ideas = [
-            f"Visual Guide: Evolution of {name} Top Models",
-            f"{name} Product Selection Cheat Sheet (Infographic)"
-        ]
-
-    # Blog article idea (1 SEO title)
-    if entity_type.lower() == "category":
-        if content_angle == "guide":
-            blog_article_idea = f"The Ultimate {name} Buying Guide & Expert Recommendations"
-        elif content_angle == "comparison":
-            blog_article_idea = f"Direct Comparison: Head-to-Head {name} Review"
-        elif content_angle == "review":
-            blog_article_idea = f"In-Depth Review: Analyzing the Top-Rated {name} in Saudi Arabia"
-        else:
-            blog_article_idea = f"5 Critical Features to Look for in a Modern {name}"
-    else:
-        if content_angle == "review":
-            blog_article_idea = f"Expert Review: Are {name} Products Actually Worth It?"
-        else:
-            blog_article_idea = f"Buying Guide: Top 5 Best {name} Deals & Specifications"
-
-    return {
-        "youtube_ideas": youtube_ideas,
-        "youtube_video_ideas": youtube_ideas,
-        "pinterest_ideas": pinterest_ideas,
-        "pinterest_pin_ideas": pinterest_ideas,
-        "blog_article_idea": blog_article_idea,
-        "content_angle": content_angle,
-        "strategic_intent": strategic_intent
-    }
-
-
-def _generate_computed_action_strategy(target, type_str, action_title, priority, confidence, impact):
-    is_buying_guide = "buying" in action_title.lower() or "guide" in action_title.lower()
-    is_brand_expansion = "brand" in type_str.lower() or "brand" in action_title.lower()
-    is_high_confidence = confidence >= 0.85
-    
+    # 1. Determine content angle & strategic intent
     if is_buying_guide:
         content_angle = "guide"
-        if is_high_confidence:
-            youtube = [
-                f"Ultimate Video Guide: Best {target} of 2026",
-                f"Watch This Before Buying {target}! (Video Review)"
-            ]
-            blog = f"SEO Guide: The Definitive {target} Analysis & Search Trends"
-            pinterest = [
-                f"Cheat Sheet: {target} Video-First Setup & Specs Guide",
-                f"Step-by-Step {target} Tutorial & Video Tips"
-            ]
-        else:
-            youtube = [
-                f"Best {target} to Buy in 2026: Expert Buying Guide",
-                f"5 Mistakes to Avoid When Buying {target}"
-            ]
-            blog = f"The Ultimate {target} Buying Guide & Selection Tips"
-            pinterest = [
-                f"Infographic: How to Choose the Best {target}",
-                f"{target} Selection Cheat Sheet for Beginners"
-            ]
+        strategic_intent = "priority content creation"
     elif is_brand_expansion:
         content_angle = "comparison"
-        if is_high_confidence:
-            youtube = [
-                f"Hands-On Video Review: Testing {target} Performance",
-                f"Ultimate {target} Brand Comparison (Watch Before Buying)"
-            ]
-            blog = f"SEO Review: Are {target} Products Worth the Investment?"
-            pinterest = [
-                f"Must-Watch Video Guide: {target} Specifications Table",
-                f"Visual comparison: {target} vs Competitors (Infographic)"
-            ]
-        else:
-            youtube = [
-                f"{target} Review: Is It Actually Worth the Premium Price?",
-                f"{target} vs The Competition: Head-to-Head Comparison"
-            ]
-            blog = f"In-Depth Review: Analyzing {target} Products & Alternatives"
-            pinterest = [
-                f"Visual Guide: {target} Brand Specifications Comparison",
-                f"Pros & Cons: Honest {target} Review Checklist"
-            ]
+        strategic_intent = "fast content gap exploitation"
+    elif "review" in intent_lower or "high engagement" in intent_lower:
+        content_angle = "review"
+        strategic_intent = "reinforcement / expansion content"
     else:
-        # Fallback
-        if is_high_confidence:
-            content_angle = "trend analysis"
-            youtube = [
-                f"Ultimate Video Walkthrough: Master {target} Today",
-                f"Market Trends: Future of {target} (Watch Now)"
-            ]
-            blog = f"SEO Trend Report: In-Depth {target} Industry Analysis"
-            pinterest = [
-                f"Visual Guide: Future Trends of {target}",
-                f"Cheat Sheet: Mastering {target} in 2026"
-            ]
-        else:
-            content_angle = "trend analysis"
-            youtube = [
-                f"New Trends in {target}: What's Changing?",
-                f"How to Master {target} in 2026"
-            ]
-            blog = f"Top {target} Trends & Comprehensive Market Analysis"
-            pinterest = [
-                f"{target} Trend Highlights & Style Guide",
-                f"Infographic: {target} Cheat Sheet"
-            ]
+        content_angle = "trend analysis"
+        strategic_intent = "reinforcement / expansion content"
+
+    # 2. Generate Youtube, Pinterest, Blog ideas
+    youtube = []
+    pinterest = []
+    blog = ""
+    
+    if entity_type.lower() == "category":
+        if content_angle == "guide":
+            if is_high_confidence:
+                youtube = [
+                    f"Ultimate Video Guide: Best {entity} of 2026",
+                    f"Watch This Before Buying {entity}! (Video Review)"
+                ]
+                blog = f"SEO Guide: The Definitive {entity} Analysis & Search Trends"
+                pinterest = [
+                    f"Cheat Sheet: {entity} Video-First Setup & Specs Guide",
+                    f"Step-by-Step {entity} Tutorial & Video Tips"
+                ]
+            else:
+                youtube = [
+                    f"Best {entity} to Buy in 2026: Expert Buying Guide",
+                    f"5 Mistakes to Avoid When Buying {entity}"
+                ]
+                blog = f"The Ultimate {entity} Buying Guide & Selection Tips"
+                pinterest = [
+                    f"Infographic: How to Choose the Best {entity}",
+                    f"{entity} Selection Cheat Sheet for Beginners"
+                ]
+        elif content_angle == "comparison":
+            if is_high_confidence:
+                youtube = [
+                    f"Hands-On Video Review: Testing {entity} Performance",
+                    f"Ultimate {entity} Brand Comparison (Watch Before Buying)"
+                ]
+                blog = f"SEO Review: Are {entity} Products Worth the Investment?"
+                pinterest = [
+                    f"Must-Watch Video Guide: {entity} Specifications Table",
+                    f"Visual comparison: {entity} vs Competitors (Infographic)"
+                ]
+            else:
+                youtube = [
+                    f"{entity} Review: Is It Actually Worth the Premium Price?",
+                    f"{entity} vs The Competition: Head-to-Head Comparison"
+                ]
+                blog = f"In-Depth Review: Analyzing {entity} Products & Alternatives"
+                pinterest = [
+                    f"Visual Guide: {entity} Brand Specifications Comparison",
+                    f"Pros & Cons: Honest {entity} Review Checklist"
+                ]
+        else: # review / trend analysis
+            if is_high_confidence:
+                youtube = [
+                    f"Ultimate Video Walkthrough: Master {entity} Today",
+                    f"Market Trends: Future of {entity} (Watch Now)"
+                ]
+                blog = f"SEO Trend Report: In-Depth {entity} Industry Analysis"
+                pinterest = [
+                    f"Visual Guide: Future Trends of {entity}",
+                    f"Cheat Sheet: Mastering {entity} in 2026"
+                ]
+            else:
+                youtube = [
+                    f"New Trends in {entity}: What's Changing?",
+                    f"How to Master {entity} in 2026"
+                ]
+                blog = f"Top {entity} Trends & Comprehensive Market Analysis"
+                pinterest = [
+                    f"{entity} Trend Highlights & Style Guide",
+                    f"Infographic: {entity} Cheat Sheet"
+                ]
+    else: # Brand (or other)
+        if content_angle == "guide":
+            if is_high_confidence:
+                youtube = [
+                    f"Ultimate Video Guide: Best {entity} of 2026",
+                    f"Watch This Before Buying {entity}! (Video Review)"
+                ]
+                blog = f"SEO Guide: The Definitive {entity} Analysis & Search Trends"
+                pinterest = [
+                    f"Cheat Sheet: {entity} Video-First Setup & Specs Guide",
+                    f"Step-by-Step {entity} Tutorial & Video Tips"
+                ]
+            else:
+                youtube = [
+                    f"Best {entity} to Buy in 2026: Expert Buying Guide",
+                    f"5 Mistakes to Avoid When Buying {entity}"
+                ]
+                blog = f"The Ultimate {entity} Buying Guide & Selection Tips"
+                pinterest = [
+                    f"Infographic: How to Choose the Best {entity}",
+                    f"{entity} Selection Cheat Sheet for Beginners"
+                ]
+        elif content_angle == "comparison" or content_angle == "review":
+            if prefer_comparisons:
+                youtube = [
+                    f"{entity} vs The Competition: Is It Worth the Premium Price?",
+                    f"Testing {entity} Products: Honest Comparison & Review"
+                ]
+            else:
+                youtube = [
+                    f"The Complete Guide to {entity} Products: Features & Setup",
+                    f"Unboxing & First Look: Newest Releases from {entity}"
+                ]
             
+            if is_high_confidence:
+                blog = f"SEO Review: Are {entity} Products Worth the Investment?"
+                pinterest = [
+                    f"Must-Watch Video Guide: {entity} Specifications Table",
+                    f"Visual comparison: {entity} vs Competitors (Infographic)"
+                ]
+            else:
+                blog = f"Expert Review: Are {entity} Products Actually Worth It?"
+                pinterest = [
+                    f"Visual Guide: Evolution of {entity} Top Models",
+                    f"{entity} Product Selection Cheat Sheet (Infographic)"
+                ]
+        else: # trend analysis / fallback
+            if is_high_confidence:
+                youtube = [
+                    f"Ultimate Video Walkthrough: Master {entity} Today",
+                    f"Market Trends: Future of {entity} (Watch Now)"
+                ]
+                blog = f"SEO Trend Report: In-Depth {entity} Industry Analysis"
+                pinterest = [
+                    f"Visual Guide: Future Trends of {entity}",
+                    f"Cheat Sheet: Mastering {entity} in 2026"
+                ]
+            else:
+                youtube = [
+                    f"New Trends in {entity}: What's Changing?",
+                    f"How to Master {entity} in 2026"
+                ]
+                blog = f"Top {entity} Trends & Comprehensive Market Analysis"
+                pinterest = [
+                    f"{entity} Trend Highlights & Style Guide",
+                    f"Infographic: {entity} Cheat Sheet"
+                ]
+
+    platform = select_primary_platform(entity_type, intent_signal)
+    
+    if platform == "youtube":
+        action = youtube[0] if youtube else f"Create video for {entity}"
+    elif platform == "pinterest":
+        action = pinterest[0] if pinterest else f"Create pin for {entity}"
+    else:
+        action = blog if blog else f"Write article for {entity}"
+
     return {
+        "youtube": youtube,
         "youtube_ideas": youtube,
         "youtube_video_ideas": youtube,
+        
+        "pinterest": pinterest,
+        "pinterest_ideas": pinterest,
+        "pinterest_pin_ideas": pinterest,
+        "pinterest_content_ideas": pinterest,
+        
+        "blog": [blog] if blog else [],
+        "blog_ideas": [blog] if blog else [],
         "blog_article_idea": blog,
         "seo_blog_article_title": blog,
-        "pinterest_ideas": pinterest,
-        "pinterest_content_ideas": pinterest,
+        
         "content_angle": content_angle,
-        "suggested_content_angle": content_angle
+        "suggested_content_angle": content_angle,
+        "strategic_intent": strategic_intent,
+        
+        "topic": entity,
+        "platform": platform,
+        "action": action
     }
+
 
 
 def get_decision_intelligence_data(lightweight=False):
@@ -240,15 +273,15 @@ def get_decision_intelligence_data(lightweight=False):
         content_val = c["content_count"]
         avg_eng_val = cat_avg_engagements[idx]
         
-        norm_demand = (demand_val / max_cat_demand) if max_cat_demand > 0 else 0.0
-        norm_coverage_gap = 1.0 - ((content_val / max_cat_content) if max_cat_content > 0 else 0.0)
-        norm_eng = (avg_eng_val / max_cat_avg_eng) if max_cat_avg_eng > 0 else 0.0
-        
-        base_score = 0.4 * norm_demand + 0.4 * norm_coverage_gap + 0.2 * norm_eng
-        
-        perf_feedback = entity_avg_feedback.get(c["name"], 0.5)
-        score = 0.7 * base_score + 0.3 * perf_feedback
-        score = round(max(0.0, min(1.0, score)), 2)
+        score = score_opportunity_entity(
+            demand_val=demand_val,
+            max_demand=max_cat_demand,
+            content_val=content_val,
+            max_content=max_cat_content,
+            avg_eng=avg_eng_val,
+            max_avg_eng=max_cat_avg_eng,
+            perf_feedback=entity_avg_feedback.get(c["name"], 0.5)
+        )
         
         reason = f"{c['demand']} demand + {c['coverage'].lower()} coverage"
         if c['gap_score'] == "High Gap":
@@ -275,15 +308,15 @@ def get_decision_intelligence_data(lightweight=False):
         content_val = b["article_volume"]
         avg_eng_val = brand_avg_engagements[idx]
         
-        norm_demand = (demand_val / max_brand_demand) if max_brand_demand > 0 else 0.0
-        norm_coverage_gap = 1.0 - ((content_val / max_brand_content) if max_brand_content > 0 else 0.0)
-        norm_eng = (avg_eng_val / max_brand_avg_eng) if max_brand_avg_eng > 0 else 0.0
-        
-        base_score = 0.4 * norm_demand + 0.4 * norm_coverage_gap + 0.2 * norm_eng
-        
-        perf_feedback = entity_avg_feedback.get(b["name"], 0.5)
-        score = 0.7 * base_score + 0.3 * perf_feedback
-        score = round(max(0.0, min(1.0, score)), 2)
+        score = score_opportunity_entity(
+            demand_val=demand_val,
+            max_demand=max_brand_demand,
+            content_val=content_val,
+            max_content=max_brand_content,
+            avg_eng=avg_eng_val,
+            max_avg_eng=max_brand_avg_eng,
+            perf_feedback=entity_avg_feedback.get(b["name"], 0.5)
+        )
         
         reason = f"{b['engagement_level']} engagement + low content" if b["opportunity"] else f"{b['engagement_level']} engagement"
         
@@ -315,11 +348,11 @@ def get_decision_intelligence_data(lightweight=False):
     # Compute content strategy for each top opportunity
     related_content_ctr = rec_perf.get("related_content_ctr", 0.0)
     for opp in top_opportunities:
-        opp["content_strategy"] = _generate_computed_strategy(
+        opp["content_strategy"] = _generate_content_ideas(
             opp["entity"],
             opp["type"],
             opp["reason"],
-            related_content_ctr
+            related_content_ctr=related_content_ctr
         )
 
     # 4. Insight Actions Queue
@@ -372,13 +405,11 @@ def get_decision_intelligence_data(lightweight=False):
             
     action_queue.sort(key=lambda x: x["score"], reverse=True)
     for item in action_queue:
-        item["content_output"] = _generate_computed_action_strategy(
+        item["content_output"] = _generate_content_ideas(
             item["target"],
             item["type"],
             item["title"],
-            item["priority"],
-            item["confidence"],
-            item["impact"]
+            confidence=item["confidence"]
         )
         item.pop("score", None)
 

@@ -10,12 +10,12 @@ Refactoring applied:
   relationship traversal during serialization (R-15).
 - Shared helpers from app.admin.helpers for pagination and sort parsing (R-18, R-21).
 """
-from flask import Blueprint, jsonify, request, render_template, make_response
+from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
 from app.domains.taxonomy.models import Category, Brand, Source
-from app.admin.helpers import parse_pagination_params, parse_sort_params
+from app.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
 from sqlalchemy import select, func, or_
 from sqlalchemy.orm import joinedload
 
@@ -333,11 +333,12 @@ def items_rows():
         })
 
     html = render_template("admin/control_panel/items/_rows.html", items=serialized)
-    resp = make_response(html)
-    resp.headers["X-Total"] = pagination.total
-    resp.headers["X-Pages"] = pagination.pages
-    resp.headers["X-Page"]  = pagination.page
-    return resp
+    return make_rows_response(
+        html,
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+    )
 
 
 @bp.route("/<int:id>/inspect", methods=["GET"])

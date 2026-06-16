@@ -1,12 +1,18 @@
 # app/domains/interaction/service/insights/opportunities.py
-from sqlalchemy import func, select, desc, case
+from sqlalchemy import func, select, desc, case, cast, Integer
+from functools import lru_cache
 from app.core.extensions import db
 from app.domains.interaction.models import View, Reaction, Comment, Save, ItemClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
 from app.domains.item.models import Item, ItemStoreLink, ItemVariant
 from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet
 from app.domains.relationships import content_brands, content_topics
-from app.domains.interaction.service.insights.shared import get_start_date
+from app.domains.interaction.service.insights.shared import (
+    get_start_date,
+    finalize_trend_stats,
+    build_period_split_query,
+    compute_quality_scores
+)
 
 def get_top_content_data(time_frame: str, limit: int = 5):
     start_date = get_start_date(time_frame)
@@ -143,77 +149,29 @@ def get_trending_categories_data():
                 cat_stats[cid]["period_a"] += a or 0
                 cat_stats[cid]["period_b"] += b or 0
 
-    # 1. Content Views
-    add_content_stats(
-        select(
-            Content.category_id,
-            func.count(case((View.created_at >= start_a, View.id))).label("a"),
-            func.count(case(((View.created_at >= start_b) & (View.created_at < start_a), View.id))).label("b")
-        ).join(View, (View.target_id == Content.id) & (View.target_type == "content")).group_by(Content.category_id)
-    )
+    # 1-4. Content Interactions
+    for model in [View, Reaction, Comment, Save]:
+        add_content_stats(
+            build_period_split_query(
+                (model.target_id == Content.id) & (model.target_type == "content"),
+                Content.category_id,
+                model,
+                start_a,
+                start_b
+            )
+        )
 
-    # 2. Content Reactions
-    add_content_stats(
-        select(
-            Content.category_id,
-            func.count(case((Reaction.created_at >= start_a, Reaction.id))).label("a"),
-            func.count(case(((Reaction.created_at >= start_b) & (Reaction.created_at < start_a), Reaction.id))).label("b")
-        ).join(Reaction, (Reaction.target_id == Content.id) & (Reaction.target_type == "content")).group_by(Content.category_id)
-    )
-
-    # 3. Content Comments
-    add_content_stats(
-        select(
-            Content.category_id,
-            func.count(case((Comment.created_at >= start_a, Comment.id))).label("a"),
-            func.count(case(((Comment.created_at >= start_b) & (Comment.created_at < start_a), Comment.id))).label("b")
-        ).join(Comment, (Comment.target_id == Content.id) & (Comment.target_type == "content")).group_by(Content.category_id)
-    )
-
-    # 4. Content Saves
-    add_content_stats(
-        select(
-            Content.category_id,
-            func.count(case((Save.created_at >= start_a, Save.id))).label("a"),
-            func.count(case(((Save.created_at >= start_b) & (Save.created_at < start_a), Save.id))).label("b")
-        ).join(Save, (Save.target_id == Content.id) & (Save.target_type == "content")).group_by(Content.category_id)
-    )
-
-    # 5. Item Views
-    add_content_stats(
-        select(
-            Item.category_id,
-            func.count(case((View.created_at >= start_a, View.id))).label("a"),
-            func.count(case(((View.created_at >= start_b) & (View.created_at < start_a), View.id))).label("b")
-        ).join(View, (View.target_id == Item.id) & (View.target_type == "item")).group_by(Item.category_id)
-    )
-
-    # 6. Item Reactions
-    add_content_stats(
-        select(
-            Item.category_id,
-            func.count(case((Reaction.created_at >= start_a, Reaction.id))).label("a"),
-            func.count(case(((Reaction.created_at >= start_b) & (Reaction.created_at < start_a), Reaction.id))).label("b")
-        ).join(Reaction, (Reaction.target_id == Item.id) & (Reaction.target_type == "item")).group_by(Item.category_id)
-    )
-
-    # 7. Item Comments
-    add_content_stats(
-        select(
-            Item.category_id,
-            func.count(case((Comment.created_at >= start_a, Comment.id))).label("a"),
-            func.count(case(((Comment.created_at >= start_b) & (Comment.created_at < start_a), Comment.id))).label("b")
-        ).join(Comment, (Comment.target_id == Item.id) & (Comment.target_type == "item")).group_by(Item.category_id)
-    )
-
-    # 8. Item Saves
-    add_content_stats(
-        select(
-            Item.category_id,
-            func.count(case((Save.created_at >= start_a, Save.id))).label("a"),
-            func.count(case(((Save.created_at >= start_b) & (Save.created_at < start_a), Save.id))).label("b")
-        ).join(Save, (Save.target_id == Item.id) & (Save.target_type == "item")).group_by(Item.category_id)
-    )
+    # 5-8. Item Interactions
+    for model in [View, Reaction, Comment, Save]:
+        add_content_stats(
+            build_period_split_query(
+                (model.target_id == Item.id) & (model.target_type == "item"),
+                Item.category_id,
+                model,
+                start_a,
+                start_b
+            )
+        )
 
     # 9. Item Clicks
     item_clicks_stmt = select(
@@ -235,24 +193,7 @@ def get_trending_categories_data():
                 cat_stats[cid]["period_a"] += a or 0
                 cat_stats[cid]["period_b"] += b or 0
 
-    results = []
-    for stat in cat_stats.values():
-        a = stat["period_a"]
-        b = stat["period_b"]
-        change = a - b
-        pct = ((a - b) / b * 100.0) if b > 0 else (100.0 if a > 0 else 0.0)
-        results.append({
-            "id": stat["id"],
-            "name": stat["name"],
-            "slug": stat["slug"],
-            "period_a": a,
-            "period_b": b,
-            "change": change,
-            "pct_change": round(pct, 1)
-        })
-
-    results.sort(key=lambda x: (x["period_a"], x["change"]), reverse=True)
-    return results
+    return finalize_trend_stats(cat_stats)
 
 def get_trending_brands_data():
     from datetime import datetime, timedelta, timezone
@@ -266,93 +207,35 @@ def get_trending_brands_data():
         for b in brands
     }
 
-    # Content Views for Brands
-    stmt = select(
-        content_brands.c.brand_id,
-        func.count(case((View.created_at >= start_a, View.id))).label("a"),
-        func.count(case(((View.created_at >= start_b) & (View.created_at < start_a), View.id))).label("b")
-    ).join(View, (View.target_id == content_brands.c.content_id) & (View.target_type == "content")).group_by(content_brands.c.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
+    def add_brand_stats(stmt):
+        for bid, a, b in db.session.execute(stmt):
+            if bid in brand_stats:
+                brand_stats[bid]["period_a"] += a or 0
+                brand_stats[bid]["period_b"] += b or 0
 
-    # Content Reactions
-    stmt = select(
-        content_brands.c.brand_id,
-        func.count(case((Reaction.created_at >= start_a, Reaction.id))).label("a"),
-        func.count(case(((Reaction.created_at >= start_b) & (Reaction.created_at < start_a), Reaction.id))).label("b")
-    ).join(Reaction, (Reaction.target_id == content_brands.c.content_id) & (Reaction.target_type == "content")).group_by(content_brands.c.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
+    # Content Interactions for Brands
+    for model in [View, Reaction, Comment, Save]:
+        add_brand_stats(
+            build_period_split_query(
+                (model.target_id == content_brands.c.content_id) & (model.target_type == "content"),
+                content_brands.c.brand_id,
+                model,
+                start_a,
+                start_b
+            )
+        )
 
-    # Content Comments
-    stmt = select(
-        content_brands.c.brand_id,
-        func.count(case((Comment.created_at >= start_a, Comment.id))).label("a"),
-        func.count(case(((Comment.created_at >= start_b) & (Comment.created_at < start_a), Comment.id))).label("b")
-    ).join(Comment, (Comment.target_id == content_brands.c.content_id) & (Comment.target_type == "content")).group_by(content_brands.c.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
-
-    # Content Saves
-    stmt = select(
-        content_brands.c.brand_id,
-        func.count(case((Save.created_at >= start_a, Save.id))).label("a"),
-        func.count(case(((Save.created_at >= start_b) & (Save.created_at < start_a), Save.id))).label("b")
-    ).join(Save, (Save.target_id == content_brands.c.content_id) & (Save.target_type == "content")).group_by(content_brands.c.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
-
-    # Item Views
-    stmt = select(
-        Item.brand_id,
-        func.count(case((View.created_at >= start_a, View.id))).label("a"),
-        func.count(case(((View.created_at >= start_b) & (View.created_at < start_a), View.id))).label("b")
-    ).join(View, (View.target_id == Item.id) & (View.target_type == "item")).group_by(Item.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
-
-    # Item Reactions
-    stmt = select(
-        Item.brand_id,
-        func.count(case((Reaction.created_at >= start_a, Reaction.id))).label("a"),
-        func.count(case(((Reaction.created_at >= start_b) & (Reaction.created_at < start_a), Reaction.id))).label("b")
-    ).join(Reaction, (Reaction.target_id == Item.id) & (Reaction.target_type == "item")).group_by(Item.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
-
-    # Item Comments
-    stmt = select(
-        Item.brand_id,
-        func.count(case((Comment.created_at >= start_a, Comment.id))).label("a"),
-        func.count(case(((Comment.created_at >= start_b) & (Comment.created_at < start_a), Comment.id))).label("b")
-    ).join(Comment, (Comment.target_id == Item.id) & (Comment.target_type == "item")).group_by(Item.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
-
-    # Item Saves
-    stmt = select(
-        Item.brand_id,
-        func.count(case((Save.created_at >= start_a, Save.id))).label("a"),
-        func.count(case(((Save.created_at >= start_b) & (Save.created_at < start_a), Save.id))).label("b")
-    ).join(Save, (Save.target_id == Item.id) & (Save.target_type == "item")).group_by(Item.brand_id)
-    for bid, a, b in db.session.execute(stmt):
-        if bid in brand_stats:
-            brand_stats[bid]["period_a"] += a or 0
-            brand_stats[bid]["period_b"] += b or 0
+    # Item Interactions for Brands
+    for model in [View, Reaction, Comment, Save]:
+        add_brand_stats(
+            build_period_split_query(
+                (model.target_id == Item.id) & (model.target_type == "item"),
+                Item.brand_id,
+                model,
+                start_a,
+                start_b
+            )
+        )
 
     # Item Clicks
     stmt = select(
@@ -363,6 +246,7 @@ def get_trending_brands_data():
      .join(ItemClick, ItemClick.item_store_link_id == ItemStoreLink.id)\
      .group_by(ItemVariant.item_id)
     item_clicks = db.session.execute(stmt).all()
+    
     if item_clicks:
         item_ids = [row[0] for row in item_clicks]
         items = db.session.execute(select(Item.id, Item.brand_id).where(Item.id.in_(item_ids))).all()
@@ -373,24 +257,7 @@ def get_trending_brands_data():
                 brand_stats[bid]["period_a"] += a or 0
                 brand_stats[bid]["period_b"] += b or 0
 
-    results = []
-    for stat in brand_stats.values():
-        a = stat["period_a"]
-        b = stat["period_b"]
-        change = a - b
-        pct = ((a - b) / b * 100.0) if b > 0 else (100.0 if a > 0 else 0.0)
-        results.append({
-            "id": stat["id"],
-            "name": stat["name"],
-            "slug": stat["slug"],
-            "period_a": a,
-            "period_b": b,
-            "change": change,
-            "pct_change": round(pct, 1)
-        })
-
-    results.sort(key=lambda x: (x["period_a"], x["change"]), reverse=True)
-    return results
+    return finalize_trend_stats(brand_stats)
 
 def get_trending_topics_data():
     from datetime import datetime, timedelta, timezone
@@ -404,68 +271,25 @@ def get_trending_topics_data():
         for t in topics
     }
 
-    # Content Views
-    stmt = select(
-        content_topics.c.topic_id,
-        func.count(case((View.created_at >= start_a, View.id))).label("a"),
-        func.count(case(((View.created_at >= start_b) & (View.created_at < start_a), View.id))).label("b")
-    ).join(View, (View.target_id == content_topics.c.content_id) & (View.target_type == "content")).group_by(content_topics.c.topic_id)
-    for tid, a, b in db.session.execute(stmt):
-        if tid in topic_stats:
-            topic_stats[tid]["period_a"] += a or 0
-            topic_stats[tid]["period_b"] += b or 0
+    def add_topic_stats(stmt):
+        for tid, a, b in db.session.execute(stmt):
+            if tid in topic_stats:
+                topic_stats[tid]["period_a"] += a or 0
+                topic_stats[tid]["period_b"] += b or 0
 
-    # Content Reactions
-    stmt = select(
-        content_topics.c.topic_id,
-        func.count(case((Reaction.created_at >= start_a, Reaction.id))).label("a"),
-        func.count(case(((Reaction.created_at >= start_b) & (Reaction.created_at < start_a), Reaction.id))).label("b")
-    ).join(Reaction, (Reaction.target_id == content_topics.c.content_id) & (Reaction.target_type == "content")).group_by(content_topics.c.topic_id)
-    for tid, a, b in db.session.execute(stmt):
-        if tid in topic_stats:
-            topic_stats[tid]["period_a"] += a or 0
-            topic_stats[tid]["period_b"] += b or 0
+    # Content Interactions for Topics
+    for model in [View, Reaction, Comment, Save]:
+        add_topic_stats(
+            build_period_split_query(
+                (model.target_id == content_topics.c.content_id) & (model.target_type == "content"),
+                content_topics.c.topic_id,
+                model,
+                start_a,
+                start_b
+            )
+        )
 
-    # Content Comments
-    stmt = select(
-        content_topics.c.topic_id,
-        func.count(case((Comment.created_at >= start_a, Comment.id))).label("a"),
-        func.count(case(((Comment.created_at >= start_b) & (Comment.created_at < start_a), Comment.id))).label("b")
-    ).join(Comment, (Comment.target_id == content_topics.c.content_id) & (Comment.target_type == "content")).group_by(content_topics.c.topic_id)
-    for tid, a, b in db.session.execute(stmt):
-        if tid in topic_stats:
-            topic_stats[tid]["period_a"] += a or 0
-            topic_stats[tid]["period_b"] += b or 0
-
-    # Content Saves
-    stmt = select(
-        content_topics.c.topic_id,
-        func.count(case((Save.created_at >= start_a, Save.id))).label("a"),
-        func.count(case(((Save.created_at >= start_b) & (Save.created_at < start_a), Save.id))).label("b")
-    ).join(Save, (Save.target_id == content_topics.c.content_id) & (Save.target_type == "content")).group_by(content_topics.c.topic_id)
-    for tid, a, b in db.session.execute(stmt):
-        if tid in topic_stats:
-            topic_stats[tid]["period_a"] += a or 0
-            topic_stats[tid]["period_b"] += b or 0
-
-    results = []
-    for stat in topic_stats.values():
-        a = stat["period_a"]
-        b = stat["period_b"]
-        change = a - b
-        pct = ((a - b) / b * 100.0) if b > 0 else (100.0 if a > 0 else 0.0)
-        results.append({
-            "id": stat["id"],
-            "name": stat["name"],
-            "slug": stat["slug"],
-            "period_a": a,
-            "period_b": b,
-            "change": change,
-            "pct_change": round(pct, 1)
-        })
-
-    results.sort(key=lambda x: (x["period_a"], x["change"]), reverse=True)
-    return results
+    return finalize_trend_stats(topic_stats)
 
 def get_content_opportunities():
     from datetime import datetime, timedelta, timezone
@@ -658,6 +482,7 @@ def get_content_vs_product_performance():
 
     return items
 
+@lru_cache(maxsize=1)
 def get_intent_opportunity_data():
     categories = db.session.execute(select(Category.id, Category.name)).all()
     intents = db.session.execute(select(IntentFacet.id, IntentFacet.name, IntentFacet.slug)).all()
@@ -704,6 +529,7 @@ def get_intent_opportunity_data():
 
     return results
 
+@lru_cache(maxsize=1)
 def get_brand_opportunity_data():
     brands = db.session.execute(select(Brand.id, Brand.name)).all()
     brand_data = {b.id: {
@@ -767,26 +593,27 @@ def get_brand_opportunity_data():
     results.sort(key=lambda x: x["engagement"], reverse=True)
     return results
 
+@lru_cache(maxsize=1)
 def get_recommendation_performance_data():
-    related_content_impressions = db.session.execute(
-        select(func.count(RecommendationImpression.id)).where(RecommendationImpression.entity_type == 'related_content')
-    ).scalar() or 0
-    related_products_impressions = db.session.execute(
-        select(func.count(RecommendationImpression.id)).where(RecommendationImpression.entity_type == 'related_product')
-    ).scalar() or 0
-    shop_products_impressions = db.session.execute(
-        select(func.count(RecommendationImpression.id)).where(RecommendationImpression.entity_type == 'shop_product')
-    ).scalar() or 0
+    imp_rows = db.session.execute(
+        select(RecommendationImpression.entity_type, func.count(RecommendationImpression.id))
+        .group_by(RecommendationImpression.entity_type)
+    ).all()
+    imp_map = {r[0]: r[1] for r in imp_rows}
 
-    related_content_clicks = db.session.execute(
-        select(func.count(RecommendationClick.id)).where(RecommendationClick.entity_type == 'related_content')
-    ).scalar() or 0
-    related_products_clicks = db.session.execute(
-        select(func.count(RecommendationClick.id)).where(RecommendationClick.entity_type == 'related_product')
-    ).scalar() or 0
-    shop_products_clicks = db.session.execute(
-        select(func.count(RecommendationClick.id)).where(RecommendationClick.entity_type == 'shop_product')
-    ).scalar() or 0
+    clk_rows = db.session.execute(
+        select(RecommendationClick.entity_type, func.count(RecommendationClick.id))
+        .group_by(RecommendationClick.entity_type)
+    ).all()
+    clk_map = {r[0]: r[1] for r in clk_rows}
+
+    related_content_impressions = imp_map.get("related_content", 0)
+    related_products_impressions = imp_map.get("related_product", 0)
+    shop_products_impressions = imp_map.get("shop_product", 0)
+
+    related_content_clicks = clk_map.get("related_content", 0)
+    related_products_clicks = clk_map.get("related_product", 0)
+    shop_products_clicks = clk_map.get("shop_product", 0)
 
     related_content_ctr = round((related_content_clicks / related_content_impressions) * 100.0, 2) if related_content_impressions > 0 else 0.0
     related_products_ctr = round((related_products_clicks / related_products_impressions) * 100.0, 2) if related_products_impressions > 0 else 0.0
@@ -799,60 +626,45 @@ def get_recommendation_performance_data():
     categories = db.session.execute(select(Category.id, Category.name)).all()
     cat_id_to_name = {cat.id: cat.name for cat in categories}
     
-    content_cats = {row[0]: row[1] for row in db.session.execute(select(Content.id, Content.category_id)).all()}
-    item_cats = {row[0]: row[1] for row in db.session.execute(select(Item.id, Item.category_id)).all()}
+    cast_context_id = cast(RecommendationImpression.context_id, Integer)
+    cast_context_id_click = cast(RecommendationClick.context_id, Integer)
 
-    def resolve_category_id(context_id_str, entity_type):
-        if not context_id_str:
-            return None
-        try:
-            c_id = int(context_id_str)
-        except ValueError:
-            return None
-        if entity_type == 'shop_product':
-            return content_cats.get(c_id)
-        elif entity_type == 'related_product':
-            return item_cats.get(c_id)
-        elif entity_type == 'related_content':
-            if c_id in content_cats:
-                return content_cats[c_id]
-            return item_cats.get(c_id)
-        return None
+    category_expr = case(
+        (RecommendationImpression.entity_type == 'shop_product', Content.category_id),
+        (RecommendationImpression.entity_type == 'related_product', Item.category_id),
+        ((RecommendationImpression.entity_type == 'related_content') & (Content.category_id.isnot(None)), Content.category_id),
+        else_=Item.category_id
+    )
 
-    def resolve_page_type(context_id_str, entity_type):
-        if not context_id_str:
-            return None
-        try:
-            c_id = int(context_id_str)
-        except ValueError:
-            return None
-        if entity_type == 'shop_product':
-            return 'content'
-        elif entity_type == 'related_product':
-            return 'commercial'
-        elif entity_type == 'related_content':
-            if c_id in content_cats:
-                return 'content'
-            return 'commercial'
-        return None
+    click_category_expr = case(
+        (RecommendationClick.entity_type == 'shop_product', Content.category_id),
+        (RecommendationClick.entity_type == 'related_product', Item.category_id),
+        ((RecommendationClick.entity_type == 'related_content') & (Content.category_id.isnot(None)), Content.category_id),
+        else_=Item.category_id
+    )
 
-    all_impressions = db.session.execute(
-        select(RecommendationImpression.context_id, RecommendationImpression.entity_type)
-    ).all()
-    all_clicks = db.session.execute(
-        select(RecommendationClick.context_id, RecommendationClick.entity_type)
-    ).all()
+    category_stmt = select(
+        category_expr,
+        func.count(RecommendationImpression.id)
+    ).outerjoin(Content, cast_context_id == Content.id)\
+     .outerjoin(Item, cast_context_id == Item.id)\
+     .group_by(category_expr)
+
+    click_category_stmt = select(
+        click_category_expr,
+        func.count(RecommendationClick.id)
+    ).outerjoin(Content, cast_context_id_click == Content.id)\
+     .outerjoin(Item, cast_context_id_click == Item.id)\
+     .group_by(click_category_expr)
 
     cat_stats = {cat_id: {"impressions": 0, "clicks": 0} for cat_id in cat_id_to_name.keys()}
-    for context_id_str, rectype in all_impressions:
-        cat_id = resolve_category_id(context_id_str, rectype)
+    for cat_id, cnt in db.session.execute(category_stmt).all():
         if cat_id in cat_stats:
-            cat_stats[cat_id]["impressions"] += 1
-            
-    for context_id_str, rectype in all_clicks:
-        cat_id = resolve_category_id(context_id_str, rectype)
+            cat_stats[cat_id]["impressions"] = cnt
+
+    for cat_id, cnt in db.session.execute(click_category_stmt).all():
         if cat_id in cat_stats:
-            cat_stats[cat_id]["clicks"] += 1
+            cat_stats[cat_id]["clicks"] = cnt
 
     category_metrics = []
     for cat_id, name in cat_id_to_name.items():
@@ -866,19 +678,45 @@ def get_recommendation_performance_data():
             "ctr": round(ctr, 2)
         })
 
+    page_type_expr = case(
+        (RecommendationImpression.entity_type == 'shop_product', 'content'),
+        (RecommendationImpression.entity_type == 'related_product', 'commercial'),
+        ((RecommendationImpression.entity_type == 'related_content') & (Content.category_id.isnot(None)), 'content'),
+        else_='commercial'
+    )
+
+    click_page_type_expr = case(
+        (RecommendationClick.entity_type == 'shop_product', 'content'),
+        (RecommendationClick.entity_type == 'related_product', 'commercial'),
+        ((RecommendationClick.entity_type == 'related_content') & (Content.category_id.isnot(None)), 'content'),
+        else_='commercial'
+    )
+
+    page_stmt = select(
+        page_type_expr,
+        func.count(RecommendationImpression.id)
+    ).outerjoin(Content, cast_context_id == Content.id)\
+     .outerjoin(Item, cast_context_id == Item.id)\
+     .group_by(page_type_expr)
+
+    click_page_stmt = select(
+        click_page_type_expr,
+        func.count(RecommendationClick.id)
+    ).outerjoin(Content, cast_context_id_click == Content.id)\
+     .outerjoin(Item, cast_context_id_click == Item.id)\
+     .group_by(click_page_type_expr)
+
     page_stats = {
         "content": {"impressions": 0, "clicks": 0},
         "commercial": {"impressions": 0, "clicks": 0}
     }
-    for context_id_str, rectype in all_impressions:
-        ptype = resolve_page_type(context_id_str, rectype)
+    for ptype, cnt in db.session.execute(page_stmt).all():
         if ptype in page_stats:
-            page_stats[ptype]["impressions"] += 1
+            page_stats[ptype]["impressions"] = cnt
 
-    for context_id_str, rectype in all_clicks:
-        ptype = resolve_page_type(context_id_str, rectype)
+    for ptype, cnt in db.session.execute(click_page_stmt).all():
         if ptype in page_stats:
-            page_stats[ptype]["clicks"] += 1
+            page_stats[ptype]["clicks"] = cnt
 
     page_type_metrics = []
     for ptype in ["content", "commercial"]:
@@ -906,50 +744,9 @@ def get_recommendation_performance_data():
             "ctr": round(ctr, 2)
         })
 
-    max_cat_ctr = max([c["ctr"] for c in category_metrics]) if category_metrics else 0.0
-    max_cat_impressions = max([c["impressions"] for c in category_metrics]) if category_metrics else 0
-    category_scores = {}
-    for c in category_metrics:
-        ctr = c["ctr"]
-        impressions = c["impressions"]
-        norm_ctr = (ctr / max_cat_ctr) if max_cat_ctr > 0 else 0.0
-        engagement_weight = (impressions / max_cat_impressions) if max_cat_impressions > 0 else 0.0
-        category_scores[c["name"]] = {
-            "ctr": ctr,
-            "impressions": impressions,
-            "clicks": c["clicks"],
-            "quality_score": round(norm_ctr * engagement_weight, 2)
-        }
-
-    max_page_ctr = max([p["ctr"] for p in page_type_metrics]) if page_type_metrics else 0.0
-    max_page_impressions = max([p["impressions"] for p in page_type_metrics]) if page_type_metrics else 0
-    page_type_scores = {}
-    for p in page_type_metrics:
-        ctr = p["ctr"]
-        impressions = p["impressions"]
-        norm_ctr = (ctr / max_page_ctr) if max_page_ctr > 0 else 0.0
-        engagement_weight = (impressions / max_page_impressions) if max_page_impressions > 0 else 0.0
-        page_type_scores[p["page_type"]] = {
-            "ctr": ctr,
-            "impressions": impressions,
-            "clicks": p["clicks"],
-            "quality_score": round(norm_ctr * engagement_weight, 2)
-        }
-
-    max_rec_ctr = max([r["ctr"] for r in recommendation_type_metrics]) if recommendation_type_metrics else 0.0
-    max_rec_impressions = max([r["impressions"] for r in recommendation_type_metrics]) if recommendation_type_metrics else 0
-    recommendation_type_scores = {}
-    for r in recommendation_type_metrics:
-        ctr = r["ctr"]
-        impressions = r["impressions"]
-        norm_ctr = (ctr / max_rec_ctr) if max_rec_ctr > 0 else 0.0
-        engagement_weight = (impressions / max_rec_impressions) if max_rec_impressions > 0 else 0.0
-        recommendation_type_scores[r["recommendation_type"]] = {
-            "ctr": ctr,
-            "impressions": impressions,
-            "clicks": r["clicks"],
-            "quality_score": round(norm_ctr * engagement_weight, 2)
-        }
+    category_scores = compute_quality_scores(category_metrics, lambda c: c["name"])
+    page_type_scores = compute_quality_scores(page_type_metrics, lambda p: p["page_type"])
+    recommendation_type_scores = compute_quality_scores(recommendation_type_metrics, lambda r: r["recommendation_type"])
 
     diagnoses = {}
     for rtype in ["related_content", "related_product", "shop_product"]:
@@ -1101,6 +898,7 @@ def get_recommendation_performance_data():
         "benchmarking": benchmarking
     }
 
+@lru_cache(maxsize=1)
 def get_content_coverage_matrix():
     categories = db.session.execute(select(Category.id, Category.name)).all()
     cat_map = {c.id: {

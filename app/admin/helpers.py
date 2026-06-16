@@ -90,3 +90,29 @@ def parse_sort_params(col_map: dict, default_col, default_dir: str = "desc"):
     if sort_dir not in ("asc", "desc"):
         sort_dir = default_dir
     return sort_col, sort_dir
+
+
+# ──────────────────────────────────────────────
+# HTML PARTIAL RESPONSES
+# ──────────────────────────────────────────────
+
+def make_rows_response(html: str, *, total: int, pages: int, page: int):
+    """
+    Wrap an HTML partial in a Flask Response with the three standard
+    pagination headers consumed by AdminListController on the frontend.
+
+    Args:
+        html:  Rendered HTML string to send as the response body.
+        total: Total number of matching records (for X-Total header).
+        pages: Total number of pages (for X-Pages header).
+        page:  Current page number (for X-Page header).
+
+    Returns:
+        A Flask Response object ready to be returned from a view.
+    """
+    from flask import make_response as _make_response
+    resp = _make_response(html)
+    resp.headers["X-Total"] = total
+    resp.headers["X-Pages"] = pages
+    resp.headers["X-Page"]  = page
+    return resp

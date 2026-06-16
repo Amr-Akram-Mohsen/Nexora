@@ -22,6 +22,10 @@
     </span>
   </td>
   <td>{{ user.created_at.strftime('%b %d, %Y') if user.created_at else "—" }}</td>
+  <td>{{ user.last_login_at.strftime('%b %d, %Y') if user.last_login_at else "Never" }}</td>
+  <td>
+    <span class="status-badge purple">{{ user.engagement_score or 0 }}</span>
+  </td>
   <td>
     {% call action_group() %}
     {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-user",
@@ -31,4 +35,4 @@
 </tr>
 {% endmacro %}
 
-{{ admin_crud_rows(items, render_row, colspan=5, empty_text="No users found.") }}
+{{ admin_crud_rows(items, render_row, colspan=7, empty_text="No users found.") }}

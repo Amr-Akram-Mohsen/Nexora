@@ -1,4 +1,5 @@
 # app/domains/interaction/service/insights/content_strategy.py
+from app.domains.interaction.service.insights.shared import select_primary_platform
 
 def generate_content_strategy(opportunities_data):
     """
@@ -91,15 +92,14 @@ def generate_content_strategy(opportunities_data):
         intent_info = intent_map.get(entity_name, {}) if entity_type == "category" else None
         intent_opt = intent_info.get("opportunity", "buying-guide") if intent_info else "buying-guide"
         
-        is_comparison_review = "comparison" in intent_opt.lower() or "review" in intent_opt.lower() or entity_type == "brand"
-        is_visual = "tutorial" in intent_opt.lower() or "guide" in intent_opt.lower() or "gift" in intent_opt.lower()
+        primary_platform = select_primary_platform(entity_type, intent_opt)
         is_evergreen = lifecycle_tag == "evergreen"
         
-        if is_comparison_review:
+        if primary_platform == "youtube":
             youtube_count = 3
             pinterest_count = 1
             blog_count = 1
-        elif is_visual:
+        elif primary_platform == "pinterest":
             youtube_count = 2
             pinterest_count = 2
             blog_count = 1

@@ -25,25 +25,27 @@ def require_admin():
     pass
 
 
-@bp.route("/info", methods=["GET"])
-def system_info():
-    """Return backend status metrics and environment configurations."""
+def _build_system_info() -> list:
+    """Build the system info list shared by the JSON and HTML widget endpoints."""
     try:
         db_type = db.engine.name if db.engine else "Unknown"
     except Exception:
         db_type = "Unknown"
-
-    # Version sourced from config (set e.g. via APP_VERSION env var) — no hardcoding (R-11)
     version = current_app.config.get("APP_VERSION", "1.3.0")
-
-    return jsonify([
+    return [
         {"label": "Backend Status", "value": "online", "status": "online"},
         {"label": "Version",        "value": version},
         {"label": "Environment",    "value": current_app.config.get("ENV", "Development")},
         {"label": "Python",         "value": sys.version.split()[0]},
         {"label": "Flask",          "value": flask.__version__},
         {"label": "Database",       "value": db_type.capitalize()},
-    ])
+    ]
+
+
+@bp.route("/info", methods=["GET"])
+def system_info():
+    """Return backend status metrics and environment configurations."""
+    return jsonify(_build_system_info())
 
 
 @bp.route("/cache", methods=["DELETE"])
@@ -111,20 +113,7 @@ def reset_system():
 
 @bp.route("/widget/info", methods=["GET"])
 def widget_system_info():
-    try:
-        db_type = db.engine.name if db.engine else "Unknown"
-    except Exception:
-        db_type = "Unknown"
-
-    version = current_app.config.get("APP_VERSION", "1.3.0")
-    info = [
-        {"label": "Backend Status", "value": "online", "status": "online"},
-        {"label": "Version",        "value": version},
-        {"label": "Environment",    "value": current_app.config.get("ENV", "Development")},
-        {"label": "Python",         "value": sys.version.split()[0]},
-        {"label": "Flask",          "value": flask.__version__},
-        {"label": "Database",       "value": db_type.capitalize()},
-    ]
+    info = _build_system_info()
     return render_template("admin/control_panel/settings/widgets/_info.html", info=info)
 
 

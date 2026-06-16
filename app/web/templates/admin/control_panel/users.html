@@ -37,7 +37,7 @@ actions=header_actions
 
 {{ admin_paginator(domain="users", per_page_options=[10, 25, 50], current_per_page=25) }}
 
-{% call admin_modal("inspect-user-modal", "User Details & Access Control", "👤") %}
+{% call admin_modal("inspect-user-modal", "User Details & Access Control", "👤", "modal-content-lg") %}
 {{ admin_modal_close_button(button_id="inspect-user-close-btn") }}
 {% endcall %}
 {% endblock %}

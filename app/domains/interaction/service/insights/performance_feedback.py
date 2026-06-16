@@ -92,10 +92,12 @@ def calculate_content_metrics(content_item, data_maps):
     
     if impressions > 0:
         actual_ctr = (clicks / impressions) * 100.0
+        is_simulated = False
     else:
         actual_ctr = 3.0 + (c_id % 20)
         impressions = 50 + (c_id % 150)
         clicks = int(impressions * (actual_ctr / 100.0))
+        is_simulated = True
         
     expected_ctr = DEFAULT_EXPECTED_CTR_BASE + (c_id % EXPECTED_CTR_VARIANCE)
     
@@ -122,7 +124,8 @@ def calculate_content_metrics(content_item, data_maps):
         "ctr_diff": actual_ctr - expected_ctr,
         "engagement_rate": engagement_rate,
         "conversion_rate": conversion_rate,
-        "extended": extended
+        "extended": extended,
+        "is_simulated": is_simulated
     }
 
 def evaluate_performance(metrics):
@@ -252,6 +255,7 @@ def evaluate_content_performance_feedback(time_window="7d"):
             "platform": metrics["platform"],
             "strategy_origin": "System Recommendation",
             "predicted_intent": metrics["predicted_intent"],
+            "is_simulated": metrics["is_simulated"],
             "actual_performance": {
                 "ctr": round(metrics["actual_ctr"], 2),
                 "engagement_rate": round(metrics["engagement_rate"], 2),

@@ -1,9 +1,11 @@
 # app/domains/interaction/service/insights/publishing_plan.py
 from app.domains.interaction.service.insights.opportunities import (
     get_intent_opportunity_data,
-    get_entity_momentum,
+    get_trending_categories_data,
+    get_trending_brands_data,
     get_content_decay
 )
+from app.domains.interaction.service.insights.shared import select_primary_platform
 
 def generate_content_publishing_plan(mapped_content_data):
     """
@@ -17,14 +19,20 @@ def generate_content_publishing_plan(mapped_content_data):
     intent_map = {item["category_name"]: item for item in intent_opps}
     
     # 1. Fetch momentum & compute scheduling weights
+    cat_trends = {t["name"].lower(): float(t["pct_change"]) for t in get_trending_categories_data()}
+    brand_trends = {t["name"].lower(): float(t["pct_change"]) for t in get_trending_brands_data()}
+
     items_with_weights = []
     for item in mapped_content_data:
         entity = item["entity"]
         etype = item["type"]
         score = item["opportunity_score"]
         
-        # Get category/brand momentum trend
-        momentum = get_entity_momentum(entity, etype)
+        # Get category/brand momentum trend from preloaded maps
+        if etype.lower() == "category":
+            momentum = cat_trends.get(entity.lower(), 0.0)
+        else:
+            momentum = brand_trends.get(entity.lower(), 0.0)
         
         # Get content traffic decay for existing assets
         max_decay = 0.0
@@ -79,12 +87,7 @@ def generate_content_publishing_plan(mapped_content_data):
         elif etype == "brand":
             intent_opt = "review"
             
-        if etype == "brand" or "comparison" in intent_opt or "review" in intent_opt:
-            platform = "youtube"
-        elif "infographic" in intent_opt or "checklist" in intent_opt or "tutorial" in intent_opt:
-            platform = "pinterest"
-        else:
-            platform = "blog"
+        platform = select_primary_platform(etype, intent_opt)
             
         points = PLATFORM_POINTS.get(platform, 1.0)
         

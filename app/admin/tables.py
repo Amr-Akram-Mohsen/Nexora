@@ -3,7 +3,7 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "columns": ["User", "Role", "Status", "Joined", "Actions"],
+        "columns": ["User", "Role", "Status", "Joined", "Last Active", "Engagement Score", "Actions"],
     },
     "contents": {
         "id": "contents",
