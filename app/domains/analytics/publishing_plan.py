@@ -1,11 +1,13 @@
 # app/domains/interaction/service/insights/publishing_plan.py
-from app.domains.interaction.service.insights.opportunities import (
+from app.domains.analytics.content_opportunities import (
     get_intent_opportunity_data,
-    get_trending_categories_data,
-    get_trending_brands_data,
     get_content_decay
 )
-from app.domains.interaction.service.insights.shared import select_primary_platform
+from app.domains.analytics.trends import (
+    get_trending_categories_data,
+    get_trending_brands_data
+)
+from app.domains.analytics.shared import select_primary_platform
 
 def generate_content_publishing_plan(mapped_content_data):
     """
@@ -202,3 +204,4 @@ def generate_content_publishing_plan(mapped_content_data):
         col["tasks"].sort(key=get_task_day)
             
     return {"weekly_plan": weekly_plan}
+

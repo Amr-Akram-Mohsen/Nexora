@@ -83,7 +83,7 @@
 }
 
 .card:hover .card__title {
-  color: rgb(var(--card-color-rgb));
+  color: var(--domain-primary);
 }
 
 .card__excerpt,

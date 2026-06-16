@@ -1,85 +1,4 @@
 {% from "admin/components/macros.html" import inspect_section, inspect_detail_row %}
-<style>
-  .user-profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 1.25rem;
-    text-align: left;
-  }
-  @media (max-width: 768px) {
-    .user-profile-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  .profile-section-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
-  .profile-section-title {
-    font-size: var(--text-sm);
-    font-weight: var(--weight-bold);
-    color: var(--foreground);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .profile-metric-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.625rem;
-  }
-  .profile-metric-card {
-    background: var(--secondary);
-    border-radius: var(--radius-sm);
-    padding: 0.625rem 0.5rem;
-    text-align: center;
-    border: 1px solid var(--border);
-  }
-  .profile-metric-val {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-xbold);
-    color: var(--foreground);
-  }
-  .profile-metric-lbl {
-    font-size: 10px;
-    color: var(--muted-foreground);
-    text-transform: uppercase;
-    font-weight: var(--weight-bold);
-    margin-top: 0.125rem;
-    letter-spacing: 0.04em;
-  }
-  .profile-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: var(--text-sm);
-    padding: 0.35rem 0;
-    border-bottom: 1px dashed var(--border);
-  }
-  .profile-list-item:last-child {
-    border-bottom: none;
-  }
-  .profile-sentiment-bar {
-    display: flex;
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 0.5rem 0;
-    background: var(--border);
-  }
-  .sentiment-pos { background: var(--brand-green, #10b981); }
-  .sentiment-neu { background: var(--muted-foreground, #6b7280); }
-  .sentiment-neg { background: var(--brand-red, #ef4444); }
-</style>
 
 <div class="user-profile-grid">
   <!-- COLUMN 1: Overview, Moderation, & Actions -->
@@ -92,13 +11,13 @@
         {{ inspect_detail_row("Name", "inspect-name", value_text=user.name or "—") }}
         {{ inspect_detail_row("Email", "inspect-email", value_text=user.email) }}
         {{ inspect_detail_row("Role", "inspect-role status-badge " ~ ("admin" if user.is_admin else "user"),
-           value_text="Admin" if user.is_admin else "User") }}
+        value_text="Admin" if user.is_admin else "User") }}
         {{ inspect_detail_row("Status", "inspect-status status-badge " ~ ("active" if user.is_active else "inactive"),
-           value_text="Active" if user.is_active else "Inactive") }}
+        value_text="Active" if user.is_active else "Inactive") }}
         {{ inspect_detail_row("Joined Date", "inspect-joined",
-           value_text=user.created_at.strftime('%b %d, %Y') if user.created_at else "—") }}
+        value_text=user.created_at.strftime('%b %d, %Y') if user.created_at else "—") }}
         {{ inspect_detail_row("Last Active", "inspect-last-active",
-           value_text=user.last_login_at.strftime('%b %d, %Y %H:%M') if user.last_login_at else "Never") }}
+        value_text=user.last_login_at.strftime('%b %d, %Y %H:%M') if user.last_login_at else "Never") }}
       </div>
     </div>
 
@@ -131,20 +50,16 @@
     <div class="profile-section-card">
       <div class="profile-section-title">⚙️ Access Control Actions</div>
       <div class="flex gap-2 flex-wrap">
-        <button class="user-action-btn user-action-toggle-admin"
-                data-action="toggle-admin" data-id="{{ user.id }}"
-                data-name="{{ (user.name or user.email) | e }}">
+        <button class="user-action-btn user-action-toggle-admin" data-action="toggle-admin" data-id="{{ user.id }}"
+          data-name="{{ (user.name or user.email) | e }}">
           {{ "Demote to User" if user.is_admin else "Promote to Admin" }}
         </button>
-        <button class="user-action-btn user-action-toggle-active"
-                data-action="toggle-active" data-id="{{ user.id }}"
-                data-is-active="{{ user.is_active | lower }}"
-                data-name="{{ (user.name or user.email) | e }}">
+        <button class="user-action-btn user-action-toggle-active" data-action="toggle-active" data-id="{{ user.id }}"
+          data-is-active="{{ user.is_active | lower }}" data-name="{{ (user.name or user.email) | e }}">
           {{ "Deactivate Account" if user.is_active else "Activate Account" }}
         </button>
-        <button class="user-action-btn user-action-delete"
-                data-action="delete-user" data-id="{{ user.id }}"
-                data-name="{{ (user.name or user.email) | e }}">
+        <button class="user-action-btn user-action-delete" data-action="delete-user" data-id="{{ user.id }}"
+          data-name="{{ (user.name or user.email) | e }}">
           🗑 Delete User
         </button>
       </div>
@@ -197,11 +112,11 @@
           <div class="profile-metric-lbl" style="margin-bottom: 0.25rem;">Top Categories</div>
           <div class="flex flex-wrap gap-1">
             {% if content_consumption.categories %}
-              {% for cat in content_consumption.categories %}
-                <span class="status-badge purple">{{ cat[0] }}</span>
-              {% endfor %}
+            {% for cat in content_consumption.categories %}
+            <span class="status-badge purple">{{ cat[0] }}</span>
+            {% endfor %}
             {% else %}
-              <span class="text-xs text-muted-foreground">No category data available</span>
+            <span class="text-xs text-muted-foreground">No category data available</span>
             {% endif %}
           </div>
         </div>
@@ -209,11 +124,11 @@
           <div class="profile-metric-lbl" style="margin-bottom: 0.25rem;">Top Topics</div>
           <div class="flex flex-wrap gap-1">
             {% if content_consumption.topics %}
-              {% for topic in content_consumption.topics %}
-                <span class="status-badge purple">{{ topic[0] }}</span>
-              {% endfor %}
+            {% for topic in content_consumption.topics %}
+            <span class="status-badge purple">{{ topic[0] }}</span>
+            {% endfor %}
             {% else %}
-              <span class="text-xs text-muted-foreground">No topic data available</span>
+            <span class="text-xs text-muted-foreground">No topic data available</span>
             {% endif %}
           </div>
         </div>
@@ -221,11 +136,11 @@
           <div class="profile-metric-lbl" style="margin-bottom: 0.25rem;">Top Brands</div>
           <div class="flex flex-wrap gap-1">
             {% if content_consumption.brands %}
-              {% for brand in content_consumption.brands %}
-                <span class="status-badge purple">{{ brand[0] }}</span>
-              {% endfor %}
+            {% for brand in content_consumption.brands %}
+            <span class="status-badge purple">{{ brand[0] }}</span>
+            {% endfor %}
             {% else %}
-              <span class="text-xs text-muted-foreground">No brand data available</span>
+            <span class="text-xs text-muted-foreground">No brand data available</span>
             {% endif %}
           </div>
         </div>
@@ -235,50 +150,54 @@
     <!-- Comments & Sentiment Analysis Card -->
     <div class="profile-section-card">
       <div class="profile-section-title">💬 Comments Sentiment & Feedback</div>
-      
-      {% set total_sent = comments_summary.sentiment.positive + comments_summary.sentiment.neutral + comments_summary.sentiment.negative %}
+
+      {% set total_sent = comments_summary.sentiment.positive + comments_summary.sentiment.neutral +
+      comments_summary.sentiment.negative %}
       {% if total_sent > 0 %}
-        {% set pos_pct = ((comments_summary.sentiment.positive / total_sent) * 100)|round %}
-        {% set neu_pct = ((comments_summary.sentiment.neutral / total_sent) * 100)|round %}
-        {% set neg_pct = ((comments_summary.sentiment.negative / total_sent) * 100)|round %}
+      {% set pos_pct = ((comments_summary.sentiment.positive / total_sent) * 100)|round %}
+      {% set neu_pct = ((comments_summary.sentiment.neutral / total_sent) * 100)|round %}
+      {% set neg_pct = ((comments_summary.sentiment.negative / total_sent) * 100)|round %}
       {% else %}
-        {% set pos_pct, neu_pct, neg_pct = 0, 0, 0 %}
+      {% set pos_pct, neu_pct, neg_pct = 0, 0, 0 %}
       {% endif %}
-      
+
       <div class="flex justify-between items-center text-xs font-bold" style="margin-bottom: 0.25rem;">
         <span style="color: var(--brand-green-dark, #16a34a)">Positive: {{ comments_summary.sentiment.positive }}</span>
         <span style="color: var(--muted-foreground, #6b7280)">Neutral: {{ comments_summary.sentiment.neutral }}</span>
         <span style="color: var(--brand-red, #dc2626)">Negative: {{ comments_summary.sentiment.negative }}</span>
       </div>
-      
+
       <div class="profile-sentiment-bar">
         {% if total_sent > 0 %}
-          {% if comments_summary.sentiment.positive > 0 %}
-            <div class="sentiment-pos" style="width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>
-          {% endif %}
-          {% if comments_summary.sentiment.neutral > 0 %}
-            <div class="sentiment-neu" style="width: {{ neu_pct }}%" title="Neutral: {{ neu_pct }}%"></div>
-          {% endif %}
-          {% if comments_summary.sentiment.negative > 0 %}
-            <div class="sentiment-neg" style="width: {{ neg_pct }}%" title="Negative: {{ neg_pct }}%"></div>
-          {% endif %}
+        {% if comments_summary.sentiment.positive > 0 %}
+        <div class="sentiment-pos" style="width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>
+        {% endif %}
+        {% if comments_summary.sentiment.neutral > 0 %}
+        <div class="sentiment-neu" style="width: {{ neu_pct }}%" title="Neutral: {{ neu_pct }}%"></div>
+        {% endif %}
+        {% if comments_summary.sentiment.negative > 0 %}
+        <div class="sentiment-neg" style="width: {{ neg_pct }}%" title="Negative: {{ neg_pct }}%"></div>
+        {% endif %}
         {% else %}
-          <div style="background: var(--border); width: 100%" title="No Sentiment Data"></div>
+        <div style="background: var(--border); width: 100%" title="No Sentiment Data"></div>
         {% endif %}
       </div>
 
-      <div class="profile-metric-lbl" style="margin-top: 0.5rem; margin-bottom: 0.35rem; border-top: 1px solid var(--border); padding-top: 0.5rem;">Recent Comments</div>
+      <div class="profile-metric-lbl"
+        style="margin-top: 0.5rem; margin-bottom: 0.35rem; border-top: 1px solid var(--border); padding-top: 0.5rem;">
+        Recent Comments</div>
       {% if comments_summary.recent %}
-        <div class="flex flex-col gap-2" style="max-height: 120px; overflow-y: auto; padding-right: 0.25rem;">
-          {% for comm in comments_summary.recent %}
-            <div style="font-size: var(--text-xs); border-left: 2px solid var(--brand-purple); padding-left: 0.5rem; background: var(--secondary); padding: 0.375rem 0.5rem; border-radius: 0 4px 4px 0;">
-              <p style="margin: 0 0 0.125rem 0; color: var(--foreground); line-height: 1.3;">"{{ comm.content }}"</p>
-              <small class="text-muted-foreground">{{ comm.created_at.strftime('%b %d, %Y') }}</small>
-            </div>
-          {% endfor %}
+      <div class="flex flex-col gap-2" style="max-height: 120px; overflow-y: auto; padding-right: 0.25rem;">
+        {% for comm in comments_summary.recent %}
+        <div
+          style="font-size: var(--text-xs); border-left: 2px solid var(--brand-purple); padding-left: 0.5rem; background: var(--secondary); padding: 0.375rem 0.5rem; border-radius: 0 4px 4px 0;">
+          <p style="margin: 0 0 0.125rem 0; color: var(--foreground); line-height: 1.3;">"{{ comm.content }}"</p>
+          <small class="text-muted-foreground">{{ comm.created_at.strftime('%b %d, %Y') }}</small>
         </div>
+        {% endfor %}
+      </div>
       {% else %}
-        <div class="text-xs text-muted-foreground italic">No recent comments</div>
+      <div class="text-xs text-muted-foreground italic">No recent comments</div>
       {% endif %}
     </div>
   </div>

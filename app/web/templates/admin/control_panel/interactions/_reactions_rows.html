@@ -2,9 +2,9 @@
 
 {% macro render_row(r) %}
 <tr id="reaction-row-{{ r.id }}">
-  <td><span class="user-cell-name">#{{ r.id }}</span></td>
+  <td><span class="cell-primary-text user-cell-name">#{{ r.id }}</span></td>
   <td>
-    <span class="user-cell-name">{{ r.target_title }}</span>
+    <span class="cell-primary-text user-cell-name">{{ r.target_title }}</span>
     <div class="mt-1">
       <span class="status-badge text-capitalize
         {{ 'badge-blue' if r.target_type == 'content' else ('badge-purple' if r.target_type == 'item' else 'badge-green') }}">
@@ -16,7 +16,7 @@
     <span class="status-badge {{ 'active' if r.type == 'like' else 'inactive' }}">{{ r.type }}</span>
   </td>
   <td>
-    <span class="user-cell-name">{{ r.user_name }}</span>
+    <span class="cell-primary-text user-cell-name">{{ r.user_name }}</span>
     <div class="user-cell-email">{{ r.user_email[:2] ~ "******" ~ r.user_email[-11:] if r.user_email else "—" }}</div>
   </td>
   <td>

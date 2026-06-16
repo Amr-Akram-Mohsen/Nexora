@@ -3,10 +3,10 @@
 {% macro render_row(c) %}
 <tr>
   <td>
-    <span class="user-cell-name">{{ c.item_name }}</span>
+    <span class="cell-primary-text user-cell-name">{{ c.item_name }}</span>
   </td>
   <td>
-    <a class="user-cell-name link-external" target="_blank" rel="noopener noreferrer"
+    <a class="cell-primary-text user-cell-name link-external" target="_blank" rel="noopener noreferrer"
        href="{{ c.affiliate_url }}">{{ c.store_name }}</a>
   </td>
   <td class="col-metric">

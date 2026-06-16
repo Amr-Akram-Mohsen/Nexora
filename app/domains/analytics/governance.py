@@ -1,8 +1,8 @@
 # app/domains/interaction/service/insights/governance.py
 import hashlib
 from datetime import datetime, timezone
-from app.domains.interaction.service.insights.learning_memory import load_memory_layer
-from app.domains.interaction.service.insights.autonomous_execution import (
+from app.domains.analytics.learning_memory import load_memory_layer
+from app.domains.analytics.autonomous_execution import (
     load_execution_tasks,
     save_execution_tasks,
     process_execution_queue
@@ -283,3 +283,4 @@ def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_
         "blocked_tasks": blocked_tasks,
         "risk_summary": risk_summary
     }
+

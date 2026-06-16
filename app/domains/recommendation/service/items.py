@@ -15,6 +15,7 @@ from app.domains.item.models import Item
 def get_items_for_content(
     content_id: int,
     limit: int = 8,
+    exclude_ids: tuple | list = None,
     session=None,
 ) -> list[dict]:
     """
@@ -61,6 +62,9 @@ def get_items_for_content(
 
     stmt = build_item_stmt(eager_load="card")
 
+    if exclude_ids:
+        stmt = stmt.where(Item.id.notin_(list(exclude_ids)))
+
     # Include items that match at least one signal
     if directly_linked_ids or ref_brand_ids or ref_category_id:
         conditions = []
@@ -95,6 +99,7 @@ def get_items_for_content(
 def get_trending_items(
     limit: int = 8,
     days: int = 7,
+    exclude_ids: tuple | list = None,
     session=None,
 ) -> list[dict]:
     """
@@ -116,6 +121,9 @@ def get_trending_items(
             Item.created_at.desc(),
         )
     )
+
+    if exclude_ids:
+        stmt = stmt.where(Item.id.notin_(list(exclude_ids)))
 
     if limit:
         stmt = stmt.limit(limit)

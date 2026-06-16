@@ -1,5 +1,5 @@
 # app/domains/interaction/service/insights/content_strategy.py
-from app.domains.interaction.service.insights.shared import select_primary_platform
+from app.domains.analytics.shared import select_primary_platform
 
 def generate_content_strategy(opportunities_data):
     """
@@ -295,3 +295,4 @@ def generate_content_strategy(opportunities_data):
         })
         
     return strategies
+

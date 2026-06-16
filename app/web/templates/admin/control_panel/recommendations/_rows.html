@@ -4,7 +4,7 @@
 {% macro render_row(m) %}
 <tr id="rec-row-{{ m.content_id }}-{{ m.item_id }}">
   <td>
-    <span class="rec-content-title cell-name">{{ m.content_title }}</span>
+    <span class="rec-content-title cell-primary-text cell-name">{{ m.content_title }}</span>
     <div class="user-cell-email">
       <span>#{{ m.content_id }}</span>
       <span class="status-badge user text-capitalize"
@@ -15,7 +15,7 @@
   </td>
   <td>{{ "{:,}".format(m.content_views or 0) }}</td>
   <td>
-    <span class="rec-item-name cell-name">{{ m.item_name }}</span>
+    <span class="rec-item-name cell-primary-text cell-name">{{ m.item_name }}</span>
     <div class="user-cell-email">
       <span>#{{ m.item_id }}</span>
       <span class="status-badge user text-capitalize"

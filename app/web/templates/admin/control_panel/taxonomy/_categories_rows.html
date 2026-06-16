@@ -2,7 +2,7 @@
 
 {% macro render_row(cat) %}
 <tr id="category-row-{{ cat.id }}">
-  <td><span class="cell-name">{{ cat.name }}</span></td>
+  <td><span class="cell-primary-text cell-name">{{ cat.name }}</span></td>
   <td>
     <label class="admin-toggle" title="Toggle active">
       <input type="checkbox" class="admin-toggle-input" data-action="toggle-category"

@@ -253,15 +253,19 @@ def get_item_spec_groups(item_id, session=None):
 
 
 @cache.memoize(timeout=600)
-def get_filtered_items_for_home(filter_type="recent", limit=10, session=None):
+def get_filtered_items_for_home(filter_type="recent", limit=10, exclude_ids=None, session=None):
     from .utils import build_item_stmt, fetch_items
     
     stmt = build_item_stmt(eager_load="card")
+
+    if exclude_ids:
+        stmt = stmt.where(Item.id.notin_(list(exclude_ids)))
 
     if filter_type == "deals":
         stmt = (
             stmt.join(Item.variants)
             .where(ItemVariant.old_price > ItemVariant.price)
+            .distinct(Item.id)
             .order_by(Item.id.desc())
         )
         if limit:
@@ -269,6 +273,8 @@ def get_filtered_items_for_home(filter_type="recent", limit=10, session=None):
         items = fetch_items(stmt, session)
         if not items:
             stmt = build_item_stmt(eager_load="card").order_by(Item.created_at.desc())
+            if exclude_ids:
+                stmt = stmt.where(Item.id.notin_(list(exclude_ids)))
             if limit:
                 stmt = stmt.limit(limit)
             items = fetch_items(stmt, session)

@@ -1,11 +1,12 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_crud_table, admin_filter_select %}
+{% from "components/ui/modal.html" import modal %}
+{% from "components/ui/spinner.html" import spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table, admin_filter_select %}
 {% from "admin/components/macros.html" import
     admin_search_input,
     admin_reset_button,
     admin_summary_bar,
-    admin_modal_close_button,
+    close_button,
     action_group,
     action_button,
     inspect_section,
@@ -99,7 +100,7 @@ actions=header_actions
 
 {{ admin_paginator(domain="contents", per_page_options=[10, 20, 50, 100], current_per_page=20) }}
 
-{% call admin_modal("quick-category-modal", "Quick Recategorize", "🏷️", "modal-content-sm") %}
+{% call modal("quick-category-modal", "Quick Recategorize", "🏷️", "modal-content-sm") %}
 <p class="dashboard-modal-body">Move this item to a different content category:</p>
 <input type="hidden" id="quick-cat-content-id" />
 {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None, extra_class="modal-select-full") }}
@@ -109,8 +110,8 @@ actions=header_actions
 </div>
 {% endcall %}
 
-{% call admin_modal("inspect-modal", "Source Details", "📡") %}
-{{ admin_modal_close_button(button_id="inspect-close-btn") }}
+{% call modal("inspect-modal", "Source Details", "📡") %}
+{{ close_button(button_id="inspect-close-btn") }}
 {% endcall %}
 {% endblock %}
 

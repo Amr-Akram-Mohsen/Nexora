@@ -21,6 +21,7 @@ function initApp() {
 
     applyMode();
     initFlashMessages();
+    if (typeof initProgressiveReveal === "function") initProgressiveReveal();
 }
 
 // Run on page load and when coming back via back/forward buttons
@@ -28,6 +29,7 @@ function initUserInteractions() {
     if (isAuthenticated) {
         if (typeof initAllReactions === "function") initAllReactions();
         if (typeof initAllSaves === "function") initAllSaves();
+        if (typeof initSavedItemsPage === "function") initSavedItemsPage();
     }
 }
 

@@ -1,5 +1,5 @@
 # app/application/interaction/get_insights.py
-from app.domains.interaction.service.insights import (
+from app.domains.analytics import (
     get_intent_opportunity_data,
     get_brand_opportunity_data,
     get_recommendation_performance_data,
@@ -37,3 +37,4 @@ def get_insights_workflow(time_frame: str):
         "execution_plan": decision_data.get("execution_plan", {}),
         "execution_governance": decision_data.get("execution_governance", {})
     }
+

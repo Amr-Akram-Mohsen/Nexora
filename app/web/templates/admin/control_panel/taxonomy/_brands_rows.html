@@ -2,7 +2,7 @@
 
 {% macro render_row(b) %}
 <tr id="brand-row-{{ b.id }}">
-  <td><span class="cell-name">{{ b.name }}</span></td>
+  <td><span class="cell-primary-text cell-name">{{ b.name }}</span></td>
   <td>{{ b.industry or "—" }}</td>
   <td>
     <label class="admin-toggle">

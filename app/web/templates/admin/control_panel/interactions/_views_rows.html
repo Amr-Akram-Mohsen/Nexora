@@ -3,7 +3,7 @@
 {% macro render_row(v) %}
 <tr>
   <td>
-    <span class="user-cell-name">{{ v.target_title }}</span>
+    <span class="cell-primary-text user-cell-name">{{ v.target_title }}</span>
   </td>
   <td>
     <span class="status-badge text-capitalize {{ 'badge-blue' if v.target_type == 'content' else 'badge-purple' }}">

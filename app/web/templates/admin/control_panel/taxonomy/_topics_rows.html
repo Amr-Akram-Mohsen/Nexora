@@ -2,7 +2,7 @@
 
 {% macro render_row(t) %}
 <tr id="topic-row-{{ t.id }}">
-  <td><span class="cell-name">{{ t.name }}</span></td>
+  <td><span class="cell-primary-text cell-name">{{ t.name }}</span></td>
   <td>
     <label class="admin-toggle">
       <input type="checkbox" class="admin-toggle-input" data-action="toggle-topic"

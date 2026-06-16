@@ -65,7 +65,7 @@
             <i class="fas fa-shopping-bag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
             Shop Related Products
           </h3>
-          {{ grid(matched_items[:6], target_type='item') }}
+          {{ grid(matched_items[:6], target_type='commercial') }}
           <a href="{{ url_for('item.deals') }}" class="recommendation-box__more">
             {{ button(text="Browse All Deals", variant="ghost", icon="fas fa-arrow-right") }}
           </a>

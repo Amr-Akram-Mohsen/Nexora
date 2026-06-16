@@ -129,8 +129,7 @@
 
 /* --- In-Cell Content Elements --- */
 
-.cell-name,
-.user-cell-name {
+.cell-primary-text {
   color: var(--foreground);
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
@@ -163,12 +162,10 @@
   vertical-align: middle;
 }
 
+/* Specific behaviors */
 .content-cell-title,
 .item-cell-name {
-  font-weight: var(--weight-bold);
-  font-size: var(--text-sm);
   line-height: 1.4;
-  color: var(--foreground);
   width: 250px;
 }
 

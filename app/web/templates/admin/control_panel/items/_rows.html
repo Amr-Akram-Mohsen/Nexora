@@ -4,13 +4,13 @@
 {% macro render_row(item) %}
 <tr id="item-row-{{ item.id }}">
   <td>
-    <div class="item-cell-name cell-name">{{ item.name }}</div>
+    <div class="cell-primary-text item-cell-name cell-primary-text cell-name">{{ item.name }}</div>
   </td>
   <td>
-    <span class="item-cell-brand cell-name">{{ item.brand }}</span>
+    <span class="item-cell-brand cell-primary-text cell-name">{{ item.brand }}</span>
   </td>
   <td>
-    <span class="item-cell-category cell-name">{{ item.category }}</span>
+    <span class="item-cell-category cell-primary-text cell-name">{{ item.category }}</span>
   </td>
   <td>
     {% if item.min_price is not none %}

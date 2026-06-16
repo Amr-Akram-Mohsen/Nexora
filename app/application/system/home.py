@@ -43,34 +43,61 @@ def get_home_page_data():
     Orchestrates data for the home page.
 
     All heavy lifting is delegated to domain services and application-layer
-    cached wrappers. This function only assembles the final dict.
+    cached wrappers. This function assembles the final dict using a 
+    cascading deduplication strategy to prevent items from appearing in 
+    multiple sections simultaneously.
     """
-    # ── Existing content sections ─────────────────────────────────────────
-    hero_contents  = get_contents_render_cached(filter_values=("trends",),    rows_count=5)
-    latest_reviews = get_contents_render_cached(filter_values=("reviews",),   rows_count=24)
-    tech_news      = get_contents_render_cached(filter_values=("news",),      rows_count=24)
-    tutorials      = get_contents_render_cached(filter_values=("tutorials",), rows_count=24)
+    seen_content_ids = set()
+    seen_item_ids = set()
 
-    # ── New: discovery sections ───────────────────────────────────────────
-    # Trending across all sections (last 7 days)
-    popular_this_week    = get_trending_contents_cached_v2(limit=8, days=7)
+    def filter_and_track_contents(contents, limit):
+        if not contents:
+            return []
+        result = []
+        for c in contents:
+            cid = c.get("id")
+            if cid and cid not in seen_content_ids:
+                result.append(c)
+                seen_content_ids.add(cid)
+            if len(result) >= limit:
+                break
+        return result
 
-    # Type-specific trending feeds
-    recommended_videos   = get_trending_contents_cached_v2(limit=8, days=14, object_type="video")
-    recommended_articles = get_trending_contents_cached_v2(limit=8, days=14, object_type="article")
+    def filter_and_track_items(items, limit):
+        if not items:
+            return []
+        result = []
+        for i in items:
+            iid = i.get("id")
+            if iid and iid not in seen_item_ids:
+                result.append(i)
+                seen_item_ids.add(iid)
+            if len(result) >= limit:
+                break
+        return result
 
-    # Editorial picks (high Content.score)
-    editors_picks        = get_editors_picks_cached(limit=6)
+    # ── Priority 1: High-Intent & Curated ─────────────────────────────────
+    editors_picks = filter_and_track_contents(get_editors_picks_cached(limit=12), limit=6)
+    hero_contents = filter_and_track_contents(get_contents_render_cached(filter_values=("trends",), rows_count=10), limit=5)
 
-    # ── Existing item sections ────────────────────────────────────────────
-    top_deals      = get_filtered_items_for_home(filter_type="deals",  limit=10)
-    recently_added = get_filtered_items_for_home(filter_type="recent", limit=10)
+    # ── Priority 2: High-Value Contextual (Deals) ─────────────────────────
+    top_deals = filter_and_track_items(get_filtered_items_for_home(filter_type="deals", limit=20), limit=10)
 
-    # ── New: item discovery sections ──────────────────────────────────────
-    featured_products    = get_trending_items_cached(limit=8, days=7)
+    # ── Priority 3: Trending & Algorithmic ────────────────────────────────
+    popular_this_week = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=7), limit=8)
+    featured_products = filter_and_track_items(get_trending_items_cached(limit=24, days=7), limit=8)
 
-    # ── New: brand discovery section ──────────────────────────────────────
-    trending_brands      = get_trending_brands_cached(limit=6, days=7)
+    recommended_videos = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=14, object_type="video"), limit=8)
+    recommended_articles = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=14, object_type="article"), limit=8)
+
+    # Trending brands is taxonomy, no exclusion needed
+    trending_brands = get_trending_brands_cached(limit=6, days=7)
+
+    # ── Priority 4: Chronological & Fillers ───────────────────────────────
+    latest_reviews = filter_and_track_contents(get_contents_render_cached(filter_values=("reviews",), rows_count=36), limit=24)
+    tech_news = filter_and_track_contents(get_contents_render_cached(filter_values=("news",), rows_count=36), limit=24)
+    tutorials = filter_and_track_contents(get_contents_render_cached(filter_values=("tutorials",), rows_count=36), limit=24)
+    recently_added = filter_and_track_items(get_filtered_items_for_home(filter_type="recent", limit=30), limit=10)
 
     return {
         # ── Hero ───────────────────────────────────────────────────────────

@@ -230,11 +230,13 @@ product
         {# ── Related Items ── #}
         {% if related_items %}
         {% from "components/ui/grid.html" import grid %}
-        <section class="section recommendation-section recommendation-section--products" id="related-products" data-recommendation-container="related_product" data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
+        <section class="section recommendation-section recommendation-section--products" id="related-products"
+            data-recommendation-container="related_product"
+            data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
             <div class="section__header">
                 <h2 class="title">You May Also Like</h2>
             </div>
-            {{ grid(related_items[:4], target_type='item') }}
+            {{ grid(related_items[:4], target_type='commercial') }}
         </section>
         {% endif %}
 
@@ -245,7 +247,8 @@ product
 
             {# ── Related Articles ── #}
             {% if related_articles %}
-            <div class="recommendation-group" data-recommendation-container="related_content" data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
                 <div class="section__header">
                     <div class="flex flex-col">
                         <h2 class="title">
@@ -260,7 +263,8 @@ product
 
             {# ── Related Videos ── #}
             {% if related_videos %}
-            <div class="recommendation-group" data-recommendation-container="related_content" data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
                 <div class="section__header">
                     <div class="flex flex-col">
                         <h2 class="title">
@@ -275,7 +279,8 @@ product
 
             {# ── Buying Guides ── #}
             {% if buying_guides %}
-            <div class="recommendation-group" data-recommendation-container="related_content" data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
                 <div class="section__header">
                     <div class="flex flex-col">
                         <h2 class="title">

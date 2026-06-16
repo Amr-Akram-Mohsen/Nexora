@@ -138,8 +138,25 @@
   display: none !important;
 }
 
+/* Progressive Reveal Staggered Animation */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.is-revealing {
+  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--reveal-idx, 0) * 45ms);
+}
+
 .section-toggle {
-  --toggle-bg: var(--surface, #fff);
+  --toggle-bg: var(--accent, #fff);
   --toggle-border: var(--border-color, rgba(0, 0, 0, .08));
   --toggle-text: var(--text-color, #111);
 

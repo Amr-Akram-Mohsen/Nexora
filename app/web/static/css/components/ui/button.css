@@ -40,3 +40,91 @@
   height: 1rem;
   font-size: var(--text-sm);
 }
+
+/* --- Admin Button Variants (Migrated) --- */
+
+.admin-btn-primary,
+.admin-toolbar button {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-primary:hover,
+.admin-toolbar button:hover {
+  background: var(--brand-blue-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-btn-secondary,
+.dashboard-btn-secondary {
+  padding: 0.5rem 1rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--secondary);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-secondary:hover,
+.dashboard-btn-secondary:hover {
+  background: var(--accent);
+  border-color: rgba(var(--brand-blue-rgb), 0.2);
+}
+
+.admin-btn-danger,
+.dashboard-btn-danger,
+.dashboard-delete-btn {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-red);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-btn-danger:hover,
+.dashboard-btn-danger:hover,
+.dashboard-delete-btn:hover {
+  opacity: 0.88;
+}
+
+.btn-purple {
+  padding: 0.5rem 1.25rem;
+  height: 36px;
+  box-sizing: border-box;
+  background: var(--brand-purple);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-purple:hover {
+  background: #7c3aed;
+}

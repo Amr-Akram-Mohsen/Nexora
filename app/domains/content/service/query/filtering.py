@@ -5,6 +5,7 @@ def get_contents_render(
     filter_by_columns: tuple = ("section",),
     filter_values: tuple = (None,),
     rows_count=None,
+    exclude_ids=None,
     session=None,
 ):
     from .utils import build_content_stmt, apply_column_filters, fetch_serialized_contents
@@ -14,6 +15,10 @@ def get_contents_render(
         session = db.session
         
     stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
+    
+    if exclude_ids:
+        stmt = stmt.where(Content.id.notin_(list(exclude_ids)))
+        
     stmt = apply_column_filters(stmt, filter_by_columns, filter_values)
     stmt = stmt.order_by(Content.published_at.desc())
 

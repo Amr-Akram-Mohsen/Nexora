@@ -37,24 +37,7 @@ current_per_page=20) %}
 </div>
 {% endmacro %}
 
-{% macro admin_spinner(text="Loading...", extra_class="") %}
-<div class="dashboard-loading {{ extra_class }}">
-  <div class="spinner"></div>
-  <p>{{ text }}</p>
-</div>
-{% endmacro %}
 
-{% macro admin_table_spinner(colspan, text="Loading...", height_class="loading-height-lg") %}
-<tr>
-  <td colspan="{{ colspan }}" class="table-loading-cell">
-    {{ admin_spinner(text, height_class) }}
-  </td>
-</tr>
-{% endmacro %}
-
-{% macro admin_loading_state(text="Loading...", height_class="loading-height-lg") %}
-{{ admin_spinner(text, height_class) }}
-{% endmacro %}
 
 {% macro admin_crud_table(table, loading_text="Loading...", height_class="loading-height-lg") %}
 <div class="admin-table-wrapper">
@@ -67,22 +50,14 @@ current_per_page=20) %}
       </tr>
     </thead>
     <tbody id="{{ table.id }}-table-body">
-      {{ admin_table_spinner(table.columns|length, loading_text, height_class) }}
+      {% from "components/ui/spinner.html" import table_spinner %}
+      {{ table_spinner(table.columns|length, loading_text, class=height_class) }}
     </tbody>
   </table>
 </div>
 {% endmacro %}
 
-{% macro admin_empty_state(message="No records found matching filters.", submessage="Adjust your filters or search
-terms.") %}
-<div class="dashboard-empty">
-  <span style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</span>
-  <p>{{ message }}</p>
-  {% if submessage %}
-  <p style="font-size: 0.8rem; margin-top: 0.25rem; opacity: 0.7;">{{ submessage }}</p>
-  {% endif %}
-</div>
-{% endmacro %}
+
 {% macro admin_paginator(domain, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
 {{ admin_pagination(
 info_id=domain ~ "-pagination-info",
@@ -95,25 +70,7 @@ current_per_page=current_per_page
 ) }}
 {% endmacro %}
 
-{% macro admin_search_bar(id, placeholder="Search…") %}
-<div class="admin-toolbar-search flex items-center">
-  <span class="admin-toolbar-search-icon">🔍</span>
-  <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" />
-</div>
-{% endmacro %}
 
-{% macro admin_modal(id, title, icon, size_class="") %}
-<div id="{{ id }}" class="dashboard-modal-overlay flex-center">
-  <div class="dashboard-modal-content {{ size_class }}">
-    <button class="dashboard-modal-close-x" aria-label="Close modal" type="button" data-dismiss="modal">×</button>
-    <div class="dashboard-modal-icon">{{ icon }}</div>
-    <h3 class="dashboard-modal-title" id="{{ id }}-title">{{ title }}</h3>
-    <div class="dashboard-modal-body" id="{{ id }}-body">
-      {{ caller() }}
-    </div>
-  </div>
-</div>
-{% endmacro %}
 
 {% macro admin_filter_select(id, name, options, default_val="", default_text="All", extra_class="", attrs="") %}
 <select id="{{ id }}" {% if name %}name="{{ name }}"{% endif %} class="dashboard-filter-select {{ extra_class }}" data-default-value="{{ default_val }}" {{ attrs }}>

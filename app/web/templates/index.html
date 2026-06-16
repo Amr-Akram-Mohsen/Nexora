@@ -14,10 +14,12 @@
 
   {# ── Core editorial sections (existing) ─────────────────────────────── #}
   {% set core_sections = [
-  {"section": "deals", "section_title": "top deals", "cards": top_deals, "target_type": "item", "carousel": true },
+  {"section": "deals", "section_title": "top deals", "cards": top_deals, "target_type": "commercial", "carousel": true
+  },
   {"section": "reviews", "section_title": "latest reviews", "cards": latest_reviews },
   {"section": "news", "section_title": "tech news & trends", "cards": tech_news },
-  {"section": "recent", "section_title": "recently added", "cards": recently_added, "target_type": "item", "carousel":
+  {"section": "recent", "section_title": "recently added", "cards": recently_added, "target_type": "commercial",
+  "carousel":
   true },
   {"section": "tutorials", "section_title": "how-to guides & tutorials","cards": tutorials }
   ] %}
@@ -82,7 +84,7 @@
   </div>
 
   {% call section("Featured Products", more_url=false) %}
-  {{ grid(featured_products, target_type='item', carousel=true) }}
+  {{ grid(featured_products, target_type='commercial', carousel=true) }}
   {% endcall %}
   {% endif %}
 

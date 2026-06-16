@@ -4,16 +4,16 @@
 {% macro render_row(c) %}
 <tr id="comment-row-{{ c.id }}">
   <td>
-    <span class="comment-cell-preview user-cell-name" title="{{ c.content }}">{{ c.preview }}</span>
+    <span class="comment-cell-preview cell-primary-text user-cell-name" title="{{ c.content }}">{{ c.preview }}</span>
     {% if c.parent_id %}
     <div class="comment-cell-reply user-cell-email">↩ Reply</div>
     {% endif %}
   </td>
   <td>
-    <span class="user-cell-name">{{ c.user_name }}</span>
+    <span class="cell-primary-text user-cell-name">{{ c.user_name }}</span>
   </td>
   <td>
-    <span class="user-cell-name">{{ c.target_title }}</span>
+    <span class="cell-primary-text user-cell-name">{{ c.target_title }}</span>
     <div class="mt-1">
       <span class="status-badge text-capitalize {{ 'badge-blue' if c.target_type == 'content' else 'badge-purple' }}">
         {{ c.target_type }}

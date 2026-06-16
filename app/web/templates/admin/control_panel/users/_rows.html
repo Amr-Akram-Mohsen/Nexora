@@ -5,9 +5,9 @@
 <tr id="user-row-{{ user.id }}">
   <td>
     {% if user.name %}
-    <div class="user-cell-name">{{ user.name }}</div>
+    <div class="cell-primary-text user-cell-name">{{ user.name }}</div>
     {% else %}
-    <div class="user-cell-name"><em>No name</em></div>
+    <div class="cell-primary-text user-cell-name"><em>No name</em></div>
     {% endif %}
     <div class="user-cell-email">{{ user.email }}</div>
   </td>

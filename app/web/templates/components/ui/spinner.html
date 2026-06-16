@@ -1,0 +1,14 @@
+{% macro spinner(text="Loading...", class="", attrs={}) %}
+<div class="dashboard-loading {{ class }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+  <div class="spinner"></div>
+  <p>{{ text }}</p>
+</div>
+{% endmacro %}
+
+{% macro table_spinner(colspan, text="Loading...", class="loading-height-lg", attrs={}) %}
+<tr>
+  <td colspan="{{ colspan }}" class="table-loading-cell">
+    {{ spinner(text, class, attrs) }}
+  </td>
+</tr>
+{% endmacro %}

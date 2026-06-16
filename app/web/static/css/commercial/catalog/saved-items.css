@@ -35,3 +35,45 @@
   background: rgba(var(--domain-primary-rgb), var(--alpha-soft));
   transform: translateY(-1px);
 }
+
+/* --- Responsive Overrides for Saved Items Page --- */
+@media (max-width: 1024px) {
+  /* Override off-canvas sidebar to display statically stacked */
+  .saved-items-page .listing-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .saved-items-page .listing-sidebar {
+    position: static;
+    width: 100%;
+    transform: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border);
+    max-height: none;
+  }
+
+  /* Hide elements related to the off-canvas drawer UI */
+  .saved-items-page .sidebar-close-btn,
+  .saved-items-page .sidebar-header {
+    display: none !important;
+  }
+
+  /* Reflow filter options into a horizontal row */
+  .saved-items-page .filter-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .saved-items-page .filter-item {
+    flex: 1 1 auto;
+    min-width: fit-content;
+  }
+  
+  /* Restore the header title/count visibility */
+  .saved-items-page .listing-header__inner {
+    display: flex !important;
+  }
+}

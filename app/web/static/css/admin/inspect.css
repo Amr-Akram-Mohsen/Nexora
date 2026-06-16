@@ -1,0 +1,118 @@
+/* --- Admin Inspect Views ---
+   Centralized styles for entity-specific inspect modals.
+--- */
+
+/* ---------------------------------
+   Users Inspect View
+--------------------------------- */
+.user-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .user-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-section-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.profile-section-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+}
+
+.profile-metric-card {
+  background: var(--secondary);
+  border-radius: var(--radius-sm);
+  padding: 0.625rem 0.5rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.profile-metric-val {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-xbold);
+  color: var(--foreground);
+}
+
+.profile-metric-lbl {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  font-weight: var(--weight-bold);
+  margin-top: 0.125rem;
+  letter-spacing: 0.04em;
+}
+
+.profile-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.profile-list-item:last-child {
+  border-bottom: none;
+}
+
+.profile-sentiment-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+  background: var(--border);
+}
+
+.sentiment-pos {
+  background: var(--brand-green, #10b981);
+}
+
+.sentiment-neu {
+  background: var(--muted-foreground, #6b7280);
+}
+
+.sentiment-neg {
+  background: var(--brand-red, #ef4444);
+}
+
+/* ---------------------------------
+   Comments Inspect View
+--------------------------------- */
+.inspect-comment-body-text {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 6px;
+  font-style: italic;
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
+  word-break: break-word;
+}

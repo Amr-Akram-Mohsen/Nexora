@@ -12,10 +12,10 @@ bp = Blueprint("content", __name__)
 
 @bp.route("/sections/<section_slug>")
 def sections(section_slug):
-    from app.web.helpers.content import parse_active_filters
+    from app.web.helpers.filters import parse_active_filters
 
     active_filters = parse_active_filters(
-        ["category", "topic", "brand", "intent", "price_tier", "type", "attributes"]
+        list_names=["category", "topic", "brand", "intent", "price_tier", "type", "attributes"]
     )
     page = request.args.get("page", 1, type=int)
 
@@ -29,14 +29,7 @@ def sections(section_slug):
             logger.warning("[ROUTE][/sections/%s] no data returned — 404", section_slug)
             abort(404)
 
-        # Safety defaults before template render
-        data.setdefault("items", [])
-        data.setdefault("pagination", None)
-        data.setdefault("section", None)
-        data.setdefault("trending_contents", [])
-        data.setdefault("recommendations", [])
-
-        item_count = len(data.get("items") or [])
+        item_count = len(data.get("items") or data.get("contents") or [])
         log_route_success(
             logger,
             f"/sections/{section_slug}",
@@ -73,13 +66,6 @@ def content_page(content_id):
         if not data:
             logger.warning("[ROUTE][/contents/%d] no data returned — 404", content_id)
             abort(404)
-
-        # Safety defaults
-        data.setdefault("content", None)
-        data.setdefault("related_contents", [])
-        data.setdefault("trending_contents", [])
-        data.setdefault("matched_items", [])
-
         record_content_view(content_id, user, ip_address)
         db.session.commit()
 

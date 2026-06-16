@@ -32,6 +32,7 @@ def get_trending_contents_cached_v2(
     days: int = 7,
     object_type: str | None = None,
     section_ids: tuple | None = None,
+    exclude_ids: tuple | None = None,
 ) -> list:
     """
     Cached wrapper: trending content, optionally filtered by type/section.
@@ -48,15 +49,16 @@ def get_trending_contents_cached_v2(
         days=days,
         object_type=object_type,
         section_ids=list(section_ids) if section_ids else None,
+        exclude_ids=exclude_ids,
         session=db.session,
     )
 
 
 @cache.memoize(timeout=1800)
-def get_editors_picks_cached(limit: int = 6) -> list:
+def get_editors_picks_cached(limit: int = 6, exclude_ids: tuple | None = None) -> list:
     """Cached wrapper: highest-scored editorial content."""
     from app.domains.recommendation.service import get_editors_picks
-    return get_editors_picks(limit=limit, session=db.session)
+    return get_editors_picks(limit=limit, exclude_ids=exclude_ids, session=db.session)
 
 
 # ---------------------------------------------------------------------------
@@ -64,7 +66,7 @@ def get_editors_picks_cached(limit: int = 6) -> list:
 # ---------------------------------------------------------------------------
 
 @cache.memoize(timeout=3600)
-def get_items_for_content_cached(content_id: int, limit: int = 8) -> list:
+def get_items_for_content_cached(content_id: int, limit: int = 8, exclude_ids: tuple | None = None) -> list:
     """
     Cached wrapper: items recommended for a content piece.
 
@@ -72,14 +74,14 @@ def get_items_for_content_cached(content_id: int, limit: int = 8) -> list:
     taxonomy-matched items (brand/category overlap).
     """
     from app.domains.recommendation.service import get_items_for_content
-    return get_items_for_content(content_id=content_id, limit=limit, session=db.session)
+    return get_items_for_content(content_id=content_id, limit=limit, exclude_ids=exclude_ids, session=db.session)
 
 
 @cache.memoize(timeout=600)
-def get_trending_items_cached(limit: int = 8, days: int = 7) -> list:
+def get_trending_items_cached(limit: int = 8, days: int = 7, exclude_ids: tuple | None = None) -> list:
     """Cached wrapper: items ranked by recent views + clicks."""
     from app.domains.recommendation.service import get_trending_items
-    return get_trending_items(limit=limit, days=days, session=db.session)
+    return get_trending_items(limit=limit, days=days, exclude_ids=exclude_ids, session=db.session)
 
 
 @cache.memoize(timeout=3600)

@@ -25,6 +25,8 @@ function handleGlobalClicks(e) {
 
     if (handleAuthClick(e)) return;
 
+    if (typeof handleSavedItemsFilterClick === "function" && handleSavedItemsFilterClick(e)) return;
+    if (typeof handleProgressiveRevealClick === "function" && handleProgressiveRevealClick(e)) return;
 }
 
 

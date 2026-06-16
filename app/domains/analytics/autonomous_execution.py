@@ -2,7 +2,7 @@
 import os
 import json
 from datetime import datetime, timezone
-from app.domains.interaction.service.insights.learning_memory import load_json_file, save_json_file
+from app.domains.analytics.learning_memory import load_json_file, save_json_file
 
 # Queue File Path
 QUEUE_FILE_PATH = os.path.join("instance", "execution_governance_queue.json")
@@ -299,3 +299,4 @@ def process_execution_queue(tasks):
             executed_entities_week.add(key)
             
     return tasks
+

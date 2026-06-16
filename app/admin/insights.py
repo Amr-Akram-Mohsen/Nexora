@@ -2,8 +2,8 @@
 import time
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
-from app.application.interaction.get_insights import get_insights_workflow
-from app.domains.interaction.service.insights import (
+# from app.application.interaction.get_insights import get_insights_workflow
+from app.domains.analytics import (
     get_decision_intelligence_data,
     get_intent_opportunity_data,
     get_brand_opportunity_data,
@@ -606,5 +606,6 @@ def widget_governance():
         approved_tasks=approved_tasks,
         blocked_tasks=blocked_tasks
     ), 200, headers
+
 
 

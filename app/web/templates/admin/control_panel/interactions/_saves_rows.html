@@ -3,7 +3,7 @@
 {% macro render_row(s) %}
 <tr>
   <td>
-    <span class="user-cell-name">{{ s.target_title }}</span>
+    <span class="cell-primary-text user-cell-name">{{ s.target_title }}</span>
   </td>
   <td>
     <span class="status-badge text-capitalize {{ 'badge-blue' if s.target_type == 'content' else 'badge-purple' }}">
@@ -11,7 +11,7 @@
     </span>
   </td>
   <td>
-    <span class="user-cell-name">{{ s.user_name }}</span>
+    <span class="cell-primary-text user-cell-name">{{ s.user_name }}</span>
     <div class="user-cell-email">{{ s.user_email[:2] ~ "******" ~ s.user_email[-11:] if s.user_email else "—" }}</div>
   </td>
   <td>

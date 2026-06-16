@@ -13,7 +13,7 @@
     <span class="content-cell-type status-badge {{ type_class }} text-capitalize">{{ item.object_type }}</span>
   </td>
   <td>
-    <div class="content-cell-title">
+    <div class="cell-primary-text content-cell-title">
       {% if item.url %}
       <a class="activity-target text-deco-none" target="_blank" href="{{ item.url }}">
         {{ item.title }}
@@ -31,7 +31,7 @@
     </span>
   </td>
   <td>
-    <span class="user-cell-name">{{ item.sources if item.sources is string else (item.sources | join(", ")) }}</span>
+    <span class="cell-primary-text user-cell-name">{{ item.sources if item.sources is string else (item.sources | join(", ")) }}</span>
   </td>
   <td>
     <div class="text-sm"><i class="far fa-eye text-muted"></i> {{ "{:,}".format(item.view_count or 0) }}</div>

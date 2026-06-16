@@ -21,3 +21,7 @@ function renderTopArticles(containerId) {
 function renderTopItems(containerId) {
   fetchAndInjectHtml('/admin/dashboard/widget/top-items', containerId, 'Loading items...');
 }
+
+function renderInteractionBreakdown(containerId) {
+  fetchAndInjectHtml('/admin/dashboard/widget/interactions-breakdown', containerId, 'Loading breakdown...');
+}

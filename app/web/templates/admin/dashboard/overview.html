@@ -1,5 +1,7 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_spinner, admin_panel %}
+{% from "components/ui/modal.html" import modal %}
+{% from "components/ui/spinner.html" import spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_panel %}
 
 {% block title %}Dashboard Overview — Nexora Admin{% endblock %}
 
@@ -16,14 +18,14 @@
   <!-- Catalog Health & Review Queue -->
   {% call admin_panel("🛡️ Catalog Health & Moderation", "Queue Status", header_class="flex items-center justify-between") %}
     <div id="catalog-health-container" class="panel-body-padded">
-      {{ admin_spinner("Loading health indicators…") }}
+      {{ spinner("Loading health indicators…") }}
     </div>
   {% endcall %}
 
   <!-- Real-time Ingestion Activities -->
   {% call admin_panel("⚡ Real-time Ingest Log", "Latest Aggregations", header_class="flex items-center justify-between") %}
     <div id="recent-ingest-container" class="panel-body-list">
-      {{ admin_spinner("Loading ingest logs…") }}
+      {{ spinner("Loading ingest logs…") }}
     </div>
   {% endcall %}
 
@@ -35,14 +37,14 @@
   <!-- Categories Distribution -->
   {% call admin_panel("🏷️ Top Categories", "Volume Breakdown", header_class="flex items-center justify-between") %}
     <div id="categories-distribution-container" class="panel-body-padded">
-      {{ admin_spinner("Loading category stats…") }}
+      {{ spinner("Loading category stats…") }}
     </div>
   {% endcall %}
 
   <!-- Sources Distribution -->
   {% call admin_panel("📡 Top Content Sources", "Volume Breakdown", header_class="flex items-center justify-between") %}
     <div id="sources-distribution-container" class="panel-body-padded">
-      {{ admin_spinner("Loading source stats…") }}
+      {{ spinner("Loading source stats…") }}
     </div>
   {% endcall %}
 
@@ -54,14 +56,14 @@
   <!-- Top Articles by views -->
   {% call admin_panel("📰 Top Articles", "by view count", header_class="flex items-center justify-between") %}
     <div id="top-articles-container">
-      {{ admin_spinner("Loading articles…") }}
+      {{ spinner("Loading articles…") }}
     </div>
   {% endcall %}
 
   <!-- Top Items by clicks -->
   {% call admin_panel("🛍️ Top Items", "by click count", header_class="flex items-center justify-between") %}
     <div id="top-items-container">
-      {{ admin_spinner("Loading items…") }}
+      {{ spinner("Loading items…") }}
     </div>
   {% endcall %}
 
@@ -72,13 +74,13 @@
   <!-- Top Performing Providers -->
   {% call admin_panel("📈 Top Content Providers", "By Total Views", header_class="flex items-center justify-between") %}
     <div id="top-content-providers-container" class="panel-body-padded">
-      {{ admin_spinner("Loading provider performance…") }}
+      {{ spinner("Loading provider performance…") }}
     </div>
   {% endcall %}
 
   {% call admin_panel("🛒 Top Merchant Sources", "By Affiliate Clicks", header_class="flex items-center justify-between") %}
     <div id="top-product-providers-container" class="panel-body-padded">
-      {{ admin_spinner("Loading marketplace performance…") }}
+      {{ spinner("Loading marketplace performance…") }}
     </div>
   {% endcall %}
 </div>
@@ -87,14 +89,14 @@
   <!-- Product Sources Distribution -->
   {% call admin_panel("🛍️ Product Sources", "Marketplace Volume", header_class="flex items-center justify-between") %}
     <div id="product-sources-distribution-container" class="panel-body-padded">
-      {{ admin_spinner("Loading product sources…") }}
+      {{ spinner("Loading product sources…") }}
     </div>
   {% endcall %}
 
   <!-- Provider Activity Summary -->
   {% call admin_panel("📡 Active Provider Ingest Status", "Live Ingestion & Metadata Tracking", header_class="flex items-center justify-between") %}
     <div id="provider-activities-container" class="panel-body-list">
-      {{ admin_spinner("Loading provider status…") }}
+      {{ spinner("Loading provider status…") }}
     </div>
   {% endcall %}
 </div>
@@ -103,7 +105,7 @@
 <div class="mt-6">
   {% call admin_panel("📊 Interaction Breakdown", "all time", header_class="flex items-center justify-between") %}
     <div id="overview-interactions-container">
-      {{ admin_spinner("Loading breakdown…") }}
+      {{ spinner("Loading breakdown…") }}
     </div>
   {% endcall %}
 </div>

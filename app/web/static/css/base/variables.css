@@ -101,6 +101,17 @@
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
+
+
+  /* Interaction States */
+  --like-rgb: var(--brand-blue-rgb);
+  --dislike-rgb: 239, 68, 68;
+  --save-rgb: var(--brand-purple-rgb);
+  --share-rgb: var(--brand-teal-rgb);
+
+  --interaction-bg: rgba(var(--foreground-rgb), 0.04);
+  --interaction-bg-hover: rgba(var(--foreground-rgb), 0.08);
+
 }
 
 body.light-mode,

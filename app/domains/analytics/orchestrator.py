@@ -1,18 +1,18 @@
 # app/domains/interaction/service/insights/orchestrator.py
-from app.domains.interaction.service.insights.opportunities import (
+from app.domains.analytics.content_opportunities import (
     get_content_coverage_matrix,
-    get_brand_opportunity_data,
-    get_intent_opportunity_data,
-    get_recommendation_performance_data
+    get_intent_opportunity_data
 )
-from app.domains.interaction.service.insights.learning_memory import load_memory_layer
-from app.domains.interaction.service.insights.performance_feedback import evaluate_content_performance_feedback
-from app.domains.interaction.service.insights.content_strategy import generate_content_strategy
-from app.domains.interaction.service.insights.asset_mapping import map_content_strategy_to_assets
-from app.domains.interaction.service.insights.publishing_plan import generate_content_publishing_plan
-from app.domains.interaction.service.insights.autonomous_execution import generate_execution_plan
-from app.domains.interaction.service.insights.governance import generate_execution_governance_layer
-from app.domains.interaction.service.insights.shared import score_opportunity_entity, select_primary_platform
+from app.domains.analytics.product_opportunities import get_brand_opportunity_data
+from app.domains.analytics.recommendation_performance import get_recommendation_performance_data
+from app.domains.analytics.learning_memory import load_memory_layer
+from app.domains.analytics.performance_feedback import evaluate_content_performance_feedback
+from app.domains.analytics.content_strategy import generate_content_strategy
+from app.domains.analytics.asset_mapping import map_content_strategy_to_assets
+from app.domains.analytics.publishing_plan import generate_content_publishing_plan
+from app.domains.analytics.autonomous_execution import generate_execution_plan
+from app.domains.analytics.governance import generate_execution_governance_layer
+from app.domains.analytics.shared import score_opportunity_entity, select_primary_platform
 
 def _generate_content_ideas(
     entity: str,
@@ -472,3 +472,4 @@ def get_decision_intelligence_data(lightweight=False):
         "execution_plan": execution_plan,
         "execution_governance": execution_governance
     }
+

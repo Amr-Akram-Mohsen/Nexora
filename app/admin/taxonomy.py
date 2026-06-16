@@ -296,7 +296,7 @@ def categories_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     serialized = [_serialize_category(c) for c in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/categories/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/taxonomy/_categories_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -317,7 +317,7 @@ def brands_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     serialized = [_serialize_brand(b) for b in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/brands/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/taxonomy/_brands_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -338,7 +338,7 @@ def topics_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     serialized = [_serialize_topic(t) for t in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/topics/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/taxonomy/_topics_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -359,7 +359,7 @@ def sections_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     serialized = [_serialize_section(s) for s in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/sections/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/taxonomy/_sections_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,

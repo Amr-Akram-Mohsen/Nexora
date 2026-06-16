@@ -62,3 +62,119 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   pointer-events: none;
 }
+
+/* --- Status Badges (Migrated) --- */
+
+.status-badge {
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.status-badge.admin {
+  background: rgba(var(--brand-blue-rgb), 0.1);
+  color: var(--brand-blue);
+}
+
+.status-badge.purple {
+  background: rgba(var(--brand-purple-rgb), 0.1);
+  color: var(--brand-purple);
+}
+
+.status-badge.user {
+  background: var(--secondary);
+  color: var(--muted-foreground);
+}
+
+.status-badge.active {
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.status-badge.inactive {
+  background: rgba(var(--destructive-rgb), 0.08);
+  color: var(--brand-red);
+}
+
+/* Compact badge modifier */
+.badge-compact {
+  padding: 0.15rem 0.4rem;
+  font-size: var(--text-xs);
+}
+
+/* Semantic color variants */
+.badge-blue {
+  background: rgba(var(--brand-blue-rgb), 0.08);
+  color: var(--brand-blue);
+}
+
+.badge-purple {
+  background: rgba(var(--brand-purple-rgb), 0.08);
+  color: var(--brand-purple);
+}
+
+.badge-orange {
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--brand-orange);
+}
+
+.badge-green {
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.badge-indigo {
+  background: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+}
+
+.badge-slate {
+  background: rgba(100, 116, 139, 0.08);
+  color: #64748b;
+}
+
+.badge-pending {
+  background: rgba(var(--brand-purple-rgb), 0.1);
+  color: var(--brand-purple);
+}
+
+.badge-margin {
+  margin: 0.125rem 0;
+}
+
+/* Smaller type compact variant */
+.badge-type-compact {
+  padding: 0.1rem 0.3rem;
+  font-size: var(--text-xs);
+}
+
+/* Status badge extensions */
+.status-badge.inspect-badge-secondary {
+  text-transform: capitalize;
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.status-badge.inspect-badge-blue {
+  background: rgba(var(--brand-blue-rgb), 0.1);
+  color: var(--brand-blue);
+  letter-spacing: 0.04em;
+}
+
+.status-badge.inspect-badge-complete {
+  text-transform: capitalize;
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green-dark);
+}
+
+.status-badge.inspect-badge-pending {
+  text-transform: capitalize;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--brand-orange);
+}

@@ -31,23 +31,17 @@ def view_full_specs(item_id):
 
 @bp.route("/deals")
 def deals():
-    active_filters = {
-        "category": [f for f in request.args.getlist("category") if f.strip()],
-        "brand": [f for f in request.args.getlist("brand") if f.strip()],
-        "store": [f for f in request.args.getlist("store") if f.strip()],
-        "type": [f for f in request.args.getlist("type") if f.strip()],
-        "min_price": request.args.get("min_price"),
-        "max_price": request.args.get("max_price"),
-        "sort": request.args.get("sort", "newest"),
-    }
+    from app.web.helpers.filters import parse_active_filters
+    
+    active_filters = parse_active_filters(
+        list_names=["category", "brand", "store", "type"],
+        scalar_names=["min_price", "max_price"]
+    )
     page = request.args.get("page", 1, type=int)
 
     log_route_start(logger, "/deals", page=page)
 
     data = get_catalog_data(active_filters, page=page)
-    data.setdefault("items", [])
-    data.setdefault("pagination", None)
-    data.setdefault("recommendations", [])
 
     item_count = len(data.get("items") or [])
     log_route_success(logger, "/deals", items=item_count, template="catalog-page.html")
@@ -75,14 +69,6 @@ def item_page(item_id):
     if not data:
         logger.warning("[ROUTE][/items/%d] no data returned — 404", item_id)
         abort(404)
-
-    # Safety defaults
-    data.setdefault("item", None)
-    data.setdefault("related_items", [])
-    data.setdefault("related_contents", [])
-    data.setdefault("related_articles", [])
-    data.setdefault("related_videos", [])
-    data.setdefault("buying_guides", [])
 
     record_item_view(item_id, user, ip_address)
     db.session.commit()

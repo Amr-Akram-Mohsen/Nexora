@@ -2,7 +2,7 @@
 
 {% macro render_row(s) %}
 <tr id="section-row-{{ s.id }}">
-  <td><span class="cell-name">{{ s.name }}</span></td>
+  <td><span class="cell-primary-text cell-name">{{ s.name }}</span></td>
   <td class="text-muted" style="max-width:260px;white-space:normal;">{{ s.description or "" }}</td>
   <td>
     <label class="admin-toggle">

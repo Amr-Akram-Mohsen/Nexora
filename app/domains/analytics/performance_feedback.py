@@ -4,7 +4,7 @@ from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category, IntentFacet
 from app.domains.interaction.models import RecommendationImpression, RecommendationClick
-from app.domains.interaction.service.insights.learning_memory import load_memory_layer, save_memory_layer
+from app.domains.analytics.learning_memory import load_memory_layer, save_memory_layer
 
 # Centralized thresholds and weights configurations
 DEFAULT_EXPECTED_CTR_BASE = 12.0
@@ -293,3 +293,4 @@ def evaluate_content_performance_feedback(time_window="7d"):
         "failures_detected": failures_detected[:50],
         "memory_layer": memory_data
     }
+

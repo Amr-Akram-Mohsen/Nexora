@@ -601,7 +601,7 @@ def comments_rows():
     users, content_titles, item_names = _load_comment_context(pagination.items)
     serialized = [_serialize_comment(c, users, content_titles, item_names) for c in pagination.items]
 
-    html = render_template("admin/control_panel/interactions/comments/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/interactions/_comments_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -618,7 +618,7 @@ def inspect_comment(id):
         return "<p class='text-muted'>Comment not found.</p>", 404
     users, content_titles, item_names = _load_comment_context([comment])
     data = _serialize_comment(comment, users, content_titles, item_names)
-    return render_template("admin/control_panel/interactions/comments/_inspect.html", comment=data)
+    return render_template("admin/control_panel/interactions/_comments_inspect.html", comment=data)
 
 
 @bp.route("/reactions/rows", methods=["GET"])
@@ -652,7 +652,7 @@ def reactions_rows():
             "created_at": r.created_at.isoformat() if r.created_at else None,
         })
 
-    html = render_template("admin/control_panel/interactions/reactions/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/interactions/_reactions_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -747,7 +747,7 @@ def views_rows():
             "created_at": v.latest_view.isoformat() if v.latest_view else None
         })
 
-    html = render_template("admin/control_panel/interactions/views/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/interactions/_views_rows.html", items=serialized)
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 
@@ -795,7 +795,7 @@ def clicks_rows():
         "created_at": r["created_at"].isoformat() if r["created_at"] else None,
     } for r in rows]
 
-    html = render_template("admin/control_panel/interactions/clicks/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/interactions/_clicks_rows.html", items=serialized)
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 
@@ -829,7 +829,7 @@ def saves_rows():
             "created_at": s.created_at.isoformat() if s.created_at else None,
         })
 
-    html = render_template("admin/control_panel/interactions/saves/_rows.html", items=serialized)
+    html = render_template("admin/control_panel/interactions/_saves_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,

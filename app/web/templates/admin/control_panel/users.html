@@ -1,10 +1,11 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_crud_table, admin_filter_select %}
+{% from "components/ui/modal.html" import modal %}
+{% from "components/ui/spinner.html" import spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table, admin_filter_select %}
 {% from "admin/components/macros.html" import
     admin_search_input,
     admin_summary_bar,
-    admin_modal_close_button,
+    close_button,
     action_button,
     action_group,
     inspect_section,
@@ -37,8 +38,8 @@ actions=header_actions
 
 {{ admin_paginator(domain="users", per_page_options=[10, 25, 50], current_per_page=25) }}
 
-{% call admin_modal("inspect-user-modal", "User Details & Access Control", "👤", "modal-content-lg") %}
-{{ admin_modal_close_button(button_id="inspect-user-close-btn") }}
+{% call modal("inspect-user-modal", "User Details & Access Control", "👤", "modal-content-lg") %}
+{{ close_button(button_id="inspect-user-close-btn") }}
 {% endcall %}
 {% endblock %}
 

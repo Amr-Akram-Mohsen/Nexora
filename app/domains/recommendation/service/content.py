@@ -33,6 +33,7 @@ def get_trending_contents_scored(
     days: int = 7,
     object_type: str | None = None,
     section_ids: list[int] | None = None,
+    exclude_ids: tuple | list = None,
     session=None,
 ) -> list[dict]:
     """
@@ -45,12 +46,14 @@ def get_trending_contents_scored(
         days=days,
         section_ids=section_ids,
         object_type=object_type,
+        exclude_ids=exclude_ids,
         session=session,
     )
 
 
 def get_editors_picks(
     limit: int = 6,
+    exclude_ids: tuple | list = None,
     session=None,
 ) -> list[dict]:
     """
@@ -70,8 +73,12 @@ def get_editors_picks(
     stmt = (
         build_content_stmt(active_only=True, published_only=True, eager_load="default")
         .where(Content.score > 0)
-        .order_by(Content.score.desc(), Content.published_at.desc())
     )
+    
+    if exclude_ids:
+        stmt = stmt.where(Content.id.notin_(list(exclude_ids)))
+
+    stmt = stmt.order_by(Content.score.desc(), Content.published_at.desc())
 
     if limit:
         stmt = stmt.limit(limit)
