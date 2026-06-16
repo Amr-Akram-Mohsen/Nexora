@@ -1,0 +1,27 @@
+{% if not top_performing_content or top_performing_content | length == 0 %}
+<div class="dashboard-empty loading-height-sm">
+  <span class="dashboard-state-icon">📭</span>
+  <p class="empty-message">No provider data.</p>
+</div>
+{% else %}
+{% set max_val = namespace(val=1) %}
+{% for s in top_performing_content %}
+  {% if s.views > max_val.val %}
+    {% set max_val.val = s.views %}
+  {% endif %}
+{% endfor %}
+<div class="dist-list">
+  {% for s in top_performing_content %}
+    {% set pct = ((s.views / max_val.val) * 100) | round | int %}
+    <a class="dist-row-link" href="/admin/contents?source={{ s.slug }}&sort_by=view_count&sort_dir=desc">
+      <div class="dist-row flex justify-between">
+        <span class="dist-row-name font-bold text-foreground">{{ s.name }}</span>
+        <span class="dist-row-count text-muted">{{ "{:,}".format(s.views) }} views</span>
+      </div>
+      <div class="overview-breakdown-bar-track bar-track-health">
+        <div class="overview-breakdown-bar bar-trend" style="width: {{ pct }}%;"></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}

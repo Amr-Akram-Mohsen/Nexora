@@ -1,0 +1,76 @@
+{% from "admin/components/macros.html" import action_button, action_group %}
+{% from "admin/components/crud.html" import admin_crud_rows %}
+
+{% macro render_row(item) %}
+<tr class="clickable-row" id="content-row-{{ item.id }}" data-id="{{ item.id }}"
+  data-category-id="{{ item.category_id or '' }}">
+  <td class="text-center align-middle">
+    <input type="checkbox" class="row-select-checkbox" data-id="{{ item.id }}" />
+  </td>
+  <td>
+    {% set type_class = 'admin' if item.object_type == 'article' else ('active' if item.object_type == 'video' else
+    'user') %}
+    <span class="content-cell-type status-badge {{ type_class }} text-capitalize">{{ item.object_type }}</span>
+  </td>
+  <td>
+    <div class="content-cell-title">
+      {% if item.url %}
+      <a class="activity-target text-deco-none" target="_blank" href="{{ item.url }}">
+        {{ item.title }}
+        <i class="fas fa-external-link-alt text-xs-sub"></i>
+      </a>
+      {% else %}
+      <span>{{ item.title }}</span>
+      {% endif %}
+    </div>
+  </td>
+  <td>
+    <span class="content-cell-category status-badge badge-purple quick-cat-trigger clickable-purple-link ml-1"
+      title="Double-click row to quickly move content.">
+      <i class="fas fa-tag"></i> {{ item.category_name }}
+    </span>
+  </td>
+  <td>
+    <span class="user-cell-name">{{ item.sources if item.sources is string else (item.sources | join(", ")) }}</span>
+  </td>
+  <td>
+    <div class="text-sm"><i class="far fa-eye text-muted"></i> {{ "{:,}".format(item.view_count or 0) }}</div>
+    <div class="content-engagement-sub"><i class="far fa-comment"></i> {{ item.comment_count }}</div>
+  </td>
+  <td>
+    <div class="content-date-row mt-1">
+      {{ item.published_at[:10] if item.published_at else "—" }}
+    </div>
+  </td>
+  <td>
+    <div class="content-status-group flex items-center">
+      <span class="status-badge {{ 'active' if item.is_active else 'inactive' }}">
+        {{ "Active" if item.is_active else "Inactive" }}
+      </span>
+      {% for flag in (item.quality_issues or []) %}
+      {% if flag == 'missing_category' %}
+      <span class="status-badge inactive badge-margin"
+        title="Content belongs to uncategorized and requires clean routing."> ⚠️ Category</span>
+      {% elif flag == 'missing_metadata' %}
+      <span class="status-badge inactive badge-orange badge-margin" title="Missing essential title or preview details.">
+        📝 Metadata</span>
+      {% elif flag == 'duplicate' %}
+      <span class="status-badge inactive badge-indigo badge-margin" title="Duplicate titles matching other aggregates.">
+        👯 Duplicate</span>
+      {% endif %}
+      {% else %}
+      <span class="status-badge active badge-margin" title="No critical catalog/enrichment issues."> ✓ Clean</span>
+      {% endfor %}
+    </div>
+  </td>
+  <td class="text-center align-middle">
+    {% call action_group(wrapper_class="actions-cell-group flex justify-center") %}
+    {{ action_button("Inspect", action_type="inspect", icon="👁️",
+    title="Inspect source and ingestion metadata", extra_class="inspect-btn",
+    button_id=item.id) }}
+    {% endcall %}
+  </td>
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, colspan=9, empty_text="No content found.") }}

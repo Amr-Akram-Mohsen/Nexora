@@ -10,7 +10,7 @@ Refactoring applied:
   relationship traversal during serialization (R-15).
 - Shared helpers from app.admin.helpers for pagination and sort parsing (R-18, R-21).
 """
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template, make_response
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
@@ -267,3 +267,112 @@ def delete_item(id):
     db.session.delete(item)
     db.session.commit()
     return jsonify({"success": True, "message": f"Item '{item.name}' deleted successfully."})
+
+
+@bp.route("/rows", methods=["GET"])
+def items_rows():
+    """Return server-rendered HTML rows partial for AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=20)
+    sort_col, sort_dir = parse_sort_params(_ITEM_SORT_MAP, Item.id)
+
+    search        = request.args.get("search", "").strip()
+    brand_slug    = request.args.get("brand")
+    category_slug = request.args.get("category")
+    source_slug   = request.args.get("source")
+
+    stmt = select(Item).options(joinedload(Item.brand), joinedload(Item.category))
+    if search:
+        term = f"%{search}%"
+        if search.isdigit():
+            stmt = stmt.where(or_(Item.id == int(search), Item.name.ilike(term)))
+        else:
+            stmt = stmt.where(or_(Item.name.ilike(term), Item.description.ilike(term)))
+    if brand_slug:
+        stmt = stmt.join(Item.brand).where(Brand.slug == brand_slug)
+    if category_slug:
+        stmt = stmt.join(Item.category).where(Category.slug == category_slug)
+    if source_slug:
+        stmt = stmt.join(Item.source).where(Source.slug == source_slug)
+    stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    page_ids = [item.id for item in pagination.items]
+
+    min_price_rows = db.session.execute(
+        select(ItemVariant.item_id, func.min(ItemVariant.price).label("min_price"), ItemVariant.currency)
+        .where(ItemVariant.item_id.in_(page_ids), ItemVariant.price != None)
+        .group_by(ItemVariant.item_id, ItemVariant.currency)
+        .order_by(ItemVariant.item_id, func.min(ItemVariant.price))
+    ).all()
+    min_price_map: dict[int, dict] = {}
+    for r in min_price_rows:
+        if r.item_id not in min_price_map:
+            min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
+
+    store_rows = db.session.execute(
+        select(ItemVariant.item_id, func.count(ItemStoreLink.id).label("active_links"))
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(ItemVariant.item_id.in_(page_ids), ItemStoreLink.is_active.is_(True))
+        .group_by(ItemVariant.item_id)
+    ).all()
+    store_info_map = {r.item_id: int(r.active_links) for r in store_rows}
+
+    serialized = []
+    for item in pagination.items:
+        price_info = min_price_map.get(item.id, {})
+        serialized.append({
+            "id":          item.id,
+            "name":        item.name,
+            "brand":       item.brand.name if item.brand else "—",
+            "category":    item.category.name if item.category else "—",
+            "min_price":   price_info.get("price"),
+            "currency":    price_info.get("currency"),
+            "store_count": store_info_map.get(item.id, 0),
+            "click_count": item.click_count or 0,
+            "created_at":  item.created_at.isoformat() if item.created_at else None,
+        })
+
+    html = render_template("admin/control_panel/items/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_item(id):
+    """Return server-rendered HTML for the item inspect modal body."""
+    item = db.session.get(Item, id)
+    if not item:
+        return "<p class='text-muted'>Item not found.</p>", 404
+
+    store_links_data = []
+    for v in item.variants:
+        for lnk in v.store_links:
+            store_links_data.append({
+                "store_name":        lnk.store.name if lnk.store else "—",
+                "affiliate_network": lnk.store.affiliate_network if lnk.store else "—",
+                "program_name":      lnk.program_name or "—",
+                "affiliate_url":     lnk.affiliate_url or "—",
+                "original_url":      lnk.original_url or "—",
+                "price":             float(lnk.price) if lnk.price is not None else None,
+                "currency":          lnk.currency,
+                "availability":      lnk.availability,
+                "is_active":         lnk.is_active,
+                "metadata":          lnk.network_metadata or {},
+            })
+
+    data = {
+        "id":          item.id,
+        "name":        item.name,
+        "item_type":   item.item_type or "—",
+        "brand":       item.brand.name if item.brand else "—",
+        "category":    item.category.name if item.category else "—",
+        "source_name": item.source.name if item.source else "—",
+        "source_slug": item.source.slug if item.source else None,
+        "source_type": item.source_type or "—",
+        "store_links": store_links_data,
+    }
+    return render_template("admin/control_panel/items/_inspect.html", item=data)
+

@@ -1,5 +1,5 @@
 # app/admin/taxonomy.py
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template, make_response
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.taxonomy.models import Category, Brand, Topic, Section
@@ -277,3 +277,91 @@ def _serialize_section(s):
         "is_active": s.is_active,
         "sort_order": s.sort_order,
     }
+
+
+# ─────────────────────────────────────────────
+# HTML PARTIAL ROWS ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route("/categories/rows", methods=["GET"])
+def categories_rows():
+    """Return server-rendered HTML rows partial for categories AJAX injection."""
+    from app.admin.helpers import parse_pagination_params
+    page, per_page = parse_pagination_params(default_per_page=50)
+    search = request.args.get("search", "").strip()
+
+    stmt = select(Category).order_by(Category.name.asc())
+    if search:
+        stmt = stmt.where(Category.name.ilike(f"%{search}%"))
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    serialized = [_serialize_category(c) for c in pagination.items]
+
+    html = render_template("admin/control_panel/taxonomy/categories/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/brands/rows", methods=["GET"])
+def brands_rows():
+    """Return server-rendered HTML rows partial for brands AJAX injection."""
+    from app.admin.helpers import parse_pagination_params
+    page, per_page = parse_pagination_params(default_per_page=50)
+    search = request.args.get("search", "").strip()
+
+    stmt = select(Brand).order_by(Brand.name.asc())
+    if search:
+        stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    serialized = [_serialize_brand(b) for b in pagination.items]
+
+    html = render_template("admin/control_panel/taxonomy/brands/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/topics/rows", methods=["GET"])
+def topics_rows():
+    """Return server-rendered HTML rows partial for topics AJAX injection."""
+    from app.admin.helpers import parse_pagination_params
+    page, per_page = parse_pagination_params(default_per_page=50)
+    search = request.args.get("search", "").strip()
+
+    stmt = select(Topic).order_by(Topic.name.asc())
+    if search:
+        stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    serialized = [_serialize_topic(t) for t in pagination.items]
+
+    html = render_template("admin/control_panel/taxonomy/topics/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/sections/rows", methods=["GET"])
+def sections_rows():
+    """Return server-rendered HTML rows partial for sections AJAX injection."""
+    from app.admin.helpers import parse_pagination_params
+    page, per_page = parse_pagination_params(default_per_page=50)
+    search = request.args.get("search", "").strip()
+
+    stmt = select(Section).order_by(Section.name.asc())
+    if search:
+        stmt = stmt.where(Section.name.ilike(f"%{search}%"))
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    serialized = [_serialize_section(s) for s in pagination.items]
+
+    html = render_template("admin/control_panel/taxonomy/sections/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp

@@ -1,0 +1,69 @@
+<div class="health-list">
+  <!-- Active contents row -->
+  <div>
+    <div class="health-row flex justify-between">
+      <span class="font-bold">
+        <span class="status-badge active badge-compact">Active</span>
+        <span class="health-label-text"> Live Index</span>
+      </span>
+      {% set total = data.contents_count or 1 %}
+      {% set active_pct = ((data.active_contents or 0) / total * 100) | round | int %}
+      <span class="health-value-text text-muted">{{ "{:,}".format(data.active_contents or 0) }} ({{ active_pct }}%)</span>
+    </div>
+    <div class="overview-breakdown-bar-track bar-track-health">
+      <div class="overview-breakdown-bar bar-active" style="width: {{ active_pct }}%;"></div>
+    </div>
+  </div>
+
+  <!-- Inactive contents row -->
+  <div>
+    <div class="health-row flex justify-between">
+      <span class="font-bold">
+        <span class="status-badge inactive badge-compact">Inactive</span>
+        <span class="health-label-text"> Hidden Archive</span>
+      </span>
+      {% set inactive_pct = ((data.inactive_contents or 0) / total * 100) | round | int %}
+      <span class="health-value-text text-muted">{{ "{:,}".format(data.inactive_contents or 0) }} ({{ inactive_pct }}%)</span>
+    </div>
+    <div class="overview-breakdown-bar-track bar-track-health">
+      <div class="overview-breakdown-bar bar-inactive" style="width: {{ inactive_pct }}%;"></div>
+    </div>
+  </div>
+
+  <!-- Moderation Queue Link -->
+  <a class="dashboard-stat-card clickable-card moderation-queue-link flex items-center justify-between" href="/admin/contents?published=false">
+    <div class="flex items-center gap-sm">
+      <span class="text-lg-icon">⏳</span>
+      <div>
+        <div class="font-bold text-sm text-foreground">Moderation Queue</div>
+        <div class="text-xs text-muted">Unpublished aggregator drafts</div>
+      </div>
+    </div>
+    <span class="status-badge badge-pending">{{ data.review_queue_count }} pending</span>
+  </a>
+
+  <!-- Ingestion Growth Trend -->
+  {% if data.growth_trends and data.growth_trends | length > 0 %}
+    {% set max_count = namespace(val=1) %}
+    {% for trend in data.growth_trends %}
+      {% if trend.count > max_count.val %}
+        {% set max_count.val = trend.count %}
+      {% endif %}
+    {% endfor %}
+    <div>
+      <h4 class="filter-label-xs mt-3 mb-1">7-Day Ingestion Growth</h4>
+      <div class="trend-chart-list">
+        {% for trend in data.growth_trends %}
+          {% set pct = ((trend.count / max_count.val) * 100) | round | int %}
+          <div class="trend-chart-item flex items-center">
+            <span class="trend-chart-date">{{ trend.date }}</span>
+            <div class="overview-breakdown-bar-track bar-track-trend">
+              <div class="overview-breakdown-bar bar-trend" style="width: {{ pct }}%;"></div>
+            </div>
+            <span class="trend-chart-value">{{ trend.count }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>

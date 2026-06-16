@@ -1,0 +1,26 @@
+{% if not provider_activities or provider_activities | length == 0 %}
+<div class="dashboard-empty loading-height-sm">
+  <span class="dashboard-state-icon">📭</span>
+  <p class="empty-message">No active providers.</p>
+</div>
+{% else %}
+<ul class="activity-feed">
+  {% for s in provider_activities %}
+    <li class="activity-item ingest-log-item flex items-start">
+      <div class="activity-icon icon-comment ingest-log-icon flex-center">📡</div>
+      <div class="activity-content">
+        <p class="activity-text ingest-log-text">
+          <strong class="text-foreground provider-name">{{ s.name }}</strong>
+          <span class="status-badge active badge-type-compact badge-indigo provider-slug">slug: {{ s.slug }}</span>
+        </p>
+        <p class="activity-meta ingest-log-text mt-1 text-muted">
+          Volume: <strong class="provider-content-count">{{ "{:,}".format(s.content_count or 0) }}</strong> content items &amp; <strong class="provider-product-count">{{ "{:,}".format(s.product_count or 0) }}</strong> products
+        </p>
+        <p class="activity-meta ingest-log-meta mt-1">
+          Last Ingest Activity: <strong class="provider-activity-time">{{ s.latest_activity_formatted }}</strong>
+        </p>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}

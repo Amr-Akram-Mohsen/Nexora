@@ -1,5 +1,5 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui.html" import admin_page_header, admin_table_spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_table_spinner, admin_loading_state, admin_panel %}
 
 {% block title %}Insights & Opportunities — Nexora Admin{% endblock %}
 
@@ -29,7 +29,7 @@ recommendation CTR.",
 actions=header_actions
 ) }}
 
-<div class="insights-section">
+<div class="insights-section" id="recommendations-widget-container">
   {% include "admin/control_panel/insights/_summary_cards.html" %}
 </div>
 
@@ -37,14 +37,14 @@ actions=header_actions
 <div class="insights-double-grid insights-section">
   <!-- Top Opportunities Table -->
   <div class="overview-panel">
-    <div class="overview-panel-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div class="overview-panel-header flex items-center justify-between">
       <div>
         <h3 class="overview-panel-title">🏆 Top Opportunities</h3>
         <p class="overview-panel-sub">Unified priority list of categories and brands with the highest growth potential.</p>
       </div>
-      <div id="active-filter-container" style="display: none; align-items: center; gap: 0.5rem;">
+      <div id="active-filter-container" class="flex items-center gap-sm" style="display: none;">
         <span id="active-filter-badge" class="status-badge badge-blue font-bold"></span>
-        <button id="clear-filter-btn" class="admin-btn-secondary" style="height: 28px; padding: 0.15rem 0.5rem; font-size: 11px; margin-left: 0.5rem; line-height: 1;">Clear Filter</button>
+        <button id="clear-filter-btn" class="admin-btn-secondary">Clear Filter</button>
       </div>
     </div>
     <div class="insights-table-scroll">
@@ -54,36 +54,25 @@ actions=header_actions
             <th>Rank</th>
             <th>Entity</th>
             <th>Type</th>
-            <th class="col-metric">
-              <div>Opportunity</div>
-              <div>Score</div>
-            </th>
+            <th>Opportunity Score</th>
             <th>Reason</th>
           </tr>
         </thead>
         <tbody id="top-opportunities-body">
-          <tr>
-            <td colspan="5" class="text-center">
-              {{ admin_table_spinner(5, "Prioritizing entities...") }}
-            </td>
-          </tr>
+          {{ admin_table_spinner(5, "Prioritizing entities...") }}
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- Insight Actions Queue -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">⚡ Insight Actions Queue</h3>
-      <p class="overview-panel-sub">Immediate tactical recommendations sorted by expected impact and priority.</p>
-    </div>
+  {% call admin_panel("⚡ Insight Actions Queue", "Immediate tactical recommendations sorted by expected impact and priority.") %}
     <div class="insights-table-scroll">
       <div id="action-queue-list" class="suggestions-list-scroll">
-        {{ admin_table_spinner(1, "Compiling action guidance...") }}
+        {{ admin_loading_state("Compiling action guidance...") }}
       </div>
     </div>
-  </div>
+  {% endcall %}
 </div>
 
 <div class="insights-section">
@@ -117,154 +106,59 @@ actions=header_actions
 
 <!-- Section 2: Content Coverage Matrix -->
 <h2 class="insight-group-title">⚖️ Content Coverage Matrix</h2>
-<div class="overview-panel insights-section">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Category Coverage & Demand Gaps</h3>
-    <p class="overview-panel-sub">Analyzing content volume vs user engagement signals to identify content gaps.</p>
-  </div>
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="coverage-matrix-table">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th class="col-metric">Demand Level</th>
-          <th class="col-metric">Coverage Level</th>
-          <th>Gap Score / Status</th>
-        </tr>
-      </thead>
-      <tbody id="coverage-matrix-body">
-        <tr>
-          <td colspan="4" class="text-center">
-            {{ admin_table_spinner(4, "Assessing category alignment...") }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="insights-section">
+  {% call admin_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to identify content gaps.") %}
+    <div class="admin-table-wrapper">
+      <table class="admin-table" id="coverage-matrix-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Demand Level</th>
+            <th>Coverage Level</th>
+            <th>Gap Score / Status</th>
+          </tr>
+        </thead>
+        <tbody id="coverage-matrix-body">
+          {{ admin_table_spinner(4, "Assessing category alignment...") }}
+        </tbody>
+      </table>
+    </div>
+  {% endcall %}
 </div>
 
 <!-- Section 3 & 4: Intent & Brand Opportunities -->
 <div class="insights-double-grid insights-section">
   <!-- Intent Opportunity Analysis -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">🎯 Intent Opportunity Analysis</h3>
-      <p class="overview-panel-sub">Content distribution across taxonomy intents and identified coverage gaps.</p>
-    </div>
+  {% call admin_panel("🎯 Intent Opportunity Analysis", "Content distribution across taxonomy intents and identified coverage gaps.") %}
     <div class="insights-table-scroll">
       <div id="intent-opportunities-list" class="suggestions-list-scroll">
-        {{ admin_table_spinner(1, "Analyzing intent distributions...") }}
+        {{ admin_loading_state("Analyzing intent distributions...") }}
       </div>
     </div>
-  </div>
+  {% endcall %}
 
   <!-- Brand Opportunity Analysis -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">⭐ Brand Opportunity Analysis</h3>
-      <p class="overview-panel-sub">User engagement vs content volume to identify brand expansion opportunities.</p>
-    </div>
+  {% call admin_panel("⭐ Brand Opportunity Analysis", "User engagement vs content volume to identify brand expansion opportunities.") %}
     <div class="insights-table-scroll">
       <table class="admin-table text-sm" id="brand-opportunities-table">
         <thead>
           <tr>
             <th>Brand</th>
-            <th class="col-metric">Articles</th>
-            <th class="col-metric">Engagement</th>
+            <th>Articles</th>
+            <th>Engagement</th>
             <th>Expansion Status</th>
           </tr>
         </thead>
         <tbody id="brand-opportunities-body">
-          <tr>
-            <td colspan="4" class="text-center">
-              {{ admin_table_spinner(4, "Calculating brand expansion opportunities...") }}
-            </td>
-          </tr>
+          {{ admin_table_spinner(4, "Calculating brand expansion opportunities...") }}
         </tbody>
       </table>
     </div>
-  </div>
+  {% endcall %}
 </div>
 
 {% endblock %}
-{% block additional_content %}
-{{ super() }}
-<!-- Client-side templates for insights widgets (add to insights.html) -->
-<template id="asset-mapping-row-template">
-  <tr class="asset-mapping-row">
-    <td>
-      <div class="font-bold text-foreground text-base" data-field="entity"></div>
-    </td>
-    <td>
-      <div class="asset-mapping-item-meta mt-2" data-field="score"></div>
-    </td>
-    <td class="col-asset-count" data-field="existing_count"></td>
-    <td class="col-gap-count" data-field="missing_count"></td>
-    <td>
-      <div class="asset-mapping-actions">
-        <button type="button" class="btn btn-outline btn-sm asset-mapping-details-toggle" aria-expanded="false">
-          <i class="fa fa-chevron-right" aria-hidden="true"></i> View
-        </button>
-      </div>
-    </td>
-  </tr>
-</template>
 
-<template id="asset-mapping-details-template">
-  <tr class="asset-mapping-details-row">
-    <td colspan="5">
-      <div class="asset-mapping-details">
-        <div class="row">
-          <div class="col-md-6">
-            <h6>Existing Assets</h6>
-            <ul class="asset-mapping-list" data-field="existing_list"></ul>
-          </div>
-          <div class="col-md-6">
-            <h6>Missing Assets (Gaps)</h6>
-            <ul class="asset-mapping-list" data-field="missing_list"></ul>
-          </div>
-        </div>
-      </div>
-    </td>
-  </tr>
-</template>
-
-<template id="top-opportunity-row-template">
-  <tr class="clickable-row" style="cursor: pointer;" data-entity="">
-    <td><span class="font-bold" data-field="rank"></span></td>
-    <td><span class="font-bold text-foreground clickable-entity-name" data-field="entity"></span></td>
-    <td><span class="status-badge info font-bold" data-field="type"></span></td>
-    <td class="col-metric font-bold text-foreground" data-field="score"></td>
-    <td><span class="text-muted" data-field="reason"></span></td>
-  </tr>
-</template>
-
-<template id="action-queue-card-template">
-  <div class="insights-opp-card">
-    <div class="opp-card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
-      <h3 class="opp-title" data-field="title" style="margin:0;font-size:var(--text-sm);"></h3>
-      <span class="expand-arrow" style="font-size:10px;color:var(--muted-foreground);margin-left:.5rem;transition:transform .2s;">▼</span>
-    </div>
-    <div class="opp-metrics" style="margin-bottom:.5rem;" data-field="metrics"></div>
-    <div class="opp-action" style="display:flex;align-items:center;justify-content:space-between;" data-field="action"></div>
-    <div class="action-card-details" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed var(--border);font-size:var(--text-xs);line-height:1.4;" data-field="details"></div>
-  </div>
-</template>
-
-<template id="kanban-task-card-template">
-  <div class="kanban-task-card">
-    <div class="kanban-task-header">
-      <span class="kanban-task-platform" data-field="platform"></span>
-      <span class="status-badge" data-field="action"></span>
-    </div>
-    <h4 class="kanban-task-title" data-field="title"></h4>
-    <p class="kanban-task-meta" data-field="meta"></p>
-    <div class="kanban-task-reason" data-field="reason"></div>
-    <div class="kanban-task-risk" data-field="risk"></div>
-    <div class="kanban-task-log" data-field="log"></div>
-  </div>
-</template>
-{% endblock %}
 
 {% block admin_scripts %}
 <script type="module" src="{{ url_for('static', filename='js/admin/pages/insights/index.js') }}"></script>

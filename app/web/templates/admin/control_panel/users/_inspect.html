@@ -1,0 +1,34 @@
+{% from "admin/components/macros.html" import inspect_section, inspect_detail_row %}
+<div class="inspect-details-group flex flex-col">
+  {% call inspect_section("User Account Details") %}
+    {{ inspect_detail_row("ID", "inspect-id", value_text="#" ~ user.id) }}
+    {{ inspect_detail_row("Name", "inspect-name", value_text=user.name or "—") }}
+    {{ inspect_detail_row("Email", "inspect-email", value_text=user.email) }}
+    {{ inspect_detail_row("Role", "inspect-role status-badge " ~ ("admin" if user.is_admin else "user"),
+       value_text="Admin" if user.is_admin else "User") }}
+    {{ inspect_detail_row("Status", "inspect-status status-badge " ~ ("active" if user.is_active else "inactive"),
+       value_text="Active" if user.is_active else "Inactive") }}
+    {{ inspect_detail_row("Joined Date", "inspect-joined",
+       value_text=user.created_at.strftime('%b %d, %Y') if user.created_at else "—") }}
+  {% endcall %}
+  {% call inspect_section("Access Control Actions", divider=false) %}
+    <div class="flex gap-2 mt-2 flex-wrap">
+      <button class="user-action-btn user-action-toggle-admin"
+              data-action="toggle-admin" data-id="{{ user.id }}"
+              data-name="{{ (user.name or user.email) | e }}">
+        {{ "Demote to User" if user.is_admin else "Promote to Admin" }}
+      </button>
+      <button class="user-action-btn user-action-toggle-active"
+              data-action="toggle-active" data-id="{{ user.id }}"
+              data-is-active="{{ user.is_active | lower }}"
+              data-name="{{ (user.name or user.email) | e }}">
+        {{ "Deactivate Account" if user.is_active else "Activate Account" }}
+      </button>
+      <button class="user-action-btn user-action-delete"
+              data-action="delete-user" data-id="{{ user.id }}"
+              data-name="{{ (user.name or user.email) | e }}">
+        🗑 Delete User
+      </button>
+    </div>
+  {% endcall %}
+</div>

@@ -48,100 +48,67 @@ function escapeHtml(str) {
 // ==============================
 // STATE TEMPLATE HELPERS
 // ==============================
-function getSpinnerHtml(text = "Loading…", extraClass = "") {
-  const template = document.getElementById("global-spinner-template");
-  if (!template) {
-    return `
-      <div class="dashboard-loading ${extraClass}">
-        <div class="spinner"></div>
-        <p>${escapeHtml(text)}</p>
-      </div>
-    `;
-  }
+function addClasses(el, classNames = "") {
+  if (classNames) el.classList.add(...classNames.split(" ").filter(Boolean));
+}
+
+function templateToHtml(templateId, selector, update) {
+  const template = document.getElementById(templateId);
+  if (!template) return "";
   const clone = template.content.cloneNode(true);
-  const div = clone.querySelector(".dashboard-loading");
-  if (extraClass) div.classList.add(...extraClass.split(" ").filter(c => c));
-  div.querySelector(".spinner-text").textContent = text;
+  const root = clone.querySelector(selector);
+  if (!root) return "";
+  update(root);
   const outer = document.createElement("div");
-  outer.appendChild(div);
+  outer.appendChild(root);
   return outer.innerHTML;
+}
+
+function getSpinnerHtml(text = "Loading…", extraClass = "") {
+  return templateToHtml("global-spinner-template", ".dashboard-loading", div => {
+    addClasses(div, extraClass);
+    div.querySelector(".spinner-text").textContent = text;
+  });
+}
+
+function getTableStateHtml(colspan, stateHtml, cellClass = "") {
+  return `
+    <tr>
+      <td colspan="${colspan}"${cellClass ? ` class="${cellClass}"` : ""}>
+        ${stateHtml}
+      </td>
+    </tr>
+  `;
 }
 
 function getTableSpinnerHtml(colspan, text = "Loading…", extraClass = "") {
-  return `
-    <tr>
-      <td colspan="${colspan}" class="table-loading-cell">
-        ${getSpinnerHtml(text, extraClass)}
-      </td>
-    </tr>
-  `;
+  return getTableStateHtml(colspan, getSpinnerHtml(text, extraClass), "table-loading-cell");
 }
 
 function getEmptyStateHtml(message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
-  const template = document.getElementById("global-empty-template");
-  if (!template) {
-    return `
-      <div class="dashboard-empty ${extraClass}">
-        <span class="dashboard-state-icon">${icon}</span>
-        <p>${escapeHtml(message)}</p>
-        ${submessage ? `<p class="dashboard-empty-subtext">${escapeHtml(submessage)}</p>` : ""}
-      </div>
-    `;
-  }
-  const clone = template.content.cloneNode(true);
-  const div = clone.querySelector(".dashboard-empty");
-  if (extraClass) div.classList.add(...extraClass.split(" ").filter(c => c));
-  div.querySelector(".dashboard-state-icon").textContent = icon;
-  div.querySelector(".empty-message").textContent = message;
-  const subEl = div.querySelector(".empty-submessage");
-  if (submessage) {
-    subEl.textContent = submessage;
-    subEl.style.display = "";
-  } else {
-    subEl.style.display = "none";
-  }
-  const outer = document.createElement("div");
-  outer.appendChild(div);
-  return outer.innerHTML;
+  return templateToHtml("global-empty-template", ".dashboard-empty", div => {
+    addClasses(div, extraClass);
+    div.querySelector(".dashboard-state-icon").textContent = icon;
+    div.querySelector(".empty-message").textContent = message;
+    const subEl = div.querySelector(".empty-submessage");
+    subEl.textContent = submessage || "";
+    subEl.style.display = submessage ? "" : "none";
+  });
 }
 
 function getTableEmptyStateHtml(colspan, message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
-  return `
-    <tr>
-      <td colspan="${colspan}">
-        ${getEmptyStateHtml(message, submessage, extraClass, icon)}
-      </td>
-    </tr>
-  `;
+  return getTableStateHtml(colspan, getEmptyStateHtml(message, submessage, extraClass, icon));
 }
 
 function getErrorStateHtml(message = "Failed to load data. Please try again.", extraClass = "") {
-  const template = document.getElementById("global-error-template");
-  if (!template) {
-    return `
-      <div class="dashboard-error ${extraClass}">
-        <span class="dashboard-error-icon">⚠️</span>
-        <p>${escapeHtml(message)}</p>
-      </div>
-    `;
-  }
-  const clone = template.content.cloneNode(true);
-  const div = clone.querySelector(".dashboard-error");
-  if (extraClass) div.classList.add(...extraClass.split(" ").filter(c => c));
-  div.querySelector(".error-message").textContent = message;
-  const outer = document.createElement("div");
-  outer.appendChild(div);
-  return outer.innerHTML;
+  return templateToHtml("global-error-template", ".dashboard-error", div => {
+    addClasses(div, extraClass);
+    div.querySelector(".error-message").textContent = message;
+  });
 }
 
 function getTableErrorStateHtml(colspan, message = "Failed to load data. Please try again.", extraClass = "") {
-  return `
-    <tr>
-      <td colspan="${colspan}">
-        ${getErrorStateHtml(message, extraClass)}
-      </td>
-    </tr>
-  `;
+  return getTableStateHtml(colspan, getErrorStateHtml(message, extraClass));
 }
 
 function showToast(msg, type = "success") {
@@ -156,6 +123,48 @@ function showToast(msg, type = "success") {
   }, 3200);
 }
 
+function fetchAndInjectHtml(url, targetElementId, loadingText = "Loading...", colspan = null, options = {}) {
+  const container = document.getElementById(targetElementId);
+  if (!container) return Promise.resolve();
+
+  if (container.tagName === 'TBODY' && colspan) {
+    container.innerHTML = getTableSpinnerHtml(colspan, loadingText);
+  } else {
+    container.innerHTML = getSpinnerHtml(loadingText);
+  }
+
+  return fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to load ${url}`);
+      const isEmpty = res.headers.get("X-Empty") === "true";
+      return res.text().then(html => ({ html, isEmpty }));
+    })
+    .then(({ html, isEmpty }) => {
+      if (isEmpty && options.hideElementIdOnEmpty) {
+        const elToHide = document.getElementById(options.hideElementIdOnEmpty);
+        if (elToHide) {
+          elToHide.style.display = "none";
+        }
+      } else {
+        if (options.hideElementIdOnEmpty) {
+          const elToShow = document.getElementById(options.hideElementIdOnEmpty);
+          if (elToShow) {
+            elToShow.style.display = options.displayStyle || "block";
+          }
+        }
+        container.innerHTML = html;
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      if (container.tagName === 'TBODY' && colspan) {
+        container.innerHTML = getTableErrorStateHtml(colspan, "Failed to load data.");
+      } else {
+        container.innerHTML = getErrorStateHtml("Failed to load data.");
+      }
+    });
+}
+
 
 // ==============================
 // ADMIN LIST CONTROLLER CLASS
@@ -163,7 +172,7 @@ function showToast(msg, type = "success") {
 class AdminListController {
   constructor(config) {
     this.domain = config.domain;
-    this.endpoint = config.endpoint || `/admin/${config.domain}/`;
+    this.rowsEndpoint = config.rowsEndpoint;
     this.tbodyId = config.tbodyId || `${config.domain}-table-body`;
     this.searchId = config.searchId || `${config.domain}-search`;
     this.filterIds = config.filterIds || [];
@@ -175,28 +184,25 @@ class AdminListController {
     this.countId = config.countId || `${config.domain}-count`;
     this.clearBtnId = config.clearBtnId || `clear-${config.domain}-filters-btn`;
     this.refreshBtnId = config.refreshBtnId || `refresh-${config.domain}-btn`;
-    this.rowTemplateId = config.rowTemplateId || `${config.domain}-row-template`;
-    
-    this.renderRow = config.renderRow;
+
     this.onLoaded = config.onLoaded;
     this.colspan = config.colspan || 5;
-    this.itemsKey = config.itemsKey || "items";
-    
+
     this.currentPage = 1;
     this.totalPages = 1;
     this.perPage = config.defaultPerPage || 20;
     this.searchDebounce = null;
-    
+
     if (config.autoInit !== false) {
       document.addEventListener("DOMContentLoaded", () => this.init());
     }
   }
-  
+
   init() {
     this.bindEvents();
     this.load(1);
   }
-  
+
   getFilters() {
     const filters = {};
     const searchEl = document.getElementById(this.searchId);
@@ -212,80 +218,63 @@ class AdminListController {
     });
     return filters;
   }
-  
+
   load(page) {
     this.currentPage = page || 1;
     const tbody = document.getElementById(this.tbodyId);
     if (!tbody) return;
-    
+
     tbody.innerHTML = getTableSpinnerHtml(this.colspan, `Loading ${this.domain}...`, "loading-height-sm");
-    
+
     const filters = this.getFilters();
     const params = new URLSearchParams({
       page: this.currentPage,
       per_page: this.perPage,
       ...filters
     });
-    
-    fetch(`${this.endpoint}?${params}`)
+
+    if (!this.rowsEndpoint) {
+      console.error(`rowsEndpoint is required for ${this.domain} controller.`);
+      tbody.innerHTML = getTableErrorStateHtml(this.colspan, `Configuration error.`);
+      return;
+    }
+
+    // JS only fetches + injects. All row HTML is rendered by Jinja on the server.
+    fetch(`${this.rowsEndpoint}?${params}`)
       .then(res => {
         if (!res.ok) throw new Error("Load error");
-        return res.json();
+        const total = parseInt(res.headers.get("X-Total") || "0", 10);
+        const pages = parseInt(res.headers.get("X-Pages") || "1", 10);
+        this.totalPages = pages;
+        return res.text().then(html => ({ html, total }));
       })
-      .then(data => {
-        const items = Array.isArray(data) ? data : (data[this.itemsKey] || data.items || []);
-        this.totalPages = data.pages || 1;
-        const total = data.total !== undefined ? data.total : (Array.isArray(data) ? data.length : 0);
-        
-        const from = ((this.currentPage - 1) * this.perPage) + 1;
+      .then(({ html, total }) => {
+        tbody.innerHTML = html;
+        const from = total > 0 ? ((this.currentPage - 1) * this.perPage) + 1 : 0;
         const to = Math.min(this.currentPage * this.perPage, total);
-        
-        this.render(items, tbody);
         this.updatePagination(total, from, to);
-        if (this.onLoaded) this.onLoaded(data);
+        if (this.onLoaded) this.onLoaded({ total });
       })
       .catch(err => {
         console.error(err);
         tbody.innerHTML = getTableErrorStateHtml(this.colspan, `Failed to load ${this.domain}.`);
       });
   }
-  
-  render(items, tbody) {
-    tbody.innerHTML = "";
-    if (items.length === 0) {
-      tbody.innerHTML = getTableEmptyStateHtml(this.colspan, `No ${this.domain} found.`, "Adjust your search or filters.", "loading-height-sm");
-      return;
-    }
-    
-    const template = document.getElementById(this.rowTemplateId);
-    items.forEach(item => {
-      let node;
-      if (this.renderRow) {
-        node = this.renderRow(item);
-      } else if (template) {
-        node = template.content.cloneNode(true);
-      }
-      
-      if (node) {
-        tbody.appendChild(node);
-      }
-    });
-  }
-  
+
   updatePagination(total, from, to) {
     const countEl = document.getElementById(this.countId);
     const infoEl = document.getElementById(this.infoId);
     const pageEl = document.getElementById(this.indicatorId);
     const prevBtn = document.getElementById(this.prevBtnId);
     const nextBtn = document.getElementById(this.nextBtnId);
-    
+
     if (countEl) countEl.textContent = total.toLocaleString();
     if (infoEl) infoEl.textContent = `Showing ${total ? from : 0} to ${to} of ${total.toLocaleString()} ${this.domain}`;
     if (pageEl) pageEl.textContent = `Page ${this.currentPage} of ${this.totalPages}`;
     if (prevBtn) prevBtn.disabled = this.currentPage <= 1;
     if (nextBtn) nextBtn.disabled = this.currentPage >= this.totalPages;
   }
-  
+
   bindEvents() {
     const searchEl = document.getElementById(this.searchId);
     if (searchEl) {
@@ -294,14 +283,14 @@ class AdminListController {
         this.searchDebounce = setTimeout(() => this.load(1), 400);
       });
     }
-    
+
     this.filterIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("change", () => this.load(1));
       }
     });
-    
+
     const perPageEl = document.getElementById(this.perPageId);
     if (perPageEl) {
       perPageEl.addEventListener("change", e => {
@@ -309,21 +298,21 @@ class AdminListController {
         this.load(1);
       });
     }
-    
+
     const prevEl = document.getElementById(this.prevBtnId);
     if (prevEl) {
       prevEl.addEventListener("click", () => {
         if (this.currentPage > 1) this.load(this.currentPage - 1);
       });
     }
-    
+
     const nextEl = document.getElementById(this.nextBtnId);
     if (nextEl) {
       nextEl.addEventListener("click", () => {
         if (this.currentPage < this.totalPages) this.load(this.currentPage + 1);
       });
     }
-    
+
     const clearEl = document.getElementById(this.clearBtnId);
     if (clearEl) {
       clearEl.addEventListener("click", () => {
@@ -335,7 +324,7 @@ class AdminListController {
         this.load(1);
       });
     }
-    
+
     const refreshEl = document.getElementById(this.refreshBtnId);
     if (refreshEl) {
       refreshEl.addEventListener("click", () => this.load(this.currentPage));
@@ -424,45 +413,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderInteractionBreakdown(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  fetch('/admin/interactions/stats')
-    .then(res => res.json())
-    .then(data => {
-      container.innerHTML = "";
-      const templateGrid = document.getElementById("overview-breakdown-template");
-      if (!templateGrid) return;
-      const grid = templateGrid.content.cloneNode(true).querySelector(".overview-breakdown-grid");
-
-      const items = [
-        { label: "Views", key: "views", icon: "👁️" },
-        { label: "Comments", key: "comments", icon: "💬" },
-        { label: "Likes", key: "likes", icon: "👍" },
-        { label: "Dislikes", key: "dislikes", icon: "👎" },
-        { label: "Saves", key: "saves", icon: "🔖" },
-        { label: "Item Clicks", key: "item_clicks", icon: "🛒" },
-      ];
-      const total = data.total || 1;
-      const templateRow = document.getElementById("overview-breakdown-row-template");
-
-      items.forEach(it => {
-        const val = data[it.key] || 0;
-        const pct = Math.round((val / total) * 100);
-
-        const clone = templateRow.content.cloneNode(true);
-        clone.querySelector(".overview-breakdown-icon").textContent = it.icon;
-        clone.querySelector(".overview-breakdown-label").textContent = it.label;
-        clone.querySelector(".overview-breakdown-bar").style.width = `${pct}%`;
-        clone.querySelector(".overview-breakdown-val").textContent = val.toLocaleString();
-        clone.querySelector(".overview-breakdown-pct").textContent = `${pct}%`;
-        grid.appendChild(clone);
-      });
-
-      container.appendChild(grid);
-    })
-    .catch(() => {
-      container.innerHTML = getErrorStateHtml("Could not load interaction data.");
-    });
+  fetchAndInjectHtml('/admin/dashboard/widget/interactions-breakdown', containerId, 'Loading breakdown...');
 }
-

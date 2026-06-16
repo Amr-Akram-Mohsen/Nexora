@@ -1,0 +1,25 @@
+<div class="overview-breakdown-grid">
+  {% set total = interactions.total or 1 %}
+  
+  {% set items = [
+    { 'label': 'Views', 'val': interactions.views or 0, 'icon': '👁️' },
+    { 'label': 'Comments', 'val': interactions.comments or 0, 'icon': '💬' },
+    { 'label': 'Likes', 'val': interactions.likes or 0, 'icon': '👍' },
+    { 'label': 'Dislikes', 'val': interactions.dislikes or 0, 'icon': '👎' },
+    { 'label': 'Saves', 'val': interactions.saves or 0, 'icon': '🔖' },
+    { 'label': 'Item Clicks', 'val': (interactions.clicks if interactions.clicks is defined else (interactions.item_clicks if interactions.item_clicks is defined else 0)), 'icon': '🛒' }
+  ] %}
+
+  {% for it in items %}
+    {% set pct = ((it.val / total) * 100) | round | int %}
+    <div class="overview-breakdown-row flex items-center">
+      <span class="overview-breakdown-icon">{{ it.icon }}</span>
+      <span class="overview-breakdown-label">{{ it.label }}</span>
+      <div class="overview-breakdown-bar-track">
+        <div class="overview-breakdown-bar" style="width: {{ pct }}%;"></div>
+      </div>
+      <span class="overview-breakdown-val">{{ "{:,}".format(it.val) }}</span>
+      <span class="overview-breakdown-pct">{{ pct }}%</span>
+    </div>
+  {% endfor %}
+</div>

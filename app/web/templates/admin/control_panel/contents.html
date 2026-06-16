@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_table_spinner, admin_filter_select %}
+admin_crud_table, admin_filter_select %}
 {% from "admin/components/macros.html" import
     admin_search_input,
     admin_reset_button,
@@ -95,26 +95,7 @@ actions=header_actions
 {% endcall %}
 
 <!-- Main Contents Table -->
-<div class="admin-table-wrapper">
-  <table class="admin-table" id="contents-table">
-    <thead>
-      <tr>
-        <th class="col-check"><input type="checkbox" id="select-all-contents" /></th>
-        <th class="col-type">Type</th>
-        <th class="col-primary">Title</th>
-        <th>Category</th>
-        <th>Sources</th>
-        <th class="col-metric">Engagement</th>
-        <th class="col-date">Published</th>
-        <th class="col-status">Status</th>
-        <th class="col-actions">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="contents-table-body">
-      {{ admin_table_spinner(9, "Loading catalog contents…") }}
-    </tbody>
-  </table>
-</div>
+{{ admin_crud_table(table, "Loading catalog contents…") }}
 
 {{ admin_paginator(domain="contents", per_page_options=[10, 20, 50, 100], current_per_page=20) }}
 
@@ -131,85 +112,6 @@ actions=header_actions
 {% call admin_modal("inspect-modal", "Source Details", "📡") %}
 {{ admin_modal_close_button(button_id="inspect-close-btn") }}
 {% endcall %}
-
-<template id="contents-row-template">
-  <tr class="clickable-row">
-    <td class="text-center align-middle">
-      <input type="checkbox" class="row-select-checkbox" />
-    </td>
-    <td>
-      <span class="content-cell-type status-badge text-capitalize"></span>
-    </td>
-    <td>
-      <div class="content-cell-title">
-        <span class="content-cell-title-text"></span>
-        <a class="content-cell-title-link activity-target text-deco-none" target="_blank" href="">
-          <span class="content-cell-title-link-text"></span>
-          <i class="fas fa-external-link-alt text-xs-sub"></i>
-        </a>
-      </div>
-    </td>
-    <td>
-      <span class="content-cell-category status-badge badge-purple quick-cat-trigger clickable-purple-link ml-1"
-        title="Double-click row to quickly move content.">
-        <i class="fas fa-tag"></i> <span class="content-cell-category-name"></span>
-      </span>
-    </td>
-    <td>
-      <span class="content-cell-source user-cell-name"></span>
-    </td>
-    <td>
-      <div class="text-sm"><i class="far fa-eye text-muted"></i> <span class="content-cell-views"></span></div>
-      <div class="content-engagement-sub"><i class="far fa-comment"></i> <span class="content-cell-comments"></span>
-      </div>
-    </td>
-    <td>
-      <div class="content-cell-date content-date-row mt-1"></div>
-    </td>
-    <td>
-      <div class="content-cell-status content-status-group flex items-center">
-      </div>
-    </td>
-    <td class="text-center align-middle">
-      {% call action_group(wrapper_class="actions-cell-group flex justify-center") %}
-        {{ action_button("Inspect", action_type="inspect", icon="👁️", title="Inspect source and ingestion metadata", extra_class="inspect-btn") }}
-      {% endcall %}
-    </td>
-  </tr>
-</template>
-
-<template id="content-inspect-template">
-  <div class="inspect-details-group flex flex-col">
-    {% call inspect_section("Content Metadata") %}
-      {{ inspect_detail_row("ID", "inspect-id") }}
-      {{ inspect_detail_row("Type", "inspect-type status-badge inspect-badge-secondary") }}
-      {{ inspect_detail_row("Category", "inspect-category") }}
-      {{ inspect_detail_row("Section", "inspect-section") }}
-    {% endcall %}
-
-    {% call inspect_section("Provider & Source Info") %}
-      {{ inspect_detail_row("Source Name", "inspect-source-name") }}
-      {{ inspect_detail_row("Source Slug", "inspect-source-slug", value_tag="code") }}
-      {{ inspect_detail_row("Source Link", "inspect-source-link") }}
-    {% endcall %}
-
-    {% call inspect_section("System Tracking") %}
-      {{ inspect_detail_row("Ingested At", "inspect-ingested-at") }}
-      {{ inspect_detail_row("Published At", "inspect-published-at") }}
-      {{ inspect_detail_row("Enrichment Status", "inspect-status status-badge") }}
-      {{ inspect_detail_row("Visibility", "inspect-visibility") }}
-      {{ inspect_detail_row("Record Status", "inspect-record-status") }}
-    {% endcall %}
-
-    {% call inspect_section("Management Actions", divider=false) %}
-      <div class="flex gap-2 mt-2">
-        <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="" data-title="">
-          🗑 Delete Content
-        </button>
-      </div>
-    {% endcall %}
-  </div>
-</template>
 {% endblock %}
 
 {% block admin_scripts %}

@@ -1,6 +1,6 @@
 // ==============================
 // ADMIN — INTERACTIONS / MODERATION
-// interactions.js
+// Refactored: HTML partial mode — no renderRow, no JS HTML building
 // ==============================
 
 (function () {
@@ -11,8 +11,6 @@
   let viewsController;
   let clicksController;
   let savesController;
-
-  let loadedComments = [];
 
   // ── Tab switching ───────────────────────
   function switchTab(tabName) {
@@ -61,16 +59,16 @@
         const template = document.getElementById('interactions-stat-card-template');
         const cards = [
           { icon: '💬', label: 'Comments', value: data.comments },
-          { icon: '👍', label: 'Likes', value: data.likes },
+          { icon: '👍', label: 'Likes',    value: data.likes    },
           { icon: '👎', label: 'Dislikes', value: data.dislikes },
-          { icon: '👁️', label: 'Views', value: data.views },
-          { icon: '🔖', label: 'Saves', value: data.saves },
-          { icon: '🛒', label: 'Clicks', value: data.item_clicks },
+          { icon: '👁️', label: 'Views',   value: data.views    },
+          { icon: '🔖', label: 'Saves',    value: data.saves    },
+          { icon: '🛒', label: 'Clicks',   value: data.item_clicks },
         ];
 
         cards.forEach(c => {
           const clone = template.content.cloneNode(true);
-          clone.querySelector('.dashboard-stat-icon').textContent = c.icon;
+          clone.querySelector('.dashboard-stat-icon').textContent  = c.icon;
           clone.querySelector('.dashboard-stat-value').textContent = (c.value || 0).toLocaleString();
           clone.querySelector('.dashboard-stat-label').textContent = c.label;
           container.appendChild(clone);
@@ -88,42 +86,7 @@
     }
   }
 
-  // ── COMMENTS RENDER ──────────────────────
-  function renderCommentRow(c) {
-    const template = document.getElementById('comments-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    const previewEl = clone.querySelector('.comment-cell-preview');
-    previewEl.textContent = c.preview;
-    previewEl.title = c.content;
-
-    const replyEl = clone.querySelector('.comment-cell-reply');
-    if (!c.parent_id) {
-      replyEl.remove();
-    }
-
-    clone.querySelector('.comment-cell-username').textContent = c.user_name;
-    clone.querySelector('.comment-cell-target').textContent = c.target_title;
-
-    const targetTypeEl = clone.querySelector('.comment-cell-targettype');
-    targetTypeEl.textContent = c.target_type;
-    targetTypeEl.classList.add(c.target_type === 'content' ? 'badge-blue' : 'badge-purple');
-
-    const sentimentEl = clone.querySelector('.comment-cell-sentiment');
-    sentimentEl.textContent = c.sentiment;
-    const sentimentClass = { positive: 'active', negative: 'inactive', neutral: 'user', spam: 'admin' };
-    sentimentEl.classList.add(sentimentClass[c.sentiment] || 'user');
-
-    clone.querySelector('.comment-cell-date').textContent = formatDate(c.created_at);
-
-    // Buttons dataset
-    const inspectBtn = clone.querySelector('.inspect-btn');
-    inspectBtn.dataset.commentId = c.id;
-
-    return tr;
-  }
-
+  // ── Comment Moderation Actions ───────────
   function deleteComment(id, btn, modal) {
     showModal(
       'Delete Comment',
@@ -165,136 +128,21 @@
       .catch(() => { showToast('Flag failed.', 'error'); if (btn) btn.disabled = false; });
   }
 
-  function showInspectModal(comment) {
-    const modal = document.getElementById("inspect-comment-modal");
-    const body = document.getElementById("inspect-comment-modal-body");
+  // ── Inspect Modal (server-rendered body) ──────────────────────
+  function openCommentInspect(commentId) {
+    const modal   = document.getElementById("inspect-comment-modal");
+    const body    = document.getElementById("inspect-comment-modal-body");
     const titleEl = document.getElementById("inspect-comment-modal-title");
+    if (!modal || !body) return;
 
-    titleEl.textContent = `Inspect Comment`;
-
-    const template = document.getElementById("comment-inspect-template");
-    const clone = template.content.cloneNode(true);
-
-    clone.querySelector(".inspect-id").textContent = `#${comment.id}`;
-    clone.querySelector(".inspect-username").textContent = comment.user_name || "—";
-    clone.querySelector(".inspect-useremail").textContent = comment.user_email || "—";
-    clone.querySelector(".inspect-userid").textContent = comment.user_id || "—";
-    clone.querySelector(".inspect-target-title").textContent = comment.target_title || "—";
-
-    const targetTypeBadge = clone.querySelector(".inspect-target-type");
-    targetTypeBadge.textContent = comment.target_type;
-    targetTypeBadge.className = `inspect-target-type status-badge ${comment.target_type === 'content' ? 'badge-blue' : 'badge-purple'}`;
-
-    clone.querySelector(".inspect-date").textContent = formatDate(comment.created_at);
-
-    const sentimentBadge = clone.querySelector(".inspect-sentiment");
-    sentimentBadge.textContent = comment.sentiment;
-    const sentimentClass = { positive: 'active', negative: 'inactive', neutral: 'user', spam: 'admin' };
-    sentimentBadge.className = `inspect-sentiment status-badge ${sentimentClass[comment.sentiment] || 'user'}`;
-
-    // Comment text
-    clone.querySelector(".inspect-comment-body-text").textContent = comment.content;
-
-    // Bind action buttons inside inspect modal
-    const flagBtn = clone.querySelector(".inspect-flag-btn");
-    if (flagBtn) {
-      if (comment.sentiment === 'spam') {
-        flagBtn.disabled = true;
-        flagBtn.textContent = 'Already Flagged';
-      } else {
-        flagBtn.addEventListener("click", () => {
-          flagComment(comment.id, flagBtn, modal);
-        });
-      }
-    }
-
-    const deleteBtn = clone.querySelector(".inspect-delete-btn");
-    if (deleteBtn) {
-      deleteBtn.addEventListener("click", () => {
-        deleteComment(comment.id, deleteBtn, modal);
-      });
-    }
-
-    body.innerHTML = "";
-    body.appendChild(clone);
+    body.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>';
+    titleEl.textContent = "Inspect Comment";
     modal.classList.add("active");
-  }
 
-  // ── REACTIONS RENDER ─────────────────────
-  function renderReactionRow(r) {
-    const template = document.getElementById('reactions-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.reaction-cell-id').textContent = `#${r.id}`;
-    clone.querySelector('.reaction-cell-target').textContent = r.target_title;
-
-    const targetTypeEl = clone.querySelector('.reaction-cell-targettype');
-    targetTypeEl.textContent = r.target_type;
-    targetTypeEl.classList.add(r.target_type === 'content' ? 'badge-blue' : r.target_type === 'item' ? 'badge-purple' : 'badge-green');
-
-    const typeEl = clone.querySelector('.reaction-cell-type');
-    typeEl.textContent = r.type;
-    typeEl.classList.add(r.type === 'like' ? 'active' : 'inactive');
-
-    clone.querySelector('.reaction-cell-username').textContent = r.user_name;
-    clone.querySelector('.reaction-cell-useremail').textContent = `${r.user_email.slice(0, 2)}******${r.user_email.slice(-11)}`;
-    clone.querySelector('.reaction-cell-date').textContent = formatDate(r.created_at);
-
-    return tr;
-  }
-
-  function renderViewRow(v) {
-    const template = document.getElementById('views-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.views-cell-target').textContent = v.target_title;
-
-    const typeEl = clone.querySelector('.views-cell-targettype');
-    typeEl.textContent = v.target_type;
-    typeEl.classList.add(v.target_type === 'content' ? 'badge-blue' : 'badge-purple');
-
-    clone.querySelector('.views-cell-count').textContent = v.view_count.toLocaleString();
-    clone.querySelector('.views-cell-date').textContent = formatDate(v.created_at);
-
-    return tr;
-  }
-
-  // Clicks and Saves use manual compound queries, so we display their counts
-  function renderClickRow(c) {
-    const template = document.getElementById('clicks-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.clicks-cell-item').textContent = c.item_name;
-
-    const destEl = clone.querySelector('.clicks-cell-destination');
-    destEl.textContent = c.store_name;
-    destEl.href = c.affiliate_url;
-
-    clone.querySelector('.clicks-cell-count').textContent = c.click_count.toLocaleString();
-    clone.querySelector('.clicks-cell-date').textContent = formatDate(c.created_at);
-
-    return tr;
-  }
-
-  function renderSaveRow(s) {
-    const template = document.getElementById('saves-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.saves-cell-target').textContent = s.target_title;
-
-    const typeEl = clone.querySelector('.saves-cell-targettype');
-    typeEl.textContent = s.target_type;
-    typeEl.classList.add(s.target_type === 'content' ? 'badge-blue' : 'badge-purple');
-
-    clone.querySelector('.saves-cell-username').textContent = s.user_name;
-    clone.querySelector('.saves-cell-useremail').textContent = `${s.user_email.slice(0, 2)}******${s.user_email.slice(-11)}`;
-    clone.querySelector('.saves-cell-date').textContent = formatDate(s.created_at);
-
-    return tr;
+    fetch(`/admin/interactions/comments/${commentId}/inspect`)
+      .then(r => r.text())
+      .then(html => { body.innerHTML = html; })
+      .catch(() => { body.innerHTML = "<p class='text-muted'>Could not load comment.</p>"; });
   }
 
   function applyInteractionsUrlFilters() {
@@ -302,18 +150,14 @@
     const params = getUrlQueryParams();
     const activeTab = params.tab || 'comments';
 
-    // Map generic 'search' query param to active tab search input
     if (params.search !== undefined) {
       let searchInputId = 'comment-search';
       if (activeTab === 'reactions') searchInputId = 'reactions-search';
       else if (activeTab === 'views') searchInputId = 'views-search';
       else if (activeTab === 'clicks') searchInputId = 'clicks-search';
       else if (activeTab === 'saves') searchInputId = 'saves-search';
-
       const searchEl = document.getElementById(searchInputId);
-      if (searchEl) {
-        searchEl.value = params.search;
-      }
+      if (searchEl) searchEl.value = params.search;
     }
 
     applyUrlFilters({
@@ -328,12 +172,12 @@
     });
   }
 
-
   // ── Init ─────────────────────────────────
   function init() {
     commentsController = new AdminListController({
       domain: 'comments',
       endpoint: '/admin/interactions/comments',
+      rowsEndpoint: '/admin/interactions/comments/rows',   // ← HTML partial mode
       tbodyId: 'comments-table-body',
       searchId: 'comment-search',
       filterIds: ['filter-comment-sentiment', 'filter-comment-target'],
@@ -344,20 +188,15 @@
       infoId: 'comments-pagination-info',
       countId: 'comments-count',
       clearBtnId: 'clear-comment-filters-btn',
-      rowTemplateId: 'comments-row-template',
       defaultPerPage: 25,
       colspan: 6,
-      itemsKey: 'items',
-      renderRow: renderCommentRow,
-      onLoaded: (data) => {
-        loadedComments = data.items || [];
-      },
       autoInit: false
     });
 
     reactionsController = new AdminListController({
       domain: 'reactions',
       endpoint: '/admin/interactions/reactions',
+      rowsEndpoint: '/admin/interactions/reactions/rows',  // ← HTML partial mode
       tbodyId: 'reactions-table-body',
       searchId: 'reactions-search',
       filterIds: ['filter-reaction-type', 'filter-reactions-user'],
@@ -368,17 +207,15 @@
       infoId: 'reactions-pagination-info',
       countId: 'reactions-count',
       clearBtnId: 'clear-reactions-filters-btn',
-      rowTemplateId: 'reactions-row-template',
       defaultPerPage: 25,
       colspan: 5,
-      itemsKey: 'items',
-      renderRow: renderReactionRow,
       autoInit: false
     });
 
     viewsController = new AdminListController({
       domain: 'views',
       endpoint: '/admin/interactions/views',
+      rowsEndpoint: '/admin/interactions/views/rows',     // ← HTML partial mode
       tbodyId: 'views-table-body',
       searchId: 'views-search',
       filterIds: ['filter-views-start-date', 'filter-views-end-date'],
@@ -389,17 +226,15 @@
       infoId: 'views-pagination-info',
       countId: 'views-count',
       clearBtnId: 'clear-views-filters-btn',
-      rowTemplateId: 'views-row-template',
       defaultPerPage: 25,
       colspan: 4,
-      itemsKey: 'items',
-      renderRow: renderViewRow,
       autoInit: false
     });
 
     clicksController = new AdminListController({
       domain: 'clicks',
       endpoint: '/admin/interactions/clicks',
+      rowsEndpoint: '/admin/interactions/clicks/rows',    // ← HTML partial mode
       tbodyId: 'clicks-table-body',
       searchId: 'clicks-search',
       filterIds: ['filter-clicks-destination'],
@@ -410,17 +245,15 @@
       infoId: 'clicks-pagination-info',
       countId: 'clicks-count',
       clearBtnId: 'clear-clicks-filters-btn',
-      rowTemplateId: 'clicks-row-template',
       defaultPerPage: 25,
       colspan: 4,
-      itemsKey: 'items',
-      renderRow: renderClickRow,
       autoInit: false
     });
 
     savesController = new AdminListController({
       domain: 'saves',
       endpoint: '/admin/interactions/saves',
+      rowsEndpoint: '/admin/interactions/saves/rows',     // ← HTML partial mode
       tbodyId: 'saves-table-body',
       searchId: 'saves-search',
       filterIds: ['filter-saves-user'],
@@ -431,11 +264,8 @@
       infoId: 'saves-pagination-info',
       countId: 'saves-count',
       clearBtnId: 'clear-saves-filters-btn',
-      rowTemplateId: 'saves-row-template',
       defaultPerPage: 25,
       colspan: 4,
-      itemsKey: 'items',
-      renderRow: renderSaveRow,
       autoInit: false
     });
 
@@ -443,7 +273,6 @@
     loadStatsRow();
     applyInteractionsUrlFilters();
 
-    // Bind events for all controllers
     commentsController.bindEvents();
     reactionsController.bindEvents();
     viewsController.bindEvents();
@@ -454,18 +283,29 @@
     const activeTab = params.tab || 'comments';
     switchTab(activeTab);
 
-    // Comments table click delegation
+    // Comments table: inspect click delegation
     document.getElementById('comments-table-body').addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'inspect-comment') {
-        const commentId = parseInt(btn.dataset.commentId, 10);
-        const comment = loadedComments.find(c => c.id === commentId);
-        if (comment) {
-          showInspectModal(comment);
-        }
+        openCommentInspect(parseInt(btn.dataset.id || btn.dataset.commentId, 10));
       }
     });
+
+    // Comment inspect modal: action delegation (rendered by _inspect.html)
+    const commentModal = document.getElementById("inspect-comment-modal");
+    if (commentModal) {
+      commentModal.addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id = parseInt(btn.dataset.id, 10);
+        if (btn.dataset.action === 'flag-comment') {
+          flagComment(id, btn, commentModal);
+        } else if (btn.classList.contains('inspect-delete-btn')) {
+          deleteComment(id, btn, commentModal);
+        }
+      });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);

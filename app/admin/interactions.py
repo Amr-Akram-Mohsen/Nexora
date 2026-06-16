@@ -9,7 +9,7 @@ Refactoring applied:
 - All queries use modern select() style (R-07).
 - Shared pagination helpers from app.admin.helpers (R-18, R-21).
 """
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template, make_response
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick
@@ -501,6 +501,280 @@ def list_saves():
         "total":    pagination.total,
         "per_page": pagination.per_page,
     })
+
+
+# ─────────────────────────────────────────────
+# HTML PARTIAL ROWS + INSPECT ENDPOINTS
+# ─────────────────────────────────────────────
+
+def _serialize_comment(c, users, content_titles, item_names):
+    """Shared comment serializer for both JSON and HTML endpoints."""
+    user = users.get(c.user_id)
+    target_title = (
+        content_titles.get(c.target_id)
+        if c.target_type == "content"
+        else item_names.get(c.target_id)
+    )
+    return {
+        "id":           c.id,
+        "content":      c.content,
+        "preview":      c.content[:120] + ("…" if len(c.content) > 120 else ""),
+        "user_id":      c.user_id,
+        "user_name":    user["name"] if user else f"User #{c.user_id}",
+        "user_email":   user["email"] if user else None,
+        "parent_id":    c.parent_id,
+        "sentiment":    c.sentiment or "neutral",
+        "target_type":  c.target_type,
+        "target_id":    c.target_id,
+        "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
+        "created_at":   c.created_at.isoformat() if c.created_at else None,
+    }
+
+
+def _load_comment_context(items):
+    """Batch-load user info and target titles for a list of comments."""
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    user_ids     = {c.user_id for c in items}
+    content_ids  = {c.target_id for c in items if c.target_type == "content"}
+    item_ids     = {c.target_id for c in items if c.target_type == "item"}
+    users, content_titles, item_names = {}, {}, {}
+    if user_ids:
+        rows = db.session.execute(select(User.id, User.name, User.email).where(User.id.in_(user_ids))).mappings().all()
+        users = {r["id"]: r for r in rows}
+    if content_ids:
+        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+    if item_ids:
+        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+    return users, content_titles, item_names
+
+
+@bp.route("/comments/rows", methods=["GET"])
+def comments_rows():
+    """Return server-rendered HTML rows partial for comments AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    sentiment   = request.args.get("sentiment", "").strip()
+    target_type = request.args.get("target_type", "").strip()
+    search      = request.args.get("search", "").strip()
+
+    stmt = select(Comment).order_by(Comment.id.desc())
+    if sentiment:   stmt = stmt.where(Comment.sentiment == sentiment)
+    if target_type: stmt = stmt.where(Comment.target_type == target_type)
+    if search:      stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    users, content_titles, item_names = _load_comment_context(pagination.items)
+    serialized = [_serialize_comment(c, users, content_titles, item_names) for c in pagination.items]
+
+    html = render_template("admin/control_panel/interactions/comments/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/comments/<int:id>/inspect", methods=["GET"])
+def inspect_comment(id):
+    """Return server-rendered HTML for the comment inspect modal body."""
+    comment = db.session.get(Comment, id)
+    if not comment:
+        return "<p class='text-muted'>Comment not found.</p>", 404
+    users, content_titles, item_names = _load_comment_context([comment])
+    data = _serialize_comment(comment, users, content_titles, item_names)
+    return render_template("admin/control_panel/interactions/comments/_inspect.html", comment=data)
+
+
+@bp.route("/reactions/rows", methods=["GET"])
+def reactions_rows():
+    """Return server-rendered HTML rows partial for reactions AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    reaction_type = request.args.get("reactions_type", "").strip()
+    user_search   = request.args.get("reactions_user", "").strip()
+    search        = request.args.get("search", "").strip()
+
+    stmt = select(Reaction).order_by(Reaction.id.desc())
+    if reaction_type: stmt = stmt.where(Reaction.type == reaction_type)
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    user_ids    = {r.user_id for r in pagination.items}
+    content_ids = {r.target_id for r in pagination.items if r.target_type == "content"}
+    item_ids    = {r.target_id for r in pagination.items if r.target_type == "item"}
+    users = {}
+    if user_ids:
+        rows = db.session.execute(select(User.id, User.name, User.email).where(User.id.in_(user_ids))).mappings().all()
+        users = {r["id"]: r for r in rows}
+    content_titles, item_names = {}, {}
+    if content_ids:
+        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+    if item_ids:
+        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    serialized = []
+    for r in pagination.items:
+        user = users.get(r.user_id)
+        tt = content_titles.get(r.target_id) if r.target_type == "content" else item_names.get(r.target_id)
+        serialized.append({
+            "id": r.id, "type": r.type, "target_type": r.target_type, "target_id": r.target_id,
+            "target_title": tt or f"{r.target_type.capitalize()} #{r.target_id}",
+            "user_name": user["name"] if user else f"User #{r.user_id}",
+            "user_email": user["email"] if user else "",
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+        })
+
+    html = render_template("admin/control_panel/interactions/reactions/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/views/rows", methods=["GET"])
+def views_rows():
+    """Return server-rendered HTML rows partial for views AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    start_date = request.args.get("views_start_date", "").strip()
+    end_date   = request.args.get("views_end_date", "").strip()
+    search     = request.args.get("search", "").strip()
+
+    stmt = select(View).order_by(View.view_count.desc())
+    if start_date:
+        try: stmt = stmt.where(View.created_at >= datetime.strptime(start_date, "%Y-%m-%d"))
+        except ValueError: pass
+    if end_date:
+        try: stmt = stmt.where(View.created_at <= datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59))
+        except ValueError: pass
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    content_ids = {v.target_id for v in pagination.items if v.target_type == "content"}
+    item_ids    = {v.target_id for v in pagination.items if v.target_type == "item"}
+    content_titles, item_names = {}, {}
+    if content_ids:
+        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+    if item_ids:
+        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    serialized = []
+    for v in pagination.items:
+        tt = content_titles.get(v.target_id) if v.target_type == "content" else item_names.get(v.target_id)
+        serialized.append({
+            "target_title": tt or f"{v.target_type.capitalize()} #{v.target_id}",
+            "target_type": v.target_type,
+            "view_count": v.view_count or 0,
+            "created_at": v.created_at.isoformat() if v.created_at else None,
+        })
+
+    html = render_template("admin/control_panel/interactions/views/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/clicks/rows", methods=["GET"])
+def clicks_rows():
+    """Return server-rendered HTML rows partial for clicks AJAX injection."""
+    from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
+    page, per_page = parse_pagination_params(default_per_page=25)
+    search = request.args.get("search", "").strip()
+
+    stmt = (
+        select(
+            Item.name.label("item_name"),
+            Store.name.label("store_name"),
+            ItemStoreLink.affiliate_url,
+            func.count(ItemClick.id).label("click_count"),
+            func.max(ItemClick.clicked_at).label("created_at"),
+        )
+        .join(ItemStoreLink, ItemStoreLink.id == ItemClick.item_store_link_id)
+        .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
+        .join(Item, Item.id == ItemVariant.item_id)
+        .join(Store, Store.id == ItemStoreLink.store_id)
+        .group_by(Item.id, Store.id, ItemStoreLink.affiliate_url)
+        .order_by(func.count(ItemClick.id).desc())
+    )
+    if search:
+        stmt = stmt.where(or_(Item.name.ilike(f"%{search}%"), Store.name.ilike(f"%{search}%")))
+
+    total_stmt = select(func.count()).select_from(stmt.subquery())
+    total = db.session.execute(total_stmt).scalar() or 0
+    stmt = stmt.limit(per_page).offset((page - 1) * per_page)
+    rows = db.session.execute(stmt).mappings().all()
+
+    pages = max(1, (total + per_page - 1) // per_page)
+    serialized = [{
+        "item_name": r["item_name"], "store_name": r["store_name"],
+        "affiliate_url": r["affiliate_url"],
+        "click_count": r["click_count"] or 0,
+        "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+    } for r in rows]
+
+    html = render_template("admin/control_panel/interactions/clicks/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = total
+    resp.headers["X-Pages"] = pages
+    resp.headers["X-Page"]  = page
+    return resp
+
+
+@bp.route("/saves/rows", methods=["GET"])
+def saves_rows():
+    """Return server-rendered HTML rows partial for saves AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    user_search = request.args.get("saves_user", "").strip()
+    search      = request.args.get("search", "").strip()
+
+    stmt = select(Save).order_by(Save.id.desc())
+    if search: stmt = stmt.where(Save.target_type.ilike(f"%{search}%"))
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    user_ids    = {s.user_id for s in pagination.items}
+    content_ids = {s.target_id for s in pagination.items if s.target_type == "content"}
+    item_ids    = {s.target_id for s in pagination.items if s.target_type == "item"}
+    users = {}
+    if user_ids:
+        rows = db.session.execute(select(User.id, User.name, User.email).where(User.id.in_(user_ids))).mappings().all()
+        users = {r["id"]: r for r in rows}
+    content_titles, item_names = {}, {}
+    if content_ids:
+        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
+        content_titles = {r["id"]: r["title"] for r in rows}
+    if item_ids:
+        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
+        item_names = {r["id"]: r["name"] for r in rows}
+
+    serialized = []
+    for s in pagination.items:
+        user = users.get(s.user_id)
+        tt = content_titles.get(s.target_id) if s.target_type == "content" else item_names.get(s.target_id)
+        serialized.append({
+            "target_title": tt or f"{s.target_type.capitalize()} #{s.target_id}",
+            "target_type": s.target_type,
+            "user_name": user["name"] if user else f"User #{s.user_id}",
+            "user_email": user["email"] if user else "",
+            "created_at": s.created_at.isoformat() if s.created_at else None,
+        })
+
+    html = render_template("admin/control_panel/interactions/saves/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
 
 
 # ─────────────────────────────────────────────

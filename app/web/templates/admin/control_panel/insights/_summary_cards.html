@@ -1,20 +1,51 @@
+{% from "admin/components/ui.html" import admin_loading_state %}
 <!-- Section 1: Recommendation CTR Dashboard -->
 <h2 class="insight-group-title">🔗 Recommendation Widget Performance</h2>
 <div class="dashboard-stats-grid" id="recommendation-ctr-grid">
-  <div class="grid-full-width">
-    {{ admin_table_spinner(1, "Loading recommendation metrics...") }}
-  </div>
+  {% if metrics %}
+    <div class="rec-stat-card">
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Overall CTR</p>
+        <p class="dashboard-stat-value">{{ "%.2f"|format(metrics.overall_ctr) }}%</p>
+      </div>
+      <p class="dashboard-stat-meta">Across all recommendation slots</p>
+    </div>
+    <div class="rec-stat-card">
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Related Products CTR</p>
+        <p class="dashboard-stat-value">{{ "%.2f"|format(metrics.related_products_ctr) }}%</p>
+      </div>
+      <p class="dashboard-stat-meta">Clicks on related product listings</p>
+    </div>
+    <div class="rec-stat-card">
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Related Content CTR</p>
+        <p class="dashboard-stat-value">{{ "%.2f"|format(metrics.related_content_ctr) }}%</p>
+      </div>
+      <p class="dashboard-stat-meta">Clicks on suggested articles/guides</p>
+    </div>
+    <div class="rec-stat-card">
+      <div class="dashboard-stat-group flex justify-between items-center">
+        <p class="dashboard-stat-label">Shop Products CTR</p>
+        <p class="dashboard-stat-value">{{ "%.2f"|format(metrics.shop_products_ctr) }}%</p>
+      </div>
+      <p class="dashboard-stat-meta">Clicks on primary shop links</p>
+    </div>
+  {% else %}
+    <div class="grid-full-width">
+      {{ admin_loading_state("Loading recommendation metrics...") }}
+    </div>
+  {% endif %}
 </div>
 
 <!-- Section 1.5: Recommendation Intelligence Summary -->
 <h2 class="insight-group-title">🧠 Recommendation Intelligence Summary</h2>
-<div class="insights-double-grid" id="recommendation-intelligence-panel" style="display: none;">
+<div class="insights-double-grid" id="recommendation-intelligence-panel" style="display: {% if metrics and metrics.diagnoses %}grid{% else %}none{% endif %};">
   <!-- Left Side: Quality Scores & Benchmark -->
   <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">📊 Quality Scores & Benchmarks</h3>
-      <p class="overview-panel-sub">Normalized CTR weighted by page/category engagement volume and taxonomy baseline
-        comparison.</p>
+      <p class="overview-panel-sub">Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.</p>
     </div>
 
     <div class="benchmark-list">
@@ -24,7 +55,30 @@
           <i class="fas fa-chart-line"></i> Cross-Category Benchmarks
         </h4>
         <div id="category-benchmark-summary">
-          <!-- Populated by JS -->
+          {% if metrics and metrics.benchmarking %}
+            {% set bench = metrics.benchmarking %}
+            <div class="benchmark-text-item">
+              <div>🏆 Best Performing Category: 
+                {% if bench.best_category and bench.best_category.name != "N/A" %}
+                  <span class="status-badge badge-success font-bold">{{ bench.best_category.name }}</span> with <strong>{{ "%.2f"|format(bench.best_category.ctr) }}%</strong> CTR (+{{ "%.2f"|format(bench.best_category.deviation) }}% dev)
+                {% else %}
+                  <span class="status-badge secondary">N/A</span>
+                {% endif %}
+              </div>
+              <div>⚠️ Worst Performing Category: 
+                {% if bench.worst_category and bench.worst_category.name != "N/A" %}
+                  <span class="status-badge badge-danger font-bold">{{ bench.worst_category.name }}</span> with <strong>{{ "%.2f"|format(bench.worst_category.ctr) }}%</strong> CTR ({{ "%.2f"|format(bench.worst_category.deviation) }}% dev)
+                {% else %}
+                  <span class="status-badge secondary">N/A</span>
+                {% endif %}
+              </div>
+              <div class="benchmark-divider">
+                📊 Taxonomy CTR Baseline: <strong>{{ "%.2f"|format(bench.average_baseline) }}%</strong>
+              </div>
+            </div>
+          {% else %}
+            <p class="text-muted text-xs">No benchmark data available.</p>
+          {% endif %}
         </div>
       </div>
 
@@ -38,13 +92,48 @@
             <thead>
               <tr>
                 <th>Segment</th>
-                <th><span>Type /</span><span>Name</span></th>
-                <th class="col-metric">CTR</th>
-                <th class="col-metric"><span>Quality</span><span>Score</span></th>
+                <th>Type / Name</th>
+                <th>CTR</th>
+                <th>Quality Score</th>
               </tr>
             </thead>
             <tbody id="quality-scores-table-body">
-              <!-- Populated by JS -->
+              {% if metrics and metrics.quality_scores %}
+                {% set qScores = metrics.quality_scores %}
+                <!-- A. Render Recommendation Types -->
+                {% for rtype, rdata in qScores.recommendation_types.items() %}
+                  {% set typeLabel = "Related Content" if rtype == "related_content" else "Related Products" if rtype == "related_product" else "Shop Products" %}
+                  <tr>
+                    <td><span class="status-badge secondary font-bold badge-type-compact">Rec Type</span></td>
+                    <td><span class="font-bold text-foreground text-sm">{{ typeLabel }}</span></td>
+                    <td class="col-metric text-xs">{{ "%.2f"|format(rdata.ctr) }}%</td>
+                    <td class="col-metric font-bold text-brand-blue text-xs">{{ "%.2f"|format(rdata.quality_score) }}</td>
+                  </tr>
+                {% endfor %}
+                <!-- B. Render Page Types -->
+                {% for ptype, pdata in qScores.page_types.items() %}
+                  {% set pageLabel = "Content Pages" if ptype == "content" else "Product Pages" %}
+                  <tr>
+                    <td><span class="status-badge badge-blue font-bold badge-type-compact">Page Context</span></td>
+                    <td><span class="font-bold text-foreground text-sm">{{ pageLabel }}</span></td>
+                    <td class="col-metric text-xs">{{ "%.2f"|format(pdata.ctr) }}%</td>
+                    <td class="col-metric font-bold badge-green text-xs">{{ "%.2f"|format(pdata.quality_score) }}</td>
+                  </tr>
+                {% endfor %}
+                <!-- C. Render Top 3 Categories by Quality Score -->
+                {% for catName, cdata in qScores.categories.items()|sort(attribute='1.quality_score', reverse=True) %}
+                  {% if loop.index <= 3 %}
+                    <tr>
+                      <td><span class="status-badge badge-purple font-bold badge-type-compact">Category</span></td>
+                      <td><span class="font-bold text-foreground text-sm">{{ catName }}</span></td>
+                      <td class="col-metric text-xs">{{ "%.2f"|format(cdata.ctr) }}%</td>
+                      <td class="col-metric font-bold text-xs">{{ "%.2f"|format(cdata.quality_score) }}</td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                <tr><td colspan="4" class="text-center text-muted">No quality score details.</td></tr>
+              {% endif %}
             </tbody>
           </table>
         </div>
@@ -59,7 +148,38 @@
       <p class="overview-panel-sub">Behavior-driven diagnoses and recommended actions per recommendation module.</p>
     </div>
     <div id="rec-action-suggestions-list" class="suggestions-list-scroll">
-      <!-- Populated by JS -->
+      {% if metrics and metrics.diagnoses %}
+        {% for rtype, ddata in metrics.diagnoses.items() %}
+          {% set typeLabel = "Related Content" if rtype == "related_content" else "Related Products" if rtype == "related_product" else "Shop Products" %}
+          {% set badgeClass = "badge-success" if ddata.classification == "High" else "badge-warning" if ddata.classification == "Medium" else "badge-danger" %}
+          {% set rtypeClass = "product" if rtype == "related_product" else "shop" if rtype == "shop_product" else "content" %}
+          <div class="rec-action-card {{ rtypeClass }}">
+            <span class="opp-tag rec-action-tag-wrap">
+              CTR: <strong class="status-badge {{ badgeClass }}">{{ "%.2f"|format(ddata.ctr) }}% ({{ ddata.classification }})</strong>
+            </span>
+            <h4 class="rec-action-title">{{ typeLabel }} Module</h4>
+            <p class="rec-action-issue">
+              <strong>Issue:</strong> {{ ddata.action_suggestion.issue }}
+            </p>
+            <p class="rec-action-issue">
+              <strong>Diagnosis:</strong> {{ ddata.action_suggestion.diagnosis }}
+            </p>
+            <div class="rec-action-box">
+              <div class="rec-action-box-header">
+                <span>💡 Recommended Action:</span>
+              </div>
+              <div class="rec-action-box-recommendation">
+                {{ ddata.action_suggestion.recommended_action }}
+              </div>
+              <div class="rec-action-box-meta">
+                <strong>Impact:</strong> {{ ddata.action_suggestion.expected_impact }} &middot; Confidence: <strong>{{ (ddata.action_suggestion.confidence * 100)|round|int }}%</strong>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted text-xs p-4">No suggestions available.</p>
+      {% endif %}
     </div>
   </div>
 </div>

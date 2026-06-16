@@ -1,0 +1,28 @@
+{% from "admin/components/crud.html" import admin_crud_rows %}
+
+{% macro render_row(r) %}
+<tr id="reaction-row-{{ r.id }}">
+  <td><span class="user-cell-name">#{{ r.id }}</span></td>
+  <td>
+    <span class="user-cell-name">{{ r.target_title }}</span>
+    <div class="mt-1">
+      <span class="status-badge text-capitalize
+        {{ 'badge-blue' if r.target_type == 'content' else ('badge-purple' if r.target_type == 'item' else 'badge-green') }}">
+        {{ r.target_type }}
+      </span>
+    </div>
+  </td>
+  <td>
+    <span class="status-badge {{ 'active' if r.type == 'like' else 'inactive' }}">{{ r.type }}</span>
+  </td>
+  <td>
+    <span class="user-cell-name">{{ r.user_name }}</span>
+    <div class="user-cell-email">{{ r.user_email[:2] ~ "******" ~ r.user_email[-11:] if r.user_email else "—" }}</div>
+  </td>
+  <td>
+    <span class="user-cell-email">{{ r.created_at[:10] if r.created_at else "—" }}</span>
+  </td>
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, colspan=5, empty_text="No reactions found.") }}

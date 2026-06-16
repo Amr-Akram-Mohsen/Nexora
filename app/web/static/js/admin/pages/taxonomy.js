@@ -51,33 +51,7 @@
     }
   }
 
-  // ── CATEGORIES RENDER ──────────────────────
-  function renderCategoryRow(cat) {
-    const template = document.getElementById('categories-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.cat-cell-name').textContent = cat.name;
-
-    const cb = clone.querySelector('.cat-cell-checkbox');
-    cb.dataset.id = cat.id;
-    cb.checked = cat.is_active;
-
-    const badge = clone.querySelector('.cat-cell-badge');
-    badge.className = `status-badge ${cat.is_active ? 'active' : 'inactive'}`;
-    badge.textContent = cat.is_active ? 'Active' : 'Inactive';
-
-    const leaf = clone.querySelector('.cat-cell-leaf');
-    leaf.className = `status-badge ${cat.is_leaf ? 'user' : 'admin'}`;
-    leaf.textContent = cat.is_leaf ? 'Leaf' : 'Parent';
-
-    const delBtn = clone.querySelector('.cat-cell-delete');
-    delBtn.dataset.id = cat.id;
-    delBtn.dataset.name = cat.name;
-
-    return tr;
-  }
-
+  // ── CATEGORIES ─────────────────────────────
   function createCategory() {
     const nameInput = document.getElementById('new-category-name');
     const name = nameInput.value.trim();
@@ -127,34 +101,7 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── BRANDS RENDER ─────────────────────────
-  function renderBrandRow(b) {
-    const template = document.getElementById('brands-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.brand-cell-name').textContent = b.name;
-    clone.querySelector('.brand-cell-industry').textContent = b.industry || '—';
-
-    const cb = clone.querySelector('.brand-cell-checkbox');
-    cb.dataset.id = b.id;
-    cb.checked = b.is_active;
-
-    const badge = clone.querySelector('.brand-cell-badge');
-    badge.className = `status-badge ${b.is_active ? 'active' : 'inactive'}`;
-    badge.textContent = b.is_active ? 'Active' : 'Inactive';
-
-    const feat = clone.querySelector('.brand-cell-featured');
-    feat.className = `status-badge ${b.is_featured ? 'admin' : 'user'}`;
-    feat.textContent = b.is_featured ? 'Featured' : '—';
-
-    const delBtn = clone.querySelector('.brand-cell-delete');
-    delBtn.dataset.id = b.id;
-    delBtn.dataset.name = b.name;
-
-    return tr;
-  }
-
+  // ── BRANDS ───────────────────────────────
   function createBrand() {
     const name = document.getElementById('new-brand-name').value.trim();
     const industry = document.getElementById('new-brand-industry').value.trim();
@@ -177,7 +124,6 @@
       .catch(() => showToast('Create failed.', 'error'));
   }
 
-  // Delete brand
   function deleteBrand(id, name, btn) {
     showModal('Delete Brand', `Delete "${name}"? Items and content tagged with this brand will lose the association.`, () => {
       if (btn) btn.disabled = true;
@@ -206,33 +152,7 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── TOPICS RENDER ─────────────────────────
-  function renderTopicRow(t) {
-    const template = document.getElementById('topics-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.topic-cell-name').textContent = t.name;
-
-    const cb = clone.querySelector('.topic-cell-checkbox');
-    cb.dataset.id = t.id;
-    cb.checked = t.is_active;
-
-    const badge = clone.querySelector('.topic-cell-badge');
-    badge.className = `status-badge ${t.is_active ? 'active' : 'inactive'}`;
-    badge.textContent = t.is_active ? 'Active' : 'Inactive';
-
-    const feat = clone.querySelector('.topic-cell-featured');
-    feat.className = `status-badge ${t.is_featured ? 'admin' : 'user'}`;
-    feat.textContent = t.is_featured ? 'Featured' : '—';
-
-    const delBtn = clone.querySelector('.topic-cell-delete');
-    delBtn.dataset.id = t.id;
-    delBtn.dataset.name = t.name;
-
-    return tr;
-  }
-
+  // ── TOPICS ───────────────────────────────
   function createTopic() {
     const name = document.getElementById('new-topic-name').value.trim();
     if (!name) { showToast('Topic name is required.', 'error'); return; }
@@ -281,26 +201,7 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── SECTIONS RENDER ───────────────────────
-  function renderSectionRow(s) {
-    const template = document.getElementById('sections-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.section-cell-name').textContent = s.name;
-    clone.querySelector('.section-cell-desc').textContent = s.description;
-
-    const cb = clone.querySelector('.section-cell-checkbox');
-    cb.dataset.id = s.id;
-    cb.checked = s.is_active;
-
-    const badge = clone.querySelector('.section-cell-badge');
-    badge.className = `status-badge ${s.is_active ? 'active' : 'inactive'}`;
-    badge.textContent = s.is_active ? 'Active' : 'Inactive';
-
-    return tr;
-  }
-
+  // ── SECTIONS ─────────────────────────────
   function toggleSectionActive(id, isActive, el) {
     fetch(`/admin/taxonomy/sections/${id}`, {
       method: 'PATCH',
@@ -385,48 +286,44 @@
     categoriesController = new AdminListController({
       domain: 'categories',
       endpoint: '/admin/taxonomy/categories',
+      rowsEndpoint: '/admin/taxonomy/categories/rows',  // ← HTML partial mode
       tbodyId: 'categories-table-body',
       searchId: 'category-search',
       filterIds: [],
       colspan: 4,
-      rowTemplateId: 'categories-row-template',
-      renderRow: renderCategoryRow,
       autoInit: false
     });
 
     brandsController = new AdminListController({
       domain: 'brands',
       endpoint: '/admin/taxonomy/brands',
+      rowsEndpoint: '/admin/taxonomy/brands/rows',      // ← HTML partial mode
       tbodyId: 'brands-table-body',
       searchId: 'brand-search',
       filterIds: [],
       colspan: 5,
-      rowTemplateId: 'brands-row-template',
-      renderRow: renderBrandRow,
       autoInit: false
     });
 
     topicsController = new AdminListController({
       domain: 'topics',
       endpoint: '/admin/taxonomy/topics',
+      rowsEndpoint: '/admin/taxonomy/topics/rows',      // ← HTML partial mode
       tbodyId: 'topics-table-body',
       searchId: 'topic-search',
       filterIds: [],
       colspan: 4,
-      rowTemplateId: 'topics-row-template',
-      renderRow: renderTopicRow,
       autoInit: false
     });
 
     sectionsController = new AdminListController({
       domain: 'sections',
       endpoint: '/admin/taxonomy/sections',
+      rowsEndpoint: '/admin/taxonomy/sections/rows',    // ← HTML partial mode
       tbodyId: 'sections-table-body',
       searchId: '',
       filterIds: [],
       colspan: 4,
-      rowTemplateId: 'sections-row-template',
-      renderRow: renderSectionRow,
       autoInit: false
     });
 

@@ -33,9 +33,8 @@ def require_admin():
     pass
 
 
-@bp.route("/status", methods=["GET"])
-def integrations_status():
-    """Return live API usage and last-fetch data for all known ingestion sources."""
+def get_integrations_status_data():
+    """Helper to fetch live API usage and last-fetch data for all known ingestion sources."""
     today = date.today()
 
     # API usage counts for today
@@ -81,12 +80,11 @@ def integrations_status():
             "errors":          fetch_info.get("errors", 0),
         })
 
-    return jsonify(result)
+    return result
 
 
-@bp.route("/logs", methods=["GET"])
-def integrations_logs():
-    """Return the 15 most recent ingestion log entries."""
+def get_integrations_logs_data():
+    """Helper to fetch the 15 most recent ingestion log entries."""
     logs = db.session.execute(
         select(LastAPIFetch)
         .order_by(LastAPIFetch.last_fetched_at.desc())
@@ -108,4 +106,16 @@ def integrations_logs():
             "failures": log.failure_count,
         })
 
-    return jsonify(result)
+    return result
+
+
+@bp.route("/status", methods=["GET"])
+def integrations_status():
+    """Return live API usage and last-fetch data for all known ingestion sources."""
+    return jsonify(get_integrations_status_data())
+
+
+@bp.route("/logs", methods=["GET"])
+def integrations_logs():
+    """Return the 15 most recent ingestion log entries."""
+    return jsonify(get_integrations_logs_data())

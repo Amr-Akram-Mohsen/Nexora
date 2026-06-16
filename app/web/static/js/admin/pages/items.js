@@ -8,7 +8,6 @@
 
   // ── State ──────────────────────────────
   let itemsController;
-  let loadedItems = [];
 
   // ── Fetch meta for dropdowns ────────────
   function loadMeta() {
@@ -41,28 +40,6 @@
           typeSel.appendChild(opt);
         });
       });
-  }
-
-  function renderItemRow(item) {
-    const template = document.getElementById('item-row-template');
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector('tr');
-
-    clone.querySelector('.item-cell-name').textContent = item.name;
-    clone.querySelector('.item-cell-brand').textContent = item.brand;
-    clone.querySelector('.item-cell-category').textContent = item.category;
-    clone.querySelector('.item-cell-price').textContent = item.min_price != null
-      ? `${Number(item.min_price).toFixed(2)} ${item.currency || ''}`
-      : '—';
-    clone.querySelector('.item-cell-storecount').textContent = item.store_count;
-    clone.querySelector('.item-cell-clicks').textContent = (item.click_count || 0).toLocaleString();
-    clone.querySelector('.item-cell-date').textContent = formatDate(item.created_at);
-
-    // Buttons dataset
-    const inspectBtn = clone.querySelector('.inspect-btn');
-    inspectBtn.dataset.itemId = item.id;
-
-    return tr;
   }
 
   // ── Delete ───────────────────────────────
@@ -112,6 +89,7 @@
     itemsController = new AdminListController({
       domain: 'items',
       endpoint: '/admin/items/',
+      rowsEndpoint: '/admin/items/rows',  // ← HTML partial mode
       tbodyId: 'items-table-body',
       searchId: 'item-search',
       filterIds: [
@@ -126,14 +104,8 @@
       countId: 'items-count',
       clearBtnId: 'clear-item-filters-btn',
       refreshBtnId: 'refresh-items-btn',
-      rowTemplateId: 'item-row-template',
       defaultPerPage: 20,
       colspan: 8,
-      itemsKey: 'items',
-      renderRow: renderItemRow,
-      onLoaded: (data) => {
-        loadedItems = data.items || [];
-      },
       autoInit: false
     });
 
@@ -151,122 +123,44 @@
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'inspect-item') {
-        const itemId = parseInt(btn.dataset.itemId, 10);
-        const item = loadedItems.find(i => i.id === itemId);
-        if (item) {
-          showInspectModal(itemId, item);
-        }
+        const itemId = parseInt(btn.dataset.id || btn.dataset.itemId, 10);
+        showInspectModal(itemId);
       }
     });
+
+    // Inspect modal: delete action delegation
+    const inspectModal = document.getElementById("inspect-item-modal");
+    if (inspectModal) {
+      inspectModal.addEventListener('click', e => {
+        const btn = e.target.closest("[data-action='delete-item']");
+        if (!btn) return;
+        deleteItem(parseInt(btn.dataset.id, 10), btn.dataset.name, btn, inspectModal);
+      });
+    }
   }
 
-  // ── Source/Provider Detail Inspection Modal ──────
-  function showInspectModal(itemId, listItem) {
-    const modal = document.getElementById("inspect-item-modal");
-    const body = document.getElementById("inspect-item-modal-body");
+  // ── Inspect Modal (server-rendered) ──────────────────
+  function showInspectModal(itemId) {
+    const modal   = document.getElementById("inspect-item-modal");
+    const body    = document.getElementById("inspect-item-modal-body");
     const titleEl = document.getElementById("inspect-item-modal-title");
+    if (!modal || !body) return;
 
-    titleEl.textContent = `Inspect Product: ${listItem.name}`;
     body.innerHTML = getSpinnerHtml('Loading store links…');
+    titleEl.textContent = 'Product Details';
     modal.classList.add("active");
 
-    fetch(`/admin/items/${itemId}/detail`)
-      .then(r => { if (!r.ok) throw new Error('Failed to load item detail'); return r.json(); })
-      .then(detail => {
-        body.innerHTML = "";
-        body.appendChild(buildInspectBody(detail, modal));
+    fetch(`/admin/items/${itemId}/inspect`)
+      .then(r => r.text())
+      .then(html => {
+        body.innerHTML = html;
       })
       .catch(() => {
         body.innerHTML = getErrorStateHtml('Could not load product details. Please try again.');
       });
   }
 
-  function buildInspectBody(detail, modal) {
-    const template = document.getElementById('item-inspect-template');
-    const clone = template.content.cloneNode(true);
-    const container = clone.querySelector('.inspect-details-group');
 
-    clone.querySelector('.inspect-id').textContent = `#${detail.id}`;
-    clone.querySelector('.inspect-type').textContent = detail.item_type;
-    clone.querySelector('.inspect-brand').textContent = detail.brand;
-    clone.querySelector('.inspect-category').textContent = detail.category;
-    clone.querySelector('.inspect-source').textContent = detail.source_name;
-    clone.querySelector('.inspect-source-slug').textContent = detail.source_slug;
-    clone.querySelector('.inspect-source-type').textContent = detail.source_type;
-
-    const links = detail.store_links || [];
-    clone.querySelector('.inspect-links-count').textContent = links.length;
-
-    const linksContainer = clone.querySelector('.inspect-links-container');
-    const cardTemplate = document.getElementById('item-store-link-template');
-
-    if (links.length > 0) {
-      links.forEach(lnk => {
-        const cardClone = cardTemplate.content.cloneNode(true);
-        const card = cardClone.querySelector('.inspect-store-card');
-
-        cardClone.querySelector('.inspect-store-card-name').textContent = lnk.store_name;
-
-        const netBadge = cardClone.querySelector('.inspect-store-card-badge-net');
-        netBadge.textContent = lnk.affiliate_network;
-
-        const availBadge = cardClone.querySelector('.inspect-store-availability');
-        availBadge.textContent = lnk.availability === 'in_stock' ? 'In Stock' : (lnk.availability || 'Out of Stock');
-        availBadge.classList.add(lnk.availability === 'in_stock' ? 'active' : 'inactive');
-
-        cardClone.querySelector('.inspect-store-program').textContent = lnk.program_name;
-        cardClone.querySelector('.inspect-store-price').textContent = lnk.price != null
-          ? `${Number(lnk.price).toFixed(2)} ${lnk.currency || ''}`
-          : "—";
-
-        const origLink = cardClone.querySelector('.inspect-store-orig-link');
-        origLink.href = lnk.original_url;
-        origLink.textContent = lnk.original_url;
-
-        const affLink = cardClone.querySelector('.inspect-store-aff-link');
-        affLink.href = lnk.affiliate_url;
-        affLink.textContent = lnk.affiliate_url;
-
-        const metaBox = cardClone.querySelector('.inspect-store-metadata-box');
-        if (lnk.metadata && Object.keys(lnk.metadata).length > 0) {
-          metaBox.className = "inspect-store-card-meta-box";
-          metaBox.innerHTML = "";
-          for (const [k, v] of Object.entries(lnk.metadata)) {
-            const rowDiv = document.createElement("div");
-            const strong = document.createElement("strong");
-            strong.textContent = `${k}: `;
-            rowDiv.appendChild(strong);
-            rowDiv.appendChild(document.createTextNode(JSON.stringify(v)));
-            metaBox.appendChild(rowDiv);
-          }
-        } else {
-          metaBox.className = "inspect-store-card-meta-empty";
-          metaBox.textContent = "No raw network tracking metadata.";
-        }
-
-        linksContainer.appendChild(card);
-      });
-    } else {
-      linksContainer.innerHTML = "";
-      const emptyDiv = document.createElement("div");
-      emptyDiv.className = "text-center text-muted p-4";
-      emptyDiv.textContent = "No store links or variant providers mapped for this product.";
-      linksContainer.appendChild(emptyDiv);
-    }
-
-
-    const deleteBtn = clone.querySelector('.inspect-delete-btn');
-    if (deleteBtn) {
-      deleteBtn.dataset.id = detail.id;
-      deleteBtn.dataset.name = detail.name;
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        deleteItem(detail.id, detail.name, deleteBtn, modal);
-      });
-    }
-
-    return container;
-  }
 
   document.addEventListener('DOMContentLoaded', init);
 })();

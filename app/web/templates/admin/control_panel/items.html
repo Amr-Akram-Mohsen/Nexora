@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_table_spinner, admin_filter_select %}
+admin_spinner, admin_crud_table, admin_filter_select %}
 {% from "admin/components/macros.html" import
     admin_search_input,
     admin_reset_button,
@@ -54,111 +54,13 @@ actions=header_actions
 {{ admin_summary_bar("items-count", "products", summary_id="items-summary") }}
 
 <!-- Table -->
-<div class="admin-table-wrapper">
-  <table class="admin-table" id="items-table">
-    <thead>
-      <tr>
-        <th class="col-primary">Name</th>
-        <th>Brand</th>
-        <th>Category</th>
-        <th class="col-metric">Price</th>
-        <th class="col-metric">Stores Count</th>
-        <th class="col-metric">Clicks</th>
-        <th class="col-date">Added</th>
-        <th class="col-actions">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="items-table-body">
-      {{ admin_table_spinner(8, "Loading products…") }}
-    </tbody>
-  </table>
-</div>
+{{ admin_crud_table(table, "Loading products…") }}
 
 {{ admin_paginator(domain="items", per_page_options=[10, 20, 50], current_per_page=20) }}
 
 {% call admin_modal("inspect-item-modal", "Product Provider & Store Links", "📡", "modal-content-lg") %}
 {{ admin_modal_close_button(button_id="inspect-item-close-btn") }}
 {% endcall %}
-
-<template id="item-row-template">
-  <tr>
-    <td>
-      <div class="item-cell-name user-cell-name"></div>
-    </td>
-    <td>
-      <span class="item-cell-brand user-cell-name"></span>
-    </td>
-    <td>
-      <span class="item-cell-category user-cell-name"></span>
-    </td>
-    <td class="item-cell-price"></td>
-    <td class="item-cell-storecount"></td>
-    <td class="item-cell-clicks"></td>
-    <td>
-      <span class="item-cell-date user-cell-email"></span>
-    </td>
-    <td>
-      {% call action_group() %}
-        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-item", extra_class="inspect-btn") }}
-      {% endcall %}
-    </td>
-  </tr>
-</template>
-
-<template id="item-inspect-template">
-  <div class="inspect-details-group flex flex-col">
-    {% call inspect_section("Product Core Mappings") %}
-      {{ inspect_detail_row("ID", "inspect-id") }}
-      {{ inspect_detail_row("Type", "inspect-type status-badge inspect-badge-secondary") }}
-      {{ inspect_detail_row("Brand", "inspect-brand") }}
-      {{ inspect_detail_row("Category", "inspect-category") }}
-      {% call inspect_custom_row("System Source/Provider") %}
-        <span class="inspect-source inspect-brand-purple"></span> (slug: <code class="inspect-source-slug"></code>)
-      {% endcall %}
-      {{ inspect_detail_row("Source Type", "inspect-source-type", value_tag="code") }}
-    {% endcall %}
-    
-    {% set links_title %}Ingested Stores &amp; Affiliate Links (<span class="inspect-links-count"></span>){% endset %}
-    {% call inspect_section(links_title) %}
-      <div class="inspect-links-container"></div>
-    {% endcall %}
-    
-    {% call inspect_section("Management Actions", divider=false) %}
-      <div class="flex gap-2 mt-2">
-        <button class="user-action-btn user-action-delete inspect-delete-btn" data-id="" data-name="">
-          🗑 Delete Product
-        </button>
-      </div>
-    {% endcall %}
-  </div>
-</template>
-
-<template id="item-store-link-template">
-  <div class="inspect-store-card">
-    <div class="inspect-store-card-header flex justify-between items-center flex-wrap">
-      <div>
-        <strong class="inspect-store-card-name"></strong>
-        <span class="inspect-store-card-badge-net status-badge"></span>
-      </div>
-      <div>
-        <span class="inspect-store-availability status-badge badge-compact"></span>
-      </div>
-    </div>
-    <div class="inspect-store-card-grid">
-      <div><strong>Program:</strong> <span class="inspect-store-program"></span></div>
-      <div><strong>Price:</strong> <span class="inspect-store-price"></span></div>
-    </div>
-    <div class="inspect-store-card-links flex flex-col">
-      <div><strong>Original URL:</strong> <a target="_blank" class="inspect-store-orig-link inspect-link"></a></div>
-      <div><strong>Affiliate URL:</strong> <a target="_blank"
-          class="inspect-store-aff-link inspect-link text-brand-blue"></a></div>
-    </div>
-    <div class="mt-2">
-      <span class="inspect-store-card-meta-label">Network Tracking Metadata:</span>
-      <div class="inspect-store-metadata-box"></div>
-    </div>
-  </div>
-</template>
 {% endblock %}
 
 {% block admin_scripts %}

@@ -1,12 +1,9 @@
+{% from "admin/components/ui.html" import admin_panel %}
 <!-- Section 1.98: Content Performance Feedback -->
 <h2 class="insight-group-title">📉 Content Performance Feedback</h2>
 <div class="insights-double-grid" id="content-feedback-panel" style="display: none;">
   <!-- Left Side: Strategy Accuracy & Failures -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">🧠 Strategy Accuracy & Failures</h3>
-      <p class="overview-panel-sub">Platform-weighted accuracy index and root-cause diagnoses of underperforming assets.</p>
-    </div>
+  {% call admin_panel("🧠 Strategy Accuracy & Failures", "Platform-weighted accuracy index and root-cause diagnoses of underperforming assets.") %}
     <div class="accuracy-panel-body">
       <!-- Strategy Accuracy Widget -->
       <div class="insights-accuracy-card">
@@ -29,14 +26,10 @@
         </div>
       </div>
     </div>
-  </div>
+  {% endcall %}
   
   <!-- Right Side: Evaluations list -->
-  <div class="overview-panel">
-    <div class="overview-panel-header">
-      <h3 class="overview-panel-title">📋 Content Evaluations Inventory</h3>
-      <p class="overview-panel-sub">Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.</p>
-    </div>
+  {% call admin_panel("📋 Content Evaluations Inventory", "Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.") %}
     <div class="insights-table-scroll">
       <table class="admin-table text-xs" id="feedback-evaluations-table">
         <thead>
@@ -53,5 +46,5 @@
         </tbody>
       </table>
     </div>
-  </div>
+  {% endcall %}
 </div>

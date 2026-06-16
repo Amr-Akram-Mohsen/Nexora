@@ -1,0 +1,32 @@
+{% if not logs or logs | length == 0 %}
+<p class="hint">No ingestion logs found.</p>
+{% else %}
+<ul class="activity-feed">
+  {% for log in logs %}
+    {% set is_success = log.status == "Success" %}
+    <li class="activity-item flex items-start">
+      <div class="activity-icon flex-center {{ 'icon-like' if is_success else 'icon-dislike' }}">
+        {{ '✅' if is_success else '❌' }}
+      </div>
+
+      <div class="activity-content">
+        <p class="activity-text">
+          <strong class="log-source">{{ log.source }}</strong>
+          <span>fetched</span>
+          <span class="activity-target log-category">{{ log.category }}</span>
+
+          <span class="log-badges flex">
+            <span class="integration-status log-status {{ 'status-ok' if is_success else 'status-error' }}">{{ log.status }}</span>
+            <span class="integration-status status-badge admin log-type">{{ log.type | upper }}</span>
+          </span>
+        </p>
+
+        <p class="activity-meta log-query">Query: "{{ log.query }}"</p>
+        <p class="activity-meta log-time">
+          {{ log.time_formatted }}{% if log.failures > 0 %} • Failures: {{ log.failures }}{% endif %}
+        </p>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}

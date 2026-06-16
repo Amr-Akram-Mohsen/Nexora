@@ -1,0 +1,20 @@
+{% if not items or items | length == 0 %}
+<div class="dashboard-empty loading-height-sm">
+  <span class="dashboard-state-icon">📭</span>
+  <p class="empty-message">No data yet.</p>
+</div>
+{% else %}
+<ol class="overview-top-list">
+  {% for item in items %}
+    <li class="overview-top-item flex items-center">
+      <span class="overview-top-rank">{{ loop.index }}</span>
+      <span class="overview-top-name">
+        <a class="overview-top-link-title" href="/admin/items?search={{ item.id }}" title="{{ item.name or '—' }}">
+          {{ item.name or '—' }}
+        </a>
+      </span>
+      <span class="overview-top-value">{{ "{:,}".format(item.click_count or 0) }} clicks</span>
+    </li>
+  {% endfor %}
+</ol>
+{% endif %}

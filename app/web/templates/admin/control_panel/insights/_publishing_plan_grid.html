@@ -1,0 +1,49 @@
+<!-- Summary Metrics Bar -->
+<div class="publishing-summary-bar" id="publishing-plan-summary">
+  <div class="publishing-summary-item">🎯 Total Scheduled: <strong>{{ total_tasks }}</strong></div>
+  <div class="publishing-summary-item">📺 Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
+  <div class="publishing-summary-item">🛠️ Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
+</div>
+
+<div class="insights-kanban-grid" id="publishing-plan-grid-container">
+  {% for week in weekly_plan %}
+    {% set headerClass = 'auto-execute' %}
+    {% set statusLabel = '<span class="status-badge badge-secondary font-bold">LOW PRIORITY</span>'|safe %}
+    {% set name = week.week %}
+    {% if week.week == 'Week 1' %}
+      {% set headerClass = 'blocked' %}
+      {% set statusLabel = '<span class="status-badge badge-danger font-bold">HIGH URGENCY</span>'|safe %}
+      {% set name = 'Week 1 (Days 1-7)' %}
+    {% elif week.week == 'Week 2' %}
+      {% set headerClass = 'needs-review' %}
+      {% set statusLabel = '<span class="status-badge badge-warning font-bold">MEDIUM</span>'|safe %}
+      {% set name = 'Week 2 (Days 8-14)' %}
+    {% endif %}
+
+    <div class="kanban-column">
+      <div class="publishing-column-header {{ headerClass }}">
+        <div class="font-bold text-sm">{{ name }}</div>
+        <div>{{ statusLabel }}</div>
+      </div>
+      <div class="kanban-column-body">
+        {% if not week.tasks %}
+          <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
+        {% else %}
+          {% for task in week.tasks %}
+            {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
+            {% set actionBadgeClass = 'badge-danger' if task.action == 'create' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
+            <div class="kanban-task-card">
+              <div class="kanban-task-header">
+                <span class="kanban-task-platform">{{ platformIcon }} {{ task.platform|upper }}</span>
+                <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
+              </div>
+              <h4 class="kanban-task-title">{{ task.entity }}</h4>
+              <p class="kanban-task-meta">Type: <strong>{{ task.content_type }}</strong> &middot; Source: <code>{{ task.source }}</code></p>
+              <div class="kanban-task-reason">{{ task.reason }}</div>
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

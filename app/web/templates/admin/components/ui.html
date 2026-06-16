@@ -47,12 +47,30 @@ current_per_page=20) %}
 {% macro admin_table_spinner(colspan, text="Loading...", height_class="loading-height-lg") %}
 <tr>
   <td colspan="{{ colspan }}" class="table-loading-cell">
-    <div class="dashboard-loading {{ height_class }}">
-      <div class="spinner"></div>
-      <p>{{ text }}</p>
-    </div>
+    {{ admin_spinner(text, height_class) }}
   </td>
 </tr>
+{% endmacro %}
+
+{% macro admin_loading_state(text="Loading...", height_class="loading-height-lg") %}
+{{ admin_spinner(text, height_class) }}
+{% endmacro %}
+
+{% macro admin_crud_table(table, loading_text="Loading...", height_class="loading-height-lg") %}
+<div class="admin-table-wrapper">
+  <table class="admin-table" id="{{ table.id }}-table">
+    <thead>
+      <tr>
+        {% for column in table.columns %}
+        <th>{{ column.html|safe if column.html is defined else column }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody id="{{ table.id }}-table-body">
+      {{ admin_table_spinner(table.columns|length, loading_text, height_class) }}
+    </tbody>
+  </table>
+</div>
 {% endmacro %}
 
 {% macro admin_empty_state(message="No records found matching filters.", submessage="Adjust your filters or search
@@ -111,3 +129,16 @@ current_per_page=current_per_page
   {% endfor %}
 </select>
 {% endmacro %}
+
+{% macro admin_panel(title, subtitle=None, id=None, header_class="", display_style=None) %}
+<div class="overview-panel" {% if id %}id="{{ id }}"{% endif %} {% if display_style %}style="display: {{ display_style }};"{% endif %}>
+  <div class="overview-panel-header {{ header_class }}">
+    <h3 class="overview-panel-title">{{ title }}</h3>
+    {% if subtitle %}
+      <p class="overview-panel-sub">{{ subtitle }}</p>
+    {% endif %}
+  </div>
+  {{ caller() }}
+</div>
+{% endmacro %}
+

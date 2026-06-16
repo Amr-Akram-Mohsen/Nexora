@@ -1,17 +1,12 @@
+{% from "admin/components/ui.html" import admin_panel, admin_table_spinner %}
 <!-- Section 1.9: Content Asset Mapping -->
 <h2 class="insight-group-title">🔗 Content Asset Mapping</h2>
-<div class="overview-panel" id="content-asset-mapping-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Asset Inventory & Gaps</h3>
-    <p class="overview-panel-sub">Analyzing existing database articles, videos, and product pages against the
-      recommended content strategy.</p>
-  </div>
-
+{% call admin_panel("Asset Inventory & Gaps", "Analyzing existing database articles, videos, and product pages against the recommended content strategy.", id="content-asset-mapping-panel", display_style="none") %}
   <div class="insights-table-scroll-large">
     <table class="admin-table text-sm" id="asset-mapping-table">
       <thead>
         <tr>
-          <th class="col-entity"><span>Target |</span><span>Entity</span></th>
+          <th>Target Entity</th>
           <th>Score</th>
           <th>Existing Assets</th>
           <th>Content Gaps</th>
@@ -19,12 +14,8 @@
         </tr>
       </thead>
       <tbody id="asset-mapping-table-body">
-        <tr>
-          <td colspan="5" class="text-center">
-            {{ admin_table_spinner(5, "Mapping strategy to assets...") }}
-          </td>
-        </tr>
+        {{ admin_table_spinner(5, "Mapping strategy to assets...") }}
       </tbody>
     </table>
   </div>
-</div>
+{% endcall %}

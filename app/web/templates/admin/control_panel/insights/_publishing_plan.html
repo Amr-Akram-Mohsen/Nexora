@@ -1,11 +1,8 @@
+{% from "admin/components/ui.html" import admin_panel, admin_loading_state %}
 <!-- Section 1.95: Content Publishing Plan -->
 <h2 class="insight-group-title">📅 Content Publishing Plan</h2>
-<div class="overview-panel" id="content-publishing-plan-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Content Execution Calendar</h3>
-    <p class="overview-panel-sub">Automated schedule showing priority actions, platform channels, and timing based on opportunity potential.</p>
-  </div>
-  
+{% call admin_panel("Content Execution Calendar", "Automated schedule showing priority actions, platform channels, and timing based on opportunity potential.", id="content-publishing-plan-panel", display_style="none") %}
+<div id="publishing-plan-body-wrapper">
   <!-- Summary Metrics Bar -->
   <div class="publishing-summary-bar" id="publishing-plan-summary">
     <!-- Populated by JS -->
@@ -14,7 +11,8 @@
   <div class="insights-kanban-grid" id="publishing-plan-grid-container">
     <!-- Three Columns (Week 1, Week 2, Backlog) populated by JS -->
     <div class="grid-full-width text-center">
-      {{ admin_table_spinner(1, "Orchestrating weekly publishing schedule...") }}
+      {{ admin_loading_state("Orchestrating weekly publishing schedule...") }}
     </div>
   </div>
 </div>
+{% endcall %}

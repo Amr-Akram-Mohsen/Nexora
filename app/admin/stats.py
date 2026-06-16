@@ -10,7 +10,7 @@ Performance optimisations applied:
 - Interaction breakdown reads from the 60-second cached get_interactions_breakdown() (R-03).
 - All queries use SQLAlchemy 2.0-style select() (R-07).
 """
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template
 from app.core.extensions import db
 from app.core.decorators import admin_required
 from app.domains.content.models import Content
@@ -31,14 +31,8 @@ def require_admin():
     pass
 
 
-# ─────────────────────────────────────────────
-# MAIN STATS ENDPOINT
-# ─────────────────────────────────────────────
-
-@bp.route("/stats", methods=["GET"])
-def dashboard_stats():
-    """Enhanced dashboard metrics, aggregates, distributions, and trends."""
-
+def get_dashboard_stats_data():
+    """Consolidated helper to compute all dashboard statistics."""
     # ── Interaction stats (single cached call) ────────────────────────────
     breakdown = get_interactions_breakdown()
     total_interactions = sum(v for k, v in breakdown.items() if not k.startswith("_"))
@@ -52,7 +46,7 @@ def dashboard_stats():
     active_contents   = db.session.execute(
         select(func.count(Content.id)).where(Content.is_active == True)
     ).scalar() or 0
-    inactive_contents = contents_count - active_contents   # R-16: arithmetic, no extra query
+    inactive_contents = contents_count - active_contents
 
     # ── Review queue ─────────────────────────────────────────────────────
     review_queue_count = db.session.execute(
@@ -120,7 +114,7 @@ def dashboard_stats():
     ).all()
     top_performing_product = [{"name": r.name, "slug": r.slug, "clicks": int(r.total_clicks or 0)} for r in top_product_rows]
 
-    # ── Provider activity summary (R-02: 2 aggregate queries, not N×4) ───
+    # ── Provider activity summary ─────────────────────────────────────────
     content_agg = db.session.execute(
         select(
             Content.source_id,
@@ -141,7 +135,6 @@ def dashboard_stats():
         .group_by(Item.source_id)
     ).all()
 
-    # Fetch source names for the IDs we care about
     all_source_ids = {r.source_id for r in content_agg} | {r.source_id for r in item_agg}
     source_map = {}
     if all_source_ids:
@@ -151,7 +144,6 @@ def dashboard_stats():
         ).all()
         source_map = {r.id: {"name": r.name, "slug": r.slug} for r in source_rows}
 
-    # Merge content and item aggregates by source_id
     content_by_sid = {r.source_id: r for r in content_agg}
     item_by_sid    = {r.source_id: r for r in item_agg}
     provider_activities = []
@@ -187,7 +179,7 @@ def dashboard_stats():
     )
     provider_activities = provider_activities[:10]
 
-    # ── 7-day growth trend (R-17: single GROUP BY, not 7 loops) ──────────
+    # ── 7-day growth trend ────────────────────────────────────────────────
     today = datetime.now(timezone.utc).date()
     week_start = datetime.combine(today - timedelta(days=6), datetime.min.time())
 
@@ -239,7 +231,7 @@ def dashboard_stats():
             "time":  time_str,
         })
 
-    return jsonify({
+    return {
         "contents_count":         contents_count,
         "items_count":            items_count,
         "users_count":            users_count,
@@ -266,11 +258,128 @@ def dashboard_stats():
             "likes":     breakdown.get("_likes", 0),
             "dislikes":  breakdown.get("_dislikes", 0),
         },
-    })
+    }
 
 
 # ─────────────────────────────────────────────
-# TOP CONTENT & ITEMS
+# MAIN STATS ENDPOINT
+# ─────────────────────────────────────────────
+
+@bp.route("/stats", methods=["GET"])
+def dashboard_stats():
+    """Enhanced dashboard metrics, aggregates, distributions, and trends."""
+    return jsonify(get_dashboard_stats_data())
+
+
+# ─────────────────────────────────────────────
+# WIDGET ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route("/widget/stats", methods=["GET"])
+def widget_stats():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_stats_grid.html", stats=data)
+
+
+@bp.route("/widget/catalog-health", methods=["GET"])
+def widget_catalog_health():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_catalog_health.html", data=data)
+
+
+@bp.route("/widget/recent-ingest", methods=["GET"])
+def widget_recent_ingest():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_recent_ingest.html", recent_ingested=data.get("recent_ingested", []))
+
+
+@bp.route("/widget/categories-distribution", methods=["GET"])
+def widget_categories_distribution():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_categories_distribution.html", by_category=data.get("by_category", []))
+
+
+@bp.route("/widget/sources-distribution", methods=["GET"])
+def widget_sources_distribution():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_sources_distribution.html", by_source=data.get("by_source", []))
+
+
+@bp.route("/widget/product-sources-distribution", methods=["GET"])
+def widget_product_sources_distribution():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_product_sources_distribution.html", product_by_source=data.get("product_by_source", []))
+
+
+@bp.route("/widget/top-content-providers", methods=["GET"])
+def widget_top_content_providers():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_top_content_providers.html", top_performing_content=data.get("top_performing_content", []))
+
+
+@bp.route("/widget/top-product-providers", methods=["GET"])
+def widget_top_product_providers():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_top_product_providers.html", top_performing_product=data.get("top_performing_product", []))
+
+
+@bp.route("/widget/provider-activities", methods=["GET"])
+def widget_provider_activities():
+    data = get_dashboard_stats_data()
+    activities = data.get("provider_activities", [])
+    for act in activities:
+        if act.get("latest_activity"):
+            try:
+                dt = datetime.fromisoformat(act["latest_activity"])
+                act["latest_activity_formatted"] = dt.strftime("%b %d, %Y")
+            except Exception:
+                act["latest_activity_formatted"] = act["latest_activity"]
+        else:
+            act["latest_activity_formatted"] = "No activity"
+    return render_template("admin/dashboard/widgets/_provider_activities.html", provider_activities=activities)
+
+
+@bp.route("/widget/top-articles", methods=["GET"])
+def widget_top_articles():
+    rows = db.session.execute(
+        select(Content.id, Content.title, Content.object_type, Content.view_count)
+        .order_by(Content.view_count.desc())
+        .limit(5)
+    ).mappings().all()
+    items = [{
+        "id":         r["id"],
+        "title":      r["title"] or f"{r['object_type'].capitalize()} #{r['id']}",
+        "type":       r["object_type"],
+        "view_count": r["view_count"] or 0,
+    } for r in rows]
+    return render_template("admin/dashboard/widgets/_top_articles.html", items=items)
+
+
+@bp.route("/widget/top-items", methods=["GET"])
+def widget_top_items():
+    rows = db.session.execute(
+        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
+        .order_by(Item.click_count.desc())
+        .limit(5)
+    ).mappings().all()
+    items = [{
+        "id":          r["id"],
+        "name":        r["name"],
+        "item_type":   r["item_type"],
+        "click_count": r["click_count"] or 0,
+        "rating":      r["rating"],
+    } for r in rows]
+    return render_template("admin/dashboard/widgets/_top_items.html", items=items)
+
+
+@bp.route("/widget/interactions-breakdown", methods=["GET"])
+def widget_interactions_breakdown():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_interactions_breakdown.html", interactions=data.get("interactions", {}))
+
+
+# ─────────────────────────────────────────────
+# TOP CONTENT & ITEMS JSON ENDPOINTS (keep for backwards compat if needed)
 # ─────────────────────────────────────────────
 
 @bp.route("/top-contents", methods=["GET"])

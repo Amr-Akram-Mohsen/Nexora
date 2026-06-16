@@ -1,0 +1,27 @@
+{% if not by_category or by_category | length == 0 %}
+<div class="dashboard-empty loading-height-sm">
+  <span class="dashboard-state-icon">📭</span>
+  <p class="empty-message">No categories mapped.</p>
+</div>
+{% else %}
+{% set max_val = namespace(val=1) %}
+{% for c in by_category %}
+  {% if c.count > max_val.val %}
+    {% set max_val.val = c.count %}
+  {% endif %}
+{% endfor %}
+<div class="dist-list">
+  {% for c in by_category %}
+    {% set pct = ((c.count / max_val.val) * 100) | round | int %}
+    <a class="dist-row-link" href="/admin/contents?category={{ c.slug }}">
+      <div class="dist-row flex justify-between">
+        <span class="dist-row-name font-bold text-foreground">{{ c.name }}</span>
+        <span class="dist-row-count text-muted">{{ "{:,}".format(c.count) }} items</span>
+      </div>
+      <div class="overview-breakdown-bar-track bar-track-health">
+        <div class="overview-breakdown-bar bar-purple" style="width: {{ pct }}%;"></div>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}

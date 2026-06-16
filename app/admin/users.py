@@ -7,8 +7,9 @@ Refactoring applied:
 - Listing now returns a proper paginated envelope {items, page, pages, total, per_page}
   instead of a flat array limited to 10 results (R-09).
 - Normalized to LF line endings (R-24).
+- Added /rows HTML partial endpoint and /<id>/inspect HTML endpoint for Jinja AJAX architecture.
 """
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template, make_response
 from app.domains.user.models import User
 from app.domains.user.service import deactivate_user as deactivate_user_service, activate_user as activate_user_service
 from app.core.decorators import admin_required
@@ -84,6 +85,51 @@ def activate_user(id):
         return jsonify({"error": "User not found"}), 404
     db.session.commit()
     return jsonify({"success": True})
+
+
+def _build_user_query(search, role):
+    """Shared query builder for users listing and rows endpoint."""
+    stmt = select(User).order_by(User.id.desc())
+    if search:
+        stmt = stmt.where(
+            or_(User.name.ilike(f"%{search}%"), User.email.ilike(f"%{search}%"))
+        )
+    if role:
+        if role.lower() == "admin":
+            stmt = stmt.where(User.is_admin == True)
+        elif role.lower() == "user":
+            stmt = stmt.where(User.is_admin == False)
+    return stmt
+
+
+@bp.route("/rows", methods=["GET"])
+def users_rows():
+    """Return server-rendered HTML rows partial for AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    search = request.args.get("search", "").strip()
+    role   = request.args.get("role", "").strip()
+
+    stmt = _build_user_query(search, role)
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    html = render_template(
+        "admin/control_panel/users/_rows.html",
+        items=pagination.items,
+    )
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_user(id):
+    """Return server-rendered HTML for the user inspect modal body."""
+    user = db.session.get(User, id)
+    if not user:
+        return "<p class='text-muted'>User not found.</p>", 404
+    return render_template("admin/control_panel/users/_inspect.html", user=user)
 
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])

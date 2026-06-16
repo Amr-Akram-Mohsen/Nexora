@@ -1,0 +1,24 @@
+{% if not data or data | length == 0 %}
+<p class="hint">No integration activity yet. Run a fetch job to populate data.</p>
+{% else %}
+  {% for intg in data %}
+    {% set status_class = "status-ok" %}
+    {% set status_text = "Active" %}
+    {% if intg.errors > 0 %}
+      {% set status_class = "status-error" %}
+      {% set status_text = "Error" %}
+    {% elif intg.requests_today == 0 and not intg.last_fetch %}
+      {% set status_class = "status-pending" %}
+      {% set status_text = "Pending" %}
+    {% endif %}
+    <div class="integration-row flex items-center">
+      <span class="integration-name">{{ intg.name | upper }}</span>
+      <span class="integration-status {{ status_class }}">{{ status_text }}</span>
+      <span class="integration-meta">
+        <span class="meta-requests">Reqs Today: {{ intg.requests_today }}</span>
+        <span class="integration-separator">|</span>
+        <span class="meta-last-fetch">Last Fetch: {{ intg.last_fetch_formatted }}</span>
+      </span>
+    </div>
+  {% endfor %}
+{% endif %}

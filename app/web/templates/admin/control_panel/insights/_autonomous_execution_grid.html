@@ -1,0 +1,62 @@
+<!-- Summary Metrics Bar -->
+<div class="publishing-summary-bar" id="execution-plan-summary">
+  <div class="publishing-summary-item">🤖 Auto-Execute Queue: <span class="status-badge badge-success font-bold">{{ auto_execute|length }}</span></div>
+  <div class="publishing-summary-item">🤔 Needs Review Queue: <span class="status-badge badge-warning font-bold">{{ needs_review|length }}</span></div>
+  <div class="publishing-summary-item">❌ Blocked Queue: <span class="status-badge badge-danger font-bold">{{ blocked|length }}</span></div>
+</div>
+
+<div class="insights-kanban-grid" id="execution-plan-grid-container">
+  {% set queues = [
+    { 'name': 'AUTO EXECUTE', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge badge-secondary font-bold">AUTO APPROVED</span>'|safe, 'list': auto_execute },
+    { 'name': 'NEEDS REVIEW', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge badge-secondary font-bold">PENDING REVIEW</span>'|safe, 'list': needs_review },
+    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge badge-secondary font-bold">SAFETY BLOCKED</span>'|safe, 'list': blocked }
+  ] %}
+
+  {% for q in queues %}
+    <div class="kanban-column">
+      <div class="publishing-column-header {{ q.headerClass }}">
+        <div class="font-bold text-sm">{{ q.name }}</div>
+        <div>{{ q.statusLabel }}</div>
+      </div>
+      <div class="kanban-column-body">
+        {% if not q.list %}
+          <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
+        {% else %}
+          {% for task in q.list %}
+            {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
+            {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
+            <div class="kanban-task-card">
+              <div class="kanban-task-header">
+                <span class="kanban-task-platform">{{ platformIcon }} {{ task.platform|upper }}</span>
+                <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
+              </div>
+              <h4 class="kanban-task-title">{{ task.entity }}</h4>
+              <p class="kanban-task-meta">Confidence Score: <strong style="color:#6366f1;">{{ (task.confidence_score * 100)|round|int }}%</strong></p>
+              <div class="kanban-task-reason">{{ task.reason }}</div>
+              
+              {% if task.risk_factors %}
+                <div class="kanban-task-risk">
+                  {% for r in task.risk_factors %}
+                    <div>⚠️ {{ r }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {% if task.execution_log %}
+                {% set log_status = (task.execution_log.status or '')|upper %}
+                {% set log_url = task.execution_log.published_url or task.execution_log.mock_url or '' %}
+                <div class="kanban-task-log">
+                  <strong>Status:</strong> {{ log_status }}<br/>
+                  {% if log_url %}
+                    <strong>Sim Published:</strong> <a href="{{ log_url }}" target="_blank">{{ log_url }}</a><br/>
+                  {% endif %}
+                  <strong>Timestamp:</strong> {{ task.execution_log.timestamp or '' }}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

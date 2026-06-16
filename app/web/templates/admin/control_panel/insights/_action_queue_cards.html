@@ -1,0 +1,29 @@
+{% if items %}
+  {% for item in items %}
+    {% set priorityBadgeClass = "badge-danger" if item.priority == "High" else "badge-warning" if item.priority == "Medium" else "badge-secondary" %}
+    <div class="insights-opp-card" {% if item.content_output %}data-content-output="{{ item.content_output|tojson|forceescape }}"{% endif %}>
+      <div class="opp-card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+        <h3 class="opp-title" title="{{ item.title }}" style="margin:0;font-size:var(--text-sm);">{{ item.title }}</h3>
+        <span class="expand-arrow" style="font-size:10px;color:var(--muted-foreground);margin-left:.5rem;transition:transform .2s;">▼</span>
+      </div>
+      <div class="opp-metrics" style="margin-bottom:.5rem;">
+        <div class="opp-metric-item">Target<strong>{{ item.target }}</strong></div>
+        <div class="opp-metric-item">Type<strong>{{ item.type }}</strong></div>
+        <div class="opp-metric-item">Priority<strong class="status-badge {{ priorityBadgeClass }}">{{ item.priority }}</strong></div>
+        <div class="opp-metric-item">Confidence<strong>{{ (item.confidence * 100)|round|int }}%</strong></div>
+      </div>
+      <div class="opp-action" style="display:flex;align-items:center;justify-content:space-between;">
+        💡<span>Impact: {{ item.impact }}</span>
+      </div>
+      <div class="action-card-details" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px dashed var(--border);font-size:var(--text-xs);line-height:1.4;">
+        {% if item.content_output %}
+          <strong>Topic:</strong> {{ item.content_output.topic }}<br/>
+          <strong>Platform:</strong> {{ item.content_output.platform }}<br/>
+          <strong>Action:</strong> {{ item.content_output.action }}
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="text-center text-muted p-4">No immediate actions required.</div>
+{% endif %}

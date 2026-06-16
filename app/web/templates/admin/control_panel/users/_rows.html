@@ -1,0 +1,34 @@
+{% from "admin/components/macros.html" import action_button, action_group %}
+{% from "admin/components/crud.html" import admin_crud_rows %}
+
+{% macro render_row(user) %}
+<tr id="user-row-{{ user.id }}">
+  <td>
+    {% if user.name %}
+    <div class="user-cell-name">{{ user.name }}</div>
+    {% else %}
+    <div class="user-cell-name"><em>No name</em></div>
+    {% endif %}
+    <div class="user-cell-email">{{ user.email }}</div>
+  </td>
+  <td>
+    <span class="status-badge {{ 'admin' if user.is_admin else 'user' }}">
+      {{ "Admin" if user.is_admin else "User" }}
+    </span>
+  </td>
+  <td>
+    <span class="status-badge {{ 'active' if user.is_active else 'inactive' }}">
+      {{ "Active" if user.is_active else "Inactive" }}
+    </span>
+  </td>
+  <td>{{ user.created_at.strftime('%b %d, %Y') if user.created_at else "—" }}</td>
+  <td>
+    {% call action_group() %}
+    {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-user",
+    extra_class="inspect-btn", button_id=user.id) }}
+    {% endcall %}
+  </td>
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, colspan=5, empty_text="No users found.") }}

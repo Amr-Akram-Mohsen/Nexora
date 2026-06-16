@@ -1,0 +1,38 @@
+{% if items %}
+  {% for item in items %}
+    <tr {% if item.priority_score %}data-priority-score="{{ item.priority_score }}"{% endif %}>
+      <td class="text-center"><span class="strategy-table-rank">#{{ item.priority_rank }}</span></td>
+      <td>
+        <div class="font-bold text-foreground text-base">{{ item.entity }} | <span class="status-badge {% if item.type == 'category' %}badge-blue{% else %}badge-purple{% endif %}">{{ item.type|upper }}</span></div>
+        <div class="asset-mapping-item-meta mt-2">{{ item.reasoning or '' }}</div>
+      </td>
+      <td>
+        <ul class="asset-mapping-list">
+          {% for t in item.youtube or [] %}
+            <li class="asset-mapping-item">📺 <strong>{{ t }}</strong></li>
+          {% endfor %}
+        </ul>
+      </td>
+      <td>
+        <ul class="asset-mapping-list">
+          {% for t in item.pinterest or [] %}
+            <li class="asset-mapping-item">📌 <strong>{{ t }}</strong></li>
+          {% endfor %}
+        </ul>
+      </td>
+      <td>
+        <ul class="asset-mapping-list">
+          {% for t in item.blog or [] %}
+            <li class="asset-mapping-item">📝 <strong>{{ t }}</strong></li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="5" class="text-center text-muted">
+      No content strategies found matching active filter.
+    </td>
+  </tr>
+{% endif %}

@@ -1,9 +1,10 @@
-let globalInsightsData = null;
+// app/web/static/js/admin/pages/insights/state.js
+let selectedEntity = null;
 
-export function getState() {
-    return globalInsightsData;
+export function getSelectedEntity() {
+  return selectedEntity;
 }
 
-export function setState(data) {
-    globalInsightsData = data;
+export function setSelectedEntity(val) {
+  selectedEntity = val;
 }

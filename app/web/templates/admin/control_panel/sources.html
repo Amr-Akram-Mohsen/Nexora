@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_table_spinner %}
+admin_spinner, admin_crud_table %}
 {% from "admin/components/macros.html" import
 admin_search_input,
 admin_reset_button,
@@ -34,61 +34,9 @@ actions=header_actions
 {{ admin_summary_bar("sources-count", "sources", summary_id="sources-summary") }}
 
 <!-- Sources Table -->
-<div class="admin-table-wrapper">
-  <table class="admin-table" id="sources-table">
-    <thead>
-      <tr>
-        <th class="col-primary">Name</th>
-        <th class="col-metric">Volume</th>
-        <th class="col-date">Last Crawl</th>
-        <th class="col-metric">Success Rate</th>
-        <th class="col-metric">Failures</th>
-        <th class="col-metric">Engagement</th>
-        <th class="col-status">Status</th>
-        <th class="col-actions">Actions</th>
-      </tr>
-    </thead>
-    <tbody id="sources-table-body">
-      {{ admin_table_spinner(8, "Loading sources list…") }}
-    </tbody>
-  </table>
-</div>
+{{ admin_crud_table(table, "Loading sources list…") }}
 
 {{ admin_paginator(domain="sources", per_page_options=[10, 20, 50], current_per_page=20) }}
-
-<template id="sources-row-template">
-  <tr>
-    <td>
-      <div class="source-cell-name"><a class="source-cell-link text-muted" target="_blank" href=""></a></div>
-    </td>
-    <td>
-      <strong class="source-cell-count inspect-brand-purple"></strong>
-    </td>
-    <td>
-      <span class="source-cell-time text-foreground"></span>
-    </td>
-    <td>
-      <span class="source-cell-success-rate text-foreground"></span>
-    </td>
-    <td>
-      <span class="source-cell-failures text-foreground"></span>
-    </td>
-    <td>
-      <span class="source-cell-engagement text-foreground font-bold"></span>
-    </td>
-    <td class="source-cell-status">
-    </td>
-    <td>
-      {% call action_group() %}
-      <a class="source-cell-inspect user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
-        href="">
-        👁️ View Content
-      </a>
-      {% endcall %}
-    </td>
-  </tr>
-</template>
-
 
 {% endblock %}
 

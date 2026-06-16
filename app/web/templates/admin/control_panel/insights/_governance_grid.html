@@ -1,0 +1,69 @@
+<!-- Summary / Config Mode Bar -->
+<div class="publishing-summary-bar" id="execution-governance-summary">
+  <div class="publishing-summary-item">🛡️ Governance Mode: <span class="status-badge badge-blue font-bold">{{ mode }}</span></div>
+  <div class="publishing-summary-item">✅ Safe / Executed: <span class="status-badge badge-success font-bold">{{ approved_tasks|length }}</span></div>
+  <div class="publishing-summary-item">⏳ Needs Approval: <span class="status-badge badge-warning font-bold">{{ queued_tasks|length }}</span></div>
+  <div class="publishing-summary-item">❌ Blocked Tasks: <span class="status-badge badge-danger font-bold">{{ blocked_tasks|length }}</span></div>
+</div>
+
+<div class="insights-kanban-grid" id="execution-governance-grid-container">
+  {% set queues = [
+    { 'name': 'SAFE / EXECUTED', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge badge-secondary font-bold">SAFE FOR PRODUCTION</span>'|safe, 'list': approved_tasks },
+    { 'name': 'NEEDS APPROVAL', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge badge-secondary font-bold">APPROVAL GATED</span>'|safe, 'list': queued_tasks },
+    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge badge-secondary font-bold">SAFETY RESTRICTED</span>'|safe, 'list': blocked_tasks }
+  ] %}
+
+  {% for q in queues %}
+    <div class="kanban-column">
+      <div class="publishing-column-header {{ q.headerClass }}">
+        <div class="font-bold text-sm">{{ q.name }}</div>
+        <div>{{ q.statusLabel }}</div>
+      </div>
+      <div class="kanban-column-body">
+        {% if not q.list %}
+          <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
+        {% else %}
+          {% for task in q.list %}
+            {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
+            {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
+            {% set riskBadgeClass = 'badge-danger' if task.risk_level == 'HIGH' else 'badge-warning' if task.risk_level == 'MEDIUM' else 'badge-success' %}
+            <div class="kanban-task-card">
+              <div class="kanban-task-header">
+                <span class="kanban-task-platform">{{ platformIcon }} {{ task.platform|upper }}</span>
+                <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
+              </div>
+              <h4 class="kanban-task-title">{{ task.entity }}</h4>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;flex-wrap:wrap;gap:.5rem;">
+                <span class="kanban-task-meta">Decision Score: <strong style="color:#6366f1;">{{ (task.decision_score * 100)|round|int }}%</strong></span>
+                <span class="status-badge {{ riskBadgeClass }}">{{ task.risk_level }} RISK</span>
+              </div>
+              <div class="kanban-task-meta" style="display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;">
+                <span>Timeline: <strong>{{ task.scheduled_time }}</strong></span>
+                <span>Status: <strong style="text-transform:uppercase;">{{ task.status }}</strong></span>
+              </div>
+              
+              {% if task.risk_reasons %}
+                <div class="kanban-task-risk">
+                  {% for r in task.risk_reasons %}
+                    <div>⚠️ {{ r }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {% if task.execution_log %}
+                {% set log_status = (task.execution_log.status or '')|upper %}
+                {% set log_url = task.execution_log.mock_url or '' %}
+                <div class="kanban-task-log">
+                  <strong>Status:</strong> {{ log_status }}
+                  {% if log_url %}
+                    <br/><strong>Sim Published:</strong> <a href="{{ log_url }}" target="_blank">{{ log_url }}</a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

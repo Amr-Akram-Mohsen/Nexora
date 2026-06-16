@@ -11,7 +11,7 @@ Refactoring applied:
 - Removed ingestion_origin and object_id from serialized output (R-13).
 - Shared pagination helpers from app.admin.helpers (R-18, R-21).
 """
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template, make_response
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
@@ -324,6 +324,132 @@ def delete_content(id):
     _delete_content_and_relations(content)
     db.session.commit()
     return jsonify({"success": True, "message": "Content deleted successfully"})
+
+
+@bp.route("/rows", methods=["GET"])
+def contents_rows():
+    """Return server-rendered HTML rows partial for AJAX injection."""
+    from app.admin.helpers import parse_pagination_params, parse_sort_params
+    page, per_page = parse_pagination_params(default_per_page=20)
+    sort_col, sort_dir = parse_sort_params(_CONTENT_SORT_MAP, Content.published_at)
+
+    search        = request.args.get("search")
+    section_slug  = request.args.get("section")
+    category_slug = request.args.get("category")
+    object_type   = request.args.get("type")
+    source        = request.args.get("source")
+    status        = request.args.get("status")
+    active        = request.args.get("active")
+    published     = request.args.get("published")
+    date_type     = request.args.get("date_type", "published_at")
+    start_date    = request.args.get("start_date")
+    end_date      = request.args.get("end_date")
+    quality       = request.args.get("quality")
+
+    query = db.session.query(Content).options(
+        joinedload(Content.source),
+        joinedload(Content.category),
+        joinedload(Content.section),
+    )
+
+    if search and search.strip():
+        term = f"%{search.strip()}%"
+        if search.strip().isdigit():
+            query = query.filter(or_(Content.id == int(search.strip()), Content.title.ilike(term)))
+        else:
+            query = query.filter(or_(Content.title.ilike(term), Content.preview_text.ilike(term)))
+    if section_slug:
+        query = query.join(Content.section).filter(Section.slug == section_slug)
+    if category_slug:
+        if category_slug == "uncategorized":
+            query = query.filter(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
+        else:
+            query = query.join(Content.category).filter(Category.slug == category_slug)
+    if object_type:
+        query = query.filter(Content.object_type == object_type)
+    if source:
+        query = query.join(Content.source).filter(Source.slug == source)
+    if status:
+        query = query.filter(Content.object_type == "article", Content.object_id.in_(db.session.query(Article.id).filter(Article.status == status)))
+    if active:
+        query = query.filter(Content.is_active == (active.lower() == "true"))
+    if published:
+        query = query.filter(Content.is_published == (published.lower() == "true"))
+    date_col = Content.published_at if date_type == "published_at" else Content.ingested_at
+    if start_date:
+        try:
+            query = query.filter(date_col >= datetime.strptime(start_date, "%Y-%m-%d"))
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            query = query.filter(date_col <= datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59))
+        except ValueError:
+            pass
+    if quality:
+        if quality == "missing_category":
+            query = query.filter(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
+        elif quality == "missing_metadata":
+            query = query.filter(or_(Content.title.is_(None), Content.title == "", Content.preview_text.is_(None), Content.preview_text == ""))
+        elif quality == "duplicate":
+            dup_sub = db.session.query(Content.title).group_by(Content.title).having(func.count(Content.id) > 1).subquery()
+            query = query.filter(Content.title.in_(dup_sub))
+
+    query = query.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    page_items = pagination.items
+
+    ids_by_type: dict[str, set] = {}
+    for c in page_items:
+        ids_by_type.setdefault(c.object_type, set()).add(c.object_id)
+    targets_map = {}
+    for obj_type, ids in ids_by_type.items():
+        model = {"article": Article, "video": Video, "post": Post}.get(obj_type)
+        if model:
+            stmt = select(model).where(model.id.in_(list(ids)))
+            if model == Article:
+                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
+            objs = db.session.execute(stmt).scalars().all()
+            for obj in objs:
+                targets_map[(obj_type, obj.id)] = obj
+
+    duplicate_titles: set = set()
+    if quality == "duplicate":
+        titles = [c.title for c in page_items if c.title]
+        if titles:
+            dup_rows = db.session.execute(
+                select(Content.title).where(Content.title.in_(titles)).group_by(Content.title).having(func.count(Content.id) > 1)
+            ).scalars().all()
+            duplicate_titles = set(dup_rows)
+
+    serialized = [
+        _serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
+        for c in page_items
+    ]
+
+    html = render_template("admin/control_panel/contents/_rows.html", items=serialized)
+    resp = make_response(html)
+    resp.headers["X-Total"] = pagination.total
+    resp.headers["X-Pages"] = pagination.pages
+    resp.headers["X-Page"]  = pagination.page
+    return resp
+
+
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_content(id):
+    """Return server-rendered HTML for the content inspect modal body."""
+    content = db.session.get(Content, id)
+    if not content:
+        return "<p class='text-muted'>Content not found.</p>", 404
+
+    target = None
+    if content.object_type in ("article", "video", "post"):
+        model = {"article": Article, "video": Video, "post": Post}.get(content.object_type)
+        if model:
+            target = db.session.get(model, content.object_id)
+
+    row = _serialize_content_row(content, target, set())
+    return render_template("admin/control_panel/contents/_inspect.html", content=row)
 
 
 @bp.route("/bulk", methods=["POST"])

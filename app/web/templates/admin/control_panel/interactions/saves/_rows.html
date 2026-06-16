@@ -1,0 +1,23 @@
+{% from "admin/components/crud.html" import admin_crud_rows %}
+
+{% macro render_row(s) %}
+<tr>
+  <td>
+    <span class="user-cell-name">{{ s.target_title }}</span>
+  </td>
+  <td>
+    <span class="status-badge text-capitalize {{ 'badge-blue' if s.target_type == 'content' else 'badge-purple' }}">
+      {{ s.target_type }}
+    </span>
+  </td>
+  <td>
+    <span class="user-cell-name">{{ s.user_name }}</span>
+    <div class="user-cell-email">{{ s.user_email[:2] ~ "******" ~ s.user_email[-11:] if s.user_email else "—" }}</div>
+  </td>
+  <td>
+    <span class="user-cell-email">{{ s.created_at[:10] if s.created_at else "—" }}</span>
+  </td>
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, colspan=4, empty_text="No saves found.") }}

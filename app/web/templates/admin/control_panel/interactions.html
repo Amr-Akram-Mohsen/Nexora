@@ -1,6 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_modal,
-admin_spinner, admin_table_spinner, admin_filter_select %}
+admin_spinner, admin_crud_table, admin_filter_select %}
 {% from "admin/components/macros.html" import
     admin_search_input,
     admin_reset_button,
@@ -65,23 +65,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   {{ admin_summary_bar("comments-count", "comments", summary_id="comments-summary") }}
 
   <!-- Comment Table -->
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="comments-table">
-      <thead>
-        <tr>
-          <th class="col-primary">Comment Preview</th>
-          <th>User</th>
-          <th>Target</th>
-          <th class="col-status">Sentiment</th>
-          <th class="col-date">Date</th>
-          <th class="col-actions">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="comments-table-body">
-        {{ admin_table_spinner(6, "Loading comments…") }}
-      </tbody>
-    </table>
-  </div>
+  {{ admin_crud_table(tables["comments"], "Loading comments…") }}
 
   {{ admin_paginator(domain="comments", per_page_options=[25, 50], current_per_page=25) }}
 </div>
@@ -114,22 +98,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
     <!-- Reactions Summary -->
     {{ admin_summary_bar("reactions-count", "reactions", summary_id="reactions-summary") }}
 
-    <div class="admin-table-wrapper">
-      <table class="admin-table" id="reactions-table">
-        <thead>
-          <tr>
-            <th class="col-id">ID</th>
-            <th class="col-primary">Target</th>
-            <th class="col-status">Type</th>
-            <th class="col-primary">User</th>
-            <th class="col-date">Date</th>
-          </tr>
-        </thead>
-        <tbody id="reactions-table-body">
-          {{ admin_table_spinner(5, "Loading reactions…", "loading-height-md") }}
-        </tbody>
-      </table>
-    </div>
+    {{ admin_crud_table(tables["reactions"], "Loading reactions…", "loading-height-md") }}
 
     {{ admin_paginator(domain="reactions", per_page_options=[25, 50], current_per_page=25) }}
   </div>
@@ -155,21 +124,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   {{ admin_summary_bar("views-count", "view targets", summary_id="views-summary") }}
 
   <!-- Views Table -->
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="views-table">
-      <thead>
-        <tr>
-          <th class="col-primary">Target</th>
-          <th class="col-status">Target Type</th>
-          <th class="col-metric">Views Count</th>
-          <th class="col-date">Latest View</th>
-        </tr>
-      </thead>
-      <tbody id="views-table-body">
-        {{ admin_table_spinner(4, "Loading views…") }}
-      </tbody>
-    </table>
-  </div>
+  {{ admin_crud_table(tables["views"], "Loading views…") }}
 
   {{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
 </div>
@@ -189,21 +144,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   {{ admin_summary_bar("clicks-count", "click logs", summary_id="clicks-summary") }}
 
   <!-- Clicks Table -->
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="clicks-table">
-      <thead>
-        <tr>
-          <th class="col-primary">Item</th>
-          <th class="col-primary">Destination</th>
-          <th class="col-metric">Click Count</th>
-          <th class="col-date">Latest Click</th>
-        </tr>
-      </thead>
-      <tbody id="clicks-table-body">
-        {{ admin_table_spinner(4, "Loading clicks…") }}
-      </tbody>
-    </table>
-  </div>
+  {{ admin_crud_table(tables["clicks"], "Loading clicks…") }}
 
   {{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
 </div>
@@ -223,21 +164,7 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
   {{ admin_summary_bar("saves-count", "saves", summary_id="saves-summary") }}
 
   <!-- Saves Table -->
-  <div class="admin-table-wrapper">
-    <table class="admin-table" id="saves-table">
-      <thead>
-        <tr>
-          <th class="col-primary">Target</th>
-          <th class="col-status">Target Type</th>
-          <th class="col-primary">User</th>
-          <th class="col-date">Save Date</th>
-        </tr>
-      </thead>
-      <tbody id="saves-table-body">
-        {{ admin_table_spinner(4, "Loading saves…") }}
-      </tbody>
-    </table>
-  </div>
+  {{ admin_crud_table(tables["saves"], "Loading saves…") }}
 
   {{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
 </div>
@@ -245,142 +172,6 @@ admin_spinner, admin_table_spinner, admin_filter_select %}
 {% call admin_modal("inspect-comment-modal", "Comment Details & Moderation", "💬") %}
 {{ admin_modal_close_button(button_id="inspect-comment-close-btn") }}
 {% endcall %}
-
-<template id="comments-row-template">
-  <tr>
-    <td>
-      <span class="comment-cell-preview user-cell-name"></span>
-      <div class="comment-cell-reply user-cell-email">↩ Reply</div>
-    </td>
-    <td>
-      <span class="comment-cell-username user-cell-name"></span>
-    </td>
-    <td>
-      <span class="comment-cell-target user-cell-name"></span>
-      <div class="mt-1">
-        <span class="comment-cell-targettype status-badge text-capitalize"></span>
-      </div>
-    </td>
-    <td>
-      <span class="comment-cell-sentiment status-badge"></span>
-    </td>
-    <td>
-      <span class="comment-cell-date user-cell-email"></span>
-    </td>
-    <td>
-      {% call action_group() %}
-        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-comment", extra_class="inspect-btn") }}
-      {% endcall %}
-    </td>
-  </tr>
-</template>
-
-<template id="comment-inspect-template">
-  <div class="inspect-details-group flex flex-col">
-    {% call inspect_section("Comment Metadata") %}
-      {{ inspect_detail_row("ID", "inspect-id") }}
-      {% call inspect_custom_row("Author") %}
-        <span class="inspect-username"></span> (email: <span class="inspect-useremail"></span>, ID: <span class="inspect-userid"></span>)
-      {% endcall %}
-      {{ inspect_detail_row("Target Title", "inspect-target-title") }}
-      {{ inspect_detail_row("Target Type", "inspect-target-type status-badge inspect-badge-secondary") }}
-      {{ inspect_detail_row("Created At", "inspect-date") }}
-      {{ inspect_detail_row("AI Sentiment", "inspect-sentiment status-badge") }}
-    {% endcall %}
-
-    {% call inspect_section("Comment Body") %}
-      <div class="inspect-comment-body-text"
-        style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 6px; font-style: italic; white-space: pre-wrap; margin-top: 0.5rem; word-break: break-word;">
-      </div>
-    {% endcall %}
-
-    {% call inspect_section("Moderation Actions", divider=false) %}
-      <div class="flex gap-2 mt-2 flex-wrap">
-        {{ action_button("Flag as Spam", action_type="toggle-active", icon="🚩", extra_class="inspect-flag-btn") }}
-        {{ action_button("Delete Comment", action_type="delete", icon="🗑", extra_class="inspect-delete-btn") }}
-      </div>
-    {% endcall %}
-  </div>
-</template>
-
-<template id="reactions-row-template">
-  <tr>
-    <td><span class="reaction-cell-id user-cell-name"></span></td>
-    <td>
-      <span class="reaction-cell-target user-cell-name"></span>
-      <div class="mt-1">
-        <span class="reaction-cell-targettype status-badge text-capitalize"></span>
-      </div>
-    </td>
-    <td><span class="reaction-cell-type status-badge"></span></td>
-    <td>
-      <span class="reaction-cell-username user-cell-name"></span>
-      <div class="reaction-cell-useremail user-cell-email"></div>
-    </td>
-    <td><span class="reaction-cell-date user-cell-email"></span></td>
-  </tr>
-</template>
-
-<template id="views-row-template">
-  <tr>
-    <td>
-      <span class="views-cell-target user-cell-name"></span>
-    </td>
-    <td>
-      <span class="views-cell-targettype status-badge text-capitalize"></span>
-    </td>
-    <td class="col-metric">
-      <span class="views-cell-count font-mono font-medium"></span>
-    </td>
-    <td>
-      <span class="views-cell-date user-cell-email"></span>
-    </td>
-  </tr>
-</template>
-
-<template id="clicks-row-template">
-  <tr>
-    <td>
-      <span class="clicks-cell-item user-cell-name"></span>
-    </td>
-    <td>
-      <a class="clicks-cell-destination user-cell-name link-external" target="_blank" rel="noopener noreferrer"></a>
-    </td>
-    <td class="col-metric">
-      <span class="clicks-cell-count font-mono font-medium"></span>
-    </td>
-    <td>
-      <span class="clicks-cell-date user-cell-email"></span>
-    </td>
-  </tr>
-</template>
-
-<template id="saves-row-template">
-  <tr>
-    <td>
-      <span class="saves-cell-target user-cell-name"></span>
-    </td>
-    <td>
-      <span class="saves-cell-targettype status-badge text-capitalize"></span>
-    </td>
-    <td>
-      <span class="saves-cell-username user-cell-name"></span>
-      <div class="saves-cell-useremail user-cell-email"></div>
-    </td>
-    <td>
-      <span class="saves-cell-date user-cell-email"></span>
-    </td>
-  </tr>
-</template>
-
-<template id="interactions-stat-card-template">
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-icon inline-flex-center"></div>
-    <h3 class="dashboard-stat-value"></h3>
-    <p class="dashboard-stat-label"></p>
-  </div>
-</template>
-
 
 {% endblock %}
 

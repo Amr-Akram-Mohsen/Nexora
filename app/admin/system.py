@@ -10,9 +10,10 @@ Refactoring applied:
 import os
 import sys
 import flask
-from flask import Blueprint, jsonify, current_app, request
+from flask import Blueprint, jsonify, current_app, request, render_template
 from app.core.extensions import db, cache
 from app.core.decorators import admin_required
+from app.admin.ingestions import get_integrations_status_data, get_integrations_logs_data
 
 bp = Blueprint("api_system", __name__, url_prefix="/admin/system")
 
@@ -102,3 +103,66 @@ def reset_system():
         db.session.rollback()
         current_app.logger.error(f"[SYSTEM] System reset failed: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ─────────────────────────────────────────────
+# WIDGET ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route("/widget/info", methods=["GET"])
+def widget_system_info():
+    try:
+        db_type = db.engine.name if db.engine else "Unknown"
+    except Exception:
+        db_type = "Unknown"
+
+    version = current_app.config.get("APP_VERSION", "1.3.0")
+    info = [
+        {"label": "Backend Status", "value": "online", "status": "online"},
+        {"label": "Version",        "value": version},
+        {"label": "Environment",    "value": current_app.config.get("ENV", "Development")},
+        {"label": "Python",         "value": sys.version.split()[0]},
+        {"label": "Flask",          "value": flask.__version__},
+        {"label": "Database",       "value": db_type.capitalize()},
+    ]
+    return render_template("admin/control_panel/settings/widgets/_info.html", info=info)
+
+
+@bp.route("/widget/integrations", methods=["GET"])
+def widget_integrations():
+    data = get_integrations_status_data()
+    from datetime import datetime
+    for intg in data:
+        last_fetch = intg.get("last_fetch")
+        if last_fetch:
+            try:
+                dt = datetime.fromisoformat(last_fetch)
+                intg["last_fetch_formatted"] = dt.strftime("%m/%d/%Y, %I:%M:%S %p")
+            except Exception:
+                intg["last_fetch_formatted"] = last_fetch
+        else:
+            intg["last_fetch_formatted"] = "Never"
+    return render_template("admin/control_panel/settings/widgets/_integrations.html", data=data)
+
+
+@bp.route("/widget/ingestion-logs", methods=["GET"])
+def widget_ingestion_logs():
+    log_type = request.args.get("type", "all")
+    data = get_integrations_logs_data()
+    
+    if log_type != "all":
+        data = [log for log in data if log.get("type") == log_type]
+        
+    from datetime import datetime
+    for log in data:
+        log_time = log.get("time")
+        if log_time:
+            try:
+                dt = datetime.fromisoformat(log_time)
+                log["time_formatted"] = dt.strftime("%m/%d/%Y, %I:%M:%S %p")
+            except Exception:
+                log["time_formatted"] = log_time
+        else:
+            log["time_formatted"] = "Recently"
+            
+    return render_template("admin/control_panel/settings/widgets/_ingestion_logs.html", logs=data)

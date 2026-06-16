@@ -148,7 +148,7 @@ extra_class="",
 button_id="",
 button_type="button"
 ) %}
-<button type="{{ button_type }}" {% if button_id %} id="{{ button_id }}" {% endif %} {% if data_action %}
+<button type="{{ button_type }}" {% if button_id %} data-id="{{ button_id }}" {% endif %} {% if data_action %}
     data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
     class="user-action-btn user-action-{{ action_type }} {{ extra_class }}">
     {% if icon %}

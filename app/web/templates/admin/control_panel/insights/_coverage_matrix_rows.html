@@ -1,0 +1,14 @@
+{% if items %}
+  {% for item in items %}
+    <tr>
+      <td class="font-bold text-foreground">{{ item.name }}</td>
+      <td class="col-metric"><span class="status-badge badge-blue font-bold">{{ item.demand }}</span></td>
+      <td class="col-metric"><span class="status-badge badge-purple font-bold">{{ item.coverage }}</span></td>
+      <td>
+        <span class="status-badge {{ item.gap_class }}">{{ item.gap_score }}</span>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr><td colspan="4" class="text-center text-muted">No matrix data available.</td></tr>
+{% endif %}

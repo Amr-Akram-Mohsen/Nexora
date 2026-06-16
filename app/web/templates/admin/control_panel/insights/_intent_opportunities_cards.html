@@ -1,0 +1,18 @@
+{% if items %}
+  {% for item in items %}
+    <div class="insights-opp-card flex flex-col">
+      <h3 class="opp-title" title="{{ item.category_name }}">{{ item.category_name }}</h3>
+      <div class="opp-metrics">
+        {% for intentName, count in item.distribution.items() %}
+          <span class="status-badge secondary font-normal">{{ intentName }}: <strong>{{ count }}</strong></span>
+        {% endfor %}
+      </div>
+      <div class="opp-action">
+        <span>🎯</span>
+        <span>Opportunity: <strong>{{ item.opportunity }}</strong></span>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="text-center text-muted p-4">No intent distribution gaps identified.</div>
+{% endif %}

@@ -1,0 +1,15 @@
+<ul class="system-info-list">
+  {% for row in info %}
+    <li class="system-info-row flex justify-between items-center">
+      <span class="system-info-label">{{ row.label }}</span>
+      <span class="system-info-value">
+        {% if row.status %}
+          {% set cls = 'status-ok' if row.status == 'online' else ('status-error' if row.status == 'error' else 'status-pending') %}
+          <span class="integration-status {{ cls }}">{{ row.value }}</span>
+        {% else %}
+          {{ row.value or "—" }}
+        {% endif %}
+      </span>
+    </li>
+  {% endfor %}
+</ul>

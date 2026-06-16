@@ -1,10 +1,7 @@
+{% from "admin/components/ui.html" import admin_panel, admin_loading_state %}
 <!-- Section 1.995: Execution Governance Panel -->
-<div class="overview-panel" id="execution-governance-panel" style="display: none;">
-  <div class="overview-panel-header">
-    <h3 class="overview-panel-title">Execution Governance & Production Control</h3>
-    <p class="overview-panel-sub">Production control center displaying risk scores, safety modes, and gated execution queues.</p>
-  </div>
-  
+{% call admin_panel("Execution Governance & Production Control", "Production control center displaying risk scores, safety modes, and gated execution queues.", id="execution-governance-panel", display_style="none") %}
+<div id="execution-governance-body-wrapper">
   <!-- Summary / Config Mode Bar -->
   <div class="publishing-summary-bar" id="execution-governance-summary">
     <!-- Populated by JS -->
@@ -13,7 +10,8 @@
   <div class="insights-kanban-grid" id="execution-governance-grid-container">
     <!-- Three Columns (Safe/Executed, Needs Approval, Blocked) populated by JS -->
     <div class="grid-full-width text-center">
-      {{ admin_table_spinner(1, "Loading governance queues...") }}
+      {{ admin_loading_state("Loading governance queues...") }}
     </div>
   </div>
 </div>
+{% endcall %}

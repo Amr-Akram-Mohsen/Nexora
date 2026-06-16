@@ -1,0 +1,36 @@
+{% from "admin/components/macros.html" import action_button, action_group %}
+{% from "admin/components/crud.html" import admin_crud_rows %}
+
+{% macro render_row(item) %}
+<tr id="item-row-{{ item.id }}">
+  <td>
+    <div class="item-cell-name cell-name">{{ item.name }}</div>
+  </td>
+  <td>
+    <span class="item-cell-brand cell-name">{{ item.brand }}</span>
+  </td>
+  <td>
+    <span class="item-cell-category cell-name">{{ item.category }}</span>
+  </td>
+  <td>
+    {% if item.min_price is not none %}
+    {{ "%.2f"|format(item.min_price) }} {{ item.currency or "" }}
+    {% else %}
+    —
+    {% endif %}
+  </td>
+  <td>{{ item.store_count }}</td>
+  <td>{{ "{:,}".format(item.click_count or 0) }}</td>
+  <td>
+    <span class="user-cell-email">{{ item.created_at[:10] if item.created_at else "—" }}</span>
+  </td>
+  <td>
+    {% call action_group() %}
+    {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-item",
+    extra_class="inspect-btn", button_id=item.id) }}
+    {% endcall %}
+  </td>
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, colspan=8, empty_text="No products found.") }}

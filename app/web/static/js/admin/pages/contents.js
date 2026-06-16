@@ -7,7 +7,6 @@
   let contentsController;
   let selectedIds = new Set();
   let categoriesList = [];
-  let loadedItems = [];
 
   // ==============================
   // INITIALIZATION
@@ -81,105 +80,7 @@
       });
   }
 
-  // ==============================
-  // RENDER TABLE ROWS
-  // ==============================
-  function renderContentRow(item) {
-    const template = document.getElementById("contents-row-template");
-    const clone = template.content.cloneNode(true);
-    const tr = clone.querySelector("tr");
-    tr.id = `content-row-${item.id}`;
-    tr.dataset.id = item.id;
-    tr.dataset.categoryId = item.category_id || "";
 
-    // Checkbox setup
-    const checkbox = clone.querySelector(".row-select-checkbox");
-    checkbox.dataset.id = item.id;
-    checkbox.checked = selectedIds.has(item.id);
-    if (selectedIds.has(item.id)) {
-      tr.classList.add("is-selected");
-    }
-
-    // Type Badge styling
-    let typeClass = "user";
-    if (item.object_type === "article") typeClass = "admin";
-    else if (item.object_type === "video") typeClass = "active";
-
-    const typeBadge = clone.querySelector(".content-cell-type");
-    typeBadge.className = `content-cell-type status-badge ${typeClass} text-capitalize`;
-    typeBadge.textContent = item.object_type;
-
-    // Title
-    const titleText = clone.querySelector(".content-cell-title-text");
-    const titleLink = clone.querySelector(".content-cell-title-link");
-    const titleLinkText = clone.querySelector(".content-cell-title-link-text");
-
-    if (item.url) {
-      titleText.remove();
-      titleLink.href = item.url;
-      titleLinkText.textContent = item.title;
-    } else {
-      titleLink.remove();
-      titleText.textContent = item.title;
-    }
-
-    // Category
-    clone.querySelector(".content-cell-category-name").textContent = item.category_name;
-
-    // Source
-    clone.querySelector(".content-cell-source").textContent = item.sources;
-
-    // Views & Comments
-    clone.querySelector(".content-cell-views").textContent = item.view_count.toLocaleString();
-    clone.querySelector(".content-cell-comments").textContent = item.comment_count;
-
-    // Date
-    clone.querySelector(".content-cell-date").textContent = item.published_at ? new Date(item.published_at).toLocaleDateString() : "—";
-
-    // Status / Quality issues badge
-    const statusCell = clone.querySelector(".content-cell-status");
-    statusCell.innerHTML = "";
-
-    const statusBadge = document.createElement("span");
-    statusBadge.className = `status-badge ${item.is_active ? 'active' : 'inactive'}`;
-    statusBadge.textContent = item.is_active ? "Active" : "Inactive";
-    statusCell.appendChild(statusBadge);
-
-    if (item.quality_issues && item.quality_issues.length > 0) {
-      item.quality_issues.forEach((flag) => {
-        const flagBadge = document.createElement("span");
-        flagBadge.className = "status-badge inactive badge-margin";
-        if (flag === "missing_category") {
-          flagBadge.textContent = "⚠️ Category";
-          flagBadge.title = "Content belongs to uncategorized and requires clean routing.";
-        } else if (flag === "missing_metadata") {
-          flagBadge.className += " badge-orange";
-          flagBadge.textContent = "📝 Metadata";
-          flagBadge.title = "Missing essential title or preview details.";
-        } else if (flag === "duplicate") {
-          flagBadge.className += " badge-indigo";
-          flagBadge.textContent = "👯 Duplicate";
-          flagBadge.title = "Duplicate titles matching other aggregates.";
-        }
-        statusCell.appendChild(document.createTextNode(" "));
-        statusCell.appendChild(flagBadge);
-      });
-    } else {
-      const cleanBadge = document.createElement("span");
-      cleanBadge.className = "status-badge active";
-      cleanBadge.title = "No critical catalog/enrichment issues.";
-      cleanBadge.textContent = "✓ Clean";
-      statusCell.appendChild(document.createTextNode(" "));
-      statusCell.appendChild(cleanBadge);
-    }
-
-
-    // Inspect datasets
-    const inspectBtn = clone.querySelector(".inspect-btn");
-    inspectBtn.dataset.id = item.id;
-
-    return tr;
-  }
 
   // ==============================
   // STATE SELECTIONS
@@ -363,75 +264,21 @@
   }
 
 
-  // ==============================
-  // SOURCE/PROVIDER DETAILS INSPECTOR
-  // ==============================
-  function showInspectModal(item) {
-    const modal = document.getElementById("inspect-modal");
-    const body = document.getElementById("inspect-modal-body");
+  // ── Inspect Modal (server-rendered body) ─────────────────────
+  function showInspectModal(contentId, title) {
+    const modal   = document.getElementById("inspect-modal");
+    const body    = document.getElementById("inspect-modal-body");
     const titleEl = document.getElementById("inspect-modal-title");
+    if (!modal || !body) return;
 
-    titleEl.textContent = `Inspect: ${item.title}`;
-
-    const template = document.getElementById("content-inspect-template");
-    const clone = template.content.cloneNode(true);
-
-    clone.querySelector(".inspect-id").textContent = `#${item.id}`;
-    clone.querySelector(".inspect-type").textContent = item.object_type;
-    clone.querySelector(".inspect-category").textContent = item.category_name;
-    clone.querySelector(".inspect-section").textContent = item.section_name;
-    clone.querySelector(".inspect-source-name").textContent = item.source_name;
-    clone.querySelector(".inspect-source-slug").textContent = item.source_slug;
-
-    const linkContainer = clone.querySelector(".inspect-source-link");
-    if (item.url) {
-      linkContainer.innerHTML = "";
-      const a = document.createElement("a");
-      a.href = item.url;
-      a.target = "_blank";
-      a.className = "activity-target inspect-link";
-      a.textContent = "View Original Link ";
-      
-      const icon = document.createElement("i");
-      icon.className = "fas fa-external-link-alt";
-      a.appendChild(icon);
-      linkContainer.appendChild(a);
-    } else {
-      linkContainer.textContent = "—";
-    }
-
-
-    clone.querySelector(".inspect-ingested-at").textContent = item.ingested_at ? new Date(item.ingested_at).toLocaleString() : "—";
-    clone.querySelector(".inspect-published-at").textContent = item.published_at ? new Date(item.published_at).toLocaleString() : "—";
-
-    const statusEl = clone.querySelector(".inspect-status");
-    statusEl.textContent = item.status;
-    statusEl.classList.add(item.status === 'complete' ? 'inspect-badge-complete' : 'inspect-badge-pending');
-
-    clone.querySelector(".inspect-visibility").textContent = item.is_published ? "Live Index" : "Draft (Moderation Review)";
-    clone.querySelector(".inspect-record-status").textContent = item.is_active ? "Active" : "Inactive / Hidden";
-
-    // Wire up delete button inside inspect modal
-    const deleteBtn = clone.querySelector(".inspect-delete-btn");
-    if (deleteBtn) {
-      deleteBtn.dataset.id = item.id;
-      deleteBtn.dataset.title = item.title;
-      deleteBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        showModal(
-          "Safer Catalog Deletion",
-          `Are you sure you want to completely delete "${item.title}"? This will safely wipe the database record, its polymorphic references (Article/Video/Post entries), reactions, logs, and comments. This is permanent.`,
-          () => {
-            performSingleDelete(item.id);
-            modal.classList.remove("active");
-          }
-        );
-      });
-    }
-
-    body.innerHTML = "";
-    body.appendChild(clone);
+    body.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>';
+    titleEl.textContent = `Inspect: ${title || "Content"}`;
     modal.classList.add("active");
+
+    fetch(`/admin/contents/${contentId}/inspect`)
+      .then(res => res.text())
+      .then(html => { body.innerHTML = html; })
+      .catch(() => { body.innerHTML = "<p class='text-muted'>Could not load content details.</p>"; });
   }
 
   // ==============================
@@ -555,17 +402,34 @@
       const inspectBtn = e.target.closest(".inspect-btn");
       if (inspectBtn) {
         e.stopPropagation();
-        const cid = parseInt(inspectBtn.dataset.id, 10);
-        const item = loadedItems.find(it => it.id === cid);
-        if (item) showInspectModal(item);
+        const cid   = parseInt(inspectBtn.dataset.id, 10);
+        const title = inspectBtn.closest("tr")?.querySelector(".content-cell-title")?.textContent?.trim();
+        showInspectModal(cid, title);
       }
     });
+
+    // Inspect modal: delete action delegation
+    const inspectModal = document.getElementById("inspect-modal");
+    if (inspectModal) {
+      inspectModal.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action='delete-content']");
+        if (!btn) return;
+        const id    = parseInt(btn.dataset.id, 10);
+        const title = btn.dataset.title || "this content";
+        showModal(
+          "Safer Catalog Deletion",
+          `Are you sure you want to completely delete "${title}"? This is permanent.`,
+          () => { performSingleDelete(id); inspectModal.classList.remove("active"); }
+        );
+      });
+    }
   }
 
   // Define Controller Configuration
   contentsController = new AdminListController({
     domain: "contents",
     endpoint: "/admin/contents/",
+    rowsEndpoint: "/admin/contents/rows",  // ← HTML partial mode
     tbodyId: "contents-table-body",
     searchId: "content-search",
     filterIds: [
@@ -581,13 +445,9 @@
     countId: "contents-count",
     clearBtnId: "clear-filters-btn",
     refreshBtnId: "refresh-contents-btn",
-    rowTemplateId: "contents-row-template",
     defaultPerPage: 20,
     colspan: 9,
-    itemsKey: "items",
-    renderRow: renderContentRow,
-    onLoaded: (data) => {
-      loadedItems = data.items || [];
+    onLoaded: () => {
       document.getElementById("select-all-contents").checked = false;
     },
     autoInit: false // Initialized manually inside loadMetadata()

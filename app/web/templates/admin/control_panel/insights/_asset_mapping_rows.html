@@ -1,0 +1,102 @@
+{% if items %}
+  {% for item in items %}
+    <tr class="asset-mapping-row" data-entity="{{ item.entity or '' }}">
+      <td>
+        <div class="font-bold text-foreground text-base">{{ item.entity }} | {{ item.type|upper }}</div>
+      </td>
+      <td>
+        <div class="asset-mapping-item-meta mt-2">Score: {{ "%.2f"|format(item.opportunity_score) }}</div>
+      </td>
+      <td class="col-asset-count">{{ (item.existing_assets or [])|length }} Assets</td>
+      <td class="col-gap-count">{{ (item.missing_assets or [])|length }} Gaps</td>
+      <td>
+        <div class="asset-mapping-actions">
+          <button type="button" class="btn btn-outline btn-sm asset-mapping-details-toggle" aria-expanded="false">
+            <i class="fa fa-chevron-right" aria-hidden="true"></i> View
+          </button>
+        </div>
+      </td>
+    </tr>
+    <tr class="asset-mapping-details-row" style="display: none;">
+      <td colspan="5">
+        <div class="asset-mapping-details">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Existing Assets</h6>
+              <ul class="asset-mapping-list">
+                {% if item.existing_assets %}
+                  {% for asset in item.existing_assets %}
+                    <li class="asset-mapping-item">
+                      <div class="asset-mapping-item-header">
+                        <div class="asset-mapping-item-title">
+                          {% if asset.type == 'video' %}🎥{% elif asset.type == 'article' %}📄{% else %}🛍️{% endif %}
+                          {{ asset.title }}
+                        </div>
+                        <div>
+                          {% if asset.action %}
+                            <span class="status-badge {% if asset.action == 'reuse' %}badge-green{% elif asset.action == 'update' %}badge-warning{% else %}badge-blue{% endif %}">
+                              {{ asset.action|upper }}
+                            </span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <div class="asset-mapping-item-meta">
+                        Relevance Match: {{ (asset.relevance_score * 100)|round|int }}%
+                      </div>
+                    </li>
+                  {% endfor %}
+                {% else %}
+                  <li class="text-muted asset-mapping-item" style="font-style: italic;">
+                    No matching assets found in database.
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Missing Assets (Gaps)</h6>
+              <ul class="asset-mapping-list">
+                {% if item.missing_assets %}
+                  {% for gap in item.missing_assets %}
+                    <li class="asset-mapping-item">
+                      <div class="asset-mapping-item-header">
+                        <div class="asset-mapping-item-title">
+                          <span class="status-badge badge-purple">{{ gap.content_type|upper }}</span>
+                          {{ gap.missing_topic }}
+                        </div>
+                        <div>
+                          {% if gap.priority == 'high' %}
+                            <span class="status-badge badge-danger">CREATE (HIGH)</span>
+                          {% elif gap.priority == 'medium' %}
+                            <span class="status-badge badge-warning">CREATE (MED)</span>
+                          {% else %}
+                            <span class="status-badge badge-secondary">CREATE (LOW)</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% if gap.reason %}
+                        <div class="asset-mapping-item-meta mt-1"><strong>Reason:</strong> {{ gap.reason }}</div>
+                      {% endif %}
+                      {% if gap.priority_justification %}
+                        <div class="asset-mapping-item-meta"><strong>Justification:</strong> {{ gap.priority_justification }}</div>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                {% else %}
+                  <li class="text-muted asset-mapping-item" style="font-style: italic;">
+                    No content gaps identified.
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="5" class="text-center text-muted">
+      No asset mappings found.
+    </td>
+  </tr>
+{% endif %}
