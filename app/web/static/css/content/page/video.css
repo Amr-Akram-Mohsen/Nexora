@@ -15,12 +15,6 @@
   border: 1px solid var(--border);
 }
 
-.platform-badge--youtube {
-  background: rgba(255, 0, 0, 0.1);
-  color: #ff0000;
-  border-color: rgba(255, 0, 0, 0.2);
-}
-
 .video-header__title {
   font-size: clamp(1.75rem, 4vw, 3rem);
   font-weight: 800;

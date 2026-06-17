@@ -15,12 +15,6 @@
   border: 1px solid var(--border);
 }
 
-.platform-badge--reddit {
-  background: rgba(255, 69, 0, 0.1);
-  color: #ff4500;
-  border-color: rgba(255, 69, 0, 0.2);
-}
-
 .post-header__title {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 800;

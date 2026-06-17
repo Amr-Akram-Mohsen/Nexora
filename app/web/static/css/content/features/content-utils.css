@@ -69,16 +69,6 @@
     box-shadow: var(--shadow-md);
   }
 }
-
-.snippet-content__img {
-  width: 100%;
-  max-width: 200px;
-  max-height: 200px;
-  aspect-ratio: 16 / 9;
-  flex-shrink: 0;
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
 .snippet-content__content {flex-direction: column;
   width: 100%;
   max-width: 200px;

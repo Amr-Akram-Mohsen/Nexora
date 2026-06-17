@@ -23,17 +23,6 @@
     overflow-y: auto;
 }
 
-.dashboard-wrapper {
-    max-width: var(--container-max-width, 1000px);
-    margin: 0 auto;
-    padding: 2rem 1rem;
-}
-
-.dashboard-list {
-    gap: var(--card-gap, 1.5rem);
-    width: 100%;
-}
-
 .dashboard-item {
     padding: 1.25rem 1.5rem;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -42,35 +31,6 @@
 .dashboard-item:hover {
     box-shadow: var(--shadow-md);
     border-color: rgba(var(--brand-blue-rgb), 0.25);
-}
-
-.dashboard-top-bar {
-    margin-bottom: 1.5rem;
-}
-
-.dashboard-title {
-    margin: 0;
-    font-size: var(--text-base);
-    font-weight: var(--weight-bold);
-    color: var(--foreground);
-}
-.dashboard-meta-container {margin-top: 0.25rem;
-}
-
-.dashboard-meta {
-    font-size: var(--text-sm);
-    color: var(--muted-foreground);
-    margin: 0;
-}
-
-.dashboard-meta strong {
-    font-weight: var(--weight-bold);
-    margin-right: 0.25rem;
-    color: var(--foreground);
-}
-
-.dashboard-actions {
-    margin-left: 1rem;
 }
 
 /* --- Control Panel Grid Layout --- */
@@ -105,10 +65,6 @@
     width: 100%;
     margin: 0 auto;
     min-width: 0;
-}
-
-.admin-content-fluid {
-    max-width: var(--container-max-width-fluid, 1600px);
 }
 
 /* --- Page Header Layout & Typography --- */
@@ -266,13 +222,6 @@
     padding: 1.25rem 1rem;
 }
 
-.dashboard-loading.loading-height-md,
-.dashboard-empty.loading-height-md,
-.dashboard-error.loading-height-md {
-    min-height: 180px;
-    padding: 2rem 1.5rem;
-}
-
 .dashboard-loading.loading-height-lg,
 .dashboard-empty.loading-height-lg,
 .dashboard-error.loading-height-lg {
@@ -298,10 +247,4 @@
     font-size: var(--text-xs);
     margin-top: 0.375rem;
     opacity: 0.7;
-}
-
-.state-action-wrap {
-    text-align: center;
-    margin-top: -1rem;
-    margin-bottom: 1rem;
 }

@@ -276,29 +276,6 @@ details[open] .filter-section__chevron {
   transform: translateX(2px);
 }
 
-/* Subtitle tagline below the section header (e.g., "Articles & reviews for what you're browsing") */
-.sidebar-trending__subtitle {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  margin: -0.5rem 0 0.75rem;
-  line-height: 1.4;
-  opacity: 0.8;
-}
-
-/* Editorial variant — blue accent instead of domain-primary (commercial green) */
-.sidebar-trending--editorial {
-  border-top-color: rgba(var(--brand-blue-rgb), 0.2);
-}
-
-.sidebar-trending--editorial .sidebar-trending__header i {
-  color: rgb(var(--brand-blue-rgb));
-}
-
-.sidebar-trending--editorial .sidebar-trending__link.is-active,
-.sidebar-trending--editorial .sidebar-trending__link:hover i {
-  color: rgb(var(--brand-blue-rgb));
-}
-
 /* --- "Show More" Interactive Toggle --- */
 .filter-item--more-toggle {
   margin-top: 0.25rem;

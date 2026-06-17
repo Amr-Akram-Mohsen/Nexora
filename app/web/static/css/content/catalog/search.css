@@ -1,8 +1,4 @@
-/* --- Search Results --- */
 
-.search-results-page .listing-header {
-  gap: 1rem;
-}
 .search-page-form {min-width: min(100%, 400px);
 }
 .search-page-form__wrapper {

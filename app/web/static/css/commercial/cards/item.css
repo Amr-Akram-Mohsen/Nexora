@@ -40,26 +40,6 @@
   background: var(--background);
 }
 
-.card__tag--electronics {
-  /* Use type-specific token (electronics) */
-  color: rgb(var(--type-electronics-rgb));
-  border-color: rgba(var(--type-electronics-rgb), 0.25);
-}
-
-.card__tag--perfumes,
-.card__tag--perfume {
-  /* Use type-specific token (perfume) */
-  color: rgb(var(--type-perfume-rgb));
-  border-color: rgba(var(--type-perfume-rgb), 0.25);
-}
-
-.card__tag--accessories,
-.card__tag--accessory {
-  /* Use type-specific token (accessories) */
-  color: rgb(var(--type-accessories-rgb));
-  border-color: rgba(var(--type-accessories-rgb), 0.25);
-}
-
 /* Discount Badge */
 .card__discount-badge {
   position: absolute;

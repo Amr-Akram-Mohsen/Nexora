@@ -98,13 +98,6 @@ padding-bottom: 1rem;
 .meta-item {gap: 0.6rem;
   transition: color 0.3s;
 }
-.meta-icon-wrapper {width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(var(--domain-primary-rgb), var(--alpha-soft));
-  color: var(--domain-primary);
-  font-size: 14px;
-}
 
 /* --- Media Section --- */
 .detail-page__image {

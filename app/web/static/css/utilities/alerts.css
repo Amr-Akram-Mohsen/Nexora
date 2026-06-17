@@ -43,27 +43,3 @@
 .alert .alert-close:hover {
   color: #ffffff;
 }
-
-/* ── Alert variants ────────────────────────────────────────────── */
-
-.alert-error {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border-left-color: #b91c1c;
-}
-
-.alert-success {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  border-left-color: #15803d;
-}
-
-.alert-info {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border-left-color: #1d4ed8;
-}
-
-/* alert-warning was previously missing — this caused white text on
-   transparent background = invisible messages */
-.alert-warning {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border-left-color: #b45309;
-}

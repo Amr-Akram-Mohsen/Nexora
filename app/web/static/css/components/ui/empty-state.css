@@ -44,14 +44,3 @@
 .empty-state__btn {
   box-shadow: 0 10px 20px -5px rgba(var(--brand-blue-rgb), 0.3);
 }
-.no-results {
-  padding: 4rem 2rem;
-text-align: center;
-  /* layout handled by template utilities */
-}
-
-.icon-empty {
-  font-size: 3rem;
-  color: var(--muted-foreground);
-  opacity: 0.4;
-}

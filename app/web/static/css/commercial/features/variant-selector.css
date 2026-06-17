@@ -34,12 +34,6 @@
   flex-shrink: 0;
 }
 
-.item-variants__icon {
-  font-size: var(--text-sm);
-  color: var(--domain-primary);
-  opacity: 0.75;
-}
-
 /* ─── Variant group list ─────────────────────────────────────────────── */
 
 

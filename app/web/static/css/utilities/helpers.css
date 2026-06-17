@@ -4,10 +4,6 @@
   object-fit: cover;
 }
 
-.img-contain {
-  object-fit: contain;
-}
-
 .is-hidden {
   display: none;
 }
@@ -123,16 +119,6 @@ label[data-disabled="true"] * {
 .hover-lift:hover {
   transform: translateY(var(--lift-amount, -5px));
   box-shadow: var(--lift-shadow, var(--shadow-lg));
-}
-
-/* --- Premium Surfaces --- */
-
-.glass-surface {
-  background: rgba(var(--card-rgb), var(--alpha-heavy));
-  backdrop-filter: blur(var(--glass-blur, 12px));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 12px));
-  border: 1px solid rgba(var(--border-rgb), var(--alpha-soft));
-  box-shadow: 0 8px 32px 0 rgba(var(--black-rgb), var(--alpha-soft));
 }
 
 /* --- High-Fidelity Professional Back to Top Button --- */

@@ -48,13 +48,6 @@ border-bottom: 1px dashed var(--border);
   row-gap: 1rem;
 }
 
-/* --- Brand Section --- */
-.footer-logo {
-  gap: 0.6rem;
-  /* margin-bottom: 1.25rem; */
-  text-decoration: none;
-}
-
 .footer-logo__icon {
   padding: 0.5rem;
   border-radius: var(--radius-lg);
@@ -65,15 +58,6 @@ border-bottom: 1px dashed var(--border);
 
 .footer-logo__icon i {
   font-size: 1.1rem;
-}
-
-.footer-logo__text {
-  font-weight: var(--weight-xbold);
-  font-size: 1.35rem;
-  background: linear-gradient(to right, var(--brand-blue), var(--brand-purple));
-  -webkit-background-clip: text;
-  color: transparent;
-  letter-spacing: -0.02em;
 }
 
 .footer-description {
@@ -111,31 +95,6 @@ border-bottom: 1px dashed var(--border);
 
 .footer-social:hover i {
   transform: scale(1.1);
-}
-
-/* Brand specific transitions */
-.footer-social.twitter:hover {
-  color: var(--foreground);
-  background: var(--accent);
-  border-color: var(--border);
-}
-
-.footer-social.facebook:hover {
-  color: #1877f2;
-  background: rgba(24, 119, 242, 0.1);
-  border-color: rgba(24, 119, 242, 0.15);
-}
-
-.footer-social.instagram:hover {
-  color: #e4405f;
-  background: rgba(228, 64, 95, 0.1);
-  border-color: rgba(228, 64, 95, 0.15);
-}
-
-.footer-social.youtube:hover {
-  color: #ff0000;
-  background: rgba(255, 0, 0, 0.1);
-  border-color: rgba(255, 0, 0, 0.15);
 }
 
 .footer-column {

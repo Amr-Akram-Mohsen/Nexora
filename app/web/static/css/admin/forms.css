@@ -31,37 +31,6 @@
   box-shadow: 0 0 0 2px rgba(var(--destructive-rgb), 0.1);
 }
 
-/* --- Filter & Search Bars --- */
-
-.dashboard-filter-bar {margin-bottom: 1.25rem;
-}
-
-.dashboard-search-container {
-  flex-grow: 1;
-}
-
-.dashboard-search-container input {
-  width: 100%;
-}
-
-.dashboard-filter-search-wrap {
-  position: relative;
-  flex: 1;
-}
-
-.dashboard-filter-search-icon {
-  position: absolute;
-  left: 0.75rem;
-  font-size: 0.8rem;
-  color: var(--muted-foreground);
-  pointer-events: none;
-}
-
-.dashboard-filter-search-wrap .dashboard-filter-input {
-  padding-left: 2.25rem;
-  width: 100%;
-}
-
 .dashboard-filter-clear {
   padding: 0.5rem 0.875rem;
   height: 36px;

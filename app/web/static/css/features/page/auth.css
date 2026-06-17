@@ -124,19 +124,6 @@
   border-color: var(--destructive);
   box-shadow: 0 0 0 2px rgba(var(--destructive-rgb, 239, 68, 68), 0.1);
 }
-.field-error {
-  font-size: 0.75rem;
-  color: var(--destructive);
-  margin-top: 0.3rem;
-gap: 0.3rem;
-  line-height: 1.4;
-}
-
-.field-error::before {
-  content: "⚠";
-  font-size: 0.7rem;
-  flex-shrink: 0;
-}
 
 .field-hint {
   font-size: 0.75rem;
@@ -194,11 +181,6 @@ width: 1.5rem;
   transition: background 0.25s ease;
 }
 
-.strength-segment.active.weak   { background: #ef4444; }
-.strength-segment.active.fair   { background: #f97316; }
-.strength-segment.active.good   { background: #eab308; }
-.strength-segment.active.strong { background: #22c55e; }
-
 .password-strength-label {
   font-size: 0.7rem;
   font-weight: 600;
@@ -207,11 +189,6 @@ width: 1.5rem;
   color: var(--muted-foreground);
   transition: color 0.25s ease;
 }
-
-.password-strength-label.weak   { color: #ef4444; }
-.password-strength-label.fair   { color: #f97316; }
-.password-strength-label.good   { color: #eab308; }
-.password-strength-label.strong { color: #22c55e; }
 
 /* --- Confirm Match Indicator --- */
 .confirm-match {
@@ -224,8 +201,6 @@ width: 1.5rem;
 }
 
 .confirm-match.visible { display: flex; }
-.confirm-match.match   { color: #22c55e; }
-.confirm-match.no-match { color: #ef4444; }
 
 /* --- Social login Button --- */
 

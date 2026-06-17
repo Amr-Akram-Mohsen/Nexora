@@ -5,12 +5,6 @@
   --variant-hover-bg: rgba(var(--primary-rgb), var(--variant-bg-hover-opacity));
 }
 
-.variant--secondary {
-  --variant-bg: var(--secondary);
-  --variant-color: var(--secondary-foreground);
-  --variant-hover-bg: rgba(var(--secondary-rgb), var(--variant-bg-hover-opacity));
-}
-
 .variant--outline,
 .variant--ghost {
   --variant-bg: transparent;
@@ -23,28 +17,6 @@
 .btn.variant--outline {
   --variant-bg: var(--outline);
   --variant-border: var(--border);
-}
-
-.variant--link {
-  --variant-bg: transparent;
-  --variant-color: var(--primary);
-  --variant-border: transparent;
-  --variant-hover-bg: transparent;
-  --variant-hover-color: var(--primary);
-}
-
-.variant--destructive {
-  --variant-bg: var(--destructive);
-  --variant-color: var(--destructive-foreground);
-  --variant-hover-bg: rgba(var(--destructive-rgb), var(--variant-bg-hover-opacity));
-  --variant-ring-rgb: var(--destructive-rgb);
-  --variant-focus-opacity: 0.2;
-  --variant-focus-border-color: transparent;
-}
-
-.btn.variant--link {
-  text-underline-offset: 0.25rem;
-  text-decoration: underline;
 }
 
 .btn.variant--primary {
@@ -70,11 +42,6 @@ body.dark-mode .btn.variant--outline {
 body.dark-mode .btn.variant--outline:hover,
 body.dark-mode .btn.variant--ghost:hover {
   --variant-hover-bg: rgba(var(--accent-rgb), var(--alpha-bold));
-}
-
-body.dark-mode .variant--destructive {
-  --variant-hover-bg: rgba(var(--destructive-rgb), var(--alpha-stronger));
-  --focus-opacity: 0.4;
 }
 
 

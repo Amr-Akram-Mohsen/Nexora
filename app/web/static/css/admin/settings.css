@@ -26,10 +26,6 @@
   margin: 0 0 0.375rem 0;
 }
 
-.settings-card.danger {
-  border-left: 4px solid var(--brand-red);
-}
-
 .settings-card-header {
   gap: 0.875rem;
   margin-bottom: 1rem;
@@ -65,10 +61,6 @@
 .settings-log-container {
   max-height: 400px;
   overflow-y: auto;
-}
-
-.full-width-card {
-  grid-column: 1 / -1;
 }
 
 /* --- Toggle Switches --- */
@@ -156,15 +148,6 @@
   color: var(--foreground);
 }
 
-.system-loading {
-  min-height: 80px;
-  padding: 1.25rem;
-}
-
-.settings-hint {
-  margin-bottom: 0.875rem;
-}
-
 /* --- Icon Wrapper Accent Styling --- */
 
 .settings-card-icon-wrapper {
@@ -221,21 +204,6 @@
   border-radius: var(--radius-full);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-.status-pending {
-  background: var(--secondary);
-  color: var(--muted-foreground);
-}
-
-.status-ok {
-  background: rgba(var(--brand-green-rgb), 0.1);
-  color: var(--brand-green-dark);
-}
-
-.status-error {
-  background: rgba(var(--destructive-rgb), 0.08);
-  color: var(--brand-red);
 }
 
 .integration-meta {
@@ -297,21 +265,6 @@
 .settings-tab.active {
   color: var(--brand-blue);
   border-bottom-color: var(--brand-blue);
-}
-
-/* --- Inline Elements & Log Info --- */
-
-.icon-inline {
-  margin-right: 0.5rem;
-}
-
-
-.error-text {
-  color: var(--brand-red);
-}
-
-.status-dot.online {
-  color: var(--brand-green);
 }
 
 /* --- Danger Zone Layout --- */

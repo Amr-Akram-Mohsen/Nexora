@@ -1,8 +1,4 @@
-.products-listing .checkbox-box.checked {
-  background: rgb(var(--brand-green-rgb));
-  border-color: rgb(var(--brand-green-rgb));
-  box-shadow: 0 2px 6px rgba(var(--brand-green-rgb), 0.35);
-}
+
 
 .input {
   min-width: 0;
@@ -46,20 +42,6 @@
   color: var(--muted-foreground);
 }
 
-.form-message {
-  font-size: var(--text-sm);
-  /* text-sm */
-  color: var(--destructive);
-}
-
-.newsletter-form .input {
-  flex: 1;
-}
-
-.checkbox-wrapper {
-  gap: .5rem;
-}
-
 /* Core checkbox box styles (canonical) */
 .checkbox-box {
   width: 16px;
@@ -70,29 +52,6 @@
   transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
   background: var(--input-background);
   position: relative;
-}
-
-/* Default checked indicator (used in form contexts where FontAwesome is available) */
-.checkbox-box.checked::after {
-  content: '\f00c';
-  font-family: 'Font Awesome 6 Free';
-  font-weight: 900;
-  font-size: 9px;
-  color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.input-sm {
-  width: 70px;
-  padding: 0.35rem 0.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--input);
-  color: var(--foreground);
-  font-size: var(--text-sm);
 }
 
 /* (merged above) */
@@ -149,10 +108,4 @@
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   margin-top: 0.25rem;
-}
-
-.checkbox-box.checked {
-  background: rgb(var(--brand-blue-rgb));
-  border-color: rgb(var(--brand-blue-rgb));
-  box-shadow: 0 2px 6px rgba(var(--brand-blue-rgb), 0.35);
 }

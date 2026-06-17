@@ -65,23 +65,6 @@
   line-height: 1.6;
 }
 
-
-/* --- Modal Size Modifiers --- */
-
-.modal-content-sm {
-  max-width: 420px;
-}
-
-.modal-content-lg {
-  max-width: 720px;
-  width: 90%;
-}
-
-.modal-icon-purple {
-  background: rgba(var(--brand-purple-rgb), 0.1);
-  color: var(--brand-purple);
-}
-
 .modal-select-full {
   width: 100%;
   margin-bottom: 1rem;
@@ -109,24 +92,6 @@
 .settings-toast-show {
   opacity: 1;
   transform: translateY(0);
-}
-
-.settings-toast-success {
-  background: #166534;
-  color: #dcfce7;
-  border: 1px solid #16a34a;
-}
-
-.settings-toast-error {
-  background: #7f1d1d;
-  color: #fee2e2;
-  border: 1px solid var(--brand-red);
-}
-
-.settings-toast-warning {
-  background: #713f12;
-  color: #fef9c3;
-  border: 1px solid #ca8a04;
 }
 
 @media (max-width: 768px) {

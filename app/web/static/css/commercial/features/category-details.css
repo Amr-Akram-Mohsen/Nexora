@@ -111,24 +111,6 @@ flex-direction: column;
   margin: 0;
 }
 
-.pyramid-layer--top {
-  width: 65%;
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
-}
-
-.pyramid-layer--heart {
-  width: 82%;
-  background: linear-gradient(135deg, #fb7185, #e11d48);
-  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.18);
-}
-
-.pyramid-layer--base {
-  width: 100%;
-  background: linear-gradient(135deg, #c084fc, #7c3aed);
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.18);
-}
-
 /* ─── Perfume meta row ───────────────────────────────────────────────── */
 
 .perfume-meta {

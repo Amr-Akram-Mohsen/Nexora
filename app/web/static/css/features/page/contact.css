@@ -75,21 +75,9 @@ transition: all 0.2s ease;
   padding: 2.5rem; /* luxurious, balanced padding */
   box-shadow: var(--shadow-sm);
 }
-.contact-form {flex-direction: column;
-}
 
 .contact-submit {
   width: 100%;
-}
-
-.contact-success {
-  text-align: center;
-  padding: 3rem 0;
-}
-
-.ajax-form button.is-loading {
-  pointer-events: none;
-  opacity: 0.7;
 }
 
 /* Responsive Overrides */

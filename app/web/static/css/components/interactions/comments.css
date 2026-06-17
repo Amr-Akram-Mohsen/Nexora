@@ -2,23 +2,10 @@
   margin-top: 3rem;
 }
 
-.comments__title {
-  margin-bottom: 1.5rem;
-}
-.comment-form {
-  margin-bottom: 2rem;
-}
-
 .comments__textarea {
   padding-block: 0.75rem;
   font-size: var(--text-sm);
   resize: vertical;
-}
-
-
-.comments__load-more {
-  margin-top: 1rem;
-  align-self: center;
 }
 
 
@@ -63,15 +50,6 @@
 }
 .comment__actions {margin-top: 0.5rem;
   margin-left: 0.5rem;
-}
-.comment-action-btn {
-  padding: 0.25rem 0.5rem;
-  font-size: var(--text-sm);
-  height: auto;
-}
-
-.comment-action-btn:hover {
-  color: var(--primary);
 }
 .comment__replies-list {
   margin-top: 1rem;

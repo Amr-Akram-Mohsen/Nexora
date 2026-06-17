@@ -21,46 +21,9 @@
   transform: translateY(-1px);
 }
 
-/* --- Badge Variants --- */
-
-.badge--category {
-  --card-badge-rgb: var(--domain-primary-rgb);
-  border-color: rgba(var(--domain-primary-rgb), 0.2);
-}
-
-.badge--topic, .badge--brand {
-  --card-badge-rgb: var(--domain-secondary-rgb);
-  border-color: rgba(var(--domain-secondary-rgb), 0.2);
-}
-
-.badge--card-type {
-    background: var(--gradient-primary);
-    color: #fff;
-    border: none;
-    box-shadow: 0 2px 8px rgba(var(--domain-primary-rgb), 0.2);
-}
-
 .badge--xs {
   font-size: 9px;
   padding: 0.2rem 0.5rem;
-}
-
-.badge--object-type {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  color: #fff;
-  font-size: 10px;
-  font-weight: var(--weight-xbold);
-  padding: 0.3rem 0.7rem;
-  border-radius: var(--radius-full);
-  text-transform: uppercase;
-  z-index: 5;
-  letter-spacing: 0.05em;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  pointer-events: none;
 }
 
 /* --- Status Badges (Migrated) --- */
@@ -75,11 +38,6 @@
   white-space: nowrap;
   display: inline-block;
   line-height: 1.2;
-}
-
-.status-badge.admin {
-  background: rgba(var(--brand-blue-rgb), 0.1);
-  color: var(--brand-blue);
 }
 
 .status-badge.purple {
@@ -134,47 +92,13 @@
   color: #6366f1;
 }
 
-.badge-slate {
-  background: rgba(100, 116, 139, 0.08);
-  color: #64748b;
-}
-
 .badge-pending {
   background: rgba(var(--brand-purple-rgb), 0.1);
   color: var(--brand-purple);
-}
-
-.badge-margin {
-  margin: 0.125rem 0;
 }
 
 /* Smaller type compact variant */
 .badge-type-compact {
   padding: 0.1rem 0.3rem;
   font-size: var(--text-xs);
-}
-
-/* Status badge extensions */
-.status-badge.inspect-badge-secondary {
-  text-transform: capitalize;
-  background: var(--secondary);
-  color: var(--foreground);
-}
-
-.status-badge.inspect-badge-blue {
-  background: rgba(var(--brand-blue-rgb), 0.1);
-  color: var(--brand-blue);
-  letter-spacing: 0.04em;
-}
-
-.status-badge.inspect-badge-complete {
-  text-transform: capitalize;
-  background: rgba(var(--brand-green-rgb), 0.1);
-  color: var(--brand-green-dark);
-}
-
-.status-badge.inspect-badge-pending {
-  text-transform: capitalize;
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--brand-orange);
 }

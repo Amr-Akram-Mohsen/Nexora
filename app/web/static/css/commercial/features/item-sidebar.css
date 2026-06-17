@@ -49,19 +49,6 @@
   gap: 0.65rem;
 }
 
-.sidebar-reset-row {
-  padding: 0.5rem 0.75rem;
-  background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
-  border-radius: var(--radius-md);
-  margin-bottom: 1rem;
-}
-
-.sidebar-reset-label {
-  font-size: var(--text-xs);
-  color: var(--muted-foreground);
-  gap: 0.35rem;
-}
-
 /* --- Sidebar Modifiers --- */
 
 .sidebar-promo {

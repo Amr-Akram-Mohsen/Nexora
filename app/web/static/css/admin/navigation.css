@@ -137,24 +137,6 @@
   flex-shrink: 0;
 }
 
-.nav-badge-soon {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  background: var(--secondary);
-  color: var(--muted-foreground);
-  padding: 0.1rem 0.35rem;
-  border-radius: var(--radius-full);
-  margin-left: auto;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.nav-link-disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 /* --- Admin Tab Bar (Page-level Tab Navigation) --- */
 
 .admin-tabs {margin-bottom: 1.5rem;

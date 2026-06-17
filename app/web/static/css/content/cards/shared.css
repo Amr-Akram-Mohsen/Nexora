@@ -35,8 +35,7 @@
   transform: scale(1.08);
 }
 
-.card__type-indicator,
-.card__type-badge {
+.card__type-indicator {
   position: absolute;
   top: 12px;
   left: 12px;
@@ -83,8 +82,7 @@
   color: var(--domain-primary);
 }
 
-.card__excerpt,
-.card__description {
+.card__excerpt {
   font-size: 0.875rem;
   color: var(--muted-foreground);
   line-height: 1.6;
@@ -142,35 +140,6 @@ font-size: 0.75rem;
 .card:hover .platform-icon {
   transform: scale(1.1) rotate(5deg);
   border-color: rgba(var(--card-color-rgb), 0.2);
-}
-
-/* --- Meta Context Colors --- */
-.meta-user {
-  /* Prefer type-specific card color, fall back to domain primary */
-  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
-}
-
-.meta-clock {
-  /* Prefer type-specific card color, fall back to domain primary */
-  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
-}
-
-.meta-calendar {
-  /* Prefer type-specific card color, fall back to domain primary */
-  --meta-color: var(--card-color-rgb, var(--domain-primary-rgb));
-}
-
-.meta-icon-wrapper {
-  padding: 0.5rem;
-  border-radius: 50%;
-  background-color: rgba(var(--meta-color), 0.1);
-  display: grid;
-  place-items: center;
-}
-
-.meta-icon-wrapper i {
-  color: rgb(var(--meta-color));
-  font-size: 0.875rem;
 }
 
 /* --- Mobile Layout Refinements --- */

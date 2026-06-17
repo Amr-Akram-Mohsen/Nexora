@@ -23,17 +23,6 @@ opacity: 0.7;
     transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
   }
 
-  .image-placeholder__icon {
-    font-size: 2.5rem;
-  }
-
-  .image-placeholder__text {
-    font-size: 0.85rem;
-    font-weight: var(--weight-bold);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
   .card:hover .card__img:not(.image-placeholder) {
     transform: scale(1.05);
   }

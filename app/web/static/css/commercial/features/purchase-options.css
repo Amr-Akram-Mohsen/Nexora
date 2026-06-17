@@ -107,13 +107,6 @@ flex-shrink: 0;
   flex-shrink: 0;
 }
 
-.item-buy-link__store-name {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: var(--foreground);
-  white-space: nowrap;
-}
-
 .item-buy-link__price {
   font-size: var(--text-base);
   font-weight: var(--weight-xbold);
