@@ -20,7 +20,9 @@
 .section+.section {
   margin-top: 4.5rem;
 }
-.section__header {margin-bottom: 1.75rem;
+
+.section__header {
+  margin-bottom: 1.75rem;
   /* perfect balanced spacing above grid cards */
 }
 
@@ -65,12 +67,68 @@
 }
 
 
+/* --- Responsive Auto Grids --- */
+.grid-auto {
+  display: grid;
+  gap: var(--card-gap, 1.5rem);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  align-items: start;
+}
 
+.contents-listing .grid-auto {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
 
+@media (max-width: 1024px) {
+  .grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+}
 
+@media (max-width: 768px) {
+  .grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
 
+  .contents-listing .grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
 
+@media (max-width: 580px) {
+  .grid-auto {
+    grid-template-columns: 1fr 1fr;
+    /* Space-efficient dual-column grid on mobile */
+    gap: 0.75rem;
+  }
+}
 
+@media (max-width: 360px) {
+  .grid-auto {
+    grid-template-columns: 1fr;
+    /* single full-width column on very narrow viewports */
+  }
+}
+
+/* --- Horizontal Card Carousels --- */
+.grid-carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 1.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Hide default scrollbar on Firefox */
+}
+
+.grid-carousel::-webkit-scrollbar {
+  display: none;
+  /* Hide default scrollbars on Chrome/Safari for scrollbarless organic touch */
+}
 
 .grid-item-hidden {
   display: none !important;
@@ -82,6 +140,7 @@
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -145,3 +204,22 @@
   outline-offset: 3px;
 }
 
+
+.grid-carousel>.card {
+  min-width: 290px;
+  max-width: 320px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 580px) {
+  .grid-carousel {
+    gap: 1rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .grid-carousel>.card {
+    min-width: 260px;
+    max-width: 280px;
+  }
+}

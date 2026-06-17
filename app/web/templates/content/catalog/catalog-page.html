@@ -40,7 +40,8 @@ SLOT: header
   {% set slug = opt.slug if opt.slug is defined else opt %}
   {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
   {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-  <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="topic-pill {{ inline-flex items-center"is-active' if is_active }}">
+  {% set class_name = 'topic-pill' ~ ('inline-flex items-center is-active' if is_active else '') %}
+  <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="{{ class_name }}">
     {{ name }}
   </a>
   {% endfor %}
