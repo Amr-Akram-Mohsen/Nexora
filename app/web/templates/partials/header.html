@@ -73,7 +73,7 @@
             {% set item_class = "dropdown-item flex items-center"%}
             {% if is_authenticated %}
             <div class="user-info {{ item_class }}">
-              <span class="user-email">{{ user_email }}</span>
+              <span class="user-email">{{ user_name or user_email }}</span>
             </div>
 
             <a href="{{ url_for('user.profile') }}" class="{{ item_class }}">
@@ -86,18 +86,55 @@
               Saved Items
             </a>
 
+            {% if is_admin %}
+            <a href="{{ url_for('admin.home') }}" class="{{ item_class }}">
+              <i class="fas fa-shield-alt"></i>
+              Admin Panel
+            </a>
+            {% endif %}
+
+            <div class="dropdown-divider"></div>
+            
+            {% if multi_accounts and multi_accounts|length > 1 %}
+            <div class="account-switcher">
+              <span class="dropdown-header">Switch Account</span>
+              {% for acc in multi_accounts %}
+                {% if not acc.is_active %}
+                {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form") %}
+                <button type="submit" class="{{ item_class }} switch-btn">
+                  <span class="switch-avatar">{{ acc.avatar_letter }}</span>
+                  <div class="switch-details">
+                    <span class="switch-name">{{ acc.name }}</span>
+                    <span class="switch-email">{{ acc.email }}</span>
+                  </div>
+                </button>
+                {% endcall %}
+                {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <a href="{{ url_for('user.login', add_account=1) }}" class="{{ item_class }}">
+              <i class="fas fa-plus-circle"></i>
+              Add Another Account
+            </a>
+
+            <div class="dropdown-divider"></div>
+
             {% call form(variant="", form_action=url_for('user.logout'), class="logout-form") %}
             {{ button(
             text="Logout", variant="",
             type="submit", icon="fas fa-sign-out-alt",
             class=item_class ~ " logout-btn")}}
             {% endcall %}
-
-            {% if is_admin %}
-            <a href="{{ url_for('admin.home') }}" class="{{ item_class }}">
-              <i class="fas fa-sign-out-alt"></i>
-              Admin Panel
-            </a>
+            
+            {% if multi_accounts and multi_accounts|length > 1 %}
+            {% call form(variant="", form_action=url_for('user.logout_all'), class="logout-form") %}
+            {{ button(
+            text="Logout All", variant="",
+            type="submit", icon="fas fa-power-off",
+            class=item_class ~ " logout-btn text-danger")}}
+            {% endcall %}
             {% endif %}
 
             {% else %}

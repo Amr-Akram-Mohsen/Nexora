@@ -69,7 +69,8 @@ SLOT: results
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
+  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>
@@ -99,7 +100,8 @@ action_url=url_for(request.endpoint, **request.view_args)
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
+  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>

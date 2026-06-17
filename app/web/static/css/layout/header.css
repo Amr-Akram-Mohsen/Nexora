@@ -151,6 +151,84 @@
   text-align: center;
 }
 
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: .4rem 0;
+}
+
+.dropdown-header {
+  display: block;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  padding: .4rem .75rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.account-switcher {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-form {
+  margin: 0;
+  width: 100%;
+}
+
+.switch-btn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.switch-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: .75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.switch-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switch-name {
+  font-weight: 500;
+  font-size: .85rem;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.switch-email {
+  font-size: .75rem;
+  color: var(--muted-foreground);
+}
+
+.text-danger {
+  color: var(--destructive, #ef4444) !important;
+}
+
+.text-danger:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
 
 .header-actions {
   gap: .5rem;

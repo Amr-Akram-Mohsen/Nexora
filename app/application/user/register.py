@@ -28,7 +28,7 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
     logger.info("[AUTH] Registration workflow start for email: %s", email)
     if get_user_by_email(email):
         logger.info("[AUTH] Registration aborted: account with email %s already exists.", email)
-        return None, "An account with this email already exists."
+        return None, "An account with this email already exists.", False
 
     user = create_user(name, email, password)
     logger.info("[AUTH] User created in DB with user_id=%s for email: %s", user.id, email)
@@ -56,4 +56,4 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
     else:
         logger.warning("[AUTH] Verification email FAILED to send to %s (user_id=%s)", email, user.id)
 
-    return user, newsletter_msg
+    return user, newsletter_msg, sent

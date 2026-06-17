@@ -42,8 +42,8 @@ bp = Blueprint("user", __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('system.home') if current_user.is_admin else url_for('system.home'))
+    if current_user.is_authenticated and not request.args.get('add_account'):
+        return redirect(url_for('system.home'))
 
     try:
         log_route_start(logger, "/login")
@@ -74,10 +74,18 @@ def login():
                 clear_failed_logins(email)
 
                 # Session rotation — prevents session fixation
+                existing_accounts = session.get('multi_accounts', [])
+                if current_user.is_authenticated and current_user.id not in existing_accounts:
+                    existing_accounts.append(current_user.id)
+                if user.id not in existing_accounts:
+                    existing_accounts.append(user.id)
+
                 session.clear()
                 login_user(user, remember=remember)
                 if remember:
                     session.permanent = True
+                
+                session['multi_accounts'] = existing_accounts
 
                 # Track last login
                 record_login(user)
@@ -119,6 +127,9 @@ def login():
 def google_login():
     try:
         log_route_start(logger, "/auth/google/login")
+        if request.args.get('add_account'):
+            session['add_account_flow'] = True
+            
         redirect_uri = url_for('user.google_authorize', _external=True)
         log_route_success(logger, "/auth/google/login", status=302)
         return current_app.google.authorize_redirect(redirect_uri, prompt='select_account')
@@ -172,8 +183,19 @@ def google_authorize():
             db.session.commit()
             _mv(user)
 
+        existing_accounts = session.get('multi_accounts', [])
+        is_add_account = session.pop('add_account_flow', False)
+        
+        if is_add_account and current_user.is_authenticated and current_user.id not in existing_accounts:
+            existing_accounts.append(current_user.id)
+
         session.clear()
         login_user(user)
+
+        if user.id not in existing_accounts:
+            existing_accounts.append(user.id)
+            
+        session['multi_accounts'] = existing_accounts
         record_login(user)
         db.session.commit()
         flash("Signed in with Google!", "success")
@@ -222,7 +244,7 @@ def register():
                 log_route_success(logger, "/register", template="register.html")
                 return render_template('register.html')
 
-            user, newsletter_msg = register_user_workflow(sanitized_name, email, password, wants_newsletter)
+            user, newsletter_msg, email_sent = register_user_workflow(sanitized_name, email, password, wants_newsletter)
 
             if not user:
                 flash(newsletter_msg or "An account with this email already exists.", "error")
@@ -233,10 +255,16 @@ def register():
                 flash(newsletter_msg, "info")
 
             db.session.commit()
-            flash(
-                "Account created! Please check your email to verify your account before logging in. 📧",
-                "success",
-            )
+            if email_sent:
+                flash(
+                    "Account created! Please check your email to verify your account before logging in. 📧",
+                    "success",
+                )
+            else:
+                flash(
+                    "Account created! However, we couldn't send the verification email at this time. Please try resending it later or contact support.",
+                    "warning",
+                )
             log_route_success(logger, "/register", status=302)
             return redirect(url_for('user.login'))
 
@@ -378,12 +406,71 @@ def reset_password(token: str):
 def logout():
     try:
         log_route_start(logger, "/logout")
+        
+        existing_accounts = session.get('multi_accounts', [])
+        if current_user.id in existing_accounts:
+            existing_accounts.remove(current_user.id)
+            
         logout_user()
+        
+        if existing_accounts:
+            next_user_id = existing_accounts[0]
+            from app.domains.user.models import User
+            next_user = db.session.get(User, next_user_id)
+            if next_user:
+                login_user(next_user)
+                session['multi_accounts'] = existing_accounts
+                flash(f"Logged out. Switched to {next_user.name or next_user.email}.", "info")
+                log_route_success(logger, "/logout", status=302)
+                return redirect(url_for('system.home'))
+
+        session.pop('multi_accounts', None)
         flash("You have been logged out.", "info")
         log_route_success(logger, "/logout", status=302)
         return redirect(url_for('system.home'))
     except Exception as e:
         log_route_error(logger, "/logout", e)
+        raise
+
+@bp.route('/logout-all', methods=['POST'])
+@login_required
+def logout_all():
+    try:
+        log_route_start(logger, "/logout-all")
+        logout_user()
+        session.pop('multi_accounts', None)
+        flash("You have been logged out of all accounts.", "info")
+        log_route_success(logger, "/logout-all", status=302)
+        return redirect(url_for('system.home'))
+    except Exception as e:
+        log_route_error(logger, "/logout-all", e)
+        raise
+
+@bp.route('/switch-account/<int:user_id>', methods=['POST'])
+@login_required
+def switch_account(user_id):
+    try:
+        log_route_start(logger, f"/switch-account/{user_id}")
+        existing_accounts = session.get('multi_accounts', [])
+        
+        if user_id in existing_accounts:
+            from app.domains.user.models import User
+            target_user = db.session.get(User, user_id)
+            if target_user:
+                logout_user()
+                login_user(target_user)
+                flash(f"Switched to {target_user.name or target_user.email}", "success")
+            else:
+                existing_accounts.remove(user_id)
+                session['multi_accounts'] = existing_accounts
+                flash("Account not found. It may have been deleted.", "error")
+        else:
+            flash("Unauthorized account switch.", "error")
+            
+        log_route_success(logger, f"/switch-account/{user_id}", status=302)
+        return redirect(request.referrer or url_for('system.home'))
+    except Exception as e:
+        log_route_error(logger, f"/switch-account/{user_id}", e)
         raise
 
 
