@@ -35,12 +35,12 @@ SLOT: header
 
 {# ── Horizontal Topics Ribbon ── #}
 {% if filter_options.get('topic') %}
-<div class="topics-ribbon">
+<div class="topics-ribbon gap-2 flex items-center">
   {% for opt in filter_options.get('topic', []) %}
   {% set slug = opt.slug if opt.slug is defined else opt %}
   {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
   {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-  <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="topic-pill {{ 'is-active' if is_active }}">
+  <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="topic-pill {{ inline-flex items-center"is-active' if is_active }}">
     {{ name }}
   </a>
   {% endfor %}

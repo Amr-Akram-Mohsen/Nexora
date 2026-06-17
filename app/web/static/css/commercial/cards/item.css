@@ -134,9 +134,8 @@
 }
 
 /* Star rating on card */
-.card__rating {
-  gap: 0.25rem;
-  color: var(--domain-primary);
+
+.card__rating {color: var(--domain-primary);
 }
 
 .card__rating .star {
@@ -157,16 +156,13 @@
 }
 
 /* Item actions section (Price + Store + CTA) */
+
 .item-actions {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px dashed var(--border);
-  gap: 0.75rem;
 }
 
-.item-price-box {
-  gap: 0.5rem;
-}
 
 .item-price-current {
   font-weight: var(--weight-xbold);
@@ -231,12 +227,5 @@
   color: #fff;
   border-color: var(--domain-primary);
 }
-
-
-.card__meta-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
+.card__meta-bottom {margin-top: 10px;
 }

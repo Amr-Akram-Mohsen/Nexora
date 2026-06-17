@@ -1,5 +1,5 @@
 {% macro label(text, for_id, class="") %}
-<label for="{{ for_id }}" class="label flex items-center {{ class }}">
+<label for="{{ for_id }}" class="label flex items-center {{ class }} gap-2">
   {{ text }}
 
   {% if caller is defined %}

@@ -58,12 +58,8 @@
 .settings-card-body {
   padding-top: 0;
 }
-
 .settings-action-btn {
   width: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .settings-log-container {
@@ -77,9 +73,7 @@
 
 /* --- Toggle Switches --- */
 
-.settings-toggle-row {
-  gap: 1rem;
-  cursor: pointer;
+.settings-toggle-row {cursor: pointer;
   padding: 0.625rem 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 0.75rem;
@@ -205,9 +199,7 @@
 
 /* --- Integrations & Third Party Connectors --- */
 
-.integration-row {
-  gap: 0.75rem;
-  padding: 0.5rem 0;
+.integration-row {padding: 0.5rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -279,9 +271,7 @@
 
 /* --- Tabs inside Settings / Log Widgets --- */
 
-.settings-tabs-wrapper {
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
+.settings-tabs-wrapper {border-bottom: 1px solid var(--border);
   padding: 0 1.25rem;
   margin: 0 -1.25rem 1rem -1.25rem;
   background: var(--background);
@@ -315,11 +305,6 @@
   margin-right: 0.5rem;
 }
 
-.log-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 .error-text {
   color: var(--brand-red);
@@ -354,12 +339,10 @@
   max-width: 480px;
 }
 
-.settings-danger-row {
-  gap: 1rem;
-}
 
 @media (max-width: 768px) {
-  .settings-danger-row {
+
+.settings-danger-row {
     flex-direction: column;
     align-items: flex-start;
   }

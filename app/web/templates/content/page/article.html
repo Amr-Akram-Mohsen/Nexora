@@ -45,7 +45,7 @@
 
 {% block base_header %}
 <div class="article-header flex flex-col">
-  <div class="article-header__badges flex flex-wrap">
+  <div class="article-header__badges flex flex-wrap gap-3">
     {{ badge(content.category.name, 'badge--category') }}
     {% for topic in content.topics[:2] %}
     {{ badge(topic.name, 'badge--topic', 'secondary') }}
@@ -54,25 +54,25 @@
 
   <h1 class="article-header__title">{{ article.title }}</h1>
 
-  <div class="article-header__meta flex flex-wrap items-center">
-    <div class="meta-pill">
+  <div class="article-header__meta flex flex-wrap items-center gap-4">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-newspaper"></i>
       <span class="meta-pill__text">{{ article.source_name }}</span>
     </div>
 
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-clock"></i>
       <span class="meta-pill__text">{{ article.read_time_minutes }} min read</span>
     </div>
 
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar"></i>
       <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
         }}</span>
     </div>
 
     {% if article.is_content_scraped %}
-    <div class="meta-pill meta-pill--success" title="Full Article Extracted">
+    <div class="meta-pill meta-pill--success gap-2 flex items-center" title="Full Article Extracted">
       <i class="fas fa-check-circle"></i>
       <span class="meta-pill__text">Verified Content</span>
     </div>

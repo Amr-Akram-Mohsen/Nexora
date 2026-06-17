@@ -10,7 +10,7 @@
     {% set max_val.val = s.clicks %}
   {% endif %}
 {% endfor %}
-<div class="dist-list">
+<div class="dist-list flex">
   {% for s in top_performing_product %}
     {% set pct = ((s.clicks / max_val.val) * 100) | round | int %}
     <a class="dist-row-link" href="/admin/items?source={{ s.slug }}&sort_by=click_count&sort_dir=desc">

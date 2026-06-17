@@ -59,11 +59,11 @@
 
     {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     <div class="sidebar-trending">
-      <div class="sidebar-trending__header flex items-center">
+      <div class="sidebar-trending__header flex items-center gap-2">
         <i class="fas fa-fire"></i>
         <span class="sidebar-trending__title">Trending Now</span>
       </div>
-      <div class="sidebar-trending__links flex flex-col">
+      <div class="sidebar-trending__links flex flex-col gap-1">
 
         {# Show active topic quick-links if topics available #}
         {% set topic_opts = filter_options.get('topic', []) %}

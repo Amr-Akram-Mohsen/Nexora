@@ -1,13 +1,13 @@
 {% from "admin/components/ui.html" import admin_panel %}
 <!-- Section 1.98: Content Performance Feedback -->
-<h2 class="insight-group-title">📉 Content Performance Feedback</h2>
+<h2 class="insight-group-title flex gap-3 items-center">📉 Content Performance Feedback</h2>
 <div class="flex flex-col gap-6" id="content-feedback-panel" style="display: none;">
     <!-- Left Side: Strategy Accuracy & Failures -->
     {% call admin_panel("🧠 Strategy Accuracy & Failures", "Platform-weighted accuracy index and root-cause diagnoses of
     underperforming assets.") %}
-    <div class="accuracy-panel-body">
+    <div class="accuracy-panel-body flex gap-6">
         <!-- Strategy Accuracy Widget -->
-        <div class="insights-accuracy-card">
+        <div class="insights-accuracy-card gap-5 flex justify-between items-center">
             <div>
                 <h4 class="insights-accuracy-title">Strategy Accuracy Index</h4>
                 <p class="insights-accuracy-meta">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest
@@ -20,10 +20,10 @@
 
         <!-- Failures List -->
         <div>
-            <h4 class="quality-score-header">
+            <h4 class="quality-score-header gap-2 flex items-center">
                 <i class="fas fa-exclamation-triangle"></i> Failure Diagnostics & Recommendations
             </h4>
-            <div id="feedback-failures-list" class="insights-failures-scroll">
+            <div id="feedback-failures-list" class="insights-failures-scroll flex gap-4">
                 <!-- Populated by JS -->
             </div>
         </div>

@@ -1,6 +1,6 @@
 {% from "components/ui/badge.html" import badge %}
 {% macro render_item_compact_card(item) %}
-<a href="{{ url_for('item.item_page', item_id=item.id) }}" class="inline-product-card" data-domain-type="commercial">
+<a href="{{ url_for('item.item_page', item_id=item.id) }}" class="inline-product-card gap-2 flex" data-domain-type="commercial">
   <div class="inline-product__image">
     {% if item.image_url %}
     <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
@@ -9,7 +9,7 @@
     {% endif %}
   </div>
 
-  <div class="inline-product__info">
+  <div class="inline-product__info flex">
     {{ badge(item.item_type, attrs={'data-type': 'item'}) }}
     <div class="inline-product__title">{{ item.name }}</div>
     {% if item.price %}
@@ -20,7 +20,7 @@
   </div>
 
   <div class="inline-product__action">
-    <button class="btn btn--primary btn--sm" tabindex="-1">View Deal</button>
+    <button class="btn btn--primary btn--sm gap-2" tabindex="-1">View Deal</button>
   </div>
 </a>
 {% endmacro %}

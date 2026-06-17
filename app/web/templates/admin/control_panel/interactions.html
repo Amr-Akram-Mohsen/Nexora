@@ -43,7 +43,7 @@ inspect_custom_row
 
 
 <!-- Tab Navigation -->
-<div class="admin-tabs flex" id="interactions-tabs">
+<div class="admin-tabs flex gap-1" id="interactions-tabs">
   <button class="admin-tab-btn active" data-tab="comments">
     💬 Comments
   </button>
@@ -64,8 +64,8 @@ inspect_custom_row
 <!-- Comments Tab -->
 <div class="admin-tab-panel" id="tab-panel-comments">
   <!-- Comment Filters -->
-  <div class="admin-toolbar-advanced flex flex-col">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("comment-search", "Search comment text…") }}
       {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
       ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
@@ -89,8 +89,8 @@ inspect_custom_row
 <div class="admin-tab-panel is-hidden" id="tab-panel-reactions">
   <!-- Reactions Table -->
   <div style="margin-top:2rem;">
-    <div class="admin-toolbar-advanced flex flex-col">
-      <div class="admin-toolbar-row flex items-center flex-wrap">
+    <div class="admin-toolbar-advanced flex flex-col gap-3">
+      <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
         {{ admin_search_input("reactions-search", "Search target title…") }}
         {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
         default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
@@ -136,8 +136,8 @@ inspect_custom_row
 <!-- Clicks Tab -->
 <div class="admin-tab-panel is-hidden" id="tab-panel-clicks">
   <!-- Clicks Filters -->
-  <div class="admin-toolbar-advanced flex flex-col">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("clicks-search", "Search item name…") }}
       {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon="🏪") }}
       {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
@@ -156,8 +156,8 @@ inspect_custom_row
 <!-- Saves Tab -->
 <div class="admin-tab-panel is-hidden" id="tab-panel-saves">
   <!-- Saves Filters -->
-  <div class="admin-toolbar-advanced flex flex-col">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("saves-search", "Search target title…") }}
       {{ admin_search_input("filter-saves-user", "Search user name/email…", icon="👤") }}
       {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}

@@ -1,9 +1,9 @@
+
 .interaction-panel__actions {
   padding-block: 1rem;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   margin-block: 1.5rem;
-  gap: 0.5rem;
 }
 
 .interaction-btn {
@@ -68,11 +68,9 @@
   color: rgb(var(--share-rgb));
   border-color: rgba(var(--share-rgb), 0.3);
 }
-
 .interaction-panel__meta {
   margin-left: auto;
-  gap: 0.5rem;
-  font-size: var(--text-sm);
+font-size: var(--text-sm);
   color: var(--muted-foreground);
   opacity: .85;
 }
@@ -80,26 +78,20 @@
 .interaction-panel__meta i {
   font-size: .9rem;
 }
-
 .item-actions {
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--border);
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
 }
 
 
 .interaction-panel--compact {
   margin-top: 0.75rem;
 }
-
 .interaction-panel__actions--compact {
   padding: 0;
   margin: 0;
   border: 0;
-  gap: 0.25rem;
 }
 
 .interaction-stats {

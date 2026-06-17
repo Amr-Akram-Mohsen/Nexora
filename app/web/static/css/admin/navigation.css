@@ -1,8 +1,6 @@
 /* --- Horizontal Dashboard Navigation --- */
 
-.dashboard-nav {
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+.dashboard-nav {margin-bottom: 2rem;
   border-bottom: 1px solid var(--border);
   padding-bottom: 1px;
   overflow-x: auto;
@@ -108,9 +106,7 @@
 
 /* --- Navigation Links & Icons --- */
 
-.nav-link {
-  gap: 0.5rem;
-  width: 100%;
+.nav-link {width: 100%;
   padding: 0.5rem 0.875rem;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
@@ -161,9 +157,7 @@
 
 /* --- Admin Tab Bar (Page-level Tab Navigation) --- */
 
-.admin-tabs {
-  gap: 0.25rem;
-  margin-bottom: 1.5rem;
+.admin-tabs {margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--border);
   padding-bottom: 1px;
 }
@@ -212,9 +206,6 @@
   padding: 0.35rem;
   border-radius: var(--radius-sm);
   transition: background-color 0.2s, color 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .sidebar-toggle-btn:hover {

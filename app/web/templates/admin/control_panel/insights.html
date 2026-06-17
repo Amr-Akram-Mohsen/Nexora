@@ -72,7 +72,7 @@ actions=header_actions
   {% call admin_panel("⚡ Insight Actions Queue", "Immediate tactical recommendations sorted by expected impact and
   priority.") %}
   <div class="insights-table-scroll">
-    <div id="action-queue-list" class="suggestions-list-scroll">
+    <div id="action-queue-list" class="suggestions-list-scroll flex gap-3">
       {{ spinner("Compiling action guidance...") }}
     </div>
   </div>
@@ -96,20 +96,20 @@ actions=header_actions
 </div>
 
 <!-- Section 1.99: Autonomous Execution Panel -->
-<h2 class="insight-group-title">🤖 Autonomous Execution Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center">🤖 Autonomous Execution Panel</h2>
 <div class="insights-section">
   {% include "admin/control_panel/insights/_autonomous_execution.html" %}
 </div>
 
 <!-- Section 1.995: Execution Governance Panel -->
-<h2 class="insight-group-title">🤖 Execution Governance Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center">🤖 Execution Governance Panel</h2>
 <div class="insights-section">
   {% include "admin/control_panel/insights/_governance.html" %}
 </div>
 
 
 <!-- Section 2 & 3: Content Coverage & Brand Expansions -->
-<h2 class="insight-group-title">⚖️ Coverage & Brand Expansions</h2>
+<h2 class="insight-group-title flex gap-3 items-center">⚖️ Coverage & Brand Expansions</h2>
 <div class="overview-top-grid insights-section">
   {% call admin_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to
   identify content gaps.") %}
@@ -152,13 +152,13 @@ actions=header_actions
 </div>
 
 <!-- Section 4: Intent Opportunities -->
-<h2 class="insight-group-title">🎯 Intent Opportunities</h2>
+<h2 class="insight-group-title flex gap-3 items-center">🎯 Intent Opportunities</h2>
 <div class="insights-section">
   <!-- Intent Opportunity Analysis -->
   {% call admin_panel("Intent Distribution Analysis", "Content distribution across taxonomy intents and identified
   coverage gaps.") %}
   <div class="panel-body-padded">
-    <div id="intent-opportunities-list" class="suggestions-list-scroll"
+    <div id="intent-opportunities-list" class="suggestions-list-scroll flex gap-3"
       style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
       {{ spinner("Analyzing intent distributions...") }}
     </div>

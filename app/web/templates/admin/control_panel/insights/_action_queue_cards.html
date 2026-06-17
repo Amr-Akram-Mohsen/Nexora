@@ -10,14 +10,14 @@ else "badge-secondary" %}
     <span class="expand-arrow"
       style="font-size:10px;color:var(--muted-foreground);margin-left:.5rem;transition:transform .2s;">▼</span>
   </div>
-  <div class="opp-metrics" style="margin-bottom:.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-    <div class="opp-metric-item">Target<strong>{{ item.target }}</strong></div>
-    <div class="opp-metric-item">Type<strong>{{ item.type }}</strong></div>
-    <div class="opp-metric-item">Priority<strong class="status-badge {{ priorityBadgeClass }}">{{ item.priority
+  <div class="opp-metrics flex gap-3 flex-wrap items-center" style="margin-bottom:.75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+    <div class="opp-metric-item flex gap-1 items-center">Target<strong>{{ item.target }}</strong></div>
+    <div class="opp-metric-item flex gap-1 items-center">Type<strong>{{ item.type }}</strong></div>
+    <div class="opp-metric-item flex gap-1 items-center">Priority<strong class="status-badge {{ priorityBadgeClass }}">{{ item.priority
         }}</strong></div>
-    <div class="opp-metric-item">Confidence<strong>{{ (item.confidence * 100)|round|int }}%</strong></div>
+    <div class="opp-metric-item flex gap-1 items-center">Confidence<strong>{{ (item.confidence * 100)|round|int }}%</strong></div>
   </div>
-  <div class="opp-action"
+  <div class="opp-action flex items-center"
     style="background:var(--background); padding:0.5rem 0.75rem; border:1px solid var(--border); border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:space-between;">
     <span>Impact: {{ item.impact }}</span>
   </div>

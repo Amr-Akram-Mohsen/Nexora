@@ -3,8 +3,6 @@
 .breadcrumbs {
   margin: 0;
   padding: 0;
-  display: flex;
-  align-items: center;
 }
 
 .breadcrumbs ul {
@@ -26,13 +24,12 @@
 }
 
 /* --- Breadcrumb Links --- */
+
 .breadcrumb-link {
   color: var(--muted-foreground);
   transition: color 0.15s ease-in-out;
   text-transform: none;
-  display: inline-flex;
-  align-items: center;
-  font-weight: 500;
+font-weight: 500;
   text-decoration: none;
 }
 

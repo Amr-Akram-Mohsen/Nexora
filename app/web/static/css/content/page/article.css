@@ -6,9 +6,6 @@
   margin-bottom: 2rem;
 }
 
-.article-header__badges {
-  gap: 0.75rem;
-}
 
 .article-header__title {
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -18,16 +15,7 @@
   letter-spacing: -0.02em;
   margin: 0;
 }
-
-.article-header__meta {
-  gap: 1rem;
-}
-
-.meta-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--muted);
+.meta-pill {background: var(--muted);
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.875rem;

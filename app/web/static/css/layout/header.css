@@ -59,11 +59,7 @@
 
 /* --- Navigation --- */
 
-.main-nav__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: .5rem 1rem;
+.main-nav__link {padding: .5rem 1rem;
   border-radius: var(--radius-md);
   font-weight: var(--weight-md);
   color: var(--muted-foreground);
@@ -169,32 +165,21 @@
   text-transform: uppercase;
   letter-spacing: .05em;
 }
-
-.account-switcher {
-  display: flex;
-  flex-direction: column;
+.account-switcher {flex-direction: column;
 }
 
 .switch-form {
   margin: 0;
   width: 100%;
 }
-
 .switch-btn {
   width: 100%;
   background: transparent;
   border: none;
   cursor: pointer;
   text-align: left;
-  display: flex;
-  align-items: center;
 }
-
-.switch-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
+.switch-avatar {width: 24px;
   height: 24px;
   border-radius: 50%;
   background: var(--muted);
@@ -203,10 +188,7 @@
   font-weight: 600;
   flex-shrink: 0;
 }
-
-.switch-details {
-  display: flex;
-  flex-direction: column;
+.switch-details {flex-direction: column;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -300,12 +282,9 @@
 .header-search__form {
   width: 100%;
 }
-
 .header-search__wrapper {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
 }
 
 .header-search__input {
@@ -339,7 +318,6 @@
   z-index: 5;
   transition: color 0.15s ease;
 }
-
 .header-search__clear {
   position: absolute;
   right: 2.625rem;
@@ -350,10 +328,7 @@
   width: 1.625rem;
   height: 1.625rem;
   border-radius: var(--radius-full);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--text-sm);
+font-size: var(--text-sm);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
@@ -433,12 +408,7 @@ body.dark-mode .site-header {
 .mobile-nav.active {
   display: flex;
 }
-
-.mobile-nav__link {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
+.mobile-nav__link {padding: 0.75rem 1rem;
   border-radius: var(--radius-lg);
   font-weight: var(--weight-semibold);
   font-size: 0.9375rem;

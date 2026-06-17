@@ -17,7 +17,7 @@
 ) }}
 
 <!-- Tab Navigation -->
-<div class="admin-tabs flex" id="taxonomy-tabs">
+<div class="admin-tabs flex gap-1" id="taxonomy-tabs">
   <button class="admin-tab-btn active" data-tab="categories">🗂️ Categories</button>
   <button class="admin-tab-btn" data-tab="brands">🏭 Brands</button>
   <button class="admin-tab-btn" data-tab="topics">🏷️ Topics</button>
@@ -32,7 +32,7 @@
   <!-- Create Form -->
   <div class="admin-inline-form" id="category-create-form">
     <h3 class="admin-inline-form-title">Add New Category</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       <input type="text" id="new-category-name" placeholder="Category name…"
         class="dashboard-filter-input admin-inline-input" />
       <div class="admin-inline-slug-preview flex items-center">
@@ -43,8 +43,8 @@
   </div>
 
   <!-- Filter -->
-  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("category-search", "Search categories…") }}
     </div>
   </div>
@@ -56,7 +56,7 @@
 <div class="admin-tab-panel is-hidden" id="tab-panel-brands">
   <div class="admin-inline-form" id="brand-create-form">
     <h3 class="admin-inline-form-title">Add New Brand</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       <input type="text" id="new-brand-name" placeholder="Brand name…"
         class="dashboard-filter-input admin-inline-input" />
       <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
@@ -68,8 +68,8 @@
     </div>
   </div>
 
-  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("brand-search", "Search brands…") }}
     </div>
   </div>
@@ -81,7 +81,7 @@
 <div class="admin-tab-panel is-hidden" id="tab-panel-topics">
   <div class="admin-inline-form" id="topic-create-form">
     <h3 class="admin-inline-form-title">Add New Topic</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       <input type="text" id="new-topic-name" placeholder="Topic name…"
         class="dashboard-filter-input admin-inline-input" />
       <div class="admin-inline-slug-preview flex items-center">
@@ -91,8 +91,8 @@
     </div>
   </div>
 
-  <div class="admin-toolbar-advanced flex flex-col" style="margin-top:1rem;">
-    <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("topic-search", "Search topics…") }}
     </div>
   </div>

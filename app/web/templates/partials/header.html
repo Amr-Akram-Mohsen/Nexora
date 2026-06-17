@@ -9,18 +9,18 @@
     <div class="header flex items-center justify-between">
 
       <!-- Logo -->
-      <a href="/" class="logo group flex items-center main-nav__link site-logo">
+      <a href="/" class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex">
         {% include "logos/nexora-logo.html" %}
       </a>
 
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for section in main_sections %}
-        <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="main-nav__link">
+        <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="main-nav__link gap-2 inline-flex items-center">
           {{ section.name }}
         </a>
         {% endfor %}
-        <a href="{{ url_for('item.deals') }}" class="main-nav__link">
+        <a href="{{ url_for('item.deals') }}" class="main-nav__link gap-2 inline-flex items-center">
           <i class="fas fa-tag"></i> Deals
         </a>
       </nav>
@@ -43,7 +43,7 @@
 
         {% if is_authenticated %}
         <!-- Saved (Shortcut) -->
-        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon flex-center" title="Saved Items">
+        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon flex-center gap-2" title="Saved Items">
           <i class="far fa-bookmark"></i>
         </a>
         {% endif %}
@@ -96,14 +96,14 @@
             <div class="dropdown-divider"></div>
             
             {% if multi_accounts and multi_accounts|length > 1 %}
-            <div class="account-switcher">
+            <div class="account-switcher flex">
               <span class="dropdown-header">Switch Account</span>
               {% for acc in multi_accounts %}
                 {% if not acc.is_active %}
                 {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form") %}
-                <button type="submit" class="{{ item_class }} switch-btn">
-                  <span class="switch-avatar">{{ acc.avatar_letter }}</span>
-                  <div class="switch-details">
+                <button type="submit" class="{{ item_class }} switch-btn flex items-center">
+                  <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
+                  <div class="switch-details flex">
                     <span class="switch-name">{{ acc.name }}</span>
                     <span class="switch-email">{{ acc.email }}</span>
                   </div>
@@ -164,14 +164,14 @@
     <div class="header-search" id="header-search-panel">
       {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET",
       include_csrf=False, attrs={"role": "search", "aria-label": "Site Search"}) %}
-      <div class="header-search__wrapper">
+      <div class="header-search__wrapper flex items-center">
         {{ input(
         name="query", type="search",
         placeholder="Search contents and products...",
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        <button type="button" class="header-search__clear" aria-label="Clear search" tabindex="-1">
+        <button type="button" class="header-search__clear justify-center inline-flex items-center" aria-label="Clear search" tabindex="-1">
           <i class="fas fa-times"></i>
         </button>
         {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
@@ -183,15 +183,15 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
-      <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="mobile-nav__link">
+      <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="mobile-nav__link flex gap-3 items-center">
         {{ section.name }}
       </a>
       {% endfor %}
-      <a href="{{ url_for('item.deals') }}" class="mobile-nav__link">
+      <a href="{{ url_for('item.deals') }}" class="mobile-nav__link flex gap-3 items-center">
         <i class="fas fa-tag"></i>Deals
       </a>
       {% if is_authenticated %}
-      <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link">
+      <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link flex gap-3 items-center">
         <i class="far fa-bookmark"></i>Saved Items
       </a>
       {% endif %}

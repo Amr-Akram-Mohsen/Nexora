@@ -15,15 +15,11 @@
 
 /* --- Topics Ribbon --- */
 
-.topics-ribbon {
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
+.topics-ribbon {overflow-x: auto;
   white-space: nowrap;
   padding-top: 1rem;
   padding-bottom: 0.5rem;
-  gap: 0.5rem;
-  scrollbar-width: none;
+scrollbar-width: none;
   /* Firefox */
 }
 
@@ -31,11 +27,7 @@
   display: none;
   /* Chrome, Safari and Opera */
 }
-
-.topic-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.35rem 0.85rem;
+.topic-pill {padding: 0.35rem 0.85rem;
   border-radius: var(--radius-full);
   background: var(--card);
   color: var(--foreground);

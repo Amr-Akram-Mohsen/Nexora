@@ -56,9 +56,6 @@
   flex-shrink: 0;
 }
 
-.item-details-card__items {
-  gap: 0.75rem;
-}
 
 /* ─── Item Content (description) ─────────────────────────────────────── */
 
@@ -301,7 +298,6 @@
 
 .detail-page__variants {
   margin-top: 0.5rem;
-  gap: 1rem;
 }
 
 /* ─── Quick Details grid ──────────────────────────────────────────────── */
@@ -318,10 +314,7 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
-
-.quick-detail {
-  display: flex;
-  flex-direction: column;
+.quick-detail {flex-direction: column;
   gap: 0.375rem;
   background: var(--card);
   border: 1px solid var(--border);
@@ -355,12 +348,9 @@
 
 /* ─── Price summary ───────────────────────────────────────────────────── */
 
-.item-price-summary {
-  display: flex;
-  align-items: baseline;
+.item-price-summary {align-items: baseline;
   gap: 0.625rem;
   margin: 0.5rem 0 1rem;
-  flex-wrap: wrap;
 }
 
 .current-price {

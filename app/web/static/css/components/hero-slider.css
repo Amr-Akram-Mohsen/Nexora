@@ -166,14 +166,12 @@
 .hero-slider__arrow--next {
   right: 1rem;
 }
-
 .hero-slider__dots {
   position: absolute;
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  gap: 0.5rem;
-  z-index: 2;
+z-index: 2;
 }
 
 .hero-slider__dot {

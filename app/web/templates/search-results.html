@@ -27,13 +27,13 @@
 
 {% if slot == 'sidebar' %}
 <div class="search-sidebar">
-  <h3 class="filter-section__title flex items-center">Result Types</h3>
-  <div class="search-type-list flex flex-col">
+  <h3 class="filter-section__title flex items-center gap-2">Result Types</h3>
+  <div class="search-type-list flex flex-col gap-2">
     {% for search_type in search_types %}
     <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}"
-      class="search-type-link {{ 'is-active' if active_type == search_type else '' }}">
+      class="search-type-link {{ justify-between gap-2 inline-flex items-center"is-active' if active_type == search_type else '' }}">
       <span>{{ tab_labels[search_type] }}</span>
-      <span class="search-type-count">{{ result_counts.get(search_type, 0) }}</span>
+      <span class="search-type-count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
     </a>
     {% endfor %}
   </div>
@@ -41,8 +41,8 @@
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-header__inner flex items-center justify-between">
-  <div class="listing-summary">
+<div class="listing-header__inner flex items-center justify-between flex-wrap gap-4">
+  <div class="listing-summary flex">
     <h1 class="listing-title">Search Results</h1>
     <p class="listing-count">
       <span class="listing-count__num">{{ search_results|length }}</span>
@@ -52,8 +52,8 @@
 
   {% call form("search-form", variant="", form_action=url_for('recommendation.search'), method="GET",
   include_csrf=False, attrs={"role": "search", "aria-label": "Search results page"}) %}
-  <div class="listing-search-wrapper search-page-form flex">
-    <div class="search-page-form__wrapper">
+  <div class="listing-search-wrapper search-page-form flex gap-2 items-center">
+    <div class="search-page-form__wrapper flex items-center">
       {{ input(
       name="query",
       type="search",
@@ -62,7 +62,7 @@
       class="input-search",
       attrs={"autocomplete": "off", "aria-label": "Search query input"}
       ) }}
-      <button type="button" class="search-page-form__clear" aria-label="Clear search" tabindex="-1">
+      <button type="button" class="search-page-form__clear justify-center inline-flex items-center" aria-label="Clear search" tabindex="-1">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -74,12 +74,12 @@
   {% endcall %}
 </div>
 
-<nav class="search-tabs" aria-label="Search result filters">
+<nav class="search-tabs gap-2" aria-label="Search result filters">
   {% for search_type in search_types %}
   <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}"
-    class="search-tab {{ 'is-active' if active_type == search_type else '' }}">
+    class="search-tab {{ justify-between gap-2 inline-flex items-center"is-active' if active_type == search_type else '' }}">
     <span>{{ tab_labels[search_type] }}</span>
-    <span class="search-tab__count">{{ result_counts.get(search_type, 0) }}</span>
+    <span class="search-tab__count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
   </a>
   {% endfor %}
 </nav>
@@ -87,9 +87,9 @@
 
 {% if slot == 'active_filters' %}
 {% if active_type != 'all' %}
-<span class="filter-tag">
+<span class="filter-tag gap-2 inline-flex items-center">
   <span>{{ tab_labels[active_type] }}</span>
-  <a href="{{ url_for('recommendation.search', query=query, type='all') }}" class="remove-tag"
+  <a href="{{ url_for('recommendation.search', query=query, type='all') }}" class="remove-tag justify-center inline-flex items-center"
     aria-label="Clear result type">&times;</a>
 </span>
 {% endif %}

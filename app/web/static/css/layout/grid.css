@@ -20,13 +20,7 @@
 .section+.section {
   margin-top: 4.5rem;
 }
-
-.section__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 1.75rem;
+.section__header {margin-bottom: 1.75rem;
   /* perfect balanced spacing above grid cards */
 }
 
@@ -55,10 +49,9 @@
 }
 
 /* view all arrows */
+
 .view-all {
   text-decoration: none;
-  display: inline-flex;
-  align-items: center;
 }
 
 .view-all i {
@@ -117,9 +110,8 @@
 }
 
 /* --- Horizontal Card Carousels --- */
-.grid-carousel {
-  display: flex;
-  overflow-x: auto;
+
+.grid-carousel {overflow-x: auto;
   gap: 1.5rem;
   padding-bottom: 0.5rem;
   margin-bottom: 0.5rem;
@@ -215,7 +207,8 @@
 }
 
 @media (max-width: 580px) {
-  .grid-carousel {
+
+.grid-carousel {
     gap: 1rem;
     padding-bottom: 0.25rem;
   }

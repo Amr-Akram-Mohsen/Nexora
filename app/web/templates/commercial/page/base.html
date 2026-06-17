@@ -66,8 +66,8 @@ product
     <div class="container">
 
         {# ══ Breadcrumbs — full width top row ══ #}
-        <div class="detail-page__top flex items-center justify-between">
-            <div class="detail-page__breadcrumbs-wrapper">
+        <div class="detail-page__top flex items-center justify-between gap-6">
+            <div class="detail-page__breadcrumbs-wrapper flex items-center">
                 {% include "commercial/features/breadcrumbs.html" %}
             </div>
         </div>
@@ -80,7 +80,7 @@ product
             {# ── Right column: title, badges, rating, price, quick-details ── #}
             <div class="detail-page__header">
 
-                <div class="detail-page__badges flex flex-wrap items-center">
+                <div class="detail-page__badges flex flex-wrap items-center gap-3">
                     {{ badge(item.category.name, 'badge--category') if item.category else '' }}
                     {{ badge(item.brand.name, 'badge--brand') if item.brand else '' }}
                 </div>
@@ -103,7 +103,7 @@ product
 
                 {# Price — immediately below rating for clear hierarchy #}
                 {% if item.default_variant %}
-                <div class="item-price-summary">
+                <div class="item-price-summary flex flex-wrap">
                     <span class="current-price">
                         {{ item.default_variant.price }}
                         {{ item.default_variant.currency }}
@@ -118,7 +118,7 @@ product
                 {% if item.quick_details %}
                 <div class="item-quick-details">
                     {% for detail in item.quick_details[:6] %}
-                    <div class="quick-detail">
+                    <div class="quick-detail flex">
                         <span class="quick-detail__label">{{ detail.label }}</span>
                         <span class="quick-detail__value">{{ detail.value }}</span>
                     </div>
@@ -129,7 +129,7 @@ product
             </div>
 
             {# Variants + purchase options — below header in right column #}
-            <div class="detail-page__variants flex flex-wrap items-start">
+            <div class="detail-page__variants flex flex-wrap items-start gap-4">
                 {% if item.has_variants %}
                 {% include "commercial/features/variant-selector.html" %}
                 {% endif %}
@@ -166,12 +166,12 @@ product
                     if item.structured_details else None %}
 
                     {% if full_details %}
-                    <div class="item-details-card__items flex flex-col">
+                    <div class="item-details-card__items flex flex-col gap-3">
                         {% from "commercial/features/render-details.html" import render_details %}
                         {{ render_details(full_details) }}
                     </div>
 
-                    <button class="item-details-inline-toggle flex-center" id="toggle-specs-btn" type="button"
+                    <button class="item-details-inline-toggle flex-center gap-2 flex justify-center items-center" id="toggle-specs-btn" type="button"
                         aria-expanded="false">
                         <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         Show More
@@ -195,9 +195,9 @@ product
                             <span class="item-details-card__bar"></span>
                             Highlights
                         </h3>
-                        <ul class="item-highlights__list">
+                        <ul class="item-highlights__list gap-2 flex">
                             {% for key, value in item.structured_details.highlights.items() %}
-                            <li class="item-highlight-row">
+                            <li class="item-highlight-row flex gap-3">
                                 <strong class="item-highlight-row__key">{{ key|replace('_',' ')|title }}</strong>
                                 <span class="item-highlight-row__val">{{ value }}</span>
                             </li>
@@ -233,7 +233,7 @@ product
         <section class="section recommendation-section recommendation-section--products" id="related-products"
             data-recommendation-container="related_product"
             data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
-            <div class="section__header">
+            <div class="section__header flex justify-between gap-6 items-center">
                 <h2 class="title">You May Also Like</h2>
             </div>
             {{ grid(related_items[:4], target_type='commercial') }}
@@ -249,7 +249,7 @@ product
             {% if related_articles %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-newspaper" aria-hidden="true"></i> Articles & Reviews
@@ -265,7 +265,7 @@ product
             {% if related_videos %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-video" aria-hidden="true"></i> Related Videos
@@ -281,7 +281,7 @@ product
             {% if buying_guides %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-book-open" aria-hidden="true"></i> Buying Guides & Tutorials

@@ -1,4 +1,4 @@
-<div class="health-list">
+<div class="health-list flex gap-3">
   <!-- Active contents row -->
   <div>
     <div class="health-row flex justify-between">
@@ -52,10 +52,10 @@
     {% endfor %}
     <div>
       <h4 class="filter-label-xs mt-3 mb-1">7-Day Ingestion Growth</h4>
-      <div class="trend-chart-list">
+      <div class="trend-chart-list flex">
         {% for trend in data.growth_trends %}
           {% set pct = ((trend.count / max_count.val) * 100) | round | int %}
-          <div class="trend-chart-item flex items-center">
+          <div class="trend-chart-item flex items-center gap-2">
             <span class="trend-chart-date">{{ trend.date }}</span>
             <div class="overview-breakdown-bar-track bar-track-trend">
               <div class="overview-breakdown-bar bar-trend" style="width: {{ pct }}%;"></div>

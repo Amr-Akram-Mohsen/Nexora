@@ -65,9 +65,6 @@
   line-height: 1.6;
 }
 
-.dashboard-modal-actions {
-  gap: 0.75rem;
-}
 
 /* --- Modal Size Modifiers --- */
 
@@ -197,9 +194,6 @@
   background: var(--card);
 }
 
-.inspect-store-card-header {
-  gap: 0.5rem;
-}
 
 .inspect-store-card-name {
   font-size: var(--text-sm);
@@ -220,11 +214,9 @@
   gap: 0.5rem;
   font-size: var(--text-xs);
 }
-
 .inspect-store-card-links {
   margin-top: 0.5rem;
   font-size: var(--text-xs);
-  gap: 0.25rem;
 }
 
 .inspect-store-card-meta-label {

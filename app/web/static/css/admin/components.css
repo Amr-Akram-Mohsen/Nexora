@@ -103,9 +103,6 @@ body.dark-mode .bulk-actions-toolbar {
   color: var(--brand-blue);
 }
 
-.bulk-controls-group {
-  gap: 0.5rem;
-}
 
 /* --- Pagination Controls --- */
 
@@ -119,9 +116,6 @@ body.dark-mode .bulk-actions-toolbar {
   color: var(--muted-foreground);
 }
 
-.pagination-controls-group {
-  gap: 0.5rem;
-}
 
 .pagination-per-page-select {
   width: auto;

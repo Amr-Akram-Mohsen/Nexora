@@ -88,6 +88,7 @@
 }
 
 /* Section Header & Icons */
+
 .filter-section__title {
   font-size: 0.75rem;
   /* 12px clean labels */
@@ -95,7 +96,6 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--foreground);
-  gap: 0.5rem;
 }
 
 .filter-section__title i {
@@ -199,10 +199,7 @@ details[open] .filter-section__chevron {
   padding-top: 1.5rem;
   margin-top: 1.5rem;
 }
-
-.sidebar-trending__header {
-  gap: 0.5rem;
-  margin-bottom: 0.85rem;
+.sidebar-trending__header {margin-bottom: 0.85rem;
 }
 
 .sidebar-trending__header i {
@@ -219,9 +216,6 @@ details[open] .filter-section__chevron {
   color: var(--muted-foreground);
 }
 
-.sidebar-trending__links {
-  gap: 0.25rem;
-}
 
 .sidebar-trending__link {
   gap: 0.65rem;

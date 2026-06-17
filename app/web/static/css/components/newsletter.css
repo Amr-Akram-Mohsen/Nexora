@@ -36,12 +36,7 @@
   justify-items: center;
   text-align: center;
 }
-
-.newsletter-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
+.newsletter-icon {width: 3rem;
   height: 3rem;
   border-radius: var(--radius-full);
   color: var(--brand-blue);
@@ -89,13 +84,8 @@
   font-size: var(--text-sm);
   line-height: 1.5;
 }
-
-.newsletter-form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  width: 100%;
+.newsletter-form {align-items: center;
+width: 100%;
   max-width: 34rem;
   margin-inline: auto;
 }
@@ -264,8 +254,7 @@ body.dark-mode .newsletter-more a {
   .newsletter-page-panel {
     padding: 1rem;
   }
-
-  .newsletter-form {
+.newsletter-form {
     flex-direction: column;
     align-items: stretch;
   }

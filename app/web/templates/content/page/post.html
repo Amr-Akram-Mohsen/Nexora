@@ -33,8 +33,8 @@
 
 {% block base_header %}
 <div class="post-header flex flex-col">
-  <div class="post-header__badges flex flex-wrap items-center">
-    <div class="platform-badge flex items-center platform-badge--{{ post.platform }}">
+  <div class="post-header__badges flex flex-wrap items-center gap-3">
+    <div class="platform-badge flex items-center platform-badge--{{ post.platform }} gap-2">
       <i class="fab fa-{{ post.platform }}"></i>
       <span>{{ post.platform | title }}</span>
     </div>
@@ -46,20 +46,20 @@
 
   <h1 class="post-header__title">{{ post.title }}</h1>
 
-  <div class="post-header__meta flex flex-wrap">
-    <div class="meta-pill flex items-center">
+  <div class="post-header__meta flex flex-wrap gap-4">
+    <div class="meta-pill flex items-center gap-2">
       <i class="far fa-user"></i>
       <span class="meta-pill__text">{{ post.author or 'Unknown' }}</span>
     </div>
 
     {% if post.upvotes %}
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="fas fa-arrow-up"></i>
       <span class="meta-pill__text">{{ "{:,}".format(post.upvotes) }} upvotes</span>
     </div>
     {% endif %}
 
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar-alt"></i>
       <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
         }}</span>
@@ -81,7 +81,7 @@
   {% endif %}
 
   {% if post.url %}
-  <div class="post-cta-box flex items-center justify-between">
+  <div class="post-cta-box flex items-center justify-between gap-8">
     <div class="cta-content">
       <p class="cta-label">Community: <strong>r/{{ post.subreddit }}</strong></p>
       <h4 class="cta-title">Join the Discussion</h4>

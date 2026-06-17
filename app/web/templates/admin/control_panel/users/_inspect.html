@@ -4,8 +4,8 @@
   <!-- COLUMN 1: Overview, Moderation, & Actions -->
   <div class="flex flex-col gap-4">
     <!-- Profile Overview Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">👤 User Overview</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">👤 User Overview</div>
       <div class="inspect-details-group flex flex-col">
         {{ inspect_detail_row("ID", "inspect-id", value_text="#" ~ user.id) }}
         {{ inspect_detail_row("Name", "inspect-name", value_text=user.name or "—") }}
@@ -22,22 +22,22 @@
     </div>
 
     <!-- Moderation Signals Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">⚠️ Moderation Signals</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">⚠️ Moderation Signals</div>
       <div class="flex flex-col">
-        <div class="profile-list-item">
+        <div class="profile-list-item flex justify-between items-center">
           <span>Warnings Sent</span>
           <span class="status-badge {{ 'inactive' if moderation.warnings > 0 else 'user' }}">
             {{ moderation.warnings }}
           </span>
         </div>
-        <div class="profile-list-item">
+        <div class="profile-list-item flex justify-between items-center">
           <span>Reported Content</span>
           <span class="status-badge {{ 'inactive' if moderation.reported_content > 0 else 'user' }}">
             {{ moderation.reported_content }}
           </span>
         </div>
-        <div class="profile-list-item">
+        <div class="profile-list-item flex justify-between items-center">
           <span>Deleted Comments</span>
           <span class="status-badge {{ 'inactive' if moderation.deleted_comments > 0 else 'user' }}">
             {{ moderation.deleted_comments }}
@@ -47,8 +47,8 @@
     </div>
 
     <!-- Account Actions Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">⚙️ Access Control Actions</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">⚙️ Access Control Actions</div>
       <div class="flex gap-2 flex-wrap">
         <button class="user-action-btn user-action-toggle-admin" data-action="toggle-admin" data-id="{{ user.id }}"
           data-name="{{ (user.name or user.email) | e }}">
@@ -69,8 +69,8 @@
   <!-- COLUMN 2: Engagement, Content, & Comments -->
   <div class="flex flex-col gap-4">
     <!-- Activity & Recommendation Engagement Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">📈 Activity & Recommendations</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">📈 Activity & Recommendations</div>
       <div class="profile-metric-grid">
         <div class="profile-metric-card">
           <div class="profile-metric-val">{{ activity.views }}</div>
@@ -105,8 +105,8 @@
     </div>
 
     <!-- Content Consumption Patterns Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">🍽️ Content Consumption</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">🍽️ Content Consumption</div>
       <div class="flex flex-col gap-3">
         <div>
           <div class="profile-metric-lbl" style="margin-bottom: 0.25rem;">Top Categories</div>
@@ -148,8 +148,8 @@
     </div>
 
     <!-- Comments & Sentiment Analysis Card -->
-    <div class="profile-section-card">
-      <div class="profile-section-title">💬 Comments Sentiment & Feedback</div>
+    <div class="profile-section-card flex gap-3">
+      <div class="profile-section-title gap-2 flex items-center">💬 Comments Sentiment & Feedback</div>
 
       {% set total_sent = comments_summary.sentiment.positive + comments_summary.sentiment.neutral +
       comments_summary.sentiment.negative %}
@@ -167,7 +167,7 @@
         <span style="color: var(--brand-red, #dc2626)">Negative: {{ comments_summary.sentiment.negative }}</span>
       </div>
 
-      <div class="profile-sentiment-bar">
+      <div class="profile-sentiment-bar flex">
         {% if total_sent > 0 %}
         {% if comments_summary.sentiment.positive > 0 %}
         <div class="sentiment-pos" style="width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>

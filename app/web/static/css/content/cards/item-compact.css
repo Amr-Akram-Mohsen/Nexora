@@ -1,9 +1,7 @@
 /* --- Inline Product Card (Compact Vertical) --- */
-.inline-product-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  background: var(--card);
+
+.inline-product-card {flex-direction: column;
+background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 0 0.5rem;
@@ -38,10 +36,7 @@
 .inline-product-card:hover .inline-product__image img {
   transform: scale(1.08);
 }
-
-.inline-product__info {
-  display: flex;
-  flex-direction: column;
+.inline-product__info {flex-direction: column;
   gap: 0.1rem;
   min-width: 0;
   width: 100%;

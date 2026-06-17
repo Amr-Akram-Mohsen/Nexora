@@ -15,7 +15,7 @@
 
 <details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open }}>
   <summary class="filter-section__summary flex items-center justify-between">
-    <span class="filter-section__title flex items-center">
+    <span class="filter-section__title flex items-center gap-2">
       {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
       {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
       {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics

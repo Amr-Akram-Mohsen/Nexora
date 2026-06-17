@@ -79,7 +79,7 @@
     <details class="filter-section filter-section--price" {{ 'open' if active_filters.min_price or
       active_filters.max_price else 'open' }}>
       <summary class="filter-section__summary flex items-center justify-between">
-        <span class="filter-section__title">
+        <span class="filter-section__title gap-2">
           <i class="fas fa-dollar-sign"></i> Price Range
         </span>
         <span class="filter-section__meta flex items-center">
@@ -91,7 +91,7 @@
       </summary>
 
       <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="get"
-        class="price-range-form flex flex-col">
+        class="price-range-form flex flex-col gap-3">
         {# Persist existing filters #}
         {% for key, vals in request.args.to_dict(flat=False).items() %}
         {% if key not in ['min_price', 'max_price'] %}
@@ -99,7 +99,7 @@
         {% endif %}
         {% endfor %}
 
-        <div class="price-range-inputs flex items-center">
+        <div class="price-range-inputs flex items-center gap-2">
           <div class="price-input-group flex flex-col">
             <label for="min_price" class="price-input-label">Min</label>
             <div class="price-input-wrapper flex items-center">
@@ -129,11 +129,11 @@
     {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     {% if target_type == 'articles' %}
     <div class="sidebar-trending">
-      <div class="sidebar-trending__header flex items-center">
+      <div class="sidebar-trending__header flex items-center gap-2">
         <i class="fas fa-fire"></i>
         <span class="sidebar-trending__title">Trending Now</span>
       </div>
-      <div class="sidebar-trending__links flex flex-col">
+      <div class="sidebar-trending__links flex flex-col gap-1">
 
         {# Show active topic quick-links if topics available #}
         {% set topic_opts = filter_options.get('topic', []) %}

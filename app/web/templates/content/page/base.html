@@ -14,8 +14,8 @@
 
 
     <!-- Top Nav Row -->
-    <div class="detail-page__top flex items-center justify-between">
-      <div class="detail-page__breadcrumbs-wrapper">
+    <div class="detail-page__top flex items-center justify-between gap-6">
+      <div class="detail-page__breadcrumbs-wrapper flex items-center">
         {% include "content/features/breadcrumbs.html" %}
       </div>
       <div class="detail-page__back-wrapper">
@@ -43,7 +43,7 @@
         {% if content.linked_items %}
         {% from "content/cards/item-compact.html" import render_item_compact_card %}
         <div class="recommendation-box recommendation-box--linked">
-          <h3 class="recommendation-box__title">Products Mentioned In This Article</h3>
+          <h3 class="recommendation-box__title flex items-center">Products Mentioned In This Article</h3>
           <div class="recommendation-box__grid">
             {% for item in content.linked_items %}
             {{ render_item_compact_card(item) }}
@@ -61,7 +61,7 @@
         {% set extra_items = matched_items | selectattr('id', 'ne', -1) | list %}
         {% if extra_items %}
         <div class="recommendation-box recommendation-box--matched" data-recommendation-container="shop_product" data-entity-ids="{{ matched_items[:6] | map(attribute='id') | list | tojson | safe }}">
-          <h3 class="recommendation-box__title">
+          <h3 class="recommendation-box__title flex items-center">
             <i class="fas fa-shopping-bag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
             Shop Related Products
           </h3>

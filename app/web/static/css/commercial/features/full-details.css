@@ -130,7 +130,6 @@
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   line-height: 1.6;
-  gap: 0.25rem;
 }
 
 .item-details-group__list li {
@@ -148,11 +147,7 @@
 
 /* ─── "Show More / Show Less" toggle button ──────────────────────────── */
 
-.item-details-inline-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+.item-details-inline-toggle {background-color: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   color: var(--domain-primary);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
@@ -164,8 +159,7 @@
   width: 100%;
   margin-top: 1rem;
   cursor: pointer;
-  gap: 0.5rem;
-  letter-spacing: 0.01em;
+letter-spacing: 0.01em;
 }
 
 .item-details-inline-toggle:hover {

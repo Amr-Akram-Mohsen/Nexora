@@ -1,4 +1,4 @@
-<div class="overview-breakdown-grid">
+<div class="overview-breakdown-grid flex gap-3">
   {% set total = interactions.total or 1 %}
   
   {% set items = [
@@ -12,7 +12,7 @@
 
   {% for it in items %}
     {% set pct = ((it.val / total) * 100) | round | int %}
-    <div class="overview-breakdown-row flex items-center">
+    <div class="overview-breakdown-row flex items-center gap-3">
       <span class="overview-breakdown-icon">{{ it.icon }}</span>
       <span class="overview-breakdown-label">{{ it.label }}</span>
       <div class="overview-breakdown-bar-track">

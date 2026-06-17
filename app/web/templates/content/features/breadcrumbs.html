@@ -1,8 +1,8 @@
-<nav class="breadcrumbs" aria-label="Breadcrumb">
+<nav class="breadcrumbs flex items-center" aria-label="Breadcrumb">
   <ul class="flex items-center">
 
     <li>
-      <a href="/" class="breadcrumb-link">
+      <a href="/" class="breadcrumb-link inline-flex items-center">
         <i class="fas fa-home"></i>
       </a>
     </li>
@@ -13,7 +13,7 @@
 
     {% if content.section %}
     <li>
-      <a href="{{ url_for('content.sections', section_slug=content.section.slug) }}" class="breadcrumb-link">
+      <a href="{{ url_for('content.sections', section_slug=content.section.slug) }}" class="breadcrumb-link inline-flex items-center">
         {{ content.section.name }}
       </a>
     </li>

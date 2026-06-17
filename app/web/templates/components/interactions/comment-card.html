@@ -6,14 +6,14 @@
 <div class="comment{% if comment.parent_id %} comment--reply{% endif %}" data-type="{{ comment.target_type }}"
   data-id="{{ comment.target_id }}" data-comment-id="{{ comment.id }}">
 
-  <div class="comment__inner flex">
+  <div class="comment__inner flex gap-3">
     <!-- Avatar -->
     <img src="{{ comment.user.avatar }}" alt="{{ comment.user.email }}" class="comment__avatar" />
 
     <div class="comment__body">
       <div class="comment__bubble">
         <!-- Header -->
-        <div class="comment__header flex items-center">
+        <div class="comment__header flex items-center gap-2">
           <span class="comment__author">
             {{ comment.user.email }}
           </span>
@@ -27,7 +27,7 @@
         </p>
       </div>
       <!-- Interactions -->
-      <div class="comment__actions flex items-center">
+      <div class="comment__actions flex items-center gap-4">
         {% set v = 'ghost' %}
         {{ button(
         text=comment.like_count or 0, btn_span_class="reaction-count",
@@ -55,7 +55,7 @@
       <!-- Replies -->
       <div class="comment__replies flex flex-col">
 
-        <div class="comment__replies-list flex-col">
+        <div class="comment__replies-list flex-col gap-4">
           <!-- JS injects replies here -->
         </div>
 
@@ -65,7 +65,7 @@
         placeholder="Write a reply...",
         class="comments__textarea"
         ) }}
-        <div class="comment__reply-actions flex">
+        <div class="comment__reply-actions flex gap-2">
           {{ button(
           text="Post Reply", class=btn_class ~ " reply__send-btn", icon="fa fa-paper-plane"
           )

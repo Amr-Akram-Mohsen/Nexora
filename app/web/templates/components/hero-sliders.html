@@ -30,7 +30,7 @@
       {{ button(icon="fas fa-chevron-right", variant="secondary",
       class="hero-slider__arrow hero-slider__arrow--next btn--icon")}}
       <!-- Dots -->
-      <div class="hero-slider__dots flex">
+      <div class="hero-slider__dots flex gap-2">
         {% for i in range(hero_sliders|length) %}
         <button class="hero-slider__dot {% if loop.first %}active{% endif %}" data-slide="{{ i }}"
           aria-label="Go to slide {{ i + 1 }}"></button>

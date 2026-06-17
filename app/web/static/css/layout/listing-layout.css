@@ -77,24 +77,15 @@
   display: block;
   opacity: 1;
 }
-
 .listing-main {
   min-width: 0;
-  gap: 1.5rem;
 }
 
-.listing-header {
-  gap: 1rem;
-}
 
 /* --- Listing UI Components --- */
 
 .listing-header__inner {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .listing-title {
@@ -104,10 +95,7 @@
   margin: 0;
   line-height: 1.2;
 }
-
-.listing-summary {
-  display: flex;
-  flex-direction: column;
+.listing-summary {flex-direction: column;
   gap: 0.2rem;
 }
 
@@ -139,12 +127,7 @@
   margin-bottom: 1.5rem;
   box-shadow: var(--shadow-sm);
 }
-
-.filter-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1rem;
+.filter-toggle-btn {padding: 0.55rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   font-size: var(--text-sm);
@@ -165,12 +148,7 @@
   font-size: 13px;
   color: var(--domain-primary);
 }
-
-.filter-toggle-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
+.filter-toggle-badge {min-width: 18px;
   height: 18px;
   padding: 0 0.3rem;
   border-radius: var(--radius-full);
@@ -187,11 +165,8 @@
 }
 
 /* --- Premium Active Filter Chips (.filter-tag) --- */
-.filter-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+
+.filter-tag {background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   color: var(--domain-primary);
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-full);
@@ -212,12 +187,7 @@
 .filter-tag span {
   white-space: nowrap;
 }
-
-.remove-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
+.remove-tag {width: 16px;
   height: 16px;
   border-radius: var(--radius-full);
   color: var(--domain-primary);
@@ -251,8 +221,7 @@
   .listing-mobile-bar {
     display: flex;
   }
-
-  .listing-header__inner {
+.listing-header__inner {
     display: none;
   }
 }
@@ -270,14 +239,10 @@
 .listing-footer {
   padding-top: 1rem;
 }
-
-.listing-filters-active {
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+.listing-filters-active {padding: 0.75rem 1rem;
   background: var(--secondary);
   border-radius: var(--radius-md);
-  flex-wrap: wrap;
-  border: 1px solid var(--border);
+border: 1px solid var(--border);
 }
 
 
@@ -328,8 +293,7 @@
   .listing-layout {
     padding-inline: 1rem;
   }
-
-  .listing-filters-active {
+.listing-filters-active {
     padding: 0.6rem 0.75rem;
   }
 }

@@ -101,10 +101,7 @@
   border-color: rgba(var(--brand-blue-rgb), 0.5);
   box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), 0.08);
 }
-
-.label {
-  gap: 0.5rem;
-  /* gap-2 */
+.label {/* gap-2 */
   font-size: var(--text-sm);
   /* text-sm */
   line-height: 1;

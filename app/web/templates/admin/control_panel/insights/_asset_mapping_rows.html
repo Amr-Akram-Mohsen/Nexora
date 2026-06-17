@@ -11,7 +11,7 @@
     <td class="col-gap-count">{{ (item.missing_assets or [])|length }} Gaps</td>
     <td>
         <div class="asset-mapping-actions">
-            <button type="button" class="btn btn-outline btn-sm asset-mapping-details-toggle" aria-expanded="false">
+            <button type="button" class="btn btn-outline btn-sm asset-mapping-details-toggle gap-2" aria-expanded="false">
                 <i class="fa fa-chevron-right" aria-hidden="true"></i> View
             </button>
         </div>
@@ -23,11 +23,11 @@
             <div style="display: flex; gap: 1rem;">
                 <div style="flex: 1; min-width: 0;">
                     <h6 style="margin-bottom: 0.75rem;">Existing Assets</h6>
-                    <ul class="asset-mapping-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0;">
+                    <ul class="asset-mapping-list flex gap-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0;">
                         {% if item.existing_assets %}
                         {% for asset in item.existing_assets %}
                         <li class="asset-mapping-item">
-                            <div class="asset-mapping-item-header">
+                            <div class="asset-mapping-item-header gap-2 justify-between flex flex-wrap items-center">
                                 <div class="asset-mapping-item-title">
                                     {% if asset.type == 'video' %}🎥{% elif asset.type == 'article' %}📄{% else %}🛍️{%
                                     endif %}
@@ -56,11 +56,11 @@
                 </div>
                 <div style="flex: 1; min-width: 0;">
                     <h6 style="margin-bottom: 0.75rem;">Missing Assets (Gaps)</h6>
-                    <ul class="asset-mapping-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0;">
+                    <ul class="asset-mapping-list flex gap-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding: 0;">
                         {% if item.missing_assets %}
                         {% for gap in item.missing_assets %}
                         <li class="asset-mapping-item">
-                            <div class="asset-mapping-item-header">
+                            <div class="asset-mapping-item-header gap-2 justify-between flex flex-wrap items-center">
                                 <div class="asset-mapping-item-title">
                                     <span class="status-badge badge-purple">{{ gap.content_type|upper }}</span>
                                     {{ gap.missing_topic }}

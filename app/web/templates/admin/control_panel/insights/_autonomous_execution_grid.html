@@ -1,8 +1,8 @@
 <!-- Summary Metrics Bar -->
-<div class="publishing-summary-bar" id="execution-plan-summary">
-  <div class="publishing-summary-item">🤖 Auto-Execute Queue: <span class="status-badge badge-success font-bold">{{ auto_execute|length }}</span></div>
-  <div class="publishing-summary-item">🤔 Needs Review Queue: <span class="status-badge badge-warning font-bold">{{ needs_review|length }}</span></div>
-  <div class="publishing-summary-item">❌ Blocked Queue: <span class="status-badge badge-danger font-bold">{{ blocked|length }}</span></div>
+<div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-plan-summary">
+  <div class="publishing-summary-item gap-2 flex items-center">🤖 Auto-Execute Queue: <span class="status-badge badge-success font-bold">{{ auto_execute|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center">🤔 Needs Review Queue: <span class="status-badge badge-warning font-bold">{{ needs_review|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center">❌ Blocked Queue: <span class="status-badge badge-danger font-bold">{{ blocked|length }}</span></div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-plan-grid-container">
@@ -13,12 +13,12 @@
   ] %}
 
   {% for q in queues %}
-    <div class="kanban-column">
-      <div class="publishing-column-header {{ q.headerClass }}">
+    <div class="kanban-column flex">
+      <div class="publishing-column-header {{ q.headerClass }} flex justify-between items-center">
         <div class="font-bold text-sm">{{ q.name }}</div>
         <div>{{ q.statusLabel }}</div>
       </div>
-      <div class="kanban-column-body">
+      <div class="kanban-column-body flex gap-3">
         {% if not q.list %}
           <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
         {% else %}
@@ -26,8 +26,8 @@
             {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
-              <div class="kanban-task-header">
-                <span class="kanban-task-platform">{{ platformIcon }} {{ task.platform|upper }}</span>
+              <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
+                <span class="kanban-task-platform flex gap-1 items-center">{{ platformIcon }} {{ task.platform|upper }}</span>
                 <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>
@@ -35,7 +35,7 @@
               <div class="kanban-task-reason">{{ task.reason }}</div>
               
               {% if task.risk_factors %}
-                <div class="kanban-task-risk">
+                <div class="kanban-task-risk flex gap-1">
                   {% for r in task.risk_factors %}
                     <div>⚠️ {{ r }}</div>
                   {% endfor %}

@@ -54,10 +54,7 @@
     font-weight: var(--weight-bold);
     color: var(--foreground);
 }
-
-.dashboard-meta-container {
-    gap: 1rem;
-    margin-top: 0.25rem;
+.dashboard-meta-container {margin-top: 0.25rem;
 }
 
 .dashboard-meta {
@@ -134,9 +131,6 @@
     margin: 0;
 }
 
-.admin-page-header-row {
-    gap: 1rem;
-}
 
 .admin-page-header-actions {
     gap: 0.75rem;

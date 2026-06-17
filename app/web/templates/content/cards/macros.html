@@ -26,7 +26,7 @@
     </a>
 
     <div class="card__body flex flex-col">
-        <div class="card__top-meta flex items-center">
+        <div class="card__top-meta flex items-center gap-2 justify-between">
             {{ badge(item.category.name, 'badge--category') }}
             {% for topic in item.topics[:1] %}
             {{ badge(topic.name, 'badge--topic', 'secondary') }}
@@ -39,14 +39,14 @@
 
         <p class="card__excerpt">{{ item.target.preview_text | truncate(110) or '' }}</p>
 
-        <div class="card__footer flex items-center">
-            <div class="card__footer-item">
+        <div class="card__footer flex items-center gap-3">
+            <div class="card__footer-item gap-2">
                 <i class="far fa-newspaper"></i>
                 <span class="truncate">{{ item.target.source_name }}</span>
             </div>
             <div class="card__footer-divider"></div>
             {% if item.target.read_time_minutes %}
-            <div class="card__footer-item">
+            <div class="card__footer-item gap-2">
                 <i class="far fa-clock"></i>
                 <span>{{ item.target.read_time_minutes }}m</span>
             </div>
@@ -72,7 +72,7 @@
     </div>
 
     <div class="card__body flex flex-col">
-        <div class="card__top-meta flex items-center">
+        <div class="card__top-meta flex items-center gap-2 justify-between">
             {{ badge(item.category.name, 'badge--category') }}
             <span class="platform-icon platform-icon--{{ item.target.platform }} flex-center">
                 <i class="fab fa-{{ item.target.platform }}"></i>
@@ -83,8 +83,8 @@
             <h3 class="card__title">{{ item.target.title }}</h3>
         </a>
 
-        <div class="card__footer">
-            <div class="card__footer-item">
+        <div class="card__footer gap-3">
+            <div class="card__footer-item gap-2">
                 <i class="fas fa-play-circle"></i>
                 <span class="truncate">{{ item.target.channel_name }}</span>
             </div>
@@ -100,7 +100,7 @@
 {% macro render_post_card(item) %}
 <article class="card flex flex-col" data-type="post" data-id="{{ item.id }}" data-domain-type="content">
     <div class="card__body flex flex-col">
-        <div class="card__top-meta flex items-center">
+        <div class="card__top-meta flex items-center gap-2 justify-between">
             {{ badge('Community', 'badge--post-type') }}
             {% if item.target.subreddit %}
             {{ badge('r/' ~ item.target.subreddit, 'badge--topic', 'secondary') }}
@@ -116,14 +116,14 @@
 
         <p class="card__excerpt">{{ item.target.body | truncate(150) or '' }}</p>
 
-        <div class="card__footer">
-            <div class="card__footer-item">
+        <div class="card__footer gap-3">
+            <div class="card__footer-item gap-2">
                 <i class="far fa-user"></i>
                 <span class="truncate">{{ item.target.author or 'Unknown' }}</span>
             </div>
             <div class="card__footer-divider"></div>
             {% if item.target.upvotes %}
-            <div class="card__footer-item">
+            <div class="card__footer-item gap-2">
                 <i class="fas fa-arrow-up"></i>
                 <span>{{ item.target.upvotes }}</span>
             </div>

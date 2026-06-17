@@ -50,9 +50,7 @@
 
 /* ─── Links list ─────────────────────────────────────────────────────── */
 
-.item-buy-links__items {
-  gap: 0.5rem;
-}
+
 
 /* ─── Individual buy link row ────────────────────────────────────────── */
 
@@ -82,14 +80,12 @@
   min-width: 0;
   flex: 1;
 }
-
 .item-buy-link__store {
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
   color: var(--foreground);
   gap: 0.4rem;
-  align-items: center;
-  flex-shrink: 0;
+flex-shrink: 0;
 }
 
 .item-buy-link__store img.store-logo {

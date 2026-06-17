@@ -28,7 +28,7 @@
       text="Continue with Google",
       type="button",
       variant="outline",
-      class="google-auth-btn inline-flex-center",
+      class="google-auth-btn inline-flex-center gap-3",
       icon="fa-brands fa-google",
       attrs={"onclick": "window.location.href='" ~ google_url ~ "'"}
       ) }}
@@ -55,21 +55,21 @@
 
       {# Password with visibility toggle #}
       {% call field(label_text="Password", for_id="password") %}
-      <div class="password-wrapper">
+      <div class="password-wrapper flex items-center">
         {{ input(
         name="password", id="password", type="password",
         placeholder="••••••••",
         attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
         required=True
         ) }}
-        <button type="button" class="password-toggle" aria-label="Show password">
+        <button type="button" class="password-toggle flex justify-center items-center" aria-label="Show password">
           <i class="fa-regular fa-eye"></i>
         </button>
       </div>
       {# Strength meter — register only #}
       {% if is_new_user %}
       <div class="password-strength" style="display:none;">
-        <div class="password-strength-bar">
+        <div class="password-strength-bar flex gap-1">
           <div class="strength-segment"></div>
           <div class="strength-segment"></div>
           <div class="strength-segment"></div>
@@ -84,14 +84,14 @@
       {# Confirm Password — register only #}
       {% if is_new_user %}
       {% call field(label_text="Confirm Password", for_id="confirm_password") %}
-      <div class="password-wrapper">
+      <div class="password-wrapper flex items-center">
         {{ input(
         name="confirm_password", id="confirm_password", type="password",
         placeholder="••••••••",
         attrs={"autocomplete": "new-password"},
         required=True
         ) }}
-        <button type="button" class="password-toggle" aria-label="Show password">
+        <button type="button" class="password-toggle flex justify-center items-center" aria-label="Show password">
           <i class="fa-regular fa-eye"></i>
         </button>
       </div>
@@ -122,7 +122,7 @@
         <form action="{{ url_for('user.resend_verification') }}" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="email" value="{{ email }}">
-          <button type="submit" class="btn variant--outline resend-alert__btn">Resend Verification Email</button>
+          <button type="submit" class="btn variant--outline resend-alert__btn gap-2">Resend Verification Email</button>
         </form>
       </div>
       {% endif %}

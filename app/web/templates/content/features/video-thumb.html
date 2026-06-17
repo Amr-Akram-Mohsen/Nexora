@@ -8,8 +8,8 @@ wrapper_class='card__img-wrapper') %}
     <div class="video-preview__surface">
         {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img') }}
 
-        <div class="video-preview__overlay">
-            <button class="video-preview__play-btn" aria-label="Play {{ title }}" data-action="lazy-play">
+        <div class="video-preview__overlay flex justify-center items-center">
+            <button class="video-preview__play-btn flex justify-center items-center" aria-label="Play {{ title }}" data-action="lazy-play">
                 <div class="play-icon-wrapper">
                     <i class="fas fa-play"></i>
                 </div>

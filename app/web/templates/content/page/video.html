@@ -32,8 +32,8 @@
 
 {% block base_header %}
 <div class="video-header flex flex-col">
-  <div class="video-header__badges flex flex-wrap items-center">
-    <div class="platform-badge flex items-center platform-badge--{{ video.platform }}">
+  <div class="video-header__badges flex flex-wrap items-center gap-3">
+    <div class="platform-badge flex items-center platform-badge--{{ video.platform }} gap-2">
       <i class="fab fa-{{ video.platform }}"></i>
       <span>{{ video.platform | title }}</span>
     </div>
@@ -45,22 +45,22 @@
 
   <h1 class="video-header__title">{{ video.title }}</h1>
 
-  <div class="video-header__meta flex flex-wrap">
+  <div class="video-header__meta flex flex-wrap gap-4">
     {% if video.channel_name %}
-    <div class="meta-pill flex items-center">
+    <div class="meta-pill flex items-center gap-2">
       <i class="fas fa-play-circle"></i>
       <span class="meta-pill__text">{{ video.channel_name }}</span>
     </div>
     {% endif %}
 
     {% if content.view_count %}
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="fas fa-eye"></i>
       <span class="meta-pill__text">{{ "{:,}".format(content.view_count) }} views</span>
     </div>
     {% endif %}
 
-    <div class="meta-pill">
+    <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar-alt"></i>
       <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
         }}</span>

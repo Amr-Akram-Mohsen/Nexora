@@ -10,7 +10,7 @@
     {% set max_val.val = s.count %}
   {% endif %}
 {% endfor %}
-<div class="dist-list">
+<div class="dist-list flex">
   {% for s in product_by_source %}
     {% set pct = ((s.count / max_val.val) * 100) | round | int %}
     <a class="dist-row-link" href="/admin/items?source={{ s.slug }}">

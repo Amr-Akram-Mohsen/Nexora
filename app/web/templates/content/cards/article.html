@@ -9,7 +9,7 @@
 
 {% block meta_top %}
 <!-- Meta -->
-<div class="card__meta-top flex items-center">
+<div class="card__meta-top flex items-center gap-2 justify-between">
   {% if content.category %}
   {{ badge(content.category.name, 'badge--category', 'secondary') }}
   {% endif %}
@@ -20,8 +20,8 @@
 {% endblock %}
 
 {% block meta_bottom %}
-<div class="card__meta-group flex items-center">
-  <div class="card__meta-item flex items-center">
+<div class="card__meta-group flex items-center gap-2">
+  <div class="card__meta-item flex items-center gap-2">
     <i class="far fa-newspaper card__meta-icon"></i>
     <span class="card__meta-text truncate">
       {{ article.source_name }}

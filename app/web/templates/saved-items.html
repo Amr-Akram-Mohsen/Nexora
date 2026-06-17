@@ -25,7 +25,7 @@
 
 <div class="filter-sidebar">
   <div class="filter-section">
-    <h3 class="filter-section__title flex items-center">
+    <h3 class="filter-section__title flex items-center gap-2">
       <i class="far fa-folder"></i> Collections
     </h3>
     <ul class="filter-list flex flex-col">
@@ -57,8 +57,8 @@
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-header__inner">
-  <div class="listing-summary">
+<div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
+  <div class="listing-summary flex">
     <h1 class="listing-title">Your Saved Items</h1>
     <p class="listing-count">
       <span class="listing-count__num" id="total-count">{{ saved_articles|length + saved_items|length }}</span>
@@ -70,7 +70,7 @@
 
 {% if slot == 'results' %}
 {% if not saved_articles and not saved_items %}
-<div class="empty-state flex flex-col items-center">
+<div class="empty-state flex flex-col items-center gap-4">
   <div class="empty-state__icon-wrapper flex-center">
     <i class="far fa-bookmark"></i>
     <div class="empty-state__pulse"></div>
@@ -83,9 +83,9 @@
 </div>
 {% else %}
 
-<div class="saved-collections flex flex-col">
+<div class="saved-collections flex flex-col gap-12">
   {% if saved_items %}
-  <section class="saved-collection flex flex-col" data-domain-type="commercial" id="products-section">
+  <section class="saved-collection flex flex-col gap-6" data-domain-type="commercial" id="products-section">
     <h2 class="section-title flex justify-between items-center">
       <span>Saved Products</span>
       <span class="count-badge">({{ saved_items|length }})</span>
@@ -95,7 +95,7 @@
   {% endif %}
 
   {% if saved_articles %}
-  <section class="saved-collection flex flex-col" data-domain-type="content" id="articles-section">
+  <section class="saved-collection flex flex-col gap-6" data-domain-type="content" id="articles-section">
     <h2 class="section-title flex justify-between items-center">
       <span>Saved Articles</span>
       <span class="count-badge">({{ saved_articles|length }})</span>

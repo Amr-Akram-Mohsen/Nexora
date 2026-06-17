@@ -2,11 +2,6 @@
   gap: 0.6rem;
 }
 
-.listing-sort-compact {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
 .sort-label {
   font-size: var(--text-sm);
@@ -14,11 +9,8 @@
   white-space: nowrap;
   font-weight: var(--weight-md);
 }
-
 .sort-select-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .sort-select-icon {

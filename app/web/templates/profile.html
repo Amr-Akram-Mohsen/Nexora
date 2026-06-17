@@ -20,13 +20,13 @@
       <aside class="profile-sidebar">
         <div class="profile-card profile-user-card glass">
           <div class="profile-user-info flex flex-col items-center">
-            <div class="profile-avatar flex-center">
+            <div class="profile-avatar flex-center flex justify-center items-center">
               {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
             </div>
             <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
             <p class="profile-email">{{ current_user.email }}</p>
 
-            <div class="profile-verification-status">
+            <div class="profile-verification-status flex justify-center">
               {% if current_user.is_verified %}
               <span class="badge badge--verified"><i class="fas fa-check-circle"></i> Verified Account</span>
               {% else %}
@@ -56,7 +56,7 @@
           <form action="{{ url_for('user.resend_verification') }}" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="email" value="{{ current_user.email }}">
-            <button type="submit" class="btn variant--primary w-full text-center">Resend Link</button>
+            <button type="submit" class="btn variant--primary w-full text-center gap-2">Resend Link</button>
           </form>
         </div>
         {% endif %}
@@ -75,14 +75,14 @@
             <input type="hidden" name="action" value="name">
 
             <div class="profile-form-grid">
-              <div class="form-field">
-                <label class="label" for="name">Display Name</label>
+              <div class="form-field gap-2 flex">
+                <label class="label gap-2" for="name">Display Name</label>
                 <input type="text" id="name" name="name" class="input" value="{{ current_user.name or '' }}"
                   placeholder="Enter your name">
                 <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
               </div>
               <div class="form-actions">
-                <button type="submit" class="btn variant--primary">Save Changes</button>
+                <button type="submit" class="btn variant--primary gap-2">Save Changes</button>
               </div>
             </div>
           </form>
@@ -106,7 +106,7 @@
                 <input type="hidden" name="newsletter_placement" value="profile">
                 <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
                 <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
-                <button type="submit" class="btn variant--outline text-xs">Unsubscribe</button>
+                <button type="submit" class="btn variant--outline text-xs gap-2">Unsubscribe</button>
               </form>
             </div>
             {% else %}
@@ -127,7 +127,7 @@
                 <input type="hidden" name="newsletter_placement" value="profile">
                 <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
                 <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
-                <button type="submit" class="btn variant--primary text-xs">
+                <button type="submit" class="btn variant--primary text-xs gap-2">
                   {% if subscriber and subscriber.unsubscribed_at is none %}Resend confirmation{% else %}Subscribe{% endif %}
                 </button>
               </form>
@@ -146,7 +146,7 @@
               <p class="card-section-desc" style="margin-top: 0.25rem;">Change your password to ensure your account
                 security.</p>
             </div>
-            <button type="button" class="btn variant--ghost btn--icon" id="password-toggle-btn"
+            <button type="button" class="btn variant--ghost btn--icon gap-2" id="password-toggle-btn"
               aria-label="Toggle Password Form">
               <i class="fas fa-chevron-down transition-transform duration-300" id="accordion-arrow"></i>
             </button>
@@ -159,27 +159,27 @@
               <input type="hidden" name="action" value="password">
 
               <div class="form-row-grid">
-                <div class="form-field full-width">
-                  <label class="label" for="current_password">Current Password</label>
+                <div class="form-field full-width gap-2 flex">
+                  <label class="label gap-2" for="current_password">Current Password</label>
                   <input type="password" id="current_password" name="current_password" class="input" required
                     placeholder="Enter your current password">
                 </div>
 
-                <div class="form-field">
-                  <label class="label" for="new_password">New Password</label>
+                <div class="form-field gap-2 flex">
+                  <label class="label gap-2" for="new_password">New Password</label>
                   <input type="password" id="new_password" name="new_password" class="input" minlength="8" required
                     placeholder="Enter new password (min. 8 chars)">
                 </div>
 
-                <div class="form-field">
-                  <label class="label" for="confirm_new_password">Confirm New Password</label>
+                <div class="form-field gap-2 flex">
+                  <label class="label gap-2" for="confirm_new_password">Confirm New Password</label>
                   <input type="password" id="confirm_new_password" name="confirm_new_password" class="input"
                     minlength="8" required placeholder="Confirm your new password">
                 </div>
               </div>
 
               <div class="form-actions flex justify-end">
-                <button type="submit" class="btn variant--primary">Update Password</button>
+                <button type="submit" class="btn variant--primary gap-2">Update Password</button>
               </div>
             </form>
           </div>

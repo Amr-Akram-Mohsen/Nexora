@@ -109,15 +109,7 @@
 .sidebar-price-active__remove:hover {
   opacity: 1;
 }
-
-
-.price-range-form {
-  gap: 0.75rem;
-}
-
-.price-range-inputs {
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+.price-range-inputs {margin-top: 0.5rem;
 }
 
 .price-input-group {

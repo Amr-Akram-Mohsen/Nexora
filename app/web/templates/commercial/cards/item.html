@@ -41,7 +41,7 @@
   <div class="card__content">
 
     {# Category + Brand badges #}
-    <div class="card__meta-top flex items-center">
+    <div class="card__meta-top flex items-center gap-2 justify-between">
       {{ badge(item.category.name, 'badge--category', 'secondary') if item.category else '' }}
       {{ badge(item.brand.name, 'badge--brand', 'secondary') if item.brand else '' }}
     </div>
@@ -52,8 +52,8 @@
     </a>
 
     {# Ratings row #}
-    <div class="card__meta-bottom flex items-center">
-      <div class="card__rating flex items-center">
+    <div class="card__meta-bottom flex items-center gap-3 justify-between">
+      <div class="card__rating flex items-center gap-1">
         {{ render_stars(item.rating or 0) }}
         <span class="item-rating">({{ item.rating or 0 }})</span>
       </div>
@@ -65,9 +65,9 @@
     {% include "components/interactions/interactions-compact.html" %}
 
     {# ── Price + Store + CTA ── #}
-    <div class="item-actions flex flex-col">
+    <div class="item-actions flex flex-col gap-3 gap-4 flex-wrap">
 
-      <div class="item-price-box flex items-center">
+      <div class="item-price-box flex items-center gap-2">
         {% if best_link %}
         <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
         {% if best_link.old_price %}

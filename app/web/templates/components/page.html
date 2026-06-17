@@ -3,7 +3,7 @@
   {% if title %}
     <h1 class="page__title">{{ title|safe }}</h1>
   {% endif %}
-  <div class="page__body flex flex-col">
+  <div class="page__body flex flex-col gap-6">
     {{ caller() }}
   </div>
 </section>

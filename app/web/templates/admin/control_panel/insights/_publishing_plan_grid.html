@@ -1,8 +1,8 @@
 <!-- Summary Metrics Bar -->
-<div class="publishing-summary-bar" id="publishing-plan-summary">
-  <div class="publishing-summary-item">🎯 Total Scheduled: <strong>{{ total_tasks }}</strong></div>
-  <div class="publishing-summary-item">📺 Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
-  <div class="publishing-summary-item">🛠️ Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
+<div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="publishing-plan-summary">
+  <div class="publishing-summary-item gap-2 flex items-center">🎯 Total Scheduled: <strong>{{ total_tasks }}</strong></div>
+  <div class="publishing-summary-item gap-2 flex items-center">📺 Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
+  <div class="publishing-summary-item gap-2 flex items-center">🛠️ Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
 </div>
 
 <div class="insights-kanban-grid" id="publishing-plan-grid-container">
@@ -20,12 +20,12 @@
       {% set name = 'Week 2 (Days 8-14)' %}
     {% endif %}
 
-    <div class="kanban-column">
-      <div class="publishing-column-header {{ headerClass }}">
+    <div class="kanban-column flex">
+      <div class="publishing-column-header {{ headerClass }} flex justify-between items-center">
         <div class="font-bold text-sm">{{ name }}</div>
         <div>{{ statusLabel }}</div>
       </div>
-      <div class="kanban-column-body">
+      <div class="kanban-column-body flex gap-3">
         {% if not week.tasks %}
           <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
         {% else %}
@@ -33,8 +33,8 @@
             {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
-              <div class="kanban-task-header">
-                <span class="kanban-task-platform">{{ platformIcon }} {{ task.platform|upper }}</span>
+              <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
+                <span class="kanban-task-platform flex gap-1 items-center">{{ platformIcon }} {{ task.platform|upper }}</span>
                 <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>

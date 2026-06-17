@@ -29,10 +29,10 @@ actions=header_actions
 ) }}
 
 <!-- Advanced Filters -->
-<div class="admin-toolbar-advanced flex flex-col">
+<div class="admin-toolbar-advanced flex flex-col gap-3">
 
   <!-- Row 1: Search & Basic Filters -->
-  <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("content-search", "Search title or ID…") }}
 
     {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")], default_val="", default_text="All Content Types", extra_class="filter-select-item") }}
@@ -41,7 +41,7 @@ actions=header_actions
   </div>
 
   <!-- Row 2: Ingest Details & Compliance -->
-  <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-status", None, [("pending", "Pending"), ("enriching", "Enriching"), ("complete", "Complete"), ("failed", "Failed")], default_val="", default_text="All Processing States", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-active", None, [("true", "Active Only"), ("false", "Inactive Only")], default_val="", default_text="Active & Inactive", extra_class="filter-select-item") }}
@@ -50,7 +50,7 @@ actions=header_actions
   </div>
 
   <!-- Row 3: Date Filters & Sorting -->
-  <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     <span class="filter-label-xs">Date Range:</span>
     {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")], default_val="published_at", default_text=None, extra_class="filter-input-auto") }}
 
@@ -58,7 +58,7 @@ actions=header_actions
     <span class="filter-text-divider">to</span>
     <input type="date" id="filter-end-date" class="dashboard-filter-input filter-input-auto" />
 
-    <div class="filter-sort-group flex items-center">
+    <div class="filter-sort-group flex items-center gap-2">
       <span class="filter-label-xs">Sort:</span>
       {{ admin_filter_select("sort-by", None, [("id", "ID / Newest"), ("published_at", "Publish Date"), ("ingested_at", "Ingest Date"), ("view_count", "Views"), ("comment_count", "Comments"), ("title", "Title")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
       {{ admin_filter_select("sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
@@ -76,7 +76,7 @@ actions=header_actions
     <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
   </div>
 
-  <div class="bulk-controls-group flex items-center gap-sm">
+  <div class="bulk-controls-group flex items-center gap-sm gap-2">
     {{ admin_filter_select("bulk-action-select", None, [("activate", "Activate Selected"), ("deactivate", "Deactivate Selected"), ("review", "Mark for Review (Draft)"), ("recategorize", "Recategorize Content"), ("delete", "Safe Delete Selected")], default_val="", default_text="Choose Bulk Action...") }}
 
     <!-- Bulk Category Dropdown (Shown only when recategorize is selected) -->
@@ -105,7 +105,7 @@ actions=header_actions
 <p class="dashboard-modal-body">Move this item to a different content category:</p>
 <input type="hidden" id="quick-cat-content-id" />
 {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None, extra_class="modal-select-full") }}
-<div class="dashboard-modal-actions flex justify-center">
+<div class="dashboard-modal-actions flex justify-center gap-3">
   <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Cancel</button>
   <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
 </div>

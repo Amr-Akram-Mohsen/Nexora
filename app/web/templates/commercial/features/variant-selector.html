@@ -7,11 +7,11 @@
         Choose Options
     </h3>
 
-    <div class="variant-groups flex flex-col">
+    <div class="variant-groups flex flex-col gap-4">
         {% for attr, values in item.variant_groups.items() %}
         <div class="variant-group" data-group="{{ attr }}">
 
-            <div class="variant-group__label flex items-center">
+            <div class="variant-group__label flex items-center justify-between">
                 <span class="flex items-center gap-1.5">
                     {% if attr in ['color', 'finish'] %}
                     <i class="fas fa-palette variant-group__label-icon"></i>
@@ -39,7 +39,7 @@
                 {% if attr in ['color', 'finish'] %}
 
                 <button type="button"
-                    class="variant-option variant-option--color-pill flex items-center"
+                    class="variant-option variant-option--color-pill flex items-center gap-2 inline-flex"
                     data-attribute="{{ attr }}" data-value="{{ value }}"
                     title="{{ value }}"
                     aria-label="Select {{ attr }}: {{ value }}">

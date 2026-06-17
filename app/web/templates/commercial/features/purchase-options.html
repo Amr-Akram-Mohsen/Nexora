@@ -7,7 +7,7 @@
     <i class="fas fa-info-circle"></i>
     <span class="disclosure-text">Affiliate links · We may earn a commission</span>
   </div>
-  <div class="item-buy-links__items flex flex-col">
+  <div class="item-buy-links__items flex flex-col gap-2">
     {% for link in store_links %}
     <a href="{{ link.affiliate_url }}" target="_blank" rel="noopener noreferrer"
       class="link item-buy-link flex items-center justify-between" data-link-id="{{ link.id }}">

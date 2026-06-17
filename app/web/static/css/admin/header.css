@@ -29,11 +29,6 @@ body.dark-mode .admin-header {
     padding-right: 1rem;
 }
 
-.admin-header__left,
-.admin-header__actions {
-    display: flex;
-    align-items: center;
-}
 
 .admin-header__logo {
     height: 36px;

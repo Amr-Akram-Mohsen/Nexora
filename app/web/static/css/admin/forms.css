@@ -33,9 +33,7 @@
 
 /* --- Filter & Search Bars --- */
 
-.dashboard-filter-bar {
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+.dashboard-filter-bar {margin-bottom: 1.25rem;
 }
 
 .dashboard-search-container {
@@ -114,16 +112,11 @@
 
 /* --- Advanced Filters Toolbar --- */
 
-.admin-toolbar-advanced {
-  gap: 0.75rem;
-  align-items: stretch;
+.admin-toolbar-advanced {align-items: stretch;
   padding: 1rem 1.25rem;
   margin-bottom: 1.25rem;
 }
-
-.admin-toolbar-row {
-  gap: 0.75rem;
-  width: 100%;
+.admin-toolbar-row {width: 100%;
 }
 
 .admin-search-grow {
@@ -185,10 +178,8 @@
   font-weight: var(--weight-md);
   white-space: nowrap;
 }
-
 .filter-sort-group {
   margin-left: auto;
-  gap: 0.5rem;
 }
 
 /* --- Summary Bar --- */
@@ -227,9 +218,6 @@
   margin: 0 0 0.625rem 0;
 }
 
-.admin-inline-form-row {
-  gap: 0.75rem;
-}
 
 .admin-inline-input {
   flex: 1;
@@ -274,8 +262,7 @@
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-
-  .filter-sort-group {
+.filter-sort-group {
     margin-left: 0;
     width: 100%;
     justify-content: flex-start;
@@ -283,7 +270,8 @@
 }
 
 @media (max-width: 640px) {
-  .admin-inline-form-row {
+
+.admin-inline-form-row {
     flex-direction: column;
     align-items: stretch;
   }

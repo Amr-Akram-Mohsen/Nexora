@@ -22,17 +22,17 @@
     </aside>
     {% endif %}
     {# ── Main Results Area ── #}
-    <main class="listing-main flex flex-col">
+    <main class="listing-main flex flex-col gap-6">
 
       {# ── Listing Header: title + sort ── #}
-      <header class="listing-header flex flex-col">
+      <header class="listing-header flex flex-col gap-4">
         {{ caller('header') }}
       </header>
 
       {# ── Active Filter Chips ── #}
       {% set active_filter_content = caller('active_filters') %}
       {% if active_filter_content and active_filter_content | trim %}
-      <div class="listing-filters-active flex flex-wrap items-center" role="region" aria-label="Active filters">
+      <div class="listing-filters-active flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
         {{ active_filter_content }}
       </div>
       {% endif %}

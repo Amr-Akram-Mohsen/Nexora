@@ -35,21 +35,13 @@
 .contact-info {
   gap: 1.75rem;
 }
-
-.contact-item {
-  gap: 1rem;
-}
-
 .contact-icon {
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--radius-lg);
   background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+transition: all 0.2s ease;
 }
 
 .contact-icon i {
@@ -83,11 +75,7 @@
   padding: 2.5rem; /* luxurious, balanced padding */
   box-shadow: var(--shadow-sm);
 }
-
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.contact-form {flex-direction: column;
 }
 
 .contact-submit {

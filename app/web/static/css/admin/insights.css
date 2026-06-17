@@ -76,22 +76,11 @@
     white-space: nowrap;
     letter-spacing: -0.01em;
 }
-
-.opp-metrics {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: var(--text-xs);
+.opp-metrics {font-size: var(--text-xs);
     color: var(--muted-foreground);
     margin-bottom: 0.75rem;
 }
 
-.opp-metric-item {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
 .opp-metric-item strong {
     color: var(--foreground);
     margin-left: 0.125rem;
@@ -110,15 +99,12 @@
     gap: 0.5rem;
     width: 100%;
 }
-
 .opp-action {
     border-radius: var(--radius-md);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
     color: var(--foreground);
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+gap: 0.35rem;
 }
 
 .trending-sections-grid {
@@ -143,15 +129,12 @@
 .col-span-full {
     grid-column: 1 / -1;
 }
-
 .trend-badge {
     font-size: 11px;
     font-weight: var(--weight-bold);
     padding: 3px 8px;
     border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
+gap: 3px;
     letter-spacing: 0.02em;
 }
 
@@ -169,16 +152,12 @@
     background: var(--secondary);
     color: var(--muted-foreground);
 }
-
 .insight-group-title {
     font-size: var(--text-xl);
     font-weight: var(--weight-xbold);
     color: var(--foreground);
     margin: 1.75rem 0 1rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    letter-spacing: -0.02em;
+letter-spacing: -0.02em;
 }
 
 .insight-group-title::after {
@@ -212,37 +191,22 @@
     background: rgba(239, 68, 68, 0.1);
     color: var(--brand-red);
 }
-
-.publishing-summary-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 0.75rem 1.25rem;
+.publishing-summary-bar {padding: 0.75rem 1.25rem;
     background: var(--background);
     border-bottom: 1px solid var(--border);
     font-size: var(--text-xs);
     color: var(--muted-foreground);
 }
 
-.publishing-summary-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
 
 .publishing-summary-item strong {
     color: var(--foreground);
 }
-
 .publishing-column-header {
     padding: 1.25rem;
     font-weight: var(--weight-xbold);
     border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    letter-spacing: -0.01em;
+letter-spacing: -0.01em;
 }
 
 /* Scoped Styles for Spacing & Spacing Cleanup */
@@ -282,29 +246,18 @@
     border-radius: var(--radius-md);
     padding: 1rem;
 }
-
 .benchmark-header {
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--foreground);
+color: var(--foreground);
 }
-
-.benchmark-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.benchmark-list {flex-direction: column;
 }
-
 .benchmark-text-item {
     font-size: var(--text-xs);
     color: var(--muted-foreground);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+flex-direction: column;
 }
 
 .benchmark-divider {
@@ -317,25 +270,20 @@
 .quality-score-section {
     margin-top: 1.25rem;
 }
-
 .quality-score-header {
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--foreground);
+color: var(--foreground);
 }
 
 /* Action Suggestions panel scroll */
+
 .suggestions-list-scroll {
     max-height: 480px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-right: 0.25rem;
+flex-direction: column;
+padding-right: 0.25rem;
 }
 
 /* Action suggestion cards */
@@ -354,14 +302,7 @@
     border-color: rgba(var(--brand-blue-rgb), 0.35);
     box-shadow: var(--insights-hover-shadow);
 }
-
-.rec-action-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
+.rec-action-header {margin-bottom: 0.75rem;
 }
 
 .rec-action-tag-wrap {
@@ -390,24 +331,18 @@
     color: var(--foreground);
     line-height: 1.4;
 }
-
 .rec-action-box {
     background: var(--background);
     border: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.35rem;
+flex-direction: column;
+gap: 0.35rem;
     font-size: var(--text-sm);
     padding: 0.75rem;
     border-radius: var(--radius-sm);
 }
-
 .rec-action-box-header {
     color: var(--foreground);
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
+gap: 0.35rem;
     font-weight: var(--weight-bold);
 }
 
@@ -432,26 +367,21 @@
     gap: 1rem;
     padding: 1.25rem;
 }
-
 .kanban-column {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: none;
-    display: flex;
-    flex-direction: column;
+flex-direction: column;
     min-height: 200px;
     overflow: hidden;
 }
-
 .kanban-column-body {
     padding: 1rem;
     overflow-y: auto;
     flex: 1;
     max-height: 480px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+flex-direction: column;
 }
 
 .kanban-task-card {
@@ -468,23 +398,12 @@
     border-color: rgba(var(--brand-blue-rgb), 0.35);
     box-shadow: var(--insights-hover-shadow);
 }
-
-.kanban-task-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-    gap: 0.25rem;
+.kanban-task-header {margin-bottom: 0.5rem;
 }
-
 .kanban-task-platform {
     font-size: 11px;
     font-weight: var(--weight-bold);
     color: var(--muted-foreground);
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
 
 .kanban-task-title {
@@ -511,16 +430,13 @@
     border-radius: 2px;
     margin-top: 0.5rem;
 }
-
 .kanban-task-risk {
     margin-top: 0.6rem;
     font-size: 11px;
     color: var(--brand-red);
     font-weight: var(--weight-bold);
     line-height: 1.3;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+flex-direction: column;
 }
 
 .kanban-task-log {
@@ -541,14 +457,13 @@
 }
 
 /* Asset mapping lists */
+
 .asset-mapping-list {
     list-style: none;
     padding-left: 0;
     margin: 0;
     font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+flex-direction: column;
 }
 
 .asset-mapping-details {
@@ -581,14 +496,7 @@
     border-color: rgba(var(--brand-blue-rgb), 0.35);
     box-shadow: var(--shadow-md);
 }
-
-.asset-mapping-item-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.25rem;
+.asset-mapping-item-header {margin-bottom: 0.25rem;
 }
 
 .asset-mapping-item-title {
@@ -601,22 +509,16 @@
 }
 
 /* Strategy accuracy feedback */
+
 .accuracy-panel-body {
     padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+flex-direction: column;
 }
-
 .insights-accuracy-card {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem;
-    padding: 1rem 1.25rem;
+padding: 1rem 1.25rem;
 }
 
 .insights-accuracy-title {
@@ -640,13 +542,10 @@
     letter-spacing: -0.02em;
     line-height: 1;
 }
-
 .insights-failures-scroll {
     max-height: 320px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+flex-direction: column;
 }
 
 .failure-card {
@@ -658,14 +557,7 @@
     width: 100%;
     box-shadow: var(--insights-card-shadow);
 }
-
-.failure-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.35rem;
-    flex-wrap: wrap;
-    gap: 0.25rem;
+.failure-header {margin-bottom: 0.35rem;
 }
 
 .failure-type {
@@ -710,6 +602,7 @@
 
 
 /* additions for refactor */
+
 .kanban-column { min-width: 280px; display: inline-block; vertical-align: top; margin-right: 1rem; }
 .kanban-column-body { padding: 0.5rem 0; }
 .kanban-task-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem; }

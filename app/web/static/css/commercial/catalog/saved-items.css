@@ -1,13 +1,8 @@
 /* saved-items.css - Styling for Saved Items Page layout & grid sections */
 
-.saved-collections {
-  gap: 3rem;
-  width: 100%;
+.saved-collections {width: 100%;
 }
 
-.saved-collection {
-  gap: 1.5rem;
-}
 
 .saved-collection .section-title {
   font-size: var(--text-xl);

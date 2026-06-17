@@ -6,8 +6,7 @@
   color: var(--foreground);
   padding: 1.75rem 2rem;
   border-radius: var(--radius-xl);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+margin-bottom: 2rem;
   text-align: left;
   box-shadow: var(--shadow-sm);
 }
@@ -26,9 +25,8 @@
 }
 
 /* --- Partner Card grid --- */
-.affiliate-partners {
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+
+.affiliate-partners {margin-top: 1.5rem;
   margin-bottom: 2.5rem;
 }
 
@@ -69,14 +67,14 @@
 }
 
 /* --- Advisory Disclosure Callouts --- */
+
 .affiliate-disclosure-banner {
   background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.05);
   border-left: 4px solid var(--domain-primary, var(--primary));
   padding: 1rem 1.25rem;
   margin-bottom: 2.5rem;
   border-radius: var(--radius-md);
-  gap: 0.75rem;
-  font-size: 0.875rem;
+font-size: 0.875rem;
   color: var(--muted-foreground);
   line-height: 1.55;
 }

@@ -29,9 +29,9 @@ actions=header_actions
 ) }}
 
 <!-- Filters -->
-<div class="admin-toolbar-advanced flex flex-col">
+<div class="admin-toolbar-advanced flex flex-col gap-3">
   <!-- Row 1: Search & Basic Filters -->
-  <div class="admin-toolbar-row flex items-center flex-wrap">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("item-search", "Search by name or ID…") }}
 
     {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
@@ -41,8 +41,8 @@ actions=header_actions
   </div>
 
   <!-- Row 2: Sorting & Reset -->
-  <div class="admin-toolbar-row flex items-center flex-wrap">
-    <div class="filter-sort-group" style="margin-left:0;">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    <div class="filter-sort-group gap-2" style="margin-left:0;">
       <span class="filter-label-xs">Sort:</span>
       {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"), ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
       {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}

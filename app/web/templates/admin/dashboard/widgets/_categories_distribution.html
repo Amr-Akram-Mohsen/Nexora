@@ -10,7 +10,7 @@
     {% set max_val.val = c.count %}
   {% endif %}
 {% endfor %}
-<div class="dist-list">
+<div class="dist-list flex">
   {% for c in by_category %}
     {% set pct = ((c.count / max_val.val) * 100) | round | int %}
     <a class="dist-row-link" href="/admin/contents?category={{ c.slug }}">

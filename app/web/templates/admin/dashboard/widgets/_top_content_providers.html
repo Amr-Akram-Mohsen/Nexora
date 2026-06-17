@@ -10,7 +10,7 @@
     {% set max_val.val = s.views %}
   {% endif %}
 {% endfor %}
-<div class="dist-list">
+<div class="dist-list flex">
   {% for s in top_performing_content %}
     {% set pct = ((s.views / max_val.val) * 100) | round | int %}
     <a class="dist-row-link" href="/admin/contents?source={{ s.slug }}&sort_by=view_count&sort_dir=desc">

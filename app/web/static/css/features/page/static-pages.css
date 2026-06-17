@@ -17,9 +17,9 @@
 }
 
 /* Editorial Body Spacing */
+
 .page__body {
   line-height: 1.75;
-  gap: 1.5rem;
 }
 
 .page__body p {

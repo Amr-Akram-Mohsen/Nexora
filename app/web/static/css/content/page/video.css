@@ -4,14 +4,7 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
-
-.video-header__badges {
-  gap: 0.75rem;
-}
-
-.platform-badge {
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+.platform-badge {padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 700;
@@ -35,14 +28,7 @@
   color: var(--foreground);
   margin: 0;
 }
-
-.video-header__meta {
-  gap: 1rem;
-}
-
-.meta-pill {
-  gap: 0.5rem;
-  background: var(--muted);
+.meta-pill {background: var(--muted);
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.875rem;

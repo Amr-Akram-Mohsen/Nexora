@@ -15,7 +15,7 @@
         {% if items|length < 2 %} <div class="compare-empty flex-center flex-col">
             <i class="fas fa-balance-scale empty-icon"></i>
             <p>Not enough items to compare. Add at least two items.</p>
-            <a href="{{ url_for('item.deals') }}" class="btn btn--primary">Browse Products</a>
+            <a href="{{ url_for('item.deals') }}" class="btn btn--primary gap-2">Browse Products</a>
     </div>
     {% else %}
     <div class="compare-table-wrapper">
@@ -25,7 +25,7 @@
                     <th class="sticky-col">Features</th>
                     {% for item in items %}
                     <th class="compare-col">
-                        <div class="compare-item-header flex flex-col items-center">
+                        <div class="compare-item-header flex flex-col items-center gap-2">
                             <div class="compare-img-wrapper flex-center">
                                 {{ render_image_url(item.image_url, item.name) }}
                             </div>
@@ -42,12 +42,12 @@
                                 {% endif %}
                             </div>
 
-                            <div class="compare-actions flex flex-col">
+                            <div class="compare-actions flex flex-col gap-2">
                                 <a href="{{ url_for('item.item_page', item_id=item.id) }}"
-                                    class="btn btn--outline btn--sm">View Full Details</a>
+                                    class="btn btn--outline btn--sm gap-2">View Full Details</a>
                                 {% if best_link %}
                                 <a href="{{ best_link.affiliate_url }}" target="_blank" rel="noopener nofollow"
-                                    class="btn btn--primary btn--sm">Get Deal</a>
+                                    class="btn btn--primary btn--sm gap-2">Get Deal</a>
                                 {% endif %}
                             </div>
                         </div>
