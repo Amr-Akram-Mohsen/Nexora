@@ -49,7 +49,7 @@
   font-weight: 600;
   font-size: 0.875rem;
   border-radius: var(--radius-lg);
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   width: 100%;
   position: relative;
 }
@@ -309,6 +309,10 @@
   text-decoration: underline;
 }
 
+.redirect-link--bold {
+  font-weight: 700;
+}
+
 /* --- High-Fidelity Professional Auth Footer --- */
 .auth-footer {
   margin-top: 2rem;
@@ -346,4 +350,12 @@
   border-radius: var(--radius-lg);
   background: rgba(var(--muted-rgb), 0.1);
   text-align: center;
+}
+
+.resend-alert__hint {
+  margin-bottom: 0.5rem;
+}
+
+.resend-alert__btn {
+  font-size: 0.75rem;
 }

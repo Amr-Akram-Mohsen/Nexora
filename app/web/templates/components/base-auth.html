@@ -9,7 +9,7 @@
 <section class="auth-section flex-center">
   <div class="auth-wrapper animate-fade-in">
 
-    <div class="auth-header text-center">
+    <div class="auth-header">
       <h1 class="auth-title">{{ auth_title or "Welcome Back" }}</h1>
       <p class="auth-text">{{ auth_text or "Please enter your details to continue" }}</p>
     </div>
@@ -28,7 +28,7 @@
       text="Continue with Google",
       type="button",
       variant="outline",
-      class="google-auth-btn w-full inline-flex-center",
+      class="google-auth-btn inline-flex-center",
       icon="fa-brands fa-google",
       attrs={"onclick": "window.location.href='" ~ google_url ~ "'"}
       ) }}
@@ -107,37 +107,37 @@
           {% set check_name = "newsletter" if is_new_user else "remember" %}
           {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
           {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
-          {{ label(check_text, check_name, class="text-sm cursor-pointer") }}
+          {{ label(check_text, check_name, class="auth-checkbox-label cursor-pointer") }}
           #}
         </div>
         {% if not is_new_user %}
-        <a href="{{ url_for('user.forgot_password') }}" class="redirect-link text-sm">Forgot password?</a>
+        <a href="{{ url_for('user.forgot_password') }}" class="redirect-link">Forgot password?</a>
         {% endif %}
       </div>
 
       {# Resend-verification alert — shown when login is blocked on unverified account #}
       {% if show_resend and email %}
-      <div class="resend-alert mt-4 text-center">
-        <p class="field-hint mb-2">Haven't received the verification email?</p>
+      <div class="resend-alert">
+        <p class="field-hint resend-alert__hint">Haven't received the verification email?</p>
         <form action="{{ url_for('user.resend_verification') }}" method="POST">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="email" value="{{ email }}">
-          <button type="submit" class="btn variant--outline text-xs">Resend Verification Email</button>
+          <button type="submit" class="btn variant--outline resend-alert__btn">Resend Verification Email</button>
         </form>
       </div>
       {% endif %}
 
-      {{ button(text=title, type="submit", variant="primary", class="auth-btn w-full mt-4") }}
+      {{ button(text=title, type="submit", variant="primary", class="auth-btn") }}
 
       {% endcall %}
     </div>
 
-    <div class="auth-footer text-center mt-8">
+    <div class="auth-footer">
       <span class="auth-status-text">
         {{ "Already have an account?" if is_new_user else "New to Nexora?" }}
       </span>
       <a href="{{ url_for('user.login') if is_new_user else url_for('user.register') }}"
-        class="redirect-link font-bold">
+        class="redirect-link redirect-link--bold">
         {{ "Login" if is_new_user else "Join now" }}
       </a>
     </div>
