@@ -4,28 +4,28 @@
 {% macro render_row(item) %}
 <tr id="item-row-{{ item.id }}">
   <td>
-    <div class="cell-primary-text item-cell-name cell-primary-text cell-name">{{ item.name }}</div>
-  </td>
-  <td>
-    <span class="item-cell-brand cell-primary-text cell-name">{{ item.brand }}</span>
-  </td>
-  <td>
-    <span class="item-cell-category cell-primary-text cell-name">{{ item.category }}</span>
+    <div class="cell-primary-text item-cell-name cell-name" style="white-space: normal;">{{ item.name }}</div>
+    <div class="flex items-center gap-1 mt-1 text-xs">
+      <span class="status-badge badge-blue" style="font-size: 10px; padding: 0.15rem 0.4rem;">{{ item.brand }}</span>
+      <span class="status-badge badge-purple" style="font-size: 10px; padding: 0.15rem 0.4rem;">{{ item.category }}</span>
+    </div>
   </td>
   <td>
     {% if item.min_price is not none %}
-    {{ "%.2f"|format(item.min_price) }} {{ item.currency or "" }}
+    <span class="font-bold">{{ "%.2f"|format(item.min_price) }} {{ item.currency or "" }}</span>
     {% else %}
-    —
+    <span class="text-muted">—</span>
     {% endif %}
   </td>
-  <td>{{ item.store_count }}</td>
-  <td>{{ "{:,}".format(item.click_count or 0) }}</td>
   <td>
-    <span class="user-cell-email">{{ item.created_at[:10] if item.created_at else "—" }}</span>
+    <div class="text-sm"><i class="fas fa-store text-muted"></i> {{ item.store_count }} Stores</div>
+    <div class="text-xs text-muted-foreground mt-1"><i class="far fa-eye text-muted"></i> {{ "{:,}".format(item.click_count or 0) }} Clicks</div>
   </td>
   <td>
-    {% call action_group() %}
+    <span class="text-sm">{{ item.created_at[:10] if item.created_at else "—" }}</span>
+  </td>
+  <td class="text-center align-middle">
+    {% call action_group(wrapper_class="actions-cell-group flex justify-center") %}
     {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-item",
     extra_class="inspect-btn", button_id=item.id) }}
     {% endcall %}
@@ -33,4 +33,4 @@
 </tr>
 {% endmacro %}
 
-{{ admin_crud_rows(items, render_row, colspan=8, empty_text="No products found.") }}
+{{ admin_crud_rows(items, render_row, colspan=5, empty_text="No products found.") }}

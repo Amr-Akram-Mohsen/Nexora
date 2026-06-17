@@ -1,4 +1,5 @@
-{% from "admin/components/ui.html" import admin_panel, admin_table_spinner %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
+{% from "admin/components/ui.html" import admin_panel %}
 <!-- Section 1.9: Content Asset Mapping -->
 <h2 class="insight-group-title">🔗 Content Asset Mapping</h2>
 {% call admin_panel("Asset Inventory & Gaps", "Analyzing existing database articles, videos, and product pages against the recommended content strategy.", id="content-asset-mapping-panel", display_style="none") %}
@@ -14,7 +15,7 @@
         </tr>
       </thead>
       <tbody id="asset-mapping-table-body">
-        {{ admin_table_spinner(5, "Mapping strategy to assets...") }}
+        {{ table_spinner(5, "Mapping strategy to assets...") }}
       </tbody>
     </table>
   </div>

@@ -1,4 +1,5 @@
-{% from "admin/components/ui.html" import admin_loading_state %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
+
 <!-- Section 1: Recommendation CTR Dashboard -->
 <h2 class="insight-group-title">🔗 Recommendation Widget Performance</h2>
 <div class="dashboard-stats-grid" id="recommendation-ctr-grid">
@@ -33,7 +34,7 @@
     </div>
   {% else %}
     <div class="grid-full-width">
-      {{ admin_loading_state("Loading recommendation metrics...") }}
+      {{ spinner("Loading recommendation metrics...") }}
     </div>
   {% endif %}
 </div>

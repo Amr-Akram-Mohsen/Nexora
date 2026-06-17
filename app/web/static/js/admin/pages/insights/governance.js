@@ -10,8 +10,6 @@ export function renderExecutionGovernance() {
   fetchAndInjectHtml(
     `/admin/insights/widget/governance?time_frame=${timeframe}`,
     'execution-governance-body-wrapper',
-    'Loading governance queues...',
-    null,
-    { hideElementIdOnEmpty: 'execution-governance-panel' }
+    'Loading governance queues...'
   );
 }

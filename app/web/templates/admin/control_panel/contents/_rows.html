@@ -2,18 +2,12 @@
 {% from "admin/components/crud.html" import admin_crud_rows %}
 
 {% macro render_row(item) %}
-<tr class="clickable-row" id="content-row-{{ item.id }}" data-id="{{ item.id }}"
-  data-category-id="{{ item.category_id or '' }}">
+<tr class="clickable-row" id="content-row-{{ item.id }}" data-id="{{ item.id }}" data-category-id="{{ item.category_id or '' }}">
   <td class="text-center align-middle">
     <input type="checkbox" class="row-select-checkbox" data-id="{{ item.id }}" />
   </td>
   <td>
-    {% set type_class = 'admin' if item.object_type == 'article' else ('active' if item.object_type == 'video' else
-    'user') %}
-    <span class="content-cell-type status-badge {{ type_class }} text-capitalize">{{ item.object_type }}</span>
-  </td>
-  <td>
-    <div class="cell-primary-text content-cell-title">
+    <div class="cell-primary-text content-cell-title" style="max-width: 320px; white-space: normal;">
       {% if item.url %}
       <a class="activity-target text-deco-none" target="_blank" href="{{ item.url }}">
         {{ item.title }}
@@ -23,44 +17,43 @@
       <span>{{ item.title }}</span>
       {% endif %}
     </div>
-  </td>
-  <td>
-    <span class="content-cell-category status-badge badge-purple quick-cat-trigger clickable-purple-link ml-1"
-      title="Double-click row to quickly move content.">
-      <i class="fas fa-tag"></i> {{ item.category_name }}
-    </span>
-  </td>
-  <td>
-    <span class="cell-primary-text user-cell-name">{{ item.sources if item.sources is string else (item.sources | join(", ")) }}</span>
-  </td>
-  <td>
-    <div class="text-sm"><i class="far fa-eye text-muted"></i> {{ "{:,}".format(item.view_count or 0) }}</div>
-    <div class="content-engagement-sub"><i class="far fa-comment"></i> {{ item.comment_count }}</div>
-  </td>
-  <td>
-    <div class="content-date-row mt-1">
-      {{ item.published_at[:10] if item.published_at else "—" }}
+    <div class="text-xs mt-1 text-muted-foreground flex items-center gap-1">
+      {% set type_class = 'admin' if item.object_type == 'article' else ('active' if item.object_type == 'video' else 'user') %}
+      <span class="status-badge {{ type_class }} text-capitalize" style="font-size: 10px; padding: 0.15rem 0.4rem;">{{ item.object_type }}</span>
+      <span class="opacity-50">•</span>
+      <span>{{ item.sources if item.sources is string else (item.sources | join(", ")) }}</span>
     </div>
   </td>
   <td>
-    <div class="content-status-group flex items-center">
-      <span class="status-badge {{ 'active' if item.is_active else 'inactive' }}">
-        {{ "Active" if item.is_active else "Inactive" }}
+    <div class="flex flex-col items-start gap-1">
+      <span class="content-cell-category status-badge badge-purple quick-cat-trigger clickable-purple-link" title="Double-click row to quickly move content.">
+        <i class="fas fa-tag"></i> {{ item.category_name }}
       </span>
-      {% for flag in (item.quality_issues or []) %}
-      {% if flag == 'missing_category' %}
-      <span class="status-badge inactive badge-margin"
-        title="Content belongs to uncategorized and requires clean routing."> ⚠️ Category</span>
-      {% elif flag == 'missing_metadata' %}
-      <span class="status-badge inactive badge-orange badge-margin" title="Missing essential title or preview details.">
-        📝 Metadata</span>
-      {% elif flag == 'duplicate' %}
-      <span class="status-badge inactive badge-indigo badge-margin" title="Duplicate titles matching other aggregates.">
-        👯 Duplicate</span>
-      {% endif %}
-      {% else %}
-      <span class="status-badge active badge-margin" title="No critical catalog/enrichment issues."> ✓ Clean</span>
-      {% endfor %}
+      <div class="content-status-group flex items-center flex-wrap gap-1 mt-1">
+        <span class="status-badge {{ 'active' if item.is_active else 'inactive' }}" style="font-size: 10px; padding: 0.15rem 0.4rem;">
+          {{ "Active" if item.is_active else "Inactive" }}
+        </span>
+        {% for flag in (item.quality_issues or []) %}
+          {% if flag == 'missing_category' %}
+            <span class="status-badge inactive" title="Missing category" style="font-size: 10px; padding: 0.15rem 0.4rem;">⚠️ Cat</span>
+          {% elif flag == 'missing_metadata' %}
+            <span class="status-badge inactive badge-orange" title="Missing metadata" style="font-size: 10px; padding: 0.15rem 0.4rem;">📝 Meta</span>
+          {% elif flag == 'duplicate' %}
+            <span class="status-badge inactive badge-indigo" title="Duplicate" style="font-size: 10px; padding: 0.15rem 0.4rem;">👯 Dup</span>
+          {% endif %}
+        {% else %}
+          <span class="status-badge active" title="Clean" style="font-size: 10px; padding: 0.15rem 0.4rem;">✓ Clean</span>
+        {% endfor %}
+      </div>
+    </div>
+  </td>
+  <td>
+    <div class="text-sm"><i class="far fa-eye text-muted"></i> {{ "{:,}".format(item.view_count or 0) }}</div>
+    <div class="content-engagement-sub text-xs text-muted-foreground mt-1"><i class="far fa-comment"></i> {{ item.comment_count }}</div>
+  </td>
+  <td>
+    <div class="content-date-row text-sm">
+      {{ item.published_at[:10] if item.published_at else "—" }}
     </div>
   </td>
   <td class="text-center align-middle">
@@ -73,4 +66,4 @@
 </tr>
 {% endmacro %}
 
-{{ admin_crud_rows(items, render_row, colspan=9, empty_text="No content found.") }}
+{{ admin_crud_rows(items, render_row, colspan=6, empty_text="No content found.") }}

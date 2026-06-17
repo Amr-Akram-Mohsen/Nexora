@@ -229,6 +229,12 @@
       if (action === 'delete-category') deleteCategory(id, name, btn);
       if (action === 'delete-brand')    deleteBrand(id, name, btn);
       if (action === 'delete-topic')    deleteTopic(id, name, btn);
+
+      // Inspect actions
+      if (action === 'inspect-category') inspectTaxonomy('categories', 'category', id);
+      if (action === 'inspect-brand')    inspectTaxonomy('brands', 'brand', id);
+      if (action === 'inspect-topic')    inspectTaxonomy('topics', 'topic', id);
+      if (action === 'inspect-section')  inspectTaxonomy('sections', 'section', id);
     });
 
     // Toggle checkboxes (use change event)
@@ -242,6 +248,32 @@
       if (action === 'toggle-topic')    toggleTopicActive(id, isActive, el);
       if (action === 'toggle-section')  toggleSectionActive(id, isActive, el);
     });
+  }
+
+  // ── Inspect Helper ────────────────────────
+  function inspectTaxonomy(domainPlural, domainSingular, id) {
+    const modalId = `inspect-${domainSingular}-modal`;
+    const bodyId = `inspect-${domainSingular}-body`;
+    const bodyEl = document.getElementById(bodyId);
+    
+    if (!bodyEl) return;
+    
+    // Show modal with loading state
+    bodyEl.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div></div>';
+    
+    const modalEl = document.getElementById(modalId);
+    if (modalEl) {
+      modalEl.classList.add('active');
+    }
+    
+    fetch(`/admin/taxonomy/${domainPlural}/${id}/inspect`)
+      .then(r => r.ok ? r.text() : Promise.reject('Failed to load inspect data'))
+      .then(html => {
+        bodyEl.innerHTML = html;
+      })
+      .catch(err => {
+        bodyEl.innerHTML = `<div class="dashboard-error loading-height-sm">Error: ${err}</div>`;
+      });
   }
 
   // ── Slug Preview Wiring ──────────────────

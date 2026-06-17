@@ -61,7 +61,14 @@
 
 .settings-action-btn {
   width: auto;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-log-container {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .full-width-card {
@@ -120,11 +127,11 @@
   transition: transform 0.2s ease;
 }
 
-.settings-toggle-input:checked ~ .settings-toggle-track {
+.settings-toggle-input:checked~.settings-toggle-track {
   background: var(--brand-blue);
 }
 
-.settings-toggle-input:checked ~ .settings-toggle-track::after {
+.settings-toggle-input:checked~.settings-toggle-track::after {
   transform: translateX(18px);
 }
 
@@ -309,8 +316,9 @@
 }
 
 .log-badges {
-  float: right;
-  gap: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .error-text {

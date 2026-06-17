@@ -6,6 +6,8 @@ from app.domains.taxonomy.models import Category, Brand, Topic, Section
 from app.shared.utils.slug import generate_slug
 from app.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func
+from app.domains.content.models.content import Content
+from app.domains.item.models import Item
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
 
@@ -365,4 +367,64 @@ def sections_rows():
         total=pagination.total,
         pages=pagination.pages,
         page=pagination.page,
+    )
+
+# ─────────────────────────────────────────────
+# INSPECT ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route("/categories/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_category(id):
+    cat = db.session.get(Category, id)
+    if not cat:
+        return "Category not found", 404
+    content_count = db.session.query(func.count(Content.id)).filter(Content.category_id == id).scalar()
+    item_count = db.session.query(func.count(Item.id)).filter(Item.category_id == id).scalar()
+    return render_template(
+        "admin/control_panel/taxonomy/_category_inspect.html",
+        category=cat,
+        content_count=content_count,
+        item_count=item_count
+    )
+
+@bp.route("/brands/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_brand(id):
+    brand = db.session.get(Brand, id)
+    if not brand:
+        return "Brand not found", 404
+    content_count = db.session.query(Content).with_parent(brand, "contents").count()
+    item_count = db.session.query(func.count(Item.id)).filter(Item.brand_id == id).scalar()
+    return render_template(
+        "admin/control_panel/taxonomy/_brand_inspect.html",
+        brand=brand,
+        content_count=content_count,
+        item_count=item_count
+    )
+
+@bp.route("/topics/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_topic(id):
+    topic = db.session.get(Topic, id)
+    if not topic:
+        return "Topic not found", 404
+    content_count = db.session.query(Content).with_parent(topic, "contents").count()
+    return render_template(
+        "admin/control_panel/taxonomy/_topic_inspect.html",
+        topic=topic,
+        content_count=content_count
+    )
+
+@bp.route("/sections/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_section(id):
+    section = db.session.get(Section, id)
+    if not section:
+        return "Section not found", 404
+    content_count = db.session.query(func.count(Content.id)).filter(Content.section_id == id).scalar()
+    return render_template(
+        "admin/control_panel/taxonomy/_section_inspect.html",
+        section=section,
+        content_count=content_count
     )

@@ -1,4 +1,5 @@
 {% from "admin/components/crud.html" import admin_crud_rows %}
+{% from "admin/components/macros.html" import action_button %}
 
 {% macro render_row(s) %}
 <tr id="section-row-{{ s.id }}">
@@ -13,7 +14,9 @@
       </span>
     </label>
   </td>
-  <td></td>
+  <td class="text-right">
+    {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-section", extra_class="inspect-btn", button_id=s.id) }}
+  </td>
 </tr>
 {% endmacro %}
 

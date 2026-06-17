@@ -1,12 +1,13 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
 {% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table %}
 {% from "admin/components/macros.html" import
     admin_search_input
 %}
 
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
+{% block content_class %}admin-content-fluid{% endblock %}
 
 {% block admin_content %}
 
@@ -22,6 +23,9 @@
   <button class="admin-tab-btn" data-tab="topics">🏷️ Topics</button>
   <button class="admin-tab-btn" data-tab="sections">📋 Sections</button>
 </div>
+
+<!-- Restrict width so it doesn't stretch 100% on large monitors -->
+<div style="max-width: 900px;">
 
 <!-- ======== CATEGORIES TAB ======== -->
 <div class="admin-tab-panel" id="tab-panel-categories">
@@ -100,6 +104,25 @@
 <div class="admin-tab-panel is-hidden" id="tab-panel-sections">
   {{ admin_crud_table(tables["sections"], "Loading sections…", "loading-height-md") }}
 </div>
+</div> <!-- End max-width wrapper -->
+
+<!-- ======== INSPECT MODALS ======== -->
+{% call modal("inspect-category-modal", "Category Details", "🗂️") %}
+<div id="inspect-category-body">{{ spinner("Loading details...") }}</div>
+{% endcall %}
+
+{% call modal("inspect-brand-modal", "Brand Details", "🏭") %}
+<div id="inspect-brand-body">{{ spinner("Loading details...") }}</div>
+{% endcall %}
+
+{% call modal("inspect-topic-modal", "Topic Details", "🏷️") %}
+<div id="inspect-topic-body">{{ spinner("Loading details...") }}</div>
+{% endcall %}
+
+{% call modal("inspect-section-modal", "Section Details", "📋") %}
+<div id="inspect-section-body">{{ spinner("Loading details...") }}</div>
+{% endcall %}
+
 {% endblock %}
 
 {% block admin_scripts %}

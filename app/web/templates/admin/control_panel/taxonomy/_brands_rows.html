@@ -1,9 +1,9 @@
 {% from "admin/components/crud.html" import admin_crud_rows %}
+{% from "admin/components/macros.html" import action_button %}
 
 {% macro render_row(b) %}
 <tr id="brand-row-{{ b.id }}">
   <td><span class="cell-primary-text cell-name">{{ b.name }}</span></td>
-  <td>{{ b.industry or "—" }}</td>
   <td>
     <label class="admin-toggle">
       <input type="checkbox" class="admin-toggle-input" data-action="toggle-brand"
@@ -13,16 +13,12 @@
       </span>
     </label>
   </td>
-  <td>
-    <span class="status-badge {{ 'admin' if b.is_featured else 'user' }}">
-      {{ "Featured" if b.is_featured else "—" }}
-    </span>
-  </td>
-  <td>
+  <td class="text-right">
+    {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-brand", extra_class="inspect-btn", button_id=b.id) }}
     <button class="btn-text-subtle-danger" data-action="delete-brand"
             data-id="{{ b.id }}" data-name="{{ b.name }}">🗑</button>
   </td>
 </tr>
 {% endmacro %}
 
-{{ admin_crud_rows(items, render_row, colspan=5, empty_text="No brands found.") }}
+{{ admin_crud_rows(items, render_row, colspan=3, empty_text="No brands found.") }}

@@ -136,21 +136,14 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .overview-panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
   margin-bottom: 1rem;
-  /* padding: 1rem; */
 }
 
 .overview-panel-header {
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border);
   background: var(--secondary);
-  /* Negative margin pulls the header to the padded container's edges */
-  /* margin: -1.25rem -1.25rem 1.25rem -1.25rem; */
 }
 
 .overview-panel-title {
@@ -167,12 +160,11 @@ a.clickable-card:hover .dashboard-stat-value {
 }
 
 .panel-body-padded {
-  padding: 1rem;
-  margin: -1.25rem;
+  padding: 1.25rem;
 }
 
 .panel-body-list {
-  padding: 0.5rem 0;
+  padding: 0;
 }
 
 /* --- Rank Lists --- */
@@ -187,7 +179,11 @@ a.clickable-card:hover .dashboard-stat-value {
   gap: 0.875rem;
   padding: 0.625rem 1.25rem;
   transition: background-color 0.15s ease;
-  margin-inline: -1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.overview-top-item:last-child {
+  border-bottom: none;
 }
 
 .overview-top-item:hover {
@@ -426,7 +422,6 @@ a.clickable-card:hover .dashboard-stat-value {
   gap: 0.875rem;
   padding: 0.875rem 1.25rem;
   border-bottom: 1px solid var(--border);
-  margin-inline: -1.25rem;
 }
 
 .activity-item:last-child {

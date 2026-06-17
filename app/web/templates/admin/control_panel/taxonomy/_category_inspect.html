@@ -1,0 +1,15 @@
+{% from "admin/components/macros.html" import inspect_section, inspect_detail_row %}
+<div class="inspect-details-group flex flex-col">
+  {% call inspect_section("Category Information") %}
+    {{ inspect_detail_row("ID", "inspect-id", value_text="#" ~ category.id) }}
+    {{ inspect_detail_row("Name", "inspect-name", value_text=category.name) }}
+    {{ inspect_detail_row("Slug", "inspect-slug", value_text=category.slug) }}
+    {{ inspect_detail_row("Status", "inspect-status status-badge " ~ ("active" if category.is_active else "inactive"), value_text="Active" if category.is_active else "Inactive") }}
+    {{ inspect_detail_row("Hierarchy Level", "inspect-hierarchy status-badge " ~ ("user" if category.is_leaf else "admin"), value_text="Leaf" if category.is_leaf else "Parent") }}
+  {% endcall %}
+
+  {% call inspect_section("Related Data Summary", divider=false) %}
+    {{ inspect_detail_row("Content Count", "inspect-content-count", value_text="{:,}".format(content_count or 0) ~ " pieces of content") }}
+    {{ inspect_detail_row("Product Count", "inspect-item-count", value_text="{:,}".format(item_count or 0) ~ " linked products") }}
+  {% endcall %}
+</div>

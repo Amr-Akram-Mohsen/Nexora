@@ -1,21 +1,22 @@
-{% from "admin/components/ui.html" import admin_panel, admin_table_spinner %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
+{% from "admin/components/ui.html" import admin_panel %}
 <!-- Section 1.7: Content Strategy Output -->
 <h2 class="insight-group-title">🚀 Content Strategy Output</h2>
-{% call admin_panel("Content Publishing Plan", "Actionable multi-platform content roadmap prioritized by opportunity growth score and behavioral cues.", id="content-strategy-panel", display_style="none") %}
-  <div class="insights-table-scroll-large">
+{% call admin_panel("Content Publishing Plan", "Actionable multi-platform content roadmap prioritized by opportunity
+growth score and behavioral cues.", id="content-strategy-panel", display_style="none") %}
+<div class="insights-table-scroll-large">
     <table class="admin-table text-sm" id="content-strategy-table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Target Entity</th>
-          <th>YouTube Video Ideas</th>
-          <th>Pinterest Cheat Sheets</th>
-          <th>Blog / SEO Articles</th>
-        </tr>
-      </thead>
-      <tbody id="content-strategy-table-body">
-        {{ admin_table_spinner(5, "Generating content strategies...") }}
-      </tbody>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Target Entity</th>
+                <th>Reasoning & Asset Mapping</th>
+                <th style="width: 60%; min-width: 500px;">Platform Content Strategies</th>
+            </tr>
+        </thead>
+        <tbody id="content-strategy-table-body">
+            {{ table_spinner(4, "Generating content strategies...") }}
+        </tbody>
     </table>
-  </div>
+</div>
 {% endcall %}

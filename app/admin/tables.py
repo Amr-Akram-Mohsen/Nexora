@@ -9,19 +9,16 @@ CRUD_TABLES = {
         "id": "contents",
         "columns": [
             {"html": '<input type="checkbox" id="select-all-contents" />'},
-            "Type",
-            "Title",
-            "Category",
-            "Sources",
+            "Content Details",
+            "Metadata & Health",
             "Engagement",
             "Published",
-            "Status",
             "Actions",
         ],
     },
     "items": {
         "id": "items",
-        "columns": ["Name", "Brand", "Category", "Price", "Stores Count", "Clicks", "Added", "Actions"],
+        "columns": ["Product Details", "Price", "Engagement", "Added", "Actions"],
     },
     "sources": {
         "id": "sources",
@@ -50,15 +47,15 @@ CRUD_TABLES = {
     },
     "brands": {
         "id": "brands",
-        "columns": ["Name", "Industry", "Status", "Featured", "Actions"],
+        "columns": ["Name", "Status", "Actions"],
     },
     "topics": {
         "id": "topics",
-        "columns": ["Name", "Status", "Featured", "Actions"],
+        "columns": ["Name", "Status", "Actions"],
     },
     "sections": {
         "id": "sections",
-        "columns": ["Name", "Description", "Status", "Actions"],
+        "columns": ["Name", "Description", "Status"],
     },
     "comments": {
         "id": "comments",

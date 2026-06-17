@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
 
 {% block title %}Admin{% endblock %}
 
@@ -25,7 +25,7 @@
   <div class="admin-main">
     {% include "admin/dashboard/_header.html" %}
 
-    <main class="admin-content">
+    <main class="admin-content {% block content_class %}{% endblock %}">
       {% block admin_content %}{% endblock %}
     </main>
 

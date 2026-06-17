@@ -10,8 +10,6 @@ export function renderAutonomousExecution() {
   fetchAndInjectHtml(
     `/admin/insights/widget/autonomous-execution?time_frame=${timeframe}`,
     'autonomous-execution-body-wrapper',
-    'Preparing autonomous queues...',
-    null,
-    { hideElementIdOnEmpty: 'autonomous-execution-panel' }
+    'Preparing autonomous queues...'
   );
 }

@@ -1,0 +1,13 @@
+{% from "admin/components/macros.html" import inspect_section, inspect_detail_row %}
+<div class="inspect-details-group flex flex-col">
+  {% call inspect_section("Section Information") %}
+    {{ inspect_detail_row("ID", "inspect-id", value_text="#" ~ section.id) }}
+    {{ inspect_detail_row("Name", "inspect-name", value_text=section.name) }}
+    {{ inspect_detail_row("Description", "inspect-description", value_text=section.description or "—") }}
+    {{ inspect_detail_row("Status", "inspect-status status-badge " ~ ("active" if section.is_active else "inactive"), value_text="Active" if section.is_active else "Inactive") }}
+  {% endcall %}
+
+  {% call inspect_section("Related Data Summary", divider=false) %}
+    {{ inspect_detail_row("Content Count", "inspect-content-count", value_text="{:,}".format(content_count or 0) ~ " pieces of content") }}
+  {% endcall %}
+</div>

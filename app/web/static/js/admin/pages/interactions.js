@@ -26,7 +26,6 @@
     if (panel) panel.classList.remove('is-hidden');
 
     if (btn.dataset.tab === 'reactions') {
-      loadInteractionBreakdown();
       reactionsController.load(1);
     } else if (btn.dataset.tab === 'comments') {
       commentsController.load(1);
@@ -81,8 +80,8 @@
   }
 
   function loadInteractionBreakdown() {
-    if (typeof renderInteractionBreakdown === 'function') {
-      renderInteractionBreakdown('moderation-interactions-breakdown');
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml('/admin/dashboard/widget/interactions-breakdown', 'moderation-interactions-breakdown', 'Loading breakdown...');
     }
   }
 
@@ -271,6 +270,7 @@
 
     initTabs();
     loadStatsRow();
+    loadInteractionBreakdown();
     applyInteractionsUrlFilters();
 
     commentsController.bindEvents();

@@ -14,13 +14,13 @@
 /* --- Table Headers & Cells --- */
 
 .admin-table th {
-  padding: 0.25rem 0.5rem;
+  padding: 0.75rem;
   font-size: var(--text-xs);
   vertical-align: middle;
   font-weight: var(--weight-bold);
-  color: var(--muted-foreground);
+  color: var(--foreground);
   background: var(--secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   white-space: wrap;
@@ -31,11 +31,12 @@
 }
 
 .admin-table td {
-  padding: 0.5rem;
+  padding: 0.75rem 1rem;
   font-size: var(--text-sm);
   border-bottom: 1px solid var(--border);
   transition: background-color 0.15s ease;
-  line-height: 1;
+  line-height: 1.4;
+  vertical-align: top;
 }
 
 /* --- Row Interaction States & Selection --- */
@@ -50,7 +51,7 @@
 
 .admin-table tbody tr:hover td,
 .admin-table tbody tr:hover {
-  background-color: var(--secondary);
+  background-color: rgba(var(--brand-blue-rgb), 0.04);
 }
 
 .admin-table tbody tr.is-selected td {
