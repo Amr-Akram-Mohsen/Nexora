@@ -60,6 +60,9 @@
 /* --- Navigation --- */
 
 .main-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: .5rem 1rem;
   border-radius: var(--radius-md);
   font-weight: var(--weight-md);
@@ -221,12 +224,12 @@
   color: var(--muted-foreground);
 }
 
-.text-danger {
-  color: var(--destructive, #ef4444) !important;
+.logout-btn--danger {
+  color: var(--destructive, #ef4444);
 }
 
-.text-danger:hover {
-  background: rgba(239, 68, 68, 0.1) !important;
+.logout-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
 }
 
 

@@ -21,7 +21,7 @@
         </a>
         {% endfor %}
         <a href="{{ url_for('item.deals') }}" class="main-nav__link">
-          <i class="fas fa-tag mr-1"></i> Deals
+          <i class="fas fa-tag"></i> Deals
         </a>
       </nav>
 
@@ -133,7 +133,7 @@
             {{ button(
             text="Logout All", variant="",
             type="submit", icon="fas fa-power-off",
-            class=item_class ~ " logout-btn text-danger")}}
+            class=item_class ~ " logout-btn logout-btn--danger")}}
             {% endcall %}
             {% endif %}
 
@@ -188,11 +188,11 @@
       </a>
       {% endfor %}
       <a href="{{ url_for('item.deals') }}" class="mobile-nav__link">
-        <i class="fas fa-tag mr-2"></i>Deals
+        <i class="fas fa-tag"></i>Deals
       </a>
       {% if is_authenticated %}
       <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link">
-        <i class="far fa-bookmark mr-2"></i>Saved Items
+        <i class="far fa-bookmark"></i>Saved Items
       </a>
       {% endif %}
     </nav>
