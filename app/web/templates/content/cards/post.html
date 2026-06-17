@@ -13,7 +13,7 @@
   {% else %}
   {{ badge('Community Post', 'badge--category', 'secondary') }}
   {% endif %}
-  <span class="platform-icon platform-icon--reddit inline-flex-center ml-auto">
+  <span class="platform-icon platform-icon--reddit inline-flex-center">
     <i class="fab fa-reddit-alien"></i>
   </span>
 </div>
@@ -46,7 +46,7 @@
 </div>
 
 {% if post.upvotes %}
-<div class="card__meta-item flex items-center ml-auto">
+<div class="card__meta-item flex items-center">
   <i class="fas fa-arrow-up card__meta-icon"></i>
   <span class="card__meta-text">{{ post.upvotes }}</span>
 </div>

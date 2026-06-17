@@ -74,7 +74,7 @@
     <div class="card__body flex flex-col">
         <div class="card__top-meta flex items-center">
             {{ badge(item.category.name, 'badge--category') }}
-            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex-center">
+            <span class="platform-icon platform-icon--{{ item.target.platform }} flex-center">
                 <i class="fab fa-{{ item.target.platform }}"></i>
             </span>
         </div>
@@ -105,7 +105,7 @@
             {% if item.target.subreddit %}
             {{ badge('r/' ~ item.target.subreddit, 'badge--topic', 'secondary') }}
             {% endif %}
-            <span class="platform-icon platform-icon--{{ item.target.platform }} ml-auto flex-center">
+            <span class="platform-icon platform-icon--{{ item.target.platform }} flex-center">
                 <i class="fab fa-{{ item.target.platform }}"></i>
             </span>
         </div>

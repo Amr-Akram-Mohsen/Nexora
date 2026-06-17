@@ -13,7 +13,7 @@
   {% if content.category %}
   {{ badge(content.category.name, 'badge--category', 'secondary') }}
   {% endif %}
-  <span class="platform-icon inline-flex-center ml-auto">
+  <span class="platform-icon inline-flex-center">
     <i class="far fa-file-alt"></i>
   </span>
 </div>
@@ -36,7 +36,7 @@
 </div>
 
 {% if article.read_time_minutes %}
-<span class="card__read-time ml-auto">
+<span class="card__read-time">
   <i class="far fa-clock"></i>
   {{ article.read_time_minutes }} min
 </span>
