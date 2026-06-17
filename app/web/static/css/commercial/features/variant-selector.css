@@ -53,6 +53,7 @@
 
 .variant-group__label {
   justify-content: space-between;
+  width: 100%;
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
   text-transform: uppercase;
