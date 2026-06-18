@@ -77,6 +77,19 @@ def delete_category(id):
     db.session.commit()
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
+def _serialize_taxonomy(t):
+    data = {
+        "id": t.id,
+        "name": t.name,
+        "status": 'active' if t.is_active else 'inactive',
+    }
+    if isinstance(t, Category):
+        data["type"] = "Leaf" if t.is_leaf else "Parent"
+    if isinstance(t, Section):
+        data['description'] = t.description
+    if isinstance(t, (Brand, Topic)):
+        data['featured'] = "Featured" if t.is_featured else "Not Featured"
+    return data
 
 def _serialize_category(c):
     return {
@@ -296,9 +309,9 @@ def categories_rows():
     if search:
         stmt = stmt.where(Category.name.ilike(f"%{search}%"))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    serialized = [_serialize_category(c) for c in pagination.items]
+    serialized = [_serialize_taxonomy(c) for c in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/_categories_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type='category')
     return make_rows_response(
         html,
         total=pagination.total,
@@ -317,9 +330,9 @@ def brands_rows():
     if search:
         stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    serialized = [_serialize_brand(b) for b in pagination.items]
+    serialized = [_serialize_taxonomy(b) for b in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/_brands_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type='brand')
     return make_rows_response(
         html,
         total=pagination.total,
@@ -338,9 +351,9 @@ def topics_rows():
     if search:
         stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    serialized = [_serialize_topic(t) for t in pagination.items]
+    serialized = [_serialize_taxonomy(t) for t in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/_topics_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type='topic')
     return make_rows_response(
         html,
         total=pagination.total,
@@ -359,9 +372,9 @@ def sections_rows():
     if search:
         stmt = stmt.where(Section.name.ilike(f"%{search}%"))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    serialized = [_serialize_section(s) for s in pagination.items]
+    serialized = [_serialize_taxonomy(s) for s in pagination.items]
 
-    html = render_template("admin/control_panel/taxonomy/_sections_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type='section')
     return make_rows_response(
         html,
         total=pagination.total,
@@ -394,7 +407,8 @@ def inspect_brand(id):
     brand = db.session.get(Brand, id)
     if not brand:
         return "Brand not found", 404
-    content_count = db.session.query(Content).with_parent(brand, "contents").count()
+    # content_count = db.session.query(Content).with_parent(brand, "contents").count()
+    content_count = len(brand.contents)
     item_count = db.session.query(func.count(Item.id)).filter(Item.brand_id == id).scalar()
     return render_template(
         "admin/control_panel/taxonomy/_brand_inspect.html",
@@ -409,7 +423,7 @@ def inspect_topic(id):
     topic = db.session.get(Topic, id)
     if not topic:
         return "Topic not found", 404
-    content_count = db.session.query(Content).with_parent(topic, "contents").count()
+    content_count = len(topic.contents)
     return render_template(
         "admin/control_panel/taxonomy/_topic_inspect.html",
         topic=topic,

@@ -1,15 +1,15 @@
 {
-  "smartphones": 0,
-  "laptops": 4,
-  "smartwatches": 4,
-  "cameras": 5,
-  "watches": 6,
-  "earbuds": 2,
-  "bags": 6,
-  "jewelry": 3,
-  "niche-artisanal": 7,
-  "oud-oriental": 1,
-  "tablets": 3,
-  "headphones": 5,
-  "sunglasses": 6
+  "smartphones": 2,
+  "laptops": 6,
+  "smartwatches": 2,
+  "cameras": 1,
+  "watches": 0,
+  "earbuds": 6,
+  "bags": 2,
+  "jewelry": 1,
+  "niche-artisanal": 3,
+  "oud-oriental": 5,
+  "tablets": 0,
+  "headphones": 3,
+  "sunglasses": 4
 }

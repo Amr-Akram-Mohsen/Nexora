@@ -207,7 +207,7 @@
       countId: 'reactions-count',
       clearBtnId: 'clear-reactions-filters-btn',
       defaultPerPage: 25,
-      colspan: 5,
+      colspan: 6,
       autoInit: false
     });
 
@@ -226,7 +226,7 @@
       countId: 'views-count',
       clearBtnId: 'clear-views-filters-btn',
       defaultPerPage: 25,
-      colspan: 4,
+      colspan: 5,
       autoInit: false
     });
 
@@ -245,7 +245,7 @@
       countId: 'clicks-count',
       clearBtnId: 'clear-clicks-filters-btn',
       defaultPerPage: 25,
-      colspan: 4,
+      colspan: 5,
       autoInit: false
     });
 
@@ -264,7 +264,7 @@
       countId: 'saves-count',
       clearBtnId: 'clear-saves-filters-btn',
       defaultPerPage: 25,
-      colspan: 4,
+      colspan: 5,
       autoInit: false
     });
 

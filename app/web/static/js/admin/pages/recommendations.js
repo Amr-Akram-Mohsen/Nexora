@@ -107,8 +107,15 @@
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
       if (btn.dataset.action === 'inspect-rec') {
-        const contentId = parseInt(btn.closest('tr')?.id?.split('-')[2] || btn.dataset.contentId, 10);
-        const itemId    = parseInt(btn.closest('tr')?.id?.split('-')[3] || btn.dataset.itemId, 10);
+        let contentId, itemId;
+        if (btn.dataset.id) {
+          const parts = btn.dataset.id.split('-');
+          contentId = parseInt(parts[0], 10);
+          itemId = parseInt(parts[1], 10);
+        } else {
+          contentId = parseInt(btn.closest('tr')?.id?.split('-')[2] || btn.dataset.contentId, 10);
+          itemId    = parseInt(btn.closest('tr')?.id?.split('-')[3] || btn.dataset.itemId, 10);
+        }
         openInspectModal(contentId, itemId);
       }
     });

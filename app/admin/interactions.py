@@ -601,7 +601,19 @@ def comments_rows():
     users, content_titles, item_names = _load_comment_context(pagination.items)
     serialized = [_serialize_comment(c, users, content_titles, item_names) for c in pagination.items]
 
-    html = render_template("admin/control_panel/interactions/_comments_rows.html", items=serialized)
+    display_items = [
+        {
+            "id": c["id"],
+            "preview": c["preview"],
+            "user_name": c["user_name"],
+            "target": c["target_title"],
+            "target_type": c["target_type"],
+            "sentiment": c["sentiment"],
+            "date": c["created_at"][:10] if c["created_at"] else "—"
+        } for c in serialized
+    ]
+
+    html = render_template("admin/components/_rows.html", items=display_items, domain_type="comment")
     return make_rows_response(
         html,
         total=pagination.total,
@@ -645,14 +657,15 @@ def reactions_rows():
         user = users.get(r.user_id)
         tt = content_titles.get(r.target_id) if r.target_type == "content" else item_names.get(r.target_id)
         serialized.append({
-            "id": r.id, "type": r.type, "target_type": r.target_type, "target_id": r.target_id,
-            "target_title": tt or f"{r.target_type.capitalize()} #{r.target_id}",
+            "id": r.id,
+            "target": tt or f"{r.target_type.capitalize()} #{r.target_id}",
+            "target_type": r.target_type,
+            "type": r.type,
             "user_name": user["name"] if user else f"User #{r.user_id}",
-            "user_email": user["email"] if user else "",
-            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "date": r.created_at.isoformat()[:10] if r.created_at else "—",
         })
 
-    html = render_template("admin/control_panel/interactions/_reactions_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="reaction", hide_action_column=True)
     return make_rows_response(
         html,
         total=pagination.total,
@@ -740,14 +753,14 @@ def views_rows():
             else item_names.get(v.target_id)
         )
         serialized.append({
+            "id": f"{v.target_type}-{v.target_id}",
+            "target": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
             "target_type": v.target_type,
-            "target_id": v.target_id,
-            "target_title": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
-            "view_count": v.view_count or 0,
-            "created_at": v.latest_view.isoformat() if v.latest_view else None
+            "view_count": "{:,}".format(v.view_count or 0),
+            "date": v.latest_view.isoformat()[:10] if v.latest_view else "—"
         })
 
-    html = render_template("admin/control_panel/interactions/_views_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="view", hide_action_column=True)
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 
@@ -789,13 +802,19 @@ def clicks_rows():
 
     pages = max(1, (total + per_page - 1) // per_page)
     serialized = [{
-        "item_name": r["item_name"], "store_name": r["store_name"],
-        "affiliate_url": r["affiliate_url"],
-        "click_count": r["click_count"] or 0,
-        "created_at": r["created_at"].isoformat() if r["created_at"] else None,
+        "id": r["affiliate_url"],
+        "item_name": r["item_name"],
+        "store_name": {"name": r["store_name"], "url": r["affiliate_url"]},
+        "click_count": "{:,}".format(r["click_count"] or 0),
+        "date": r["created_at"].isoformat()[:10] if r["created_at"] else "—",
     } for r in rows]
 
-    html = render_template("admin/control_panel/interactions/_clicks_rows.html", items=serialized)
+    # Map the store_name back to link format if we wanted, but _rows.html uses 'link' key explicitly for URLs.
+    # Wait, 'link' key uses <a>, but the column name will be 'link'. Let's rename the key to 'link'.
+    for d in serialized:
+        d["link"] = d.pop("store_name")
+
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="click", hide_action_column=True)
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 
@@ -822,14 +841,14 @@ def saves_rows():
         user = users.get(s.user_id)
         tt = content_titles.get(s.target_id) if s.target_type == "content" else item_names.get(s.target_id)
         serialized.append({
-            "target_title": tt or f"{s.target_type.capitalize()} #{s.target_id}",
+            "id": s.id,
+            "target": tt or f"{s.target_type.capitalize()} #{s.target_id}",
             "target_type": s.target_type,
             "user_name": user["name"] if user else f"User #{s.user_id}",
-            "user_email": user["email"] if user else "",
-            "created_at": s.created_at.isoformat() if s.created_at else None,
+            "date": s.created_at.isoformat()[:10] if s.created_at else "—",
         })
 
-    html = render_template("admin/control_panel/interactions/_saves_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="save", hide_action_column=True)
     return make_rows_response(
         html,
         total=pagination.total,

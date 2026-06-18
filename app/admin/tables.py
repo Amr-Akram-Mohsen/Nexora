@@ -18,7 +18,7 @@ CRUD_TABLES = {
     },
     "items": {
         "id": "items",
-        "columns": ["Product Details", "Price", "Engagement", "Added", "Actions"],
+        "columns": ["Name", "Category / Brand", "Price", "Store Count", "Click Count", "Added", "Actions"],
     },
     "sources": {
         "id": "sources",
@@ -47,15 +47,15 @@ CRUD_TABLES = {
     },
     "brands": {
         "id": "brands",
-        "columns": ["Name", "Status", "Actions"],
+        "columns": ["Name", "Status", "Featured", "Actions"],
     },
     "topics": {
         "id": "topics",
-        "columns": ["Name", "Status", "Actions"],
+        "columns": ["Name", "Status", "Featured", "Actions"],
     },
     "sections": {
         "id": "sections",
-        "columns": ["Name", "Description", "Status"],
+        "columns": ["Name", "Status", "Description", "Actions"],
     },
     "comments": {
         "id": "comments",

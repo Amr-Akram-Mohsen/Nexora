@@ -1,28 +1,28 @@
 {
   "news": {
-    "electronics:smartphones": 3,
-    "accessories:watches": 5,
-    "accessories:bags": 9,
-    "electronics:laptops": 1,
-    "accessories:sunglasses": 4,
-    "accessories:jewelry": 5,
-    "electronics:tablets": 7,
-    "electronics:smartwatches": 8,
-    "electronics:earbuds": 9,
-    "electronics:headphones": 8,
-    "electronics:cameras": 9
-  },
-  "trends": {
-    "electronics:tablets": 1,
-    "electronics:smartwatches": 6,
-    "electronics:earbuds": 8,
-    "electronics:headphones": 8,
-    "electronics:cameras": 9,
+    "electronics:smartphones": 6,
     "accessories:watches": 2,
-    "accessories:bags": 1,
+    "accessories:bags": 9,
+    "electronics:laptops": 4,
     "accessories:sunglasses": 2,
     "accessories:jewelry": 2,
-    "electronics:smartphones": 0,
-    "electronics:laptops": 0
+    "electronics:tablets": 0,
+    "electronics:smartwatches": 1,
+    "electronics:earbuds": 1,
+    "electronics:headphones": 0,
+    "electronics:cameras": 3
+  },
+  "trends": {
+    "electronics:tablets": 7,
+    "electronics:smartwatches": 2,
+    "electronics:earbuds": 0,
+    "electronics:headphones": 0,
+    "electronics:cameras": 1,
+    "accessories:watches": 2,
+    "accessories:bags": 7,
+    "accessories:sunglasses": 2,
+    "accessories:jewelry": 2,
+    "electronics:smartphones": 6,
+    "electronics:laptops": 7
   }
 }

@@ -16,7 +16,8 @@
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for section in main_sections %}
-        <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="main-nav__link gap-2 inline-flex items-center">
+        <a href="{{ url_for('content.sections', section_slug=section.slug) }}"
+          class="main-nav__link gap-2 inline-flex items-center">
           {{ section.name }}
         </a>
         {% endfor %}
@@ -94,22 +95,23 @@
             {% endif %}
 
             <div class="dropdown-divider"></div>
-            
+
             {% if multi_accounts and multi_accounts|length > 1 %}
             <div class="account-switcher flex">
               <span class="dropdown-header">Switch Account</span>
               {% for acc in multi_accounts %}
-                {% if not acc.is_active %}
-                {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form") %}
-                <button type="submit" class="{{ item_class }} switch-btn flex items-center">
-                  <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
-                  <div class="switch-details flex">
-                    <span class="switch-name">{{ acc.name }}</span>
-                    <span class="switch-email">{{ acc.email }}</span>
-                  </div>
-                </button>
-                {% endcall %}
-                {% endif %}
+              {% if not acc.is_active %}
+              {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form")
+              %}
+              <button type="submit" class="{{ item_class }} switch-btn flex items-center">
+                <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
+                <div class="switch-details flex">
+                  <span class="switch-name">{{ acc.name }}</span>
+                  <span class="switch-email">{{ acc.email }}</span>
+                </div>
+              </button>
+              {% endcall %}
+              {% endif %}
               {% endfor %}
             </div>
             {% endif %}
@@ -127,7 +129,7 @@
             type="submit", icon="fas fa-sign-out-alt",
             class=item_class ~ " logout-btn")}}
             {% endcall %}
-            
+
             {% if multi_accounts and multi_accounts|length > 1 %}
             {% call form(variant="", form_action=url_for('user.logout_all'), class="logout-form") %}
             {{ button(
@@ -171,7 +173,8 @@
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        <button type="button" class="header-search__clear justify-center inline-flex items-center" aria-label="Clear search" tabindex="-1">
+        <button type="button" class="header-search__clear justify-center inline-flex items-center"
+          aria-label="Clear search" tabindex="-1">
           <i class="fas fa-times"></i>
         </button>
         {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
@@ -183,7 +186,8 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
-      <a href="{{ url_for('content.sections', section_slug=section.slug) }}" class="mobile-nav__link flex gap-3 items-center">
+      <a href="{{ url_for('content.sections', section_slug=section.slug) }}"
+        class="mobile-nav__link flex gap-3 items-center">
         {{ section.name }}
       </a>
       {% endfor %}

@@ -104,20 +104,20 @@ def _fetch_sources_page(page, per_page, search):
         else:
             status_val = "healthy"
         serialized.append({
-            "id":              s.id,
-            "name":            s.name,
-            "slug":            s.slug,
-            "domain":          s.domain,
-            "logo_url":        s.logo_url,
-            "is_active":       s.is_active,
-            "authority_score": s.authority_score,
+            "link":              {'url': f'https://{s.domain}', 'name': s.name},
             "content_count":   content_count,
-            "latest_activity": latest_activity,
             "last_crawl":      last_crawl,
             "success_rate":    success_rate,
             "failure_count":   failure_count,
             "engagement":      engagement,
             "status":          status_val,
+            "slug":            s.slug,
+            # "name":            s.name,
+            # "domain":          s.domain,
+            # "logo_url":        s.logo_url,
+            # "is_active":       s.is_active,
+            # "authority_score": s.authority_score,
+            # "latest_activity": latest_activity,
         })
     return pagination, serialized
 
@@ -216,19 +216,20 @@ def _fetch_stores_page(page, per_page, search):
         else:
             status_val = "healthy"
         serialized.append({
-            "id":                st.id,
-            "name":              st.name,
-            "slug":              st.slug,
-            "website":           st.website,
+            "link":                {'url': st.website, 'name': st.name},
             "affiliate_network": st.affiliate_network,
-            "logo_url":          st.logo_url,
-            "is_active":         st.is_active,
             "product_count":     product_count,
             "clicks":            clicks,
             "ctr":               ctr,
             "conversions":       0,
-            "latest_activity":   latest_activity.isoformat() if latest_activity else None,
             "status":            status_val,
+            "slug":              st.slug,
+            "id":              st.id,
+            "latest_activity":   latest_activity.isoformat() if latest_activity else None,
+            "name":              st.name,
+            "website":           st.website,
+            "logo_url":          st.logo_url,
+            "is_active":         st.is_active,
         })
     return pagination, serialized
 
@@ -254,7 +255,7 @@ def sources_rows():
     page, per_page = parse_pagination_params(default_per_page=20)
     search = request.args.get("search", "").strip()
     pagination, serialized = _fetch_sources_page(page, per_page, search)
-    html = render_template("admin/control_panel/sources/_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="source", domain_target_type="contents")
     return make_rows_response(
         html,
         total=pagination.total,
@@ -269,7 +270,8 @@ def stores_rows():
     page, per_page = parse_pagination_params(default_per_page=20)
     search = request.args.get("search", "").strip()
     pagination, serialized = _fetch_stores_page(page, per_page, search)
-    html = render_template("admin/control_panel/stores/_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="store", domain_target_type="items")
+    # html = render_template("admin/control_panel/stores/_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,

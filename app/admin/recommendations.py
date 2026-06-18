@@ -110,7 +110,18 @@ def matches_rows():
     per_page = request.args.get("per_page", 25, type=int)
     search   = request.args.get("search", "").strip()
     total, pages, serialized = _fetch_matches_page(page, per_page, search)
-    html = render_template("admin/control_panel/recommendations/_rows.html", items=serialized)
+    
+    display_items = [
+        {
+            "id": f"{r['content_id']}-{r['item_id']}",
+            "content": f"{r['content_title']} (#{r['content_id']})",
+            "content_views": "{:,}".format(r["content_views"] or 0),
+            "item": f"{r['item_name']} (#{r['item_id']})",
+            "item_clicks": "{:,}".format(r["item_clicks"] or 0)
+        } for r in serialized
+    ]
+
+    html = render_template("admin/components/_rows.html", items=display_items, domain_type="rec")
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 

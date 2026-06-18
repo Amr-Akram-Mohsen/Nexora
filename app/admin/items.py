@@ -323,16 +323,14 @@ def items_rows():
         serialized.append({
             "id":          item.id,
             "name":        item.name,
-            "brand":       item.brand.name if item.brand else "—",
-            "category":    item.category.name if item.category else "—",
-            "min_price":   price_info.get("price"),
-            "currency":    price_info.get("currency"),
+            "taxonomy": f'{item.category.name} / {item.brand.name}',
+            "min_price":   f'{price_info.get("price")} {price_info.get("currency")}',
             "store_count": store_info_map.get(item.id, 0),
             "click_count": item.click_count or 0,
             "created_at":  item.created_at.isoformat() if item.created_at else None,
         })
 
-    html = render_template("admin/control_panel/items/_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type='item')
     return make_rows_response(
         html,
         total=pagination.total,

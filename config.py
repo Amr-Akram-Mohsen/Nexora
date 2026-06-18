@@ -65,9 +65,10 @@ class Config:
 
 # ================================================
 SOCIAL_LINKS = [
-  ("facebook", "https://facebook.com/Nexora"),
-  ("youtube", "https://youtube.com/Nexora"),
-  ("twitter", "https://twitter.com/Nexora"),
-  ("instagram", "https://instagram.com/Nexora"),
-  ("quora", "https://quora.com/Nexora")
+  ("facebook", "https://www.facebook.com/profile.php?id=61590735370977"),
+  ("youtube", "https://youtube.com/@nexorasignals"),
+  ("instagram", "https://instagram.com/nexorasignals"),
+  ("x", "https://x.com/nexorasignals"),
+  ("tiktok", "https://tiktok.com/@nexora.signals"),
+  ("pinterest", "https://pinterest.com/nexorasignals")
 ]
