@@ -1,13 +1,9 @@
 // app/web/static/js/admin/pages/insights/index.js
 import { getSelectedEntity, setSelectedEntity } from './state.js';
-import { getSpinnerHtml, getErrorStateHtml, getEmptyStateHtml, fetchAndInjectHtml } from './utilities.js';
+import { fetchAndInjectHtml } from './utilities.js';
 import { renderContentStrategy } from './contentStrategy.js';
 import { renderContentAssetMapping } from './assetMapping.js';
-import { renderContentPublishingPlan } from './publishingPlan.js';
 import { renderContentPerformanceFeedback } from './performanceFeedback.js';
-import { renderAutonomousExecution } from './autonomousExecution.js';
-import { renderExecutionGovernance } from './governance.js';
-import { renderSocialDistribution } from './socialDistribution.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   initInsights();
@@ -80,28 +76,12 @@ function initInsights() {
       toggleEntityFilter(entity);
     });
   }
-
-  const actionQueue = document.getElementById('action-queue-list');
-  if (actionQueue) {
-    actionQueue.addEventListener('click', (e) => {
-      const card = e.target.closest('.insights-opp-card');
-      if (!card) return;
-      if (e.target.tagName === 'A') return;
-      const details = card.querySelector('.action-card-details');
-      const arrow = card.querySelector('.expand-arrow');
-      if (!details) return;
-      const isCollapsed = details.style.display === '' || details.style.display === 'none';
-      details.style.display = isCollapsed ? 'block' : 'none';
-      if (arrow) arrow.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-    });
-  }
 }
 
 export function loadMainWidgets(timeFrame) {
   const promises = [
     fetchAndInjectHtml(`/admin/insights/widget/recommendations?time_frame=${timeFrame}`, 'recommendations-widget-container', 'Loading metrics...'),
     fetchAndInjectHtml(`/admin/insights/widget/top-opportunities?time_frame=${timeFrame}`, 'top-opportunities-table-body', 'Prioritizing entities...', 5),
-    fetchAndInjectHtml(`/admin/insights/widget/action-queue?time_frame=${timeFrame}`, 'action-queue-list', 'Compiling action guidance...'),
     fetchAndInjectHtml(`/admin/insights/widget/coverage-matrix?time_frame=${timeFrame}`, 'coverage-matrix-table-body', 'Assessing category alignment...', 4),
     fetchAndInjectHtml(`/admin/insights/widget/intent-opportunities?time_frame=${timeFrame}`, 'intent-opportunities-list', 'Analyzing intent distributions...'),
     fetchAndInjectHtml(`/admin/insights/widget/brand-opportunities?time_frame=${timeFrame}`, 'brand-opportunities-table-body', 'Calculating brand expansion opportunities...', 4)
@@ -138,9 +118,5 @@ export function updateFilterUI() {
 export function renderAllWidgets() {
   renderContentStrategy();
   renderContentAssetMapping();
-  renderContentPublishingPlan();
   renderContentPerformanceFeedback();
-  renderAutonomousExecution();
-  renderExecutionGovernance();
-  renderSocialDistribution();
 }

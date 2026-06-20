@@ -9,5 +9,7 @@ from .taxonomy import bp as api_taxonomy_bp
 from .recommendations import bp as api_recommendation_bp
 from .providers import bp as api_provider_bp
 from .insights import bp as api_insights_bp
+from .distribution import bp as api_distribution_bp
+
 
 

@@ -273,12 +273,10 @@ def stores_rows():
 # INSPECT ENDPOINTS
 # ─────────────────────────────────────────────
 
-@bp.route("/sources/<int:id>/inspect", methods=["GET"])
-@admin_required
-def inspect_source(id):
+def build_source_inspect_data(id):
     source = db.session.get(Source, id)
     if not source:
-        return "<p class='text-muted'>Source not found.</p>", 404
+        return None
         
     content_count = db.session.scalar(select(func.count(Content.id)).filter(Content.source_id == id)) or 0
     from app.admin.helpers import format_status
@@ -294,16 +292,16 @@ def inspect_source(id):
         "content count": str(content_count),
     }
     inspect_table = get_inspect_table("sources", data)
-    
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return {
+        "inspect_table": inspect_table,
+        "inspect_id": source.id
+    }
 
 
-@bp.route("/stores/<int:id>/inspect", methods=["GET"])
-@admin_required
-def inspect_store(id):
+def build_store_inspect_data(id):
     store = db.session.get(Store, id)
     if not store:
-        return "<p class='text-muted'>Store not found.</p>", 404
+        return None
         
     product_count = db.session.scalar(
         select(func.count(func.distinct(ItemVariant.item_id)))
@@ -324,5 +322,26 @@ def inspect_store(id):
         "product count": str(product_count),
     }
     inspect_table = get_inspect_table("stores", data)
-    
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return {
+        "inspect_table": inspect_table,
+        "inspect_id": store.id
+    }
+
+
+@bp.route("/sources/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_source(id):
+    data = build_source_inspect_data(id)
+    if not data:
+        return "<p class='text-muted'>Source not found.</p>", 404
+    return render_template("admin/components/_inspect.html", **data)
+
+
+@bp.route("/stores/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_store(id):
+    data = build_store_inspect_data(id)
+    if not data:
+        return "<p class='text-muted'>Store not found.</p>", 404
+    return render_template("admin/components/_inspect.html", **data)
+

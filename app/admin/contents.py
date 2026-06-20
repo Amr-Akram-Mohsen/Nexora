@@ -383,12 +383,16 @@ def build_content_inspect_data(id):
     from app.admin.helpers import format_datetime
     from app.admin.tables import get_inspect_table
     
+    from app.domains.interaction.service.scoring import get_content_engagement_score
+    engagement_score = get_content_engagement_score(content.id)
+    
     data = {
         "id": f"#{content.id}",
         "title": content.title or "—",
         "type": content.object_type,
         "category": content.category.name if content.category else "Uncategorized",
         "section": content.section.name if content.section else "Unassigned",
+        "engagement score": str(engagement_score),
         "related brands": ", ".join(b.name for b in content.brands) if content.brands else "—",
         "related topics": ", ".join(t.name for t in content.topics) if content.topics else "—",
         "mentioned products": ", ".join(i.name for i in content.linked_items) if content.linked_items else "—",
@@ -402,8 +406,10 @@ def build_content_inspect_data(id):
         "renderation status": "Active" if content.is_active else "Inactive",
         "views": "{:,}".format(content.view_count or 0),
         "likes": "{:,}".format(content.like_count or 0),
+        "dislikes": "{:,}".format(content.dislike_count or 0),
         "comments": "{:,}".format(content.comment_count or 0),
         "shares": "{:,}".format(content.share_count or 0),
+        "saves": "{:,}".format(content.save_count or 0),
         "intent": content.intent.name if content.intent else "—",
         "gender": content.gender.name if content.gender else "—",
         "price tier": content.price_tier.name if content.price_tier else "—",

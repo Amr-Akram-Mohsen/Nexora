@@ -3,192 +3,192 @@
 /* Cleaned: removed duplicate declarations and consolidated */
 
 .action-card-details {
-  border-color: var(--border);
-  border-style: dashed;
-  border-top: 1px solid var(--border);
-  font-size: var(--text-xs);
-  line-height: 1.625;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
+    border-color: var(--border);
+    border-style: dashed;
+    border-top: 1px solid var(--border);
+    font-size: var(--text-xs);
+    line-height: 1.625;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
 }
 
 .activity-item {
-  align-items: flex-start;
+    align-items: flex-start;
 }
 
 .activity-meta {
-  color: var(--muted-foreground);
-  margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
 }
 
 .admin-btn-danger {
-  display: inline-flex;
+    display: inline-flex;
 }
 
 .admin-btn-primary {
-  display: inline-flex;
+    display: inline-flex;
 }
 
 .admin-card {
-  padding: 1.25rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    padding: 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
 /* Note: admin-table font-size is controlled by tables.css — do not override here */
 
 .admin-table-scrollable {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .admin-toolbar-advanced {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .asset-mapping-item {
-  color: var(--muted-foreground);
+    color: var(--muted-foreground);
 }
 
 .asset-mapping-item-meta {
-  margin-top: 0.375rem;
+    margin-top: 0.375rem;
 }
 
 .badge {
-  border: 1px solid var(--border);
+    border: 1px solid var(--border);
 }
 
 .clickable-entity-name {
-  color: var(--foreground);
-  cursor: pointer;
-  transition: color 0.15s ease;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: color 0.15s ease;
 }
 
 .clickable-entity-name:hover {
-  color: var(--brand-blue);
+    color: var(--brand-blue);
 }
 
 .col-metric {
-  color: var(--foreground);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  text-align: right;
+    color: var(--foreground);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    text-align: right;
 }
 
 .dashboard-stat-card {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .dist-row-count {
-  color: var(--muted-foreground);
+    color: var(--muted-foreground);
 }
 
 .dist-row-name {
-  color: var(--foreground);
-  font-weight: var(--weight-bold);
+    color: var(--foreground);
+    font-weight: var(--weight-bold);
 }
 
 .expand-arrow {
-  color: var(--muted-foreground);
-  font-size: var(--text-xs);
-  margin-left: 0.5rem;
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+    margin-left: 0.5rem;
 }
 
 .filter-label-xs {
-  margin-bottom: 0.25rem;
+    margin-bottom: 0.25rem;
 }
 
 .grid-full-width {
-  text-align: center;
+    text-align: center;
 }
 
 .health-value-text {
-  color: var(--muted-foreground);
+    color: var(--muted-foreground);
 }
 
 /* insight-group-title margins defined in insights.css — not duplicated here */
 
 .insights-opp-card {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .inspect-details-group {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .inspect-store-card-grid {
-  margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .inspect-store-card-links {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 .opp-action {
-  background-color: var(--background);
-  border-color: var(--border);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  padding: 0.5rem;
+    background-color: var(--background);
+    border-color: var(--border);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    padding: 0.5rem;
 }
 
 .opp-metric-item {
-  font-size: var(--text-xs);
+    font-size: var(--text-xs);
 }
 
 .opp-metrics {
-  margin-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .opp-title {
-  font-size: var(--text-sm);
-  margin: 0;
+    font-size: var(--text-sm);
+    margin: 0;
 }
 
 .overview-panel {
-  margin-top: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 .overview-top-grid {
-  margin-top: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 .provider-name {
-  color: var(--foreground);
+    color: var(--foreground);
 }
 
 .rec-action-box {
-  align-items: flex-start;
+    align-items: flex-start;
 }
 
 .settings-card-header {
-  align-items: flex-start;
+    align-items: flex-start;
 }
 
 /* settings-card-icon-wrapper colors declared as modifiers in settings.css */
 
 .small {
-  color: var(--muted-foreground);
+    color: var(--muted-foreground);
 }
 
 .status-badge {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  color: var(--secondary-foreground);
-  background-color: var(--secondary);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    color: var(--secondary-foreground);
+    background-color: var(--secondary);
 }
 
 .table {
-  margin-bottom: 0;
-  vertical-align: middle;
+    margin-bottom: 0;
+    vertical-align: middle;
 }
 
 .trend-badge {
-  display: inline-flex;
-  font-weight: var(--weight-bold);
+    display: inline-flex;
+    font-weight: var(--weight-bold);
 }
 
 .wrapper_class {
-  margin-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
 }

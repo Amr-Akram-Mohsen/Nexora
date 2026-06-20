@@ -211,9 +211,10 @@ def build_user_inspect_data(id):
         (select(func.count(ItemClick.id)).where(ItemClick.user_id == id)).scalar_subquery(),
         (select(func.count(Save.id)).where(Save.user_id == id)).scalar_subquery(),
         (select(func.count(Reaction.id)).where(Reaction.user_id == id)).scalar_subquery(),
-        (select(func.count(Comment.id)).where(Comment.user_id == id)).scalar_subquery()
+        (select(func.count(Comment.id)).where(Comment.user_id == id)).scalar_subquery(),
+        (select(func.count(Share.id)).where(Share.user_id == id)).scalar_subquery()
     )
-    views_count, clicks_count, saves_count, reactions_count, comments_count = db.session.execute(stmt_metrics).first()
+    views_count, clicks_count, saves_count, reactions_count, comments_count, shares_count = db.session.execute(stmt_metrics).first()
 
     recs_seen_rows = db.session.execute(
         select(RecommendationImpression.entity_ids).where(RecommendationImpression.user_id == id)
@@ -228,22 +229,41 @@ def build_user_inspect_data(id):
     provider = user.provider.title() if user.provider else "Local"
     verified_str = "Yes" if user.is_verified else "No"
     
-    brand_ids, cat_ids, topic_ids = set(), set(), set()
+    interests_html = ""
     for ui in user.user_interests:
+        target_name = getattr(ui.target, 'name', getattr(ui.target, 'title', f"{ui.target_type} #{ui.target_id}")) if ui.target else f"{ui.target_type} #{ui.target_id}"
+        interests_html += f"<div class='mb-2'><b>{target_name}</b> ({ui.interaction_count} interactions)</div>"
         for score in ui.entity_scores:
-            if score.brand_id: brand_ids.add(score.brand_id)
-            if score.category_id: cat_ids.add(score.category_id)
-            if score.topic_id: topic_ids.add(score.topic_id)
-            
-    interests = []
-    if brand_ids:
-        interests.extend(db.session.scalars(select(Brand.name).where(Brand.id.in_(brand_ids))).all())
-    if cat_ids:
-        interests.extend(db.session.scalars(select(Category.name).where(Category.id.in_(cat_ids))).all())
-    if topic_ids:
-        interests.extend(db.session.scalars(select(Topic.name).where(Topic.id.in_(topic_ids))).all())
-        
-    interests_str = ", ".join(interests) if interests else "—"
+            entity = ""
+            if score.brand_id:
+                brand = db.session.get(Brand, score.brand_id)
+                entity = f"Brand: {brand.name}" if brand else "Brand"
+            elif score.category_id:
+                category = db.session.get(Category, score.category_id)
+                entity = f"Category: {category.name}" if category else "Category"
+            elif score.topic_id:
+                topic = db.session.get(Topic, score.topic_id)
+                entity = f"Topic: {topic.name}" if topic else "Topic"
+            if entity:
+                interests_html += f"<div class='ml-4 text-xs text-muted'>- {entity}: {score.score} pts</div>"
+    
+    if not interests_html:
+        interests_html = "—"
+
+    counts_dict = {
+        "Commenter": comments_count,
+        "Saver": saves_count,
+        "Sharer": shares_count,
+        "Clicker": clicks_count,
+        "Viewer": views_count
+    }
+    max_count = max(counts_dict.values()) if any(counts_dict.values()) else 0
+    engagement_profile = "Inactive"
+    if max_count > 0:
+        for profile, count in counts_dict.items():
+            if count == max_count:
+                engagement_profile = profile
+                break
 
     recent_activity = "—"
     latest_comment = db.session.scalar(select(Comment).where(Comment.user_id == id).order_by(Comment.created_at.desc()).limit(1))
@@ -276,15 +296,17 @@ def build_user_inspect_data(id):
         "verified at": format_datetime(user.verified_at, fmt='%b %d, %Y %H:%M') if user.verified_at else "—",
         "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else "—",
 
+        "engagement profile": f"<span class='badge bg-primary'>{engagement_profile}</span>",
         "engagement score": str(engagement_score),
         "views": str(views_count),
         "reactions": str(reactions_count),
         "comments": str(comments_count),
         "saves": str(saves_count),
+        "shares": str(shares_count),
         "item clicks": str(clicks_count),
         "recommendations shown": str(recs_seen),
         
-        "interests": interests_str,
+        "interests": {"value": interests_html, "is_custom": True} if interests_html != "—" else "—",
         "recent activity": {"value": recent_activity, "is_custom": True} if recent_activity != "—" else "—"
     }
     inspect_table = get_inspect_table("users", data)

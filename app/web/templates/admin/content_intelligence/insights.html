@@ -3,7 +3,7 @@
 {% from "components/ui/spinner.html" import spinner %}
 {% from "admin/components/ui.html" import admin_page_header, admin_panel, admin_table_panel, admin_crud_table %}
 
-{% block title %}Insights & Opportunities — Nexora Admin{% endblock %}
+{% block title %}Content Intelligence — Nexora Admin{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/insights.css') }}" />
@@ -24,18 +24,17 @@
 {% endset %}
 
 {{ admin_page_header(
-"Editorial Intelligence Dashboard",
-"Strategic decision-making intelligence engine. Focus on content gaps, intent distribution, brand opportunities, and
-recommendation CTR.",
-actions=header_actions
+  "Editorial Intelligence Dashboard",
+  "Strategic decision-making intelligence engine. Focus on content gaps, intent distribution, brand opportunities, and recommendation CTR.",
+  actions=header_actions
 ) }}
 
 <div class="insights-section" id="recommendations-widget-container">
-  {% include "admin/control_panel/insights/_summary_cards.html" %}
+  {% include "admin/content_intelligence/_summary_cards.html" %}
 </div>
 
-<!-- Decision Engine: Top Opportunities & Actions Queue -->
-<div class="overview-top-grid insights-section">
+<!-- Decision Engine: Top Opportunities -->
+<div class="insights-section">
   <!-- Top Opportunities Table -->
   {% set opps_actions %}
   <div id="active-filter-container" class="flex items-center gap-sm" style="display: none;">
@@ -46,49 +45,21 @@ actions=header_actions
   {% call admin_table_panel("🏆 Top Opportunities", "Unified priority list of categories and brands with the highest growth potential.", actions=opps_actions) %}
     {{ admin_crud_table(tables['top_opportunities'], loading_text="Compiling top opportunities...") }}
   {% endcall %}
-
-  <!-- Insight Actions Queue -->
-  {% call admin_table_panel("⚡ Insight Actions Queue", "Immediate tactical recommendations sorted by expected impact and priority.") %}
-    <div id="action-queue-list" class="suggestions-list-scroll flex gap-3">
-      {{ spinner("Compiling action guidance...") }}
-    </div>
-  {% endcall %}
 </div>
 
 <div class="insights-section">
-  {% include "admin/control_panel/insights/_content_strategy.html" %}
+  {% include "admin/content_intelligence/_content_strategy.html" %}
 </div>
 
 <div class="insights-section">
-  {% include "admin/control_panel/insights/_asset_mapping.html" %}
+  {% include "admin/content_intelligence/_asset_mapping.html" %}
 </div>
 
 <div class="insights-section">
-  {% include "admin/control_panel/insights/_publishing_plan.html" %}
+  {% include "admin/content_intelligence/_performance_feedback.html" %}
 </div>
 
-<div class="insights-section">
-  {% include "admin/control_panel/insights/_social_distribution.html" %}
-</div>
-
-<div class="insights-section">
-  {% include "admin/control_panel/insights/_performance_feedback.html" %}
-</div>
-
-<!-- Section 1.99: Autonomous Execution Panel -->
-<h2 class="insight-group-title flex gap-3 items-center">🤖 Autonomous Execution Panel</h2>
-<div class="insights-section">
-  {% include "admin/control_panel/insights/_autonomous_execution.html" %}
-</div>
-
-<!-- Section 1.995: Execution Governance Panel -->
-<h2 class="insight-group-title flex gap-3 items-center">🤖 Execution Governance Panel</h2>
-<div class="insights-section">
-  {% include "admin/control_panel/insights/_governance.html" %}
-</div>
-
-
-<!-- Section 2 & 3: Content Coverage & Brand Expansions -->
+<!-- Section 2 & 3: Content Coverage & Brand Gaps -->
 <h2 class="insight-group-title flex gap-3 items-center">⚖️ Coverage & Brand Expansions</h2>
 <div class="overview-top-grid insights-section">
   {% call admin_table_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to identify content gaps.") %}
@@ -105,8 +76,7 @@ actions=header_actions
 <h2 class="insight-group-title flex gap-3 items-center">🎯 Intent Opportunities</h2>
 <div class="insights-section">
   <!-- Intent Opportunity Analysis -->
-  {% call admin_panel("Intent Distribution Analysis", "Content distribution across taxonomy intents and identified
-  coverage gaps.") %}
+  {% call admin_panel("Intent Distribution Analysis", "Content distribution across taxonomy intents and identified coverage gaps.") %}
   <div class="panel-body-padded">
     <div id="intent-opportunities-list" class="suggestions-list-scroll intent-opportunities-grid flex gap-3">
       {{ spinner("Analyzing intent distributions...") }}
@@ -116,7 +86,6 @@ actions=header_actions
 </div>
 
 {% endblock %}
-
 
 {% block admin_scripts %}
 <script type="module" src="{{ url_for('static', filename='js/admin/pages/insights/index.js') }}"></script>

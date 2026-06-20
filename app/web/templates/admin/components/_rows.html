@@ -16,7 +16,7 @@
     {% endfor %}
     {% if not hide_action_column %}
     <td class="cell-actions flex flex-col gap-1">
-        {% if domain_type in ['content', 'item', 'user'] %}
+        {% if domain_type in ['content', 'item', 'user', 'store', 'source', 'comment'] %}
         <a class="user-action-btn" href="/admin/{{ domain_type }}s/{{ row.id }}" target="_blank">
             👁️ Inspect
         </a>

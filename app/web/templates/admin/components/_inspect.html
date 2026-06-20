@@ -1,20 +1,21 @@
-{% from "admin/components/macros.html" import inspect_section, inspect_detail_row, inspect_custom_row, action_group,
-action_button %}
+{% from "admin/components/macros.html" import inspect_section, action_group, action_button %}
 {% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card %}
+{% from "admin/components/ui.html" import admin_inspect_section_table, admin_crud_table %}
+
+{% set linked_items_table = {
+    "id": "linked-items",
+    "preview_table": ["ID", "Name", "Type", "Clicks", "Actions"]
+} %}
 
 <div class="inspect-details-group flex">
   {% if inspect_table and inspect_table is mapping %}
   {% for section_name, fields in inspect_table.items() %}
   {% call inspect_section(section_name|title) %}
-  {% for item in fields %}
-  {% if item.is_custom %}
-  {% call inspect_custom_row(item.label) %}
-  {{ item.value|safe }}
-  {% endcall %}
+  {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
+  {{ admin_inspect_section_table(fields, layout='horizontal') }}
   {% else %}
-  {{ inspect_detail_row(item.label, "inspect-" ~ item.label|lower|replace(' ', '-'), value_text=item.value) }}
+  {{ admin_inspect_section_table(fields, layout='vertical') }}
   {% endif %}
-  {% endfor %}
   {% endcall %}
   {% endfor %}
   {% endif %}
@@ -27,7 +28,7 @@ action_button %}
     {{ inspect_store_card(lnk) }}
     {% endfor %}
     {% else %}
-    <div >No store links mapped.</div>
+    <div>No store links mapped.</div>
     {% endif %}
   </div>
   {% endcall %}
@@ -36,37 +37,25 @@ action_button %}
   {% if linked_items is defined %}
   {% call inspect_section("Linked Products") %}
   {% if linked_items %}
-  <div class="admin-table-wrapper">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Clicks</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in linked_items %}
-        <tr>
-          <td>#{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td><span class="status-badge inspect-">{{ item.type or "—" }}</span></td>
-          <td class="col-metric">{{ "{:,}".format(item.clicks) }}</td>
-          <td>
-            <button class="user-action-btn user-action-delete" data-action="unlink-match"
-              data-content-id="{{ inspect_id }}" data-item-id="{{ item.id }}">
-              🔓 Unlink
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  {% call admin_crud_table(linked_items_table) %}
+    {% for item in linked_items %}
+    <tr>
+      <td>#{{ item.id }}</td>
+      <td>{{ item.name }}</td>
+      <td><span class="status-badge">{{ item.type or "—" }}</span></td>
+      <td class="col-metric">{{ "{:,}".format(item.clicks) }}</td>
+      <td>
+        {{ action_button("Unlink", action_type="delete", icon="🔓", extra_class="user-action-delete",
+           attrs={"data-action": "unlink-match", "data-content-id": inspect_id, "data-item-id": item.id}) }}
+      </td>
+    </tr>
+    {% endfor %}
+  {% endcall %}
   {% else %}
-  <p >No linked products found.</p>
+  <div class="dashboard-empty loading-height-sm">
+    <span>📭</span>
+    <p>No linked products found.</p>
+  </div>
   {% endif %}
   {% endcall %}
   {% endif %}
@@ -79,7 +68,7 @@ action_button %}
     {{ inspect_distribution_card(post) }}
     {% endfor %}
     {% else %}
-    <div >No distribution history found.</div>
+    <div>No distribution history found.</div>
     {% endif %}
   </div>
   {% endcall %}
@@ -95,4 +84,4 @@ action_button %}
   {% endcall %}
   {% endcall %}
   {% endif %}
-</div>
+</div>

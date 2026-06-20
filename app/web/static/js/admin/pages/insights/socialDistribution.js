@@ -7,7 +7,7 @@ export function renderSocialDistribution() {
 
   container.innerHTML = getSpinnerHtml(6, "Loading distribution history...");
 
-  fetchAndInjectHtml(`/admin/insights/widget/social-distribution`, 'social-distribution-table-body', 'Loading distribution history...', 6)
+  fetchAndInjectHtml(`/admin/distribution/widget/social-distribution`, 'social-distribution-table-body', 'Loading distribution history...', 6)
     .catch(err => {
       console.error("Failed to load social distribution widget:", err);
     });
@@ -33,7 +33,7 @@ window.viewDistributionDraft = function(postId, sourceType, sourceId, platform) 
     }
     
     // Fetch or generate draft
-    fetchAndInjectHtml("/admin/insights/social-distribution/generate", "distribution-draft-content", "Loading post details...", null, {
+    fetchAndInjectHtml("/admin/distribution/social-distribution/generate", "distribution-draft-content", "Loading post details...", null, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -61,7 +61,7 @@ window.publishDistributionPost = function(postId) {
     const text = textEl ? textEl.value : "";
     const url = urlEl ? urlEl.value : "";
     
-    fetch(`/admin/insights/social-distribution/${postId}/publish`, {
+    fetch(`/admin/distribution/social-distribution/${postId}/publish`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

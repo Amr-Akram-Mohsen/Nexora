@@ -181,7 +181,15 @@ def get_save_stats() -> dict:
 
 
 def get_share_stats() -> dict:
-    return {"total": get_interactions_breakdown()["shares"]}
+    from sqlalchemy import select, func
+    from app.core.extensions import db
+    from app.domains.interaction.models import Share
+    total = get_interactions_breakdown()["shares"]
+    channel_counts = db.session.execute(
+        select(Share.channel, func.count(Share.id)).group_by(Share.channel)
+    ).all()
+    distribution = {c or "Unknown": cnt for c, cnt in channel_counts}
+    return {"total": total, "distribution": distribution}
 
 
 def get_click_stats() -> dict:

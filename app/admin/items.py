@@ -294,7 +294,8 @@ def build_item_inspect_data(id):
             selectinload(Item.variants).selectinload(ItemVariant.store_links).joinedload(ItemStoreLink.store),
             selectinload(Item.linked_contents),
             selectinload(Item.images),
-            selectinload(Item.specifications)
+            selectinload(Item.specifications),
+            selectinload(Item.comments).joinedload(Comment.user)
         ).where(Item.id == id)
     )
     
@@ -339,6 +340,9 @@ def build_item_inspect_data(id):
         curr = store_links_data[0]["currency"] if store_links_data else ""
         price_str = f"{item.min_price} {curr}"
 
+    from app.domains.interaction.service.scoring import get_item_engagement_score
+    engagement_score = get_item_engagement_score(item.id)
+
     data = {
         "id": f"#{item.id}",
         "name": item.name,
@@ -352,9 +356,11 @@ def build_item_inspect_data(id):
         "price": price_str,
         "variant groups": {"value": variant_groups_str, "is_custom": True},
         
+        "engagement score": str(engagement_score),
         "views": "{:,}".format(item.view_count or 0),
         "likes": "{:,}".format(item.like_count or 0),
         "dislikes": "{:,}".format(item.dislike_count or 0),
+        "comments": "{:,}".format(item.comment_count or 0),
         "shares": "{:,}".format(item.share_count or 0),
         "saves": "{:,}".format(item.save_count or 0),
         "click count": "{:,}".format(item.click_count or 0),
@@ -368,6 +374,20 @@ def build_item_inspect_data(id):
     }
     
     inspect_table = get_inspect_table("items", data)
+
+    from datetime import datetime
+    recent_comments = sorted(item.comments, key=lambda c: c.created_at or datetime.min, reverse=True)[:3]
+    if recent_comments:
+        if "Content & Quality" not in inspect_table:
+            inspect_table["Content & Quality"] = []
+        for idx, c in enumerate(recent_comments):
+            user_name = c.user.name if c.user else f"User #{c.user_id}"
+            preview = c.content[:100] + ("..." if len(c.content) > 100 else "")
+            inspect_table["Content & Quality"].append({
+                "label": f"Recent Comment {idx+1}",
+                "value": f"<b>{user_name}</b>: {preview}",
+                "is_custom": True
+            })
 
     actions = [
         {

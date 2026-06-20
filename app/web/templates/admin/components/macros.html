@@ -121,44 +121,6 @@ wrapper_class=""
 {% endmacro %}
 
 
-{# ==========================================================
-SIMPLE INSPECT ROW
-========================================================== #}
-{% macro inspect_detail_row(
-label,
-value_class,
-value_tag="span",
-row_class="inspect-details-row",
-value_text=None
-) %}
-<div class="{{ row_class }}">
-    <strong>{{ label }}:</strong>
-
-    {% if value_text is not none %}
-    <{{ value_tag }} class="{{ value_class }}">
-        {{ value_text }}
-    </{{ value_tag }}>
-    {% else %}
-    <{{ value_tag }} class="{{ value_class }}"></{{ value_tag }}>
-    {% endif %}
-</div>
-{% endmacro %}
-
-
-{# ==========================================================
-COMPLEX INSPECT ROW
-For rows like:
-Author: USER (email: EMAIL, ID: ID)
-========================================================== #}
-{% macro inspect_custom_row(
-label,
-row_class="inspect-details-row"
-) %}
-<div class="{{ row_class }}">
-    <strong>{{ label }}:</strong>
-    {{ caller() }}
-</div>
-{% endmacro %}
 
 
 {# ==========================================================

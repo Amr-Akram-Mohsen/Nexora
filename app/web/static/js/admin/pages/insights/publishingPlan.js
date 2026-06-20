@@ -11,7 +11,7 @@ export function renderContentPublishingPlan() {
   const entityFilter = selectedEntity ? `&entity=${encodeURIComponent(selectedEntity)}` : '';
 
   fetchAndInjectHtml(
-    `/admin/insights/widget/publishing-plan?time_frame=${timeframe}${entityFilter}`,
+    `/admin/distribution/widget/publishing-plan?time_frame=${timeframe}${entityFilter}`,
     'publishing-plan-body-wrapper',
     'Orchestrating weekly publishing schedule...',
     null,

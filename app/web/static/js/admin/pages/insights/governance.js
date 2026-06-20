@@ -8,7 +8,7 @@ export function renderExecutionGovernance() {
   const timeframe = document.getElementById("timeframe-select")?.value || "7_days";
 
   fetchAndInjectHtml(
-    `/admin/insights/widget/governance?time_frame=${timeframe}`,
+    `/admin/distribution/widget/governance?time_frame=${timeframe}`,
     'execution-governance-body-wrapper',
     'Loading governance queues...'
   );

@@ -30,6 +30,7 @@ from app.admin import (
     api_recommendation_bp,
     api_provider_bp,
     api_insights_bp,
+    api_distribution_bp,
 )
 
 from app.domains.user.models import User
@@ -208,6 +209,7 @@ def create_app():
     app.register_blueprint(api_recommendation_bp)
     app.register_blueprint(api_provider_bp)
     app.register_blueprint(api_insights_bp)
+    app.register_blueprint(api_distribution_bp)
 
     # app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)

@@ -16,17 +16,28 @@ def require_admin():
 
 @bp.route("/")
 def home():
-    return render_template("admin/dashboard/overview.html", title="Overview", domain="home")
+    return render_template("admin/overview/overview.html", title="Overview", domain="home")
 
 @bp.route("/insights")
 def dashboard_insights():
-    return render_template("admin/control_panel/insights.html", title="Insights & Opportunities", domain="insights", tables=INSIGHTS_TABLES)
+    return render_template("admin/content_intelligence/insights.html", title="Insights & Opportunities", domain="insights", tables=INSIGHTS_TABLES)
+
+
+@bp.route("/distribution")
+def dashboard_distribution():
+    return render_template(
+        "admin/distribution/distribution.html",
+        title="Distribution & Publishing",
+        domain="distribution",
+        tables=INSIGHTS_TABLES
+    )
+
 
 
 @bp.route("/contents")
 def dashboard_contents():
     return render_template(
-        "admin/control_panel/contents.html",
+        "admin/content_library/contents.html",
         title="Content Management",
         domain="contents",
         table=CRUD_TABLES["contents"],
@@ -36,7 +47,7 @@ def dashboard_contents():
 @bp.route("/items")
 def dashboard_items():
     return render_template(
-        "admin/control_panel/items.html",
+        "admin/product_intelligence/items.html",
         title="Product Management",
         domain="items",
         table=CRUD_TABLES["items"],
@@ -46,7 +57,7 @@ def dashboard_items():
 @bp.route("/sources")
 def dashboard_sources():
     return render_template(
-        "admin/control_panel/sources.html",
+        "admin/acquisition/sources.html",
         title="Sources Management",
         domain="sources",
         table=CRUD_TABLES["sources"],
@@ -56,7 +67,7 @@ def dashboard_sources():
 @bp.route("/stores")
 def dashboard_stores():
     return render_template(
-        "admin/control_panel/stores.html",
+        "admin/product_intelligence/stores.html",
         title="Stores Management",
         domain="stores",
         table=CRUD_TABLES["stores"]        
@@ -66,7 +77,7 @@ def dashboard_stores():
 @bp.route("/taxonomy")
 def dashboard_taxonomy():
     return render_template(
-        "admin/control_panel/taxonomy.html",
+        "admin/taxonomy/taxonomy.html",
         title="Taxonomy Management",
         domain="taxonomy",
         tables=CRUD_TABLES,
@@ -76,7 +87,7 @@ def dashboard_taxonomy():
 @bp.route("/users")
 def dashboard_users():
     return render_template(
-        "admin/control_panel/users.html",
+        "admin/audience/users.html",
         title="Users",
         domain="users",
         table=CRUD_TABLES["users"],
@@ -86,7 +97,7 @@ def dashboard_users():
 @bp.route("/moderation")
 def dashboard_moderation():
     return render_template(
-        "admin/control_panel/interactions.html",
+        "admin/audience/interactions.html",
         title="Moderation & Interactions",
         domain="moderation",
         tables=CRUD_TABLES,
@@ -96,7 +107,7 @@ def dashboard_moderation():
 @bp.route("/recommendations")
 def dashboard_recommendations():
     return render_template(
-        "admin/control_panel/recommendations.html",
+        "admin/content_intelligence/recommendations.html",
         title="Recommendations",
         domain="recommendations",
         table=CRUD_TABLES["recommendations"],
@@ -105,7 +116,7 @@ def dashboard_recommendations():
 
 @bp.route("/settings")
 def settings():
-    return render_template("admin/control_panel/settings.html", title="Settings", domain="settings")
+    return render_template("admin/settings.html", title="Settings", domain="settings")
 
 
 @bp.route("/contents/<int:id>")
@@ -115,7 +126,7 @@ def content_detail(id):
     data = build_content_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/details/content_detail.html", title=f"Content {id}", domain="contents", **data)
+    return render_template("admin/content_library/content_detail.html", title=f"Content {id}", domain="contents", **data)
 
 
 @bp.route("/items/<int:id>")
@@ -125,7 +136,7 @@ def item_detail(id):
     data = build_item_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/details/item_detail.html", title=f"Product {id}", domain="items", **data)
+    return render_template("admin/product_intelligence/item_detail.html", title=f"Product {id}", domain="items", **data)
 
 
 @bp.route("/users/<int:id>")
@@ -135,5 +146,36 @@ def user_detail(id):
     data = build_user_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/details/user_detail.html", title=f"User {id}", domain="users", **data)
+    return render_template("admin/audience/user_detail.html", title=f"User {id}", domain="users", **data)
+
+
+@bp.route("/stores/<int:id>")
+def store_detail(id):
+    from app.admin.providers import build_store_inspect_data
+    from flask import abort
+    data = build_store_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/product_intelligence/store_detail.html", title=f"Store Details {id}", domain="stores", **data)
+
+
+@bp.route("/sources/<int:id>")
+def source_detail(id):
+    from app.admin.providers import build_source_inspect_data
+    from flask import abort
+    data = build_source_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/acquisition/source_detail.html", title=f"Source Details {id}", domain="sources", **data)
+
+
+@bp.route("/comments/<int:id>")
+def comment_detail(id):
+    from app.admin.interactions import build_comment_inspect_data
+    from flask import abort
+    data = build_comment_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/audience/comment_detail.html", title=f"Comment Details {id}", domain="comments", **data)
+
 

@@ -62,6 +62,13 @@ class Config:
     CACHE_TYPE = os.environ.get("CACHE_TYPE", "SimpleCache")
     CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT", 3600))
 
+    # ── Engagement Scoring Weights ─────────────────────────────────
+    ENGAGEMENT_WEIGHT_VIEW = float(os.environ.get("ENGAGEMENT_WEIGHT_VIEW", 1.0))
+    ENGAGEMENT_WEIGHT_LIKE = float(os.environ.get("ENGAGEMENT_WEIGHT_LIKE", 3.0))
+    ENGAGEMENT_WEIGHT_COMMENT = float(os.environ.get("ENGAGEMENT_WEIGHT_COMMENT", 5.0))
+    ENGAGEMENT_WEIGHT_SAVE = float(os.environ.get("ENGAGEMENT_WEIGHT_SAVE", 4.0))
+    ENGAGEMENT_WEIGHT_SHARE = float(os.environ.get("ENGAGEMENT_WEIGHT_SHARE", 6.0))
+    ENGAGEMENT_WEIGHT_CLICK = float(os.environ.get("ENGAGEMENT_WEIGHT_CLICK", 5.0))
 
 # ================================================
 SOCIAL_LINKS = [

@@ -47,6 +47,8 @@ def list_comments():
     sentiment   = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
     search      = request.args.get("search", "").strip()
+    start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
+    end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     stmt = select(Comment).order_by(Comment.id.desc())
     if sentiment:
@@ -55,6 +57,18 @@ def list_comments():
         stmt = stmt.where(Comment.target_type == target_type)
     if search:
         stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
+    if start_date:
+        try:
+            from datetime import date, datetime
+            stmt = stmt.where(Comment.created_at >= datetime.combine(date.fromisoformat(start_date), datetime.min.time()))
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            from datetime import date, datetime
+            stmt = stmt.where(Comment.created_at <= datetime.combine(date.fromisoformat(end_date), datetime.max.time()))
+        except ValueError:
+            pass
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
@@ -414,6 +428,70 @@ def list_saves():
     })
 
 
+@bp.route("/shares", methods=["GET"])
+def list_shares():
+    """Paginated list of shares with user and target details."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    target = request.args.get("search", "").strip()
+    user_search = request.args.get("shares_user", request.args.get("user", "")).strip()
+
+    stmt = select(Share).order_by(Share.id.desc())
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (Share.target_id == Content.id) & (Share.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (Share.target_id == Item.id) & (Share.target_type == "item"))
+    stmt = stmt.join(User, Share.user_id == User.id)
+
+    if target:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{target}%"),
+                Item.name.ilike(f"%{target}%")
+            )
+        )
+    if user_search:
+        stmt = stmt.where(
+            or_(
+                User.name.ilike(f"%{user_search}%"),
+                User.email.ilike(f"%{user_search}%")
+            )
+        )
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
+
+    serialized = []
+    for s in pagination.items:
+        user = users.get(s.user_id)
+        target_title = (
+            content_titles.get(s.target_id)
+            if s.target_type == "content"
+            else item_names.get(s.target_id)
+        )
+        serialized.append({
+            "id": s.id,
+            "user_id": s.user_id,
+            "user_name": user["name"] if user else f"User #{s.user_id}",
+            "user_email": user["email"] if user else None,
+            "target_type": s.target_type,
+            "target_id": s.target_id,
+            "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
+            "channel": s.channel or "—",
+            "created_at": s.created_at.isoformat() if s.created_at else None
+        })
+
+    return jsonify({
+        "items":    serialized,
+        "page":     pagination.page,
+        "pages":    pagination.pages,
+        "total":    pagination.total,
+        "per_page": pagination.per_page,
+    })
+
+
 # ─────────────────────────────────────────────
 # HTML PARTIAL ROWS + INSPECT ENDPOINTS
 # ─────────────────────────────────────────────
@@ -437,7 +515,10 @@ def _serialize_comment(c, users, content_titles, item_names):
         "sentiment":    c.sentiment or "neutral",
         "target_type":  c.target_type,
         "target_id":    c.target_id,
-        "replies":    c.replies,
+        "like_count":   c.like_count,
+        "dislike_count": c.dislike_count,
+        "replies_count": c.replies_count,
+        "replies":      c.replies,
         "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
         "created_at":   c.created_at.isoformat() if c.created_at else None,
     }
@@ -503,11 +584,25 @@ def comments_rows():
     sentiment   = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
     search      = request.args.get("search", "").strip()
+    start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
+    end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     stmt = select(Comment).order_by(Comment.id.desc())
     if sentiment:   stmt = stmt.where(Comment.sentiment == sentiment)
     if target_type: stmt = stmt.where(Comment.target_type == target_type)
     if search:      stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
+    if start_date:
+        try:
+            from datetime import date, datetime
+            stmt = stmt.where(Comment.created_at >= datetime.combine(date.fromisoformat(start_date), datetime.min.time()))
+        except ValueError:
+            pass
+    if end_date:
+        try:
+            from datetime import date, datetime
+            stmt = stmt.where(Comment.created_at <= datetime.combine(date.fromisoformat(end_date), datetime.max.time()))
+        except ValueError:
+            pass
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, content_titles, item_names = _load_interaction_context(pagination.items)
@@ -520,7 +615,9 @@ def comments_rows():
             "target_type": c["target_type"],
             "preview": c["preview"],
             "sentiment": c["sentiment"],
-            "replies-count": str(len(c["replies"])),
+            "likes": f"👍 {c['like_count']} 👎 {c['dislike_count']}",
+            "replies": str(c["replies_count"]),
+            "thread?": "Reply" if c["parent_id"] else "—",
             "date": c["created_at"][:10] if c["created_at"] else "—",
             "username": c["user_name"],
         } for c in serialized
@@ -535,9 +632,7 @@ def comments_rows():
     )
 
 
-@bp.route("/comments/<int:id>/inspect", methods=["GET"])
-def inspect_comment(id):
-    """Return server-rendered HTML for the comment inspect modal body."""
+def build_comment_inspect_data(id):
     from sqlalchemy.orm import selectinload
     stmt = select(Comment).options(
         selectinload(Comment.user),
@@ -549,7 +644,7 @@ def inspect_comment(id):
     comment = db.session.scalar(stmt)
     
     if not comment:
-        return "<p class='text-muted'>Comment not found.</p>", 404
+        return None
     
     from app.admin.tables import get_inspect_table
     
@@ -564,6 +659,34 @@ def inspect_comment(id):
         sorted_replies = sorted(comment.replies, key=lambda r: r.created_at, reverse=True)
         latest_replies = "<br>".join([f"• {r.content[:40]}..." for r in sorted_replies[:3]])
 
+    total_user_comments = db.session.scalar(select(func.count(Comment.id)).where(Comment.user_id == comment.user_id)) if comment.user_id else 0
+
+    target_sentiments = db.session.execute(
+        select(Comment.sentiment, func.count(Comment.id))
+        .where(Comment.target_type == comment.target_type)
+        .where(Comment.target_id == comment.target_id)
+        .group_by(Comment.sentiment)
+    ).all()
+    
+    total_target_comments = sum(count for _, count in target_sentiments)
+    sentiment_dist = []
+    for sentiment, count in target_sentiments:
+        pct = (count / total_target_comments * 100) if total_target_comments > 0 else 0
+        s_label = sentiment.title() if sentiment else 'Neutral'
+        sentiment_dist.append(f"{s_label}: {count} ({pct:.1f}%)")
+    sentiment_dist_str = "<br>".join(sentiment_dist) if sentiment_dist else "—"
+
+    recent_reactions = db.session.execute(
+        select(Reaction).options(selectinload(Reaction.user))
+        .where(Reaction.target_type == 'comment', Reaction.target_id == comment.id)
+        .order_by(Reaction.created_at.desc())
+        .limit(3)
+    ).scalars().all()
+    
+    reactions_html = "—"
+    if recent_reactions:
+        reactions_html = "<br>".join([f"• <b>{r.user.name if r.user else 'User'}</b>: {r.type.title()}" for r in recent_reactions])
+
     data = {
         "id": f"#{comment.id}",
         "comment": comment.content,
@@ -573,10 +696,12 @@ def inspect_comment(id):
         "dislikes": "{:,}".format(comment.dislike_count),
         "shares": "{:,}".format(comment.share_count),
         "replies count": str(comment.replies_count),
+        "recent reactions": {"value": reactions_html, "is_custom": True} if reactions_html != "—" else "—",
         
         "user id": str(comment.user_id),
         "user name": comment.user.name if comment.user else "—",
         "user email": comment.user.email if comment.user else "—",
+        "total comments": str(total_user_comments),
         
         "parent context": parent_context,
         "latest replies": {"value": latest_replies, "is_custom": True} if latest_replies != "—" else "—",
@@ -584,6 +709,8 @@ def inspect_comment(id):
         "target type": comment.target_type,
         "target title": target_title,
         "date": comment.created_at.isoformat()[:10] if comment.created_at else "—",
+        "target comments": str(total_target_comments),
+        "sentiment distribution": {"value": sentiment_dist_str, "is_custom": True}
     }
     inspect_table = get_inspect_table("comments", data)
 
@@ -604,10 +731,22 @@ def inspect_comment(id):
         }
     ]
 
+    return {
+        "inspect_table": inspect_table,
+        "actions": actions,
+        "inspect_id": comment.id
+    }
+
+
+@bp.route("/comments/<int:id>/inspect", methods=["GET"])
+def inspect_comment(id):
+    """Return server-rendered HTML for the comment inspect modal body."""
+    data = build_comment_inspect_data(id)
+    if not data:
+        return "<p class='text-muted'>Comment not found.</p>", 404
     return render_template(
         "admin/components/_inspect.html",
-        inspect_table=inspect_table,
-        actions=actions
+        **data
     )
 
 @bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
@@ -633,25 +772,35 @@ def inspect_clicks(link_id):
     total_clicks = db.session.scalar(select(func.count()).select_from(ItemClick).where(ItemClick.item_store_link_id == link_id)) or 0
     latest_click = db.session.scalar(select(func.max(ItemClick.created_at)).where(ItemClick.item_store_link_id == link_id))
     
-    recent_clicks = db.session.execute(
-        select(ItemClick).where(ItemClick.item_store_link_id == link_id).order_by(ItemClick.created_at.desc()).limit(5)
-    ).scalars().all()
+    country_stats = db.session.execute(
+        select(ItemClick.country, func.count(ItemClick.id))
+        .where(ItemClick.item_store_link_id == link_id)
+        .group_by(ItemClick.country)
+        .order_by(func.count(ItemClick.id).desc())
+        .limit(5)
+    ).all()
     
+    referrer_stats = db.session.execute(
+        select(ItemClick.referrer, func.count(ItemClick.id))
+        .where(ItemClick.item_store_link_id == link_id)
+        .where(ItemClick.referrer.isnot(None))
+        .where(ItemClick.referrer != "")
+        .group_by(ItemClick.referrer)
+        .order_by(func.count(ItemClick.id).desc())
+        .limit(5)
+    ).all()
+    
+    top_countries_str = "<br>".join([f"{c or 'Unknown'}: {cnt}" for c, cnt in country_stats]) or "No data"
+    top_referrers_str = "<br>".join([f"{r or 'Direct'}: {cnt}" for r, cnt in referrer_stats]) or "No data"
+
     data = {
         "store name": link_data["store_name"],
         "item name": link_data["item_name"],
         "total clicks": str(total_clicks),
-        "latest click": latest_click.isoformat()[:10] if latest_click else "—"
+        "latest click": latest_click.isoformat()[:10] if latest_click else "—",
+        "top countries": {"value": top_countries_str, "is_custom": True},
+        "top referrers": {"value": top_referrers_str, "is_custom": True}
     }
-    
-    for i, click in enumerate(recent_clicks):
-        data[f"click {i+1}"] = {
-            "value": f"<b>IP:</b> {click.ip_address or '—'} <br> <b>Country:</b> {click.country or '—'} <br> <b>User Agent:</b> {click.user_agent or '—'}",
-            "is_custom": True
-        }
-        
-    for i in range(len(recent_clicks), 5):
-        data[f"click {i+1}"] = "—"
         
     inspect_table = get_inspect_table("clicks", data)
     
@@ -681,17 +830,34 @@ def reactions_rows():
 
     content_titles, item_names = _load_target_titles(pagination.items)
 
+    comment_ids = {r.target_id for r in pagination.items if r.target_type == "comment"}
+    comment_previews = {}
+    if comment_ids:
+        rows = db.session.execute(
+            select(Comment.id, Comment.content).where(Comment.id.in_(comment_ids))
+        ).mappings().all()
+        comment_previews = {r["id"]: r["content"][:60] + ("…" if len(r["content"]) > 60 else "") for r in rows}
+
     serialized = []
     for r in pagination.items:
         user = users.get(r.user_id)
-        tt = content_titles.get(r.target_id) if r.target_type == "content" else item_names.get(r.target_id)
+        if r.target_type == "content":
+            tt = content_titles.get(r.target_id)
+            icon = "📄 Content"
+        elif r.target_type == "item":
+            tt = item_names.get(r.target_id)
+            icon = "📦 Item"
+        else:
+            tt = comment_previews.get(r.target_id)
+            icon = "💬 Comment"
+
         serialized.append({
             "id": r.id,
             "target": tt or f"{r.target_type.capitalize()} #{r.target_id}",
-            "target_type": r.target_type,
+            "target_type": icon,
             "reaction_type": r.type,
-            "username": user["name"] if user else f"User #{r.user_id}",
             "date": r.created_at.isoformat()[:10] if r.created_at else "—",
+            "username": user["name"] if user else f"User #{r.user_id}",
         })
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type="reaction", hide_action_column=True)
@@ -711,11 +877,14 @@ def views_rows():
     end_date   = request.args.get("views_end_date", "").strip()
     search     = request.args.get("search", "").strip()
 
+    from sqlalchemy import case
     stmt = (
         select(
             View.target_type,
             View.target_id,
             func.count(View.id).label("view_count"),
+            func.sum(case((View.user_id.isnot(None), 1), else_=0)).label("auth_views"),
+            func.sum(case((View.user_id.is_(None), 1), else_=0)).label("anon_views"),
             func.max(View.created_at).label("latest_view")
         )
         .select_from(View)
@@ -770,7 +939,9 @@ def views_rows():
             "id": f"{v.target_type}-{v.target_id}",
             "target": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
             "target_type": v.target_type,
-            "view-count": "{:,}".format(v.view_count or 0),
+            "total-views": "{:,}".format(v.view_count or 0),
+            "auth-views": "{:,}".format(v.auth_views or 0),
+            "anon-views": "{:,}".format(v.anon_views or 0),
             "date": v.latest_view.isoformat()[:10] if v.latest_view else "—"
         })
 
@@ -788,6 +959,7 @@ def clicks_rows():
 
     stmt = (
         select(
+            ItemStoreLink.id.label("link_id"),
             Item.name.label("item_name"),
             Store.name.label("store_name"),
             ItemStoreLink.affiliate_url,
@@ -798,7 +970,7 @@ def clicks_rows():
         .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
         .join(Item, Item.id == ItemVariant.item_id)
         .join(Store, Store.id == ItemStoreLink.store_id)
-        .group_by(Item.id, Store.id, ItemStoreLink.affiliate_url)
+        .group_by(ItemStoreLink.id, Item.id, Store.id, ItemStoreLink.affiliate_url)
         .order_by(func.count(ItemClick.id).desc())
     )
     if search:
@@ -816,7 +988,7 @@ def clicks_rows():
 
     pages = max(1, (total + per_page - 1) // per_page)
     serialized = [{
-        "id": r["affiliate_url"],
+        "id": r["link_id"],
         "name": r["item_name"],
         "store-name": {"name": r["store_name"], "url": r["affiliate_url"]},
         "click-count": "{:,}".format(r["click_count"] or 0),
@@ -828,7 +1000,7 @@ def clicks_rows():
     for d in serialized:
         d["link"] = d.pop("store_name")
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="click", hide_action_column=True)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="click", hide_action_column=False)
     return make_rows_response(html, total=total, pages=pages, page=page)
 
 
@@ -836,10 +1008,33 @@ def clicks_rows():
 def saves_rows():
     """Return server-rendered HTML rows partial for saves AJAX injection."""
     page, per_page = parse_pagination_params(default_per_page=25)
-    search      = request.args.get("search", "").strip()
+    search = request.args.get("search", "").strip()
+    user_search = request.args.get("saves_user", request.args.get("user", "")).strip()
 
     stmt = select(Save).order_by(Save.id.desc())
-    if search: stmt = stmt.where(Save.target_type.ilike(f"%{search}%"))
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (Save.target_id == Content.id) & (Save.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (Save.target_id == Item.id) & (Save.target_type == "item"))
+    stmt = stmt.join(User, Save.user_id == User.id)
+
+    if search:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{search}%"),
+                Item.name.ilike(f"%{search}%")
+            )
+        )
+    if user_search:
+        stmt = stmt.where(
+            or_(
+                User.name.ilike(f"%{user_search}%"),
+                User.email.ilike(f"%{user_search}%")
+            )
+        )
+
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
     user_ids = {s.user_id for s in pagination.items}
@@ -869,6 +1064,60 @@ def saves_rows():
         pages=pagination.pages,
         page=pagination.page,
     )
+
+@bp.route("/shares/rows", methods=["GET"])
+def shares_rows():
+    """Return server-rendered HTML rows partial for shares AJAX injection."""
+    page, per_page = parse_pagination_params(default_per_page=25)
+    search = request.args.get("search", "").strip()
+    user_search = request.args.get("shares_user", request.args.get("user", "")).strip()
+
+    stmt = select(Share).order_by(Share.id.desc())
+
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+
+    stmt = stmt.outerjoin(Content, (Share.target_id == Content.id) & (Share.target_type == "content"))
+    stmt = stmt.outerjoin(Item, (Share.target_id == Item.id) & (Share.target_type == "item"))
+    stmt = stmt.join(User, Share.user_id == User.id)
+
+    if search:
+        stmt = stmt.where(
+            or_(
+                Content.title.ilike(f"%{search}%"),
+                Item.name.ilike(f"%{search}%")
+            )
+        )
+    if user_search:
+        stmt = stmt.where(
+            or_(
+                User.name.ilike(f"%{user_search}%"),
+                User.email.ilike(f"%{user_search}%")
+            )
+        )
+
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
+
+    serialized = []
+    for s in pagination.items:
+        user = users.get(s.user_id)
+        target_title = (
+            content_titles.get(s.target_id)
+            if s.target_type == "content"
+            else item_names.get(s.target_id)
+        )
+        serialized.append({
+            "id": s.id,
+            "user": user["name"] if user else f"User #{s.user_id}",
+            "target": f"{s.target_type.title()}: {target_title or s.target_id}",
+            "channel": s.channel or "—",
+            "date": s.created_at.isoformat()[:10] if s.created_at else "—"
+        })
+
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="share", hide_action_column=True)
+    return make_rows_response(html, total=pagination.total, pages=pagination.pages, page=pagination.page)
 
 
 # ─────────────────────────────────────────────
@@ -917,3 +1166,9 @@ def shares_stats():
 @bp.route("/clicks/stats", methods=["GET"])
 def clicks_stats():
     return jsonify(get_click_stats())
+
+
+@bp.route("/analytics", methods=["GET"])
+def analytics_dashboard():
+    from app.domains.interaction.service.analytics import get_analytics_dashboard_data
+    return jsonify(get_analytics_dashboard_data())

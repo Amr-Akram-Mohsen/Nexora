@@ -3,12 +3,12 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score"],
+        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score", "Actions"],
         "detailed_table": {
-            "user info": ["id", "name", "email", "role", "subscription", "status", "joined", "last active"],
-            "auth & security": ["provider", "verified", "verified at", "password changed"],
-            "user activity metrics": ["engagement score", "views", "reactions", "comments", "saves", "item clicks", "recommendations shown"],
-            "personalization": ["interests", "recent activity"]
+            "account info": ["id", "name", "email", "role", "status", "provider"],
+            "security & auth": ["verified", "verified at", "password changed", "joined", "last active"],
+            "engagement metrics": ["engagement profile", "engagement score", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown"],
+            "activity & interests": ["recent activity", "interests", "subscription"]
         }
     },
     "contents": {
@@ -24,7 +24,7 @@ CRUD_TABLES = {
         ],
         "detailed_table": {
             "content info": ["id", "title", "type", "category", "section"],
-            "performance metrics": ["views", "likes", "comments", "shares"],
+            "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves"],
             "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count"],
             "quality & scoring": ["base score", "review score", "article quality score"],
             "taxonomy & targeting": ["intent", "gender", "price tier"],
@@ -38,7 +38,7 @@ CRUD_TABLES = {
         "detailed_table": {
             "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
             "variants & availability": ["variants count", "store count", "price", "variant groups"],
-            "performance metrics": ["views", "likes", "dislikes", "shares", "saves", "click count"],
+            "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves", "click count"],
             "content & quality": ["linked contents", "description", "rating", "review count", "images count", "specs count"]
         }
     },
@@ -105,12 +105,13 @@ CRUD_TABLES = {
     },
     "comments": {
         "id": "comments",
-        "preview_table": ["Title", "Type", "Comment", "Sentiment", "Replies Count", "Date", "User", "Actions"],
+        "preview_table": ["Title", "Type", "Comment", "Sentiment", "Likes", "Replies", "Thread?", "Date", "User", "Actions"],
         "detailed_table": {
-            "moderation context": ["id", "comment", "sentiment", "confidence", "likes", "dislikes", "shares", "replies count"],
-            "user info": ["user id", "user name", "user email"],
-            "thread context": ["parent context", "latest replies"],
-            "target info": ["target type", "target title", "date"]
+            "comment content": ["id", "comment", "target title", "target type", "date"],
+            "moderation": ["sentiment", "confidence", "sentiment distribution"],
+            "engagement": ["likes", "dislikes", "shares", "replies count", "recent reactions"],
+            "thread context": ["parent context", "latest replies", "target comments"],
+            "author info": ["user id", "user name", "user email", "total comments"]
         }
     },
     "reactions": {
@@ -119,19 +120,26 @@ CRUD_TABLES = {
     },
     "views": {
         "id": "views",
-        "preview_table": ["Title", "Type", "Count", "Latest View"],
+        "preview_table": ["Title", "Type", "Total Views", "Auth Views", "Anon Views", "Latest View"],
     },
     "clicks": {
         "id": "clicks",
         "preview_table": ["Product Name", "Category", "Brand", "Store", "Count", "Latest Click"],
         "detailed_table": {
             "link info": ["store name", "item name", "total clicks", "latest click"],
-            "recent traffic (last 5 clicks)": ["click 1", "click 2", "click 3", "click 4", "click 5"]
+            "traffic geography": ["top countries"],
+            "traffic sources": ["top referrers"]
         }
     },
     "saves": {
         "id": "saves",
-        "preview_table": ["Title", "Type", "Date", "User"],
+        "preview_table": ["User", "Target", "Date"],
+        "detailed_table": None
+    },
+    "shares": {
+        "id": "shares",
+        "preview_table": ["User", "Target", "Channel", "Date"],
+        "detailed_table": None
     },
     "user_interests": {
         "id": "user_interests",

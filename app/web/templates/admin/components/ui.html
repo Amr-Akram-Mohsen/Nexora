@@ -62,6 +62,65 @@ current_per_page=20) %}
 {% endmacro %}
 
 
+{% macro admin_inspect_attributes_table(fields) %}
+<div class="admin-table-wrapper">
+  <table class="admin-table vertical-table">
+    <tbody>
+      {% for item in fields %}
+      <tr>
+        <th class="cell-label">{{ item.label }}</th>
+        <td class="cell-value">
+          {% if item.is_custom %}
+            {{ item.value|safe }}
+          {% else %}
+            <span>{{ item.value }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+
+{% macro admin_inspect_metrics_table(fields) %}
+<div class="admin-table-wrapper">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        {% for item in fields %}
+        <th>{{ item.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for item in fields %}
+        <td>
+          {% if item.is_custom %}
+            {{ item.value|safe }}
+          {% else %}
+            <span>{{ item.value }}</span>
+          {% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+
+{% macro admin_inspect_section_table(fields, layout='vertical') %}
+  {% if layout == 'horizontal' or layout == 'metrics' %}
+    {{ admin_inspect_metrics_table(fields) }}
+  {% else %}
+    {{ admin_inspect_attributes_table(fields) }}
+  {% endif %}
+{% endmacro %}
+
+
 {% macro admin_paginator(domain, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
 {{ admin_pagination(
 info_id=domain ~ "-pagination-info",

@@ -12,44 +12,35 @@
   </div>
 
   <div class="nav-section">
-    <p class="nav-title">Overview</p>
+    <p class="nav-title">Intelligence</p>
     <a href="{{ url_for('admin.home') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'home' %}active{% endif %}"
       title="Overview">
       <span class="nav-icon">📊</span> <span class="nav-link-text">Overview</span>
     </a>
-  </div>
-
-  <div class="nav-section">
-    <p class="nav-title">Admin</p>
-    <a href="{{ url_for('admin.dashboard_sources') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
-      title="Sources">
-      <span class="nav-icon">📡</span> <span class="nav-link-text">Sources</span>
-    </a>
-    <a href="{{ url_for('admin.dashboard_stores') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"
-      title="Stores">
-      <span class="nav-icon">🏪</span> <span class="nav-link-text">Stores</span>
-    </a>
     <a href="{{ url_for('admin.dashboard_insights') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'insights' %}active{% endif %}"
-      title="Insights">
-      <span class="nav-icon">💡</span> <span class="nav-link-text">Insights</span>
+      title="Content Intelligence">
+      <span class="nav-icon">💡</span> <span class="nav-link-text">Content Intelligence</span>
+    </a>
+    <a href="{{ url_for('admin.dashboard_distribution') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'distribution' %}active{% endif %}"
+      title="Distribution">
+      <span class="nav-icon">📢</span> <span class="nav-link-text">Distribution</span>
     </a>
   </div>
 
   <div class="nav-section">
-    <p class="nav-title">Content</p>
+    <p class="nav-title">Catalog</p>
     <a href="{{ url_for('admin.dashboard_contents') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'contents' %}active{% endif %}"
-      title="Content">
-      <span class="nav-icon">📰</span> <span class="nav-link-text">Content</span>
+      title="Content Library">
+      <span class="nav-icon">📰</span> <span class="nav-link-text">Content Library</span>
     </a>
     <a href="{{ url_for('admin.dashboard_items') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'items' %}active{% endif %}"
-      title="Products">
-      <span class="nav-icon">🛍️</span> <span class="nav-link-text">Products</span>
+      title="Product Intelligence">
+      <span class="nav-icon">🛍️</span> <span class="nav-link-text">Product Intelligence</span>
     </a>
     <a href="{{ url_for('admin.dashboard_taxonomy') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'taxonomy' %}active{% endif %}"
@@ -59,7 +50,11 @@
   </div>
 
   <div class="nav-section">
-    <p class="nav-title">Moderation</p>
+    <p class="nav-title">Audience & Moderation</p>
+    <a href="{{ url_for('admin.dashboard_users') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'users' %}active{% endif %}" title="Users">
+      <span class="nav-icon">👥</span> <span class="nav-link-text">Audience</span>
+    </a>
     <a href="{{ url_for('admin.dashboard_moderation') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'moderation' %}active{% endif %}"
       title="Interactions">
@@ -73,11 +68,21 @@
   </div>
 
   <div class="nav-section">
-    <p class="nav-title">System</p>
-    <a href="{{ url_for('admin.dashboard_users') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'users' %}active{% endif %}" title="Users">
-      <span class="nav-icon">👥</span> <span class="nav-link-text">Users</span>
+    <p class="nav-title">Acquisition & Providers</p>
+    <a href="{{ url_for('admin.dashboard_sources') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
+      title="Sources">
+      <span class="nav-icon">📡</span> <span class="nav-link-text">Acquisition</span>
     </a>
+    <a href="{{ url_for('admin.dashboard_stores') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"
+      title="Stores">
+      <span class="nav-icon">🏪</span> <span class="nav-link-text">Stores</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <p class="nav-title">System</p>
     <a href="{{ url_for('admin.settings') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'settings' %}active{% endif %}"
       title="Settings">

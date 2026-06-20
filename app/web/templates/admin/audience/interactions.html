@@ -1,0 +1,199 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "components/ui/spinner.html" import spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_paginator, admin_crud_table, admin_filter_select,
+admin_inspect_modal, admin_tab_navigation, admin_tab_panel %}
+{% from "admin/components/macros.html" import admin_search_input, admin_reset_button, admin_summary_bar,
+admin_toolbar_section %}
+
+{% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{{ admin_page_header(
+"Interactions & Moderation",
+"Review user comments, reactions, and engagement metrics"
+) }}
+
+{# Interaction Stats Row #}
+<div id="interactions-stats-row" class="dashboard-stats-grid" style="margin-bottom:2rem;">
+  {{ spinner("Loading stats…", "system-loading full-width-card") }}
+</div>
+
+{# Analytics Overview Section #}
+<div id="analytics-overview" class="overview-panel" style="margin-bottom: 2rem;">
+  <div class="overview-panel-header flex items-center justify-between">
+    <h3 class="overview-panel-title">📈 Analytics Overview (30 Days)</h3>
+    <span class="overview-panel-sub text-muted" id="recs-ctr-badge"></span>
+  </div>
+  <div class="panel-body-padded">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem;">
+      <div class="chart-container card" style="position: relative; height:300px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <canvas id="engagementTrendChart"></canvas>
+      </div>
+      <div class="chart-container card" style="position: relative; height:300px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <canvas id="sentimentSpamChart"></canvas>
+      </div>
+      <div class="chart-container card" style="position: relative; height:300px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <canvas id="countryDistChart"></canvas>
+      </div>
+      <div class="chart-container card" style="position: relative; height:300px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <canvas id="reactionTargetChart"></canvas>
+      </div>
+      <div class="chart-container card" style="grid-column: 1 / -1; position: relative; height:250px; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px;">
+        <canvas id="hourlyHeatmapChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="mt-4 card" style="padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 1rem;">
+      <h4 class="text-sm font-semibold mb-2">🔖 Top Saved Content/Items</h4>
+      <div id="top-saves-container">
+        {{ spinner("Loading top saves…") }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Tab Navigation #}
+{{ admin_tab_navigation("interactions", [
+{"id": "comments", "label": "💬 Comments", "active": true},
+{"id": "reactions", "label": "👍 Reactions"},
+{"id": "views", "label": "👁️ Views"},
+{"id": "clicks", "label": "🛒 Clicks"},
+{"id": "saves", "label": "🔖 Saves"},
+{"id": "shares", "label": "🔗 Shares"}
+]) }}
+
+{# ── Comments Tab ─────────────────────────────────────────── #}
+{% call admin_tab_panel("comments", is_active=true) %}
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4" id="moderation-stats-panel" style="display:none; margin-bottom: 1rem;">
+  <div class="card p-4 border border-[var(--border-color)] rounded-lg text-center bg-[var(--surface-color)]">
+    <div class="text-xs text-muted font-semibold uppercase tracking-wider">New Comments (24h)</div>
+    <div class="text-2xl font-bold mt-1 text-[var(--text-color)]" id="mod-daily-new">-</div>
+  </div>
+  <div class="card p-4 border border-[var(--border-color)] rounded-lg text-center bg-[var(--surface-color)]">
+    <div class="text-xs text-muted font-semibold uppercase tracking-wider">Flagged/Spam (24h)</div>
+    <div class="text-2xl font-bold mt-1 text-[var(--accent-color)]" id="mod-daily-flagged">-</div>
+  </div>
+  <div class="card p-4 border border-red-500 rounded-lg text-center bg-red-50 dark:bg-red-900/20">
+    <div class="text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">Pending Triage</div>
+    <div class="text-2xl font-bold mt-1 text-red-700 dark:text-red-300" id="mod-pending-triage">-</div>
+  </div>
+</div>
+
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("comment-search", "Search comment text…") }}
+  {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
+  ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="",
+  default_text="All Targets", extra_class="filter-select-item") }}
+  <div class="flex items-center gap-2">
+    <span class="filter-label-xs">From:</span>
+    <input type="date" id="filter-comments-start-date" class="dashboard-filter-select filter-select-item" />
+  </div>
+  <div class="flex items-center gap-2">
+    <span class="filter-label-xs">To:</span>
+    <input type="date" id="filter-comments-end-date" class="dashboard-filter-select filter-select-item" />
+  </div>
+  {{ admin_reset_button("clear-comment-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+{{ admin_summary_bar("comments-count", "comments", summary_id="comments-summary") }}
+{{ admin_crud_table(tables["comments"], "Loading comments…") }}
+{{ admin_paginator(domain="comments", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Reactions Tab ────────────────────────────────────────── #}
+{% call admin_tab_panel("reactions") %}
+<div class="admin-tab-panel-body">
+  {% call admin_toolbar_section() %}
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    {{ admin_search_input("reactions-search", "Search target title…") }}
+    {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
+    default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
+    {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon="👤") }}
+    {{ admin_reset_button("clear-reactions-filters-btn", "Reset") }}
+  </div>
+  {% endcall %}
+
+  {{ admin_summary_bar("reactions-count", "reactions", summary_id="reactions-summary") }}
+  {{ admin_crud_table(tables["reactions"], "Loading reactions…", "loading-height-md") }}
+  {{ admin_paginator(domain="reactions", per_page_options=[25, 50], current_per_page=25) }}
+</div>
+{% endcall %}
+
+{# ── Views Tab ────────────────────────────────────────────── #}
+{% call admin_tab_panel("views") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("views-search", "Search target title…") }}
+  <div class="flex items-center gap-2">
+    <span class="filter-label-xs">From:</span>
+    <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item" />
+  </div>
+  <div class="flex items-center gap-2">
+    <span class="filter-label-xs">To:</span>
+    <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item" />
+  </div>
+  {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+{{ admin_summary_bar("views-count", "view targets", summary_id="views-summary") }}
+{{ admin_crud_table(tables["views"], "Loading views…") }}
+{{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Clicks Tab ───────────────────────────────────────────── #}
+{% call admin_tab_panel("clicks") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("clicks-search", "Search item name…") }}
+  {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon="🏪") }}
+  {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+{{ admin_summary_bar("clicks-count", "click logs", summary_id="clicks-summary") }}
+{{ admin_crud_table(tables["clicks"], "Loading clicks…") }}
+{{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Saves Tab ────────────────────────────────────────────── #}
+{% call admin_tab_panel("saves") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("saves-search", "Search target title…") }}
+  {{ admin_search_input("filter-saves-user", "Search user name/email…", icon="👤") }}
+  {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+{{ admin_summary_bar("saves-count", "saves", summary_id="saves-summary") }}
+{{ admin_crud_table(tables["saves"], "Loading saves…") }}
+{{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Shares Tab ────────────────────────────────────────────── #}
+{% call admin_tab_panel("shares") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("shares-search", "Search target title…") }}
+  {{ admin_search_input("filter-shares-user", "Search user name/email…", icon="👤") }}
+  {{ admin_reset_button("clear-shares-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+{{ admin_summary_bar("shares-count", "shares", summary_id="shares-summary") }}
+{{ admin_crud_table(tables["shares"], "Loading shares…") }}
+{{ admin_paginator(domain="shares", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{% block admin_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/interactions.js') }}"></script>
+{% endblock %}
+{% endblock %}

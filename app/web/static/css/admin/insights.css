@@ -59,7 +59,9 @@
     white-space: nowrap;
     letter-spacing: -0.01em;
 }
-.opp-metrics {font-size: var(--text-xs);
+
+.opp-metrics {
+    font-size: var(--text-xs);
     color: var(--muted-foreground);
     margin-bottom: 0.75rem;
 }
@@ -75,12 +77,13 @@
     gap: 0.5rem;
     width: 100%;
 }
+
 .opp-action {
     border-radius: var(--radius-md);
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
     color: var(--foreground);
-gap: 0.35rem;
+    gap: 0.35rem;
 }
 
 .insights-double-grid {
@@ -94,12 +97,13 @@ gap: 0.35rem;
         grid-template-columns: 1fr;
     }
 }
+
 .trend-badge {
     font-size: 11px;
     font-weight: var(--weight-bold);
     padding: 3px 8px;
     border-radius: 6px;
-gap: 3px;
+    gap: 3px;
     letter-spacing: 0.02em;
 }
 
@@ -112,12 +116,13 @@ gap: 3px;
     background: var(--secondary);
     color: var(--muted-foreground);
 }
+
 .insight-group-title {
     font-size: var(--text-xl);
     font-weight: var(--weight-xbold);
     color: var(--foreground);
     margin: 1.75rem 0 1rem 0;
-letter-spacing: -0.02em;
+    letter-spacing: -0.02em;
 }
 
 .insight-group-title::after {
@@ -146,7 +151,9 @@ letter-spacing: -0.02em;
     background: rgba(239, 68, 68, 0.1);
     color: var(--brand-red);
 }
-.publishing-summary-bar {padding: 0.75rem 1.25rem;
+
+.publishing-summary-bar {
+    padding: 0.75rem 1.25rem;
     background: var(--background);
     border-bottom: 1px solid var(--border);
     font-size: var(--text-xs);
@@ -157,11 +164,12 @@ letter-spacing: -0.02em;
 .publishing-summary-item strong {
     color: var(--foreground);
 }
+
 .publishing-column-header {
     padding: 1.25rem;
     font-weight: var(--weight-xbold);
     border-bottom: 1px solid var(--border);
-letter-spacing: -0.01em;
+    letter-spacing: -0.01em;
 }
 
 /* Scoped Styles for Spacing & Spacing Cleanup */
@@ -188,18 +196,22 @@ letter-spacing: -0.01em;
     border-radius: var(--radius-md);
     padding: 1rem;
 }
+
 .benchmark-header {
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     margin-bottom: 0.75rem;
-color: var(--foreground);
+    color: var(--foreground);
 }
-.benchmark-list {flex-direction: column;
+
+.benchmark-list {
+    flex-direction: column;
 }
+
 .benchmark-text-item {
     font-size: var(--text-xs);
     color: var(--muted-foreground);
-flex-direction: column;
+    flex-direction: column;
 }
 
 .benchmark-divider {
@@ -212,11 +224,12 @@ flex-direction: column;
 .quality-score-section {
     margin-top: 1.25rem;
 }
+
 .quality-score-header {
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
     margin-bottom: 0.75rem;
-color: var(--foreground);
+    color: var(--foreground);
 }
 
 /* Action Suggestions panel scroll */
@@ -266,18 +279,20 @@ color: var(--foreground);
     margin: 0 0 0.5rem 0;
     font-style: italic;
 }
+
 .rec-action-box {
     background: var(--background);
     border: 1px solid var(--border);
-flex-direction: column;
-gap: 0.35rem;
+    flex-direction: column;
+    gap: 0.35rem;
     font-size: var(--text-sm);
     padding: 0.75rem;
     border-radius: var(--radius-sm);
 }
+
 .rec-action-box-header {
     color: var(--foreground);
-gap: 0.35rem;
+    gap: 0.35rem;
     font-weight: var(--weight-bold);
 }
 
@@ -302,21 +317,23 @@ gap: 0.35rem;
     gap: 1rem;
     padding: 1.25rem;
 }
+
 .kanban-column {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: none;
-flex-direction: column;
+    flex-direction: column;
     min-height: 200px;
     overflow: hidden;
 }
+
 .kanban-column-body {
     padding: 1rem;
     overflow-y: auto;
     flex: 1;
     max-height: 480px;
-flex-direction: column;
+    flex-direction: column;
 }
 
 .kanban-task-card {
@@ -333,8 +350,11 @@ flex-direction: column;
     border-color: rgba(var(--brand-blue-rgb), 0.35);
     box-shadow: var(--insights-hover-shadow);
 }
-.kanban-task-header {margin-bottom: 0.5rem;
+
+.kanban-task-header {
+    margin-bottom: 0.5rem;
 }
+
 .kanban-task-platform {
     font-size: 11px;
     font-weight: var(--weight-bold);
@@ -365,13 +385,14 @@ flex-direction: column;
     border-radius: 2px;
     margin-top: 0.5rem;
 }
+
 .kanban-task-risk {
     margin-top: 0.6rem;
     font-size: 11px;
     color: var(--brand-red);
     font-weight: var(--weight-bold);
     line-height: 1.3;
-flex-direction: column;
+    flex-direction: column;
 }
 
 .kanban-task-log {
@@ -398,7 +419,7 @@ flex-direction: column;
     padding-left: 0;
     margin: 0;
     font-size: 13px;
-flex-direction: column;
+    flex-direction: column;
 }
 
 .asset-mapping-details {
@@ -407,7 +428,7 @@ flex-direction: column;
     padding: 1.25rem;
     margin: 0.5rem 1rem 1rem 1rem;
     border: 1px solid var(--border);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .asset-mapping-details h6 {
@@ -431,7 +452,9 @@ flex-direction: column;
     border-color: rgba(var(--brand-blue-rgb), 0.35);
     box-shadow: var(--shadow-md);
 }
-.asset-mapping-item-header {margin-bottom: 0.25rem;
+
+.asset-mapping-item-header {
+    margin-bottom: 0.25rem;
 }
 
 .asset-mapping-item-title {
@@ -447,13 +470,14 @@ flex-direction: column;
 
 .accuracy-panel-body {
     padding: 1.25rem;
-flex-direction: column;
+    flex-direction: column;
 }
+
 .insights-accuracy-card {
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem;
 }
 
 .insights-accuracy-title {
@@ -477,10 +501,11 @@ padding: 1rem 1.25rem;
     letter-spacing: -0.02em;
     line-height: 1;
 }
+
 .insights-failures-scroll {
     max-height: 320px;
     overflow-y: auto;
-flex-direction: column;
+    flex-direction: column;
 }
 
 .failure-card {
@@ -492,7 +517,9 @@ flex-direction: column;
     width: 100%;
     box-shadow: var(--insights-card-shadow);
 }
-.failure-header {margin-bottom: 0.35rem;
+
+.failure-header {
+    margin-bottom: 0.35rem;
 }
 
 .failure-type {
@@ -539,61 +566,61 @@ flex-direction: column;
 /* additions for refactor */
 
 .kanban-column {
-  min-width: 280px;
-  display: flex;
-  flex-direction: column;
-  vertical-align: top;
-  margin-right: 1rem;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    vertical-align: top;
+    margin-right: 1rem;
 }
 
 .kanban-column-body {
-  padding: 0.5rem 0;
+    padding: 0.5rem 0;
 }
 
 .kanban-task-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 0.75rem;
-  margin-bottom: 0.75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .asset-mapping-details-row {
-  display: none;
+    display: none;
 }
 
 .asset-mapping-actions .asset-mapping-details-toggle i {
-  transition: transform .2s;
+    transition: transform .2s;
 }
 
 .action-card-details {
-  display: none;
+    display: none;
 }
 
 /* --- Semantic Classes (replaces inline styles) --- */
 
 /* Replaces style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;" on intent-opportunities-list */
 .intent-opportunities-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
 }
 
 @media (max-width: 1100px) {
-  .intent-opportunities-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+    .intent-opportunities-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-  .intent-opportunities-grid {
-    grid-template-columns: 1fr;
-  }
+    .intent-opportunities-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Replaces inline style on timeframe-select in header */
 .insights-timeframe-select {
-  min-width: 140px;
-  height: 36px;
-  padding: 0.375rem 2rem 0.375rem 0.75rem;
-}
+    min-width: 140px;
+    height: 36px;
+    padding: 0.375rem 2rem 0.375rem 0.75rem;
+}

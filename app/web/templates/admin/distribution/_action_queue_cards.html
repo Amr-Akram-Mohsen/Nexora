@@ -1,4 +1,4 @@
-{% from "admin/control_panel/insights/_components.html" import opportunity_card %}
+{% from "admin/distribution/_components.html" import opportunity_card %}
 {% if items %}
   {% for item in items %}
     {% set priorityBadgeClass = "badge-danger" if item.priority == "High" else "badge-warning" if item.priority == "Medium" else "badge-secondary" %}

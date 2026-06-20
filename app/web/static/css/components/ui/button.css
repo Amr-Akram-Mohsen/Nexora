@@ -1,5 +1,5 @@
-
-.btn {/* gap-2 */
+.btn {
+  /* gap-2 */
   font-size: var(--text-sm);
   /* text-sm */
   border-radius: var(--radius-md);

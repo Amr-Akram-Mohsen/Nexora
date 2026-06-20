@@ -8,7 +8,7 @@ export function renderAutonomousExecution() {
   const timeframe = document.getElementById("timeframe-select")?.value || "7_days";
 
   fetchAndInjectHtml(
-    `/admin/insights/widget/autonomous-execution?time_frame=${timeframe}`,
+    `/admin/distribution/widget/autonomous-execution?time_frame=${timeframe}`,
     'autonomous-execution-body-wrapper',
     'Preparing autonomous queues...'
   );
