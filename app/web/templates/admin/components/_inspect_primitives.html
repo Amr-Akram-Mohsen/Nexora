@@ -1,0 +1,127 @@
+{# app/web/templates/admin/components/_inspect_primitives.html #}
+
+{% macro inspect_card(title, icon="", body_class="") %}
+<div class="profile-section-card flex gap-3">
+  {% if title or icon %}
+  <div class="profile-section-title gap-2 flex items-center">
+    {% if icon %}<span>{{ icon }}</span>{% endif %}
+    {% if title %}<span>{{ title }}</span>{% endif %}
+  </div>
+  {% endif %}
+  <div class="inspect-card-body {{ body_class }}">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro inspect_metric_grid() %}
+<div class="profile-metric-grid">
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro inspect_metric_item(value, label) %}
+<div class="profile-metric-card">
+  <div class="profile-metric-val">{{ value }}</div>
+  <div class="profile-metric-lbl">{{ label }}</div>
+</div>
+{% endmacro %}
+
+{% macro inspect_sentiment_bar(pos, neu, neg) %}
+{% set total = pos + neu + neg %}
+{% if total > 0 %}
+  {% set pos_pct = ((pos / total) * 100)|round %}
+  {% set neu_pct = ((neu / total) * 100)|round %}
+  {% set neg_pct = ((neg / total) * 100)|round %}
+{% else %}
+  {% set pos_pct, neu_pct, neg_pct = 0, 0, 0 %}
+{% endif %}
+<div class="flex justify-between items-center">
+  <span class="sentiment-pos-text">Positive: {{ pos }}</span>
+  <span class="sentiment-neu-text">Neutral: {{ neu }}</span>
+  <span class="sentiment-neg-text">Negative: {{ neg }}</span>
+</div>
+<div class="profile-sentiment-bar flex">
+  {% if total > 0 %}
+    {% if pos > 0 %}<div class="sentiment-pos" style="width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>{% endif %}
+    {% if neu > 0 %}<div class="sentiment-neu" style="width: {{ neu_pct }}%" title="Neutral: {{ neu_pct }}%"></div>{% endif %}
+    {% if neg > 0 %}<div class="sentiment-neg" style="width: {{ neg_pct }}%" title="Negative: {{ neg_pct }}%"></div>{% endif %}
+  {% else %}
+    <div class="sentiment-empty" title="No Sentiment Data"></div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro inspect_store_card(lnk) %}
+<div class="inspect-store-card">
+  <div class="inspect-store-card-header flex justify-between items-center flex-wrap gap-2">
+    <div>
+      <strong class="inspect-store-card-name">{{ lnk.store_name }}</strong>
+      <span class="inspect-store-card- status-badge">{{ lnk.affiliate_network }}</span>
+    </div>
+    <div>
+      <span class="inspect-store-availability status-badge {{ 'active' if lnk.availability == 'in_stock' else 'inactive' }}">
+        {{ "In Stock" if lnk.availability == 'in_stock' else (lnk.availability or "Out of Stock") }}
+      </span>
+    </div>
+  </div>
+  <div class="inspect-store-card-grid">
+    <div><strong>Program:</strong> <span>{{ lnk.program_name or "—" }}</span></div>
+    <div><strong>Price:</strong> <span>{{ "%.2f"|format(lnk.price) ~ " " ~ (lnk.currency or "") if lnk.price is not none else "—" }}</span></div>
+  </div>
+  <div class="inspect-store-card-links flex gap-1">
+    <div><strong>Original URL:</strong> <a target="_blank" class="inspect-link" href="{{ lnk.original_url }}">{{ lnk.original_url }}</a></div>
+    <div><strong>Affiliate URL:</strong> <a target="_blank" class="inspect-link" href="{{ lnk.affiliate_url }}">{{ lnk.affiliate_url }}</a></div>
+  </div>
+  <div >
+    <span class="inspect-store-card-meta-label">Network Tracking Metadata:</span>
+    {% if lnk.metadata %}
+    <div class="inspect-store-card-meta-box">
+      {% for k, v in lnk.metadata.items() %}
+      <div><strong>{{ k }}: </strong>{{ v | tojson }}</div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="inspect-store-card-meta-empty">No raw network tracking metadata.</div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro inspect_distribution_card(post) %}
+<div class="inspect-store-card">
+  <div class="inspect-store-card-header flex justify-between items-center flex-wrap gap-2">
+    <div>
+      <strong class="inspect-store-card-name">{{ post.platform | title }}</strong>
+    </div>
+    <div>
+      <span class="status-badge {{ '' if post.status == 'published' else '' }}">
+        {{ post.status | title }}
+      </span>
+    </div>
+  </div>
+  <div class="inspect-store-card-grid">
+    <div><strong>Published At:</strong> <span>{{ post.publish_date }}</span></div>
+    <div class="flex gap-md">
+      <span><i class="bi bi-eye"></i> {{ post.views }}</span>
+      <span><i class="bi bi-heart"></i> {{ post.likes }}</span>
+      <span><i class="bi bi-cursor"></i> {{ post.clicks }}</span>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro inspect_tag_list(tags, label) %}
+<div>
+  <div class="profile-metric-lbl">{{ label }}</div>
+  <div class="flex flex-wrap gap-1">
+    {% if tags %}
+      {% for tag in tags %}
+      <span class="status-badge">{{ tag[0] if tag is iterable and not tag is string else tag }}</span>
+      {% endfor %}
+    {% else %}
+      <span >No {{ label | lower }} data available</span>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

@@ -163,3 +163,85 @@ class AdminListController {
     }
   }
 }
+
+// ==============================
+// INSPECT MODAL HELPER
+// ==============================
+window.openInspectModal = function(url, modalId, title) {
+  const modal = document.getElementById(modalId);
+  const titleEl = document.getElementById(`${modalId}-title`);
+  if (titleEl && title) {
+    titleEl.textContent = title;
+  }
+  
+  if (modal) {
+    modal.classList.add("active");
+  }
+  
+  if (typeof fetchAndInjectHtml === "function") {
+    return fetchAndInjectHtml(url, `${modalId}-body`, 'Loading details...');
+  } else {
+    console.error("fetchAndInjectHtml is not defined");
+    return Promise.reject("fetchAndInjectHtml is missing");
+  }
+};
+
+// ==============================
+// GLOBAL INSPECT HANDLER
+// ==============================
+document.addEventListener("click", e => {
+  const btn = e.target.closest('[data-action="global-inspect"]');
+  if (!btn) return;
+  
+  const domain = btn.dataset.domain;
+  const id = btn.dataset.id;
+  const title = btn.dataset.title;
+  let url = btn.dataset.url;
+  
+  if (!url) {
+    if (domain === "source" || domain === "store") {
+      url = `/admin/providers/${domain}s/${id}/inspect`;
+    } else if (domain === "rec") {
+      const parts = id.split('-');
+      url = `/admin/recommendations/matches/${parts[0]}/${parts[1]}/inspect`;
+    } else if (["category", "brand", "topic", "section"].includes(domain)) {
+      const plural = domain === "category" ? "categories" : `${domain}s`;
+      url = `/admin/taxonomy/${plural}/${id}/inspect`;
+    } else if (domain === "comment") {
+      url = `/admin/interactions/comments/${id}/inspect`;
+    } else {
+      url = `/admin/${domain}s/${id}/inspect`;
+    }
+  }
+  
+  const modalId = `inspect-${domain}-modal`;
+  const modalTitle = title ? `Inspect: ${title}` : `Inspect ${domain.charAt(0).toUpperCase() + domain.slice(1)}`;
+  
+  if (typeof window.openInspectModal === "function") {
+    window.openInspectModal(url, modalId, modalTitle);
+  }
+});
+
+// ==============================
+// GENERIC CRUD BOOTSTRAP
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  const crudMarker = document.querySelector('[data-crud-domain]');
+  if (crudMarker) {
+    const domain = crudMarker.dataset.crudDomain;
+    const endpoint = crudMarker.dataset.crudEndpoint || `/admin/${domain}`;
+    const rowsEndpoint = crudMarker.dataset.crudRowsEndpoint || `${endpoint}/rows`;
+    
+    // Only auto-init if there isn't already a script handling this domain
+    if (!window[`${domain}Controller`]) {
+      const controller = new AdminListController({
+        domain: domain,
+        endpoint: endpoint,
+        rowsEndpoint: rowsEndpoint,
+        autoInit: false
+      });
+      controller.init();
+      window[`${domain}Controller`] = controller;
+    }
+  }
+});

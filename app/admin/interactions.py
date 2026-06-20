@@ -58,34 +58,7 @@ def list_comments():
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    # Batch-load user info
-    user_ids = {c.user_id for c in pagination.items}
-    users = {}
-    if user_ids:
-        rows = db.session.execute(
-            select(User.id, User.name, User.email).where(User.id.in_(user_ids))
-        ).mappings().all()
-        users = {r["id"]: r for r in rows}
-
-    # Batch-load target titles
-    content_ids = {c.target_id for c in pagination.items if c.target_type == "content"}
-    item_ids    = {c.target_id for c in pagination.items if c.target_type == "item"}
-    content_titles = {}
-    item_names     = {}
-
-    if content_ids:
-        from app.domains.content.models import Content
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-
-    if item_ids:
-        from app.domains.item.models import Item
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
 
     serialized = []
     for c in pagination.items:
@@ -184,34 +157,10 @@ def list_reactions():
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    # Batch user info
-    user_ids = {r.user_id for r in pagination.items}
-    users = {}
-    if user_ids:
-        rows = db.session.execute(
-            select(User.id, User.name, User.email).where(User.id.in_(user_ids))
-        ).mappings().all()
-        users = {r["id"]: r for r in rows}
-
-    content_ids = {r.target_id for r in pagination.items if r.target_type == "content"}
-    item_ids = {r.target_id for r in pagination.items if r.target_type == "item"}
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
+    
     comment_ids = {r.target_id for r in pagination.items if r.target_type == "comment"}
-    content_titles = {}
-    item_names = {}
     comment_previews = {}
-
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
-
     if comment_ids:
         rows = db.session.execute(
             select(Comment.id, Comment.content).where(Comment.id.in_(comment_ids))
@@ -232,7 +181,7 @@ def list_reactions():
             "id":          r.id,
             "type":        r.type,
             "user_id":     r.user_id,
-            "user_name":   user["name"] if user else f"User #{r.user_id}",
+            "username":   user["name"] if user else f"User #{r.user_id}",
             "user_email":  user["email"] if user else None,
             "target_type": r.target_type,
             "target_id":   r.target_id,
@@ -301,22 +250,7 @@ def list_views():
     paginated_stmt = stmt.limit(per_page).offset((page - 1) * per_page)
     items = db.session.execute(paginated_stmt).all()
 
-    content_ids = {v.target_id for v in items if v.target_type == "content"}
-    item_ids = {v.target_id for v in items if v.target_type == "item"}
-    content_titles = {}
-    item_names = {}
-
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
+    content_titles, item_names = _load_target_titles(items)
 
     import math
     pages = math.ceil(total / per_page) if per_page > 0 else 1
@@ -450,30 +384,7 @@ def list_saves():
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    user_ids = {s.user_id for s in pagination.items}
-    users = {}
-    if user_ids:
-        rows = db.session.execute(
-            select(User.id, User.name, User.email).where(User.id.in_(user_ids))
-        ).mappings().all()
-        users = {r["id"]: r for r in rows}
-
-    content_ids = {s.target_id for s in pagination.items if s.target_type == "content"}
-    item_ids = {s.target_id for s in pagination.items if s.target_type == "item"}
-    content_titles = {}
-    item_names = {}
-
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
 
     serialized = []
     for s in pagination.items:
@@ -526,13 +437,14 @@ def _serialize_comment(c, users, content_titles, item_names):
         "sentiment":    c.sentiment or "neutral",
         "target_type":  c.target_type,
         "target_id":    c.target_id,
+        "replies":    c.replies,
         "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
         "created_at":   c.created_at.isoformat() if c.created_at else None,
     }
 
 
-def _load_comment_context(items):
-    """Batch-load user info and target titles for a list of comments."""
+def _load_interaction_context(items):
+    """Batch-load user info and target titles for a list of interaction items."""
     from app.domains.content.models import Content
     from app.domains.item.models import Item
     user_ids     = {c.user_id for c in items}
@@ -598,18 +510,19 @@ def comments_rows():
     if search:      stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, content_titles, item_names = _load_comment_context(pagination.items)
+    users, content_titles, item_names = _load_interaction_context(pagination.items)
     serialized = [_serialize_comment(c, users, content_titles, item_names) for c in pagination.items]
 
     display_items = [
         {
             "id": c["id"],
-            "preview": c["preview"],
-            "user_name": c["user_name"],
-            "target": c["target_title"],
+            "title": c["target_title"],
             "target_type": c["target_type"],
+            "preview": c["preview"],
             "sentiment": c["sentiment"],
-            "date": c["created_at"][:10] if c["created_at"] else "—"
+            "replies-count": str(len(c["replies"])),
+            "date": c["created_at"][:10] if c["created_at"] else "—",
+            "username": c["user_name"],
         } for c in serialized
     ]
 
@@ -625,12 +538,128 @@ def comments_rows():
 @bp.route("/comments/<int:id>/inspect", methods=["GET"])
 def inspect_comment(id):
     """Return server-rendered HTML for the comment inspect modal body."""
-    comment = db.session.get(Comment, id)
+    from sqlalchemy.orm import selectinload
+    stmt = select(Comment).options(
+        selectinload(Comment.user),
+        selectinload(Comment.content_target),
+        selectinload(Comment.item),
+        selectinload(Comment.parent),
+        selectinload(Comment.replies)
+    ).where(Comment.id == id)
+    comment = db.session.scalar(stmt)
+    
     if not comment:
         return "<p class='text-muted'>Comment not found.</p>", 404
-    users, content_titles, item_names = _load_comment_context([comment])
-    data = _serialize_comment(comment, users, content_titles, item_names)
-    return render_template("admin/control_panel/interactions/_comments_inspect.html", comment=data)
+    
+    from app.admin.tables import get_inspect_table
+    
+    target_title = comment.target.title if comment.target_type == 'content' and comment.target else (comment.target.name if comment.target else f"{comment.target_type.capitalize()} #{comment.target_id}")
+    
+    parent_context = "—"
+    if comment.parent:
+        parent_context = comment.parent.content[:60] + ("…" if len(comment.parent.content) > 60 else "")
+
+    latest_replies = "—"
+    if comment.replies:
+        sorted_replies = sorted(comment.replies, key=lambda r: r.created_at, reverse=True)
+        latest_replies = "<br>".join([f"• {r.content[:40]}..." for r in sorted_replies[:3]])
+
+    data = {
+        "id": f"#{comment.id}",
+        "comment": comment.content,
+        "sentiment": comment.sentiment or "neutral",
+        "confidence": str(round(comment.confidence, 2)) if comment.confidence else "—",
+        "likes": "{:,}".format(comment.like_count),
+        "dislikes": "{:,}".format(comment.dislike_count),
+        "shares": "{:,}".format(comment.share_count),
+        "replies count": str(comment.replies_count),
+        
+        "user id": str(comment.user_id),
+        "user name": comment.user.name if comment.user else "—",
+        "user email": comment.user.email if comment.user else "—",
+        
+        "parent context": parent_context,
+        "latest replies": {"value": latest_replies, "is_custom": True} if latest_replies != "—" else "—",
+        
+        "target type": comment.target_type,
+        "target title": target_title,
+        "date": comment.created_at.isoformat()[:10] if comment.created_at else "—",
+    }
+    inspect_table = get_inspect_table("comments", data)
+
+    actions = [
+        {
+            "label": "Already Flagged" if comment.sentiment == 'spam' else "Flag as Spam",
+            "action_type": "toggle-active",
+            "icon": "🚩",
+            "disabled": True if comment.sentiment == 'spam' else False,
+            "attrs": {"data-action": "flag-comment", "data-id": comment.id}
+        },
+        {
+            "label": "Delete Comment",
+            "action_type": "delete",
+            "icon": "🗑",
+            "extra_class": "inspect-delete-btn",
+            "attrs": {"data-action": "delete-comment", "data-id": comment.id}
+        }
+    ]
+
+    return render_template(
+        "admin/components/_inspect.html",
+        inspect_table=inspect_table,
+        actions=actions
+    )
+
+@bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
+def inspect_clicks(link_id):
+    """Return server-rendered HTML for recent clicks on a given store link."""
+    from app.domains.item.models import ItemStoreLink, Store, ItemVariant, Item
+    
+    stmt = (
+        select(ItemStoreLink.id.label("link_id"), ItemStoreLink.affiliate_url, Store.name.label("store_name"), Item.name.label("item_name"))
+        .select_from(ItemStoreLink)
+        .join(Store, ItemStoreLink.store_id == Store.id)
+        .join(ItemVariant, ItemStoreLink.variant_id == ItemVariant.id)
+        .join(Item, ItemVariant.item_id == Item.id)
+        .where(ItemStoreLink.id == link_id)
+    )
+    link_data = db.session.execute(stmt).mappings().first()
+    
+    if not link_data:
+         return "<p class='text-muted'>Link data not found.</p>", 404
+
+    from app.admin.tables import get_inspect_table
+    
+    total_clicks = db.session.scalar(select(func.count()).select_from(ItemClick).where(ItemClick.item_store_link_id == link_id)) or 0
+    latest_click = db.session.scalar(select(func.max(ItemClick.created_at)).where(ItemClick.item_store_link_id == link_id))
+    
+    recent_clicks = db.session.execute(
+        select(ItemClick).where(ItemClick.item_store_link_id == link_id).order_by(ItemClick.created_at.desc()).limit(5)
+    ).scalars().all()
+    
+    data = {
+        "store name": link_data["store_name"],
+        "item name": link_data["item_name"],
+        "total clicks": str(total_clicks),
+        "latest click": latest_click.isoformat()[:10] if latest_click else "—"
+    }
+    
+    for i, click in enumerate(recent_clicks):
+        data[f"click {i+1}"] = {
+            "value": f"<b>IP:</b> {click.ip_address or '—'} <br> <b>Country:</b> {click.country or '—'} <br> <b>User Agent:</b> {click.user_agent or '—'}",
+            "is_custom": True
+        }
+        
+    for i in range(len(recent_clicks), 5):
+        data[f"click {i+1}"] = "—"
+        
+    inspect_table = get_inspect_table("clicks", data)
+    
+    return render_template(
+        "admin/components/_inspect.html",
+        inspect_table=inspect_table,
+        actions=[]
+    )
 
 
 @bp.route("/reactions/rows", methods=["GET"])
@@ -660,8 +689,8 @@ def reactions_rows():
             "id": r.id,
             "target": tt or f"{r.target_type.capitalize()} #{r.target_id}",
             "target_type": r.target_type,
-            "type": r.type,
-            "user_name": user["name"] if user else f"User #{r.user_id}",
+            "reaction_type": r.type,
+            "username": user["name"] if user else f"User #{r.user_id}",
             "date": r.created_at.isoformat()[:10] if r.created_at else "—",
         })
 
@@ -725,22 +754,7 @@ def views_rows():
     paginated_stmt = stmt.limit(per_page).offset((page - 1) * per_page)
     items = db.session.execute(paginated_stmt).all()
 
-    content_ids = {v.target_id for v in items if v.target_type == "content"}
-    item_ids = {v.target_id for v in items if v.target_type == "item"}
-    content_titles = {}
-    item_names = {}
-
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
+    content_titles, item_names = _load_target_titles(items)
 
     import math
     pages = math.ceil(total / per_page) if per_page > 0 else 1
@@ -756,7 +770,7 @@ def views_rows():
             "id": f"{v.target_type}-{v.target_id}",
             "target": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
             "target_type": v.target_type,
-            "view_count": "{:,}".format(v.view_count or 0),
+            "view-count": "{:,}".format(v.view_count or 0),
             "date": v.latest_view.isoformat()[:10] if v.latest_view else "—"
         })
 
@@ -803,9 +817,9 @@ def clicks_rows():
     pages = max(1, (total + per_page - 1) // per_page)
     serialized = [{
         "id": r["affiliate_url"],
-        "item_name": r["item_name"],
-        "store_name": {"name": r["store_name"], "url": r["affiliate_url"]},
-        "click_count": "{:,}".format(r["click_count"] or 0),
+        "name": r["item_name"],
+        "store-name": {"name": r["store_name"], "url": r["affiliate_url"]},
+        "click-count": "{:,}".format(r["click_count"] or 0),
         "date": r["created_at"].isoformat()[:10] if r["created_at"] else "—",
     } for r in rows]
 
@@ -844,7 +858,7 @@ def saves_rows():
             "id": s.id,
             "target": tt or f"{s.target_type.capitalize()} #{s.target_id}",
             "target_type": s.target_type,
-            "user_name": user["name"] if user else f"User #{s.user_id}",
+            "username": user["name"] if user else f"User #{s.user_id}",
             "date": s.created_at.isoformat()[:10] if s.created_at else "—",
         })
 

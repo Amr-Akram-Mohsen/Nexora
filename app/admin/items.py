@@ -79,6 +79,39 @@ def get_item_meta():
     })
 
 
+def _load_item_aggregates(page_ids):
+    min_price_rows = db.session.execute(
+        select(
+            ItemVariant.item_id,
+            func.min(ItemVariant.price).label("min_price"),
+            ItemVariant.currency,
+        )
+        .where(ItemVariant.item_id.in_(page_ids), ItemVariant.price != None)
+        .group_by(ItemVariant.item_id, ItemVariant.currency)
+        .order_by(ItemVariant.item_id, func.min(ItemVariant.price))
+    ).all()
+
+    min_price_map: dict[int, dict] = {}
+    for r in min_price_rows:
+        if r.item_id not in min_price_map:
+            min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
+
+    store_rows = db.session.execute(
+        select(
+            ItemVariant.item_id,
+            func.count(ItemStoreLink.id).label("active_links"),
+        )
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(
+            ItemVariant.item_id.in_(page_ids),
+            ItemStoreLink.is_active.is_(True),
+        )
+        .group_by(ItemVariant.item_id)
+    ).all()
+
+    store_info_map = {r.item_id: int(r.active_links) for r in store_rows}
+    return min_price_map, store_info_map
+
 @bp.route("/", methods=["GET"])
 def list_items():
     """Paginated, filterable item listing for the admin control panel."""
@@ -89,26 +122,6 @@ def list_items():
     brand_slug    = request.args.get("brand")
     category_slug = request.args.get("category")
     source_slug   = request.args.get("source")
-
-    # ── Build base query with SQL subqueries for aggregated fields (R-15) ─
-    # min_price subquery: lowest price across all variants for each item
-    min_price_sq = (
-        select(func.min(ItemVariant.price), ItemVariant.currency)
-        .where(ItemVariant.item_id == Item.id)
-        .order_by(func.min(ItemVariant.price))
-        .limit(1)
-        .correlate(Item)
-        .scalar_subquery()
-    )
-
-    # store_count subquery: number of active store links across all variants
-    store_count_sq = (
-        select(func.count(ItemStoreLink.id))
-        .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
-        .where(ItemVariant.item_id == Item.id, ItemStoreLink.is_active == True)
-        .correlate(Item)
-        .scalar_subquery()
-    )
 
     stmt = select(Item).options(joinedload(Item.brand), joinedload(Item.category))
 
@@ -131,66 +144,14 @@ def list_items():
     stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-    # ── Compute aggregated values for this page in bulk (R-15) ────────────
     page_ids = [item.id for item in pagination.items]
 
-    # Fetch min price per item
-    min_price_rows = db.session.execute(
-        select(
-            ItemVariant.item_id,
-            func.min(ItemVariant.price).label("min_price"),
-            ItemVariant.currency,
-        )
-        .where(ItemVariant.item_id.in_(page_ids), ItemVariant.price != None)
-        .group_by(ItemVariant.item_id, ItemVariant.currency)
-        .order_by(ItemVariant.item_id, func.min(ItemVariant.price))
-    ).all()
+    min_price_map, store_info_map = _load_item_aggregates(page_ids)
 
-    # Keep only the lowest per item_id (in case of multi-currency)
-    min_price_map: dict[int, dict] = {}
-    for r in min_price_rows:
-        if r.item_id not in min_price_map:
-            min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
-
-    # Fetch active store link counts per item
-    # store_count_rows = db.session.execute(
-    #     select(
-    #         ItemVariant.item_id,
-    #         func.count(ItemStoreLink.id).label("active_links"),
-    #     )
-    #     .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-    #     .where(ItemVariant.item_id.in_(page_ids), ItemStoreLink.is_active == True)
-    #     .group_by(ItemVariant.item_id)
-    # ).all()
-
-    # Fetch active store link counts per item
-    store_rows = db.session.execute(
-        select(
-            ItemVariant.item_id,
-            func.count(ItemStoreLink.id).label("active_links"),
-        )
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .where(
-            ItemVariant.item_id.in_(page_ids),
-            ItemStoreLink.is_active.is_(True),
-        )
-        .group_by(ItemVariant.item_id)
-    ).all()
-
-    store_info_map: dict[int, dict] = {
-        r.item_id: {
-            "active_links": int(r.active_links),
-        }
-        for r in store_rows
-    }
-
-    # ── Serialize (no ORM relationship traversal needed for list view) ────
     serialized = []
     for item in pagination.items:
         price_info  = min_price_map.get(item.id, {})
-        store_info  = store_info_map.get(item.id, {})
-        store_count = store_info.get("active_links", 0)
+        store_count = store_info_map.get(item.id, 0)
 
         serialized.append({
             "id":          item.id,
@@ -298,24 +259,7 @@ def items_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     page_ids = [item.id for item in pagination.items]
 
-    min_price_rows = db.session.execute(
-        select(ItemVariant.item_id, func.min(ItemVariant.price).label("min_price"), ItemVariant.currency)
-        .where(ItemVariant.item_id.in_(page_ids), ItemVariant.price != None)
-        .group_by(ItemVariant.item_id, ItemVariant.currency)
-        .order_by(ItemVariant.item_id, func.min(ItemVariant.price))
-    ).all()
-    min_price_map: dict[int, dict] = {}
-    for r in min_price_rows:
-        if r.item_id not in min_price_map:
-            min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
-
-    store_rows = db.session.execute(
-        select(ItemVariant.item_id, func.count(ItemStoreLink.id).label("active_links"))
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .where(ItemVariant.item_id.in_(page_ids), ItemStoreLink.is_active.is_(True))
-        .group_by(ItemVariant.item_id)
-    ).all()
-    store_info_map = {r.item_id: int(r.active_links) for r in store_rows}
+    min_price_map, store_info_map = _load_item_aggregates(page_ids)
 
     serialized = []
     for item in pagination.items:
@@ -324,10 +268,10 @@ def items_rows():
             "id":          item.id,
             "name":        item.name,
             "taxonomy": f'{item.category.name} / {item.brand.name}',
-            "min_price":   f'{price_info.get("price")} {price_info.get("currency")}',
-            "store_count": store_info_map.get(item.id, 0),
-            "click_count": item.click_count or 0,
-            "created_at":  item.created_at.isoformat() if item.created_at else None,
+            "price":   f'{price_info.get("price")} {price_info.get("currency")}',
+            "store-count": store_info_map.get(item.id, 0),
+            "click-count": item.click_count or 0,
+            "created-at":  item.created_at.isoformat() if item.created_at else None,
         })
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='item')
@@ -339,16 +283,34 @@ def items_rows():
     )
 
 
-@bp.route("/<int:id>/inspect", methods=["GET"])
-def inspect_item(id):
-    """Return server-rendered HTML for the item inspect modal body."""
-    item = db.session.get(Item, id)
+def build_item_inspect_data(id):
+    """Return dictionary of data needed for the item inspect/detail view."""
+    from sqlalchemy.orm import selectinload, joinedload
+    item = db.session.scalar(
+        select(Item).options(
+            joinedload(Item.category),
+            joinedload(Item.brand),
+            joinedload(Item.source),
+            selectinload(Item.variants).selectinload(ItemVariant.store_links).joinedload(ItemStoreLink.store),
+            selectinload(Item.linked_contents),
+            selectinload(Item.images),
+            selectinload(Item.specifications)
+        ).where(Item.id == id)
+    )
+    
     if not item:
-        return "<p class='text-muted'>Item not found.</p>", 404
+        return None
 
     store_links_data = []
+    last_synced_dates = []
+    
     for v in item.variants:
         for lnk in v.store_links:
+            if lnk.last_synced_at:
+                last_synced_dates.append(lnk.last_synced_at)
+            elif lnk.last_checked_at:
+                last_synced_dates.append(lnk.last_checked_at)
+                
             store_links_data.append({
                 "store_name":        lnk.store.name if lnk.store else "—",
                 "affiliate_network": lnk.store.affiliate_network if lnk.store else "—",
@@ -360,18 +322,71 @@ def inspect_item(id):
                 "availability":      lnk.availability,
                 "is_active":         lnk.is_active,
                 "metadata":          lnk.network_metadata or {},
+                "commission_rate":   float(lnk.commission_rate) if lnk.commission_rate is not None else None,
             })
 
+    last_synced = max(last_synced_dates) if last_synced_dates else None
+
+    from app.admin.helpers import format_date
+    from app.admin.tables import get_inspect_table
+    
+    variant_groups_str = "—"
+    if item.variant_groups:
+        variant_groups_str = ", ".join(f"<b>{k.title()}</b>: {', '.join(v)}" for k, v in item.variant_groups.items())
+
+    price_str = "—"
+    if item.min_price is not None and store_links_data:
+        curr = store_links_data[0]["currency"] if store_links_data else ""
+        price_str = f"{item.min_price} {curr}"
+
     data = {
-        "id":          item.id,
-        "name":        item.name,
-        "item_type":   item.item_type or "—",
-        "brand":       item.brand.name if item.brand else "—",
-        "category":    item.category.name if item.category else "—",
-        "source_name": item.source.name if item.source else "—",
-        "source_slug": item.source.slug if item.source else None,
-        "source_type": item.source_type or "—",
-        "store_links": store_links_data,
+        "id": f"#{item.id}",
+        "name": item.name,
+        "category": item.category.name if item.category else "—",
+        "brand": item.brand.name if item.brand else "—",
+        "source": item.source.name if item.source else "—",
+        "added": format_date(item.created_at, fmt='%b %d, %Y') if item.created_at else "—",
+        "last synced": format_date(last_synced, fmt='%b %d, %Y') if last_synced else "—",
+        "variants count": "{:,}".format(len(item.variants)),
+        "store count": "{:,}".format(len(store_links_data)),
+        "price": price_str,
+        "variant groups": {"value": variant_groups_str, "is_custom": True},
+        
+        "views": "{:,}".format(item.view_count or 0),
+        "likes": "{:,}".format(item.like_count or 0),
+        "dislikes": "{:,}".format(item.dislike_count or 0),
+        "shares": "{:,}".format(item.share_count or 0),
+        "saves": "{:,}".format(item.save_count or 0),
+        "click count": "{:,}".format(item.click_count or 0),
+        
+        "linked contents": "{:,}".format(len(item.linked_contents)),
+        "description": "Yes" if item.description else "No",
+        "rating": str(item.rating) if item.rating is not None else "—",
+        "review count": "{:,}".format(item.review_count or 0),
+        "images count": "{:,}".format(len(item.images)),
+        "specs count": "{:,}".format(len(item.specifications)),
     }
-    return render_template("admin/control_panel/items/_inspect.html", item=data)
+    
+    inspect_table = get_inspect_table("items", data)
+
+    actions = [
+        {
+            "label": "Delete Product",
+            "action_type": "delete",
+            "icon": "🗑",
+            "extra_class": "user-action-delete",
+            "attrs": {"data-action": "delete-item", "data-id": item.id, "data-name": item.name}
+        }
+    ]
+
+    from app.domains.distribution.services import get_distribution_history
+    distribution_history = get_distribution_history("item", id)
+        
+    return {
+        "inspect_table": inspect_table,
+        "store_links": store_links_data,
+        "distribution_history": distribution_history,
+        "actions": actions,
+        "inspect_id": item.id
+    }
 

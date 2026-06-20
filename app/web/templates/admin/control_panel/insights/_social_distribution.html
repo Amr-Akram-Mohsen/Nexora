@@ -1,0 +1,21 @@
+<!-- _social_distribution.html -->
+{% from "admin/components/ui.html" import admin_panel, admin_table_panel, admin_crud_table %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
+<h2 class="insight-group-title flex gap-3 items-center">
+    📱 Social Distribution Tracking
+</h2>
+{% call admin_table_panel("Distribution Lifecycle", "Track drafted, scheduled, and published content across social platforms.", actions='') %}
+    {{ admin_crud_table(tables['social_distribution'], loading_text="Loading distribution history...") }}
+{% endcall %}
+
+<!-- Social Distribution Modal -->
+{% call modal("distributionDraftModal", "Distribution Post", "lg") %}
+<div id="distribution-draft-content">
+    <div >
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div >Loading post details...</div>
+    </div>
+</div>
+{% endcall %}

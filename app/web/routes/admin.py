@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint
-from app.admin.tables import CRUD_TABLES
+from app.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
 from app.core.decorators import admin_required
 
 bp = Blueprint(
@@ -20,7 +20,7 @@ def home():
 
 @bp.route("/insights")
 def dashboard_insights():
-    return render_template("admin/control_panel/insights.html", title="Insights & Opportunities", domain="insights")
+    return render_template("admin/control_panel/insights.html", title="Insights & Opportunities", domain="insights", tables=INSIGHTS_TABLES)
 
 
 @bp.route("/contents")
@@ -59,7 +59,7 @@ def dashboard_stores():
         "admin/control_panel/stores.html",
         title="Stores Management",
         domain="stores",
-        table=CRUD_TABLES["stores"],
+        table=CRUD_TABLES["stores"]        
     )
 
 
@@ -106,3 +106,34 @@ def dashboard_recommendations():
 @bp.route("/settings")
 def settings():
     return render_template("admin/control_panel/settings.html", title="Settings", domain="settings")
+
+
+@bp.route("/contents/<int:id>")
+def content_detail(id):
+    from app.admin.contents import build_content_inspect_data
+    from flask import abort
+    data = build_content_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/details/content_detail.html", title=f"Content {id}", domain="contents", **data)
+
+
+@bp.route("/items/<int:id>")
+def item_detail(id):
+    from app.admin.items import build_item_inspect_data
+    from flask import abort
+    data = build_item_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/details/item_detail.html", title=f"Product {id}", domain="items", **data)
+
+
+@bp.route("/users/<int:id>")
+def user_detail(id):
+    from app.admin.users import build_user_inspect_data
+    from flask import abort
+    data = build_user_inspect_data(id)
+    if not data:
+        abort(404)
+    return render_template("admin/details/user_detail.html", title=f"User {id}", domain="users", **data)
+

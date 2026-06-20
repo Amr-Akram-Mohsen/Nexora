@@ -39,12 +39,12 @@ def require_admin():
 
 # Safe allowlist for sort columns (R-12)
 _CONTENT_SORT_MAP = {
-    "id":           Content.id,
+    "id": Content.id,
     "published_at": Content.published_at,
-    "ingested_at":  Content.ingested_at,
-    "view_count":   Content.view_count,
+    "ingested_at": Content.ingested_at,
+    "view_count": Content.view_count,
     "comment_count": Content.comment_count,
-    "title":        Content.title,
+    "title": Content.title,
 }
 
 
@@ -53,8 +53,8 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
     Serialize a single Content row for the admin listing.
 
     Args:
-        c:                The Content ORM instance.
-        target:           The polymorphic target (Article / Video / Post) or None.
+        c: The Content ORM instance.
+        target: The polymorphic target (Article / Video / Post) or None.
         duplicate_titles: Set of titles known to be duplicated on the current page.
 
     Returns:
@@ -84,24 +84,17 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
         issues.append("duplicate")
 
     return {
-        "id":            c.id,
-        "title":         c.title or f"Untitled ({c.object_type} #{c.id})",
-        "object_type":   c.object_type,
-        "published_at":  c.published_at.isoformat() if c.published_at else None,
-        "ingested_at":   c.ingested_at.isoformat() if c.ingested_at else None,
-        "is_active":     c.is_active,
-        "is_published":  c.is_published,
-        "view_count":    c.view_count or 0,
-        "comment_count": c.comment_count or 0,
-        "category_name": c.category.name if c.category else "Uncategorized",
-        "category_id":   c.category_id,
-        "section_name":  c.section.name if c.section else "Unassigned",
-        "source_name":   source_name,
-        "source_slug":   source_slug,
-        "sources":   sources,
-        "status":        status_val,
-        "url":           canonical_url,
-        "quality_issues": issues,
+        "id": c.id,
+        "title": c.title or '',
+        "metadata": f'''
+        type: {c.object_type}
+        section: {c.section.name}
+        category: {c.category.name}
+        ''',
+        "published-at": c.published_at.isoformat() if c.published_at else None,
+        "sources": sources,
+        "status": 'active' if c.is_active else 'inactive',
+        "renderation-status": 'Published' if c.is_published else 'Draft',
     }
 
 
@@ -203,6 +196,37 @@ def _build_contents_query(args):
     query = query.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
     return query, quality
 
+def _load_content_relations(page_items, quality):
+    """Batch-load polymorphic targets and duplicate titles for a page of contents."""
+    ids_by_type: dict[str, set] = {}
+    for c in page_items:
+        ids_by_type.setdefault(c.object_type, set()).add(c.object_id)
+
+    targets_map = {}
+    for obj_type, ids in ids_by_type.items():
+        model = {"article": Article, "video": Video, "post": Post}.get(obj_type)
+        if model:
+            stmt = select(model).where(model.id.in_(list(ids)))
+            if model == Article:
+                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
+            objs = db.session.execute(stmt).scalars().all()
+            for obj in objs:
+                targets_map[(obj_type, obj.id)] = obj
+
+    duplicate_titles: set = set()
+    if quality == "duplicate":
+        titles = [c.title for c in page_items if c.title]
+        if titles:
+            dup_rows = db.session.execute(
+                select(Content.title)
+                .where(Content.title.in_(titles))
+                .group_by(Content.title)
+                .having(func.count(Content.id) > 1)
+            ).scalars().all()
+            duplicate_titles = set(dup_rows)
+            
+    return targets_map, duplicate_titles
+
 
 def _delete_content_and_relations(content: Content) -> None:
     """
@@ -250,8 +274,8 @@ def get_metadata():
 
     return jsonify({
         "categories": [{"id": c.id, "slug": c.slug, "name": c.name} for c in categories],
-        "sections":   [{"id": s.id, "slug": s.slug, "name": s.name} for s in sections],
-        "sources":    [{"slug": s.slug, "name": s.name} for s in sources],
+        "sections": [{"id": s.id, "slug": s.slug, "name": s.name} for s in sections],
+        "sources": [{"slug": s.slug, "name": s.name} for s in sources],
     })
 
 
@@ -264,35 +288,8 @@ def list_contents():
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     page_items = pagination.items
 
-    # Batch-load polymorphic targets
-    ids_by_type: dict[str, set] = {}
-    for c in page_items:
-        ids_by_type.setdefault(c.object_type, set()).add(c.object_id)
-
-    targets_map = {}
-    for obj_type, ids in ids_by_type.items():
-        model = {"article": Article, "video": Video, "post": Post}.get(obj_type)
-        if model:
-            stmt = select(model).where(model.id.in_(list(ids)))
-            if model == Article:
-                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
-            objs = db.session.execute(stmt).scalars().all()
-            for obj in objs:
-                targets_map[(obj_type, obj.id)] = obj
-
-    # Build duplicate-title set ONLY when the quality=duplicate filter is active.
-    # Otherwise skip the extra GROUP BY+HAVING query entirely (R-05).
-    duplicate_titles: set = set()
-    if quality == "duplicate":
-        titles = [c.title for c in page_items if c.title]
-        if titles:
-            dup_rows = db.session.execute(
-                select(Content.title)
-                .where(Content.title.in_(titles))
-                .group_by(Content.title)
-                .having(func.count(Content.id) > 1)
-            ).scalars().all()
-            duplicate_titles = set(dup_rows)
+    # Batch-load polymorphic targets and duplicate titles
+    targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 
     serialized = [
         _serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
@@ -300,10 +297,10 @@ def list_contents():
     ]
 
     return jsonify({
-        "items":    serialized,
-        "page":     pagination.page,
-        "pages":    pagination.pages,
-        "total":    pagination.total,
+        "items": serialized,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
         "per_page": pagination.per_page,
     })
 
@@ -329,35 +326,14 @@ def contents_rows():
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     page_items = pagination.items
 
-    ids_by_type: dict[str, set] = {}
-    for c in page_items:
-        ids_by_type.setdefault(c.object_type, set()).add(c.object_id)
-    targets_map = {}
-    for obj_type, ids in ids_by_type.items():
-        model = {"article": Article, "video": Video, "post": Post}.get(obj_type)
-        if model:
-            stmt = select(model).where(model.id.in_(list(ids)))
-            if model == Article:
-                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
-            objs = db.session.execute(stmt).scalars().all()
-            for obj in objs:
-                targets_map[(obj_type, obj.id)] = obj
-
-    duplicate_titles: set = set()
-    if quality == "duplicate":
-        titles = [c.title for c in page_items if c.title]
-        if titles:
-            dup_rows = db.session.execute(
-                select(Content.title).where(Content.title.in_(titles)).group_by(Content.title).having(func.count(Content.id) > 1)
-            ).scalars().all()
-            duplicate_titles = set(dup_rows)
+    targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 
     serialized = [
         _serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
         for c in page_items
     ]
 
-    html = render_template("admin/control_panel/contents/_rows.html", items=serialized)
+    html = render_template("admin/components/_rows.html", items=serialized, domain_type="content")
     return make_rows_response(
         html,
         total=pagination.total,
@@ -366,21 +342,124 @@ def contents_rows():
     )
 
 
-@bp.route("/<int:id>/inspect", methods=["GET"])
-def inspect_content(id):
-    """Return server-rendered HTML for the content inspect modal body."""
-    content = db.session.get(Content, id)
+def build_content_inspect_data(id):
+    """Return dictionary of data needed for the content inspect/detail view."""
+    from app.domains.user.models import User
+
+    content = db.session.scalar(
+        select(Content).options(
+            joinedload(Content.category),
+            joinedload(Content.section),
+            joinedload(Content.source),
+            joinedload(Content.gender),
+            joinedload(Content.intent),
+            joinedload(Content.price_tier),
+            selectinload(Content.brands),
+            selectinload(Content.topics),
+            selectinload(Content.linked_items),
+            selectinload(Content.comments).joinedload(Comment.user)
+        ).where(Content.id == id)
+    )
     if not content:
-        return "<p class='text-muted'>Content not found.</p>", 404
+        return None
 
     target = None
     if content.object_type in ("article", "video", "post"):
         model = {"article": Article, "video": Video, "post": Post}.get(content.object_type)
         if model:
-            target = db.session.get(model, content.object_id)
+            stmt = select(model).where(model.id == content.object_id)
+            if model == Article:
+                stmt = stmt.options(selectinload(Article.article_sources).joinedload(ArticleSource.source))
+            target = db.session.scalar(stmt)
 
-    row = _serialize_content_row(content, target, set())
-    return render_template("admin/control_panel/contents/_inspect.html", content=row)
+    sources = []
+    if content.object_type == "article" and target:
+        sources = [s.source.name for s in target.sorted_source_relations if s.source]
+    else:
+        sources = [content.source.name] if content.source else []
+
+    status_val = target.status if target and hasattr(target, "status") else "complete"
+
+    from app.admin.helpers import format_datetime
+    from app.admin.tables import get_inspect_table
+    
+    data = {
+        "id": f"#{content.id}",
+        "title": content.title or "—",
+        "type": content.object_type,
+        "category": content.category.name if content.category else "Uncategorized",
+        "section": content.section.name if content.section else "Unassigned",
+        "related brands": ", ".join(b.name for b in content.brands) if content.brands else "—",
+        "related topics": ", ".join(t.name for t in content.topics) if content.topics else "—",
+        "mentioned products": ", ".join(i.name for i in content.linked_items) if content.linked_items else "—",
+        "available sources": ", ".join(sources) if sources else "—",
+        "primary source": content.source.name if content.source else "—",
+        "ingestion source": content.ingestion_origin if content.ingestion_origin else "—",
+        "published at": format_datetime(content.published_at) or "—",
+        "ingested at": format_datetime(content.ingested_at) or "—",
+        "enrichment status": status_val,
+        "status": "Live Index" if content.is_published else "Draft",
+        "renderation status": "Active" if content.is_active else "Inactive",
+        "views": "{:,}".format(content.view_count or 0),
+        "likes": "{:,}".format(content.like_count or 0),
+        "comments": "{:,}".format(content.comment_count or 0),
+        "shares": "{:,}".format(content.share_count or 0),
+        "intent": content.intent.name if content.intent else "—",
+        "gender": content.gender.name if content.gender else "—",
+        "price tier": content.price_tier.name if content.price_tier else "—",
+        "base score": str(content.score or 0),
+        "review score": str(content.review_score or 0),
+    }
+
+    if content.object_type == "video" and target:
+        data["platform"] = target.platform
+        data["channel"] = target.channel_name or "—"
+    elif content.object_type == "post" and target:
+        data["platform"] = target.platform
+        data["author"] = target.author or "—"
+        data["subreddit"] = target.subreddit or "—"
+    elif content.object_type == "article" and target:
+        data["is scraped"] = "Yes" if target.is_content_scraped else "No"
+        data["word count"] = "{:,}".format(target.word_count or 0)
+        data["article quality score"] = str(target.quality_score or 0)
+
+    inspect_table = get_inspect_table("contents", data)
+    
+    if target and hasattr(target, "url") and target.url:
+        inspect_table["Related Metadata"].append(
+            {"label": "Source Link", "value": f'<a class="activity-target inspect-link" href="{target.url}" target="_blank">View Original Link <i class="fas fa-external-link-alt"></i></a>', "is_custom": True}
+        )
+        
+    recent_comments = sorted(content.comments, key=lambda c: c.created_at or datetime.min, reverse=True)[:3]
+    if recent_comments:
+        for idx, c in enumerate(recent_comments):
+            user_name = c.user.name if c.user else f"User #{c.user_id}"
+            preview = c.content[:100] + ("..." if len(c.content) > 100 else "")
+            inspect_table["Related Metadata"].append({
+                "label": f"Recent Comment {idx+1}",
+                "value": f"<b>{user_name}</b>: {preview}",
+                "is_custom": True
+            })
+
+    actions = [
+        {
+            "label": "Delete Content",
+            "action_type": "delete",
+            "icon": "🗑",
+            "extra_class": "user-action-delete",
+            "attrs": {"data-action": "delete-content", "data-id": content.id, "data-title": (content.title or '')}
+        }
+    ]
+
+    from app.domains.distribution.services import get_distribution_history
+    distribution_history = get_distribution_history("content", id)
+        
+    return {
+        "inspect_table": inspect_table,
+        "distribution_history": distribution_history,
+        "actions": actions,
+        "inspect_id": content.id
+    }
 
 
 @bp.route("/bulk", methods=["POST"])

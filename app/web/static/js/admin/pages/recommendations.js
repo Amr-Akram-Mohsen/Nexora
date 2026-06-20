@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  let listController;
+  window.recController = null;
 
   function loadStats() {
     fetch('/admin/recommendations/stats')
@@ -18,14 +18,14 @@
 
         const template = document.getElementById('rec-stat-card-template');
         const stats = [
-          { icon: '🔗', label: 'Total Matches',    value: data.total_matches   },
-          { icon: '📰', label: 'Linked Contents',  value: data.linked_contents },
-          { icon: '🛍️', label: 'Linked Products', value: data.linked_items    },
+          { icon: '🔗', label: 'Total Matches', value: data.total_matches },
+          { icon: '📰', label: 'Linked Contents', value: data.linked_contents },
+          { icon: '🛍️', label: 'Linked Products', value: data.linked_items },
         ];
 
         stats.forEach(c => {
           const clone = template.content.cloneNode(true);
-          clone.querySelector('.dashboard-stat-icon').textContent  = c.icon;
+          clone.querySelector('.dashboard-stat-icon').textContent = c.icon;
           clone.querySelector('.dashboard-stat-value').textContent = (c.value || 0).toLocaleString();
           clone.querySelector('.dashboard-stat-label').textContent = c.label;
           container.appendChild(clone);
@@ -48,7 +48,7 @@
           .then(d => {
             if (d.success) {
               showToast('Association removed.', 'success');
-              listController.load(listController.currentPage);
+              window.recController.load(window.recController.currentPage);
               loadStats();
               if (modal) modal.classList.remove("active");
             } else {
@@ -61,64 +61,21 @@
     );
   }
 
-  // ── Inspect Modal (server-rendered body) ──────────────────────
-  function openInspectModal(contentId, itemId) {
-    const modal   = document.getElementById("inspect-rec-modal");
-    const body    = document.getElementById("inspect-rec-modal-body");
-    const titleEl = document.getElementById("inspect-rec-modal-title");
-    if (!modal || !body) return;
 
-    body.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>';
-    titleEl.textContent = "Recommendation Association Detail";
-    modal.classList.add("active");
-
-    fetch(`/admin/recommendations/matches/${contentId}/${itemId}/inspect`)
-      .then(r => r.text())
-      .then(html => { body.innerHTML = html; })
-      .catch(() => { body.innerHTML = "<p class='text-muted'>Could not load details.</p>"; });
-  }
 
   document.addEventListener('DOMContentLoaded', () => {
     loadStats();
 
-    listController = new AdminListController({
+    window.recController = new AdminListController({
       domain: 'rec',
       endpoint: '/admin/recommendations/matches',
-      rowsEndpoint: '/admin/recommendations/matches/rows',  // ← HTML partial mode
-      tbodyId: 'recs-table-body',
-      searchId: 'rec-search',
-      filterIds: [],
-      perPageId: 'rec-per-page',
-      prevBtnId: 'rec-prev-btn',
-      nextBtnId: 'rec-next-btn',
-      indicatorId: 'rec-page-indicator',
-      infoId: 'rec-pagination-info',
-      countId: 'rec-count',
-      clearBtnId: 'clear-rec-filters-btn',
-      refreshBtnId: 'refresh-recs-btn',
+      rowsEndpoint: '/admin/recommendations/matches/rows',
       defaultPerPage: 25,
       colspan: 5,
       autoInit: false
     });
-    listController.init();
+    window.recController.init();
 
-    // Table body: inspect click delegation
-    document.getElementById('recs-table-body').addEventListener('click', e => {
-      const btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      if (btn.dataset.action === 'inspect-rec') {
-        let contentId, itemId;
-        if (btn.dataset.id) {
-          const parts = btn.dataset.id.split('-');
-          contentId = parseInt(parts[0], 10);
-          itemId = parseInt(parts[1], 10);
-        } else {
-          contentId = parseInt(btn.closest('tr')?.id?.split('-')[2] || btn.dataset.contentId, 10);
-          itemId    = parseInt(btn.closest('tr')?.id?.split('-')[3] || btn.dataset.itemId, 10);
-        }
-        openInspectModal(contentId, itemId);
-      }
-    });
 
     // Inspect modal: unlink action delegation (rendered by _inspect.html)
     const modal = document.getElementById("inspect-rec-modal");

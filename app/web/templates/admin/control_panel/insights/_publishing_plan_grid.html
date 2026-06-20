@@ -8,26 +8,26 @@
 <div class="insights-kanban-grid" id="publishing-plan-grid-container">
   {% for week in weekly_plan %}
     {% set headerClass = 'auto-execute' %}
-    {% set statusLabel = '<span class="status-badge badge-secondary font-bold">LOW PRIORITY</span>'|safe %}
+    {% set statusLabel = '<span class="status-badge">LOW PRIORITY</span>'|safe %}
     {% set name = week.week %}
     {% if week.week == 'Week 1' %}
       {% set headerClass = 'blocked' %}
-      {% set statusLabel = '<span class="status-badge badge-danger font-bold">HIGH URGENCY</span>'|safe %}
+      {% set statusLabel = '<span class="status-badge">HIGH URGENCY</span>'|safe %}
       {% set name = 'Week 1 (Days 1-7)' %}
     {% elif week.week == 'Week 2' %}
       {% set headerClass = 'needs-review' %}
-      {% set statusLabel = '<span class="status-badge badge-warning font-bold">MEDIUM</span>'|safe %}
+      {% set statusLabel = '<span class="status-badge">MEDIUM</span>'|safe %}
       {% set name = 'Week 2 (Days 8-14)' %}
     {% endif %}
 
     <div class="kanban-column flex">
       <div class="publishing-column-header {{ headerClass }} flex justify-between items-center">
-        <div class="font-bold text-sm">{{ name }}</div>
+        <div >{{ name }}</div>
         <div>{{ statusLabel }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not week.tasks %}
-          <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
+          <div  >No items in this queue.</div>
         {% else %}
           {% for task in week.tasks %}
             {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}

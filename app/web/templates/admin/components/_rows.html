@@ -9,24 +9,32 @@
         {% if key == 'link' %}
         <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
         {% else %}
-        <span>{{ value|title }}</span>
+        <span>{{ value }}</span>
         {% endif %}
     </td>
     {% endif %}
     {% endfor %}
     {% if not hide_action_column %}
-    <td>
+    <td class="cell-actions flex flex-col gap-1">
+        {% if domain_type in ['content', 'item', 'user'] %}
+        <a class="user-action-btn" href="/admin/{{ domain_type }}s/{{ row.id }}" target="_blank">
+            👁️ Inspect
+        </a>
+        {% else %}
+        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="global-inspect",
+        extra_class="inspect-btn", button_id=row.id, data_domain=domain_type,
+        data_title=row.name|default(row.title|default(""))) }}
+
         {% if domain_target_type %}
         {% call action_group() %}
-        <a class="user-action-btn user-action-inspect inspect-btn text-deco-none d-inline-block"
+        <a class="user-action-btn user-action-inspect inspect-btn"
             href="/admin/{{ domain_target_type }}?source={{ row.slug }}">
             👁️ View {{ domain_target_type|title}}
         </a>
         {% endcall %}
-        {% else %}
-        {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="inspect-" ~ domain_type,
-        extra_class="inspect-btn", button_id=row.id) }}
         {% endif %}
+        {% endif %}
+
     </td>
     {% endif %}
 </tr>

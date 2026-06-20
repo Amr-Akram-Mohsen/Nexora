@@ -1,46 +1,17 @@
-{% extends "admin/layout/admin_base.html" %}
-{% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner, table_spinner %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table %}
-{% from "admin/components/macros.html" import
-admin_search_input,
-admin_reset_button,
-admin_summary_bar,
-action_group
-%}
+{% extends "admin/layout/_crud_page_base.html" %}
 
-{% block title %}Sources Management — Nexora Admin{% endblock %}
+{% set header_title = "Sources & Content Providers" %}
+{% set page_description = "Monitor content sources, imported volumes, authority rankings, and latest activities" %}
 
-{% block admin_content %}
-
-{% set header_actions %}
-<button id="refresh-sources-btn" class="admin-btn-secondary">↺ Refresh</button>
-{% endset %}
-
-{{ admin_page_header(
-"Sources & Content Providers",
-"Monitor content sources, imported volumes, authority rankings, and latest activities",
-actions=header_actions
-) }}
-
-<!-- Filters -->
-<div class="admin-toolbar-advanced flex flex-col gap-3">
+{% block crud_filters %}
+{% call admin_toolbar_section() %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("sources-search", "Search by name, slug, or domain…") }}
     {{ admin_reset_button("clear-sources-filters-btn", "Reset") }}
   </div>
-</div>
-
-<!-- Summary Bar -->
-{{ admin_summary_bar("sources-count", "sources", summary_id="sources-summary") }}
-
-<!-- Sources Table -->
-{{ admin_crud_table(table, "Loading sources list…") }}
-
-{{ admin_paginator(domain="sources", per_page_options=[10, 20, 50], current_per_page=20) }}
-
+{% endcall %}
 {% endblock %}
 
-{% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/pages/sources.js') }}"></script>
+{% block crud_modals %}
+{{ admin_inspect_modal("source", "Source Details", "📡") }}
 {% endblock %}

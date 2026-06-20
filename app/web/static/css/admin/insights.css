@@ -165,19 +165,6 @@ letter-spacing: -0.01em;
 }
 
 /* Scoped Styles for Spacing & Spacing Cleanup */
-.insights-table-scroll {
-    border: none;
-    box-shadow: none;
-    max-height: 480px;
-    overflow-y: auto;
-}
-
-.insights-table-scroll-large {
-    border: none;
-    box-shadow: none;
-    max-height: 600px;
-    overflow-y: auto;
-}
 
 /* Recommendation performance improvements */
 .rec-stat-card {

@@ -1,10 +1,9 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "components/ui/modal.html" import modal %}
 {% from "components/ui/spinner.html" import spinner %}
-{% from "admin/components/ui.html" import admin_page_header, admin_panel %}
+{% from "admin/components/ui.html" import admin_page_header, admin_panel, admin_table_panel, admin_crud_table %}
 
 {% block title %}Insights & Opportunities — Nexora Admin{% endblock %}
-{% block content_class %}admin-content-fluid{% endblock %}
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/insights.css') }}" />
@@ -39,43 +38,21 @@ actions=header_actions
 <!-- Decision Engine: Top Opportunities & Actions Queue -->
 <div class="overview-top-grid insights-section">
   <!-- Top Opportunities Table -->
-  <div class="overview-panel">
-    <div class="overview-panel-header flex items-center justify-between">
-      <div>
-        <h3 class="overview-panel-title">🏆 Top Opportunities</h3>
-        <p class="overview-panel-sub">Unified priority list of categories and brands with the highest growth potential.
-        </p>
-      </div>
-      <div id="active-filter-container" class="flex items-center gap-sm" style="display: none;">
-        <span id="active-filter-badge" class="status-badge badge-blue font-bold"></span>
-        <button id="clear-filter-btn" class="admin-btn-secondary">Clear Filter</button>
-      </div>
-    </div>
-    <div class="insights-table-scroll">
-      <table class="admin-table text-sm" id="top-opportunities-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Entity / Type</th>
-            <th>Opportunity Score</th>
-            <th>Reason</th>
-          </tr>
-        </thead>
-        <tbody id="top-opportunities-body">
-          {{ table_spinner(5, "Prioritizing entities...") }}
-        </tbody>
-      </table>
-    </div>
+  {% set opps_actions %}
+  <div id="active-filter-container" class="flex items-center gap-sm" style="display: none;">
+    <span id="active-filter-badge" class="status-badge badge-blue "></span>
+    <button id="clear-filter-btn" class="admin-btn-secondary">Clear Filter</button>
   </div>
+  {% endset %}
+  {% call admin_table_panel("🏆 Top Opportunities", "Unified priority list of categories and brands with the highest growth potential.", actions=opps_actions) %}
+    {{ admin_crud_table(tables['top_opportunities'], loading_text="Compiling top opportunities...") }}
+  {% endcall %}
 
   <!-- Insight Actions Queue -->
-  {% call admin_panel("⚡ Insight Actions Queue", "Immediate tactical recommendations sorted by expected impact and
-  priority.") %}
-  <div class="insights-table-scroll">
+  {% call admin_table_panel("⚡ Insight Actions Queue", "Immediate tactical recommendations sorted by expected impact and priority.") %}
     <div id="action-queue-list" class="suggestions-list-scroll flex gap-3">
       {{ spinner("Compiling action guidance...") }}
     </div>
-  </div>
   {% endcall %}
 </div>
 
@@ -89,6 +66,10 @@ actions=header_actions
 
 <div class="insights-section">
   {% include "admin/control_panel/insights/_publishing_plan.html" %}
+</div>
+
+<div class="insights-section">
+  {% include "admin/control_panel/insights/_social_distribution.html" %}
 </div>
 
 <div class="insights-section">
@@ -111,43 +92,13 @@ actions=header_actions
 <!-- Section 2 & 3: Content Coverage & Brand Expansions -->
 <h2 class="insight-group-title flex gap-3 items-center">⚖️ Coverage & Brand Expansions</h2>
 <div class="overview-top-grid insights-section">
-  {% call admin_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to
-  identify content gaps.") %}
-  <div class="admin-table-scrollable">
-    <table class="admin-table text-sm" id="coverage-matrix-table">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Demand Level</th>
-          <th>Coverage Level</th>
-          <th>Gap Score / Status</th>
-        </tr>
-      </thead>
-      <tbody id="coverage-matrix-body">
-        {{ table_spinner(4, "Assessing category alignment...") }}
-      </tbody>
-    </table>
-  </div>
+  {% call admin_table_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to identify content gaps.") %}
+    {{ admin_crud_table(tables['coverage_matrix'], loading_text="Assessing category alignment...") }}
   {% endcall %}
 
   <!-- Brand Opportunity Analysis -->
-  {% call admin_panel("⭐ Brand Opportunity Analysis", "User engagement vs content volume to identify brand expansion
-  opportunities.") %}
-  <div class="admin-table-scrollable">
-    <table class="admin-table text-sm" id="brand-opportunities-table">
-      <thead>
-        <tr>
-          <th>Brand</th>
-          <th>Articles</th>
-          <th>Engagement</th>
-          <th>Expansion Status</th>
-        </tr>
-      </thead>
-      <tbody id="brand-opportunities-body">
-        {{ table_spinner(4, "Calculating brand expansion opportunities...") }}
-      </tbody>
-    </table>
-  </div>
+  {% call admin_table_panel("⭐ Brand Opportunity Analysis", "User engagement vs content volume to identify brand expansion opportunities.") %}
+    {{ admin_crud_table(tables['brand_opportunities'], loading_text="Calculating brand expansion opportunities...") }}
   {% endcall %}
 </div>
 

@@ -15,8 +15,8 @@
     {% set pct = ((c.count / max_val.val) * 100) | round | int %}
     <a class="dist-row-link" href="/admin/contents?category={{ c.slug }}">
       <div class="dist-row flex justify-between">
-        <span class="dist-row-name font-bold text-foreground">{{ c.name }}</span>
-        <span class="dist-row-count text-muted">{{ "{:,}".format(c.count) }} items</span>
+        <span class="dist-row-name  ">{{ c.name }}</span>
+        <span class="dist-row-count ">{{ "{:,}".format(c.count) }} items</span>
       </div>
       <div class="overview-breakdown-bar-track bar-track-health">
         <div class="overview-breakdown-bar bar-purple" style="width: {{ pct }}%;"></div>

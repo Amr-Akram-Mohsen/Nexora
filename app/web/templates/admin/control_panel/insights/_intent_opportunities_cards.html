@@ -1,18 +1,18 @@
+{% from "admin/control_panel/insights/_components.html" import opportunity_card %}
 {% if items %}
   {% for item in items %}
-    <div class="insights-opp-card flex flex-col">
-      <h3 class="opp-title" title="{{ item.category_name }}">{{ item.category_name }}</h3>
-      <div class="opp-metrics opp-metrics-grid-3 flex gap-3 flex-wrap items-center">
+    {% call opportunity_card(item.category_name) %}
+      <div class="opp-metrics flex gap-2 flex-wrap items-center">
         {% for intentName, count in item.distribution.items() %}
-          <span class="status-badge secondary font-normal">{{ intentName }}: <strong>{{ count }}</strong></span>
+          <span class="status-badge">{{ intentName }}: <strong >{{ count }}</strong></span>
         {% endfor %}
       </div>
-      <div class="opp-action flex items-center">
+      <div class="opp-action flex items-center gap-2">
         <span>🎯</span>
-        <span>Opportunity: <strong>{{ item.opportunity }}</strong></span>
+        <span >Opportunity: <strong >{{ item.opportunity }}</strong></span>
       </div>
-    </div>
+    {% endcall %}
   {% endfor %}
 {% else %}
-  <div class="text-center text-muted p-4">No intent distribution gaps identified.</div>
+  <div >No intent distribution gaps identified.</div>
 {% endif %}

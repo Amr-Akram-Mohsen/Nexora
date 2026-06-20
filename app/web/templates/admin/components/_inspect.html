@@ -1,0 +1,98 @@
+{% from "admin/components/macros.html" import inspect_section, inspect_detail_row, inspect_custom_row, action_group,
+action_button %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card %}
+
+<div class="inspect-details-group flex">
+  {% if inspect_table and inspect_table is mapping %}
+  {% for section_name, fields in inspect_table.items() %}
+  {% call inspect_section(section_name|title) %}
+  {% for item in fields %}
+  {% if item.is_custom %}
+  {% call inspect_custom_row(item.label) %}
+  {{ item.value|safe }}
+  {% endcall %}
+  {% else %}
+  {{ inspect_detail_row(item.label, "inspect-" ~ item.label|lower|replace(' ', '-'), value_text=item.value) }}
+  {% endif %}
+  {% endfor %}
+  {% endcall %}
+  {% endfor %}
+  {% endif %}
+
+  {% if store_links is defined %}
+  {% call inspect_section("Ingested Stores & Affiliate Links") %}
+  <div class="inspect-links-container">
+    {% if store_links %}
+    {% for lnk in store_links %}
+    {{ inspect_store_card(lnk) }}
+    {% endfor %}
+    {% else %}
+    <div >No store links mapped.</div>
+    {% endif %}
+  </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if linked_items is defined %}
+  {% call inspect_section("Linked Products") %}
+  {% if linked_items %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Clicks</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in linked_items %}
+        <tr>
+          <td>#{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td><span class="status-badge inspect-">{{ item.type or "—" }}</span></td>
+          <td>{{ "{:,}".format(item.clicks) }}</td>
+          <td>
+            <button class="user-action-btn user-action-delete btn-sm" data-action="unlink-match"
+              data-content-id="{{ inspect_id }}" data-item-id="{{ item.id }}">
+              🔓 Unlink
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p >No linked products found.</p>
+  {% endif %}
+  {% endcall %}
+  {% endif %}
+
+  {% if distribution_history is defined %}
+  {% call inspect_section("Social Distribution History") %}
+  <div class="inspect-links-container">
+    {% if distribution_history %}
+    {% for post in distribution_history %}
+    {{ inspect_distribution_card(post) }}
+    {% endfor %}
+    {% else %}
+    <div >No distribution history found.</div>
+    {% endif %}
+  </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if actions is defined and actions %}
+  {% call inspect_section("Management Actions", divider=false) %}
+  {% call action_group(extra_class="flex-wrap") %}
+  {% for act in actions %}
+  {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''),
+  extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
+  {% endfor %}
+  {% endcall %}
+  {% endcall %}
+  {% endif %}
+</div>

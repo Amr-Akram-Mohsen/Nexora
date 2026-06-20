@@ -1,46 +1,20 @@
-{% extends "admin/layout/admin_base.html" %}
-{% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner, table_spinner %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table, admin_filter_select %}
-{% from "admin/components/macros.html" import
-    admin_search_input,
-    admin_reset_button,
-    admin_summary_bar,
-    close_button,
-    action_group,
-    action_button,
-    inspect_section,
-    inspect_detail_row,
-    inspect_custom_row
-%}
+{% extends "admin/layout/_crud_page_base.html" %}
 
-{% block title %}Product Management — Nexora Admin{% endblock %}
+{% set page_description = "Browse, search, and manage all affiliate and editorial products" %}
+{% set summary_label = "products" %}
 
-{% block admin_content %}
-
-{% set header_actions %}
-<button id="refresh-items-btn" class="admin-btn-secondary">↺ Refresh</button>
-{% endset %}
-
-{{ admin_page_header(
-"Product Management",
-"Browse, search, and manage all affiliate and editorial products",
-actions=header_actions
-) }}
-
-<!-- Filters -->
-<div class="admin-toolbar-advanced flex flex-col gap-3">
-  <!-- Row 1: Search & Basic Filters -->
+{% block crud_filters %}
+{% call admin_toolbar_section() %}
+  {# Row 1: Search & Basic Filters #}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("item-search", "Search by name or ID…") }}
-
     {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-item-source", None, [], default_val="", default_text="All Sources", extra_class="filter-select-item") }}
     {{ admin_filter_select("filter-item-type", None, [], default_val="", default_text="All Types", extra_class="filter-select-item") }}
   </div>
 
-  <!-- Row 2: Sorting & Reset -->
+  {# Row 2: Sorting & Reset #}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     <div class="filter-sort-group gap-2" style="margin-left:0;">
       <span class="filter-label-xs">Sort:</span>
@@ -49,21 +23,12 @@ actions=header_actions
       {{ admin_reset_button("clear-item-filters-btn", "Reset Filters") }}
     </div>
   </div>
-</div>
-
-<!-- Summary Bar -->
-{{ admin_summary_bar("items-count", "products", summary_id="items-summary") }}
-
-<!-- Table -->
-{{ admin_crud_table(table, "Loading products…") }}
-
-{{ admin_paginator(domain="items", per_page_options=[10, 20, 50], current_per_page=20) }}
-
-{% call modal("inspect-item-modal", "Product Provider & Store Links", "📡", "modal-content-lg") %}
-{{ close_button(button_id="inspect-item-close-btn") }}
 {% endcall %}
 {% endblock %}
 
-{% block admin_scripts %}
+{% block crud_modals %}
+{% endblock %}
+
+{% block custom_scripts %}
 <script src="{{ url_for('static', filename='js/admin/pages/items.js') }}"></script>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% from "admin/components/ui.html" import admin_panel %}
+{% from "admin/components/ui.html" import admin_panel, admin_crud_table %}
 
 <!-- Left Side: Strategy Accuracy & Failures -->
 {% call admin_panel("🧠 Strategy Accuracy & Failures", "Platform-weighted accuracy index and root-cause diagnoses of
@@ -23,7 +23,7 @@ underperforming assets.") %}
         </h4>
         <div id="feedback-failures-list" class="insights-failures-scroll flex gap-4">
             {% if not failures_detected %}
-            <div class="text-center text-muted p-4" style="font-style: italic;">
+            <div  >
                 No performance failures detected matching filter.
             </div>
             {% else %}
@@ -50,20 +50,10 @@ underperforming assets.") %}
 {% call admin_panel("📋 Content Evaluations Inventory", "Comparing actual CTR, engagement rate, and conversion rate with
 baseline expectations.") %}
 <div class="insights-table-scroll panel-body-padded">
-    <table class="admin-table text-xs" id="feedback-evaluations-table">
-        <thead>
-            <tr>
-                <th>Platform / Title</th>
-                <th>Entity & Intent</th>
-                <th class="col-metric text-center">CTR (Exp / Act)</th>
-                <th>Evaluation Status</th>
-                <th>Reason</th>
-            </tr>
-        </thead>
-        <tbody id="feedback-evaluations-body">
+    {% call admin_crud_table(tables['performance_feedback']) %}
             {% if not evaluation_results %}
             <tr>
-                <td colspan="5" class="text-center text-muted">
+                <td colspan="5" >
                     No evaluations matching filter.
                 </td>
             </tr>
@@ -75,21 +65,20 @@ baseline expectations.") %}
             %}
             <tr>
                 <td>
-                    <div class="font-bold text-foreground">{{ platformIcon }} {{ item.title }}</div>
+                    <div >{{ platformIcon }} {{ item.title }}</div>
                 </td>
                 <td>
-                    <div class="font-bold text-foreground">{{ item.entity }}</div>
-                    <div class="asset-mapping-item-meta mt-1">Intent: <code>{{ item.predicted_intent }}</code></div>
+                    <div >{{ item.entity }}</div>
+                    <div class="asset-mapping-item-meta">Intent: <code>{{ item.predicted_intent }}</code></div>
                 </td>
-                <td class="col-metric text-center">
-                    <span class="text-muted">{{ "%.1f"|format(item.expected_performance.ctr) }}%</span> / <span class="font-bold text-foreground">{{ "%.1f"|format(item.actual_performance.ctr) }}%</span>
+                <td class="col-metric">
+                    <span >{{ "%.1f"|format(item.expected_performance.ctr) }}%</span> / <span >{{ "%.1f"|format(item.actual_performance.ctr) }}%</span>
                 </td>
                 <td><span class="status-badge {{ evalBadgeClass }}">{{ item.evaluation }}</span></td>
-                <td class="text-muted">{{ item.reason }}</td>
+                <td >{{ item.reason }}</td>
             </tr>
             {% endfor %}
             {% endif %}
-        </tbody>
-    </table>
+    {% endcall %}
 </div>
 {% endcall %}

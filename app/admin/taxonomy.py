@@ -2,11 +2,11 @@
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section
+from app.domains.taxonomy.models import Category, Brand, Topic, Section, Source
 from app.shared.utils.slug import generate_slug
 from app.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func
-from app.domains.content.models.content import Content
+from app.domains.content.models import Content
 from app.domains.item.models import Item
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
@@ -383,62 +383,152 @@ def sections_rows():
     )
 
 # ─────────────────────────────────────────────
-# INSPECT ENDPOINTS
+# INSPECT HELPERS & ENDPOINTS
 # ─────────────────────────────────────────────
+
+def _get_entity_or_404(model, id, entity_name):
+    entity = db.session.get(model, id)
+    if not entity:
+        return None, f"<p class='text-muted'>{entity_name} not found.</p>"
+    return entity, None
+
+def _get_taxonomy_related_metadata(entity, entity_type):
+    from app.domains.relationships import content_brands, content_topics
+    data = {}
+    
+    if entity_type == "category":
+        data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.category_id == entity.id)) or 0)
+        data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0)
+        data["child categories"] = str(db.session.scalar(select(func.count()).select_from(Category).where(Category.parent_id == entity.id)) or 0)
+        
+    elif entity_type == "brand":
+        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
+        data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0)
+        
+    elif entity_type == "topic":
+        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_topics).where(content_topics.c.topic_id == entity.id)) or 0)
+        rel_cats = db.session.scalar(
+            select(func.count(func.distinct(Content.category_id)))
+            .join(content_topics, content_topics.c.content_id == Content.id)
+            .filter(content_topics.c.topic_id == entity.id)
+        ) or 0
+        data["related categories"] = str(rel_cats)
+        
+        rel_brands = db.session.scalar(
+            select(func.count(func.distinct(content_brands.c.brand_id)))
+            .join(content_topics, content_topics.c.content_id == content_brands.c.content_id)
+            .filter(content_topics.c.topic_id == entity.id)
+        ) or 0
+        data["related brands"] = str(rel_brands)
+        
+    elif entity_type == "section":
+        data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.section_id == entity.id)) or 0)
+        cat_count = db.session.scalar(
+            select(func.count(func.distinct(Content.category_id)))
+            .filter(Content.section_id == entity.id)
+        ) or 0
+        data["category count"] = str(cat_count)
+        
+        rel_brands = db.session.scalar(
+            select(func.count(func.distinct(content_brands.c.brand_id)))
+            .join(Content, Content.id == content_brands.c.content_id)
+            .filter(Content.section_id == entity.id)
+        ) or 0
+        data["related brands"] = str(rel_brands)
+        
+    return data
+
+def _get_taxonomy_inspect_table(entity, entity_type, metadata):
+    from app.admin.helpers import format_status, format_featured
+    from app.admin.tables import get_inspect_table
+    
+    data = {
+        "id": f"#{entity.id}",
+        "name": entity.name,
+        "status": format_status(entity.is_active),
+        "sort order": str(entity.sort_order) if hasattr(entity, "sort_order") else "0",
+    }
+    data.update(metadata)
+    
+    if entity_type == "category":
+        data["slug"] = entity.slug
+        data["heirarchy level"] = "Leaf" if entity.is_leaf else "Parent"
+        if entity.is_leaf and entity.parent:
+            data["parent name"] = entity.parent.name
+        return get_inspect_table("categories", data)
+    elif entity_type == "brand":
+        data["slug"] = entity.slug
+        data["industry"] = entity.industry or "—"
+        data["featured"] = format_featured(entity.is_featured)
+        return get_inspect_table("brands", data)
+    elif entity_type == "topic":
+        data["slug"] = entity.slug
+        data["featured"] = format_featured(entity.is_featured)
+        return get_inspect_table("topics", data)
+    elif entity_type == "section":
+        import json
+        data["slug"] = entity.slug
+        data["description"] = entity.description or "—"
+        data["allowed filters"] = json.dumps(entity.allowed_filters) if entity.allowed_filters else "—"
+        return get_inspect_table("sections", data)
 
 @bp.route("/categories/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_category(id):
-    cat = db.session.get(Category, id)
-    if not cat:
-        return "Category not found", 404
-    content_count = db.session.query(func.count(Content.id)).filter(Content.category_id == id).scalar()
-    item_count = db.session.query(func.count(Item.id)).filter(Item.category_id == id).scalar()
-    return render_template(
-        "admin/control_panel/taxonomy/_category_inspect.html",
-        category=cat,
-        content_count=content_count,
-        item_count=item_count
-    )
+    cat, err = _get_entity_or_404(Category, id, "Category")
+    if err: return err, 404
+    metadata = _get_taxonomy_related_metadata(cat, "category")
+    inspect_table = _get_taxonomy_inspect_table(cat, "category", metadata)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
 
 @bp.route("/brands/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_brand(id):
-    brand = db.session.get(Brand, id)
-    if not brand:
-        return "Brand not found", 404
-    # content_count = db.session.query(Content).with_parent(brand, "contents").count()
-    content_count = len(brand.contents)
-    item_count = db.session.query(func.count(Item.id)).filter(Item.brand_id == id).scalar()
-    return render_template(
-        "admin/control_panel/taxonomy/_brand_inspect.html",
-        brand=brand,
-        content_count=content_count,
-        item_count=item_count
-    )
+    brand, err = _get_entity_or_404(Brand, id, "Brand")
+    if err: return err, 404
+    metadata = _get_taxonomy_related_metadata(brand, "brand")
+    inspect_table = _get_taxonomy_inspect_table(brand, "brand", metadata)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
 
 @bp.route("/topics/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_topic(id):
-    topic = db.session.get(Topic, id)
-    if not topic:
-        return "Topic not found", 404
-    content_count = len(topic.contents)
-    return render_template(
-        "admin/control_panel/taxonomy/_topic_inspect.html",
-        topic=topic,
-        content_count=content_count
-    )
+    topic, err = _get_entity_or_404(Topic, id, "Topic")
+    if err: return err, 404
+    metadata = _get_taxonomy_related_metadata(topic, "topic")
+    inspect_table = _get_taxonomy_inspect_table(topic, "topic", metadata)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
 
 @bp.route("/sections/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_section(id):
-    section = db.session.get(Section, id)
-    if not section:
-        return "Section not found", 404
-    content_count = db.session.query(func.count(Content.id)).filter(Content.section_id == id).scalar()
-    return render_template(
-        "admin/control_panel/taxonomy/_section_inspect.html",
-        section=section,
-        content_count=content_count
-    )
+    section, err = _get_entity_or_404(Section, id, "Section")
+    if err: return err, 404
+    metadata = _get_taxonomy_related_metadata(section, "section")
+    inspect_table = _get_taxonomy_inspect_table(section, "section", metadata)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+
+@bp.route("/sources/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_source(id):
+    source, err = _get_entity_or_404(Source, id, "Source")
+    if err: return err, 404
+    from app.admin.helpers import format_status
+    from app.admin.tables import get_inspect_table
+    
+    article_count = db.session.scalar(
+        select(func.count()).select_from(Content).where(Content.source_id == source.id)
+    ) or 0
+    
+    data = {
+        "id": f"#{source.id}",
+        "name": source.name,
+        "slug": source.slug,
+        "domain": source.domain,
+        "authority score": str(source.authority_score),
+        "status": format_status(source.is_active),
+        "article count": str(article_count)
+    }
+    
+    inspect_table = get_inspect_table("sources", data)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)

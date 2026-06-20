@@ -101,3 +101,27 @@ box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-top: 0.5rem;
   word-break: break-word;
 }
+
+/* ---------------------------------
+   Users Inspect Recent Comments
+--------------------------------- */
+.inspect-comments-list {
+  max-height: 120px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.inspect-comment-item {
+  font-size: var(--text-xs);
+  border-left: 2px solid var(--brand-purple);
+  padding-left: 0.5rem;
+  background: var(--secondary);
+  padding: 0.375rem 0.5rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.inspect-comment-text {
+  margin: 0 0 0.125rem 0;
+  color: var(--foreground);
+  line-height: 1.3;
+}

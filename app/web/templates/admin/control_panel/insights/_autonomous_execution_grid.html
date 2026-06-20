@@ -1,26 +1,26 @@
 <!-- Summary Metrics Bar -->
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-plan-summary">
-  <div class="publishing-summary-item gap-2 flex items-center">🤖 Auto-Execute Queue: <span class="status-badge badge-success font-bold">{{ auto_execute|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center">🤔 Needs Review Queue: <span class="status-badge badge-warning font-bold">{{ needs_review|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center">❌ Blocked Queue: <span class="status-badge badge-danger font-bold">{{ blocked|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center">🤖 Auto-Execute Queue: <span class="status-badge">{{ auto_execute|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center">🤔 Needs Review Queue: <span class="status-badge">{{ needs_review|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center">❌ Blocked Queue: <span class="status-badge">{{ blocked|length }}</span></div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-plan-grid-container">
   {% set queues = [
-    { 'name': 'AUTO EXECUTE', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge badge-secondary font-bold">AUTO APPROVED</span>'|safe, 'list': auto_execute },
-    { 'name': 'NEEDS REVIEW', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge badge-secondary font-bold">PENDING REVIEW</span>'|safe, 'list': needs_review },
-    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge badge-secondary font-bold">SAFETY BLOCKED</span>'|safe, 'list': blocked }
+    { 'name': 'AUTO EXECUTE', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge">AUTO APPROVED</span>'|safe, 'list': auto_execute },
+    { 'name': 'NEEDS REVIEW', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge">PENDING REVIEW</span>'|safe, 'list': needs_review },
+    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge">SAFETY BLOCKED</span>'|safe, 'list': blocked }
   ] %}
 
   {% for q in queues %}
     <div class="kanban-column flex">
       <div class="publishing-column-header {{ q.headerClass }} flex justify-between items-center">
-        <div class="font-bold text-sm">{{ q.name }}</div>
+        <div >{{ q.name }}</div>
         <div>{{ q.statusLabel }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not q.list %}
-          <div class="text-center text-muted p-4" style="font-style: italic;">No items in this queue.</div>
+          <div  >No items in this queue.</div>
         {% else %}
           {% for task in q.list %}
             {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
@@ -31,7 +31,7 @@
                 <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>
-              <p class="kanban-task-meta">Confidence Score: <strong style="color:#6366f1;">{{ (task.confidence_score * 100)|round|int }}%</strong></p>
+              <p class="kanban-task-meta">Confidence Score: <strong >{{ (task.confidence_score * 100)|round|int }}%</strong></p>
               <div class="kanban-task-reason">{{ task.reason }}</div>
               
               {% if task.risk_factors %}

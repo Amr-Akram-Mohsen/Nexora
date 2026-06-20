@@ -104,20 +104,15 @@ def _fetch_sources_page(page, per_page, search):
         else:
             status_val = "healthy"
         serialized.append({
+            "id":              s.id,
             "link":              {'url': f'https://{s.domain}', 'name': s.name},
-            "content_count":   content_count,
-            "last_crawl":      last_crawl,
-            "success_rate":    success_rate,
-            "failure_count":   failure_count,
+            "content-count":   content_count,
+            "last-crawl":      last_crawl,
+            "success-rate":    success_rate,
+            "failure-count":   failure_count,
             "engagement":      engagement,
             "status":          status_val,
             "slug":            s.slug,
-            # "name":            s.name,
-            # "domain":          s.domain,
-            # "logo_url":        s.logo_url,
-            # "is_active":       s.is_active,
-            # "authority_score": s.authority_score,
-            # "latest_activity": latest_activity,
         })
     return pagination, serialized
 
@@ -216,20 +211,15 @@ def _fetch_stores_page(page, per_page, search):
         else:
             status_val = "healthy"
         serialized.append({
+            "id":                  st.id,
             "link":                {'url': st.website, 'name': st.name},
-            "affiliate_network": st.affiliate_network,
-            "product_count":     product_count,
+            "affiliate-network": st.affiliate_network,
+            "product-count":     product_count,
             "clicks":            clicks,
             "ctr":               ctr,
             "conversions":       0,
             "status":            status_val,
             "slug":              st.slug,
-            "id":              st.id,
-            "latest_activity":   latest_activity.isoformat() if latest_activity else None,
-            "name":              st.name,
-            "website":           st.website,
-            "logo_url":          st.logo_url,
-            "is_active":         st.is_active,
         })
     return pagination, serialized
 
@@ -271,10 +261,68 @@ def stores_rows():
     search = request.args.get("search", "").strip()
     pagination, serialized = _fetch_stores_page(page, per_page, search)
     html = render_template("admin/components/_rows.html", items=serialized, domain_type="store", domain_target_type="items")
-    # html = render_template("admin/control_panel/stores/_rows.html", items=serialized)
     return make_rows_response(
         html,
         total=pagination.total,
         pages=pagination.pages,
         page=pagination.page,
     )
+
+
+# ─────────────────────────────────────────────
+# INSPECT ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route("/sources/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_source(id):
+    source = db.session.get(Source, id)
+    if not source:
+        return "<p class='text-muted'>Source not found.</p>", 404
+        
+    content_count = db.session.scalar(select(func.count(Content.id)).filter(Content.source_id == id)) or 0
+    from app.admin.helpers import format_status
+    from app.admin.tables import get_inspect_table
+    
+    data = {
+        "id": f"#{source.id}",
+        "name": source.name,
+        "slug": source.slug,
+        "domain": source.domain,
+        "status": format_status(source.is_active),
+        "authority score": str(source.authority_score),
+        "content count": str(content_count),
+    }
+    inspect_table = get_inspect_table("sources", data)
+    
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+
+
+@bp.route("/stores/<int:id>/inspect", methods=["GET"])
+@admin_required
+def inspect_store(id):
+    store = db.session.get(Store, id)
+    if not store:
+        return "<p class='text-muted'>Store not found.</p>", 404
+        
+    product_count = db.session.scalar(
+        select(func.count(func.distinct(ItemVariant.item_id)))
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(ItemStoreLink.store_id == id)
+    ) or 0
+    
+    from app.admin.helpers import format_status
+    from app.admin.tables import get_inspect_table
+    
+    data = {
+        "id": f"#{store.id}",
+        "name": store.name,
+        "slug": store.slug,
+        "website": store.website,
+        "status": format_status(store.is_active),
+        "affiliate network": store.affiliate_network or "—",
+        "product count": str(product_count),
+    }
+    inspect_table = get_inspect_table("stores", data)
+    
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)

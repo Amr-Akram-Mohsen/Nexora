@@ -1,13 +1,8 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner, table_spinner %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table %}
-{% from "admin/components/macros.html" import
-    admin_search_input
-%}
+{% from "admin/components/ui.html" import admin_page_header, admin_paginator, admin_crud_table, admin_inspect_modal, admin_tab_navigation, admin_tab_panel %}
+{% from "admin/components/macros.html" import admin_search_input, admin_toolbar_section %}
 
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
-{% block content_class %}admin-content-fluid{% endblock %}
 
 {% block admin_content %}
 
@@ -16,112 +11,101 @@
 "Manage categories, brands, topics, and sections used across content and products"
 ) }}
 
-<!-- Tab Navigation -->
-<div class="admin-tabs flex gap-1" id="taxonomy-tabs">
-  <button class="admin-tab-btn active" data-tab="categories">🗂️ Categories</button>
-  <button class="admin-tab-btn" data-tab="brands">🏭 Brands</button>
-  <button class="admin-tab-btn" data-tab="topics">🏷️ Topics</button>
-  <button class="admin-tab-btn" data-tab="sections">📋 Sections</button>
-</div>
+{# Tab Navigation #}
+{{ admin_tab_navigation("taxonomy", [
+  {"id": "categories", "label": "🗂️ Categories", "active": true},
+  {"id": "brands", "label": "🏭 Brands"},
+  {"id": "topics", "label": "🏷️ Topics"},
+  {"id": "sections", "label": "📋 Sections"}
+]) }}
 
-<!-- Restrict width so it doesn't stretch 100% on large monitors -->
+{# Restrict width so it doesn't stretch 100% on large monitors #}
 <div style="max-width: 900px;">
 
-<!-- ======== CATEGORIES TAB ======== -->
-<div class="admin-tab-panel" id="tab-panel-categories">
-  <!-- Create Form -->
-  <div class="admin-inline-form" id="category-create-form">
-    <h3 class="admin-inline-form-title">Add New Category</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-category-name" placeholder="Category name…"
-        class="dashboard-filter-input admin-inline-input" />
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-category-slug-preview">—</code>
+  {# ── Categories Tab ───────────────────────────────────────── #}
+  {% call admin_tab_panel("categories", is_active=true) %}
+    {# Create Form #}
+    <div class="admin-inline-form" id="category-create-form">
+      <h3 class="admin-inline-form-title">Add New Category</h3>
+      <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
+        <input type="text" id="new-category-name" placeholder="Category name…"
+          class="dashboard-filter-input admin-inline-input" />
+        <div class="admin-inline-slug-preview flex items-center">
+          Slug: <code id="new-category-slug-preview">—</code>
+        </div>
+        <button id="create-category-btn" class="admin-btn-primary">+ Add Category</button>
       </div>
-      <button id="create-category-btn" class="admin-btn-primary">+ Add Category</button>
     </div>
-  </div>
 
-  <!-- Filter -->
-  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("category-search", "Search categories…") }}
     </div>
-  </div>
+    {% endcall %}
 
-  {{ admin_crud_table(tables["categories"], "Loading categories…", "loading-height-md") }}
-</div>
+    {{ admin_crud_table(tables["categories"], "Loading categories…", "loading-height-md") }}
+  {% endcall %}
 
-<!-- ======== BRANDS TAB ======== -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-brands">
-  <div class="admin-inline-form" id="brand-create-form">
-    <h3 class="admin-inline-form-title">Add New Brand</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-brand-name" placeholder="Brand name…"
-        class="dashboard-filter-input admin-inline-input" />
-      <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
-        class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-brand-slug-preview">—</code>
+  {# ── Brands Tab ───────────────────────────────────────────── #}
+  {% call admin_tab_panel("brands") %}
+    <div class="admin-inline-form" id="brand-create-form">
+      <h3 class="admin-inline-form-title">Add New Brand</h3>
+      <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
+        <input type="text" id="new-brand-name" placeholder="Brand name…"
+          class="dashboard-filter-input admin-inline-input" />
+        <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
+          class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
+        <div class="admin-inline-slug-preview flex items-center">
+          Slug: <code id="new-brand-slug-preview">—</code>
+        </div>
+        <button id="create-brand-btn" class="admin-btn-primary">+ Add Brand</button>
       </div>
-      <button id="create-brand-btn" class="admin-btn-primary">+ Add Brand</button>
     </div>
-  </div>
 
-  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("brand-search", "Search brands…") }}
     </div>
-  </div>
+    {% endcall %}
 
-  {{ admin_crud_table(tables["brands"], "Loading brands…", "loading-height-md") }}
-</div>
+    {{ admin_crud_table(tables["brands"], "Loading brands…", "loading-height-md") }}
+  {% endcall %}
 
-<!-- ======== TOPICS TAB ======== -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-topics">
-  <div class="admin-inline-form" id="topic-create-form">
-    <h3 class="admin-inline-form-title">Add New Topic</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-topic-name" placeholder="Topic name…"
-        class="dashboard-filter-input admin-inline-input" />
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-topic-slug-preview">—</code>
+  {# ── Topics Tab ───────────────────────────────────────────── #}
+  {% call admin_tab_panel("topics") %}
+    <div class="admin-inline-form" id="topic-create-form">
+      <h3 class="admin-inline-form-title">Add New Topic</h3>
+      <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
+        <input type="text" id="new-topic-name" placeholder="Topic name…"
+          class="dashboard-filter-input admin-inline-input" />
+        <div class="admin-inline-slug-preview flex items-center">
+          Slug: <code id="new-topic-slug-preview">—</code>
+        </div>
+        <button id="create-topic-btn" class="admin-btn-primary">+ Add Topic</button>
       </div>
-      <button id="create-topic-btn" class="admin-btn-primary">+ Add Topic</button>
     </div>
-  </div>
 
-  <div class="admin-toolbar-advanced flex flex-col gap-3" style="margin-top:1rem;">
+    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("topic-search", "Search topics…") }}
     </div>
-  </div>
+    {% endcall %}
 
-  {{ admin_crud_table(tables["topics"], "Loading topics…", "loading-height-md") }}
-</div>
+    {{ admin_crud_table(tables["topics"], "Loading topics…", "loading-height-md") }}
+  {% endcall %}
 
-<!-- ======== SECTIONS TAB ======== -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-sections">
-  {{ admin_crud_table(tables["sections"], "Loading sections…", "loading-height-md") }}
-</div>
-</div> <!-- End max-width wrapper -->
+  {# ── Sections Tab ─────────────────────────────────────────── #}
+  {% call admin_tab_panel("sections") %}
+    {{ admin_crud_table(tables["sections"], "Loading sections…", "loading-height-md") }}
+  {% endcall %}
 
-<!-- ======== INSPECT MODALS ======== -->
-{% call modal("inspect-category-modal", "Category Details", "🗂️") %}
-<div id="inspect-category-body">{{ spinner("Loading details...") }}</div>
-{% endcall %}
+</div>{# End max-width wrapper #}
 
-{% call modal("inspect-brand-modal", "Brand Details", "🏭") %}
-<div id="inspect-brand-body">{{ spinner("Loading details...") }}</div>
-{% endcall %}
-
-{% call modal("inspect-topic-modal", "Topic Details", "🏷️") %}
-<div id="inspect-topic-body">{{ spinner("Loading details...") }}</div>
-{% endcall %}
-
-{% call modal("inspect-section-modal", "Section Details", "📋") %}
-<div id="inspect-section-body">{{ spinner("Loading details...") }}</div>
-{% endcall %}
+{# Inspect Modals #}
+{{ admin_inspect_modal("category", "Category Details", "🗂️") }}
+{{ admin_inspect_modal("brand", "Brand Details", "🏭") }}
+{{ admin_inspect_modal("topic", "Topic Details", "🏷️") }}
+{{ admin_inspect_modal("section", "Section Details", "📋") }}
 
 {% endblock %}
 

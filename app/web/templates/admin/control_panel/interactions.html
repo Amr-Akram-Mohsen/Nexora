@@ -1,22 +1,11 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "components/ui/modal.html" import modal %}
-{% from "components/ui/spinner.html" import spinner, table_spinner %}
-{% from "admin/components/ui.html" import admin_page_header, admin_pagination, admin_paginator, admin_crud_table,
-admin_filter_select %}
-{% from "admin/components/macros.html" import
-admin_search_input,
-admin_reset_button,
-admin_summary_bar,
-close_button,
-action_group,
-action_button,
-inspect_section,
-inspect_detail_row,
-inspect_custom_row
-%}
+{% from "components/ui/spinner.html" import spinner %}
+{% from "admin/components/ui.html" import admin_page_header, admin_paginator, admin_crud_table, admin_filter_select,
+admin_inspect_modal, admin_tab_navigation, admin_tab_panel %}
+{% from "admin/components/macros.html" import admin_search_input, admin_reset_button, admin_summary_bar,
+admin_toolbar_section %}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
-{% block content_class %}admin-content-fluid{% endblock %}
 
 {% block admin_content %}
 
@@ -25,13 +14,13 @@ inspect_custom_row
 "Review user comments, reactions, and engagement metrics"
 ) }}
 
-<!-- Interaction Stats Row -->
+{# Interaction Stats Row #}
 <div id="interactions-stats-row" class="dashboard-stats-grid" style="margin-bottom:2rem;">
   {{ spinner("Loading stats…", "system-loading full-width-card") }}
 </div>
 
-<!-- Reactions Breakdown Panel -->
-<div class="overview-panel mt-6">
+{# Reactions Breakdown Panel #}
+<div class="overview-panel ">
   <div class="overview-panel-header flex items-center justify-between">
     <h3 class="overview-panel-title">📊 Interaction Breakdown</h3>
     <span class="overview-panel-sub">all time</span>
@@ -41,141 +30,108 @@ inspect_custom_row
   </div>
 </div>
 
+{# Tab Navigation #}
+{{ admin_tab_navigation("interactions", [
+  {"id": "comments", "label": "💬 Comments", "active": true},
+  {"id": "reactions", "label": "👍 Reactions"},
+  {"id": "views", "label": "👁️ Views"},
+  {"id": "clicks", "label": "🛒 Clicks"},
+  {"id": "saves", "label": "🔖 Saves"}
+]) }}
 
-<!-- Tab Navigation -->
-<div class="admin-tabs flex gap-1" id="interactions-tabs">
-  <button class="admin-tab-btn active" data-tab="comments">
-    💬 Comments
-  </button>
-  <button class="admin-tab-btn" data-tab="reactions">
-    👍 Reactions
-  </button>
-  <button class="admin-tab-btn" data-tab="views">
-    👁️ Views
-  </button>
-  <button class="admin-tab-btn" data-tab="clicks">
-    🛒 Clicks
-  </button>
-  <button class="admin-tab-btn" data-tab="saves">
-    🔖 Saves
-  </button>
-</div>
-
-<!-- Comments Tab -->
-<div class="admin-tab-panel" id="tab-panel-comments">
-  <!-- Comment Filters -->
-  <div class="admin-toolbar-advanced flex flex-col gap-3">
-    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-      {{ admin_search_input("comment-search", "Search comment text…") }}
-      {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
-      ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
-      extra_class="filter-select-item") }}
-      {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="",
-      default_text="All Targets", extra_class="filter-select-item") }}
-      {{ admin_reset_button("clear-comment-filters-btn", "Reset") }}
-    </div>
+{# ── Comments Tab ─────────────────────────────────────────── #}
+{% call admin_tab_panel("comments", is_active=true) %}
+  {% call admin_toolbar_section() %}
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    {{ admin_search_input("comment-search", "Search comment text…") }}
+    {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
+    ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
+    extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("item", "Item")], default_val="",
+    default_text="All Targets", extra_class="filter-select-item") }}
+    {{ admin_reset_button("clear-comment-filters-btn", "Reset") }}
   </div>
+  {% endcall %}
 
-  <!-- Comment Summary -->
   {{ admin_summary_bar("comments-count", "comments", summary_id="comments-summary") }}
-
-  <!-- Comment Table -->
   {{ admin_crud_table(tables["comments"], "Loading comments…") }}
-
   {{ admin_paginator(domain="comments", per_page_options=[25, 50], current_per_page=25) }}
-</div>
+{% endcall %}
 
-<!-- Reactions Tab -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-reactions">
-  <!-- Reactions Table -->
+{# ── Reactions Tab ────────────────────────────────────────── #}
+{% call admin_tab_panel("reactions") %}
   <div style="margin-top:2rem;">
-    <div class="admin-toolbar-advanced flex flex-col gap-3">
-      <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-        {{ admin_search_input("reactions-search", "Search target title…") }}
-        {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
-        default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
-        {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon="👤") }}
-        {{ admin_reset_button("clear-reactions-filters-btn", "Reset") }}
-      </div>
+    {% call admin_toolbar_section() %}
+    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+      {{ admin_search_input("reactions-search", "Search target title…") }}
+      {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
+      default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
+      {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon="👤") }}
+      {{ admin_reset_button("clear-reactions-filters-btn", "Reset") }}
     </div>
+    {% endcall %}
 
-    <!-- Reactions Summary -->
     {{ admin_summary_bar("reactions-count", "reactions", summary_id="reactions-summary") }}
-
     {{ admin_crud_table(tables["reactions"], "Loading reactions…", "loading-height-md") }}
-
     {{ admin_paginator(domain="reactions", per_page_options=[25, 50], current_per_page=25) }}
   </div>
-</div>
-
-<!-- Views Tab -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-views">
-  <!-- Views Filters -->
-  {{ admin_search_input("views-search", "Search target title…") }}
-  <div class="flex items-center gap-2">
-    <span class="text-sm text-muted">From:</span>
-    <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item"
-      style="padding: 0.35rem 0.5rem;" />
-  </div>
-  <div class="flex items-center gap-2">
-    <span class="text-sm text-muted">To:</span>
-    <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item"
-      style="padding: 0.35rem 0.5rem;" />
-  </div>
-  {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
-
-  <!-- Views Summary -->
-  {{ admin_summary_bar("views-count", "view targets", summary_id="views-summary") }}
-
-  <!-- Views Table -->
-  {{ admin_crud_table(tables["views"], "Loading views…") }}
-
-  {{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
-</div>
-
-<!-- Clicks Tab -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-clicks">
-  <!-- Clicks Filters -->
-  <div class="admin-toolbar-advanced flex flex-col gap-3">
-    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-      {{ admin_search_input("clicks-search", "Search item name…") }}
-      {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon="🏪") }}
-      {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
-    </div>
-  </div>
-
-  <!-- Clicks Summary -->
-  {{ admin_summary_bar("clicks-count", "click logs", summary_id="clicks-summary") }}
-
-  <!-- Clicks Table -->
-  {{ admin_crud_table(tables["clicks"], "Loading clicks…") }}
-
-  {{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
-</div>
-
-<!-- Saves Tab -->
-<div class="admin-tab-panel is-hidden" id="tab-panel-saves">
-  <!-- Saves Filters -->
-  <div class="admin-toolbar-advanced flex flex-col gap-3">
-    <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-      {{ admin_search_input("saves-search", "Search target title…") }}
-      {{ admin_search_input("filter-saves-user", "Search user name/email…", icon="👤") }}
-      {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
-    </div>
-  </div>
-
-  <!-- Saves Summary -->
-  {{ admin_summary_bar("saves-count", "saves", summary_id="saves-summary") }}
-
-  <!-- Saves Table -->
-  {{ admin_crud_table(tables["saves"], "Loading saves…") }}
-
-  {{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
-</div>
-
-{% call modal("inspect-comment-modal", "Comment Details & Moderation", "💬") %}
-{{ close_button(button_id="inspect-comment-close-btn") }}
 {% endcall %}
+
+{# ── Views Tab ────────────────────────────────────────────── #}
+{% call admin_tab_panel("views") %}
+  {% call admin_toolbar_section() %}
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    {{ admin_search_input("views-search", "Search target title…") }}
+    <div class="flex items-center gap-2">
+      <span class=" ">From:</span>
+      <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item"
+        style="padding: 0.35rem 0.5rem;" />
+    </div>
+    <div class="flex items-center gap-2">
+      <span class=" ">To:</span>
+      <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item"
+        style="padding: 0.35rem 0.5rem;" />
+    </div>
+    {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
+  </div>
+  {% endcall %}
+
+  {{ admin_summary_bar("views-count", "view targets", summary_id="views-summary") }}
+  {{ admin_crud_table(tables["views"], "Loading views…") }}
+  {{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Clicks Tab ───────────────────────────────────────────── #}
+{% call admin_tab_panel("clicks") %}
+  {% call admin_toolbar_section() %}
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    {{ admin_search_input("clicks-search", "Search item name…") }}
+    {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon="🏪") }}
+    {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
+  </div>
+  {% endcall %}
+
+  {{ admin_summary_bar("clicks-count", "click logs", summary_id="clicks-summary") }}
+  {{ admin_crud_table(tables["clicks"], "Loading clicks…") }}
+  {{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{# ── Saves Tab ────────────────────────────────────────────── #}
+{% call admin_tab_panel("saves") %}
+  {% call admin_toolbar_section() %}
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+    {{ admin_search_input("saves-search", "Search target title…") }}
+    {{ admin_search_input("filter-saves-user", "Search user name/email…", icon="👤") }}
+    {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
+  </div>
+  {% endcall %}
+
+  {{ admin_summary_bar("saves-count", "saves", summary_id="saves-summary") }}
+  {{ admin_crud_table(tables["saves"], "Loading saves…") }}
+  {{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
+{% endcall %}
+
+{{ admin_inspect_modal("comment", "Comment Details & Moderation", "💬") }}
 
 {% endblock %}
 

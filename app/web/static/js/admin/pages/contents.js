@@ -4,7 +4,8 @@
   'use strict';
 
   // Page-level State Management
-  let contentsController;
+  // Page-level State Management
+  window.contentsController = null;
   let selectedIds = new Set();
   let categoriesList = [];
 
@@ -71,12 +72,12 @@
         applyContentsUrlFilters();
 
         // Once metadata is ready, init contents controller
-        contentsController.init();
+        window.contentsController.init();
       })
       .catch((err) => {
         console.error("Could not load filters metadata:", err);
         showToast("Error loading catalog metadata filters.", "error");
-        contentsController.init(); // Fallback
+        window.contentsController.init(); // Fallback
       });
   }
 
@@ -124,7 +125,7 @@
           showToast(res.message || "Content safely deleted.", "success");
           selectedIds.delete(parseInt(id, 10));
           updateBulkToolbar();
-          contentsController.load(contentsController.currentPage);
+          window.contentsController.load(window.contentsController.currentPage);
         } else {
           showToast("Failed to delete content.", "error");
         }
@@ -179,7 +180,7 @@
               document.getElementById("bulk-category-select").value = "";
               document.getElementById("bulk-category-select").classList.add("is-hidden");
               updateBulkToolbar();
-              contentsController.load(contentsController.currentPage);
+              window.contentsController.load(window.contentsController.currentPage);
             } else {
               showToast(res.error || "Bulk action failed.", "error");
             }
@@ -232,7 +233,7 @@
         if (res.success) {
           showToast("Category quick-updated successfully.", "success");
           hideQuickCategoryModal();
-          contentsController.load(contentsController.currentPage);
+          window.contentsController.load(window.contentsController.currentPage);
         } else {
           showToast(res.error || "Recategorization failed.", "error");
         }
@@ -264,22 +265,7 @@
   }
 
 
-  // ── Inspect Modal (server-rendered body) ─────────────────────
-  function showInspectModal(contentId, title) {
-    const modal   = document.getElementById("inspect-modal");
-    const body    = document.getElementById("inspect-modal-body");
-    const titleEl = document.getElementById("inspect-modal-title");
-    if (!modal || !body) return;
 
-    body.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>';
-    titleEl.textContent = `Inspect: ${title || "Content"}`;
-    modal.classList.add("active");
-
-    fetch(`/admin/contents/${contentId}/inspect`)
-      .then(res => res.text())
-      .then(html => { body.innerHTML = html; })
-      .catch(() => { body.innerHTML = "<p class='text-muted'>Could not load content details.</p>"; });
-  }
 
   // ==============================
   // EVENT LISTENERS BINDING
@@ -312,28 +298,30 @@
       document.getElementById("sort-dir").value = "desc";
       selectedIds.clear();
       updateBulkToolbar();
-      contentsController.load(1);
+      window.contentsController.load(1);
     });
 
     // Select All binding
-    selectAllCheckbox.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
-      const visibleCheckboxes = document.querySelectorAll(".row-select-checkbox");
-      visibleCheckboxes.forEach((checkbox) => {
-        checkbox.checked = isChecked;
-        const cid = parseInt(checkbox.getAttribute("data-id"), 10);
-        if (isChecked) {
-          selectedIds.add(cid);
-        } else {
-          selectedIds.delete(cid);
-        }
-        const r = checkbox.closest("tr");
-        if (r) {
-          r.classList.toggle("is-selected", isChecked);
-        }
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener("change", (e) => {
+        const isChecked = e.target.checked;
+        const visibleCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        visibleCheckboxes.forEach((checkbox) => {
+          checkbox.checked = isChecked;
+          const cid = parseInt(checkbox.getAttribute("data-id"), 10);
+          if (isChecked) {
+            selectedIds.add(cid);
+          } else {
+            selectedIds.delete(cid);
+          }
+          const r = checkbox.closest("tr");
+          if (r) {
+            r.classList.toggle("is-selected", isChecked);
+          }
+        });
+        updateBulkToolbar();
       });
-      updateBulkToolbar();
-    });
+    }
 
     // Bulk actions display and enabling
     bulkActionSelect.addEventListener("change", (e) => {
@@ -397,58 +385,38 @@
       showQuickCategoryModal(row.dataset.id, row.dataset.categoryId);
     });
 
-    // Delegation for actions: inspect
-    tableBody.addEventListener("click", (e) => {
-      const inspectBtn = e.target.closest(".inspect-btn");
-      if (inspectBtn) {
-        e.stopPropagation();
-        const cid   = parseInt(inspectBtn.dataset.id, 10);
-        const title = inspectBtn.closest("tr")?.querySelector(".content-cell-title")?.textContent?.trim();
-        showInspectModal(cid, title);
-      }
+    // Inspect modal or detail page: delete action delegation
+    document.body.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action='delete-content']");
+      if (!btn) return;
+      const id    = parseInt(btn.dataset.id, 10);
+      const title = btn.dataset.title || "this content";
+      showModal(
+        "Safer Catalog Deletion",
+        `Are you sure you want to completely delete "${title}"? This is permanent.`,
+        () => { 
+          performSingleDelete(id); 
+          const modal = document.getElementById("inspect-content-modal");
+          if (modal) modal.classList.remove("active"); 
+        }
+      );
     });
-
-    // Inspect modal: delete action delegation
-    const inspectModal = document.getElementById("inspect-modal");
-    if (inspectModal) {
-      inspectModal.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-action='delete-content']");
-        if (!btn) return;
-        const id    = parseInt(btn.dataset.id, 10);
-        const title = btn.dataset.title || "this content";
-        showModal(
-          "Safer Catalog Deletion",
-          `Are you sure you want to completely delete "${title}"? This is permanent.`,
-          () => { performSingleDelete(id); inspectModal.classList.remove("active"); }
-        );
-      });
-    }
   }
 
   // Define Controller Configuration
-  contentsController = new AdminListController({
+  window.contentsController = new AdminListController({
     domain: "contents",
     endpoint: "/admin/contents/",
-    rowsEndpoint: "/admin/contents/rows",  // ← HTML partial mode
-    tbodyId: "contents-table-body",
-    searchId: "content-search",
+    rowsEndpoint: "/admin/contents/rows",
     filterIds: [
       "filter-type", "filter-section", "filter-category", "filter-source",
       "filter-status", "filter-active", "filter-published", "filter-quality",
       "filter-date-type", "filter-start-date", "filter-end-date", "sort-by", "sort-dir"
     ],
-    perPageId: "contents-per-page",
-    prevBtnId: "contents-prev-btn",
-    nextBtnId: "contents-next-btn",
-    indicatorId: "contents-page-indicator",
-    infoId: "contents-pagination-info",
-    countId: "contents-count",
-    clearBtnId: "clear-filters-btn",
-    refreshBtnId: "refresh-contents-btn",
-    defaultPerPage: 20,
     colspan: 9,
     onLoaded: () => {
-      document.getElementById("select-all-contents").checked = false;
+      const selectAll = document.getElementById("select-all-contents");
+      if (selectAll) selectAll.checked = false;
     },
     autoInit: false // Initialized manually inside loadMetadata()
   });

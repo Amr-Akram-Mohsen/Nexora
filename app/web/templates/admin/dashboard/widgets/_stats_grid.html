@@ -1,19 +1,19 @@
-<a href="/admin/contents" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/contents" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">📰</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.contents_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Contents</p>
 </a>
-<a href="/admin/items" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/items" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">🛍️</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.items_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Items</p>
 </a>
-<a href="/admin/users" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/users" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">👥</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.users_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Users</p>
 </a>
-<a href="/admin/moderation" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/moderation" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">📊</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.total or 0) }}</h3>
   <p class="dashboard-stat-label">Interactions</p>
@@ -23,12 +23,12 @@
   </p>
   {% endif %}
 </a>
-<a href="/admin/contents?sort_by=view_count&sort_dir=desc" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/contents?sort_by=view_count&sort_dir=desc" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">👁️</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.views or 0) }}</h3>
   <p class="dashboard-stat-label">Total Views</p>
 </a>
-<a href="/admin/moderation?tab=comments" class="dashboard-stat-card clickable-card flex flex-col justify-center">
+<a href="/admin/moderation?tab=comments" class="dashboard-stat-card clickable-card flex  justify-center">
   <div class="dashboard-stat-icon inline-flex-center">💬</div>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.comments or 0) }}</h3>
   <p class="dashboard-stat-label">Total Comments</p>

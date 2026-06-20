@@ -6,6 +6,7 @@ from .interaction.models import *
 from .recommendation.models import *
 from .external.models import *
 from .taxonomy.models import *
+from .distribution.models import *
 
 # IMPORTANT: relationships file MUST be imported too
 from .relationships import *

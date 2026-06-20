@@ -104,7 +104,22 @@ def generate_content_publishing_plan(mapped_content_data):
                 matching_asset = asset
                 break
                 
-        if max_decay > 15.0 and matching_asset:
+        # Check if already distributed
+        recently_published = False
+        if matching_asset:
+            d_posts = matching_asset.get("distribution_posts", [])
+            for dp in d_posts:
+                if dp["platform"] == platform and dp["status"] in ["published", "scheduled"]:
+                    recently_published = True
+                    break
+
+        if recently_published:
+            action = "monitor"
+            reason_str = f"Already distributed on {platform}. Monitor social performance."
+            source = matching_asset["id"]
+            content_type = f"Published {matching_asset['type'].replace('_', ' ').title()}"
+            points = 0.0 # Doesn't take workload points
+        elif max_decay > 15.0 and matching_asset:
             action = "update"
             reason_str = f"Critical traffic decay detected: views dropped by {max_decay}%. Update and refresh for search SEO."
             source = matching_asset["id"]

@@ -37,6 +37,30 @@ extra_class=""
 
 
 {# ==========================================================
+REFRESH BUTTON
+Used in page header actions on every CRUD control-panel page.
+  Usage: {% set header_actions %}{{ admin_refresh_btn("refresh-sources-btn") }}{% endset %}
+========================================================== #}
+{% macro admin_refresh_btn(id, text="↺ Refresh", extra_class="") %}
+<button id="{{ id }}" class="admin-btn-secondary {{ extra_class }}" {% for key, val in kwargs.items() %} {{ key }}="{{ val }}" {% endfor %}>{{ text }}</button>
+{% endmacro %}
+
+
+{# ==========================================================
+TOOLBAR SECTION
+Wraps filter rows in the standard admin-toolbar-advanced container.
+  Usage: {% call admin_toolbar_section() %}
+           <div class="admin-toolbar-row ...">…</div>
+         {% endcall %}
+========================================================== #}
+{% macro admin_toolbar_section(extra_class="", extra_style="") %}
+<div class="admin-toolbar-advanced flex gap-3 {{ extra_class }}" {% if extra_style %}{% endif %}>
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+
+{# ==========================================================
 SUMMARY BAR
 ========================================================== #}
 {% macro admin_summary_bar(
@@ -46,7 +70,7 @@ summary_id="",
 wrapper_class="",
 summary_class="admin-summary-bar"
 ) %}
-<div class="flex justify-between items-center mb-3 {{ wrapper_class }}">
+<div class="flex justify-between items-center {{ wrapper_class }}">
     <div {% if summary_id %} id="{{ summary_id }}" {% endif %} class="{{ summary_class }}">
         Showing <strong id="{{ count_id }}">—</strong> {{ label }}
     </div>
@@ -152,8 +176,14 @@ button_type="button"
 ) %}
 <button type="{{ button_type }}" {% if button_id %} data-id="{{ button_id }}" {% endif %} {% if data_action %}
     data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
-    class="user-action-btn user-action-{{ action_type }} {{ extra_class }}" {% for key, val in kwargs.items() %} {{ key
-    }}="{{ val }}" {% endfor %}>
+    class="user-action-btn user-action-{{ action_type }} {{ extra_class }}"
+    {% for key, val in kwargs.items() %}
+      {% if key == "attrs" and val is mapping %}
+        {% for k, v in val.items() %} {{ k }}="{{ v }}" {% endfor %}
+      {% else %}
+        {{ key.replace('_', '-') }}="{{ val }}"
+      {% endif %}
+    {% endfor %}>
     {% if icon %}
     {{ icon }}
     {% endif %}
@@ -166,7 +196,7 @@ button_type="button"
 ACTION GROUP
 ========================================================== #}
 {% macro action_group(
-wrapper_class="user-actions-group"
+wrapper_class="user-actions-group", extra_class=""
 ) %}
 <div class="{{ wrapper_class }}">
     {{ caller() }}

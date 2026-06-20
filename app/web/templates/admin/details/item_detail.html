@@ -1,0 +1,16 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block content %}
+<div class="admin-detail-page container py-4">
+    <div class="flex justify-between items-center mb-4">
+        <h2>Product Details: {{ title }}</h2>
+        <a href="{{ url_for('admin.dashboard_items') }}" class="dashboard-btn dashboard-btn-secondary">
+            &larr; Back to Products
+        </a>
+    </div>
+
+    <div class="admin-card ">
+        {% include "admin/components/_inspect.html" %}
+    </div>
+</div>
+{% endblock %}

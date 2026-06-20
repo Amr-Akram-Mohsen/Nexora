@@ -3,31 +3,57 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "columns": ["User", "Role", "Status", "Joined", "Last Active", "Engagement Score", "Actions"],
+        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score"],
+        "detailed_table": {
+            "user info": ["id", "name", "email", "role", "subscription", "status", "joined", "last active"],
+            "auth & security": ["provider", "verified", "verified at", "password changed"],
+            "user activity metrics": ["engagement score", "views", "reactions", "comments", "saves", "item clicks", "recommendations shown"],
+            "personalization": ["interests", "recent activity"]
+        }
     },
     "contents": {
         "id": "contents",
-        "columns": [
-            {"html": '<input type="checkbox" id="select-all-contents" />'},
-            "Content Details",
-            "Metadata & Health",
-            "Engagement",
-            "Published",
+        "preview_table": [
+            "Title",
+            "Metadata",
+            "Published At",
+            "Sources",
+            "Status",
+            "Renderation Status",
             "Actions",
         ],
+        "detailed_table": {
+            "content info": ["id", "title", "type", "category", "section"],
+            "performance metrics": ["views", "likes", "comments", "shares"],
+            "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count"],
+            "quality & scoring": ["base score", "review score", "article quality score"],
+            "taxonomy & targeting": ["intent", "gender", "price tier"],
+            "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "ingestion source"],
+            "status & lifecycle": ["published at", "ingested at", "enrichment status", "status", "renderation status"]
+        }
     },
     "items": {
         "id": "items",
-        "columns": ["Name", "Category / Brand", "Price", "Store Count", "Click Count", "Added", "Actions"],
+        "preview_table": ["Name", "Category / Brand", "Price", "Store Count", "Click Count", "Added", "Actions"],
+        "detailed_table": {
+            "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
+            "variants & availability": ["variants count", "store count", "price", "variant groups"],
+            "performance metrics": ["views", "likes", "dislikes", "shares", "saves", "click count"],
+            "content & quality": ["linked contents", "description", "rating", "review count", "images count", "specs count"]
+        }
     },
     "sources": {
         "id": "sources",
-        "columns": ["Name", "Volume", "Last Crawl", "Success Rate", "Failures", "Engagement", "Status", "Actions"],
+        "preview_table": ["Name", "Volume", "Last Crawl", "Success Rate", "Failures", "Engagement", "Status", "Actions"],
+        "detailed_table": {
+            "source info": ["id", "name", "slug", "domain", "authority score", "status"],
+            "related metadata": ["article count"]
+        }
     },
     "stores": {
         "id": "stores",
-        "columns": [
-            "Merchant Name",
+        "preview_table": [
+            "Name",
             "Affiliate Network",
             "Product Count",
             "Clicks",
@@ -39,42 +65,142 @@ CRUD_TABLES = {
     },
     "recommendations": {
         "id": "recs",
-        "columns": ["Content", "Views", "Linked Item", "Clicks", "Actions"],
+        "preview_table": ["Content Title", "Content Views", "Linked Items Count", "Linked Items IDs", "Actions"],
+        "detailed_table": {
+            "content info": ["id", "title", "type", "category", "views count"],
+            "item info": ["id", "name", "category", "brand", "price", "store count", "totle clicks"],
+        }
     },
     "categories": {
         "id": "categories",
-        "columns": ["Name", "Status", "Leaf", "Actions"],
+        "preview_table": ["Name", "Status", "heirarchy level", "Actions"],
+        "detailed_table": {
+            "category info": ["id", "slug", "name", "status", "sort order", "heirarchy level", "parent name"],
+            "related metadata": ["child categories", "content count", "item count"],
+        }
     },
     "brands": {
         "id": "brands",
-        "columns": ["Name", "Status", "Featured", "Actions"],
+        "preview_table": ["Name", "Status", "Featured", "Actions"],
+        "detailed_table": {
+            "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
+            "related metadata": ["content count", "item count"]
+        }
     },
     "topics": {
         "id": "topics",
-        "columns": ["Name", "Status", "Featured", "Actions"],
+        "preview_table": ["Name", "Status", "Featured", "Actions"],
+        "detailed_table": {
+            "topic info": ["id", "slug", "name", "featured", "status", "sort order"],
+            "related metadata": ["content count", "related categories", "related brands"],
+        }
     },
     "sections": {
         "id": "sections",
-        "columns": ["Name", "Status", "Description", "Actions"],
+        "preview_table": ["Name", "Status", "Description", "Actions"],
+        "detailed_table": {
+            "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
+            "related metadata": ["content count", "category count", "related brands"],
+        }
     },
     "comments": {
         "id": "comments",
-        "columns": ["Comment Preview", "User", "Target", "Sentiment", "Date", "Actions"],
+        "preview_table": ["Title", "Type", "Comment", "Sentiment", "Replies Count", "Date", "User", "Actions"],
+        "detailed_table": {
+            "moderation context": ["id", "comment", "sentiment", "confidence", "likes", "dislikes", "shares", "replies count"],
+            "user info": ["user id", "user name", "user email"],
+            "thread context": ["parent context", "latest replies"],
+            "target info": ["target type", "target title", "date"]
+        }
     },
     "reactions": {
         "id": "reactions",
-        "columns": ["ID", "Target", "Type", "User", "Date"],
+        "preview_table": ["Title", "Type", "Reaction Type", "Date", "User"],
     },
     "views": {
         "id": "views",
-        "columns": ["Target", "Target Type", "Views Count", "Latest View"],
+        "preview_table": ["Title", "Type", "Count", "Latest View"],
     },
     "clicks": {
         "id": "clicks",
-        "columns": ["Item", "Destination", "Click Count", "Latest Click"],
+        "preview_table": ["Product Name", "Category", "Brand", "Store", "Count", "Latest Click"],
+        "detailed_table": {
+            "link info": ["store name", "item name", "total clicks", "latest click"],
+            "recent traffic (last 5 clicks)": ["click 1", "click 2", "click 3", "click 4", "click 5"]
+        }
     },
     "saves": {
         "id": "saves",
-        "columns": ["Target", "Target Type", "User", "Save Date"],
+        "preview_table": ["Title", "Type", "Date", "User"],
     },
+    "user_interests": {
+        "id": "user_interests",
+        "preview_table": [],
+        "detailed_table": {
+            "top affinities (algorithmic)": ["affinity 1", "affinity 2", "affinity 3", "affinity 4", "affinity 5"]
+        }
+    }
 }
+
+INSIGHTS_TABLES = {
+    "top_opportunities": {
+        "id": "top-opportunities",
+        "preview_table": ["Rank", "Entity / Type", "Opportunity Score", "Reason"]
+    },
+    "content_strategy": {
+        "id": "content-strategy",
+        "preview_table": [
+            "Rank", 
+            "Target Entity", 
+            "Reasoning & Asset Mapping", 
+            {"html": '<th style="width: 60%; min-width: 500px;">Platform Content Strategies</th>'}
+        ]
+    },
+    "social_distribution": {
+        "id": "social-distribution",
+        "preview_table": ["Platform", "Source Asset", "Status", "Publish Date", "Performance", "Actions"]
+    },
+    "performance_feedback": {
+        "id": "feedback-evaluations",
+        "preview_table": ["Platform / Title", "Expected CTR", "Actual CTR", "Evaluation Status", "Reason"]
+    },
+    "asset_mapping": {
+        "id": "asset-mapping",
+        "preview_table": ["Target Entity", "Score", "Existing Assets", "Content Gaps", "Actions"]
+    },
+    "coverage_matrix": {
+        "id": "coverage-matrix",
+        "preview_table": ["Category", "Content Count", "Product Count", "Coverage Quality", "Action"]
+    },
+    "brand_opportunities": {
+        "id": "brand-opportunities",
+        "preview_table": ["Brand", "Opportunity Score", "Related Content", "Products", "Growth Trend"]
+    }
+}
+
+def get_inspect_table(table_name, data):
+    """
+    Generate an inspect_table dictionary by mapping the detailed_table schema 
+    for a given domain against a provided data dictionary.
+    
+    `data` should be a dict where keys are the field labels defined in the schema.
+    Values can be simple strings/numbers, or a dict like {"value": "html", "is_custom": True}
+    """
+    table = CRUD_TABLES.get(table_name, {}).get('detailed_table', {})
+    mapped_table = {}
+    for section_name, fields in table.items():
+        mapped_table[section_name.title()] = []
+        for field in fields:
+            field_data = data.get(field)
+            if isinstance(field_data, dict):
+                mapped_table[section_name.title()].append({
+                    "label": field.title(),
+                    "value": field_data.get("value", "—"),
+                    "is_custom": field_data.get("is_custom", False)
+                })
+            else:
+                mapped_table[section_name.title()].append({
+                    "label": field.title(),
+                    "value": str(field_data) if field_data is not None else "—"
+                })
+    return mapped_table

@@ -6,11 +6,11 @@
 (function () {
   'use strict';
 
-  let commentsController;
-  let reactionsController;
-  let viewsController;
-  let clicksController;
-  let savesController;
+  window.commentsController = null;
+  window.reactionsController = null;
+  window.viewsController = null;
+  window.clicksController = null;
+  window.savesController = null;
 
   // ── Tab switching ───────────────────────
   function switchTab(tabName) {
@@ -26,15 +26,15 @@
     if (panel) panel.classList.remove('is-hidden');
 
     if (btn.dataset.tab === 'reactions') {
-      reactionsController.load(1);
+      window.reactionsController.load(1);
     } else if (btn.dataset.tab === 'comments') {
-      commentsController.load(1);
+      window.commentsController.load(1);
     } else if (btn.dataset.tab === 'views') {
-      viewsController.load(1);
+      window.viewsController.load(1);
     } else if (btn.dataset.tab === 'clicks') {
-      clicksController.load(1);
+      window.clicksController.load(1);
     } else if (btn.dataset.tab === 'saves') {
-      savesController.load(1);
+      window.savesController.load(1);
     }
   }
 
@@ -97,7 +97,7 @@
           .then(d => {
             if (d.success) {
               showToast('Comment deleted.', 'success');
-              commentsController.load(commentsController.currentPage);
+              window.commentsController.load(window.commentsController.currentPage);
               loadStatsRow();
               if (modal) modal.classList.remove("active");
             } else {
@@ -117,7 +117,7 @@
       .then(d => {
         if (d.success) {
           showToast('Comment flagged as spam.', 'success');
-          commentsController.load(commentsController.currentPage);
+          window.commentsController.load(window.commentsController.currentPage);
           if (modal) modal.classList.remove("active");
         } else {
           showToast(d.error || 'Flag failed.', 'error');
@@ -127,22 +127,7 @@
       .catch(() => { showToast('Flag failed.', 'error'); if (btn) btn.disabled = false; });
   }
 
-  // ── Inspect Modal (server-rendered body) ──────────────────────
-  function openCommentInspect(commentId) {
-    const modal   = document.getElementById("inspect-comment-modal");
-    const body    = document.getElementById("inspect-comment-modal-body");
-    const titleEl = document.getElementById("inspect-comment-modal-title");
-    if (!modal || !body) return;
 
-    body.innerHTML = '<div class="dashboard-loading"><div class="spinner"></div><p>Loading…</p></div>';
-    titleEl.textContent = "Inspect Comment";
-    modal.classList.add("active");
-
-    fetch(`/admin/interactions/comments/${commentId}/inspect`)
-      .then(r => r.text())
-      .then(html => { body.innerHTML = html; })
-      .catch(() => { body.innerHTML = "<p class='text-muted'>Could not load comment.</p>"; });
-  }
 
   function applyInteractionsUrlFilters() {
     if (typeof applyUrlFilters !== "function") return;
@@ -173,96 +158,51 @@
 
   // ── Init ─────────────────────────────────
   function init() {
-    commentsController = new AdminListController({
+    window.commentsController = new AdminListController({
       domain: 'comments',
       endpoint: '/admin/interactions/comments',
-      rowsEndpoint: '/admin/interactions/comments/rows',   // ← HTML partial mode
-      tbodyId: 'comments-table-body',
-      searchId: 'comment-search',
+      rowsEndpoint: '/admin/interactions/comments/rows',
       filterIds: ['filter-comment-sentiment', 'filter-comment-target'],
-      perPageId: 'comments-per-page',
-      prevBtnId: 'comments-prev-btn',
-      nextBtnId: 'comments-next-btn',
-      indicatorId: 'comments-page-indicator',
-      infoId: 'comments-pagination-info',
-      countId: 'comments-count',
-      clearBtnId: 'clear-comment-filters-btn',
       defaultPerPage: 25,
       colspan: 6,
       autoInit: false
     });
 
-    reactionsController = new AdminListController({
+    window.reactionsController = new AdminListController({
       domain: 'reactions',
       endpoint: '/admin/interactions/reactions',
-      rowsEndpoint: '/admin/interactions/reactions/rows',  // ← HTML partial mode
-      tbodyId: 'reactions-table-body',
-      searchId: 'reactions-search',
+      rowsEndpoint: '/admin/interactions/reactions/rows',
       filterIds: ['filter-reaction-type', 'filter-reactions-user'],
-      perPageId: 'reactions-per-page',
-      prevBtnId: 'reactions-prev-btn',
-      nextBtnId: 'reactions-next-btn',
-      indicatorId: 'reactions-page-indicator',
-      infoId: 'reactions-pagination-info',
-      countId: 'reactions-count',
-      clearBtnId: 'clear-reactions-filters-btn',
       defaultPerPage: 25,
       colspan: 6,
       autoInit: false
     });
 
-    viewsController = new AdminListController({
+    window.viewsController = new AdminListController({
       domain: 'views',
       endpoint: '/admin/interactions/views',
-      rowsEndpoint: '/admin/interactions/views/rows',     // ← HTML partial mode
-      tbodyId: 'views-table-body',
-      searchId: 'views-search',
+      rowsEndpoint: '/admin/interactions/views/rows',
       filterIds: ['filter-views-start-date', 'filter-views-end-date'],
-      perPageId: 'views-per-page',
-      prevBtnId: 'views-prev-btn',
-      nextBtnId: 'views-next-btn',
-      indicatorId: 'views-page-indicator',
-      infoId: 'views-pagination-info',
-      countId: 'views-count',
-      clearBtnId: 'clear-views-filters-btn',
       defaultPerPage: 25,
       colspan: 5,
       autoInit: false
     });
 
-    clicksController = new AdminListController({
+    window.clicksController = new AdminListController({
       domain: 'clicks',
       endpoint: '/admin/interactions/clicks',
-      rowsEndpoint: '/admin/interactions/clicks/rows',    // ← HTML partial mode
-      tbodyId: 'clicks-table-body',
-      searchId: 'clicks-search',
+      rowsEndpoint: '/admin/interactions/clicks/rows',
       filterIds: ['filter-clicks-destination'],
-      perPageId: 'clicks-per-page',
-      prevBtnId: 'clicks-prev-btn',
-      nextBtnId: 'clicks-next-btn',
-      indicatorId: 'clicks-page-indicator',
-      infoId: 'clicks-pagination-info',
-      countId: 'clicks-count',
-      clearBtnId: 'clear-clicks-filters-btn',
       defaultPerPage: 25,
       colspan: 5,
       autoInit: false
     });
 
-    savesController = new AdminListController({
+    window.savesController = new AdminListController({
       domain: 'saves',
       endpoint: '/admin/interactions/saves',
-      rowsEndpoint: '/admin/interactions/saves/rows',     // ← HTML partial mode
-      tbodyId: 'saves-table-body',
-      searchId: 'saves-search',
+      rowsEndpoint: '/admin/interactions/saves/rows',
       filterIds: ['filter-saves-user'],
-      perPageId: 'saves-per-page',
-      prevBtnId: 'saves-prev-btn',
-      nextBtnId: 'saves-next-btn',
-      indicatorId: 'saves-page-indicator',
-      infoId: 'saves-pagination-info',
-      countId: 'saves-count',
-      clearBtnId: 'clear-saves-filters-btn',
       defaultPerPage: 25,
       colspan: 5,
       autoInit: false
@@ -273,24 +213,16 @@
     loadInteractionBreakdown();
     applyInteractionsUrlFilters();
 
-    commentsController.bindEvents();
-    reactionsController.bindEvents();
-    viewsController.bindEvents();
-    clicksController.bindEvents();
-    savesController.bindEvents();
+    window.commentsController.bindEvents();
+    window.reactionsController.bindEvents();
+    window.viewsController.bindEvents();
+    window.clicksController.bindEvents();
+    window.savesController.bindEvents();
 
     const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
     const activeTab = params.tab || 'comments';
     switchTab(activeTab);
 
-    // Comments table: inspect click delegation
-    document.getElementById('comments-table-body').addEventListener('click', e => {
-      const btn = e.target.closest('[data-action]');
-      if (!btn) return;
-      if (btn.dataset.action === 'inspect-comment') {
-        openCommentInspect(parseInt(btn.dataset.id || btn.dataset.commentId, 10));
-      }
-    });
 
     // Comment inspect modal: action delegation (rendered by _inspect.html)
     const commentModal = document.getElementById("inspect-comment-modal");

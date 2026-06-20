@@ -7,7 +7,7 @@
   'use strict';
 
   // ── State ──────────────────────────────
-  let itemsController;
+  window.itemsController = null;
 
   // ── Fetch meta for dropdowns ────────────
   function loadMeta() {
@@ -54,7 +54,7 @@
           .then(d => {
             if (d.success) {
               showToast(d.message || 'Product deleted.', 'success');
-              itemsController.load(itemsController.currentPage);
+              window.itemsController.load(window.itemsController.currentPage);
               if (modal) { modal.classList.remove("active"); }
             } else {
               showToast(d.error || 'Delete failed.', 'error');
@@ -86,25 +86,14 @@
   // ── Event Wiring ─────────────────────────
   function init() {
     // Instantiate items controller
-    itemsController = new AdminListController({
+    window.itemsController = new AdminListController({
       domain: 'items',
       endpoint: '/admin/items/',
-      rowsEndpoint: '/admin/items/rows',  // ← HTML partial mode
-      tbodyId: 'items-table-body',
-      searchId: 'item-search',
+      rowsEndpoint: '/admin/items/rows',
       filterIds: [
         'filter-item-brand', 'filter-item-category', 'filter-item-source', 'filter-item-type',
         'item-sort-by', 'item-sort-dir'
       ],
-      perPageId: 'items-per-page',
-      prevBtnId: 'items-prev-btn',
-      nextBtnId: 'items-next-btn',
-      indicatorId: 'items-page-indicator',
-      infoId: 'items-pagination-info',
-      countId: 'items-count',
-      clearBtnId: 'clear-item-filters-btn',
-      refreshBtnId: 'refresh-items-btn',
-      defaultPerPage: 20,
       colspan: 8,
       autoInit: false
     });
@@ -112,53 +101,24 @@
     loadMeta()
       .then(() => {
         applyItemUrlFilters();
-        itemsController.init();
+        window.itemsController.init();
       })
       .catch(() => {
-        itemsController.init();
+        window.itemsController.init();
       });
 
-    // Parent tbody click event delegation
-    document.getElementById('items-table-body').addEventListener('click', e => {
-      const btn = e.target.closest('[data-action]');
+
+
+    // Inspect modal or detail page: delete action delegation
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest("[data-action='delete-item']");
       if (!btn) return;
-      if (btn.dataset.action === 'inspect-item') {
-        const itemId = parseInt(btn.dataset.id || btn.dataset.itemId, 10);
-        showInspectModal(itemId);
-      }
+      const modal = document.getElementById("inspect-item-modal");
+      deleteItem(parseInt(btn.dataset.id, 10), btn.dataset.name, btn, modal);
     });
-
-    // Inspect modal: delete action delegation
-    const inspectModal = document.getElementById("inspect-item-modal");
-    if (inspectModal) {
-      inspectModal.addEventListener('click', e => {
-        const btn = e.target.closest("[data-action='delete-item']");
-        if (!btn) return;
-        deleteItem(parseInt(btn.dataset.id, 10), btn.dataset.name, btn, inspectModal);
-      });
-    }
   }
 
-  // ── Inspect Modal (server-rendered) ──────────────────
-  function showInspectModal(itemId) {
-    const modal   = document.getElementById("inspect-item-modal");
-    const body    = document.getElementById("inspect-item-modal-body");
-    const titleEl = document.getElementById("inspect-item-modal-title");
-    if (!modal || !body) return;
 
-    body.innerHTML = getSpinnerHtml('Loading store links…');
-    titleEl.textContent = 'Product Details';
-    modal.classList.add("active");
-
-    fetch(`/admin/items/${itemId}/inspect`)
-      .then(r => r.text())
-      .then(html => {
-        body.innerHTML = html;
-      })
-      .catch(() => {
-        body.innerHTML = getErrorStateHtml('Could not load product details. Please try again.');
-      });
-  }
 
 
 

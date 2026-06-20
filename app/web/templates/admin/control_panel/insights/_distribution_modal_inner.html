@@ -1,0 +1,35 @@
+<!-- _distribution_modal_inner.html -->
+<div >
+    <div class="flex justify-between" >
+        <div>
+            <h5 >Platform: <strong>{{ platform }}</strong></h5>
+            <div >Post Type: {{ post_type }}</div>
+        </div>
+        <div>
+            <span class="status-badge {{ '' if status == 'published' else '' }}">
+                {{ status | upper }}
+            </span>
+        </div>
+    </div>
+    
+    <div >
+        <label >Post Content</label>
+        <textarea style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-family: monospace;" id="distribution-post-text" rows="8" {% if status == 'published' %}readonly{% endif %}>{{ text }}</textarea>
+    </div>
+    
+    {% if status != 'published' %}
+    <div >
+        <label >Live URL (Optional)</label>
+        <input type="url" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;" id="distribution-external-url" placeholder="https://...">
+    </div>
+    {% endif %}
+    
+    <div class="flex justify-end gap-3 items-center" >
+        <button type="button" class="admin-btn-secondary" data-bs-dismiss="modal">Close</button>
+        {% if status != 'published' %}
+        <button type="button" class="admin-btn-primary" onclick="publishDistributionPost({{ post_id }})">Mark as Published</button>
+        {% else %}
+        <button type="button" class="admin-btn-success" disabled>Published</button>
+        {% endif %}
+    </div>
+</div>

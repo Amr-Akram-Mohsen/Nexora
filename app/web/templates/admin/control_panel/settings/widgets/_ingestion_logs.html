@@ -4,13 +4,13 @@
 <ul class="activity-feed">
   {% for log in logs %}
   {% set is_success = log.status == "Success" %}
-  <li class="activity-item flex items-start">
+  <li class="activity-item flex ">
     <div class="activity-icon flex-center {{ 'icon-like' if is_success else 'icon-dislike' }}">
       {{ '✅' if is_success else '❌' }}
     </div>
 
     <div class="activity-content" style="width: 100%;">
-      <div class="flex items-start justify-between" style="margin-bottom: 0.25rem;">
+      <div class="flex  justify-between" style="margin-bottom: 0.25rem;">
         <p class="activity-text" style="margin: 0; padding-right: 1rem;">
           <strong class="log-source">{{ log.source }}</strong>
           <span style="color: var(--muted-foreground); margin: 0 4px;">fetched</span>
@@ -19,7 +19,7 @@
 
         <span class="log-badges gap-2 flex items-center">
           <span class="status-badge {{ 'active' if is_success else 'inactive' }}">{{ log.status | upper }}</span>
-          <span class="status-badge purple">{{ log.type | upper }}</span>
+          <span class="status-badge ">{{ log.type | upper }}</span>
         </span>
       </div>
 

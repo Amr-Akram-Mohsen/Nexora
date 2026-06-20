@@ -7,10 +7,10 @@
   'use strict';
 
   const loadedTabs = new Set();
-  let categoriesController;
-  let brandsController;
-  let topicsController;
-  let sectionsController;
+  window.categoriesController = null;
+  window.brandsController = null;
+  window.topicsController = null;
+  window.sectionsController = null;
 
   // ── Slug helper (mirrors Python's generate_slug) ─────────────
   function slugify(str) {
@@ -44,10 +44,10 @@
       if (tab === 'topics')     topicsController.init();
       if (tab === 'sections')   sectionsController.init();
     } else {
-      if (tab === 'categories') categoriesController.load(1);
-      if (tab === 'brands')     brandsController.load(1);
-      if (tab === 'topics')     topicsController.load(1);
-      if (tab === 'sections')   sectionsController.load(1);
+      if (tab === 'categories') window.categoriesController.load(1);
+      if (tab === 'brands')     window.brandsController.load(1);
+      if (tab === 'topics')     window.topicsController.load(1);
+      if (tab === 'sections')   window.sectionsController.load(1);
     }
   }
 
@@ -68,7 +68,7 @@
         showToast(`Category "${name}" created.`, 'success');
         nameInput.value = '';
         document.getElementById('new-category-slug-preview').textContent = '—';
-        categoriesController.load(1);
+        window.categoriesController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -79,7 +79,7 @@
       fetch(`/admin/taxonomy/categories/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); categoriesController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); window.categoriesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -96,7 +96,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Category ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        categoriesController.load(1);
+        window.categoriesController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -119,7 +119,7 @@
         document.getElementById('new-brand-name').value = '';
         document.getElementById('new-brand-industry').value = '';
         document.getElementById('new-brand-slug-preview').textContent = '—';
-        brandsController.load(1);
+        window.brandsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -130,7 +130,7 @@
       fetch(`/admin/taxonomy/brands/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); brandsController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); window.brandsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -147,7 +147,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Brand ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        brandsController.load(1);
+        window.brandsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -168,7 +168,7 @@
         showToast(`Topic "${name}" created.`, 'success');
         document.getElementById('new-topic-name').value = '';
         document.getElementById('new-topic-slug-preview').textContent = '—';
-        topicsController.load(1);
+        window.topicsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -179,7 +179,7 @@
       fetch(`/admin/taxonomy/topics/${id}`, { method: 'DELETE' })
         .then(r => r.json())
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); topicsController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); window.topicsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -196,7 +196,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Topic ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        topicsController.load(1);
+        window.topicsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -212,7 +212,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Section ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        sectionsController.load(1);
+        window.sectionsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -250,30 +250,11 @@
     });
   }
 
-  // ── Inspect Helper ────────────────────────
   function inspectTaxonomy(domainPlural, domainSingular, id) {
-    const modalId = `inspect-${domainSingular}-modal`;
-    const bodyId = `inspect-${domainSingular}-body`;
-    const bodyEl = document.getElementById(bodyId);
-    
-    if (!bodyEl) return;
-    
-    // Show modal with loading state
-    bodyEl.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div></div>';
-    
-    const modalEl = document.getElementById(modalId);
-    if (modalEl) {
-      modalEl.classList.add('active');
+    if (typeof window.openInspectModal === "function") {
+      const title = domainSingular.charAt(0).toUpperCase() + domainSingular.slice(1);
+      window.openInspectModal(`/admin/taxonomy/${domainPlural}/${id}/inspect`, `inspect-${domainSingular}-modal`, `Inspect ${title}`);
     }
-    
-    fetch(`/admin/taxonomy/${domainPlural}/${id}/inspect`)
-      .then(r => r.ok ? r.text() : Promise.reject('Failed to load inspect data'))
-      .then(html => {
-        bodyEl.innerHTML = html;
-      })
-      .catch(err => {
-        bodyEl.innerHTML = `<div class="dashboard-error loading-height-sm">Error: ${err}</div>`;
-      });
   }
 
   // ── Slug Preview Wiring ──────────────────
@@ -315,46 +296,34 @@
 
   // ── Init ─────────────────────────────────
   function init() {
-    categoriesController = new AdminListController({
+    window.categoriesController = new AdminListController({
       domain: 'categories',
       endpoint: '/admin/taxonomy/categories',
-      rowsEndpoint: '/admin/taxonomy/categories/rows',  // ← HTML partial mode
-      tbodyId: 'categories-table-body',
-      searchId: 'category-search',
-      filterIds: [],
+      rowsEndpoint: '/admin/taxonomy/categories/rows',
       colspan: 4,
       autoInit: false
     });
 
-    brandsController = new AdminListController({
+    window.brandsController = new AdminListController({
       domain: 'brands',
       endpoint: '/admin/taxonomy/brands',
-      rowsEndpoint: '/admin/taxonomy/brands/rows',      // ← HTML partial mode
-      tbodyId: 'brands-table-body',
-      searchId: 'brand-search',
-      filterIds: [],
+      rowsEndpoint: '/admin/taxonomy/brands/rows',
       colspan: 5,
       autoInit: false
     });
 
-    topicsController = new AdminListController({
+    window.topicsController = new AdminListController({
       domain: 'topics',
       endpoint: '/admin/taxonomy/topics',
-      rowsEndpoint: '/admin/taxonomy/topics/rows',      // ← HTML partial mode
-      tbodyId: 'topics-table-body',
-      searchId: 'topic-search',
-      filterIds: [],
+      rowsEndpoint: '/admin/taxonomy/topics/rows',
       colspan: 4,
       autoInit: false
     });
 
-    sectionsController = new AdminListController({
+    window.sectionsController = new AdminListController({
       domain: 'sections',
       endpoint: '/admin/taxonomy/sections',
-      rowsEndpoint: '/admin/taxonomy/sections/rows',    // ← HTML partial mode
-      tbodyId: 'sections-table-body',
-      searchId: '',
-      filterIds: [],
+      rowsEndpoint: '/admin/taxonomy/sections/rows',
       colspan: 4,
       autoInit: false
     });
@@ -365,7 +334,7 @@
     initCreateButtons();
 
     // Load first tab (categories)
-    categoriesController.init();
+    window.categoriesController.init();
     loadedTabs.add('categories');
   }
 

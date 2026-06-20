@@ -69,12 +69,26 @@ def collect_feedback_data():
     intents = db.session.execute(select(IntentFacet.id, IntentFacet.name, IntentFacet.slug)).all()
     intent_map = {i[0]: i[2] for i in intents}
     
+    # [FUTURE FEEDBACK LOOP] Fetch DistributionPost metrics
+    # Once enough data exists, this will influence 'Platform-weighted accuracy' and future strategy.
+    from app.domains.distribution.models import DistributionPost
+    dist_stmt = select(
+        DistributionPost.source_target_id,
+        func.sum(DistributionPost.views_count),
+        func.sum(DistributionPost.likes_count),
+        func.sum(DistributionPost.clicks_count)
+    ).where(DistributionPost.source_target_type == "content").group_by(DistributionPost.source_target_id)
+    dist_map = {}
+    for row in db.session.execute(dist_stmt).all():
+        dist_map[row[0]] = {"views": row[1], "likes": row[2], "clicks": row[3]}
+
     return {
         "cat_id_to_name": cat_id_to_name,
         "contents": contents,
         "imp_map": imp_map,
         "clk_map": clk_map,
-        "intent_map": intent_map
+        "intent_map": intent_map,
+        "dist_map": dist_map
     }
 
 def calculate_content_metrics(content_item, data_maps):
@@ -109,6 +123,10 @@ def calculate_content_metrics(content_item, data_maps):
     conversion_rate = 0.5 + (c_id % 4)
     
     extended = calculate_extended_metrics(c_id, views)
+    
+    # [FUTURE FEEDBACK LOOP] Append distribution stats for architecture readiness
+    dist_stats = data_maps.get("dist_map", {}).get(c_id, {"views": 0, "likes": 0, "clicks": 0})
+    extended["social_distribution"] = dist_stats
     
     return {
         "content_id": c_id,

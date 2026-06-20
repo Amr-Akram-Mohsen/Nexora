@@ -34,7 +34,7 @@
 </div>
 
 <!-- New Ingestion Distributions Section -->
-<div class="overview-top-grid mt-6">
+<div class="overview-top-grid ">
 
   <!-- Categories Distribution -->
   {% call admin_panel("🏷️ Top Categories", "Volume Breakdown", header_class="flex items-center justify-between") %}
@@ -53,7 +53,7 @@
 </div>
 
 <!-- Top Content Section -->
-<div class="overview-top-grid mt-6">
+<div class="overview-top-grid ">
 
   <!-- Top Articles by views -->
   {% call admin_panel("📰 Top Articles", "by view count", header_class="flex items-center justify-between") %}
@@ -72,7 +72,7 @@
 </div>
 
 <!-- Provider Performance & Activity Hub -->
-<div class="overview-top-grid mt-6">
+<div class="overview-top-grid ">
   <!-- Top Performing Providers -->
   {% call admin_panel("📈 Top Content Providers", "By Total Views", header_class="flex items-center justify-between") %}
   <div id="top-content-providers-container" class="panel-body-padded admin-table-scrollable">
@@ -88,7 +88,7 @@
   {% endcall %}
 </div>
 
-<div class="overview-top-grid mt-6">
+<div class="overview-top-grid ">
   <!-- Product Sources Distribution -->
   {% call admin_panel("🛍️ Product Sources", "Marketplace Volume", header_class="flex items-center justify-between") %}
   <div id="product-sources-distribution-container" class="panel-body-padded">
@@ -106,7 +106,7 @@
 </div>
 
 <!-- Interaction Breakdown -->
-<div class="mt-6">
+<div class="">
   {% call admin_panel("📊 Interaction Breakdown", "all time", header_class="flex items-center justify-between") %}
   <div id="overview-interactions-container" class="panel-body-padded">
     {{ spinner("Loading breakdown…") }}

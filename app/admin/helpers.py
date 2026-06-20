@@ -116,3 +116,24 @@ def make_rows_response(html: str, *, total: int, pages: int, page: int):
     resp.headers["X-Pages"] = pages
     resp.headers["X-Page"]  = page
     return resp
+
+
+# ──────────────────────────────────────────────
+# FIELD FORMATTERS
+# ──────────────────────────────────────────────
+
+def format_date(dt, default="—", fmt="%Y-%m-%d"):
+    """Format a datetime object consistently."""
+    return dt.strftime(fmt) if dt else default
+
+def format_datetime(dt, default="—", fmt="%Y-%m-%d %H:%M"):
+    """Format a datetime object consistently with time."""
+    return dt.strftime(fmt) if dt else default
+
+def format_status(is_active: bool) -> str:
+    """Format a boolean status to 'active' or 'inactive'."""
+    return "active" if is_active else "inactive"
+
+def format_featured(is_featured: bool) -> str:
+    """Format a boolean featured flag to 'featured' or 'standard'."""
+    return "featured" if is_featured else "standard"

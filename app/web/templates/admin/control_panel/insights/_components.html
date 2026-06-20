@@ -1,0 +1,23 @@
+{# app/web/templates/admin/control_panel/insights/_components.html #}
+
+{% macro metric_card(label, value, meta) %}
+<div class="rec-stat-card">
+  <div class="flex justify-between items-center">
+    <p class="dashboard-stat-label">{{ label }}</p>
+    <p class="dashboard-stat-value">{{ value }}</p>
+  </div>
+  <p class="dashboard-stat-meta">{{ meta }}</p>
+</div>
+{% endmacro %}
+
+{% macro opportunity_card(title, data_attrs="", expandable=false) %}
+<div class="insights-opp-card flex" {{ data_attrs|safe }}>
+  <div class="flex justify-between items-center">
+    <h3 class="opp-title" title="{{ title }}">{{ title }}</h3>
+    {% if expandable %}
+      <span class="expand-arrow transition-transform duration-200 cursor-pointer">▼</span>
+    {% endif %}
+  </div>
+  {{ caller() }}
+</div>
+{% endmacro %}

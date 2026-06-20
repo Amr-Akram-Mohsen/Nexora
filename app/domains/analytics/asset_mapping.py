@@ -4,6 +4,7 @@ from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.taxonomy.models import Category, Brand
+from app.domains.distribution.models import DistributionPost, DistributionPlatform
 
 def map_content_strategy_to_assets(content_strategy_data):
     """
@@ -26,6 +27,24 @@ def map_content_strategy_to_assets(content_strategy_data):
     
     brands = db.session.execute(select(Brand.id, Brand.name)).all()
     brand_id_to_name = {b[0]: b[1] for b in brands}
+
+    dist_posts = db.session.execute(
+        select(DistributionPost, DistributionPlatform.name)
+        .join(DistributionPlatform)
+    ).all()
+    
+    dist_map = {}
+    for post, platform_name in dist_posts:
+        key = (post.source_target_type, post.source_target_id)
+        if key not in dist_map:
+            dist_map[key] = []
+        dist_map[key].append({
+            "platform": platform_name,
+            "status": post.status,
+            "publish_date": post.publish_date.isoformat() if post.publish_date else None,
+            "views": post.views_count,
+            "post_id": post.id
+        })
 
     STOPWORDS = {"a", "an", "the", "and", "or", "of", "in", "to", "for", "is", "on", "with", "it", "at", "by", "from", "how", "ultimate", "complete", "best", "top", "guide", "cheat", "sheet", "checklist", "infographic", "review", "vs", "comparison"}
 
@@ -238,7 +257,8 @@ def map_content_strategy_to_assets(content_strategy_data):
                         "type": "video" if c_type == "video" else "article",
                         "title": c_title,
                         "relevance_score": round(max_sim, 2),
-                        "action": action
+                        "action": action,
+                        "distribution_posts": dist_map.get(("content", c_id), [])
                     })
 
         # 2. Match against Item product pages
@@ -265,7 +285,8 @@ def map_content_strategy_to_assets(content_strategy_data):
                         "type": "product_page",
                         "title": i_name,
                         "relevance_score": round(max_sim, 2),
-                        "action": action
+                        "action": action,
+                        "distribution_posts": dist_map.get(("item", i_id), [])
                     })
 
         # 3. Detect gaps and missing assets with explanatory diagnostics

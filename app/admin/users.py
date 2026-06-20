@@ -106,6 +106,14 @@ def activate_user(id):
     return jsonify({"success": True})
 
 
+ENGAGEMENT_WEIGHTS = {
+    'views': 1,
+    'clicks': 2,
+    'saves': 3,
+    'reactions': 2,
+    'comments': 4
+}
+
 def _build_user_query(search, role):
     """Shared query builder for users listing and rows endpoint."""
     views_sub = select(View.user_id, func.count(View.id).label("cnt")).where(View.user_id.isnot(None)).group_by(View.user_id).subquery()
@@ -115,11 +123,11 @@ def _build_user_query(search, role):
     comments_sub = select(Comment.user_id, func.count(Comment.id).label("cnt")).group_by(Comment.user_id).subquery()
 
     engagement_score_expr = (
-        func.coalesce(views_sub.c.cnt, 0) * 1 +
-        func.coalesce(clicks_sub.c.cnt, 0) * 2 +
-        func.coalesce(saves_sub.c.cnt, 0) * 3 +
-        func.coalesce(reactions_sub.c.cnt, 0) * 2 +
-        func.coalesce(comments_sub.c.cnt, 0) * 4
+        func.coalesce(views_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['views'] +
+        func.coalesce(clicks_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['clicks'] +
+        func.coalesce(saves_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['saves'] +
+        func.coalesce(reactions_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['reactions'] +
+        func.coalesce(comments_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['comments']
     )
 
     stmt = select(
@@ -160,12 +168,23 @@ def users_rows():
 
     users = []
     for u, score in items:
-        u.engagement_score = score or 0
-        users.append(u)
+        users.append({
+            "id": u.id,
+            "name": f'''{u.name}
+            {u.email}'''
+            ,
+            "role": 'admin' if u.is_admin else 'user',
+            "subscription": 'subscribed' if u.newsletter_subscription and u.newsletter_subscription.is_active else 'not subscribed',
+            "status": 'active' if u.is_active else 'inactive',
+            "joined": u.created_at.strftime('%Y-%m-%d') if u.created_at else "—",
+            "last-active": u.last_login_at.strftime('%Y-%m-%d %H:%M') if u.last_login_at else "Never",
+            "engagement-score": round(score, 1) if score else 0,
+        })
 
     html = render_template(
-        "admin/control_panel/users/_rows.html",
+        "admin/components/_rows.html",
         items=users,
+        domain_type="user"
     )
     return make_rows_response(
         html,
@@ -175,123 +194,136 @@ def users_rows():
     )
 
 
-@bp.route("/<int:id>/inspect", methods=["GET"])
-def inspect_user(id):
-    """Return server-rendered HTML for the user inspect modal body."""
-    user = db.session.get(User, id)
+def build_user_inspect_data(id):
+    """Return dictionary of data needed for the user inspect/detail view."""
+    from sqlalchemy.orm import selectinload
+    stmt_user = select(User).options(
+        selectinload(User.user_interests).selectinload(UserInterest.entity_scores),
+        selectinload(User.newsletter_subscription)
+    ).where(User.id == id)
+    user = db.session.scalar(stmt_user)
+    
     if not user:
-        return "<p class='text-muted'>User not found.</p>", 404
+        return None
 
-    # 1. Activity Summary
-    views_count = db.session.scalar(select(func.count(View.id)).where(View.user_id == id)) or 0
-    clicks_count = db.session.scalar(select(func.count(ItemClick.id)).where(ItemClick.user_id == id)) or 0
-    saves_count = db.session.scalar(select(func.count(Save.id)).where(Save.user_id == id)) or 0
-    reactions_count = db.session.scalar(select(func.count(Reaction.id)).where(Reaction.user_id == id)) or 0
-    comments_count = db.session.scalar(select(func.count(Comment.id)).where(Comment.user_id == id)) or 0
+    stmt_metrics = select(
+        (select(func.count(View.id)).where(View.user_id == id)).scalar_subquery(),
+        (select(func.count(ItemClick.id)).where(ItemClick.user_id == id)).scalar_subquery(),
+        (select(func.count(Save.id)).where(Save.user_id == id)).scalar_subquery(),
+        (select(func.count(Reaction.id)).where(Reaction.user_id == id)).scalar_subquery(),
+        (select(func.count(Comment.id)).where(Comment.user_id == id)).scalar_subquery()
+    )
+    views_count, clicks_count, saves_count, reactions_count, comments_count = db.session.execute(stmt_metrics).first()
 
-    # 2. Content Consumption (from UserEntityInterest)
-    top_categories = db.session.execute(
-        select(Category.name, func.sum(UserEntityInterest.score).label("total_score"))
-        .join(UserEntityInterest, UserEntityInterest.category_id == Category.id)
-        .join(UserInterest, UserInterest.id == UserEntityInterest.user_interest_id)
-        .where(UserInterest.user_id == id)
-        .group_by(Category.name)
-        .order_by(func.sum(UserEntityInterest.score).desc())
-        .limit(5)
-    ).all()
-
-    top_topics = db.session.execute(
-        select(Topic.name, func.sum(UserEntityInterest.score).label("total_score"))
-        .join(UserEntityInterest, UserEntityInterest.topic_id == Topic.id)
-        .join(UserInterest, UserInterest.id == UserEntityInterest.user_interest_id)
-        .where(UserInterest.user_id == id)
-        .group_by(Topic.name)
-        .order_by(func.sum(UserEntityInterest.score).desc())
-        .limit(5)
-    ).all()
-
-    top_brands = db.session.execute(
-        select(Brand.name, func.sum(UserEntityInterest.score).label("total_score"))
-        .join(UserEntityInterest, UserEntityInterest.brand_id == Brand.id)
-        .join(UserInterest, UserInterest.id == UserEntityInterest.user_interest_id)
-        .where(UserInterest.user_id == id)
-        .group_by(Brand.name)
-        .order_by(func.sum(UserEntityInterest.score).desc())
-        .limit(5)
-    ).all()
-
-    # 3. Recommendation Engagement
     recs_seen_rows = db.session.execute(
         select(RecommendationImpression.entity_ids).where(RecommendationImpression.user_id == id)
     ).scalars().all()
     recs_seen = sum(len(ids) if isinstance(ids, list) else 0 for ids in recs_seen_rows)
 
-    recs_clicked = db.session.scalar(
-        select(func.count(RecommendationClick.id)).where(RecommendationClick.user_id == id)
-    ) or 0
-    rec_ctr = (recs_clicked / recs_seen * 100) if recs_seen > 0 else 0.0
+    engagement_score = (views_count * ENGAGEMENT_WEIGHTS['views']) + (clicks_count * ENGAGEMENT_WEIGHTS['clicks']) + (saves_count * ENGAGEMENT_WEIGHTS['saves']) + (reactions_count * ENGAGEMENT_WEIGHTS['reactions']) + (comments_count * ENGAGEMENT_WEIGHTS['comments'])
 
-    # 4. Comments Sentiment Summary
-    sentiment_counts = db.session.execute(
-        select(Comment.sentiment, func.count(Comment.id))
-        .where(Comment.user_id == id)
-        .group_by(Comment.sentiment)
-    ).all()
+    from app.admin.helpers import format_date, format_datetime
+    from app.admin.tables import get_inspect_table
+    
+    provider = user.provider.title() if user.provider else "Local"
+    verified_str = "Yes" if user.is_verified else "No"
+    
+    brand_ids, cat_ids, topic_ids = set(), set(), set()
+    for ui in user.user_interests:
+        for score in ui.entity_scores:
+            if score.brand_id: brand_ids.add(score.brand_id)
+            if score.category_id: cat_ids.add(score.category_id)
+            if score.topic_id: topic_ids.add(score.topic_id)
+            
+    interests = []
+    if brand_ids:
+        interests.extend(db.session.scalars(select(Brand.name).where(Brand.id.in_(brand_ids))).all())
+    if cat_ids:
+        interests.extend(db.session.scalars(select(Category.name).where(Category.id.in_(cat_ids))).all())
+    if topic_ids:
+        interests.extend(db.session.scalars(select(Topic.name).where(Topic.id.in_(topic_ids))).all())
+        
+    interests_str = ", ".join(interests) if interests else "—"
 
-    sentiment_dict = {
-        "positive": 0,
-        "neutral": 0,
-        "negative": 0
+    recent_activity = "—"
+    latest_comment = db.session.scalar(select(Comment).where(Comment.user_id == id).order_by(Comment.created_at.desc()).limit(1))
+    latest_save = db.session.scalar(select(Save).where(Save.user_id == id).order_by(Save.created_at.desc()).limit(1))
+    
+    if latest_comment and latest_save:
+        if latest_comment.created_at > latest_save.created_at:
+            recent_activity = f"<b>Commented:</b> {latest_comment.content[:50]}..."
+        else:
+            title = latest_save.target.title if latest_save.target_type == 'content' else latest_save.target.name
+            recent_activity = f"<b>Saved:</b> {title}"
+    elif latest_comment:
+        recent_activity = f"<b>Commented:</b> {latest_comment.content[:50]}..."
+    elif latest_save:
+        title = latest_save.target.title if latest_save.target_type == 'content' else latest_save.target.name
+        recent_activity = f"<b>Saved:</b> {title}"
+
+    data = {
+        "id": f"#{user.id}",
+        "name": user.name or "—",
+        "email": user.email,
+        "role": "Admin" if user.is_admin else "User",
+        "subscription": "Subscribed" if user.newsletter_subscription and user.newsletter_subscription.is_active else "Not Subscribed",
+        "status": "Active" if user.is_active else "Inactive",
+        "joined": format_date(user.created_at, fmt='%b %d, %Y') if user.created_at else "—",
+        "last active": format_datetime(user.last_login_at, fmt='%b %d, %Y %H:%M') if user.last_login_at else "Never",
+        
+        "provider": provider,
+        "verified": verified_str,
+        "verified at": format_datetime(user.verified_at, fmt='%b %d, %Y %H:%M') if user.verified_at else "—",
+        "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else "—",
+
+        "engagement score": str(engagement_score),
+        "views": str(views_count),
+        "reactions": str(reactions_count),
+        "comments": str(comments_count),
+        "saves": str(saves_count),
+        "item clicks": str(clicks_count),
+        "recommendations shown": str(recs_seen),
+        
+        "interests": interests_str,
+        "recent activity": {"value": recent_activity, "is_custom": True} if recent_activity != "—" else "—"
     }
-    for sent, count in sentiment_counts:
-        if sent:
-            sent_lower = sent.lower()
-            if sent_lower in sentiment_dict:
-                sentiment_dict[sent_lower] += count
-            else:
-                sentiment_dict[sent_lower] = count
+    inspect_table = get_inspect_table("users", data)
 
-    recent_comments = db.session.execute(
-        select(Comment)
-        .where(Comment.user_id == id)
-        .order_by(Comment.created_at.desc())
-        .limit(5)
-    ).scalars().all()
+    actions = [
+        {
+            "label": "Demote to User" if user.is_admin else "Promote to Admin",
+            "action_type": "toggle-admin",
+            "extra_class": "user-action-toggle-admin",
+            "attrs": {"data-action": "toggle-admin", "data-id": user.id, "data-name": (user.name or user.email)}
+        },
+        {
+            "label": "Deactivate Account" if user.is_active else "Activate Account",
+            "action_type": "toggle-active",
+            "extra_class": "user-action-toggle-active",
+            "attrs": {"data-action": "toggle-active", "data-id": user.id, "data-is-active": str(user.is_active).lower(), "data-name": (user.name or user.email)}
+        },
+        {
+            "label": "Debug Personalization",
+            "action_type": "view",
+            "icon": "🧠",
+            "extra_class": "inspect-action-debug-recs",
+            "attrs": {"data-action": "inspect", "data-domain": "recommendations/user_interests", "data-id": user.id}
+        },
+        {
+            "label": "Delete User",
+            "action_type": "delete",
+            "icon": "🗑",
+            "extra_class": "user-action-delete",
+            "attrs": {"data-action": "delete-user", "data-id": user.id, "data-name": (user.name or user.email)}
+        }
+    ]
 
-    # 5. Moderation Signals (Dummy since no DB tables exist)
-    moderation_signals = {
-        "warnings": 0,
-        "reported_content": 0,
-        "deleted_comments": 0
+    return {
+        "inspect_table": inspect_table,
+        "actions": actions,
+        "inspect_id": user.id,
+        "user_name": user.name or user.email
     }
-
-    return render_template(
-        "admin/control_panel/users/_inspect.html",
-        user=user,
-        activity={
-            "views": views_count,
-            "clicks": clicks_count,
-            "saves": saves_count,
-            "reactions": reactions_count,
-            "comments": comments_count
-        },
-        content_consumption={
-            "categories": top_categories,
-            "topics": top_topics,
-            "brands": top_brands
-        },
-        recommendation={
-            "seen": recs_seen,
-            "clicked": recs_clicked,
-            "ctr": rec_ctr
-        },
-        comments_summary={
-            "total": comments_count,
-            "sentiment": sentiment_dict,
-            "recent": recent_comments
-        },
-        moderation=moderation_signals
-    )
 
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])
