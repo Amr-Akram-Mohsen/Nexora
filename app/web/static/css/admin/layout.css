@@ -61,10 +61,15 @@
 
 .admin-content {
     padding: var(--listing-gap);
-    max-width: var(--container-max-width, 1000px);
+    max-width: var(--container-max-width, 1400px);
     width: 100%;
     margin: 0 auto;
     min-width: 0;
+}
+
+/* Full-width variant for dense CRUD pages where tables need space */
+.admin-content-fluid {
+    max-width: none;
 }
 
 /* --- Page Header Layout & Typography --- */
@@ -222,11 +227,38 @@
     padding: 1.25rem 1rem;
 }
 
+.dashboard-loading.loading-height-md,
+.dashboard-empty.loading-height-md,
+.dashboard-error.loading-height-md {
+    min-height: 200px;
+    padding: 2.5rem 2rem;
+}
+
 .dashboard-loading.loading-height-lg,
 .dashboard-empty.loading-height-lg,
 .dashboard-error.loading-height-lg {
     min-height: 300px;
     padding: 4rem 2rem;
+}
+
+/* --- Dedicated Entity Detail Page --- */
+
+.admin-detail-page {
+    max-width: 1100px;
+}
+
+.admin-detail-page-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-detail-page-header h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+    margin: 0;
 }
 
 /* --- State Icon & Subtext Helpers --- */

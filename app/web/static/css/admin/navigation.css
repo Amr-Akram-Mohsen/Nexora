@@ -177,6 +177,11 @@
   display: none;
 }
 
+/* Tab panel content that needs top separation from sibling elements */
+.admin-tab-panel-body {
+  margin-top: 1.5rem;
+}
+
 /* --- Collapsible Sidebar Styles & Transitions --- */
 
 .sidebar-toggle-btn {

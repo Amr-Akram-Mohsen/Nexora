@@ -60,7 +60,7 @@ admin_toolbar_section %}
 
 {# ── Reactions Tab ────────────────────────────────────────── #}
 {% call admin_tab_panel("reactions") %}
-  <div style="margin-top:2rem;">
+  <div class="admin-tab-panel-body">
     {% call admin_toolbar_section() %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("reactions-search", "Search target title…") }}
@@ -83,14 +83,12 @@ admin_toolbar_section %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("views-search", "Search target title…") }}
     <div class="flex items-center gap-2">
-      <span class=" ">From:</span>
-      <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item"
-        style="padding: 0.35rem 0.5rem;" />
+      <span class="filter-label-xs">From:</span>
+      <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item" />
     </div>
     <div class="flex items-center gap-2">
-      <span class=" ">To:</span>
-      <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item"
-        style="padding: 0.35rem 0.5rem;" />
+      <span class="filter-label-xs">To:</span>
+      <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item" />
     </div>
     {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
   </div>

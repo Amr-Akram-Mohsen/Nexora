@@ -1,5 +1,6 @@
 {% extends "admin/layout/_crud_page_base.html" %}
 
+{% set header_title = "Products Management" %}
 {% set page_description = "Browse, search, and manage all affiliate and editorial products" %}
 {% set summary_label = "products" %}
 
@@ -16,7 +17,7 @@
 
   {# Row 2: Sorting & Reset #}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    <div class="filter-sort-group gap-2" style="margin-left:0;">
+    <div class="filter-sort-group gap-2">
       <span class="filter-label-xs">Sort:</span>
       {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"), ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
       {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}

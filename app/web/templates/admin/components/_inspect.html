@@ -36,8 +36,8 @@ action_button %}
   {% if linked_items is defined %}
   {% call inspect_section("Linked Products") %}
   {% if linked_items %}
-  <div class="table-responsive">
-    <table class="table">
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -53,9 +53,9 @@ action_button %}
           <td>#{{ item.id }}</td>
           <td>{{ item.name }}</td>
           <td><span class="status-badge inspect-">{{ item.type or "—" }}</span></td>
-          <td>{{ "{:,}".format(item.clicks) }}</td>
+          <td class="col-metric">{{ "{:,}".format(item.clicks) }}</td>
           <td>
-            <button class="user-action-btn user-action-delete btn-sm" data-action="unlink-match"
+            <button class="user-action-btn user-action-delete" data-action="unlink-match"
               data-content-id="{{ inspect_id }}" data-item-id="{{ item.id }}">
               🔓 Unlink
             </button>

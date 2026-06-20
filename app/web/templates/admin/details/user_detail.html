@@ -1,16 +1,26 @@
 {% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header %}
 
-{% block content %}
-<div class="admin-detail-page container py-4">
-    <div class="flex justify-between items-center mb-4">
-        <h2>User Details: {{ title }}</h2>
-        <a href="{{ url_for('admin.dashboard_users') }}" class="dashboard-btn dashboard-btn-secondary">
-            &larr; Back to Users
-        </a>
-    </div>
+{% block title %}User Details — Nexora Admin{% endblock %}
 
-    <div class="admin-card ">
-        {% include "admin/components/_inspect.html" %}
-    </div>
+{% block admin_content %}
+
+{% set header_actions %}
+<a href="{{ url_for('admin.dashboard_users') }}" class="admin-btn-secondary">
+  ← Back to Users
+</a>
+{% endset %}
+
+{{ admin_page_header(
+  "User Details",
+  title,
+  actions=header_actions
+) }}
+
+<div class="admin-detail-page">
+  <div class="admin-card">
+    {% include "admin/components/_inspect.html" %}
+  </div>
 </div>
+
 {% endblock %}

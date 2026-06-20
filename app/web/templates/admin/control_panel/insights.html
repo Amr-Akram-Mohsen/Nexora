@@ -13,8 +13,7 @@
 
 {% set header_actions %}
 <div class="flex items-center gap-sm">
-  <select id="timeframe-select" class="dashboard-filter-select"
-    style="min-width: 140px; height: 36px; padding: 0.375rem 2rem 0.375rem 0.75rem;">
+  <select id="timeframe-select" class="dashboard-filter-select insights-timeframe-select">
     <option value="today">Today (24h)</option>
     <option value="7_days" selected>Last 7 Days</option>
     <option value="30_days">Last 30 Days</option>
@@ -40,7 +39,7 @@ actions=header_actions
   <!-- Top Opportunities Table -->
   {% set opps_actions %}
   <div id="active-filter-container" class="flex items-center gap-sm" style="display: none;">
-    <span id="active-filter-badge" class="status-badge badge-blue "></span>
+    <span id="active-filter-badge" class="status-badge badge-blue"></span>
     <button id="clear-filter-btn" class="admin-btn-secondary">Clear Filter</button>
   </div>
   {% endset %}
@@ -109,8 +108,7 @@ actions=header_actions
   {% call admin_panel("Intent Distribution Analysis", "Content distribution across taxonomy intents and identified
   coverage gaps.") %}
   <div class="panel-body-padded">
-    <div id="intent-opportunities-list" class="suggestions-list-scroll flex gap-3"
-      style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+    <div id="intent-opportunities-list" class="suggestions-list-scroll intent-opportunities-grid flex gap-3">
       {{ spinner("Analyzing intent distributions...") }}
     </div>
   </div>

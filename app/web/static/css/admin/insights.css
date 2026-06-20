@@ -224,8 +224,10 @@ color: var(--foreground);
 .suggestions-list-scroll {
     max-height: 480px;
     overflow-y: auto;
-flex-direction: column;
-padding-right: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 0.25rem;
 }
 
 /* Action suggestion cards */
@@ -536,9 +538,62 @@ flex-direction: column;
 
 /* additions for refactor */
 
-.kanban-column { min-width: 280px; display: inline-block; vertical-align: top; margin-right: 1rem; }
-.kanban-column-body { padding: 0.5rem 0; }
-.kanban-task-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.75rem; }
-.asset-mapping-details-row { display: none; }
-.asset-mapping-actions .asset-mapping-details-toggle i { transition: transform .2s; }
-.action-card-details { display: none; }
+.kanban-column {
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  vertical-align: top;
+  margin-right: 1rem;
+}
+
+.kanban-column-body {
+  padding: 0.5rem 0;
+}
+
+.kanban-task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.asset-mapping-details-row {
+  display: none;
+}
+
+.asset-mapping-actions .asset-mapping-details-toggle i {
+  transition: transform .2s;
+}
+
+.action-card-details {
+  display: none;
+}
+
+/* --- Semantic Classes (replaces inline styles) --- */
+
+/* Replaces style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;" on intent-opportunities-list */
+.intent-opportunities-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1100px) {
+  .intent-opportunities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .intent-opportunities-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Replaces inline style on timeframe-select in header */
+.insights-timeframe-select {
+  min-width: 140px;
+  height: 36px;
+  padding: 0.375rem 2rem 0.375rem 0.75rem;
+}

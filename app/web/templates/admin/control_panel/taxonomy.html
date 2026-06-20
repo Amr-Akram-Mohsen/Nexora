@@ -2,6 +2,7 @@
 {% from "admin/components/ui.html" import admin_page_header, admin_paginator, admin_crud_table, admin_inspect_modal, admin_tab_navigation, admin_tab_panel %}
 {% from "admin/components/macros.html" import admin_search_input, admin_toolbar_section %}
 
+{% set header_title = "Taxonomy Management" %}
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
 
 {% block admin_content %}
@@ -20,7 +21,7 @@
 ]) }}
 
 {# Restrict width so it doesn't stretch 100% on large monitors #}
-<div style="max-width: 900px;">
+<div class="admin-constrained-form-area">
 
   {# ── Categories Tab ───────────────────────────────────────── #}
   {% call admin_tab_panel("categories", is_active=true) %}
@@ -37,7 +38,7 @@
       </div>
     </div>
 
-    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
+    {% call admin_toolbar_section() %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("category-search", "Search categories…") }}
     </div>
@@ -54,7 +55,7 @@
         <input type="text" id="new-brand-name" placeholder="Brand name…"
           class="dashboard-filter-input admin-inline-input" />
         <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
-          class="dashboard-filter-input admin-inline-input" style="max-width:200px;" />
+          class="dashboard-filter-input admin-inline-input admin-inline-input-sm" />
         <div class="admin-inline-slug-preview flex items-center">
           Slug: <code id="new-brand-slug-preview">—</code>
         </div>
@@ -62,7 +63,7 @@
       </div>
     </div>
 
-    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
+    {% call admin_toolbar_section() %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("brand-search", "Search brands…") }}
     </div>
@@ -85,7 +86,7 @@
       </div>
     </div>
 
-    {% call admin_toolbar_section(extra_style="margin-top:1rem;") %}
+    {% call admin_toolbar_section() %}
     <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
       {{ admin_search_input("topic-search", "Search topics…") }}
     </div>

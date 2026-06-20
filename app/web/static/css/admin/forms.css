@@ -149,6 +149,19 @@
 }
 .filter-sort-group {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Inline-form secondary input constraint (taxonomy brand industry) */
+.admin-inline-input-sm {
+  max-width: 200px;
+}
+
+/* Taxonomy and similar pages that benefit from a constrained form width */
+.admin-constrained-form-area {
+  max-width: 900px;
 }
 
 /* --- Summary Bar --- */
