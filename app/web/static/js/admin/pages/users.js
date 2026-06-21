@@ -71,12 +71,77 @@
       domain: "users",
       endpoint: "/admin/users/",
       rowsEndpoint: "/admin/users/rows",
-      filterIds: ["user-role-filter"],
+      filterIds: [
+        "user-role-filter",
+        "user-status-filter",
+        "user-verified-filter",
+        "user-subscription-filter",
+        "user-provider-filter"
+      ],
       defaultPerPage: 25,
-      colspan: 7,
-      autoInit: false
+      colspan: 8,
+      autoInit: false,
+      onLoaded: function(data) {
+        if (data.headers) {
+          const active = data.headers.get("X-Active-Count");
+          const admins = data.headers.get("X-Admin-Count");
+          const verified = data.headers.get("X-Verified-Count");
+          const subbed = data.headers.get("X-Subscribed-Count");
+          
+          if (active !== null) {
+            const el = document.getElementById("summary-active-count");
+            if (el) el.textContent = `Active: ${parseInt(active).toLocaleString()}`;
+          }
+          if (admins !== null) {
+            const el = document.getElementById("summary-admins-count");
+            if (el) el.textContent = `Admins: ${parseInt(admins).toLocaleString()}`;
+          }
+          if (verified !== null) {
+            const el = document.getElementById("summary-verified-count");
+            if (el) el.textContent = `Verified: ${parseInt(verified).toLocaleString()}`;
+          }
+          if (subbed !== null) {
+            const el = document.getElementById("summary-subscribed-count");
+            if (el) el.textContent = `Subscribed: ${parseInt(subbed).toLocaleString()}`;
+          }
+        }
+      }
     });
+
+    let currentSortBy = '';
+    let currentSortDir = 'desc';
+
+    const originalGetFilters = window.usersController.getFilters.bind(window.usersController);
+    window.usersController.getFilters = function() {
+      const filters = originalGetFilters();
+      if (currentSortBy) {
+        filters.sort_by = currentSortBy;
+        filters.sort_dir = currentSortDir;
+      }
+      return filters;
+    };
+
     window.usersController.init();
+
+    // Event delegation: table header sorting
+    document.getElementById("users-table").addEventListener("click", e => {
+      const th = e.target.closest("th[data-sort]");
+      if (!th) return;
+      
+      const sortBy = th.dataset.sort;
+      if (currentSortBy === sortBy) {
+        currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+      } else {
+        currentSortBy = sortBy;
+        currentSortDir = 'desc';
+      }
+      
+      // Update arrows
+      document.querySelectorAll("th[data-sort]").forEach(col => col.innerHTML = col.innerHTML.replace(/ [↑↓↕]/, ' ↕'));
+      th.innerHTML = th.innerHTML.replace(/ [↑↓↕]/, currentSortDir === 'desc' ? ' ↓' : ' ↑');
+      
+      window.usersController.load(1);
+    });
 
     // Event delegation: inspect modal or detail page action buttons
     document.body.addEventListener("click", e => {
@@ -95,5 +160,56 @@
         handleDeleteUser(uid, name, btn, modal);
       }
     });
+
+    // ── Chart Initialization ──────────────────────────────────────
+    function initUserCharts() {
+      fetch('/admin/users/stats')
+        .then(res => res.json())
+        .then(data => {
+          if (document.getElementById('userGrowthChart') && typeof Chart !== 'undefined') {
+            new Chart(document.getElementById('userGrowthChart'), {
+              type: 'line',
+              data: {
+                labels: Object.keys(data.growth),
+                datasets: [{
+                  label: 'New Registrations',
+                  data: Object.values(data.growth),
+                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#5D5FEF',
+                  backgroundColor: 'rgba(93, 95, 239, 0.1)',
+                  tension: 0.3,
+                  fill: true
+                }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            new Chart(document.getElementById('roleDistributionChart'), {
+              type: 'doughnut',
+              data: {
+                labels: Object.keys(data.roles),
+                datasets: [{
+                  data: Object.values(data.roles),
+                  backgroundColor: ['#F2994A', '#2D9CDB']
+                }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            new Chart(document.getElementById('providerSplitChart'), {
+              type: 'doughnut',
+              data: {
+                labels: Object.keys(data.providers).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+                datasets: [{
+                  data: Object.values(data.providers),
+                  backgroundColor: ['#27AE60', '#EB5757', '#F2C94C']
+                }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+          }
+        });
+    }
+
+    initUserCharts();
   });
 })();

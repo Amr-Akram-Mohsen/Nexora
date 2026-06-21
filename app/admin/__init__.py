@@ -10,6 +10,8 @@ from .recommendations import bp as api_recommendation_bp
 from .providers import bp as api_provider_bp
 from .insights import bp as api_insights_bp
 from .distribution import bp as api_distribution_bp
+from .subscribers import bp as api_subscribers_bp
+from .audience_analytics import bp as api_audience_analytics_bp
 
 
 

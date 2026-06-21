@@ -1,0 +1,62 @@
+{% extends "admin/layout/_crud_page_base.html" %}
+
+{% set page_description = "Manage newsletter subscriptions, confirmed users, and anonymous subscribers" %}
+{% set per_page_options = [25, 50, 100] %}
+{% set current_per_page = 25 %}
+{% set table_height_class = "loading-height-md" %}
+
+{% from "admin/components/ui.html" import admin_panel %}
+
+{% block crud_filters %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("subscribers-search", "Search by email…", icon_class="admin-toolbar-search-icon") }}
+  {{ admin_filter_select("subscriber-status-filter", None, [("confirmed", "Confirmed"), ("unconfirmed", "Pending"), ("unsubscribed", "Unsubscribed")], default_val="", default_text="All Statuses") }}
+  {{ admin_filter_select("subscriber-user-filter", None, [("true", "Has Linked User"), ("false", "Anonymous Only")], default_val="", default_text="All Types") }}
+  {{ admin_reset_button("clear-subscribers-filters-btn", "Reset") }}
+</div>
+{% endcall %}
+
+<div class="user-analytics-dashboard grid gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+  {% call admin_panel("Subscription Funnel", "Key Metrics", display_style="padding: 1rem;") %}
+  <div class="grid grid-cols-2 gap-4 text-center">
+    <div>
+        <div class="text-3xl font-bold text-gray-800" id="funnel-total">—</div>
+        <div class="text-sm text-gray-500">Total</div>
+    </div>
+    <div>
+        <div class="text-3xl font-bold text-green-600" id="funnel-confirmed">—</div>
+        <div class="text-sm text-gray-500">Confirmed</div>
+    </div>
+    <div>
+        <div class="text-3xl font-bold text-orange-500" id="funnel-unconfirmed">—</div>
+        <div class="text-sm text-gray-500">Pending</div>
+    </div>
+    <div>
+        <div class="text-3xl font-bold text-red-500" id="funnel-unsubscribed">—</div>
+        <div class="text-sm text-gray-500">Unsubscribed</div>
+    </div>
+  </div>
+  <div class="mt-4 pt-4 border-t border-gray-100 text-center">
+    <div class="text-xl font-bold text-blue-600" id="funnel-anonymous">—</div>
+    <div class="text-sm text-gray-500">Anonymous Subscribers</div>
+  </div>
+  {% endcall %}
+</div>
+{% endblock %}
+
+{% block crud_summary %}
+{% call admin_summary_bar(domain ~ "-count", "Subscribers", summary_id=domain ~ "-summary") %}
+  <div class="flex items-center gap-4 text-sm text-muted">
+    <span id="summary-confirmed-count">Confirmed: —</span>
+    <span id="summary-anonymous-count">Anonymous: —</span>
+  </div>
+{% endcall %}
+{% endblock %}
+
+{% block crud_modals %}
+{% endblock %}
+
+{% block custom_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/subscribers.js') }}"></script>
+{% endblock %}

@@ -93,6 +93,23 @@ def dashboard_users():
         table=CRUD_TABLES["users"],
     )
 
+@bp.route("/subscribers")
+def dashboard_subscribers():
+    return render_template(
+        "admin/audience/subscribers.html",
+        title="Newsletter Subscribers",
+        domain="subscribers",
+        table=CRUD_TABLES.get("subscribers", {}),
+    )
+
+@bp.route("/analytics")
+def dashboard_audience_analytics():
+    return render_template(
+        "admin/audience/analytics.html",
+        title="Audience Analytics",
+        domain="analytics"
+    )
+
 
 @bp.route("/moderation")
 def dashboard_moderation():

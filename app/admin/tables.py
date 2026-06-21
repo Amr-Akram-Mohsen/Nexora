@@ -3,12 +3,26 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score", "Actions"],
+        "preview_table": [
+            "User", "Role", "Subscription", "Status", 
+            {"html": '<th data-sort="joined" class="cursor-pointer hover:bg-gray-50 select-none">Joined ↕</th>'}, 
+            {"html": '<th data-sort="last_active" class="cursor-pointer hover:bg-gray-50 select-none">Last Active ↕</th>'}, 
+            {"html": '<th data-sort="engagement_score" class="cursor-pointer hover:bg-gray-50 select-none">Engagement Score ↕</th>'}, 
+            "Tier", "Actions"
+        ],
         "detailed_table": {
             "account info": ["id", "name", "email", "role", "status", "provider"],
-            "security & auth": ["verified", "verified at", "password changed", "joined", "last active"],
-            "engagement metrics": ["engagement profile", "engagement score", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown"],
+            "security & auth": ["verified", "verified at", "verification sent", "password changed", "joined", "last active"],
+            "engagement metrics": ["engagement tier", "engagement profile", "engagement score", "engagement breakdown", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown", "recommendations clicked"],
             "activity & interests": ["recent activity", "interests", "subscription"]
+        }
+    },
+    "subscribers": {
+        "id": "subscribers",
+        "preview_table": ["Email", "Status", "User Link", "Subscribed At", "Unsubscribed At", "Actions"],
+        "detailed_table": {
+            "subscription info": ["email", "status", "subscribed at", "unsubscribed at", "confirmed at"],
+            "user link": ["user id", "user name", "engagement score"]
         }
     },
     "contents": {
@@ -106,6 +120,38 @@ CRUD_TABLES = {
         "detailed_table": {
             "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
             "related metadata": ["content count", "category count", "related brands", "top content"],
+        }
+    },
+    "attributes": {
+        "id": "attributes",
+        "preview_table": ["Name", "Category", "Content Count", "Health", "Actions"],
+        "detailed_table": {
+            "attribute info": ["id", "slug", "name", "category"],
+            "related metadata": ["content count", "top content"],
+        }
+    },
+    "gender_facets": {
+        "id": "gender_facets",
+        "preview_table": ["Name", "Content Count", "Health", "Actions"],
+        "detailed_table": {
+            "facet info": ["id", "slug", "name"],
+            "related metadata": ["content count", "top content"],
+        }
+    },
+    "intent_facets": {
+        "id": "intent_facets",
+        "preview_table": ["Name", "Content Count", "Health", "Actions"],
+        "detailed_table": {
+            "facet info": ["id", "slug", "name"],
+            "related metadata": ["content count", "top content"],
+        }
+    },
+    "price_tier_facets": {
+        "id": "price_tier_facets",
+        "preview_table": ["Name", "Content Count", "Health", "Actions"],
+        "detailed_table": {
+            "facet info": ["id", "slug", "name"],
+            "related metadata": ["content count", "top content"],
         }
     },
     "comments": {

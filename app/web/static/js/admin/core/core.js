@@ -78,14 +78,14 @@ class AdminListController {
         const total = parseInt(res.headers.get("X-Total") || "0", 10);
         const pages = parseInt(res.headers.get("X-Pages") || "1", 10);
         this.totalPages = pages;
-        return res.text().then(html => ({ html, total }));
+        return res.text().then(html => ({ html, total, headers: res.headers }));
       })
-      .then(({ html, total }) => {
+      .then(({ html, total, headers }) => {
         tbody.innerHTML = html;
         const from = total > 0 ? ((this.currentPage - 1) * this.perPage) + 1 : 0;
         const to = Math.min(this.currentPage * this.perPage, total);
         this.updatePagination(total, from, to);
-        if (this.onLoaded) this.onLoaded({ total });
+        if (this.onLoaded) this.onLoaded({ total, headers });
       })
       .catch(err => {
         console.error(err);

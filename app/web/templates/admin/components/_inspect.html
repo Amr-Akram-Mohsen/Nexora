@@ -8,6 +8,12 @@
 } %}
 
 <div class="inspect-details-group flex">
+  {% if inspect_header_html is defined and inspect_header_html %}
+    <div class="inspect-header-custom mb-3 p-4">
+      {{ inspect_header_html|safe }}
+    </div>
+  {% endif %}
+
   {% if inspect_table and inspect_table is mapping %}
   {% for section_name, fields in inspect_table.items() %}
   {% call inspect_section(section_name|title) %}

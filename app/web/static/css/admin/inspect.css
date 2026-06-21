@@ -141,3 +141,58 @@
     flex-direction: column;
     gap: 0.625rem;
 }
+
+/* ---------------------------------
+   Users Inspect - Interests
+--------------------------------- */
+#user-interest-card {
+    padding: 0.75rem;
+}
+
+#interest-badge-sm {
+    font-size: 10px;
+}
+
+.interest-last-interaction {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+#interest-scores-container {
+    margin-top: 0.5rem;
+}
+
+#interest-score-type-badge {
+    width: 60px;
+    justify-content: center;
+}
+
+/* ---------------------------------
+   Users Inspect - Engagement Breakdown
+--------------------------------- */
+.engagement-breakdown-container {
+    padding-top: 0.25rem;
+}
+
+#engagement-breakdown-label {
+    width: 80px;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.engagement-breakdown-bar-wrapper {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.engagement-breakdown-bar-fill {
+    height: 100%;
+    width: var(--percent, 0%);
+    background: var(--brand-purple);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}

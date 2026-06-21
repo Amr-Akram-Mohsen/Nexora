@@ -31,6 +31,8 @@ from app.admin import (
     api_provider_bp,
     api_insights_bp,
     api_distribution_bp,
+    api_subscribers_bp,
+    api_audience_analytics_bp,
 )
 
 from app.domains.user.models import User
@@ -210,6 +212,8 @@ def create_app():
     app.register_blueprint(api_provider_bp)
     app.register_blueprint(api_insights_bp)
     app.register_blueprint(api_distribution_bp)
+    app.register_blueprint(api_subscribers_bp)
+    app.register_blueprint(api_audience_analytics_bp)
 
     # app.register_blueprint(dashboard_bp)
     app.register_blueprint(admin_bp)

@@ -5,16 +5,56 @@
 {% set current_per_page = 25 %}
 {% set table_height_class = "loading-height-md" %}
 
+{% from "admin/components/ui.html" import admin_panel %}
+
 {% block crud_filters %}
-<div class="admin-toolbar flex items-center">
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("user-search", "Search by name or email…", icon_class="admin-toolbar-search-icon") }}
   {{ admin_filter_select("user-role-filter", None, [("admin", "Admins"), ("user", "Users")], default_val="", default_text="All Roles") }}
+  {{ admin_filter_select("user-status-filter", None, [("active", "Active"), ("inactive", "Inactive")], default_val="", default_text="All Statuses") }}
+  {{ admin_filter_select("user-verified-filter", None, [("true", "Verified"), ("false", "Unverified")], default_val="", default_text="All Verifications") }}
+  {{ admin_filter_select("user-subscription-filter", None, [("subscribed", "Subscribed"), ("unsubscribed", "Not Subscribed")], default_val="", default_text="All Subscriptions") }}
+  {{ admin_filter_select("user-provider-filter", None, [("local", "Local"), ("google", "Google")], default_val="", default_text="All Providers") }}
+  {{ admin_reset_button("clear-user-filters-btn", "Reset") }}
 </div>
+{% endcall %}
+
+<div class="user-analytics-dashboard grid gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+  {% call admin_panel("User Growth", "Registrations over time", display_style="padding: 1rem;") %}
+  <div style="position: relative; height: 200px;">
+    <canvas id="userGrowthChart"></canvas>
+  </div>
+  {% endcall %}
+
+  {% call admin_panel("Role & Provider", "Distribution", display_style="padding: 1rem;") %}
+  <div class="flex gap-4" style="height: 200px;">
+    <div style="flex: 1; position: relative;">
+      <canvas id="roleDistributionChart"></canvas>
+    </div>
+    <div style="flex: 1; position: relative;">
+      <canvas id="providerSplitChart"></canvas>
+    </div>
+  </div>
+  {% endcall %}
+</div>
+{% endblock %}
+
+{% block crud_summary %}
+{% call admin_summary_bar(domain ~ "-count", summary_label | default(domain), summary_id=domain ~ "-summary") %}
+  <div class="flex items-center gap-4 text-sm text-muted">
+    <span id="summary-active-count" title="Active Users">Active: —</span>
+    <span id="summary-admins-count" title="Admin Users">Admins: —</span>
+    <span id="summary-subscribed-count" title="Newsletter Subscribers">Subscribed: —</span>
+    <span id="summary-verified-count" title="Verified Emails">Verified: —</span>
+  </div>
+{% endcall %}
 {% endblock %}
 
 {% block crud_modals %}
 {% endblock %}
 
 {% block custom_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/admin/pages/users.js') }}"></script>
 {% endblock %}

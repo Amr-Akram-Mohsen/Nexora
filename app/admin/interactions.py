@@ -47,16 +47,23 @@ def list_comments():
     sentiment   = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
     search      = request.args.get("search", "").strip()
+    user_search = request.args.get("comments_user", request.args.get("user", "")).strip()
     start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
     end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     stmt = select(Comment).order_by(Comment.id.desc())
+    if user_search:
+        stmt = stmt.join(User, Comment.user_id == User.id)
     if sentiment:
         stmt = stmt.where(Comment.sentiment == sentiment)
     if target_type:
         stmt = stmt.where(Comment.target_type == target_type)
     if search:
         stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
+    if user_search:
+        stmt = stmt.where(
+            or_(User.name.ilike(f"%{user_search}%"), User.email.ilike(f"%{user_search}%"))
+        )
     if start_date:
         try:
             from datetime import date, datetime
@@ -584,13 +591,20 @@ def comments_rows():
     sentiment   = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
     search      = request.args.get("search", "").strip()
+    user_search = request.args.get("comments_user", request.args.get("user", "")).strip()
     start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
     end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     stmt = select(Comment).order_by(Comment.id.desc())
+    if user_search:
+        stmt = stmt.join(User, Comment.user_id == User.id)
     if sentiment:   stmt = stmt.where(Comment.sentiment == sentiment)
     if target_type: stmt = stmt.where(Comment.target_type == target_type)
     if search:      stmt = stmt.where(Comment.content.ilike(f"%{search}%"))
+    if user_search:
+        stmt = stmt.where(
+            or_(User.name.ilike(f"%{user_search}%"), User.email.ilike(f"%{user_search}%"))
+        )
     if start_date:
         try:
             from datetime import date, datetime
