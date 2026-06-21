@@ -3,11 +3,70 @@
 {% set header_title = "Sources & Content Providers" %}
 {% set page_description = "Monitor content sources, imported volumes, authority rankings, and latest activities" %}
 
+{% block crud_stats %}
+<div class="dashboard-stats-grid mb-4" id="sources-health-dashboard">
+  <!-- Total Sources -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-tower-broadcast"></i></div>
+      <p class="dashboard-stat-label">Total Sources</p>
+      <h3 class="dashboard-stat-value" id="stats-total-sources"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta" id="stats-active-sources">active providers</p>
+    </div>
+  </a>
+
+  <!-- Healthy Sources -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card border-l-4 border-success">
+      <div class="dashboard-stat-icon flex items-center justify-center bg-success-light text-success"><i class="fa-solid fa-check-circle"></i></div>
+      <p class="dashboard-stat-label">Healthy</p>
+      <h3 class="dashboard-stat-value" id="stats-healthy"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta font-bold text-success">active & fetching</p>
+    </div>
+  </a>
+
+  <!-- Warning Sources -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card border-l-4 border-warning">
+      <div class="dashboard-stat-icon flex items-center justify-center bg-warning-light text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <p class="dashboard-stat-label">Warning</p>
+      <h3 class="dashboard-stat-value" id="stats-warning"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta font-bold text-warning">low success rate</p>
+    </div>
+  </a>
+
+  <!-- Failed/Inactive -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card border-l-4 border-danger">
+      <div class="dashboard-stat-icon flex items-center justify-center bg-danger-light text-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+      <p class="dashboard-stat-label">Failed / Inactive</p>
+      <h3 class="dashboard-stat-value" id="stats-failed"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta font-bold text-danger">disabled configs</p>
+    </div>
+  </a>
+
+  <!-- Silent Sources -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card border-l-4 border-muted">
+      <div class="dashboard-stat-icon flex items-center justify-center bg-muted-light text-muted"><i class="fa-solid fa-moon"></i></div>
+      <p class="dashboard-stat-label">Silent (>7d)</p>
+      <h3 class="dashboard-stat-value" id="stats-silent"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta font-bold text-muted">no recent content</p>
+    </div>
+  </a>
+</div>
+{% endblock %}
+
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("sources-search", "Search by name, slug, or domain…") }}
+    <!-- Placeholder for new filters -->
     {{ admin_reset_button("clear-sources-filters-btn", "Reset") }}
   </div>
 {% endcall %}
+{% endblock %}
+
+{% block custom_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/sources.js') }}"></script>
 {% endblock %}

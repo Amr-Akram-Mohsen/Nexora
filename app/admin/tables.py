@@ -62,7 +62,11 @@ CRUD_TABLES = {
         "detailed_table": {
             "source info": ["id", "name", "slug", "domain", "authority score", "status"],
             "performance & quality": ["avg quality score", "avg word count", "scrape coverage", "published date range"],
-            "related metadata": ["article count"]
+            "ingestion breakdown": ["channels", "last fetch", "success count", "failure count", "consecutive failures"],
+            "content distribution": ["article count", "video count", "post count", "categories covered"],
+            "article pipeline": ["pending", "enriching", "complete", "failed"],
+            "engagement breakdown": ["total views", "total likes", "total saves", "total comments"],
+            "multi-source attribution": ["primary attribution count", "secondary attribution count"]
         }
     },
     "stores": {

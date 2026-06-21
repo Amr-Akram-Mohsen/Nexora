@@ -8,7 +8,15 @@
 } %}
 
 <div class="inspect-details-group flex">
-  {% if inspect_header_html is defined and inspect_header_html %}
+  {% if source is defined and source.logo_url %}
+    <div class="inspect-header-custom mb-3 p-4 flex items-center gap-4 border-b border-border">
+      <img src="{{ source.logo_url }}" alt="{{ source.name }} Logo" class="w-16 h-16 object-contain rounded bg-white p-1 shadow-sm">
+      <div>
+        <h2 class="text-xl font-bold mb-1 m-0">{{ source.name }}</h2>
+        <a href="https://{{ source.domain }}" target="_blank" class="text-sm text-brand-blue">{{ source.domain }}</a>
+      </div>
+    </div>
+  {% elif inspect_header_html is defined and inspect_header_html %}
     <div class="inspect-header-custom mb-3 p-4">
       {{ inspect_header_html|safe }}
     </div>
@@ -95,6 +103,21 @@
     <div>No distribution history found.</div>
     {% endif %}
   </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if top_articles is defined and top_articles %}
+  {% call inspect_section("Top Articles (by Views)") %}
+    <div class="flex flex-col">
+      {% for article in top_articles %}
+        <div class="flex justify-between items-center py-2 border-b border-border last:border-0 hover:bg-secondary rounded px-2 transition-colors">
+          <a href="/admin/contents/{{ article.id }}" target="_blank" class="font-medium text-brand-blue hover:underline truncate mr-4">
+            {{ article.title }}
+          </a>
+          <span class="badge badge-secondary whitespace-nowrap">{{ "{:,}".format(article.views) }} views</span>
+        </div>
+      {% endfor %}
+    </div>
   {% endcall %}
   {% endif %}
 

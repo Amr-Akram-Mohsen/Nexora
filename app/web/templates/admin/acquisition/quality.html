@@ -1,0 +1,103 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_panel %}
+
+{% block title %}Quality & Freshness — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+{{ admin_page_header(
+  "Quality & Freshness Monitoring",
+  "Automated quality signals, scrape coverage, and content staleness tracking.",
+) }}
+
+<div class="admin-dashboard-page mt-4">
+
+    <!-- Row 1: Leaderboards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- Quality Tier Leaderboard -->
+        {% call admin_panel("Quality Tier Leaderboard", "Ranked source list by average quality score.") %}
+        <div class="p-0 overflow-x-auto">
+            <table class="dashboard-table w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
+                        <th class="p-4 font-bold">Source</th>
+                        <th class="p-4 font-bold text-center">Avg Quality</th>
+                        <th class="p-4 font-bold text-center">Tier</th>
+                    </tr>
+                </thead>
+                <tbody id="quality-leaderboard-tbody">
+                    <tr><td colspan="3" class="p-8 text-center text-muted"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Loading...</p></td></tr>
+                </tbody>
+            </table>
+        </div>
+        {% endcall %}
+
+        <!-- Scrape Coverage Leaderboard -->
+        {% call admin_panel("Scrape Coverage Leaderboard", "Sources ordered by successful full-text extraction percentage.") %}
+        <div class="p-0 overflow-x-auto">
+            <table class="dashboard-table w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
+                        <th class="p-4 font-bold">Source</th>
+                        <th class="p-4 font-bold text-center">Scrape %</th>
+                        <th class="p-4 font-bold">Health</th>
+                    </tr>
+                </thead>
+                <tbody id="scrape-leaderboard-tbody">
+                    <tr><td colspan="3" class="p-8 text-center text-muted"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Loading...</p></td></tr>
+                </tbody>
+            </table>
+        </div>
+        {% endcall %}
+    </div>
+
+    <!-- Row 2: Charts -->
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- Per-source word count distribution -->
+        {% call admin_panel("Word Count Distribution", "Average word count per source to identify thin-content suppliers.") %}
+        <div class="panel-body-padded">
+            <div style="height: 300px;">
+                <canvas id="wordCountCanvas"></canvas>
+            </div>
+        </div>
+        {% endcall %}
+
+        <!-- Ingestion Yield Rate Tracking -->
+        {% call admin_panel("Ingestion Yield Rate", "Content produced / fetch attempts per channel over time.") %}
+        <div class="panel-body-padded">
+            <div style="height: 300px;">
+                <canvas id="yieldRateCanvas"></canvas>
+            </div>
+        </div>
+        {% endcall %}
+    </div>
+
+    <!-- Row 3: Freshness -->
+    <div class="mb-6">
+        <!-- Content Freshness Index -->
+        {% call admin_panel("Content Freshness Index", "Sources ranked by the staleness of their most recent content.") %}
+        <div class="p-0 overflow-x-auto">
+            <table class="dashboard-table w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
+                        <th class="p-4 font-bold">Source</th>
+                        <th class="p-4 font-bold">Last Ingested</th>
+                        <th class="p-4 font-bold">Days Stale</th>
+                        <th class="p-4 font-bold">Severity</th>
+                    </tr>
+                </thead>
+                <tbody id="freshness-index-tbody">
+                    <tr><td colspan="4" class="p-8 text-center text-muted"><i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i><p>Loading...</p></td></tr>
+                </tbody>
+            </table>
+        </div>
+        {% endcall %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/admin/pages/quality.js') }}"></script>
+{% endblock %}

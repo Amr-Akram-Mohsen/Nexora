@@ -4,10 +4,17 @@
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">
     {% for key, value in row.items() %}
-    {% if key not in ['slug', 'id', 'is_published', 'image_url', 'has-discount', 'is_verified', 'recency_days'] %}
+    {% if key not in ['slug', 'id', 'is_published', 'image_url', 'has-discount', 'is_verified', 'recency_days', 'logo-url'] %}
     <td class="cell-{{ key }}">
         {% if key == 'link' %}
-        <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+            {% if domain_type == 'source' and row.get('logo-url') %}
+                <div class="flex items-center gap-2">
+                    <img src="{{ row.get('logo-url') }}" alt="Logo" class="item-thumbnail-small">
+                    <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+                </div>
+            {% else %}
+                <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+            {% endif %}
         {% elif key == 'name' and domain_type == 'user' %}
             <div class="flex items-center gap-2">
                 <span>{{ value|replace('\n', '<br>')|safe }}</span>
@@ -93,6 +100,40 @@
                 <span class="badge badge-health-medium">{{ value }}</span>
             {% else %}
                 <span class="badge badge-health-low">{{ value }}</span>
+            {% endif %}
+        {% elif key == 'tier' and domain_type == 'source' %}
+            {% if value == 1 %}
+                <span class="badge badge-health-high" title="Tier 1 Authority">Tier 1</span>
+            {% elif value == 2 %}
+                <span class="badge badge-health-medium" title="Tier 2 Authority">Tier 2</span>
+            {% else %}
+                <span class="badge badge-health-low" title="Tier 3 Authority">Tier 3</span>
+            {% endif %}
+        {% elif key == 'channels' and domain_type == 'source' %}
+            <div class="flex flex-wrap gap-1">
+                {% for channel in value %}
+                    <span class="badge badge-secondary">{{ channel }}</span>
+                {% else %}
+                    <span class="text-muted">—</span>
+                {% endfor %}
+            </div>
+        {% elif key == 'freshness' and domain_type == 'source' %}
+            {% if value is none %}
+                <span class="badge badge-health-low">Never</span>
+            {% elif value <= 1 %}
+                <span class="badge badge-success">{{ value }}d</span>
+            {% elif value <= 7 %}
+                <span class="badge badge-warning">{{ value }}d</span>
+            {% else %}
+                <span class="badge badge-danger">{{ value }}d</span>
+            {% endif %}
+        {% elif key == 'failures' and domain_type == 'source' %}
+            {% if value >= 3 %}
+                <span class="badge badge-danger" title="{{ value }} consecutive failures"><i class="fa-solid fa-triangle-exclamation"></i> {{ value }}</span>
+            {% elif value > 0 %}
+                <span class="badge badge-warning">{{ value }}</span>
+            {% else %}
+                <span>{{ value }}</span>
             {% endif %}
         {% else %}
             <span>{{ value }}</span>

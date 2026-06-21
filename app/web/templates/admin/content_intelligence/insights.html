@@ -85,8 +85,12 @@
   {% endcall %}
 </div>
 
+<!-- Section 5: Acquisition & Sources -->
+{% include "admin/content_intelligence/_acquisition_sources.html" %}
+
 {% endblock %}
 
 {% block admin_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/admin/pages/insights/index.js') }}"></script>
 {% endblock %}

@@ -63,6 +63,22 @@ def dashboard_sources():
         table=CRUD_TABLES["sources"],
     )
 
+@bp.route("/ingestions")
+def dashboard_ingestions():
+    return render_template(
+        "admin/acquisition/ingestions.html",
+        title="Ingestion Channels",
+        domain="ingestions"
+    )
+
+@bp.route("/sources/quality")
+def dashboard_sources_quality():
+    return render_template(
+        "admin/acquisition/quality.html",
+        title="Quality & Freshness",
+        domain="sources_quality"
+    )
+
 
 @bp.route("/stores")
 def dashboard_stores():

@@ -84,10 +84,20 @@
 
   <div class="nav-section">
     <p class="nav-title">Acquisition & Providers</p>
+    <a href="{{ url_for('admin.dashboard_ingestions') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'ingestions' %}active{% endif %}"
+      title="Ingestion Channels">
+      <span class="nav-icon">🔌</span> <span class="nav-link-text">Ingestion Channels</span>
+    </a>
     <a href="{{ url_for('admin.dashboard_sources') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
       title="Sources">
-      <span class="nav-icon">📡</span> <span class="nav-link-text">Acquisition</span>
+      <span class="nav-icon">📡</span> <span class="nav-link-text">Sources</span>
+    </a>
+    <a href="{{ url_for('admin.dashboard_sources_quality') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources_quality' %}active{% endif %}"
+      title="Quality & Freshness">
+      <span class="nav-icon">🥇</span> <span class="nav-link-text">Quality & Freshness</span>
     </a>
     <a href="{{ url_for('admin.dashboard_stores') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"

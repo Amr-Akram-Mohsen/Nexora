@@ -4,6 +4,7 @@ import { fetchAndInjectHtml } from './utilities.js';
 import { renderContentStrategy } from './contentStrategy.js';
 import { renderContentAssetMapping } from './assetMapping.js';
 import { renderContentPerformanceFeedback } from './performanceFeedback.js';
+import { renderAcquisitionSources } from './acquisitionSources.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   initInsights();
@@ -119,4 +120,8 @@ export function renderAllWidgets() {
   renderContentStrategy();
   renderContentAssetMapping();
   renderContentPerformanceFeedback();
+  
+  const timeframeSelect = document.getElementById("timeframe-select");
+  const timeframe = timeframeSelect ? timeframeSelect.value : "7_days";
+  renderAcquisitionSources(timeframe);
 }

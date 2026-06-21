@@ -1,0 +1,61 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header %}
+
+{% block title %}Ingestion Channels — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+{{ admin_page_header(
+  "Ingestion Channels Health",
+  "Monitor API usage, channel status, and recent fetch logs",
+) }}
+
+<div class="admin-dashboard-page mt-4">
+    <!-- Channel Status Grid -->
+    <div class="mb-6">
+        <h3 class="text-lg font-bold mb-4">Channel Status Grid</h3>
+        <div class="dashboard-stats-grid" id="ingestions-status-grid">
+            <!-- Populated by JS -->
+            <div class="col-span-full py-8 text-center text-muted w-full">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
+                <p>Loading channel status...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Ingestion Events List -->
+    <div class="admin-card">
+        <div class="card-header flex justify-between items-center border-b border-border p-4 bg-secondary">
+            <h3 class="text-lg font-bold m-0">Recent Ingestion Events</h3>
+            <button id="refresh-logs-btn" class="admin-btn-secondary text-sm px-3 py-1"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+        </div>
+        <div class="p-0 overflow-x-auto">
+            <table class="dashboard-table w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
+                        <th class="p-4 font-bold">Time</th>
+                        <th class="p-4 font-bold">Channel</th>
+                        <th class="p-4 font-bold">Type</th>
+                        <th class="p-4 font-bold">Target / Query</th>
+                        <th class="p-4 font-bold">Category</th>
+                        <th class="p-4 font-bold">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ingestions-logs-tbody">
+                    <!-- Populated by JS -->
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-muted">
+                            <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
+                            <p>Loading recent events...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block custom_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/ingestions.js') }}"></script>
+{% endblock %}
