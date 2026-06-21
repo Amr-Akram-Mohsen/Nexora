@@ -4,7 +4,7 @@
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">
     {% for key, value in row.items() %}
-    {% if key not in ['slug', 'id'] %}
+    {% if key not in ['slug', 'id', 'is_published'] %}
     <td class="cell-{{ key }}">
         {% if key == 'link' %}
         <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
@@ -17,9 +17,20 @@
     {% if not hide_action_column %}
     <td class="cell-actions flex flex-col gap-1">
         {% if domain_type in ['content', 'item', 'user', 'store', 'source', 'comment'] %}
-        <a class="user-action-btn" href="/admin/{{ domain_type }}s/{{ row.id }}" target="_blank">
-            👁️ Inspect
+        <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/{{ domain_type }}s/{{ row.id }}" target="_blank">
+            <i class="fas fa-eye"></i> Inspect
         </a>
+        {% if domain_type == 'content' %}
+          {% if row.is_published %}
+            <button class="user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1" data-action="toggle-publish" data-id="{{ row.id }}" data-status="unpublish" title="Unpublish">
+              <i class="fas fa-eye-slash"></i> Unpublish
+            </button>
+          {% else %}
+            <button class="user-action-btn user-action-toggle-active flex items-center justify-center gap-1" data-action="toggle-publish" data-id="{{ row.id }}" data-status="publish" title="Publish">
+              <i class="fas fa-upload"></i> Publish
+            </button>
+          {% endif %}
+        {% endif %}
         {% else %}
         {{ action_button("Inspect", action_type="inspect", icon="👁️", data_action="global-inspect",
         extra_class="inspect-btn", button_id=row.id, data_domain=domain_type,

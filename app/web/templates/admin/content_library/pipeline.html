@@ -1,0 +1,104 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header %}
+
+{% block title %}Pipeline Audit - Nexora Admin{% endblock %}
+
+{% block admin_content %}
+<div class="flex flex-col gap-4">
+
+  {{ admin_page_header("Pipeline Audit", "Monitor ingestion pipelines, track enrichment health, and manage failed processing tasks.") }}
+
+  {% include "admin/dashboard/_nav.html" %}
+
+  <div class="overview-panel bg-card border border-border radius-md p-6">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="font-semibold text-lg">Enrichment Queue Status</h3>
+        <p class="text-sm text-muted">Real-time status of articles passing through the ingestion enricher.</p>
+      </div>
+      <button id="refresh-pipeline-btn" class="dashboard-btn dashboard-btn-outline"><i class="fas fa-sync-alt"></i>
+        Refresh Data</button>
+    </div>
+
+    <div id="pipeline-stats-container" class="flex flex-col gap-4">
+      <div class="flex items-center justify-center py-8 text-muted">
+        <i class="fas fa-spinner fa-spin mr-2"></i> Loading pipeline statistics...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("pipeline-stats-container");
+    const refreshBtn = document.getElementById("refresh-pipeline-btn");
+
+    function loadStats() {
+      refreshBtn.disabled = true;
+      container.innerHTML = '<div class="flex items-center justify-center py-8 text-muted"><i class="fas fa-spinner fa-spin mr-2"></i> Loading pipeline statistics...</div>';
+
+      fetch("/admin/contents/pipeline/stats")
+        .then(res => res.json())
+        .then(data => {
+          if (!data.stats || data.stats.length === 0) {
+            container.innerHTML = '<div class="py-8 text-center text-muted">No pipeline data available.</div>';
+            refreshBtn.disabled = false;
+            return;
+          }
+
+          let html = '<div class="admin-table-container"><table class="admin-table w-full"><thead><tr>' +
+            '<th>Ingestion Origin</th><th>Pending</th><th>Enriching</th><th>Failed</th><th>Complete</th><th>Actions</th>' +
+            '</tr></thead><tbody>';
+
+          data.stats.forEach(s => {
+            const failedBadge = s.failed > 0 ? `<span class="badge badge-health-low">${s.failed}</span>` : `<span class="text-muted">0</span>`;
+            const pendingBadge = s.pending > 0 ? `<span class="badge badge-health-medium">${s.pending}</span>` : `<span class="text-muted">0</span>`;
+
+            html += `<tr>
+            <td class="font-semibold">${s.origin}</td>
+            <td>${pendingBadge}</td>
+            <td>${s.enriching}</td>
+            <td>${failedBadge}</td>
+            <td><span class="badge badge-health-high">${s.complete}</span></td>
+            <td>
+              ${s.failed > 0 ? `<button class="dashboard-btn dashboard-btn-primary dashboard-btn-sm" onclick="retryFailed('${s.origin}')"><i class="fas fa-redo"></i> Retry Failed</button>` : `<span class="text-muted text-sm">Healthy</span>`}
+            </td>
+          </tr>`;
+          });
+
+          html += '</tbody></table></div>';
+          container.innerHTML = html;
+          refreshBtn.disabled = false;
+        })
+        .catch(err => {
+          console.error(err);
+          container.innerHTML = '<div class="py-8 text-center text-red-500">Error loading statistics.</div>';
+          refreshBtn.disabled = false;
+        });
+    }
+
+    window.retryFailed = function (origin) {
+      if (!confirm(`Are you sure you want to requeue all failed articles from ${origin}?`)) return;
+
+      fetch("/admin/contents/pipeline/retry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ origin: origin })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert(`Successfully requeued ${data.retried} articles. They will be processed in the background.`);
+            loadStats();
+          } else {
+            alert("Failed to retry items.");
+          }
+        });
+    };
+
+    refreshBtn.addEventListener("click", loadStats);
+    loadStats();
+  });
+</script>
+{% endblock %}

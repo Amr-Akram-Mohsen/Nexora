@@ -189,3 +189,42 @@ body.dark-mode .bulk-actions-toolbar {
         text-align: center;
     }
 }
+
+/* --- Semantic Admin Badges --- */
+.badge-type {
+    background: rgba(var(--brand-blue-rgb), 0.08);
+    color: var(--brand-blue);
+}
+
+.badge-category {
+    background: rgba(var(--brand-purple-rgb), 0.08);
+    color: var(--brand-purple);
+}
+
+.badge-section {
+    background: rgba(99, 102, 241, 0.08);
+    color: #6366f1;
+}
+
+.badge-origin {
+    background: rgba(var(--brand-purple-rgb), 0.1);
+    color: var(--brand-purple);
+}
+
+.badge-health-high {
+    background: rgba(var(--brand-green-rgb), 0.1);
+    border-color: rgba(var(--brand-green-rgb), 0.3);
+    color: var(--brand-green);
+}
+
+.badge-health-medium {
+    background: rgba(var(--brand-orange-rgb), 0.1);
+    border-color: rgba(var(--brand-orange-rgb), 0.3);
+    color: var(--brand-orange);
+}
+
+.badge-health-low {
+    background: rgba(var(--brand-red-rgb), 0.1);
+    border-color: rgba(var(--brand-red-rgb), 0.3);
+    color: var(--brand-red);
+}

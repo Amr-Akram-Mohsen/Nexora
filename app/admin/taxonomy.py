@@ -396,14 +396,18 @@ def _get_taxonomy_related_metadata(entity, entity_type):
     from app.domains.relationships import content_brands, content_topics
     data = {}
     
+    top_contents_query = select(Content).order_by(Content.view_count.desc()).limit(5)
+    
     if entity_type == "category":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.category_id == entity.id)) or 0)
         data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0)
         data["child categories"] = str(db.session.scalar(select(func.count()).select_from(Category).where(Category.parent_id == entity.id)) or 0)
+        top_contents = db.session.execute(top_contents_query.where(Content.category_id == entity.id)).scalars().all()
         
     elif entity_type == "brand":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
         data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0)
+        top_contents = db.session.execute(top_contents_query.join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).scalars().all()
         
     elif entity_type == "topic":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_topics).where(content_topics.c.topic_id == entity.id)) or 0)
@@ -420,6 +424,7 @@ def _get_taxonomy_related_metadata(entity, entity_type):
             .filter(content_topics.c.topic_id == entity.id)
         ) or 0
         data["related brands"] = str(rel_brands)
+        top_contents = db.session.execute(top_contents_query.join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id)).scalars().all()
         
     elif entity_type == "section":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.section_id == entity.id)) or 0)
@@ -435,7 +440,9 @@ def _get_taxonomy_related_metadata(entity, entity_type):
             .filter(Content.section_id == entity.id)
         ) or 0
         data["related brands"] = str(rel_brands)
+        top_contents = db.session.execute(top_contents_query.where(Content.section_id == entity.id)).scalars().all()
         
+    data["top content"] = {"value": render_template("admin/components/content/_top_content_table.html", contents=top_contents), "is_custom": True}
     return data
 
 def _get_taxonomy_inspect_table(entity, entity_type, metadata):
@@ -515,10 +522,26 @@ def inspect_source(id):
     if err: return err, 404
     from app.admin.helpers import format_status
     from app.admin.tables import get_inspect_table
+    from app.domains.content.models import Article
     
     article_count = db.session.scalar(
         select(func.count()).select_from(Content).where(Content.source_id == source.id)
     ) or 0
+    
+    analytics = db.session.query(
+        func.avg(Article.quality_score),
+        func.avg(Article.word_count),
+        func.count(Article.id).filter(Article.is_content_scraped == True),
+        func.min(Content.published_at),
+        func.max(Content.published_at)
+    ).select_from(Content).join(Article, Content.object_id == Article.id).filter(Content.source_id == source.id, Content.object_type == 'article').first()
+    
+    avg_quality = round(analytics[0], 1) if analytics and analytics[0] else 0
+    avg_words = int(analytics[1]) if analytics and analytics[1] else 0
+    scraped_count = analytics[2] if analytics and analytics[2] else 0
+    scrape_cov = round((scraped_count / article_count * 100), 1) if article_count > 0 else 0
+    date_min = analytics[3].strftime('%Y-%m-%d') if analytics and analytics[3] else "—"
+    date_max = analytics[4].strftime('%Y-%m-%d') if analytics and analytics[4] else "—"
     
     data = {
         "id": f"#{source.id}",
@@ -527,6 +550,10 @@ def inspect_source(id):
         "domain": source.domain,
         "authority score": str(source.authority_score),
         "status": format_status(source.is_active),
+        "avg quality score": str(avg_quality),
+        "avg word count": str(avg_words),
+        "scrape coverage": f"{scrape_cov}%",
+        "published date range": f"{date_min} to {date_max}",
         "article count": str(article_count)
     }
     

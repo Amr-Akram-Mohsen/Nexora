@@ -14,8 +14,31 @@
   // ==============================
   document.addEventListener("DOMContentLoaded", () => {
     loadMetadata();
+    loadStats();
     setupEventListeners();
   });
+
+  function loadStats() {
+    fetch("/admin/contents/stats")
+      .then(res => res.json())
+      .then(stats => {
+        const statsBar = document.getElementById("contents-stats-bar");
+        if (statsBar) statsBar.classList.remove("is-hidden");
+        
+        const elPublished = document.getElementById("stat-published");
+        const elDrafts = document.getElementById("stat-drafts");
+        const elFailed = document.getElementById("stat-failed");
+        const elNoTopics = document.getElementById("stat-no-topics");
+        const elNoBrands = document.getElementById("stat-no-brands");
+        
+        if (elPublished) elPublished.textContent = stats.published.toLocaleString();
+        if (elDrafts) elDrafts.textContent = stats.drafts.toLocaleString();
+        if (elFailed) elFailed.textContent = stats.failed.toLocaleString();
+        if (elNoTopics) elNoTopics.textContent = stats.no_topics.toLocaleString();
+        if (elNoBrands) elNoBrands.textContent = stats.no_brands.toLocaleString();
+      })
+      .catch(err => console.error("Error loading stats:", err));
+  }
 
   // ==============================
   // LOAD DYNAMIC FILTERS DATA
@@ -67,6 +90,50 @@
           opt.value = src.slug;
           opt.textContent = src.name;
           sourceSelect.appendChild(opt);
+        });
+
+        // Populate Topic Filter
+        const topicSelect = document.getElementById("filter-topic");
+        (meta.topics || []).forEach((t) => {
+          const opt = document.createElement("option");
+          opt.value = t.slug;
+          opt.textContent = t.name;
+          topicSelect.appendChild(opt);
+        });
+
+        // Populate Brand Filter
+        const brandSelect = document.getElementById("filter-brand");
+        (meta.brands || []).forEach((b) => {
+          const opt = document.createElement("option");
+          opt.value = b.slug;
+          opt.textContent = b.name;
+          brandSelect.appendChild(opt);
+        });
+
+        // Populate Origin Filter
+        const originSelect = document.getElementById("filter-ingestion-origin");
+        (meta.origins || []).forEach((o) => {
+          const opt = document.createElement("option");
+          opt.value = o.slug;
+          opt.textContent = o.name;
+          originSelect.appendChild(opt);
+        });
+
+        // Populate Intent, Gender, Price Tier Filters
+        const intentSelect = document.getElementById("filter-intent");
+        (meta.intents || []).forEach((i) => {
+          const opt = document.createElement("option"); opt.value = i.slug; opt.textContent = i.name;
+          intentSelect.appendChild(opt);
+        });
+        const genderSelect = document.getElementById("filter-gender");
+        (meta.genders || []).forEach((g) => {
+          const opt = document.createElement("option"); opt.value = g.slug; opt.textContent = g.name;
+          genderSelect.appendChild(opt);
+        });
+        const priceTierSelect = document.getElementById("filter-price-tier");
+        (meta.price_tiers || []).forEach((p) => {
+          const opt = document.createElement("option"); opt.value = p.slug; opt.textContent = p.name;
+          priceTierSelect.appendChild(opt);
         });
 
         applyContentsUrlFilters();
@@ -126,6 +193,7 @@
           selectedIds.delete(parseInt(id, 10));
           updateBulkToolbar();
           window.contentsController.load(window.contentsController.currentPage);
+          loadStats();
         } else {
           showToast("Failed to delete content.", "error");
         }
@@ -181,6 +249,7 @@
               document.getElementById("bulk-category-select").classList.add("is-hidden");
               updateBulkToolbar();
               window.contentsController.load(window.contentsController.currentPage);
+              loadStats();
             } else {
               showToast(res.error || "Bulk action failed.", "error");
             }
@@ -234,6 +303,7 @@
           showToast("Category quick-updated successfully.", "success");
           hideQuickCategoryModal();
           window.contentsController.load(window.contentsController.currentPage);
+          loadStats();
         } else {
           showToast(res.error || "Recategorization failed.", "error");
         }
@@ -244,6 +314,34 @@
       });
   }
 
+  // ==============================
+  // QUICK PUBLISH ACTION
+  // ==============================
+  function togglePublish(id, action) {
+    fetch(`/admin/contents/${id}/toggle-publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: action })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Toggle publish failed");
+        return res.json();
+      })
+      .then((res) => {
+        if (res.success) {
+          showToast(res.message, "success");
+          window.contentsController.load(window.contentsController.currentPage);
+          loadStats();
+        } else {
+          showToast(res.error || "Failed to toggle status.", "error");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        showToast("Error executing quick publish action.", "error");
+      });
+  }
+
   function applyContentsUrlFilters() {
     if (typeof applyUrlFilters !== "function") return;
     applyUrlFilters({
@@ -251,7 +349,13 @@
       type: "filter-type",
       section: "filter-section",
       category: "filter-category",
+      topic: "filter-topic",
+      brand: "filter-brand",
       source: "filter-source",
+      origin: "filter-ingestion-origin",
+      intent: "filter-intent",
+      gender: "filter-gender",
+      price_tier: "filter-price-tier",
       status: "filter-status",
       active: "filter-active",
       published: "filter-published",
@@ -286,7 +390,10 @@
       document.getElementById("filter-type").value = "";
       document.getElementById("filter-section").value = "";
       document.getElementById("filter-category").value = "";
+      document.getElementById("filter-topic").value = "";
+      document.getElementById("filter-brand").value = "";
       document.getElementById("filter-source").value = "";
+      document.getElementById("filter-ingestion-origin").value = "";
       document.getElementById("filter-status").value = "";
       document.getElementById("filter-active").value = "";
       document.getElementById("filter-published").value = "";
@@ -388,18 +495,27 @@
     // Inspect modal or detail page: delete action delegation
     document.body.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action='delete-content']");
-      if (!btn) return;
-      const id    = parseInt(btn.dataset.id, 10);
-      const title = btn.dataset.title || "this content";
-      showModal(
-        "Safer Catalog Deletion",
-        `Are you sure you want to completely delete "${title}"? This is permanent.`,
-        () => { 
-          performSingleDelete(id); 
-          const modal = document.getElementById("inspect-content-modal");
-          if (modal) modal.classList.remove("active"); 
-        }
-      );
+      if (btn) {
+          const id    = parseInt(btn.dataset.id, 10);
+          const title = btn.dataset.title || "this content";
+          showModal(
+            "Safer Catalog Deletion",
+            `Are you sure you want to completely delete "${title}"? This is permanent.`,
+            () => { 
+              performSingleDelete(id); 
+              const modal = document.getElementById("inspect-content-modal");
+              if (modal) modal.classList.remove("active"); 
+            }
+          );
+          return;
+      }
+
+      const toggleBtn = e.target.closest("[data-action='toggle-publish']");
+      if (toggleBtn) {
+          const contentId = parseInt(toggleBtn.dataset.id, 10);
+          const status = toggleBtn.dataset.status;
+          togglePublish(contentId, status);
+      }
     });
   }
 
@@ -409,8 +525,8 @@
     endpoint: "/admin/contents/",
     rowsEndpoint: "/admin/contents/rows",
     filterIds: [
-      "filter-type", "filter-section", "filter-category", "filter-source",
-      "filter-status", "filter-active", "filter-published", "filter-quality",
+      "filter-type", "filter-section", "filter-category", "filter-topic", "filter-brand", "filter-source",
+      "filter-ingestion-origin", "filter-intent", "filter-gender", "filter-price-tier", "filter-status", "filter-active", "filter-published", "filter-quality",
       "filter-date-type", "filter-start-date", "filter-end-date", "sort-by", "sort-dir"
     ],
     colspan: 9,

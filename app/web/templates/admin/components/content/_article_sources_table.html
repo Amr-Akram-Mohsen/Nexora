@@ -1,0 +1,34 @@
+<div class="article-sources-mini-table">
+  <table class="dashboard-table w-full">
+    <thead>
+      <tr>
+        <th>Source</th>
+        <th>URL</th>
+        <th>Published At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for src in sources %}
+      <tr>
+        <td>{{ src.source.name if src.source else "Unknown" }}</td>
+        <td>
+          {% if src.url %}
+          <a href="{{ src.url }}" target="_blank" class="activity-target inspect-link">
+            Link <i class="fas fa-external-link-alt"></i>
+          </a>
+          {% else %}
+          —
+          {% endif %}
+        </td>
+        <td>
+          {% if src.published_at %}
+          {{ src.published_at.strftime('%Y-%m-%d %H:%M') }}
+          {% else %}
+          —
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

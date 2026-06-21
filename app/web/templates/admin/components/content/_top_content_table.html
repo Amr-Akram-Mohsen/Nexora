@@ -1,0 +1,24 @@
+<div class="top-content-mini-table">
+  {% if contents %}
+  <table class="dashboard-table w-full">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Views</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contents %}
+      <tr>
+        <td><a href="/admin/contents?search={{ c.title | urlencode }}" class="activity-target inspect-link">{{ c.title }}</a></td>
+        <td><span class="badge badge-type badge-compact">{{ c.object_type }}</span></td>
+        <td>{{ c.view_count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="text-muted text-sm py-2">No associated content found.</div>
+  {% endif %}
+</div>

@@ -18,11 +18,18 @@
   extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-category", None, [("uncategorized", "Uncategorized")], default_val="",
   default_text="All Categories", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-topic", None, [("none", "None (No Topic)")], default_val="", default_text="All Topics", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-brand", None, [("none", "None (No Brand)")], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-intent", None, [], default_val="", default_text="All Intents", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-gender", None, [], default_val="", default_text="All Genders", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-price-tier", None, [], default_val="", default_text="All Price Tiers", extra_class="filter-select-item") }}
 </div>
 
 {# Row 2: Ingest Details & Compliance #}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-ingestion-origin", None, [], default_val="", default_text="All Ingestion Origins",
   extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-status", None, [("pending", "Pending"), ("enriching", "Enriching"), ("complete",
   "Complete"), ("failed", "Failed")], default_val="", default_text="All Processing States",
@@ -31,9 +38,15 @@
   default_text="Active & Inactive", extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-published", None, [("true", "Published Only"), ("false", "Draft / Review Only")],
   default_val="", default_text="All Visibility", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-quality", None, [("missing_category", "⚠️ Missing Category"), ("missing_metadata", "📝
-  Missing Metadata"), ("duplicate", "👯 Duplicate Title")], default_val="", default_text="All Health Statuses",
-  extra_class="filter-select-warning") }}
+  {{ admin_filter_select("filter-quality", None, [
+  ("missing_category", "⚠️ Missing Category"),
+  ("missing_metadata", "📝 Missing Metadata"),
+  ("duplicate", "👯 Duplicate Title"),
+  ("missing_topics", "⚠️ Missing Topics"),
+  ("missing_brands", "⚠️ Missing Brands"),
+  ("missing_source", "🔴 Missing Source"),
+  ("enrichment_failed", "⛔ Enrichment Failed")
+  ], default_val="", default_text="All Health Statuses", extra_class="filter-select-warning") }}
 </div>
 
 {# Row 3: Date Filters & Sorting #}
@@ -48,9 +61,18 @@
 
   <div class="filter-sort-group flex items-center gap-2">
     <span class="filter-label-xs">Sort:</span>
-    {{ admin_filter_select("sort-by", None, [("id", "ID / Newest"), ("published_at", "Publish Date"), ("ingested_at",
-    "Ingest Date"), ("view_count", "Views"), ("comment_count", "Comments"), ("title", "Title")], default_val="id",
-    default_text=None, extra_class="filter-input-auto") }}
+    {{ admin_filter_select("sort-by", None, [
+      ("id", "ID / Newest"),
+      ("published_at", "Publish Date"),
+      ("ingested_at", "Ingest Date"),
+      ("view_count", "Views"),
+      ("like_count", "Likes"),
+      ("comment_count", "Comments"),
+      ("share_count", "Shares"),
+      ("save_count", "Saves"),
+      ("score", "Engagement Score"),
+      ("title", "Title")
+    ], default_val="id", default_text=None, extra_class="filter-input-auto") }}
     {{ admin_filter_select("sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc",
     default_text=None, extra_class="filter-input-auto") }}
     {{ admin_reset_button("clear-filters-btn", "Reset Filters") }}
@@ -68,9 +90,15 @@
   </div>
 
   <div class="bulk-controls-group flex items-center gap-sm gap-2">
-    {{ admin_filter_select("bulk-action-select", None, [("activate", "Activate Selected"), ("deactivate", "Deactivate
-    Selected"), ("review", "Mark for Review (Draft)"), ("recategorize", "Recategorize Content"), ("delete", "Safe Delete
-    Selected")], default_val="", default_text="Choose Bulk Action...") }}
+    {{ admin_filter_select("bulk-action-select", None, [
+      ("activate", "Activate Selected"), 
+      ("deactivate", "Deactivate Selected"),
+      ("publish", "Publish Selected"),
+      ("unpublish", "Unpublish Selected"),
+      ("review", "Mark for Review (Draft)"), 
+      ("recategorize", "Recategorize Content"), 
+      ("delete", "Safe Delete Selected")
+    ], default_val="", default_text="Choose Bulk Action...") }}
 
     {# Bulk Category Dropdown (shown only when recategorize is selected) #}
     <select id="bulk-category-select" class="dashboard-filter-select is-hidden">
@@ -85,7 +113,16 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar("contents-count", "items", summary_id="contents-summary") %}
-<div class="tip-text">
+<div class="flex items-center gap-3">
+  <div id="contents-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden">
+    <span class="status-badge active">Live: <span id="stat-published">0</span></span>
+    <span class="status-badge user">Drafts: <span id="stat-drafts">0</span></span>
+    <span class="status-badge inactive">Failed: <span id="stat-failed">0</span></span>
+    <span class="badge badge-orange badge-compact">No Topics: <span id="stat-no-topics">0</span></span>
+    <span class="badge badge-orange badge-compact">No Brands: <span id="stat-no-brands">0</span></span>
+  </div>
+</div>
+<div class="tip-text ml-auto">
   💡 Double-click any category to quick recategorize
 </div>
 {% endcall %}

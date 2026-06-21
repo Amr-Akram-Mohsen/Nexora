@@ -281,6 +281,22 @@ def build_source_inspect_data(id):
     content_count = db.session.scalar(select(func.count(Content.id)).filter(Content.source_id == id)) or 0
     from app.admin.helpers import format_status
     from app.admin.tables import get_inspect_table
+    from app.domains.content.models import Article
+    
+    analytics = db.session.query(
+        func.avg(Article.quality_score),
+        func.avg(Article.word_count),
+        func.count(Article.id).filter(Article.is_content_scraped == True),
+        func.min(Content.published_at),
+        func.max(Content.published_at)
+    ).select_from(Content).join(Article, Content.object_id == Article.id).filter(Content.source_id == id, Content.object_type == 'article').first()
+    
+    avg_quality = round(analytics[0], 1) if analytics and analytics[0] else 0
+    avg_words = int(analytics[1]) if analytics and analytics[1] else 0
+    scraped_count = analytics[2] if analytics and analytics[2] else 0
+    scrape_cov = round((scraped_count / content_count * 100), 1) if content_count > 0 else 0
+    date_min = analytics[3].strftime('%Y-%m-%d') if analytics and analytics[3] else "—"
+    date_max = analytics[4].strftime('%Y-%m-%d') if analytics and analytics[4] else "—"
     
     data = {
         "id": f"#{source.id}",
@@ -290,6 +306,11 @@ def build_source_inspect_data(id):
         "status": format_status(source.is_active),
         "authority score": str(source.authority_score),
         "content count": str(content_count),
+        "article count": str(content_count),
+        "avg quality score": str(avg_quality),
+        "avg word count": str(avg_words),
+        "scrape coverage": f"{scrape_cov}%",
+        "published date range": f"{date_min} to {date_max}",
     }
     inspect_table = get_inspect_table("sources", data)
     return {

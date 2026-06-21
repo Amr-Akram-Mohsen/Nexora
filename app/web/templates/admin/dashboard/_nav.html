@@ -37,6 +37,21 @@
       title="Content Library">
       <span class="nav-icon">📰</span> <span class="nav-link-text">Content Library</span>
     </a>
+    <a href="{{ url_for('api_content.content_dashboard') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'content_dashboard' %}active{% endif %}"
+      title="Content Analytics">
+      <span class="nav-icon">📈</span> <span class="nav-link-text">Content Analytics</span>
+    </a>
+    <a href="{{ url_for('api_content.pipeline_view') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'pipeline' %}active{% endif %}"
+      title="Pipeline Audit">
+      <span class="nav-icon">⚙️</span> <span class="nav-link-text">Pipeline Audit</span>
+    </a>
+    <a href="{{ url_for('api_content.deduplication_view') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'deduplication' %}active{% endif %}"
+      title="Deduplication">
+      <span class="nav-icon">👯</span> <span class="nav-link-text">Deduplication</span>
+    </a>
     <a href="{{ url_for('admin.dashboard_items') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'items' %}active{% endif %}"
       title="Product Intelligence">

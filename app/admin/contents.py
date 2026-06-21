@@ -22,6 +22,7 @@ from app.admin.helpers import parse_pagination_params, parse_sort_params, make_r
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload, selectinload
 from datetime import datetime
+from markupsafe import Markup
 
 bp = Blueprint("api_content", __name__, url_prefix="/admin/contents")
 
@@ -43,7 +44,11 @@ _CONTENT_SORT_MAP = {
     "published_at": Content.published_at,
     "ingested_at": Content.ingested_at,
     "view_count": Content.view_count,
+    "like_count": Content.like_count,
     "comment_count": Content.comment_count,
+    "share_count": Content.share_count,
+    "save_count": Content.save_count,
+    "score": Content.score,
     "title": Content.title,
 }
 
@@ -75,26 +80,81 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
         sources = [c.source.name] if c.source else []
 
     # Quality flags
-    issues = []
-    if not c.category_id or (c.category and c.category.slug == "uncategorized"):
-        issues.append("missing_category")
-    if not c.title or not c.preview_text:
-        issues.append("missing_metadata")
-    if c.title and c.title in duplicate_titles:
-        issues.append("duplicate")
+    duplicate = c.title and c.title in duplicate_titles
+    
+    health_badges = []
+    
+    # Compute Health Score
+    score = 0
+    if c.title: score += 10
+    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
+    if c.category and c.category.slug != 'uncategorized': score += 10
+    if c.topics: score += 15
+    if c.brands: score += 15
+    if c.source_id: score += 10
+    if not duplicate: score += 5
+    
+    if c.object_type == "article" and target:
+        if getattr(target, 'is_content_scraped', False): score += 10
+        if getattr(target, 'status', '') == 'complete': score += 10
+        if getattr(target, 'quality_score', 0) > 0: score += 5
+    elif c.object_type in ("video", "post"):
+        score += 25
+        
+    score = min(score, 100)
+    score_class = "badge-health-high" if score >= 80 else ("badge-health-medium" if score >= 50 else "badge-health-low")
+    health_badges.append(f'<span class="badge {score_class} badge-compact">{score}% Health</span>')
+
+    if not c.topics:
+        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Topics">⚠️ No Topics</span>')
+    if not c.brands:
+        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Brands">⚠️ No Brands</span>')
+    if not c.source_id:
+        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Source">🔴 No Source</span>')
+    if c.object_type == "article" and target and target.status == "failed":
+        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="Enrichment Failed">⛔ Failed</span>')
+    if duplicate:
+        health_badges.append('<span class="status-badge user flex items-center gap-1" title="Duplicate Title">👯 Duplicate</span>')
+        
+    health_html = f'<div class="flex flex-wrap gap-1">{ "".join(health_badges) }</div>' if health_badges else ""
+    title_html = Markup(f'<div class="flex flex-col gap-2"><strong>{c.title or ""}</strong>{health_html}</div>')
+
+    # Engagement
+    views = f"{c.view_count:,}" if c.view_count else "0"
+    likes = f"{c.like_count:,}" if c.like_count else "0"
+    comments = f"{c.comment_count:,}" if c.comment_count else "0"
+    engagement_html = Markup(f'<div class="flex flex-col gap-1 text-sm"><span title="Views" class="text-muted"><i class="fas fa-eye"></i> {views} views</span><span title="Comments" class="text-muted"><i class="fas fa-comment"></i> {comments} comments</span><span title="Likes" class="text-muted"><i class="fas fa-heart"></i> {likes} likes</span></div>')
+
+    # Classification
+    cat_name = c.category.name if c.category else "None"
+    sec_name = c.section.name if c.section else "None"
+    classification_html = Markup(f'''
+    <div class="flex flex-col gap-1">
+        <span class="badge badge-type badge-compact w-fit">{c.object_type}</span>
+        <span class="text-sm text-muted">📁 {cat_name}</span>
+        <span class="text-sm text-muted">🏷️ {sec_name}</span>
+    </div>
+    ''')
+
+    # Sources
+    sources_text = ", ".join(sources)
+    origin_chip = f'<span class="badge badge-origin badge-compact">{c.ingestion_origin}</span>' if c.ingestion_origin else ""
+    sources_html = Markup(f'<div class="flex flex-col gap-1"><span class="text-sm">{sources_text}</span>{origin_chip}</div>')
+
+    # Status
+    pub_status = '<span class="status-badge active w-fit">Live</span>' if c.is_published else '<span class="status-badge inactive w-fit">Draft</span>'
+    action_btn = f'<button data-action="toggle-publish" data-id="{c.id}" data-status="unpublish" class="dashboard-btn dashboard-btn-danger w-fit" title="Unpublish">Unpublish</button>' if c.is_published else f'<button data-action="toggle-publish" data-id="{c.id}" data-status="publish" class="dashboard-btn dashboard-btn-primary w-fit" title="Publish">Publish</button>'
+    status_html = Markup(f'<div class="flex flex-col gap-2">{pub_status}{action_btn}</div>')
 
     return {
         "id": c.id,
-        "title": c.title or '',
-        "metadata": f'''
-        type: {c.object_type}
-        section: {c.section.name}
-        category: {c.category.name}
-        ''',
+        "is_published": c.is_published,
+        "title": title_html,
+        "classification": classification_html,
+        "engagement": engagement_html,
         "published-at": c.published_at.isoformat() if c.published_at else None,
-        "sources": sources,
-        "status": 'active' if c.is_active else 'inactive',
-        "renderation-status": 'Published' if c.is_published else 'Draft',
+        "sources": sources_html,
+        "status": status_html,
     }
 
 
@@ -159,6 +219,33 @@ def _build_contents_query(args):
     if published:
         query = query.filter(Content.is_published == (published.lower() == "true"))
 
+    topic_slug = args.get("topic")
+    brand_slug = args.get("brand")
+    origin     = args.get("ingestion_origin")
+    intent_slug = args.get("intent")
+    gender_slug = args.get("gender")
+    price_tier_slug = args.get("price_tier")
+
+    if topic_slug:
+        if topic_slug == "none":
+            query = query.filter(~Content.topics.any())
+        else:
+            query = query.filter(Content.topics.any(slug=topic_slug))
+    if brand_slug:
+        if brand_slug == "none":
+            query = query.filter(~Content.brands.any())
+        else:
+            query = query.filter(Content.brands.any(slug=brand_slug))
+    if origin:
+        query = query.filter(Content.ingestion_origin == origin)
+        
+    if intent_slug:
+        query = query.filter(Content.intent.has(slug=intent_slug))
+    if gender_slug:
+        query = query.filter(Content.gender.has(slug=gender_slug))
+    if price_tier_slug:
+        query = query.filter(Content.price_tier.has(slug=price_tier_slug))
+
     date_col = Content.published_at if date_type == "published_at" else Content.ingested_at
     if start_date:
         try:
@@ -192,6 +279,17 @@ def _build_contents_query(args):
                 .subquery()
             )
             query = query.filter(Content.title.in_(dup_sub))
+        elif quality == "missing_topics":
+            query = query.filter(~Content.topics.any())
+        elif quality == "missing_brands":
+            query = query.filter(~Content.brands.any())
+        elif quality == "missing_source":
+            query = query.filter(Content.source_id.is_(None))
+        elif quality == "enrichment_failed":
+            query = query.filter(
+                Content.object_type == "article",
+                Content.object_id.in_(db.session.query(Article.id).filter(Article.status == "failed"))
+            )
 
     query = query.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
     return query, quality
@@ -267,16 +365,140 @@ def _delete_content_and_relations(content: Content) -> None:
 
 @bp.route("/meta", methods=["GET"])
 def get_metadata():
-    """Retrieve lists of categories, sections, and sources for dropdown filters."""
+    """Retrieve lists of categories, sections, sources, topics, and brands for dropdown filters."""
+    from app.domains.taxonomy.models import Topic, Brand, IntentFacet, GenderFacet, PriceTierFacet
+    
     categories = db.session.execute(select(Category).order_by(Category.name)).scalars().all()
     sections   = db.session.execute(select(Section).order_by(Section.name)).scalars().all()
     sources    = db.session.execute(select(Source).order_by(Source.name)).scalars().all()
+    topics     = db.session.execute(select(Topic).order_by(Topic.name)).scalars().all()
+    brands     = db.session.execute(select(Brand).order_by(Brand.name)).scalars().all()
+    
+    intents    = db.session.execute(select(IntentFacet).order_by(IntentFacet.name)).scalars().all()
+    genders    = db.session.execute(select(GenderFacet).order_by(GenderFacet.name)).scalars().all()
+    price_tiers= db.session.execute(select(PriceTierFacet).order_by(PriceTierFacet.name)).scalars().all()
+    
+    # Get distinct ingestion origins
+    origins = db.session.execute(select(Content.ingestion_origin).filter(Content.ingestion_origin.is_not(None)).distinct()).scalars().all()
 
     return jsonify({
         "categories": [{"id": c.id, "slug": c.slug, "name": c.name} for c in categories],
         "sections": [{"id": s.id, "slug": s.slug, "name": s.name} for s in sections],
         "sources": [{"slug": s.slug, "name": s.name} for s in sources],
+        "topics": [{"slug": t.slug, "name": t.name} for t in topics],
+        "brands": [{"slug": b.slug, "name": b.name} for b in brands],
+        "intents": [{"slug": i.slug, "name": i.name} for i in intents],
+        "genders": [{"slug": g.slug, "name": g.name} for g in genders],
+        "price_tiers": [{"slug": p.slug, "name": p.name} for p in price_tiers],
+        "origins": [{"slug": o, "name": o} for o in origins]
     })
+
+
+@bp.route("/stats", methods=["GET"])
+def get_stats():
+    """Retrieve aggregate statistics for the summary bar."""
+    total = db.session.query(func.count(Content.id)).scalar()
+    published = db.session.query(func.count(Content.id)).filter(Content.is_published == True).scalar()
+    drafts = total - published
+    failed = db.session.query(func.count(Article.id)).filter(Article.status == "failed").scalar()
+    
+    no_topics = db.session.query(func.count(Content.id)).filter(~Content.topics.any()).scalar()
+    no_brands = db.session.query(func.count(Content.id)).filter(~Content.brands.any()).scalar()
+
+    return jsonify({
+        "total": total,
+        "published": published,
+        "drafts": drafts,
+        "failed": failed,
+        "no_topics": no_topics,
+        "no_brands": no_brands
+    })
+
+
+@bp.route("/dashboard", methods=["GET"])
+def content_dashboard():
+    """Render the high-level content analytics dashboard."""
+    # Compute distribution metrics
+    type_counts = db.session.execute(select(Content.object_type, func.count(Content.id)).group_by(Content.object_type)).all()
+    origin_counts = db.session.execute(select(Content.ingestion_origin, func.count(Content.id)).group_by(Content.ingestion_origin)).all()
+    status_counts = db.session.execute(select(Article.status, func.count(Article.id)).group_by(Article.status)).all()
+    
+    # KPIs
+    total = db.session.query(func.count(Content.id)).scalar() or 0
+    published = db.session.query(func.count(Content.id)).filter(Content.is_published == True).scalar() or 0
+    failed = db.session.query(func.count(Article.id)).filter(Article.status == "failed").scalar() or 0
+    scraped = db.session.query(func.count(Article.id)).filter(Article.is_content_scraped == True).scalar() or 0
+    total_articles = db.session.query(func.count(Article.id)).scalar() or 1
+    scrape_coverage = (scraped / total_articles) * 100
+    
+    # Unclassified (no topics and no brands)
+    no_tax = db.session.query(func.count(Content.id)).filter(~Content.topics.any(), ~Content.brands.any()).scalar() or 0
+
+    # Origin Analytics
+    origin_analytics = db.session.query(
+        Content.ingestion_origin,
+        func.count(Content.id).label("count"),
+        func.avg(Article.quality_score).label("avg_quality"),
+        func.avg(Article.word_count).label("avg_words"),
+        func.avg(Content.view_count).label("avg_views")
+    ).outerjoin(Article, Content.object_id == Article.id).group_by(Content.ingestion_origin).all()
+
+    origin_table = []
+    for row in origin_analytics:
+        origin_table.append({
+            "origin": row[0] or "Unknown",
+            "count": row[1] or 0,
+            "avg_quality": round(row[2], 1) if row[2] else 0,
+            "avg_words": int(row[3]) if row[3] else 0,
+            "avg_views": int(row[4]) if row[4] else 0
+        })
+        
+    # Freshness Distribution
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    d30 = now - timedelta(days=30)
+    d90 = now - timedelta(days=90)
+    
+    freshness_counts = db.session.query(Content.published_at).filter(Content.published_at != None).all()
+    freshness_dist = {"< 30 Days": 0, "30-90 Days": 0, "> 90 Days": 0}
+    for (pub_at,) in freshness_counts:
+        # handle naive vs timezone aware
+        if pub_at.tzinfo is None:
+            pub_at = pub_at.replace(tzinfo=timezone.utc)
+        if pub_at > d30:
+            freshness_dist["< 30 Days"] += 1
+        elif pub_at > d90:
+            freshness_dist["30-90 Days"] += 1
+        else:
+            freshness_dist["> 90 Days"] += 1
+            
+    # Source Authority Distribution
+    authority_dist = {"High (67-100)": 0, "Medium (34-66)": 0, "Low (0-33)": 0}
+    source_scores = db.session.query(Source.authority_score, func.count(Content.id)).join(Content, Content.source_id == Source.id).group_by(Source.authority_score).all()
+    for score, count in source_scores:
+        s = score or 0
+        if s >= 67: authority_dist["High (67-100)"] += count
+        elif s >= 34: authority_dist["Medium (34-66)"] += count
+        else: authority_dist["Low (0-33)"] += count
+
+    stats = {
+        "kpi": {
+            "total": total,
+            "published": published,
+            "drafts": total - published,
+            "failed": failed,
+            "no_tax": no_tax,
+            "scrape_coverage": round(scrape_coverage, 1)
+        },
+        "type_dist": {row[0]: row[1] for row in type_counts},
+        "origin_dist": {row[0] or 'Unknown': row[1] for row in origin_counts},
+        "status_dist": {row[0] or 'Pending': row[1] for row in status_counts},
+        "freshness_dist": freshness_dist,
+        "authority_dist": authority_dist,
+        "origin_table": origin_table
+    }
+    
+    return render_template("admin/content_library/dashboard.html", stats=stats)
 
 
 @bp.route("/", methods=["GET"])
@@ -315,6 +537,26 @@ def delete_content(id):
     _delete_content_and_relations(content)
     db.session.commit()
     return jsonify({"success": True, "message": "Content deleted successfully"})
+
+
+@bp.route("/<int:id>/toggle-publish", methods=["POST"])
+def toggle_publish(id):
+    """Quickly toggle the publish status of a content item."""
+    content = db.session.get(Content, id)
+    if not content:
+        return jsonify({"error": "Content not found"}), 404
+
+    data = request.get_json() or {}
+    action = data.get("action")
+    if action == "publish":
+        content.is_published = True
+    elif action == "unpublish":
+        content.is_published = False
+    else:
+        return jsonify({"error": "Invalid action parameter"}), 400
+
+    db.session.commit()
+    return jsonify({"success": True, "message": f"Content {'published' if content.is_published else 'unpublished'}."})
 
 
 @bp.route("/rows", methods=["GET"])
@@ -386,16 +628,25 @@ def build_content_inspect_data(id):
     from app.domains.interaction.service.scoring import get_content_engagement_score
     engagement_score = get_content_engagement_score(content.id)
     
+    sec_slug = content.section.slug if content.section else ''
+    cat_slug = content.category.slug if content.category else ''
+    sec_name = content.section.name if content.section else 'Unassigned'
+    cat_name = content.category.name if content.category else 'Uncategorized'
+    
+    sec_link = f'<a href="/admin/contents?section={sec_slug}">{sec_name}</a>'
+    cat_link = f'<a href="/admin/contents?category={cat_slug}">{cat_name}</a>'
+    taxonomy_breadcrumb = f'<div class="flex items-center gap-2">{sec_link} <i class="fas fa-chevron-right fa-xs"></i> {cat_link}</div>'
+
     data = {
         "id": f"#{content.id}",
         "title": content.title or "—",
         "type": content.object_type,
-        "category": content.category.name if content.category else "Uncategorized",
-        "section": content.section.name if content.section else "Unassigned",
+        "taxonomy path": {"value": taxonomy_breadcrumb, "is_custom": True},
         "engagement score": str(engagement_score),
         "related brands": ", ".join(b.name for b in content.brands) if content.brands else "—",
         "related topics": ", ".join(t.name for t in content.topics) if content.topics else "—",
         "mentioned products": ", ".join(i.name for i in content.linked_items) if content.linked_items else "—",
+        "attributes": ", ".join(a.name for a in content.attributes) if content.attributes else "—",
         "available sources": ", ".join(sources) if sources else "—",
         "primary source": content.source.name if content.source else "—",
         "ingestion source": content.ingestion_origin if content.ingestion_origin else "—",
@@ -424,16 +675,26 @@ def build_content_inspect_data(id):
         data["platform"] = target.platform
         data["author"] = target.author or "—"
         data["subreddit"] = target.subreddit or "—"
+        data["platform upvotes"] = str(target.upvotes or 0)
+        data["platform comments"] = str(target.comments_count or 0)
     elif content.object_type == "article" and target:
         data["is scraped"] = "Yes" if target.is_content_scraped else "No"
         data["word count"] = "{:,}".format(target.word_count or 0)
+        data["read time"] = f"{target.read_time_minutes} min" if hasattr(target, 'read_time_minutes') else "—"
         data["article quality score"] = str(target.quality_score or 0)
+        data["last enrichment attempt"] = format_datetime(target.last_enrichment_attempt) if target.last_enrichment_attempt else "—"
 
     inspect_table = get_inspect_table("contents", data)
     
     if target and hasattr(target, "url") and target.url:
         inspect_table["Related Metadata"].append(
             {"label": "Source Link", "value": f'<a class="activity-target inspect-link" href="{target.url}" target="_blank">View Original Link <i class="fas fa-external-link-alt"></i></a>', "is_custom": True}
+        )
+        
+    if content.object_type == "article" and target and target.article_sources:
+        table_html = render_template("admin/components/content/_article_sources_table.html", sources=target.article_sources)
+        inspect_table["Related Metadata"].append(
+            {"label": "Article Sources", "value": table_html, "is_custom": True}
         )
         
     recent_comments = sorted(content.comments, key=lambda c: c.created_at or datetime.min, reverse=True)[:3]
@@ -494,6 +755,18 @@ def bulk_actions():
         db.session.commit()
         return jsonify({"success": True, "message": f"Deactivated {len(contents)} content items."})
 
+    elif action == "publish":
+        for c in contents:
+            c.is_published = True
+        db.session.commit()
+        return jsonify({"success": True, "message": f"Published {len(contents)} content items."})
+
+    elif action == "unpublish":
+        for c in contents:
+            c.is_published = False
+        db.session.commit()
+        return jsonify({"success": True, "message": f"Unpublished {len(contents)} content items."})
+
     elif action == "review":
         for c in contents:
             c.is_published = False
@@ -520,3 +793,92 @@ def bulk_actions():
         return jsonify({"success": True, "message": f"Successfully deleted {len(contents)} content items and associated data."})
 
     return jsonify({"error": "Unsupported bulk action"}), 400
+
+# ─────────────────────────────────────────────
+# PIPELINE AUDIT
+# ─────────────────────────────────────────────
+
+@bp.route("/pipeline", methods=["GET"])
+@admin_required
+def pipeline_view():
+    return render_template("admin/content_library/pipeline.html")
+
+@bp.route("/pipeline/stats", methods=["GET"])
+@admin_required
+def pipeline_stats():
+    # Get article status distribution by origin
+    origins = db.session.execute(select(Content.ingestion_origin).distinct()).scalars().all()
+    stats = []
+    
+    for origin in origins:
+        if not origin: continue
+        
+        counts = db.session.execute(
+            select(Article.status, func.count(Article.id))
+            .join(Content, Content.object_id == Article.id)
+            .where(Content.object_type == "article")
+            .where(Content.ingestion_origin == origin)
+            .group_by(Article.status)
+        ).all()
+        
+        status_map = {status: count for status, count in counts}
+        total = sum(status_map.values())
+        if total > 0:
+            stats.append({
+                "origin": origin,
+                "pending": status_map.get("pending", 0),
+                "enriching": status_map.get("enriching", 0),
+                "failed": status_map.get("failed", 0),
+                "complete": status_map.get("complete", 0),
+                "total": total
+            })
+            
+    return jsonify({"stats": stats})
+
+@bp.route("/pipeline/retry", methods=["POST"])
+@admin_required
+def pipeline_retry():
+    data = request.get_json() or {}
+    origin = data.get("origin")
+    
+    query = db.session.query(Article).join(Content, Content.object_id == Article.id).filter(
+        Content.object_type == "article",
+        Article.status == "failed"
+    )
+    if origin:
+        query = query.filter(Content.ingestion_origin == origin)
+        
+    articles_to_retry = query.all()
+    for a in articles_to_retry:
+        a.status = "pending"
+        
+    db.session.commit()
+    return jsonify({"success": True, "retried": len(articles_to_retry)})
+
+# ─────────────────────────────────────────────
+# DEDUPLICATION WORKBENCH
+# ─────────────────────────────────────────────
+
+@bp.route("/deduplication", methods=["GET"])
+@admin_required
+def deduplication_view():
+    # Find titles with > 1 occurrence
+    dup_titles = db.session.execute(
+        select(Content.title, func.count(Content.id))
+        .group_by(Content.title)
+        .having(func.count(Content.id) > 1)
+        .order_by(func.count(Content.id).desc())
+        .limit(20)
+    ).all()
+    
+    groups = []
+    for title, count in dup_titles:
+        if not title: continue
+        items = db.session.execute(select(Content).where(Content.title == title)).scalars().all()
+        groups.append({
+            "title": title,
+            "count": count,
+            "content_list": [{"id": i.id, "type": i.object_type, "published_at": i.published_at.isoformat() if i.published_at else None, "source": i.source.name if i.source else "None"} for i in items]
+        })
+        
+    return render_template("admin/content_library/deduplication.html", duplicate_groups=groups)

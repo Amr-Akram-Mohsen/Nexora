@@ -15,21 +15,21 @@ CRUD_TABLES = {
         "id": "contents",
         "preview_table": [
             "Title",
-            "Metadata",
+            "Classification",
+            "Engagement",
             "Published At",
             "Sources",
             "Status",
-            "Renderation Status",
             "Actions",
         ],
         "detailed_table": {
-            "content info": ["id", "title", "type", "category", "section"],
+            "content info": ["id", "title", "type", "taxonomy path"],
             "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves"],
-            "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count"],
+            "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count", "read time", "platform upvotes", "platform comments"],
             "quality & scoring": ["base score", "review score", "article quality score"],
-            "taxonomy & targeting": ["intent", "gender", "price tier"],
+            "taxonomy & targeting": ["intent", "gender", "price tier", "attributes"],
             "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "ingestion source"],
-            "status & lifecycle": ["published at", "ingested at", "enrichment status", "status", "renderation status"]
+            "status & lifecycle": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "renderation status"]
         }
     },
     "items": {
@@ -47,6 +47,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Volume", "Last Crawl", "Success Rate", "Failures", "Engagement", "Status", "Actions"],
         "detailed_table": {
             "source info": ["id", "name", "slug", "domain", "authority score", "status"],
+            "performance & quality": ["avg quality score", "avg word count", "scrape coverage", "published date range"],
             "related metadata": ["article count"]
         }
     },
@@ -76,7 +77,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "heirarchy level", "Actions"],
         "detailed_table": {
             "category info": ["id", "slug", "name", "status", "sort order", "heirarchy level", "parent name"],
-            "related metadata": ["child categories", "content count", "item count"],
+            "related metadata": ["child categories", "content count", "item count", "top content"],
         }
     },
     "brands": {
@@ -84,7 +85,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Featured", "Actions"],
         "detailed_table": {
             "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
-            "related metadata": ["content count", "item count"]
+            "related metadata": ["content count", "item count", "top content"]
         }
     },
     "topics": {
@@ -92,7 +93,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Featured", "Actions"],
         "detailed_table": {
             "topic info": ["id", "slug", "name", "featured", "status", "sort order"],
-            "related metadata": ["content count", "related categories", "related brands"],
+            "related metadata": ["content count", "related categories", "related brands", "top content"],
         }
     },
     "sections": {
@@ -100,7 +101,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Description", "Actions"],
         "detailed_table": {
             "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
-            "related metadata": ["content count", "category count", "related brands"],
+            "related metadata": ["content count", "category count", "related brands", "top content"],
         }
     },
     "comments": {
