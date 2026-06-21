@@ -13,11 +13,13 @@ Refactoring applied:
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store
+from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store, ItemImage
 from app.domains.taxonomy.models import Category, Brand, Source
 from app.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
 from sqlalchemy import select, func, or_
 from sqlalchemy.orm import joinedload
+from app.domains.item.models import ItemSpecification
+from app.domains.interaction.models import Comment
 
 bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
 
@@ -40,6 +42,7 @@ _ITEM_SORT_MAP = {
     "click_count": Item.click_count,
     "view_count":  Item.view_count,
 }
+
 
 
 # ─────────────────────────────────────────────
@@ -79,11 +82,95 @@ def get_item_meta():
     })
 
 
+@bp.route("/health_stats", methods=["GET"])
+def get_item_health_stats():
+    """Return fast KPI stats for the item catalog health dashboard."""
+    from datetime import datetime, timezone, timedelta
+    
+    total_items = db.session.scalar(select(func.count(Item.id))) or 0
+    branded_items = db.session.scalar(select(func.count(Item.id)).where(Item.brand_id.isnot(None))) or 0
+    
+    items_with_images = db.session.scalar(
+        select(func.count(func.distinct(ItemImage.item_id)))
+    ) or 0
+    
+    items_with_links = db.session.scalar(
+        select(func.count(func.distinct(ItemVariant.item_id)))
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(ItemStoreLink.is_active.is_(True))
+    ) or 0
+    
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    
+    # Items where ALL active store links are stale (last synced > 7 days ago)
+    # Actually, simpler: count of items that have NO store links synced in the last 7 days.
+    # We can just count items with links, then subtract items with at least one recent sync.
+    items_with_recent_sync = db.session.scalar(
+        select(func.count(func.distinct(ItemVariant.item_id)))
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(ItemStoreLink.is_active.is_(True), ItemStoreLink.last_synced_at >= seven_days_ago)
+    ) or 0
+    stale_sync_items = max(0, items_with_links - items_with_recent_sync)
+
+    # Distribution by item_type
+    type_dist_rows = db.session.execute(
+        select(Item.item_type, func.count(Item.id))
+        .group_by(Item.item_type)
+        .order_by(func.count(Item.id).desc())
+    ).all()
+    
+    item_type_distribution = [
+        {"type": r[0] or "Uncategorized", "count": r[1]}
+        for r in type_dist_rows
+    ]
+
+    # Top Items by Engagement (CTR)
+    # We define CTR roughly as clicks / views.
+    # To avoid division by zero, we filter views > 10.
+    top_items_rows = db.session.execute(
+        select(
+            Item.id, 
+            Item.name, 
+            Item.click_count, 
+            Item.view_count,
+            Item.save_count,
+            Item.like_count
+        )
+        .where(Item.view_count > 10)
+        .order_by((Item.click_count * 1.0 / Item.view_count).desc())
+        .limit(5)
+    ).all()
+    
+    top_engagement_items = []
+    for r in top_items_rows:
+        ctr = round((r.click_count / r.view_count) * 100, 1) if r.view_count else 0
+        save_rate = round((r.save_count / r.view_count) * 100, 1) if r.view_count else 0
+        like_rate = round((r.like_count / r.view_count) * 100, 1) if r.view_count else 0
+        top_engagement_items.append({
+            "id": r.id,
+            "name": r.name,
+            "ctr": ctr,
+            "save_rate": save_rate,
+            "like_rate": like_rate
+        })
+
+    return jsonify({
+        "total_items": total_items,
+        "branded_items": branded_items,
+        "items_with_images": items_with_images,
+        "items_with_links": items_with_links,
+        "stale_sync_items": stale_sync_items,
+        "item_type_distribution": item_type_distribution,
+        "top_engagement_items": top_engagement_items
+    })
+
+
 def _load_item_aggregates(page_ids):
     min_price_rows = db.session.execute(
         select(
             ItemVariant.item_id,
             func.min(ItemVariant.price).label("min_price"),
+            func.max(ItemVariant.price).label("max_price"),
             ItemVariant.currency,
         )
         .where(ItemVariant.item_id.in_(page_ids), ItemVariant.price != None)
@@ -94,12 +181,18 @@ def _load_item_aggregates(page_ids):
     min_price_map: dict[int, dict] = {}
     for r in min_price_rows:
         if r.item_id not in min_price_map:
-            min_price_map[r.item_id] = {"price": float(r.min_price), "currency": r.currency}
+            min_price_map[r.item_id] = {
+                "price": float(r.min_price), 
+                "max_price": float(r.max_price) if r.max_price else None,
+                "currency": r.currency
+            }
 
     store_rows = db.session.execute(
         select(
             ItemVariant.item_id,
             func.count(ItemStoreLink.id).label("active_links"),
+            func.max(ItemStoreLink.last_synced_at).label("last_synced_at"),
+            func.max(ItemStoreLink.old_price).label("max_old_price")
         )
         .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
         .where(
@@ -109,8 +202,30 @@ def _load_item_aggregates(page_ids):
         .group_by(ItemVariant.item_id)
     ).all()
 
-    store_info_map = {r.item_id: int(r.active_links) for r in store_rows}
-    return min_price_map, store_info_map
+    store_info_map = {
+        r.item_id: {
+            "active_links": int(r.active_links),
+            "last_synced_at": r.last_synced_at,
+            "has_discount": r.max_old_price is not None and float(r.max_old_price) > 0
+        }
+        for r in store_rows
+    }
+    
+    image_rows = db.session.execute(
+        select(ItemImage.item_id, func.count(ItemImage.id).label("image_count"))
+        .where(ItemImage.item_id.in_(page_ids))
+        .group_by(ItemImage.item_id)
+    ).all()
+    image_info_map = {r.item_id: int(r.image_count) > 0 for r in image_rows}
+
+    spec_rows = db.session.execute(
+        select(ItemSpecification.item_id, func.count(ItemSpecification.id).label("spec_count"))
+        .where(ItemSpecification.item_id.in_(page_ids))
+        .group_by(ItemSpecification.item_id)
+    ).all()
+    spec_info_map = {r.item_id: int(r.spec_count) > 0 for r in spec_rows}
+
+    return min_price_map, store_info_map, image_info_map, spec_info_map
 
 @bp.route("/", methods=["GET"])
 def list_items():
@@ -122,6 +237,10 @@ def list_items():
     brand_slug    = request.args.get("brand")
     category_slug = request.args.get("category")
     source_slug   = request.args.get("source")
+    has_images    = request.args.get("has_images")
+    has_brand     = request.args.get("has_brand")
+    availability  = request.args.get("availability")
+    item_type     = request.args.get("item_type")
 
     stmt = select(Item).options(joinedload(Item.brand), joinedload(Item.category))
 
@@ -140,30 +259,88 @@ def list_items():
 
     if source_slug:
         stmt = stmt.join(Item.source).where(Source.slug == source_slug)
+        
+    if item_type:
+        stmt = stmt.where(Item.item_type == item_type)
+        
+    if has_images == "true":
+        stmt = stmt.where(Item.images.any())
+    elif has_images == "false":
+        stmt = stmt.where(~Item.images.any())
+        
+    if has_brand == "true":
+        stmt = stmt.where(Item.brand_id.isnot(None))
+    elif has_brand == "false":
+        stmt = stmt.where(Item.brand_id.is_(None))
+        
+    if availability and availability != "all":
+        # Check if there is any active link with this availability
+        stmt = stmt.where(
+            Item.variants.any(
+                ItemVariant.store_links.any(
+                    (ItemStoreLink.is_active == True) & (ItemStoreLink.availability == availability)
+                )
+            )
+        )
 
-    stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+    # Note: custom sorting like min_price, store_count, last_synced_at 
+    # would need complex joins. We can use subqueries or scalar queries here if we add them.
+    # For now we sort on standard fields.
+    if sort_col == "min_price":
+        # Approximate sort by price subquery
+        price_sub = select(func.min(ItemVariant.price)).where(ItemVariant.item_id == Item.id).scalar_subquery()
+        stmt = stmt.order_by(price_sub.asc() if sort_dir == "asc" else price_sub.desc())
+    elif sort_col == "store_count":
+        store_sub = select(func.count(ItemStoreLink.id)).join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id).where(ItemVariant.item_id == Item.id, ItemStoreLink.is_active == True).scalar_subquery()
+        stmt = stmt.order_by(store_sub.asc() if sort_dir == "asc" else store_sub.desc())
+    else:
+        stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     page_ids = [item.id for item in pagination.items]
 
-    min_price_map, store_info_map = _load_item_aggregates(page_ids)
+    min_price_map, store_info_map, image_info_map, spec_info_map = _load_item_aggregates(page_ids)
 
     serialized = []
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    
     for item in pagination.items:
         price_info  = min_price_map.get(item.id, {})
-        store_count = store_info_map.get(item.id, 0)
+        store_info  = store_info_map.get(item.id, {})
+        has_image   = image_info_map.get(item.id, False)
+        has_specs   = spec_info_map.get(item.id, False)
+
+        # Compute Completeness Score
+        completeness_points = 0
+        total_criteria = 8
+        if has_image: completeness_points += 1
+        if item.brand_id: completeness_points += 1
+        if item.description and len(item.description) > 10: completeness_points += 1
+        if store_info.get("active_links", 0) > 0: completeness_points += 1
+        if price_info.get("price") is not None: completeness_points += 1
+        if has_specs: completeness_points += 1
+        if item.searchable_attributes and len(item.searchable_attributes) > 0: completeness_points += 1
+        if item.structured_details and len(item.structured_details) > 0: completeness_points += 1
+        
+        completeness_score = int((completeness_points / total_criteria) * 100)
 
         serialized.append({
             "id":          item.id,
             "name":        item.name,
             "slug":        item.slug,
+            "image_url":   item.image_url if has_image else None,
             "brand":       item.brand.name if item.brand else "—",
             "brand_slug":  item.brand.slug if item.brand else None,
             "category":    item.category.name if item.category else "—",
             "category_slug": item.category.slug if item.category else None,
             "min_price":   price_info.get("price"),
+            "max_price":   price_info.get("max_price"),
             "currency":    price_info.get("currency"),
-            "store_count": store_count,
+            "store_count": store_info.get("active_links", 0),
+            "last_synced_at": store_info.get("last_synced_at").isoformat() if store_info.get("last_synced_at") else None,
+            "has_discount": store_info.get("has_discount", False),
+            "health":      completeness_score,
             "click_count": item.click_count or 0,
             "view_count":  item.view_count or 0,
             "created_at":  item.created_at.isoformat() if item.created_at else None,
@@ -240,6 +417,10 @@ def items_rows():
     brand_slug    = request.args.get("brand")
     category_slug = request.args.get("category")
     source_slug   = request.args.get("source")
+    has_images    = request.args.get("has_images")
+    has_brand     = request.args.get("has_brand")
+    availability  = request.args.get("availability")
+    item_type     = request.args.get("item_type")
 
     stmt = select(Item).options(joinedload(Item.brand), joinedload(Item.category))
     if search:
@@ -254,22 +435,88 @@ def items_rows():
         stmt = stmt.join(Item.category).where(Category.slug == category_slug)
     if source_slug:
         stmt = stmt.join(Item.source).where(Source.slug == source_slug)
-    stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+    if item_type:
+        stmt = stmt.where(Item.item_type == item_type)
+    if has_images == "true":
+        stmt = stmt.where(Item.images.any())
+    elif has_images == "false":
+        stmt = stmt.where(~Item.images.any())
+    if has_brand == "true":
+        stmt = stmt.where(Item.brand_id.isnot(None))
+    elif has_brand == "false":
+        stmt = stmt.where(Item.brand_id.is_(None))
+    if availability and availability != "all":
+        stmt = stmt.where(
+            Item.variants.any(
+                ItemVariant.store_links.any(
+                    (ItemStoreLink.is_active == True) & (ItemStoreLink.availability == availability)
+                )
+            )
+        )
+
+    if sort_col == "min_price":
+        price_sub = select(func.min(ItemVariant.price)).where(ItemVariant.item_id == Item.id).scalar_subquery()
+        stmt = stmt.order_by(price_sub.asc() if sort_dir == "asc" else price_sub.desc())
+    elif sort_col == "store_count":
+        store_sub = select(func.count(ItemStoreLink.id)).join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id).where(ItemVariant.item_id == Item.id, ItemStoreLink.is_active == True).scalar_subquery()
+        stmt = stmt.order_by(store_sub.asc() if sort_dir == "asc" else store_sub.desc())
+    elif sort_col == "last_synced_at":
+        sync_sub = select(func.max(ItemStoreLink.last_synced_at)).join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id).where(ItemVariant.item_id == Item.id).scalar_subquery()
+        stmt = stmt.order_by(sync_sub.asc() if sort_dir == "asc" else sync_sub.desc())
+    else:
+        stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     page_ids = [item.id for item in pagination.items]
 
-    min_price_map, store_info_map = _load_item_aggregates(page_ids)
+    min_price_map, store_info_map, image_info_map, spec_info_map = _load_item_aggregates(page_ids)
 
     serialized = []
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    
     for item in pagination.items:
         price_info = min_price_map.get(item.id, {})
+        store_info = store_info_map.get(item.id, {})
+        has_image = image_info_map.get(item.id, False)
+        has_specs = spec_info_map.get(item.id, False)
+        
+        price_str = f'{price_info.get("price")} {price_info.get("currency")}'
+        if price_info.get("max_price") and price_info.get("max_price") > price_info.get("price"):
+            price_str = f'{price_info.get("price")} – {price_info.get("max_price")} {price_info.get("currency")}'
+
+        # Compute sync age
+        sync_age_days = None
+        last_synced_at = store_info.get("last_synced_at")
+        if last_synced_at:
+            if last_synced_at.tzinfo is None:
+                last_synced_at = last_synced_at.replace(tzinfo=timezone.utc)
+            sync_age_days = (now - last_synced_at).days
+
+        # Compute Completeness Score
+        completeness_points = 0
+        total_criteria = 8
+        if has_image: completeness_points += 1
+        if item.brand_id: completeness_points += 1
+        if item.description and len(item.description) > 10: completeness_points += 1
+        if store_info.get("active_links", 0) > 0: completeness_points += 1
+        if price_info.get("price") is not None: completeness_points += 1
+        if has_specs: completeness_points += 1
+        if item.searchable_attributes and len(item.searchable_attributes) > 0: completeness_points += 1
+        if item.structured_details and len(item.structured_details) > 0: completeness_points += 1
+        
+        completeness_score = int((completeness_points / total_criteria) * 100)
+
         serialized.append({
             "id":          item.id,
             "name":        item.name,
-            "taxonomy": f'{item.category.name} / {item.brand.name}',
-            "price":   f'{price_info.get("price")} {price_info.get("currency")}',
-            "store-count": store_info_map.get(item.id, 0),
+            "image_url":   item.image_url if has_image else None,
+            "taxonomy":    f'{item.category.name} / {item.brand.name}' if item.brand else item.category.name,
+            "price":       price_str,
+            "store-count": store_info.get("active_links", 0),
+            "sync-age":    sync_age_days,
+            "has-discount": store_info.get("has_discount", False),
+            "health":      completeness_score,
             "click-count": item.click_count or 0,
             "created-at":  item.created_at.isoformat() if item.created_at else None,
         })
@@ -319,9 +566,14 @@ def build_item_inspect_data(id):
                 "affiliate_url":     lnk.affiliate_url or "—",
                 "original_url":      lnk.original_url or "—",
                 "price":             float(lnk.price) if lnk.price is not None else None,
+                "old_price":         float(lnk.old_price) if lnk.old_price is not None else None,
                 "currency":          lnk.currency,
                 "availability":      lnk.availability,
                 "is_active":         lnk.is_active,
+                "last_synced_at":    lnk.last_synced_at.isoformat() if lnk.last_synced_at else None,
+                "last_checked_at":   lnk.last_checked_at.isoformat() if lnk.last_checked_at else None,
+                "merchant_category": lnk.merchant_category or "—",
+                "external_item_id":  lnk.external_item_id or "—",
                 "metadata":          lnk.network_metadata or {},
                 "commission_rate":   float(lnk.commission_rate) if lnk.commission_rate is not None else None,
             })
@@ -366,7 +618,7 @@ def build_item_inspect_data(id):
         "click count": "{:,}".format(item.click_count or 0),
         
         "linked contents": "{:,}".format(len(item.linked_contents)),
-        "description": "Yes" if item.description else "No",
+        "description": f"{item.description[:200]}..." if item.description and len(item.description) > 200 else (item.description or "No"),
         "rating": str(item.rating) if item.rating is not None else "—",
         "review count": "{:,}".format(item.review_count or 0),
         "images count": "{:,}".format(len(item.images)),
@@ -402,9 +654,43 @@ def build_item_inspect_data(id):
     from app.domains.distribution.services import get_distribution_history
     distribution_history = get_distribution_history("item", id)
         
+    variant_summary = []
+    for v in item.variants:
+        variant_summary.append({
+            "id": v.id,
+            "sku": v.sku,
+            "is_default": v.is_default,
+            "attributes": v.attributes,
+            "price": float(v.price) if v.price is not None else None,
+            "old_price": float(v.old_price) if v.old_price is not None else None,
+            "currency": v.currency,
+            "store_links_count": len(v.store_links),
+            "images_count": len(v.images)
+        })
+
+    image_strip = []
+    for img in item.images:
+        image_strip.append({
+            "id": img.id,
+            "url": img.image_url,
+            "is_primary": img.position == 0,
+            "variant_id": img.variant_id,
+            "position": img.position
+        })
+
+    specifications = {
+        "structured_details": item.structured_details,
+        "quick_details": item.quick_details,
+        "searchable_attributes": item.searchable_attributes,
+        "specs_list": [{"key": s.category, "value": s.spec_json} for s in item.specifications]
+    }
+
     return {
         "inspect_table": inspect_table,
         "store_links": store_links_data,
+        "variant_summary": variant_summary,
+        "image_strip": image_strip,
+        "specifications": specifications,
         "distribution_history": distribution_history,
         "actions": actions,
         "inspect_id": item.id

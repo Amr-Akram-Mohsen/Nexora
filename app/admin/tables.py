@@ -34,7 +34,7 @@ CRUD_TABLES = {
     },
     "items": {
         "id": "items",
-        "preview_table": ["Name", "Category / Brand", "Price", "Store Count", "Click Count", "Added", "Actions"],
+        "preview_table": ["Name", "Category / Brand", "Price", "Store Count", "Sync Age", "Health", "Click Count", "Added", "Actions"],
         "detailed_table": {
             "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
             "variants & availability": ["variants count", "store count", "price", "variant groups"],
@@ -63,6 +63,10 @@ CRUD_TABLES = {
             "Status",
             "Actions",
         ],
+        "detailed_table": {
+            "store info": ["id", "name", "slug", "website", "status", "affiliate network"],
+            "commercial & localization": ["country", "currency", "api enabled", "product count"]
+        }
     },
     "recommendations": {
         "id": "recs",

@@ -66,12 +66,34 @@
     </div>
   </div>
   <div class="inspect-store-card-grid">
-    <div><strong>Program:</strong> <span>{{ lnk.program_name or "—" }}</span></div>
-    <div><strong>Price:</strong> <span>{{ "%.2f"|format(lnk.price) ~ " " ~ (lnk.currency or "") if lnk.price is not none else "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Program</strong> <span>{{ lnk.program_name or "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Commission</strong> <span>{{ lnk.commission_rate ~ "%" if lnk.commission_rate is not none else "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Price</strong> <span>{{ "%.2f"|format(lnk.price) ~ " " ~ (lnk.currency or "") if lnk.price is not none else "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Old Price</strong> <span>{{ "%.2f"|format(lnk.old_price) ~ " " ~ (lnk.currency or "") if lnk.old_price is not none else "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Last Synced</strong> <span>{{ lnk.last_synced_at or "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Last Checked</strong> <span>{{ lnk.last_checked_at or "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>Merchant Category</strong> <span>{{ lnk.merchant_category or "—" }}</span></div>
+    <div class="inspect-store-card-item"><strong>External ID</strong> <span>{{ lnk.external_item_id or "—" }}</span></div>
   </div>
-  <div class="inspect-store-card-links flex gap-1">
-    <div><strong>Original URL:</strong> <a target="_blank" class="inspect-link" href="{{ lnk.original_url }}">{{ lnk.original_url }}</a></div>
-    <div><strong>Affiliate URL:</strong> <a target="_blank" class="inspect-link" href="{{ lnk.affiliate_url }}">{{ lnk.affiliate_url }}</a></div>
+  <div class="inspect-store-card-links">
+    <div class="inspect-url-group">
+      <span class="inspect-url-label">Original URL</span>
+      <div class="inspect-url-container">
+        <input class="inspect-url-input" type="text" readonly value="{{ lnk.original_url or '' }}" onclick="this.select();">
+        {% if lnk.original_url %}
+        <a target="_blank" href="{{ lnk.original_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="inspect-url-group">
+      <span class="inspect-url-label">Affiliate URL</span>
+      <div class="inspect-url-container">
+        <input class="inspect-url-input" type="text" readonly value="{{ lnk.affiliate_url or '' }}" onclick="this.select();">
+        {% if lnk.affiliate_url %}
+        <a target="_blank" href="{{ lnk.affiliate_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
+        {% endif %}
+      </div>
+    </div>
   </div>
   <div >
     <span class="inspect-store-card-meta-label">Network Tracking Metadata:</span>
@@ -123,5 +145,179 @@
       <span >No {{ label | lower }} data available</span>
     {% endif %}
   </div>
+</div>
+{% endmacro %}
+
+{% macro inspect_variant_summary_table(variants) %}
+<div class="variant-list">
+  <div class="variant-list-header">
+    <div class="v-col v-sku">SKU</div>
+    <div class="v-col v-attrs">Attributes</div>
+    <div class="v-col v-price text-right">Price</div>
+    <div class="v-col v-old-price text-right">Old Price</div>
+    <div class="v-col v-stats text-right">Links / Imgs</div>
+  </div>
+  <div class="variant-list-body">
+    {% for v in variants %}
+    <div class="variant-list-row {{ 'variant-default' if v.is_default else '' }}">
+      <div class="v-col v-sku">
+        {% if v.is_default %}
+          <div class="variant-default-badge"><i class="fa-solid fa-star"></i> Default</div>
+        {% endif %}
+        <span class="variant-sku-text">{{ v.sku or "NO SKU" }}</span>
+      </div>
+      <div class="v-col v-attrs">
+        <div class="flex flex-wrap gap-1">
+          {% if v.attributes %}
+            {% for k, val in v.attributes.items() %}
+              <div class="variant-attr-pill">
+                <span class="v-attr-k">{{ k }}</span>
+                <span class="v-attr-v">{{ val }}</span>
+              </div>
+            {% endfor %}
+          {% else %}
+            <span class="text-muted-foreground" style="font-size: 0.75rem;">No attributes</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="v-col v-price text-right">
+        <span class="variant-price">{{ "%.2f"|format(v.price) ~ " " ~ (v.currency or "") if v.price is not none else "—" }}</span>
+      </div>
+      <div class="v-col v-old-price text-right">
+        {% if v.old_price is not none %}
+          <span class="variant-old-price">{{ "%.2f"|format(v.old_price) ~ " " ~ (v.currency or "") }}</span>
+        {% else %}
+          <span class="text-muted-foreground">—</span>
+        {% endif %}
+      </div>
+      <div class="v-col v-stats text-right">
+        <div class="variant-stats-group">
+          <span class="variant-stat" title="Store Links">
+            <i class="fa-solid fa-link"></i> {{ v.store_links_count }}
+          </span>
+          <span class="variant-stat" title="Images">
+            <i class="fa-regular fa-image"></i> {{ v.images_count }}
+          </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro inspect_image_strip(images) %}
+<div class="flex flex-wrap gap-2">
+  {% for img in images %}
+  <div class="inspect-image-card">
+    <img src="{{ img.url }}" alt="Item Image" class="inspect-image-card-img">
+    {% if img.is_primary %}
+      <span class="badge badge-success inspect-image-card-badge">Primary</span>
+    {% endif %}
+    <div class="inspect-image-card-label">
+      {% if img.variant_id %}Variant #{{ img.variant_id }}{% else %}Shared{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_structured_json(node, is_root=false) %}
+  {% if node is mapping %}
+    <div class="{{ 'inspect-json-node-mapping' if not is_root else 'inspect-json-tree-container' }}">
+      {% for k, v in node.items() %}
+        {% if v is mapping or (v is iterable and v is not string) %}
+          <div class="inspect-json-node-item inspect-json-node-item-full">
+            <span class="inspect-json-node-key">{{ k }}</span>
+            <div class="inspect-json-nested-mapping">
+              {{ render_structured_json(v) }}
+            </div>
+          </div>
+        {% else %}
+          <div class="inspect-json-node-item">
+            <span class="inspect-json-node-key">{{ k }}</span>
+            <span class="inspect-json-node-value">{{ v if v is not none else '—' }}</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% elif node is iterable and node is not string %}
+    <ul class="inspect-json-array">
+      {% for item in node %}
+        <li>{{ render_structured_json(item) }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <span class="inspect-json-node-value">{{ node if node is not none else '—' }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro inspect_specifications_panel(specs) %}
+<div class="flex flex-col gap-6">
+  {% if specs.searchable_attributes %}
+  <div>
+    <div class="inspect-spec-section-title">Searchable Attributes</div>
+    <div class="flex flex-wrap gap-2">
+      {% for k, v in specs.searchable_attributes.items() %}
+      <span class="badge badge-primary">{{ k }}: {{ v }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if specs.quick_details %}
+  <div>
+    <div class="inspect-spec-section-title">Specifications</div>
+    <div class="inspect-spec-grid">
+      {% for detail in specs.quick_details %}
+        <div class="inspect-spec-item">
+          <strong>{{ detail.label }}</strong>
+          <span>{{ detail.value }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if specs.structured_details or specs.specs_list %}
+  <div class="mt-4">
+    <div class="inspect-spec-section-title" style="margin-bottom: 1rem;">Developer & Raw Data</div>
+    
+    {% if specs.structured_details %}
+    <details class="inspect-accordion">
+      <summary>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-code"></i> Structured JSON Payload</div>
+      </summary>
+      <div class="inspect-accordion-content">
+        {{ render_structured_json(specs.structured_details, is_root=true) }}
+      </div>
+    </details>
+    {% endif %}
+  
+    {% if specs.specs_list %}
+    <details class="inspect-accordion">
+      <summary>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-database"></i> Raw Database Specifications</div>
+      </summary>
+      <div class="inspect-accordion-content">
+        <div class="flex flex-col gap-4">
+          {% for s in specs.specs_list %}
+            <div class="inspect-json-node-item inspect-json-node-item-full">
+              <span class="inspect-json-node-key">{{ s.key }}</span>
+              <div class="inspect-json-nested-mapping">
+                 {% if s.value is mapping or (s.value is iterable and s.value is not string) %}
+                   {{ render_structured_json(s.value) }}
+                 {% else %}
+                   <span class="inspect-json-node-value">{{ s.value }}</span>
+                 {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </details>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
 {% endmacro %}

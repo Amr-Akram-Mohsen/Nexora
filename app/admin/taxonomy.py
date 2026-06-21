@@ -393,20 +393,59 @@ def _get_entity_or_404(model, id, entity_name):
     return entity, None
 
 def _get_taxonomy_related_metadata(entity, entity_type):
-    from app.domains.relationships import content_brands, content_topics
+    from app.domains.relationships import content_brands, content_topics, content_items
+    from app.domains.item.models import ItemVariant, ItemImage
     data = {}
     
     top_contents_query = select(Content).order_by(Content.view_count.desc()).limit(5)
     
     if entity_type == "category":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.category_id == entity.id)) or 0)
-        data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0)
+        
+        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0
+        data["item count"] = str(total_items)
+        
         data["child categories"] = str(db.session.scalar(select(func.count()).select_from(Category).where(Category.parent_id == entity.id)) or 0)
+        
+        variants_count = db.session.scalar(
+            select(func.count(ItemVariant.id)).join(Item, Item.id == ItemVariant.item_id).where(Item.category_id == entity.id)
+        ) or 0
+        data["avg variants per item"] = str(round(variants_count / total_items, 1) if total_items > 0 else 0)
+        
+        items_with_images = db.session.scalar(
+            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.category_id == entity.id)
+        ) or 0
+        data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
+        
+        items_with_content = db.session.scalar(
+            select(func.count(func.distinct(content_items.c.item_id))).join(Item, Item.id == content_items.c.item_id).where(Item.category_id == entity.id)
+        ) or 0
+        data["items without content"] = str(total_items - items_with_content)
+        
         top_contents = db.session.execute(top_contents_query.where(Content.category_id == entity.id)).scalars().all()
         
     elif entity_type == "brand":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
-        data["item count"] = str(db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0)
+        
+        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0
+        data["item count"] = str(total_items)
+        
+        avg_price = db.session.scalar(
+            select(func.avg(ItemVariant.price)).join(Item, Item.id == ItemVariant.item_id).where(Item.brand_id == entity.id)
+        )
+        data["average price"] = f"${avg_price:.2f}" if avg_price else "—"
+        
+        items_with_images = db.session.scalar(
+            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.brand_id == entity.id)
+        ) or 0
+        data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
+        
+        top_items = db.session.execute(
+            select(Item).where(Item.brand_id == entity.id).order_by(Item.click_count.desc()).limit(5)
+        ).scalars().all()
+        if top_items:
+            data["top clicked items"] = {"value": render_template("admin/components/_top_items_table.html", items=top_items), "is_custom": True}
+        
         top_contents = db.session.execute(top_contents_query.join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).scalars().all()
         
     elif entity_type == "topic":

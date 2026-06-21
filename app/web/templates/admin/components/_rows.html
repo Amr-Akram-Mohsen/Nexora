@@ -4,10 +4,44 @@
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">
     {% for key, value in row.items() %}
-    {% if key not in ['slug', 'id', 'is_published'] %}
+    {% if key not in ['slug', 'id', 'is_published', 'image_url', 'has-discount'] %}
     <td class="cell-{{ key }}">
         {% if key == 'link' %}
         <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+        {% elif key == 'name' and domain_type == 'item' %}
+            <div class="flex items-center gap-2">
+                {% if row.get('image_url') %}
+                    <img src="{{ row.get('image_url') }}" alt="Thumbnail" class="item-thumbnail-small">
+                {% else %}
+                    <span class="badge badge-secondary" title="No Image">🖼</span>
+                {% endif %}
+                <span>{{ value }}</span>
+            </div>
+        {% elif key == 'price' and domain_type == 'item' %}
+            <div class="flex items-center gap-2">
+                <span>{{ value }}</span>
+                {% if row.get('has-discount') %}
+                    <span class="badge badge-success" title="Discount available">🏷 Discount</span>
+                {% endif %}
+            </div>
+        {% elif key == 'sync-age' and domain_type == 'item' %}
+            {% if value is none %}
+                <span>—</span>
+            {% elif value <= 1 %}
+                <span class="badge badge-success">{{ value }}d</span>
+            {% elif value <= 7 %}
+                <span class="badge badge-warning">{{ value }}d</span>
+            {% else %}
+                <span class="badge badge-danger">{{ value }}d</span>
+            {% endif %}
+        {% elif key == 'health' and domain_type == 'item' %}
+            {% if value >= 80 %}
+                <span class="badge badge-success" title="Catalog Health: Excellent">{{ value }}%</span>
+            {% elif value >= 50 %}
+                <span class="badge badge-warning" title="Catalog Health: Needs Work">{{ value }}%</span>
+            {% else %}
+                <span class="badge badge-danger" title="Catalog Health: Poor">{{ value }}%</span>
+            {% endif %}
         {% else %}
         <span>{{ value }}</span>
         {% endif %}

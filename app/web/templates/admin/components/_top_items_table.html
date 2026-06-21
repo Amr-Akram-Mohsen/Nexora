@@ -1,0 +1,31 @@
+<div class="top-content-mini-table">
+  {% if items %}
+  <table class="dashboard-table w-full">
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>Clicks</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>
+            <div class="flex items-center gap-2">
+                {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="Thumbnail" class="item-thumbnail-small">
+                {% else %}
+                    <span class="badge badge-secondary" title="No Image">🖼</span>
+                {% endif %}
+                <a href="/admin/items?search={{ item.id }}" class="activity-target inspect-link">{{ item.name }}</a>
+            </div>
+        </td>
+        <td>{{ item.click_count or 0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="text-muted text-sm py-2">No items found.</div>
+  {% endif %}
+</div>

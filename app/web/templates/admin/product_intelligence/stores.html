@@ -3,6 +3,113 @@
 {% set header_title = "Stores & Commercial Providers" %}
 {% set page_description = "Monitor merchant portals, affiliate network setups, product index volumes, and merchant sync status" %}
 
+{% block crud_stats %}
+<div class="dashboard-stats-grid" style="margin-bottom: 1.5rem;" id="stores-health-dashboard">
+  <!-- Total Active Links -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-link"></i></div>
+      <p class="dashboard-stat-label">Active Links</p>
+      <h3 class="dashboard-stat-value" id="stats-active-links"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta" id="stats-total-links">total recorded links</p>
+    </div>
+  </a>
+
+  <!-- Synced Today -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);"><i class="fa-solid fa-bolt"></i></div>
+      <p class="dashboard-stat-label">Synced Today</p>
+      <h3 class="dashboard-stat-value" id="stats-synced-today"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">refreshed in 24h</p>
+    </div>
+  </a>
+
+  <!-- Synced This Week -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-blue-rgb), 0.1); color: var(--brand-blue);"><i class="fa-regular fa-calendar-check"></i></div>
+      <p class="dashboard-stat-label">Synced This Week</p>
+      <h3 class="dashboard-stat-value" id="stats-synced-week"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">refreshed in 7d</p>
+    </div>
+  </a>
+
+  <!-- Out of Stock -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card" style="border-left: 4px solid var(--brand-orange);">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-orange-rgb), 0.1); color: var(--brand-orange);"><i class="fa-solid fa-box-archive"></i></div>
+      <p class="dashboard-stat-label">Out of Stock</p>
+      <h3 class="dashboard-stat-value" id="stats-out-of-stock"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta" style="color: var(--brand-orange); font-weight: bold;">unavailable</p>
+    </div>
+  </a>
+
+  <!-- Never Synced -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card" style="border-left: 4px solid var(--brand-red);">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-red-rgb), 0.1); color: var(--brand-red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <p class="dashboard-stat-label">Never Synced</p>
+      <h3 class="dashboard-stat-value" id="stats-never-synced"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta" style="color: var(--brand-red); font-weight: bold;">stuck links</p>
+    </div>
+  </a>
+</div>
+
+<!-- Overview Panels: OOS, Category Coverage, Commission Rates -->
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  
+  <!-- Out of Stock Panel -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Stores with Highest Out-of-Stock Rates</h3>
+        <p class="overview-panel-sub">Top 5 stores with unavailable inventory</p>
+      </div>
+      <i class="fa-solid fa-store-slash text-muted"></i>
+    </div>
+    <div class="panel-body-padded">
+      <div id="stats-oos-distribution" class="overview-breakdown-grid flex gap-2">
+        <div class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Coverage Panel -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Store Category Coverage</h3>
+        <p class="overview-panel-sub">Number of unique categories carried by each store</p>
+      </div>
+      <i class="fa-solid fa-layer-group text-muted"></i>
+    </div>
+    <div class="panel-body-padded">
+      <div id="stats-category-coverage" class="overview-breakdown-grid flex gap-2">
+        <div class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commission Rates Panel -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Avg Commission Rates</h3>
+        <p class="overview-panel-sub">Average payout percentage across active products</p>
+      </div>
+      <i class="fa-solid fa-percent text-muted"></i>
+    </div>
+    <div class="panel-body-padded">
+      <div id="stats-commission-rates" class="overview-breakdown-grid flex gap-2">
+        <div class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -10,4 +117,8 @@
     {{ admin_reset_button("clear-stores-filters-btn", "Reset") }}
   </div>
 {% endcall %}
+{% endblock %}
+
+{% block custom_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/stores.js') }}"></script>
 {% endblock %}

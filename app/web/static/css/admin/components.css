@@ -228,3 +228,11 @@ body.dark-mode .bulk-actions-toolbar {
     border-color: rgba(var(--brand-red-rgb), 0.3);
     color: var(--brand-red);
 }
+
+.item-thumbnail-small {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}

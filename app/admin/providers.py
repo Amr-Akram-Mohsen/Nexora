@@ -239,6 +239,98 @@ def list_stores():
     })
 
 
+@bp.route("/stores/health_stats", methods=["GET"])
+def get_store_health_stats():
+    """Return fast KPI stats for the stores/sync health dashboard."""
+    from datetime import datetime, timezone, timedelta
+    from app.domains.item.models import ItemStoreLink
+    
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = now - timedelta(days=7)
+    
+    total_links = db.session.scalar(select(func.count(ItemStoreLink.id))) or 0
+    active_links = db.session.scalar(select(func.count(ItemStoreLink.id)).where(ItemStoreLink.is_active == True)) or 0
+    
+    synced_today = db.session.scalar(
+        select(func.count(ItemStoreLink.id))
+        .where(ItemStoreLink.last_synced_at >= today_start)
+    ) or 0
+    
+    synced_this_week = db.session.scalar(
+        select(func.count(ItemStoreLink.id))
+        .where(ItemStoreLink.last_synced_at >= week_start)
+    ) or 0
+    
+    never_synced = db.session.scalar(
+        select(func.count(ItemStoreLink.id))
+        .where(ItemStoreLink.last_synced_at.is_(None))
+    ) or 0
+    
+    out_of_stock = db.session.scalar(
+        select(func.count(ItemStoreLink.id))
+        .where(ItemStoreLink.availability == 'OutOfStock')
+    ) or 0
+    
+    # Top stores by out of stock count
+    oos_stores_rows = db.session.execute(
+        select(Store.name, func.count(ItemStoreLink.id))
+        .join(ItemStoreLink, ItemStoreLink.store_id == Store.id)
+        .where(ItemStoreLink.availability == 'OutOfStock')
+        .group_by(Store.name)
+        .order_by(func.count(ItemStoreLink.id).desc())
+        .limit(5)
+    ).all()
+    
+    oos_by_store = [{"name": r[0], "count": r[1]} for r in oos_stores_rows]
+    
+    return jsonify({
+        "total_links": total_links,
+        "active_links": active_links,
+        "synced_today": synced_today,
+        "synced_this_week": synced_this_week,
+        "never_synced": never_synced,
+        "out_of_stock": out_of_stock,
+        "oos_by_store": oos_by_store
+    })
+
+
+@bp.route("/stores/coverage_stats", methods=["GET"])
+def get_store_coverage_stats():
+    """Return affiliate coverage and commission stats."""
+    from app.domains.item.models import ItemStoreLink, ItemVariant
+    from app.domains.item.models import Item
+    
+    # 1. Category Coverage per Store
+    # How many distinct categories each store covers
+    coverage_rows = db.session.execute(
+        select(Store.name, func.count(func.distinct(Item.category_id)))
+        .join(ItemStoreLink, ItemStoreLink.store_id == Store.id)
+        .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
+        .join(Item, Item.id == ItemVariant.item_id)
+        .group_by(Store.name)
+        .order_by(func.count(func.distinct(Item.category_id)).desc())
+    ).all()
+    
+    category_coverage = [{"name": r[0], "count": r[1]} for r in coverage_rows]
+    
+    # 2. Commission Rate Distribution
+    # Average commission rate per store
+    commission_rows = db.session.execute(
+        select(Store.name, func.avg(ItemStoreLink.commission_rate))
+        .join(ItemStoreLink, ItemStoreLink.store_id == Store.id)
+        .where(ItemStoreLink.commission_rate != None)
+        .group_by(Store.name)
+        .order_by(func.avg(ItemStoreLink.commission_rate).desc())
+    ).all()
+    
+    commission_rates = [{"name": r[0], "avg_rate": round(float(r[1]), 2)} for r in commission_rows]
+    
+    return jsonify({
+        "category_coverage": category_coverage,
+        "commission_rates": commission_rates
+    })
+
 @bp.route("/sources/rows", methods=["GET"])
 def sources_rows():
     """Return server-rendered HTML rows partial for sources AJAX injection."""
@@ -341,6 +433,9 @@ def build_store_inspect_data(id):
         "status": format_status(store.is_active),
         "affiliate network": store.affiliate_network or "—",
         "product count": str(product_count),
+        "country": store.country or "—",
+        "currency": store.currency or "—",
+        "api enabled": "Yes" if store.api_enabled else "No",
     }
     inspect_table = get_inspect_table("stores", data)
     return {

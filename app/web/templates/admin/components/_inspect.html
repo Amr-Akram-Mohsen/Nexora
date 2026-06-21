@@ -1,5 +1,5 @@
 {% from "admin/components/macros.html" import inspect_section, action_group, action_button %}
-{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
 {% from "admin/components/ui.html" import admin_inspect_section_table, admin_crud_table %}
 
 {% set linked_items_table = {
@@ -31,6 +31,24 @@
     <div>No store links mapped.</div>
     {% endif %}
   </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if variant_summary is defined and variant_summary %}
+  {% call inspect_section("Variant Summary") %}
+  {{ inspect_variant_summary_table(variant_summary) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if image_strip is defined and image_strip %}
+  {% call inspect_section("Images") %}
+  {{ inspect_image_strip(image_strip) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if specifications is defined and (specifications.structured_details or specifications.quick_details or specifications.searchable_attributes or specifications.specs_list) %}
+  {% call inspect_section("Specifications & Details") %}
+  {{ inspect_specifications_panel(specifications) }}
   {% endcall %}
   {% endif %}
 
