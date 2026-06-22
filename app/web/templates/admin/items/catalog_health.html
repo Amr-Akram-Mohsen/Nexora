@@ -1,0 +1,65 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_panel %}
+
+{% block title %}Catalog Health Dashboard — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{{ admin_page_header("Catalog Health Dashboard", "System-wide item completeness and operational integrity") }}
+
+<div class="summary-cards mb-6 flex gap-4">
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">Catalog Completeness Score</div>
+    <div class="summary-value {% if data.completeness_score < 60 %}text-danger{% elif data.completeness_score < 80 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.completeness_score }}%
+    </div>
+    <div class="summary-meta">System-wide average item completeness based on images, links, and pricing.</div>
+  </div>
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">Total Items Managed</div>
+    <div class="summary-value">
+      {{ "{:,}".format(data.total_items) }}
+    </div>
+    <div class="summary-meta">Total products tracked in the catalog.</div>
+  </div>
+</div>
+
+<div class="overview-top-grid mt-6">
+  {% call admin_panel("📸 Missing Images", "Items with 0 images") %}
+  <div class="panel-body-padded text-center flex-col gap-2">
+    <h2 class="{% if data.metrics.without_images_pct > 10 %}text-danger{% else %}text-success{% endif %}">
+      {{ data.metrics.without_images }}
+    </h2>
+    <p class="text-muted">{{ data.metrics.without_images_pct }}% of catalog</p>
+  </div>
+  {% endcall %}
+
+  {% call admin_panel("🔗 Missing Affiliate Links", "Items with 0 active store links") %}
+  <div class="panel-body-padded text-center flex-col gap-2">
+    <h2 class="{% if data.metrics.without_links_pct > 20 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.metrics.without_links }}
+    </h2>
+    <p class="text-muted">{{ data.metrics.without_links_pct }}% of catalog</p>
+  </div>
+  {% endcall %}
+
+  {% call admin_panel("⏳ Pricing Staleness", "Items with pricing older than 30 days") %}
+  <div class="panel-body-padded text-center flex-col gap-2">
+    <h2 class="{% if data.metrics.stale_pricing_pct > 30 %}text-danger{% else %}text-success{% endif %}">
+      {{ data.metrics.stale_pricing }}
+    </h2>
+    <p class="text-muted">{{ data.metrics.stale_pricing_pct }}% of catalog</p>
+  </div>
+  {% endcall %}
+
+  {% call admin_panel("📝 No Editorial Coverage", "Items with no linked articles") %}
+  <div class="panel-body-padded text-center flex-col gap-2">
+    <h2 class="text-warning">
+      {{ data.metrics.without_content }}
+    </h2>
+    <p class="text-muted">{{ data.metrics.without_content_pct }}% of catalog</p>
+  </div>
+  {% endcall %}
+</div>
+
+{% endblock %}

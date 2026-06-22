@@ -1,0 +1,37 @@
+<div class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <span>Review Queue Aging</span>
+    <span class="status-badge badge-warning">Total: {{ review_queue_count }}</span>
+  </div>
+  {% if not review_queue_aging or review_queue_aging | length == 0 %}
+  <div class="dashboard-empty loading-height-sm">
+    <span class="dashboard-state-icon">📭</span>
+    <p class="empty-message">No pending reviews.</p>
+  </div>
+  {% else %}
+  <ul class="activity-feed">
+    {% for r in review_queue_aging %}
+      {% set badge_class = "user" %}
+      {% set badge_icon = "📰" %}
+      {% if r.type == "video" %}
+        {% set badge_class = "active" %}
+        {% set badge_icon = "🎥" %}
+      {% elif r.type == "post" %}
+        {% set badge_class = "admin" %}
+        {% set badge_icon = "💬" %}
+      {% endif %}
+      <li class="activity-item ingest-log-item flex ">
+        <div class="activity-icon icon-save ingest-log-icon flex-center">{{ badge_icon }}</div>
+        <div class="activity-content">
+          <div class="activity-text ingest-log-text flex items-center gap-2">
+            <span class="status-badge {{ badge_class }} badge-type-compact">{{ r.type }}</span>
+            <a class="activity-target text-deco-none" href="/admin/contents?search={{ r.id }}">#{{ r.id }}</a>
+            <span class="status-badge badge-danger" title="Time in queue">Waiting: {{ r.age }}</span>
+          </div>
+          <p class="activity-meta ingest-log-title">{{ r.title }}</p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>

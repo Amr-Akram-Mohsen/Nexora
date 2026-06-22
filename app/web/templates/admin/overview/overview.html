@@ -31,6 +31,13 @@
   </div>
   {% endcall %}
 
+  <!-- Review Queue Aging -->
+  {% call admin_panel("⏳ Review Queue Aging", "Oldest Pending Reviews", header_class="flex items-center justify-between") %}
+  <div id="review-queue-aging-container" class="panel-body-list">
+    {{ spinner("Loading review queue…") }}
+  </div>
+  {% endcall %}
+
 </div>
 
 <!-- New Ingestion Distributions Section -->

@@ -9,6 +9,7 @@ from sqlalchemy import select, func, update
 import difflib
 from app.domains.content.models import Content
 from app.domains.item.models import Item
+from app.domains.analytics.taxonomy_intelligence import get_taxonomy_intelligence
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
 
@@ -19,6 +20,14 @@ def require_admin():
     """Ensure all taxonomy management endpoints require admin privilege."""
     pass
 
+
+# ─────────────────────────────────────────────
+# INTELLIGENCE DASHBOARD
+# ─────────────────────────────────────────────
+@bp.route("/intelligence", methods=["GET"])
+def intelligence_dashboard():
+    data = get_taxonomy_intelligence()
+    return render_template("admin/taxonomy/intelligence.html", data=data)
 
 # ─────────────────────────────────────────────
 # CATEGORIES

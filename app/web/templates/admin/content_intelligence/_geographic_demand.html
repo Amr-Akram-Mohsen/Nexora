@@ -1,0 +1,37 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Category Name</th>
+        <th>Total Clicks</th>
+        <th>Top Countries (Click Volume)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td><strong>{{ item.category_name }}</strong></td>
+        <td><strong>{{ item.total_clicks }}</strong></td>
+        <td>
+          <style>
+            .country-badges {
+              display: flex;
+              gap: 0.5rem;
+              flex-wrap: wrap;
+            }
+          </style>
+          <div class="country-badges">
+            {% for c in item.countries %}
+            <span class="status-badge badge-blue">{{ c.country }} ({{ c.click_count }})</span>
+            {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="3">No geographic demand data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

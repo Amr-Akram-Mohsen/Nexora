@@ -5,7 +5,7 @@ from app.domains.interaction.models import View, Reaction, Comment, Save, ItemCl
 from app.domains.content.models import Content
 from app.domains.item.models import Item, ItemStoreLink, ItemVariant
 from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet
-from app.domains.relationships import content_brands, content_topics
+from app.domains.relationships import content_brands, content_topics, content_items
 from app.domains.analytics.shared import (
     get_start_date,
     finalize_trend_stats,
@@ -432,3 +432,195 @@ def get_content_decay(content_id: int) -> float:
     except Exception:
         pass
     return 0.0
+
+def get_content_completeness_report():
+    contents = db.session.execute(
+        select(
+            Content.id,
+            Content.category_id,
+            Content.intent_id,
+            Content.gender_id,
+            Content.price_tier_id,
+            Content.source_id
+        )
+    ).all()
+    
+    topic_counts = dict(db.session.execute(select(content_topics.c.content_id, func.count(content_topics.c.topic_id)).group_by(content_topics.c.content_id)).all())
+    brand_counts = dict(db.session.execute(select(content_brands.c.content_id, func.count(content_brands.c.brand_id)).group_by(content_brands.c.content_id)).all())
+    item_counts = dict(db.session.execute(select(content_items.c.content_id, func.count(content_items.c.item_id)).group_by(content_items.c.content_id)).all())
+    
+    categories = db.session.execute(select(Category.id, Category.name)).all()
+    cat_map = {c.id: {"name": c.name, "total_content": 0, "total_score": 0.0} for c in categories}
+    
+    content_scores = []
+    
+    for c in contents:
+        score = 0
+        total_fields = 7
+        if c.intent_id is not None: score += 1
+        if c.gender_id is not None: score += 1
+        if c.price_tier_id is not None: score += 1
+        if c.source_id is not None: score += 1
+        
+        if topic_counts.get(c.id, 0) > 0: score += 1
+        if brand_counts.get(c.id, 0) > 0: score += 1
+        if item_counts.get(c.id, 0) > 0: score += 1
+        
+        pct = (score / total_fields) * 100.0
+        
+        content_scores.append({
+            "content_id": c.id,
+            "category_id": c.category_id,
+            "score": pct
+        })
+        
+        if c.category_id in cat_map:
+            cat_map[c.category_id]["total_content"] += 1
+            cat_map[c.category_id]["total_score"] += pct
+            
+    category_scores = []
+    for cid, data in cat_map.items():
+        if data["total_content"] > 0:
+            avg_score = data["total_score"] / data["total_content"]
+            category_scores.append({
+                "category_name": data["name"],
+                "content_count": data["total_content"],
+                "average_completeness": round(avg_score, 1)
+            })
+            
+    category_scores.sort(key=lambda x: x["average_completeness"], reverse=True)
+    
+    return {
+        "overall_average": round(sum(cs["score"] for cs in content_scores) / len(content_scores), 1) if content_scores else 0.0,
+        "category_scores": category_scores
+    }
+
+def get_user_interest_coverage_gap():
+    from app.domains.recommendation.models import UserEntityInterest
+    
+    categories = db.session.execute(select(Category.id, Category.name)).all()
+    cat_map = {c.id: {"id": c.id, "name": c.name, "type": "category", "interest_score": 0.0, "content_count": 0} for c in categories}
+    
+    brands = db.session.execute(select(Brand.id, Brand.name)).all()
+    brand_map = {b.id: {"id": b.id, "name": b.name, "type": "brand", "interest_score": 0.0, "content_count": 0} for b in brands}
+    
+    cat_interest = db.session.execute(
+        select(UserEntityInterest.category_id, func.sum(UserEntityInterest.score))
+        .where(UserEntityInterest.category_id.isnot(None))
+        .group_by(UserEntityInterest.category_id)
+    ).all()
+    for cid, score in cat_interest:
+        if cid in cat_map:
+            cat_map[cid]["interest_score"] = float(score or 0)
+            
+    brand_interest = db.session.execute(
+        select(UserEntityInterest.brand_id, func.sum(UserEntityInterest.score))
+        .where(UserEntityInterest.brand_id.isnot(None))
+        .group_by(UserEntityInterest.brand_id)
+    ).all()
+    for bid, score in brand_interest:
+        if bid in brand_map:
+            brand_map[bid]["interest_score"] = float(score or 0)
+            
+    cat_content = db.session.execute(
+        select(Content.category_id, func.count(Content.id))
+        .group_by(Content.category_id)
+    ).all()
+    for cid, cnt in cat_content:
+        if cid in cat_map:
+            cat_map[cid]["content_count"] = cnt or 0
+            
+    brand_content = db.session.execute(
+        select(content_brands.c.brand_id, func.count(content_brands.c.content_id))
+        .group_by(content_brands.c.brand_id)
+    ).all()
+    for bid, cnt in brand_content:
+        if bid in brand_map:
+            brand_map[bid]["content_count"] = cnt or 0
+            
+    all_entities = list(cat_map.values()) + list(brand_map.values())
+    valid_entities = [e for e in all_entities if e["interest_score"] > 0]
+    
+    if not valid_entities:
+        return []
+        
+    valid_entities.sort(key=lambda x: x["interest_score"], reverse=True)
+    for rank, e in enumerate(valid_entities, 1):
+        e["interest_rank"] = rank
+        
+    valid_entities.sort(key=lambda x: x["content_count"], reverse=True)
+    for rank, e in enumerate(valid_entities, 1):
+        e["volume_rank"] = rank
+        
+    for e in valid_entities:
+        e["gap_score"] = e["volume_rank"] - e["interest_rank"]
+        
+    return valid_entities[:10]
+
+def get_category_sentiment_health():
+    from app.domains.interaction.models import Comment
+    from app.domains.item.models import Item
+    
+    cat_expr = case(
+        (Comment.target_type == 'content', Content.category_id),
+        (Comment.target_type == 'item', Item.category_id),
+        else_=None
+    )
+    
+    stmt = select(
+        cat_expr.label('category_id'),
+        Comment.sentiment,
+        func.count(Comment.id).label('comment_count')
+    ).select_from(Comment)\
+     .outerjoin(Content, (Comment.target_type == 'content') & (Comment.target_id == Content.id))\
+     .outerjoin(Item, (Comment.target_type == 'item') & (Comment.target_id == Item.id))\
+     .where(cat_expr.isnot(None))\
+     .where(Comment.sentiment.isnot(None))\
+     .group_by(cat_expr, Comment.sentiment)
+     
+    rows = db.session.execute(stmt).all()
+    
+    categories = db.session.execute(select(Category.id, Category.name)).all()
+    cat_map = {c.id: c.name for c in categories}
+    
+    cat_sentiment = {}
+    for cid in cat_map:
+        cat_sentiment[cid] = {
+            "category_name": cat_map[cid],
+            "positive": 0,
+            "neutral": 0,
+            "negative": 0,
+            "total": 0
+        }
+        
+    for r in rows:
+        cid = r.category_id
+        if cid in cat_sentiment:
+            sentiment_type = r.sentiment.lower() if r.sentiment else "neutral"
+            if sentiment_type not in ["positive", "neutral", "negative"]:
+                sentiment_type = "neutral"
+                
+            cat_sentiment[cid][sentiment_type] += r.comment_count
+            cat_sentiment[cid]["total"] += r.comment_count
+            
+    results = []
+    for cid, data in cat_sentiment.items():
+        if data["total"] > 0:
+            data["positive_pct"] = round((data["positive"] / data["total"]) * 100, 1)
+            data["neutral_pct"] = round((data["neutral"] / data["total"]) * 100, 1)
+            data["negative_pct"] = round((data["negative"] / data["total"]) * 100, 1)
+            
+            if data["negative_pct"] > 40:
+                data["status"] = "At Risk"
+                data["status_class"] = "badge-danger"
+            elif data["positive_pct"] > 60:
+                data["status"] = "Healthy"
+                data["status_class"] = "badge-success"
+            else:
+                data["status"] = "Stable"
+                data["status_class"] = "badge-blue"
+                
+            results.append(data)
+            
+    results.sort(key=lambda x: x["total"], reverse=True)
+    return results

@@ -20,6 +20,7 @@ from sqlalchemy import select, func, or_
 from sqlalchemy.orm import joinedload
 from app.domains.item.models import ItemSpecification
 from app.domains.interaction.models import Comment
+from app.domains.analytics import get_catalog_health_report
 
 bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
 
@@ -164,6 +165,11 @@ def get_item_health_stats():
         "top_engagement_items": top_engagement_items
     })
 
+@bp.route("/catalog-health", methods=["GET"])
+def catalog_health():
+    """Renders the full Catalog Health Dashboard."""
+    data = get_catalog_health_report()
+    return render_template("admin/items/catalog_health.html", data=data)
 
 def _load_item_aggregates(page_ids):
     min_price_rows = db.session.execute(

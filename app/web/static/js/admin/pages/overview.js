@@ -6,6 +6,7 @@ function renderDashboardOverview(containerId) {
   fetchAndInjectHtml('/admin/dashboard/widget/stats', containerId, 'Loading platform metrics...');
   fetchAndInjectHtml('/admin/dashboard/widget/catalog-health', 'catalog-health-container', 'Loading health indicators...');
   fetchAndInjectHtml('/admin/dashboard/widget/recent-ingest', 'recent-ingest-container', 'Loading ingest logs...');
+  fetchAndInjectHtml('/admin/dashboard/widget/review-queue-aging', 'review-queue-aging-container', 'Loading review queue...');
   fetchAndInjectHtml('/admin/dashboard/widget/categories-distribution', 'categories-distribution-container', 'Loading category stats...');
   fetchAndInjectHtml('/admin/dashboard/widget/sources-distribution', 'sources-distribution-container', 'Loading source stats...');
   fetchAndInjectHtml('/admin/dashboard/widget/product-sources-distribution', 'product-sources-distribution-container', 'Loading product sources...');

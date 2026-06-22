@@ -18,6 +18,7 @@ from app.domains.taxonomy.models import Category, Source
 from app.domains.item.models import Item
 from app.domains.user.models import User
 from app.domains.interaction.service.query import get_interactions_breakdown, get_reaction_stats
+from app.domains.interaction.models import Share
 from sqlalchemy import func, select, cast, Date
 from datetime import datetime, timedelta, timezone
 
@@ -48,10 +49,48 @@ def get_dashboard_stats_data():
     ).scalar() or 0
     inactive_contents = contents_count - active_contents
 
+    # ── Share Channel Breakdown ──────────────────────────────────────────
+    share_channel_rows = db.session.execute(
+        select(Share.channel, func.count(Share.id).label("cnt"))
+        .group_by(Share.channel)
+        .order_by(func.count(Share.id).desc())
+    ).all()
+    share_channels = [{"channel": r.channel or "Unknown", "count": r.cnt} for r in share_channel_rows]
+
     # ── Review queue ─────────────────────────────────────────────────────
     review_queue_count = db.session.execute(
         select(func.count(Content.id)).where(Content.is_published == False)
     ).scalar() or 0
+
+    review_queue_aging_rows = db.session.execute(
+        select(Content.id, Content.title, Content.object_type, Content.ingested_at)
+        .where(Content.is_published == False)
+        .order_by(Content.ingested_at.asc())
+        .limit(5)
+    ).mappings().all()
+
+    now = datetime.now(timezone.utc)
+    review_queue_aging = []
+    for r in review_queue_aging_rows:
+        ingested_at = r["ingested_at"]
+        if ingested_at.tzinfo is None:
+            ingested_at = ingested_at.replace(tzinfo=timezone.utc)
+        diff = now - ingested_at
+        if diff.days > 0:
+            time_str = f"{diff.days}d ago"
+        elif diff.seconds >= 3600:
+            time_str = f"{diff.seconds // 3600}h ago"
+        elif diff.seconds >= 60:
+            time_str = f"{diff.seconds // 60}m ago"
+        else:
+            time_str = "Just now"
+
+        review_queue_aging.append({
+            "id":    r["id"],
+            "title": r["title"] or f"Untitled ({r['object_type']})",
+            "type":  r["object_type"],
+            "age":   time_str,
+        })
 
     # ── Content breakdown by type ─────────────────────────────────────────
     by_type_rows = db.session.execute(
@@ -165,12 +204,18 @@ def get_dashboard_stats_data():
         else:
             latest_activity = latest_c or latest_i
 
+        days_since_last_ingestion = None
+        if latest_c:
+            lc = latest_c.replace(tzinfo=timezone.utc) if latest_c.tzinfo is None else latest_c
+            days_since_last_ingestion = (datetime.now(timezone.utc) - lc).days
+
         provider_activities.append({
             "name":            src_info["name"],
             "slug":            src_info["slug"],
             "content_count":   c_count,
             "product_count":   i_count,
             "latest_activity": latest_activity.isoformat() if latest_activity else None,
+            "days_since_last_ingestion": days_since_last_ingestion,
         })
 
     provider_activities.sort(
@@ -238,6 +283,8 @@ def get_dashboard_stats_data():
         "active_contents":        active_contents,
         "inactive_contents":      inactive_contents,
         "review_queue_count":     review_queue_count,
+        "review_queue_aging":     review_queue_aging,
+        "share_channels":         share_channels,
         "by_type":                type_distribution,
         "by_category":            category_distribution,
         "by_source":              content_by_source,
@@ -291,6 +338,12 @@ def widget_catalog_health():
 def widget_recent_ingest():
     data = get_dashboard_stats_data()
     return render_template("admin/dashboard/widgets/_recent_ingest.html", recent_ingested=data.get("recent_ingested", []))
+
+
+@bp.route("/widget/review-queue-aging", methods=["GET"])
+def widget_review_queue_aging():
+    data = get_dashboard_stats_data()
+    return render_template("admin/dashboard/widgets/_review_queue_aging.html", review_queue_aging=data.get("review_queue_aging", []), review_queue_count=data.get("review_queue_count", 0))
 
 
 @bp.route("/widget/categories-distribution", methods=["GET"])

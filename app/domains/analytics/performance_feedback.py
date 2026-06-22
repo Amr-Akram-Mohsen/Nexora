@@ -3,7 +3,7 @@ from sqlalchemy import select, func
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category, IntentFacet
-from app.domains.interaction.models import RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import RecommendationImpression, RecommendationClick, View
 from app.domains.analytics.learning_memory import load_memory_layer, save_memory_layer
 
 # Centralized thresholds and weights configurations
@@ -82,13 +82,38 @@ def collect_feedback_data():
     for row in db.session.execute(dist_stmt).all():
         dist_map[row[0]] = {"views": row[1], "likes": row[2], "clicks": row[3]}
 
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    start_a = now - timedelta(days=30)
+    start_b = now - timedelta(days=60)
+    
+    decay_views_a_stmt = select(View.target_id, func.count(View.id)).where(
+        (View.target_type == "content") & (View.created_at >= start_a)
+    ).group_by(View.target_id)
+    decay_views_a = {r[0]: r[1] for r in db.session.execute(decay_views_a_stmt).all()}
+
+    decay_views_b_stmt = select(View.target_id, func.count(View.id)).where(
+        (View.target_type == "content") & (View.created_at >= start_b) & (View.created_at < start_a)
+    ).group_by(View.target_id)
+    decay_views_b = {r[0]: r[1] for r in db.session.execute(decay_views_b_stmt).all()}
+
+    decay_map = {}
+    for cid in set(decay_views_a.keys()).union(decay_views_b.keys()):
+        va = decay_views_a.get(cid, 0)
+        vb = decay_views_b.get(cid, 0)
+        if vb > 0 and va < vb:
+            decay_map[cid] = round(((vb - va) / vb) * 100.0, 1)
+        else:
+            decay_map[cid] = 0.0
+
     return {
         "cat_id_to_name": cat_id_to_name,
         "contents": contents,
         "imp_map": imp_map,
         "clk_map": clk_map,
         "intent_map": intent_map,
-        "dist_map": dist_map
+        "dist_map": dist_map,
+        "decay_map": decay_map
     }
 
 def calculate_content_metrics(content_item, data_maps):
@@ -142,6 +167,7 @@ def calculate_content_metrics(content_item, data_maps):
         "ctr_diff": actual_ctr - expected_ctr,
         "engagement_rate": engagement_rate,
         "conversion_rate": conversion_rate,
+        "decay_rate": data_maps["decay_map"].get(c_id, 0.0),
         "extended": extended,
         "is_simulated": is_simulated
     }
@@ -281,7 +307,8 @@ def evaluate_content_performance_feedback(time_window="7d"):
                 "watch_time_mins": metrics["extended"]["watch_time_mins"],
                 "conversion_attribution": metrics["extended"]["conversion_attribution"],
                 "dwell_time_sec": metrics["extended"]["dwell_time_sec"],
-                "recommendation_success_rate": metrics["extended"]["recommendation_success_rate"]
+                "recommendation_success_rate": metrics["extended"]["recommendation_success_rate"],
+                "decay_rate": metrics["decay_rate"]
             },
             "expected_performance": {
                 "ctr": round(metrics["expected_ctr"], 2)

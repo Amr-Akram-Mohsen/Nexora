@@ -1,0 +1,30 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Category Name</th>
+        <th>Total Comments</th>
+        <th>Positive</th>
+        <th>Neutral</th>
+        <th>Negative</th>
+        <th>Health Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td><strong>{{ item.category_name }}</strong></td>
+        <td>{{ item.total }}</td>
+        <td class="text-success">{{ item.positive_pct }}%</td>
+        <td class="text-muted">{{ item.neutral_pct }}%</td>
+        <td class="text-danger">{{ item.negative_pct }}%</td>
+        <td><span class="status-badge {{ item.status_class }}">{{ item.status }}</span></td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6">No sentiment data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

@@ -147,3 +147,21 @@
     padding: 0.625rem 1rem;
     color: var(--foreground);
 }
+
+/* --- Scrollable Containers for Long Lists --- */
+.insights-table-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
+}
+
+.insights-table-scroll thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 0 var(--border);
+}

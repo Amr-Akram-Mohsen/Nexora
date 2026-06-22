@@ -714,3 +714,11 @@ def publish_distribution_post(post_id):
         
     db.session.commit()
     return jsonify({"success": True, "status": post.status})
+
+
+@bp.route("/intelligence", methods=["GET"])
+def distribution_intelligence():
+    """Renders the full Distribution Intelligence Dashboard."""
+    from app.domains.analytics.distribution_intelligence import get_distribution_intelligence_data
+    data = get_distribution_intelligence_data()
+    return render_template("admin/distribution/distribution_intelligence.html", data=data)

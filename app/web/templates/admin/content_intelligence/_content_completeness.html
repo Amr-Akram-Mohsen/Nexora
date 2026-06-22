@@ -1,0 +1,44 @@
+<div class="summary-cards gap-4">
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">System-Wide Completeness</div>
+    <div class="summary-value {% if data.overall_average < 60 %}text-danger{% elif data.overall_average < 80 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.overall_average }}%
+    </div>
+    <div class="summary-meta">Average completeness score across all content assets.</div>
+  </div>
+</div>
+
+<div class="insights-table-scroll mt-6">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Content Count</th>
+        <th>Completeness %</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cat in data.category_scores %}
+      <tr>
+        <td><strong>{{ cat.category_name }}</strong></td>
+        <td>{{ cat.content_count }}</td>
+        <td class="col-metric">{{ cat.average_completeness }}%</td>
+        <td>
+          {% if cat.average_completeness < 60 %}
+          <span class="status-badge badge-danger">Needs Attention</span>
+          {% elif cat.average_completeness < 80 %}
+          <span class="status-badge badge-warning">Fair</span>
+          {% else %}
+          <span class="status-badge badge-success">Good</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="4">No data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

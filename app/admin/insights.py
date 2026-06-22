@@ -14,7 +14,17 @@ from app.domains.analytics import (
     get_content_coverage_matrix,
     generate_content_strategy,
     map_content_strategy_to_assets,
-    evaluate_content_performance_feedback
+    evaluate_content_performance_feedback,
+    get_content_completeness_report,
+    get_source_intelligence,
+    get_source_intelligence,
+    get_content_commerce_attribution,
+    get_intent_recommendation_heatmap,
+    get_user_interest_coverage_gap,
+    get_source_authority_validation,
+    get_geographic_demand_data,
+    get_category_sentiment_health,
+    get_recommendation_commerce_chain
 )
 
 bp = Blueprint("api_insights", __name__, url_prefix="/admin/insights")
@@ -256,7 +266,7 @@ def widget_coverage_matrix():
         time_frame = "7_days"
         
     coverage_matrix = get_content_coverage_matrix()
-    return render_template("admin/content_intelligence/_insights_rows.html", widget_type="coverage_matrix", items=coverage_matrix)
+    return render_template("admin/content_intelligence/_coverage_matrix_chart.html", items=coverage_matrix)
 
 
 @bp.route("/widget/intent-opportunities", methods=["GET"])
@@ -269,6 +279,66 @@ def widget_intent_opportunities():
     return render_template("admin/content_intelligence/_intent_opportunities_cards.html", items=intent_opportunities)
 
 
+@bp.route("/widget/intent-ctr-heatmap", methods=["GET"])
+def widget_intent_ctr_heatmap():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    heatmap_data = get_intent_recommendation_heatmap()
+    return render_template("admin/content_intelligence/_intent_ctr_heatmap.html", data=heatmap_data)
+
+
+@bp.route("/widget/user-interest-gap", methods=["GET"])
+def widget_user_interest_gap():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    gap_data = get_user_interest_coverage_gap()
+    return render_template("admin/content_intelligence/_user_interest_gap.html", data=gap_data)
+
+
+@bp.route("/widget/source-authority-validation", methods=["GET"])
+def widget_source_authority_validation():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    validation_data = get_source_authority_validation()
+    return render_template("admin/content_intelligence/_source_authority_validation.html", data=validation_data)
+
+
+@bp.route("/widget/geographic-demand", methods=["GET"])
+def widget_geographic_demand():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    geo_data = get_geographic_demand_data()
+    return render_template("admin/content_intelligence/_geographic_demand.html", data=geo_data)
+
+
+@bp.route("/widget/category-sentiment", methods=["GET"])
+def widget_category_sentiment():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    sentiment_data = get_category_sentiment_health()
+    return render_template("admin/content_intelligence/_category_sentiment.html", data=sentiment_data)
+
+
+@bp.route("/widget/commerce-chain", methods=["GET"])
+def widget_commerce_chain():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    chain_data = get_recommendation_commerce_chain()
+    return render_template("admin/content_intelligence/_commerce_chain.html", data=chain_data)
+
+
 @bp.route("/widget/brand-opportunities", methods=["GET"])
 def widget_brand_opportunities():
     time_frame = request.args.get("time_frame", "7_days")
@@ -277,6 +347,36 @@ def widget_brand_opportunities():
         
     brand_opportunities = get_brand_opportunity_data()
     return render_template("admin/content_intelligence/_insights_rows.html", widget_type="brand_opportunities", items=brand_opportunities)
+
+
+@bp.route("/widget/content-completeness", methods=["GET"])
+def widget_content_completeness():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    completeness_data = get_content_completeness_report()
+    return render_template("admin/content_intelligence/_content_completeness.html", data=completeness_data)
+
+
+@bp.route("/widget/source-intelligence", methods=["GET"])
+def widget_source_intelligence():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    source_data = get_source_intelligence()
+    return render_template("admin/content_intelligence/_source_intelligence.html", data=source_data)
+
+
+@bp.route("/widget/commerce-attribution", methods=["GET"])
+def widget_commerce_attribution():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+        
+    attribution_data = get_content_commerce_attribution()
+    return render_template("admin/content_intelligence/_commerce_attribution.html", data=attribution_data)
 
 
 @bp.route("/widget/content-strategy", methods=["GET"])

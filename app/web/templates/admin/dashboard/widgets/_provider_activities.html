@@ -16,8 +16,11 @@
         <p class="activity-meta ingest-log-text  ">
           Volume: <strong class="provider-content-count">{{ "{:,}".format(s.content_count or 0) }}</strong> content items &amp; <strong class="provider-product-count">{{ "{:,}".format(s.product_count or 0) }}</strong> products
         </p>
-        <p class="activity-meta ingest-log-meta ">
+        <p class="activity-meta ingest-log-meta flex items-center gap-2">
           Last Ingest Activity: <strong class="provider-activity-time">{{ s.latest_activity_formatted }}</strong>
+          {% if s.days_since_last_ingestion is not none and s.days_since_last_ingestion > 7 %}
+          <span class="status-badge badge-danger badge-type-compact" title="No new content in >7 days">Stale Source</span>
+          {% endif %}
         </p>
       </div>
     </li>

@@ -1,0 +1,42 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Store Name</th>
+        <th>Active Links</th>
+        <th>Stale Links %</th>
+        <th>Total Clicks</th>
+        <th>Conversion Potential</th>
+        <th>Health Score</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for src in data %}
+      <tr>
+        <td><strong>{{ src.store_name }}</strong></td>
+        <td>{{ "{:,}".format(src.active_links) }}</td>
+        <td class="col-metric {% if src.stale_links_pct > 20 %}text-danger{% endif %}">{{ src.stale_links_pct }}%</td>
+        <td>{{ "{:,}".format(src.total_clicks) }}</td>
+        <td class="col-metric">{{ src.conversion_potential }}% 
+          {% if src.is_simulated %}<span class="status-badge">Simulated</span>{% endif %}
+        </td>
+        <td class="col-metric">{{ src.health_score }}</td>
+        <td>
+          {% if src.health_score < 60 %}
+          <span class="status-badge badge-danger">Critical</span>
+          {% elif src.health_score < 80 %}
+          <span class="status-badge badge-warning">Needs Attention</span>
+          {% else %}
+          <span class="status-badge badge-success">Healthy</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7">No source intelligence data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

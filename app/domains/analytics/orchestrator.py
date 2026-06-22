@@ -473,3 +473,63 @@ def get_decision_intelligence_data(lightweight=False):
         "execution_governance": execution_governance
     }
 
+def get_executive_summary():
+    from app.domains.analytics.content_opportunities import get_content_completeness_report
+    from app.domains.analytics.product_opportunities import get_catalog_health_report, get_source_intelligence
+    from app.domains.analytics.recommendation_performance import get_recommendation_performance_data
+    from app.domains.analytics.distribution_intelligence import get_distribution_intelligence_data
+    from app.domains.analytics.performance_feedback import evaluate_content_performance_feedback
+    from app.domains.analytics.trends import get_trending_categories_data
+    
+    comp_report = get_content_completeness_report()
+    cat_health = get_catalog_health_report()
+    rec_perf = get_recommendation_performance_data()
+    dist_intel = get_distribution_intelligence_data()
+    
+    content_completeness = sum(c["avg_completeness"] for c in comp_report) / max(1, len(comp_report))
+    catalog_completeness = sum(c["coverage_rate"] for c in cat_health) / max(1, len(cat_health))
+    rec_ctr = rec_perf.get("overall_ctr", 0.0)
+    dist_cov = dist_intel.get("system_coverage_rate", 0.0)
+    
+    norm_ctr = min(100.0, (rec_ctr / 10.0) * 100)
+    health_score = (content_completeness + catalog_completeness + norm_ctr + dist_cov) / 4.0
+    
+    system_health = {
+        "score": round(health_score, 1),
+        "content_completeness": round(content_completeness, 1),
+        "catalog_completeness": round(catalog_completeness, 1),
+        "recommendation_ctr": round(rec_ctr, 1),
+        "distribution_coverage": round(dist_cov, 1)
+    }
+    
+    dec_data = get_decision_intelligence_data(lightweight=True)
+    top_opps = dec_data.get("top_opportunities", [])[:3]
+    
+    trends = get_trending_categories_data()
+    velocity = [
+        {"category": t["name"], "velocity": t["growth_percent"], "volume": t["current_volume"]}
+        for t in trends[:3]
+    ]
+    
+    feedback = evaluate_content_performance_feedback()
+    high_sev = [f for f in feedback.get("failures_detected", []) if f.get("severity") == "high"]
+    
+    sources = get_source_intelligence()
+    stale_sources = [s for s in sources if s.get("staleness_pct", 0) > 50]
+    
+    dead_links = sum(c["items_missing_links"] for c in cat_health)
+    
+    risks = {
+        "high_severity_underperformers": len(high_sev),
+        "stale_sources": len(stale_sources),
+        "missing_affiliate_links": dead_links,
+        "total_risks": len(high_sev) + len(stale_sources) + dead_links
+    }
+    
+    return {
+        "system_health": system_health,
+        "top_opportunities": top_opps,
+        "engagement_velocity": velocity,
+        "risks": risks
+    }
+

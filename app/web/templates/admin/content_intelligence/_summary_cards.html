@@ -10,6 +10,7 @@
     {{ metric_card("Related Products CTR", "%.2f"|format(metrics.related_products_ctr) ~ "%", "Clicks on related product listings") }}
     {{ metric_card("Related Content CTR", "%.2f"|format(metrics.related_content_ctr) ~ "%", "Clicks on suggested articles/guides") }}
     {{ metric_card("Shop Products CTR", "%.2f"|format(metrics.shop_products_ctr) ~ "%", "Clicks on primary shop links") }}
+    {{ metric_card("Coverage Rate", "%.2f"|format(metrics.coverage_rate) ~ "%", "Content with recommendation impressions") }}
   {% else %}
     <div class="grid-full-width">
       {{ spinner("Loading recommendation metrics...") }}

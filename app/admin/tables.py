@@ -231,7 +231,7 @@ INSIGHTS_TABLES = {
     },
     "performance_feedback": {
         "id": "feedback-evaluations",
-        "preview_table": ["Platform / Title", "Expected CTR", "Actual CTR", "Evaluation Status", "Reason"]
+        "preview_table": ["Platform / Title", "Expected CTR", "Actual CTR", "Evaluation Status", "Decay Rate", "Reason"]
     },
     "asset_mapping": {
         "id": "asset-mapping",

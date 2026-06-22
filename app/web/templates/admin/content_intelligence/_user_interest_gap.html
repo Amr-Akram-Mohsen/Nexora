@@ -1,0 +1,34 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Entity Name</th>
+        <th>Type</th>
+        <th>Interest Rank</th>
+        <th>Volume Rank</th>
+        <th>Gap Score</th>
+        <th>Content Volume</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td><strong>{{ item.name }}</strong></td>
+        <td><span class="status-badge {% if item.type == 'category' %}badge-blue{% else %}badge-purple{% endif %}">{{ item.type | title }}</span></td>
+        <td>#{{ item.interest_rank }}</td>
+        <td>#{{ item.volume_rank }}</td>
+        <td>
+          <span class="status-badge {% if item.gap_score > 5 %}badge-danger{% elif item.gap_score > 0 %}badge-warning{% else %}badge-success{% endif %}">
+            {% if item.gap_score > 0 %}+{% endif %}{{ item.gap_score }}
+          </span>
+        </td>
+        <td>{{ "{:,}".format(item.content_count) }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6">No user interest gap data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

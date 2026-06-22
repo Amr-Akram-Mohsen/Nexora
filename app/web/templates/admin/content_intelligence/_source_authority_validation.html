@@ -1,0 +1,28 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Source Name</th>
+        <th>Authority Score</th>
+        <th>Avg Engagement / Content</th>
+        <th>Validation Ratio</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td><strong>{{ item.source_name }}</strong><br><small class="text-muted">{{ item.content_count }} pieces published</small></td>
+        <td>{{ item.authority_score }}</td>
+        <td>{{ item.avg_engagement }}</td>
+        <td><strong>{{ item.validation_ratio }}x</strong></td>
+        <td><span class="status-badge {{ item.status_class }}">{{ item.status }}</span></td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5">No source validation data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

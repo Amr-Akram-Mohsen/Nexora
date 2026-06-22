@@ -1,0 +1,189 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Executive Intelligence Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header mb-4">
+    <div class="header-content">
+        <h1 class="page-title">Executive Intelligence</h1>
+        <p class="page-subtitle text-muted">High-level system health, velocity, and priority opportunities.</p>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Health Score -->
+    <div class="dashboard-card span-4">
+        <div class="card-header">
+            <h3>System Health Score</h3>
+        </div>
+        <div class="card-body d-flex flex-wrap gap-4">
+            <div style="width: 180px;">
+                <canvas id="healthChart"></canvas>
+            </div>
+            <div class="flex-grow-1">
+                <table class="admin-table vertical-table">
+                    <tbody>
+                        <tr>
+                            <td class="cell-label">Overall Score</td>
+                            <td class="cell-value"><h2 style="margin: 0; font-size: 2rem;">{{ summary.system_health.score }}%</h2></td>
+                        </tr>
+                        <tr>
+                            <td class="cell-label">Content completeness</td>
+                            <td class="cell-value">{{ summary.system_health.content_completeness }}%</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-label">Catalog coverage</td>
+                            <td class="cell-value">{{ summary.system_health.catalog_completeness }}%</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-label">Distribution sync</td>
+                            <td class="cell-value">{{ summary.system_health.distribution_coverage }}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engagement Velocity -->
+    <div class="dashboard-card span-8">
+        <div class="card-header">
+            <h3>Engagement Velocity (Top Categories)</h3>
+        </div>
+        <div class="card-body">
+            <canvas id="velocityChart" height="80"></canvas>
+            <div class="mt-4 insights-table-scroll" style="max-height: 200px;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Growth Velocity</th>
+                            <th>Current Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in summary.engagement_velocity %}
+                        <tr>
+                            <td><strong>{{ v.category }}</strong></td>
+                            <td class="text-success">+{{ v.velocity }}%</td>
+                            <td>{{ v.volume }} interactions</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid mt-4">
+    <!-- Top Opportunities -->
+    <div class="dashboard-card span-8">
+        <div class="card-header">
+            <h3>Top Strategic Opportunities</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-3">
+                {% for opp in summary.top_opportunities %}
+                <div class="dashboard-card" style="flex: 1; min-width: 250px; background: rgba(var(--brand-blue-rgb), 0.05); border-color: var(--brand-blue);">
+                    <div class="card-body">
+                        <span class="status-badge badge-blue mb-2">{{ opp.type }}</span>
+                        <h4 class="mb-1" style="font-size: 1.1rem;">{{ opp.entity }}</h4>
+                        <p class="text-sm text-muted mb-2">{{ opp.reason }}</p>
+                        <strong>Score: {{ opp.score }}</strong>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Summary -->
+    <div class="dashboard-card span-4">
+        <div class="card-header">
+            <h3>Risk Summary</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="dashboard-card" style="flex: 1; min-width: 120px; border-color: var(--danger-color);">
+                    <div class="card-body text-center p-3">
+                        <h2 class="text-danger mb-1">{{ summary.risks.high_severity_underperformers }}</h2>
+                        <span class="text-sm text-muted">Severe Underperformers</span>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="flex: 1; min-width: 120px; border-color: var(--warning-color);">
+                    <div class="card-body text-center p-3">
+                        <h2 class="text-warning mb-1">{{ summary.risks.stale_sources }}</h2>
+                        <span class="text-sm text-muted">Stale Sources</span>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="flex: 1; min-width: 120px; border-color: var(--warning-color);">
+                    <div class="card-body text-center p-3">
+                        <h2 class="text-warning mb-1">{{ summary.risks.missing_affiliate_links }}</h2>
+                        <span class="text-sm text-muted">Missing Aff. Links</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Health Doughnut Chart
+    const healthCtx = document.getElementById('healthChart').getContext('2d');
+    const score = {{ summary.system_health.score }};
+    new Chart(healthCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Health Score', 'Gap'],
+            datasets: [{
+                data: [score, 100 - score],
+                backgroundColor: [
+                    score > 80 ? '#10b981' : (score > 60 ? '#f59e0b' : '#ef4444'),
+                    '#e2e8f0'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '75%',
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+
+    // Velocity Bar Chart
+    const velocityData = {{ summary.engagement_velocity | tojson | safe }};
+    const velocityCtx = document.getElementById('velocityChart').getContext('2d');
+    new Chart(velocityCtx, {
+        type: 'bar',
+        data: {
+            labels: velocityData.map(v => v.category),
+            datasets: [{
+                label: 'Velocity (%)',
+                data: velocityData.map(v => v.velocity),
+                backgroundColor: '#3b82f6',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Growth %' }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

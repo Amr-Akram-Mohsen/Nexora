@@ -291,11 +291,22 @@ def get_recommendation_performance_data():
         "category_deviations": category_deviations
     }
 
+    distinct_contexts = db.session.execute(
+        select(func.count(func.distinct(RecommendationImpression.context_id)))
+    ).scalar() or 0
+
+    total_published_contents = db.session.execute(
+        select(func.count(Content.id)).where(Content.is_published == True)
+    ).scalar() or 1
+
+    coverage_rate = round((distinct_contexts / total_published_contents) * 100.0, 2)
+
     return {
         "overall_ctr": overall_ctr,
         "related_products_ctr": related_products_ctr,
         "related_content_ctr": related_content_ctr,
         "shop_products_ctr": shop_products_ctr,
+        "coverage_rate": coverage_rate,
         "impressions": {
             "related_content": related_content_impressions,
             "related_product": related_products_impressions,
@@ -315,4 +326,57 @@ def get_recommendation_performance_data():
             "recommendation_types": recommendation_type_scores
         },
         "benchmarking": benchmarking
+    }
+
+def get_intent_recommendation_heatmap():
+    categories = db.session.execute(select(Category.id, Category.name)).all()
+    intents = db.session.execute(select(IntentFacet.id, IntentFacet.name)).all()
+    
+    cat_map = {c.id: c.name for c in categories}
+    intent_map = {i.id: i.name for i in intents}
+    
+    cast_context_id = cast(RecommendationImpression.context_id, Integer)
+    cast_context_id_click = cast(RecommendationClick.context_id, Integer)
+    
+    imp_stmt = select(
+        Content.category_id,
+        Content.intent_id,
+        func.count(RecommendationImpression.id)
+    ).select_from(RecommendationImpression)\
+     .join(Content, cast_context_id == Content.id)\
+     .group_by(Content.category_id, Content.intent_id)
+     
+    clk_stmt = select(
+        Content.category_id,
+        Content.intent_id,
+        func.count(RecommendationClick.id)
+    ).select_from(RecommendationClick)\
+     .join(Content, cast_context_id_click == Content.id)\
+     .group_by(Content.category_id, Content.intent_id)
+     
+    heatmap = {}
+    for cid in cat_map:
+        heatmap[cid] = {iid: {"impressions": 0, "clicks": 0} for iid in intent_map}
+        
+    for cid, iid, cnt in db.session.execute(imp_stmt).all():
+        if cid in heatmap and iid in heatmap[cid]:
+            heatmap[cid][iid]["impressions"] = cnt
+            
+    for cid, iid, cnt in db.session.execute(clk_stmt).all():
+        if cid in heatmap and iid in heatmap[cid]:
+            heatmap[cid][iid]["clicks"] = cnt
+            
+    results = []
+    for cid, name in cat_map.items():
+        row = {"category_name": name, "intents": {}}
+        for iid, iname in intent_map.items():
+            imps = heatmap[cid][iid]["impressions"]
+            clks = heatmap[cid][iid]["clicks"]
+            ctr = (clks / imps * 100.0) if imps > 0 else None
+            row["intents"][iname] = round(ctr, 1) if ctr is not None else None
+        results.append(row)
+        
+    return {
+        "intent_names": list(intent_map.values()),
+        "heatmap": results
     }

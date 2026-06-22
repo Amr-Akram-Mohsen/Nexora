@@ -1,0 +1,30 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Content Asset</th>
+        <th>Content Views</th>
+        <th>Linked Items</th>
+        <th>Item Clicks</th>
+        <th>Attribution Rate (Clicks/Views)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for att in data %}
+      <tr>
+        <td><strong>{{ att.content_title }}</strong></td>
+        <td>{{ "{:,}".format(att.content_views) }}</td>
+        <td>{{ "{:,}".format(att.linked_items_count) }}</td>
+        <td>{{ "{:,}".format(att.total_item_clicks) }}</td>
+        <td class="col-metric {% if att.attribution_rate > 5 %}text-success{% endif %}">
+          {{ att.attribution_rate }}%
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5">No commerce attribution data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,67 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui.html" import admin_page_header, admin_panel %}
+
+{% block title %}Distribution Intelligence Dashboard — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{{ admin_page_header("Distribution Intelligence Dashboard", "Track and analyze how content and products spread across external platforms") }}
+
+<div class="summary-cards mb-6 flex gap-4">
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">Content Coverage</div>
+    <div class="summary-value {% if data.coverage.content_coverage < 50 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.coverage.content_coverage }}%
+    </div>
+    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_content) }} / {{ "{:,}".format(data.coverage.total_content) }} content pieces syndicated</div>
+  </div>
+  
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">Product Coverage</div>
+    <div class="summary-value {% if data.coverage.item_coverage < 50 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.coverage.item_coverage }}%
+    </div>
+    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_items) }} / {{ "{:,}".format(data.coverage.total_items) }} items distributed</div>
+  </div>
+  
+  <div class="summary-card flex-col gap-2">
+    <div class="summary-title">Time-to-Distribution</div>
+    <div class="summary-value {% if data.time_to_distribution_hours > 48 %}text-warning{% else %}text-success{% endif %}">
+      {{ data.time_to_distribution_hours }}h
+    </div>
+    <div class="summary-meta">Average hours from asset creation to first post</div>
+  </div>
+</div>
+
+<div class="mt-6">
+  {% call admin_panel("📊 Platform Engagement Index", "Platform performance ranked by multi-metric engagement score") %}
+  <div class="insights-table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Post Count</th>
+          <th>Engagement Index</th>
+          <th>Avg Engagement / Post</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for platform in data.platforms %}
+        <tr>
+          <td><span class="status-badge">{{ platform.platform | title }}</span></td>
+          <td>{{ "{:,}".format(platform.post_count) }}</td>
+          <td class="col-metric">{{ "{:,}".format(platform.engagement_index) }}</td>
+          <td class="col-metric">{{ "{:,}".format(platform.avg_engagement_per_post) }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4">No distribution platforms found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endcall %}
+</div>
+
+{% endblock %}

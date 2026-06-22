@@ -1,0 +1,33 @@
+<div class="insights-table-scroll">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        {% for intent in data.intent_names %}
+        <th>{{ intent | title }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data.heatmap %}
+      <tr>
+        <td><strong>{{ row.category_name }}</strong></td>
+        {% for intent in data.intent_names %}
+        {% set ctr = row.intents.get(intent) %}
+        {% if ctr == None %}
+        <td class="text-muted text-center">-</td>
+        {% else %}
+        <td class="col-metric text-center {% if ctr > 15 %}text-success{% elif ctr > 5 %}text-warning{% else %}text-danger{% endif %}">
+          {{ ctr }}%
+        </td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="{{ data.intent_names|length + 1 }}">No CTR data available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

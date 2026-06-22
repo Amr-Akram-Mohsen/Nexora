@@ -1,4 +1,4 @@
-<div class="overview-breakdown-grid flex gap-3">
+<div class="overview-breakdown-grid flex gap-3 flex-col">
   {% set total = interactions.total or 1 %}
   
   {% set items = [
@@ -7,6 +7,7 @@
     { 'label': 'Likes', 'val': interactions.likes or 0, 'icon': '👍' },
     { 'label': 'Dislikes', 'val': interactions.dislikes or 0, 'icon': '👎' },
     { 'label': 'Saves', 'val': interactions.saves or 0, 'icon': '🔖' },
+    { 'label': 'Shares', 'val': interactions.shares or 0, 'icon': '🔗' },
     { 'label': 'Item Clicks', 'val': (interactions.clicks if interactions.clicks is defined else (interactions.item_clicks if interactions.item_clicks is defined else 0)), 'icon': '🛒' }
   ] %}
 
@@ -22,4 +23,16 @@
       <span class="overview-breakdown-pct">{{ pct }}%</span>
     </div>
   {% endfor %}
+
+  {% if share_channels %}
+  <div class="overview-breakdown-row flex items-center gap-3">
+    <span class="overview-breakdown-icon">📣</span>
+    <span class="overview-breakdown-label">Channels</span>
+    <div class="overview-breakdown-bar-track flex gap-2 flex-wrap" style="background: transparent; border: none;">
+      {% for ch in share_channels %}
+        <span class="status-badge badge-secondary badge-type-compact" title="{{ ch.count }} shares">{{ ch.channel }}: {{ ch.count }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 </div>

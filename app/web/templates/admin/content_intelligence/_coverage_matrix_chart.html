@@ -1,0 +1,98 @@
+<style>
+  .coverage-chart-container {
+    position: relative;
+    height: 350px;
+    width: 100%;
+  }
+</style>
+
+<div class="coverage-chart-container">
+  <canvas id="coverageMatrixChart"></canvas>
+</div>
+
+<!-- Load Chart.js if not already loaded (ideally in base layout, but safe to include if needed, or rely on global) -->
+<!-- Assuming Chart is available globally as the user mentioned "don't use lightweight css-only grids or layouts for charts, but rather chart.js or so." -->
+
+<script>
+(function() {
+    // Wait for Chart to be available or execute immediately if it is
+    function initChart() {
+        if (typeof Chart === 'undefined') {
+            setTimeout(initChart, 100);
+            return;
+        }
+
+        const canvas = document.getElementById('coverageMatrixChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        const rawData = [
+            {% for item in items %}
+            {
+                x: {{ item.content_count }},
+                y: {{ item.demand_score }},
+                name: "{{ item.name }}",
+                gapScore: "{{ item.gap_score }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const chartData = {
+            datasets: [{
+                label: 'Categories',
+                data: rawData,
+                backgroundColor: function(context) {
+                    const point = context.raw;
+                    if (!point) return '#6b7280';
+                    if (point.gapScore === 'High Gap') return '#ef4444'; // Danger
+                    if (point.gapScore === 'Medium Gap') return '#eab308'; // Warning
+                    return '#22c55e'; // Success
+                },
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'scatter',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const point = context.raw;
+                                return `${point.name} (Coverage: ${point.x}, Demand: ${point.y})`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Content Coverage (Volume)'
+                        },
+                        beginAtZero: true
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Demand Score (Engagement)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    initChart();
+})();
+</script>
