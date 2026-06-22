@@ -135,6 +135,17 @@
             {% else %}
                 <span>{{ value }}</span>
             {% endif %}
+        {% elif key == 'widget-ctr' and domain_type == 'rec' %}
+            {% set ctr_val = value|replace('%', '')|float %}
+            {% if ctr_val >= 3.0 %}
+                <span class="badge badge-success">{{ value }}</span>
+            {% elif ctr_val >= 1.0 %}
+                <span class="badge badge-warning">{{ value }}</span>
+            {% elif ctr_val > 0.0 %}
+                <span class="badge badge-danger">{{ value }}</span>
+            {% else %}
+                <span class="badge badge-secondary">{{ value }}</span>
+            {% endif %}
         {% else %}
             <span>{{ value }}</span>
         {% endif %}

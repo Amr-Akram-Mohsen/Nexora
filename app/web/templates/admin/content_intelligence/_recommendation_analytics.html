@@ -1,0 +1,59 @@
+{% from "admin/components/ui.html" import admin_panel %}
+
+<div class="insights-section">
+  <div class="insights-double-grid">
+    {% call admin_panel("🏆 Top Contexts (by Impressions)", "The articles/pages generating the most recommendation widgets.") %}
+      <div class="insights-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Context ID</th>
+              <th>Type</th>
+              <th>Impressions</th>
+              <th>Clicks</th>
+              <th>CTR</th>
+            </tr>
+          </thead>
+          <tbody id="context-performance-tbody">
+            <tr><td colspan="5">Loading top contexts...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    {% endcall %}
+
+    {% call admin_panel("⭐ Top Entities (by Clicks)", "The recommended items/articles getting clicked the most.") %}
+      <div class="insights-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Entity</th>
+              <th>Type</th>
+              <th>Clicks</th>
+            </tr>
+          </thead>
+          <tbody id="entity-performance-tbody">
+            <tr><td colspan="3">Loading top entities...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    {% endcall %}
+  </div>
+</div>
+
+<div class="insights-double-grid">
+  <div class="insights-section">
+    {% call admin_panel("📈 Time-Series Trends", "Daily impressions vs clicks over the last 30 days.") %}
+      <div class="dashboard-chart-wrapper">
+        <canvas id="recTrendChart"></canvas>
+      </div>
+    {% endcall %}
+  </div>
+
+  <div class="insights-section">
+    {% call admin_panel("📊 Slot Position Performance", "Which recommendation slots get the most clicks.") %}
+      <div class="dashboard-chart-wrapper">
+        <canvas id="recSlotChart"></canvas>
+      </div>
+    {% endcall %}
+  </div>
+</div>
