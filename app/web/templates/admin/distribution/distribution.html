@@ -29,11 +29,25 @@
   actions=header_actions
 ) }}
 
+<!-- Overview KPIs Section -->
+<div class="insights-section" id="distribution-overview-kpis-container">
+  {{ spinner("Loading distribution overview metrics...") }}
+</div>
+
+<!-- Health Alerts Section -->
+<div id="distribution-health-alerts-wrapper"></div>
+
 <!-- Action Queue Section -->
 <div class="overview-top-grid insights-section">
   {% call admin_table_panel("⚡ Tactical Action Queue", "Immediate tactical actions including content recycles, updates, and creation drafts.") %}
-    <div id="action-queue-list" class="suggestions-list-scroll flex gap-3">
+    <div id="action-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
       {{ spinner("Compiling tactical actions...") }}
+    </div>
+  {% endcall %}
+  
+  {% call admin_table_panel("📅 Scheduling Queue", "Upcoming distribution events ready to be published.") %}
+    <div id="scheduling-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
+      {{ spinner("Loading scheduled posts...") }}
     </div>
   {% endcall %}
 </div>
@@ -58,6 +72,25 @@
 <h2 class="insight-group-title flex gap-3 items-center">🛡️ Execution Governance Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_governance.html" %}
+</div>
+
+<!-- Phase 3: Distribution Analytics -->
+<h2 class="insight-group-title flex gap-3 items-center mt-5">📊 Distribution Analytics</h2>
+
+<!-- Platform Performance -->
+<div class="insights-section">
+  {% call admin_table_panel("Platform Performance", "Aggregate engagement and reach metrics across all social platforms.", actions='') %}
+    <div id="platform-performance-container">
+      {{ spinner("Loading platform performance data...") }}
+    </div>
+  {% endcall %}
+</div>
+
+<!-- Asset Coverage -->
+<div class="insights-section">
+    <div id="coverage-analytics-container">
+      {{ spinner("Loading asset coverage data...") }}
+    </div>
 </div>
 
 {% endblock %}

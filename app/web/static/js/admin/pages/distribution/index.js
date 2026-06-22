@@ -4,10 +4,11 @@ import { fetchAndInjectHtml } from '../insights/utilities.js';
 import { renderContentPublishingPlan } from '../insights/publishingPlan.js';
 import { renderAutonomousExecution } from '../insights/autonomousExecution.js';
 import { renderExecutionGovernance } from '../insights/governance.js';
-import { renderSocialDistribution } from '../insights/socialDistribution.js';
+import { renderSocialDistribution, initSocialDistributionFilters } from '../insights/socialDistribution.js';
 
 document.addEventListener("DOMContentLoaded", () => {
   initDistribution();
+  initSocialDistributionFilters();
 });
 
 function initDistribution() {
@@ -73,7 +74,12 @@ function initDistribution() {
 
 export function loadMainWidgets(timeFrame) {
   const promises = [
+    fetchAndInjectHtml(`/admin/distribution/widget/health-alerts`, 'distribution-health-alerts-wrapper', ''),
+    fetchAndInjectHtml(`/admin/distribution/widget/overview-kpis`, 'distribution-overview-kpis-container', 'Loading overview metrics...', 7),
     fetchAndInjectHtml(`/admin/distribution/widget/action-queue?time_frame=${timeFrame}`, 'action-queue-list', 'Compiling action guidance...'),
+    fetchAndInjectHtml(`/admin/distribution/widget/scheduling-queue`, 'scheduling-queue-list', 'Loading scheduled posts...'),
+    fetchAndInjectHtml(`/admin/distribution/widget/platform-performance`, 'platform-performance-container', 'Loading platform performance...'),
+    fetchAndInjectHtml(`/admin/distribution/widget/coverage-analytics`, 'coverage-analytics-container', 'Loading asset coverage...'),
   ];
   return Promise.all(promises);
 }

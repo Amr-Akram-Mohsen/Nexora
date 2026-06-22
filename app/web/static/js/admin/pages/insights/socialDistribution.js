@@ -5,12 +5,36 @@ export function renderSocialDistribution() {
   const container = document.getElementById("social-distribution-table-body");
   if (!container) return;
 
-  container.innerHTML = getSpinnerHtml(6, "Loading distribution history...");
+  container.innerHTML = getSpinnerHtml(7, "Loading distribution history...");
 
-  fetchAndInjectHtml(`/admin/distribution/widget/social-distribution`, 'social-distribution-table-body', 'Loading distribution history...', 6)
+  const status = document.getElementById("dist-filter-status")?.value || "";
+  const type = document.getElementById("dist-filter-type")?.value || "";
+  const platform = document.getElementById("dist-filter-platform")?.value || "";
+  
+  let url = `/admin/distribution/widget/social-distribution`;
+  const params = new URLSearchParams();
+  if (status) params.append("status", status);
+  if (type) params.append("source_type", type);
+  if (platform) params.append("platform", platform);
+  
+  if (params.toString()) {
+      url += `?${params.toString()}`;
+  }
+
+  fetchAndInjectHtml(url, 'social-distribution-table-body', 'Loading distribution history...', 7)
     .catch(err => {
       console.error("Failed to load social distribution widget:", err);
     });
+}
+
+export function initSocialDistributionFilters() {
+    const statusSelect = document.getElementById("dist-filter-status");
+    const typeSelect = document.getElementById("dist-filter-type");
+    const platformSelect = document.getElementById("dist-filter-platform");
+    
+    if (statusSelect) statusSelect.addEventListener("change", renderSocialDistribution);
+    if (typeSelect) typeSelect.addEventListener("change", renderSocialDistribution);
+    if (platformSelect) platformSelect.addEventListener("change", renderSocialDistribution);
 }
 
 // Attach modal handlers globally so inline onclick works

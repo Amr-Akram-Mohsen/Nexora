@@ -227,7 +227,7 @@ INSIGHTS_TABLES = {
     },
     "social_distribution": {
         "id": "social-distribution",
-        "preview_table": ["Platform", "Source Asset", "Status", "Publish Date", "Performance", "Actions"]
+        "preview_table": ["Platform", "Source Asset", "Status", "Publish Date", "Performance", "Link", "Actions"]
     },
     "performance_feedback": {
         "id": "feedback-evaluations",

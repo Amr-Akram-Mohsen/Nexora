@@ -1,0 +1,37 @@
+{# app/web/templates/admin/distribution/_scheduling_queue.html #}
+<div class="suggestions-list-scroll flex flex-col gap-3">
+    {% for item in items %}
+    <div class="rec-action-card {% if item.is_overdue %}overdue-alert-card{% endif %}">
+        <div class="flex justify-between items-start mb-2">
+            <div class="flex items-center gap-2">
+                <span class="platform-icon">{{ item.platform_icon }}</span>
+                <span class="platform-name font-bold">{{ item.platform }}</span>
+            </div>
+            {% if item.is_overdue %}
+                <span class="status-badge badge-danger">OVERDUE</span>
+            {% else %}
+                <span class="status-badge badge-warning">SCHEDULED</span>
+            {% endif %}
+        </div>
+        
+        <h4 class="rec-action-title source-title-truncate scheduling-queue-title">
+            {{ item.source_title }}
+        </h4>
+        
+        <div class="rec-action-issue mt-2 text-muted flex gap-2 items-center">
+            <span class="font-bold">Date:</span>
+            <span class="{% if item.is_overdue %}text-danger font-bold{% endif %}">
+                {{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}
+            </span>
+        </div>
+        
+        <div class="mt-3 flex justify-end">
+            <button class="admin-btn-secondary admin-btn-sm" onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">Review</button>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-4 text-muted border rounded bg-light">
+        No upcoming scheduled posts.
+    </div>
+    {% endfor %}
+</div>

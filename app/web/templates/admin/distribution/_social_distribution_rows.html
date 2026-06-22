@@ -1,0 +1,121 @@
+<!-- _social_distribution_rows.html -->
+{% if summary_stats %}
+<div class="distribution-summary-bar flex gap-4">
+  <div class="flex items-center gap-2"><span class="status-badge badge-secondary">DRAFT: {{ summary_stats.draft }}</span></div>
+  <div class="flex items-center gap-2"><span class="status-badge badge-warning">SCHEDULED: {{ summary_stats.scheduled }}</span></div>
+  <div class="flex items-center gap-2"><span class="status-badge badge-success">PUBLISHED: {{ summary_stats.published }}</span></div>
+  {% if summary_stats.overdue > 0 %}
+  <div class="flex items-center gap-2 ml-auto"><span class="status-badge badge-danger">OVERDUE: {{ summary_stats.overdue }}</span></div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% for item in items %}
+<tr id="distribution-row-{{ item.id }}">
+  <td>
+    <div class="flex items-center gap-2">
+      <span title="{{ item.platform }}" class="platform-icon">{{ item.platform_icon }}</span>
+      <span class="platform-name">{{ item.platform }}</span>
+    </div>
+  </td>
+  <td>
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-2">
+        {% if item.source_type == 'content' %}
+        <span class="status-badge badge-info" title="Content">📝 CONTENT</span>
+        {% else %}
+        <span class="status-badge badge-secondary" title="Item">📦 ITEM</span>
+        {% endif %}
+      </div>
+      <div class="source-title-truncate" title="{{ item.source_title }}">{{ item.source_title }}</div>
+    </div>
+  </td>
+  <td>
+    {% if item.status == 'published' %}
+      <span class="status-badge badge-success">PUBLISHED</span>
+    {% elif item.status == 'scheduled' %}
+      <span class="status-badge badge-warning">SCHEDULED</span>
+    {% else %}
+      <span class="status-badge badge-secondary">DRAFT</span>
+    {% endif %}
+  </td>
+  <td>
+    <div class="distribution-date-info">
+      {% if item.status == 'draft' %}
+        {% if item.updated_at %}
+          <span class="stale-indicator" title="{{ item.updated_at.strftime('%Y-%m-%d %H:%M') }}">Stale: Last updated {{ item.updated_at.strftime('%Y-%m-%d') }}</span>
+        {% else %}
+          <span class="stale-indicator">-</span>
+        {% endif %}
+      {% else %}
+        {% if item.publish_date %}
+          <span class="publish-date-value {% if item.is_overdue %}is-overdue{% endif %}" title="{{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}">
+            {{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}
+            {% if item.is_overdue %}<br><span class="overdue-badge-wrap"><span class="status-badge badge-danger">OVERDUE</span></span>{% endif %}
+          </span>
+        {% else %}
+          <span class="stale-indicator">-</span>
+        {% endif %}
+      {% endif %}
+    </div>
+  </td>
+  <td>
+    <div class="flex flex-col gap-1 performance-metrics-container">
+      <div class="flex gap-2 performance-stats">
+        <span title="Views">👁️ {{ item.views }}</span>
+        <span title="Likes">❤️ {{ item.likes }}</span>
+        <span title="Clicks">🖱️ {{ item.clicks }}</span>
+        <span title="Shares">🔄 {{ item.shares }}</span>
+      </div>
+      <div class="engagement-score" title="Engagement Score">🔥 Score: {{ item.engagement }}</div>
+    </div>
+  </td>
+  <td>
+    <div class="flex items-center gap-2">
+      {% if item.has_url %}
+        <span class="url-present" title="URL Present">✓</span>
+      {% else %}
+        {% if item.status == 'published' %}
+        <span class="url-warning" title="No URL">⚠️</span>
+        {% else %}
+        <span class="url-missing" title="No URL">✗</span>
+        {% endif %}
+      {% endif %}
+    </div>
+  </td>
+  <td class="text-right">
+    <button class="admin-btn-secondary admin-btn-sm" onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">View</button>
+  </td>
+</tr>
+{% else %}
+<tr>
+  <td colspan="7" class="text-center py-4 text-muted">No distribution history found.</td>
+</tr>
+{% endfor %}
+
+{% if pagination and pagination.pages > 1 %}
+<tr class="pagination-row">
+  <td colspan="7">
+    <div class="flex justify-between items-center pagination-controls">
+      <div class="pagination-info">
+        Showing {{ pagination.first }} to {{ pagination.last }} of {{ pagination.total }} entries
+      </div>
+      <div class="flex items-center gap-2">
+        {% if pagination.has_prev %}
+        <button class="admin-btn-secondary admin-btn-sm" onclick="fetchAndInjectHtml('/admin/distribution/widget/social-distribution?page={{ pagination.prev_num }}', 'social-distribution-table-body', 'Loading distribution history...', 7)">Previous</button>
+        {% else %}
+        <button class="admin-btn-secondary admin-btn-sm btn-disabled" disabled>Previous</button>
+        {% endif %}
+        
+        <span class="pagination-page-indicator">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        
+        {% if pagination.has_next %}
+        <button class="admin-btn-secondary admin-btn-sm" onclick="fetchAndInjectHtml('/admin/distribution/widget/social-distribution?page={{ pagination.next_num }}', 'social-distribution-table-body', 'Loading distribution history...', 7)">Next</button>
+        {% else %}
+        <button class="admin-btn-secondary admin-btn-sm btn-disabled" disabled>Next</button>
+        {% endif %}
+      </div>
+    </div>
+  </td>
+</tr>
+{% endif %}

@@ -1,35 +1,66 @@
 <!-- _distribution_modal_inner.html -->
-<div >
-    <div class="flex justify-between" >
-        <div>
-            <h5 >Platform: <strong>{{ platform }}</strong></h5>
-            <div >Post Type: {{ post_type }}</div>
-        </div>
-        <div>
-            <span class="status-badge {{ '' if status == 'published' else '' }}">
-                {{ status | upper }}
-            </span>
+<form id="distribution-draft-form">
+    
+    <div class="distribution-modal-section">
+        <h6 class="distribution-modal-section-title">Source Entity Context</h6>
+        <div class="distribution-modal-readonly-value">{{ source_title }}</div>
+    </div>
+    
+    <div class="distribution-modal-section">
+        <h6 class="distribution-modal-section-title">Platform Details</h6>
+        <div class="flex gap-4">
+            <div>
+                <label class="distribution-modal-label">Platform</label>
+                <div class="distribution-modal-readonly-value platform-name">{{ platform }}</div>
+            </div>
+            <div>
+                <label class="distribution-modal-label">Post Type</label>
+                <div class="distribution-modal-readonly-value platform-name">{{ post_type }}</div>
+            </div>
         </div>
     </div>
     
-    <div >
-        <label >Post Content</label>
-        <textarea style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; font-family: monospace;" id="distribution-post-text" rows="8" {% if status == 'published' %}readonly{% endif %}>{{ text }}</textarea>
+    <div class="distribution-modal-section">
+        <h6 class="distribution-modal-section-title">Platform-Specific Content</h6>
+        <textarea class="distribution-post-textarea" id="distribution-post-text" rows="6" {% if status == 'published' %}readonly{% endif %}>{{ text }}</textarea>
     </div>
     
-    {% if status != 'published' %}
-    <div >
-        <label >Live URL (Optional)</label>
-        <input type="url" style="width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;" id="distribution-external-url" placeholder="https://...">
+    <div class="distribution-modal-section">
+        <h6 class="distribution-modal-section-title">Publishing Details</h6>
+        {% if status != 'published' %}
+        <label class="distribution-modal-label">Live URL (Optional)</label>
+        <input type="url" class="distribution-external-url-input" id="distribution-external-url" placeholder="https://...">
+        {% else %}
+        <label class="distribution-modal-label">Live URL</label>
+        <div class="distribution-modal-readonly-value">
+            {% if post.external_url %}
+            <a href="{{ post.external_url }}" target="_blank" class="text-primary">{{ post.external_url }}</a>
+            {% else %}
+            <span class="text-muted">No URL provided</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if status == 'published' and post %}
+    <div class="distribution-modal-section distribution-performance-summary">
+        <h6 class="performance-summary-title">Performance Summary</h6>
+        <div class="flex gap-4 items-center">
+            <span title="Views">👁️ {{ post.views_count }}</span>
+            <span title="Likes">❤️ {{ post.likes_count }}</span>
+            <span title="Clicks">🖱️ {{ post.clicks_count }}</span>
+            <span title="Shares">🔄 {{ post.shares_count }}</span>
+            <span class="engagement-score-badge" title="Engagement Score">🔥 Score: {{ engagement|int }}</span>
+        </div>
     </div>
     {% endif %}
     
-    <div class="flex justify-end gap-3 items-center" >
+    <div class="distribution-modal-actions flex justify-end gap-3 items-center">
         <button type="button" class="admin-btn-secondary" data-bs-dismiss="modal">Close</button>
         {% if status != 'published' %}
-        <button type="button" class="admin-btn-primary" onclick="publishDistributionPost({{ post_id }})">Mark as Published</button>
+        <button type="button" class="admin-btn-primary" onclick="publishDistributionPost({{ post_id }})">Publish Post</button>
         {% else %}
         <button type="button" class="admin-btn-success" disabled>Published</button>
         {% endif %}
     </div>
-</div>
+</form>

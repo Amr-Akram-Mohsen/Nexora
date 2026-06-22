@@ -1,0 +1,58 @@
+{# app/web/templates/admin/distribution/_overview_kpis.html #}
+<div class="distribution-overview-kpis-grid" id="distribution-overview-kpis">
+  <div class="rec-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label">Total Posts</p>
+      <p class="dashboard-stat-value">{{ stats.total_posts }}</p>
+    </div>
+    <p class="dashboard-stat-meta">Across all platforms</p>
+  </div>
+  
+  <div class="rec-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label stat-success">Published</p>
+      <p class="dashboard-stat-value stat-success">{{ stats.published }}</p>
+    </div>
+    <p class="dashboard-stat-meta">Live on platforms</p>
+  </div>
+  
+  <div class="rec-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label stat-warning">Scheduled</p>
+      <p class="dashboard-stat-value stat-warning">{{ stats.scheduled }}</p>
+    </div>
+    <p class="dashboard-stat-meta">Upcoming queue</p>
+  </div>
+  
+  <div class="rec-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label text-muted">Drafts</p>
+      <p class="dashboard-stat-value">{{ stats.drafts }}</p>
+    </div>
+    <p class="dashboard-stat-meta">In progress</p>
+  </div>
+  
+  <div class="rec-stat-card {% if stats.overdue > 0 %}overdue-alert-card{% endif %}">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label {% if stats.overdue > 0 %}stat-danger{% endif %}">Overdue</p>
+      <p class="dashboard-stat-value {% if stats.overdue > 0 %}stat-danger{% endif %}">{{ stats.overdue }}</p>
+    </div>
+    <p class="dashboard-stat-meta">⚠️ Requires action</p>
+  </div>
+  
+  <div class="rec-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label stat-info">Total Views</p>
+      <p class="dashboard-stat-value stat-info">{{ stats.total_views }}</p>
+    </div>
+    <p class="dashboard-stat-meta">Reach to date</p>
+  </div>
+  
+  <div class="rec-stat-card primary-stat-card">
+    <div class="flex justify-between items-center">
+      <p class="dashboard-stat-label stat-primary-label">Engagement</p>
+      <p class="dashboard-stat-value stat-primary-value">{{ stats.total_engagement|int }}</p>
+    </div>
+    <p class="dashboard-stat-meta stat-primary-label">Full signal score</p>
+  </div>
+</div>
