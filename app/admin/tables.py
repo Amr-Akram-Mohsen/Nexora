@@ -51,7 +51,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Category / Brand", "Price", "Store Count", "Sync Age", "Health", "Click Count", "Added", "Actions"],
         "detailed_table": {
             "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
-            "variants & availability": ["variants count", "store count", "price", "variant groups"],
+            "variants & availability": ["variants count", "store count", "price", "price spread", "variant groups"],
             "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves", "click count"],
             "content & quality": ["linked contents", "description", "rating", "review count", "images count", "specs count"]
         }
@@ -77,13 +77,19 @@ CRUD_TABLES = {
             "Product Count",
             "Clicks",
             "CTR",
-            "Conversions",
+            "Active Links",
+            "Sync Age",
+            "OOS Rate",
+            "Avg Commission",
             "Status",
             "Actions",
         ],
         "detailed_table": {
             "store info": ["id", "name", "slug", "website", "status", "affiliate network"],
-            "commercial & localization": ["country", "currency", "api enabled", "product count"]
+            "commercial & localization": ["country", "currency", "api enabled", "product count"],
+            "link health": ["total links", "active links", "inactive links", "never synced", "stale links (7d)", "out of stock", "avg sync age (days)", "last synced at"],
+            "affiliate & commission": ["feed enabled", "network slug", "program count", "avg commission rate", "max commission rate", "links with commission", "links without commission", "links with tracking code"],
+            "pricing summary": ["min price", "avg price", "max price", "links with discount", "avg discount %", "links with null price", "currency mix"]
         }
     },
     "recommendations": {

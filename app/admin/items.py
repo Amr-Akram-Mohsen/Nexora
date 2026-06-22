@@ -382,6 +382,18 @@ def get_item_detail(id):
                 "metadata":          lnk.network_metadata or {},
             })
 
+    prices = [p["price"] for p in store_links_data if p["price"] is not None and p["is_active"]]
+    price_spread = None
+    if prices:
+        min_p = min(prices)
+        max_p = max(prices)
+        delta_pct = ((max_p - min_p) / min_p * 100) if min_p > 0 else 0
+        price_spread = {
+            "min": round(min_p, 2),
+            "max": round(max_p, 2),
+            "delta_percentage": round(delta_pct, 1)
+        }
+
     return jsonify({
         "id":          item.id,
         "name":        item.name,
@@ -392,6 +404,7 @@ def get_item_detail(id):
         "source_slug": item.source.slug if item.source else None,
         "source_type": item.source_type or "—",
         "store_links": store_links_data,
+        "price_spread": price_spread
     })
 
 
@@ -605,6 +618,7 @@ def build_item_inspect_data(id):
         "last synced": format_date(last_synced, fmt='%b %d, %Y') if last_synced else "—",
         "variants count": "{:,}".format(len(item.variants)),
         "store count": "{:,}".format(len(store_links_data)),
+        "programs": ", ".join(sorted(list(set([lnk["program_name"] for lnk in store_links_data if lnk.get("program_name") and lnk["program_name"] != "—"])))) or "—",
         "price": price_str,
         "variant groups": {"value": variant_groups_str, "is_custom": True},
         

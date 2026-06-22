@@ -21,17 +21,27 @@
       <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);"><i class="fa-solid fa-bolt"></i></div>
       <p class="dashboard-stat-label">Synced Today</p>
       <h3 class="dashboard-stat-value" id="stats-synced-today"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
-      <p class="dashboard-stat-meta">refreshed in 24h</p>
+      <p class="dashboard-stat-meta">prices/availability</p>
     </div>
   </a>
 
-  <!-- Synced This Week -->
+  <!-- Checked Today -->
   <a class="card clickable-card">
     <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-blue-rgb), 0.1); color: var(--brand-blue);"><i class="fa-regular fa-calendar-check"></i></div>
-      <p class="dashboard-stat-label">Synced This Week</p>
-      <h3 class="dashboard-stat-value" id="stats-synced-week"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
-      <p class="dashboard-stat-meta">refreshed in 7d</p>
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-blue-rgb), 0.1); color: var(--brand-blue);"><i class="fa-solid fa-check-double"></i></div>
+      <p class="dashboard-stat-label">Checked Today</p>
+      <h3 class="dashboard-stat-value" id="stats-checked-today"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">verifications in 24h</p>
+    </div>
+  </a>
+  
+  <!-- Fresh Deeplinks -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-purple-rgb), 0.1); color: var(--brand-purple);"><i class="fa-solid fa-link-slash"></i></div>
+      <p class="dashboard-stat-label">Fresh Deeplinks</p>
+      <h3 class="dashboard-stat-value" id="stats-deeplinks-fresh"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">generated in 30d</p>
     </div>
   </a>
 
@@ -44,16 +54,77 @@
       <p class="dashboard-stat-meta" style="color: var(--brand-orange); font-weight: bold;">unavailable</p>
     </div>
   </a>
+</div>
 
-  <!-- Never Synced -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card" style="border-left: 4px solid var(--brand-red);">
-      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-red-rgb), 0.1); color: var(--brand-red);"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <p class="dashboard-stat-label">Never Synced</p>
-      <h3 class="dashboard-stat-value" id="stats-never-synced"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
-      <p class="dashboard-stat-meta" style="color: var(--brand-red); font-weight: bold;">stuck links</p>
+<!-- Phase 2: Sync & Availability Intelligence Panels -->
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  
+  <!-- Availability Breakdown Panel (Donut) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Availability Breakdown</h3>
+        <p class="overview-panel-sub">Current status of all tracked products</p>
+      </div>
+      <i class="fa-solid fa-chart-pie text-muted"></i>
     </div>
-  </a>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-availability"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Stale Stores (List) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Top Stale Stores</h3>
+        <p class="overview-panel-sub">Merchants with the oldest average sync age</p>
+      </div>
+      <i class="fa-solid fa-clock-rotate-left text-muted"></i>
+    </div>
+    <div class="panel-body-list">
+      <ul id="list-stale-stores" class="overview-top-list">
+        <li class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading top stale stores...</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  <!-- Average Sync Age by Store (Bar) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Avg Sync Age by Store</h3>
+        <p class="overview-panel-sub">Average age of product data per merchant (days)</p>
+      </div>
+      <i class="fa-solid fa-chart-bar text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-sync-age"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync Cadence Timeline (Sparkline) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Sync Cadence Timeline</h3>
+        <p class="overview-panel-sub">Daily volume of verifications over 30 days</p>
+      </div>
+      <i class="fa-solid fa-chart-line text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-sync-cadence"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Overview Panels: OOS, Category Coverage, Commission Rates -->
@@ -108,12 +179,248 @@
   </div>
 
 </div>
+
+<!-- ============================================== -->
+<!-- PHASE 3: Affiliate & Commission Intelligence   -->
+<!-- ============================================== -->
+
+<div class="admin-section-header mt-8 mb-4">
+  <h2 class="text-xl font-semibold">Affiliate & Commission Intelligence</h2>
+  <p class="text-muted text-sm mt-1">Monetization health, tracking codes, and program fragmentation</p>
+</div>
+
+<!-- Commission Gap Alert -->
+<div id="commission-gap-alert-container" style="display: none; margin-bottom: 1.5rem;">
+  <div class="admin-alert admin-alert-warning flex items-center gap-3">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div>
+      <strong>Commission Gap Detected:</strong> <span id="commission-gap-alert-text"></span>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-stats-grid" style="margin-bottom: 1.5rem;" id="affiliate-health-dashboard">
+  <!-- Avg Commission Rate -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);"><i class="fa-solid fa-percent"></i></div>
+      <p class="dashboard-stat-label">Avg Commission Rate</p>
+      <h3 class="dashboard-stat-value" id="stats-avg-commission"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">across tracked links</p>
+    </div>
+  </a>
+
+  <!-- Links With Commission -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-blue-rgb), 0.1); color: var(--brand-blue);"><i class="fa-solid fa-coins"></i></div>
+      <p class="dashboard-stat-label">Monetized Links</p>
+      <h3 class="dashboard-stat-value" id="stats-links-with-commission"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">links with payout rates</p>
+    </div>
+  </a>
+
+  <!-- Links Without Commission -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card" style="border-left: 4px solid var(--brand-orange);">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-orange-rgb), 0.1); color: var(--brand-orange);"><i class="fa-solid fa-ghost"></i></div>
+      <p class="dashboard-stat-label">Ghost Links</p>
+      <h3 class="dashboard-stat-value" id="stats-links-without-commission"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta" style="color: var(--brand-orange); font-weight: bold;">no commission mapped</p>
+    </div>
+  </a>
+
+  <!-- Top Program -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-purple-rgb), 0.1); color: var(--brand-purple);"><i class="fa-solid fa-network-wired"></i></div>
+      <p class="dashboard-stat-label">Top Program</p>
+      <h3 class="dashboard-stat-value text-lg" id="stats-top-program" style="font-size: 1.25rem;"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">most dominant network</p>
+    </div>
+  </a>
+</div>
+
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  
+  <!-- Tracking Code Coverage (Donut) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Tracking Coverage</h3>
+        <p class="overview-panel-sub">Attribution link health</p>
+      </div>
+      <i class="fa-solid fa-chart-pie text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-tracking-coverage"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deeplink Freshness (Donut) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Deeplink Freshness</h3>
+        <p class="overview-panel-sub">Age since URL generation</p>
+      </div>
+      <i class="fa-solid fa-chart-pie text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-deeplink-freshness"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  
+  <!-- Program Distribution (Bar) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Program Distribution</h3>
+        <p class="overview-panel-sub">Link volume by affiliate program</p>
+      </div>
+      <i class="fa-solid fa-chart-bar text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-program-distribution"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Commission Stores (List) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Top Commission Stores</h3>
+        <p class="overview-panel-sub">Merchants ranked by average payout</p>
+      </div>
+      <i class="fa-solid fa-trophy text-muted"></i>
+    </div>
+    <div class="panel-body-list">
+      <ul id="list-commission-stores" class="overview-top-list">
+        <li class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading top stores...</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- PHASE 4: Pricing & Inventory Intelligence      -->
+<!-- ============================================== -->
+
+<div class="admin-section-header mt-8 mb-4">
+  <h2 class="text-xl font-semibold">Pricing & Inventory Intelligence</h2>
+  <p class="text-muted text-sm mt-1">Discounts, pricing gaps, and store staleness mapping</p>
+</div>
+
+<!-- Pricing Alerts Banner -->
+<div id="pricing-alerts-container" style="display: none; margin-bottom: 1.5rem;">
+  <div class="admin-alert admin-alert-danger flex flex-col gap-2" id="pricing-alerts-list">
+  </div>
+</div>
+
+<div class="dashboard-stats-grid" style="margin-bottom: 1.5rem;" id="pricing-health-dashboard">
+  <!-- Null Price Rate -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-red-rgb), 0.1); color: var(--brand-red);"><i class="fa-solid fa-comment-dollar"></i></div>
+      <p class="dashboard-stat-label">Null Prices</p>
+      <h3 class="dashboard-stat-value" id="stats-null-prices"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">tracked links missing a price</p>
+    </div>
+  </a>
+
+  <!-- Stale Pricing Links -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-orange-rgb), 0.1); color: var(--brand-orange);"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <p class="dashboard-stat-label">Stale Pricing Links</p>
+      <h3 class="dashboard-stat-value" id="stats-stale-prices"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">not synced in > 7 days</p>
+    </div>
+  </a>
+
+  <!-- Average Discount Depth -->
+  <a class="card clickable-card">
+    <div class="dashboard-stat-card">
+      <div class="dashboard-stat-icon flex items-center justify-center" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);"><i class="fa-solid fa-tags"></i></div>
+      <p class="dashboard-stat-label">Avg Discount Depth</p>
+      <h3 class="dashboard-stat-value" id="stats-avg-discount"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <p class="dashboard-stat-meta">savings on marked-down items</p>
+    </div>
+  </a>
+</div>
+
+<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+  
+  <!-- Currency Mix (Donut) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Currency Mix</h3>
+        <p class="overview-panel-sub">Distribution of priced links</p>
+      </div>
+      <i class="fa-solid fa-money-bill-1-wave text-muted"></i>
+    </div>
+    <div class="panel-body-padded flex items-center justify-center">
+      <div style="position: relative; height: 250px; width: 100%;">
+        <canvas id="chart-currency-mix"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discount Depth Ranking (List) -->
+  <div class="overview-panel card">
+    <div class="overview-panel-header flex items-center justify-between">
+      <div>
+        <h3 class="overview-panel-title">Discount Depth by Store</h3>
+        <p class="overview-panel-sub">Stores ranked by average discount %</p>
+      </div>
+      <i class="fa-solid fa-arrow-trend-down text-muted"></i>
+    </div>
+    <div class="panel-body-list">
+      <ul id="list-discount-stores" class="overview-top-list">
+        <li class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading top stores...</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- Full Width Panel for Price Staleness Stacked Bar -->
+<div class="overview-panel card" style="margin-bottom: 1.5rem;">
+  <div class="overview-panel-header flex items-center justify-between">
+    <div>
+      <h3 class="overview-panel-title">Price Staleness Distribution</h3>
+      <p class="overview-panel-sub">Fresh vs. Stale pricing data per merchant</p>
+    </div>
+    <i class="fa-solid fa-layer-group text-muted"></i>
+  </div>
+  <div class="panel-body-padded flex items-center justify-center">
+    <div style="position: relative; height: 300px; width: 100%;">
+      <canvas id="chart-price-staleness"></canvas>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("stores-search", "Search by name, slug, or website…") }}
+    {{ admin_filter_select("filter-network", None, [], default_val="", default_text="All Networks", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-country", None, [], default_val="", default_text="All Countries", extra_class="filter-select-item") }}
+    {{ admin_filter_select("filter-sync-staleness", None, [("fresh", "Fresh (7d)"), ("stale", "Stale (>7d)"), ("never", "Never Synced")], default_val="", default_text="Sync Staleness: All", extra_class="filter-select-item") }}
     {{ admin_reset_button("clear-stores-filters-btn", "Reset") }}
   </div>
 {% endcall %}
