@@ -269,17 +269,6 @@
     line-height: 1;
 }
 
-.dashboard-error-icon {
-    font-size: 1.75rem;
-    margin-bottom: 0.5rem;
-    line-height: 1;
-}
-
-.dashboard-empty-subtext {
-    font-size: var(--text-xs);
-    margin-top: 0.375rem;
-    opacity: 0.7;
-}
 
 .dashboard-error-icon {
     font-size: 1.75rem;

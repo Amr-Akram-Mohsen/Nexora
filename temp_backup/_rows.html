@@ -1,0 +1,193 @@
+{% from 'admin/components/macros.html' import action_group, action_button %}
+{% from 'admin/components/crud.html' import admin_crud_rows %}
+
+{% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
+<tr id='{{ domain_type }}-row'>
+    {% for key, value in row.items() %}
+    {% if key not in ['slug', 'id', 'is_published', 'image_url', 'has-discount', 'is_verified', 'recency_days', 'logo-url'] %}
+    <td class='cell-{{ key }}'>
+        {% if key == 'link' %}
+            {% if domain_type == 'source' and row.get('logo-url') %}
+                <div class='flex items-center gap-2'>
+                    <img src='{{ row.get('logo-url') }}' alt='Logo' class='item-thumbnail-small'>
+                    <a target='_blank' href='{{ value.url }}'>{{ value.name }}</a>
+                </div>
+            {% else %}
+                <a target='_blank' href='{{ value.url }}'>{{ value.name }}</a>
+            {% endif %}
+        {% elif key == 'name' and domain_type == 'user' %}
+            <div class='flex items-center gap-2'>
+                <span>{{ value|replace('\n', '<br>')|safe }}</span>
+                {% if row.get('is_verified') %}
+                    <span class='badge badge-health-high' title='Verified User'>✓</span>
+                {% endif %}
+            </div>
+        {% elif key == 'name' and domain_type == 'item' %}
+            <div class='flex items-center gap-2'>
+                {% if row.get('image_url') %}
+                    <img src='{{ row.get('image_url') }}' alt='Thumbnail' class='item-thumbnail-small'>
+                {% else %}
+                    <span class='badge badge-secondary' title='No Image'><i class="fa-regular fa-image"></i></span>
+                {% endif %}
+                <span>{{ value }}</span>
+            </div>
+        {% elif key == 'price' and domain_type == 'item' %}
+            <div class='flex items-center gap-2'>
+                <span>{{ value }}</span>
+                {% if row.get('has-discount') %}
+                    <span class='badge badge-success' title='Discount available'><i class='fa-solid fa-tag'></i> Discount</span>
+                {% endif %}
+            </div>
+        {% elif key == 'sync-age' and domain_type == 'item' %}
+            {% if value is none %}
+                <span>—</span>
+            {% elif value <= 1 %}
+                <span class='badge badge-success'>{{ value }}d</span>
+            {% elif value <= 7 %}
+                <span class='badge badge-warning'>{{ value }}d</span>
+            {% else %}
+                <span class='badge badge-danger'>{{ value }}d</span>
+            {% endif %}
+        {% elif key == 'health' %}
+            {% if domain_type == 'item' %}
+                {% if value >= 80 %}
+                    <span class='badge badge-success' title='Catalog Health: Excellent'>{{ value }}%</span>
+                {% elif value >= 50 %}
+                    <span class='badge badge-warning' title='Catalog Health: Needs Work'>{{ value }}%</span>
+                {% else %}
+                    <span class='badge badge-danger' title='Catalog Health: Poor'>{{ value }}%</span>
+                {% endif %}
+            {% else %}
+                {% if value == 'unused' %}
+                    <span class='badge badge-danger' title='Entity is orphaned (0 linked items/content)'>Unused</span>
+                {% elif value == 'inactive-linked' %}
+                    <span class='badge badge-warning' title='Entity is inactive but has linked items/content'>Inactive (Linked)</span>
+                {% elif value == 'ok' %}
+                    <span class='badge badge-success'>OK</span>
+                {% else %}
+                    <span class='badge badge-secondary'>{{ value }}</span>
+                {% endif %}
+            {% endif %}
+        {% elif key == 'filter config' %}
+            {% if value == 'Configured' %}
+                <span class='badge badge-success'>Configured</span>
+            {% else %}
+                <span class='badge badge-warning'>Not Configured</span>
+            {% endif %}
+        {% elif key == 'subscription' and domain_type == 'user' %}
+            {% if value == 'subscribed' %}
+                <span class='badge badge-health-high'>Subscribed</span>
+            {% else %}
+                <span class='badge badge-secondary'>Not Subscribed</span>
+            {% endif %}
+        {% elif key == 'last-active' and domain_type == 'user' %}
+            {% set days = row.get('recency_days') %}
+            {% if days is none %}
+                <span class='badge badge-health-low'>Never</span>
+            {% elif days <= 1 %}
+                <span class="badge badge-health-high" title="{{ value }}">Active Today</span>
+            {% elif days <= 7 %}
+                <span class="badge badge-health-medium" title="{{ value }}">Active this week</span>
+            {% else %}
+                <span class="badge badge-health-low" title="{{ value }}">{{ value }}</span>
+            {% endif %}
+        {% elif key == 'engagement-tier' and domain_type == 'user' %}
+            {% if value == 'Power User' %}
+                <span class="badge badge-origin">{{ value }}</span>
+            {% elif value == 'High' %}
+                <span class="badge badge-health-high">{{ value }}</span>
+            {% elif value == 'Medium' %}
+                <span class="badge badge-health-medium">{{ value }}</span>
+            {% else %}
+                <span class="badge badge-health-low">{{ value }}</span>
+            {% endif %}
+        {% elif key == 'tier' and domain_type == 'source' %}
+            {% if value == 1 %}
+                <span class="badge badge-health-high" title="Tier 1 Authority">Tier 1</span>
+            {% elif value == 2 %}
+                <span class="badge badge-health-medium" title="Tier 2 Authority">Tier 2</span>
+            {% else %}
+                <span class="badge badge-health-low" title="Tier 3 Authority">Tier 3</span>
+            {% endif %}
+        {% elif key == 'channels' and domain_type == 'source' %}
+            <div class='flex flex-wrap gap-1'>
+                {% for channel in value %}
+                    <span class='badge badge-secondary'>{{ channel }}</span>
+                {% else %}
+                    <span class='text-muted'>—</span>
+                {% endfor %}
+            </div>
+        {% elif key == 'freshness' and domain_type == 'source' %}
+            {% if value is none %}
+                <span class='badge badge-health-low'>Never</span>
+            {% elif value <= 1 %}
+                <span class='badge badge-success'>{{ value }}d</span>
+            {% elif value <= 7 %}
+                <span class='badge badge-warning'>{{ value }}d</span>
+            {% else %}
+                <span class='badge badge-danger'>{{ value }}d</span>
+            {% endif %}
+        {% elif key == 'failures' and domain_type == 'source' %}
+            {% if value >= 3 %}
+                <span class='badge badge-danger' title='{{ value }} consecutive failures'><i class="fa-solid fa-triangle-exclamation"></i> {{ value }}</span>
+            {% elif value > 0 %}
+                <span class='badge badge-warning'>{{ value }}</span>
+            {% else %}
+                <span>{{ value }}</span>
+            {% endif %}
+        {% elif key == 'widget-ctr' and domain_type == 'rec' %}
+            {% set ctr_val = value|replace('%', '')|float %}
+            {% if ctr_val >= 3.0 %}
+                <span class='badge badge-success'>{{ value }}</span>
+            {% elif ctr_val >= 1.0 %}
+                <span class='badge badge-warning'>{{ value }}</span>
+            {% elif ctr_val > 0.0 %}
+                <span class='badge badge-danger'>{{ value }}</span>
+            {% else %}
+                <span class='badge badge-secondary'>{{ value }}</span>
+            {% endif %}
+        {% else %}
+            <span>{{ value }}</span>
+        {% endif %}
+    </td>
+    {% endif %}
+    {% endfor %}
+    {% if not hide_action_column %}
+    <td class='cell-actions flex flex-col gap-1'>
+        {% if domain_type in ['content', 'item', 'user', 'store', 'source', 'comment'] %}
+        <a class='user-action-btn flex items-center justify-center gap-1' href='/admin/{{ domain_type }}s/{{ row.id }}' target='_blank'>
+            <i class='fas fa-eye'></i> Inspect
+        </a>
+        {% if domain_type == 'content' %}
+          {% if row.is_published %}
+            <button class='user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' data-action='toggle-publish' data-id='{{ row.id }}' data-status='unpublish' title='Unpublish'>
+              <i class='fas fa-eye-slash'></i> Unpublish
+            </button>
+          {% else %}
+            <button class='user-action-btn user-action-toggle-active flex items-center justify-center gap-1' data-action='toggle-publish' data-id='{{ row.id }}' data-status='publish' title='Publish'>
+              <i class='fas fa-upload'></i> Publish
+            </button>
+          {% endif %}
+        {% endif %}
+        {% else %}
+        {{ action_button('Inspect', action_type='inspect', icon='<i class='fa-solid fa-eye'></i>', data_action='global-inspect',
+        extra_class='inspect-btn', button_id=row.id, data_domain=domain_type,
+        data_title=row.name|default(row.title|default(''))) }}
+
+        {% if domain_target_type %}
+        {% call action_group() %}
+        <a class='user-action-btn user-action-inspect inspect-btn'
+            href='/admin/{{ domain_target_type }}?source={{ row.slug }}'>
+            <i class='fa-solid fa-eye'></i> View {{ domain_target_type|title}}
+        </a>
+        {% endcall %}
+        {% endif %}
+        {% endif %}
+
+    </td>
+    {% endif %}
+</tr>
+{% endmacro %}
+
+{{ admin_crud_rows(items, render_row, empty_text='Nothing found.', domain_type=domain_type or none,
+domain_target_type=domain_target_type or none, hide_action_column=hide_action_column or false) }}

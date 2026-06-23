@@ -3,7 +3,7 @@
 {% block title %}Taxonomy Intelligence Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-header mb-4">
+<div class="dashboard-header">
     <div class="header-content">
         <h1 class="page-title">Taxonomy Intelligence</h1>
         <p class="page-subtitle text-muted">Topic concentration and category hierarchy health.</p>
@@ -12,13 +12,13 @@
 
 <div class="dashboard-grid">
     <!-- Topic Concentration -->
-    <div class="dashboard-card span-7">
+    <div class="dashboard-card">
         <div class="card-header">
             <h3>Topic Concentration (Top 10)</h3>
         </div>
         <div class="card-body">
             <canvas id="topicChart" height="120"></canvas>
-            <div class="mt-4 insights-table-scroll" style="max-height: 250px;">
+            <div class="insights-table-scroll">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -42,12 +42,12 @@
     </div>
 
     <!-- Category Health -->
-    <div class="dashboard-card span-5">
+    <div class="dashboard-card">
         <div class="card-header">
             <h3>Category Health & Engagement</h3>
         </div>
-        <div class="card-body p-0">
-            <div class="insights-table-scroll" style="max-height: 450px; border: none; border-radius: 0;">
+        <div class="card-body">
+            <div class="insights-table-scroll">
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -61,7 +61,7 @@
                         <tr>
                             <td><strong>{{ c.category }}</strong></td>
                             <td>{{ c.volume }}</td>
-                            <td class="text-success">{{ c.avg_engagement }}</td>
+                            <td>{{ c.avg_engagement }}</td>
                         </tr>
                         {% else %}
                         <tr><td colspan="3">No category data available.</td></tr>

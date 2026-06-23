@@ -13,6 +13,8 @@
   --brand-green-dark: #059669;
   --brand-teal: rgb(var(--brand-teal-rgb));
   --brand-teal-dark: #0f766e;
+  --brand-orange-rgb: 245, 158, 11;
+  --brand-red-rgb: 239, 68, 68;
   --brand-red: #ef4444;
   --brand-orange: #f59e0b;
 
@@ -65,6 +67,7 @@
 
   /* Text sizes */
   --text-xs: 0.75rem;
+  --text-2xs: 0.65rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;

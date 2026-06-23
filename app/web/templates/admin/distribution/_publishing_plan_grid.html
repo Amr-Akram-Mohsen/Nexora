@@ -1,8 +1,8 @@
 <!-- Summary Metrics Bar -->
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="publishing-plan-summary">
-  <div class="publishing-summary-item gap-2 flex items-center">🎯 Total Scheduled: <strong>{{ total_tasks }}</strong></div>
-  <div class="publishing-summary-item gap-2 flex items-center">📺 Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
-  <div class="publishing-summary-item gap-2 flex items-center">🛠️ Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-bullseye"></i> Total Scheduled: <strong>{{ total_tasks }}</strong></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-tv"></i> Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-hammer"></i>️ Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
 </div>
 
 <div class="insights-kanban-grid" id="publishing-plan-grid-container">
@@ -30,7 +30,7 @@
           <div  >No items in this queue.</div>
         {% else %}
           {% for task in week.tasks %}
-            {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
+            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if task.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if task.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
               <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">

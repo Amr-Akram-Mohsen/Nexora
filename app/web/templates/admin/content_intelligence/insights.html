@@ -42,7 +42,7 @@
     <button id="clear-filter-btn" class="admin-btn-secondary">Clear Filter</button>
   </div>
   {% endset %}
-  {% call admin_table_panel("🏆 Top Opportunities", "Unified priority list of categories and brands with the highest growth potential.", actions=opps_actions) %}
+  {% call admin_table_panel('<i class="fa-solid fa-trophy"></i> Top Opportunities', "Unified priority list of categories and brands with the highest growth potential.", actions=opps_actions) %}
     {{ admin_crud_table(tables['top_opportunities'], loading_text="Compiling top opportunities...") }}
   {% endcall %}
 </div>
@@ -60,20 +60,20 @@
 </div>
 
 <!-- Section 2 & 3: Content Coverage & Brand Gaps -->
-<h2 class="insight-group-title flex gap-3 items-center">⚖️ Coverage & Brand Expansions</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-scale-balanced"></i> Coverage & Brand Expansions</h2>
 <div class="overview-top-grid insights-section">
   {% call admin_table_panel("Category Coverage & Demand Gaps", "Analyzing content volume vs user engagement signals to identify content gaps.") %}
     {{ admin_crud_table(tables['coverage_matrix'], loading_text="Assessing category alignment...") }}
   {% endcall %}
 
   <!-- Brand Opportunity Analysis -->
-  {% call admin_table_panel("⭐ Brand Opportunity Analysis", "User engagement vs content volume to identify brand expansion opportunities.") %}
+  {% call admin_table_panel('<i class="fa-solid fa-star"></i> Brand Opportunity Analysis', "User engagement vs content volume to identify brand expansion opportunities.") %}
     {{ admin_crud_table(tables['brand_opportunities'], loading_text="Calculating brand expansion opportunities...") }}
   {% endcall %}
 </div>
 
 <!-- Section 4: Intent Opportunities -->
-<h2 class="insight-group-title flex gap-3 items-center">🎯 Intent Opportunities</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-bullseye"></i> Intent Opportunities</h2>
 <div class="insights-section">
   <!-- Intent Opportunity Analysis -->
   {% call admin_panel("Intent Distribution Analysis", "Content distribution across taxonomy intents and identified coverage gaps.") %}

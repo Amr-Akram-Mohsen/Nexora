@@ -6,7 +6,7 @@
   {% set is_success = log.status == "Success" %}
   <li class="activity-item flex ">
     <div class="activity-icon flex-center {{ 'icon-like' if is_success else 'icon-dislike' }}">
-      {{ '✅' if is_success else '❌' }}
+      {{ '<i class="fa-solid fa-check"></i>' if is_success else '<i class="fa-solid fa-xmark"></i>' }}
     </div>
 
     <div class="activity-content" style="width: 100%;">

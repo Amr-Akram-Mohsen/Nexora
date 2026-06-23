@@ -1,8 +1,8 @@
 <!-- Summary Metrics Bar -->
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-plan-summary">
-  <div class="publishing-summary-item gap-2 flex items-center">🤖 Auto-Execute Queue: <span class="status-badge">{{ auto_execute|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center">🤔 Needs Review Queue: <span class="status-badge">{{ needs_review|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center">❌ Blocked Queue: <span class="status-badge">{{ blocked|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-robot"></i> Auto-Execute Queue: <span class="status-badge">{{ auto_execute|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-circle-question"></i> Needs Review Queue: <span class="status-badge">{{ needs_review|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Queue: <span class="status-badge">{{ blocked|length }}</span></div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-plan-grid-container">
@@ -23,7 +23,7 @@
           <div  >No items in this queue.</div>
         {% else %}
           {% for task in q.list %}
-            {% set platformIcon = '📺' if task.platform == 'youtube' else '📌' if task.platform == 'pinterest' else '📝' %}
+            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if task.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if task.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
               <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
@@ -37,7 +37,7 @@
               {% if task.risk_factors %}
                 <div class="kanban-task-risk flex gap-1">
                   {% for r in task.risk_factors %}
-                    <div>⚠️ {{ r }}</div>
+                    <div><i class="fa-solid fa-triangle-exclamation"></i> {{ r }}</div>
                   {% endfor %}
                 </div>
               {% endif %}

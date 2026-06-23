@@ -2,7 +2,7 @@
 
   <div class="nav-brand flex items-center justify-between">
     <div class="brand-wrapper flex items-center">
-      <span class="nav-brand-icon">⚡</span>
+      <span class="nav-brand-icon"><i class="fa-solid fa-bolt"></i></span>
       <span class="nav-brand-name">Nexora</span>
       <span class="nav-brand-badge">Admin</span>
     </div>
@@ -16,17 +16,17 @@
     <a href="{{ url_for('admin.home') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'home' %}active{% endif %}"
       title="Overview">
-      <span class="nav-icon">📊</span> <span class="nav-link-text">Overview</span>
+      <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span> <span class="nav-link-text">Overview</span>
     </a>
     <a href="{{ url_for('admin.dashboard_insights') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'insights' %}active{% endif %}"
       title="Content Intelligence">
-      <span class="nav-icon">💡</span> <span class="nav-link-text">Content Intelligence</span>
+      <span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span> <span class="nav-link-text">Content Intelligence</span>
     </a>
     <a href="{{ url_for('admin.dashboard_distribution') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'distribution' %}active{% endif %}"
       title="Distribution">
-      <span class="nav-icon">📢</span> <span class="nav-link-text">Distribution</span>
+      <span class="nav-icon"><i class="fa-solid fa-bullhorn"></i></span> <span class="nav-link-text">Distribution</span>
     </a>
   </div>
 
@@ -35,32 +35,32 @@
     <a href="{{ url_for('admin.dashboard_contents') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'contents' %}active{% endif %}"
       title="Content Library">
-      <span class="nav-icon">📰</span> <span class="nav-link-text">Content Library</span>
+      <span class="nav-icon"><i class="fa-solid fa-newspaper"></i></span> <span class="nav-link-text">Content Library</span>
     </a>
     <a href="{{ url_for('api_content.content_dashboard') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'content_dashboard' %}active{% endif %}"
       title="Content Analytics">
-      <span class="nav-icon">📈</span> <span class="nav-link-text">Content Analytics</span>
+      <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span> <span class="nav-link-text">Content Analytics</span>
     </a>
     <a href="{{ url_for('api_content.pipeline_view') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'pipeline' %}active{% endif %}"
       title="Pipeline Audit">
-      <span class="nav-icon">⚙️</span> <span class="nav-link-text">Pipeline Audit</span>
+      <span class="nav-icon"><i class="fa-solid fa-gear"></i></span> <span class="nav-link-text">Pipeline Audit</span>
     </a>
     <a href="{{ url_for('api_content.deduplication_view') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'deduplication' %}active{% endif %}"
       title="Deduplication">
-      <span class="nav-icon">👯</span> <span class="nav-link-text">Deduplication</span>
+      <span class="nav-icon"><i class="fa-solid fa-user-group"></i></span> <span class="nav-link-text">Deduplication</span>
     </a>
     <a href="{{ url_for('admin.dashboard_items') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'items' %}active{% endif %}"
       title="Product Intelligence">
-      <span class="nav-icon">🛍️</span> <span class="nav-link-text">Product Intelligence</span>
+      <span class="nav-icon"><i class="fa-solid fa-bag-shopping"></i></span> <span class="nav-link-text">Product Intelligence</span>
     </a>
     <a href="{{ url_for('admin.dashboard_taxonomy') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'taxonomy' %}active{% endif %}"
       title="Taxonomy">
-      <span class="nav-icon">🏷️</span> <span class="nav-link-text">Taxonomy</span>
+      <span class="nav-icon"><i class="fa-solid fa-tag"></i></span> <span class="nav-link-text">Taxonomy</span>
     </a>
   </div>
 
@@ -68,17 +68,17 @@
     <p class="nav-title">Audience & Moderation</p>
     <a href="{{ url_for('admin.dashboard_users') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'users' %}active{% endif %}" title="Users">
-      <span class="nav-icon">👥</span> <span class="nav-link-text">Audience</span>
+      <span class="nav-icon"><i class="fa-solid fa-users"></i></span> <span class="nav-link-text">Audience</span>
     </a>
     <a href="{{ url_for('admin.dashboard_moderation') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'moderation' %}active{% endif %}"
       title="Interactions">
-      <span class="nav-icon">🛡️</span> <span class="nav-link-text">Interactions</span>
+      <span class="nav-icon"><i class="fa-solid fa-shield-halved"></i></span> <span class="nav-link-text">Interactions</span>
     </a>
     <a href="{{ url_for('admin.dashboard_recommendations') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'recommendations' %}active{% endif %}"
       title="Recommendations">
-      <span class="nav-icon">🔗</span> <span class="nav-link-text">Recommendations</span>
+      <span class="nav-icon"><i class="fa-solid fa-link"></i></span> <span class="nav-link-text">Recommendations</span>
     </a>
   </div>
 
@@ -87,22 +87,22 @@
     <a href="{{ url_for('admin.dashboard_ingestions') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'ingestions' %}active{% endif %}"
       title="Ingestion Channels">
-      <span class="nav-icon">🔌</span> <span class="nav-link-text">Ingestion Channels</span>
+      <span class="nav-icon"><i class="fa-solid fa-plug"></i></span> <span class="nav-link-text">Ingestion Channels</span>
     </a>
     <a href="{{ url_for('admin.dashboard_sources') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
       title="Sources">
-      <span class="nav-icon">📡</span> <span class="nav-link-text">Sources</span>
+      <span class="nav-icon"><i class="fa-solid fa-satellite-dish"></i></span> <span class="nav-link-text">Sources</span>
     </a>
     <a href="{{ url_for('admin.dashboard_sources_quality') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources_quality' %}active{% endif %}"
       title="Quality & Freshness">
-      <span class="nav-icon">🥇</span> <span class="nav-link-text">Quality & Freshness</span>
+      <span class="nav-icon"><i class="fa-solid fa-medal"></i></span> <span class="nav-link-text">Quality & Freshness</span>
     </a>
     <a href="{{ url_for('admin.dashboard_stores') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"
       title="Stores">
-      <span class="nav-icon">🏪</span> <span class="nav-link-text">Stores</span>
+      <span class="nav-icon"><i class="fa-solid fa-store"></i></span> <span class="nav-link-text">Stores</span>
     </a>
   </div>
 
@@ -111,7 +111,7 @@
     <a href="{{ url_for('admin.settings') }}"
       class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'settings' %}active{% endif %}"
       title="Settings">
-      <span class="nav-icon">⚙️</span> <span class="nav-link-text">Settings</span>
+      <span class="nav-icon"><i class="fa-solid fa-gear"></i></span> <span class="nav-link-text">Settings</span>
     </a>
   </div>
 

@@ -39,13 +39,13 @@
 
 <!-- Action Queue Section -->
 <div class="overview-top-grid insights-section">
-  {% call admin_table_panel("⚡ Tactical Action Queue", "Immediate tactical actions including content recycles, updates, and creation drafts.") %}
+  {% call admin_table_panel('<i class="fa-solid fa-bolt"></i> Tactical Action Queue', "Immediate tactical actions including content recycles, updates, and creation drafts.") %}
     <div id="action-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
       {{ spinner("Compiling tactical actions...") }}
     </div>
   {% endcall %}
   
-  {% call admin_table_panel("📅 Scheduling Queue", "Upcoming distribution events ready to be published.") %}
+  {% call admin_table_panel('<i class="fa-solid fa-calendar"></i> Scheduling Queue', "Upcoming distribution events ready to be published.") %}
     <div id="scheduling-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
       {{ spinner("Loading scheduled posts...") }}
     </div>
@@ -63,19 +63,19 @@
 </div>
 
 <!-- Section 1.99: Autonomous Execution Panel -->
-<h2 class="insight-group-title flex gap-3 items-center">🤖 Autonomous Execution Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_autonomous_execution.html" %}
 </div>
 
 <!-- Section 1.995: Execution Governance Panel -->
-<h2 class="insight-group-title flex gap-3 items-center">🛡️ Execution Governance Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_governance.html" %}
 </div>
 
 <!-- Phase 3: Distribution Analytics -->
-<h2 class="insight-group-title flex gap-3 items-center mt-5">📊 Distribution Analytics</h2>
+<h2 class="insight-group-title flex gap-3 items-center mt-5"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics</h2>
 
 <!-- Platform Performance -->
 <div class="insights-section">

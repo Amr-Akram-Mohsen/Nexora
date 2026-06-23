@@ -14,44 +14,20 @@
   window.sharesController = null;
 
   // ── Tab switching ───────────────────────
-  function switchTab(tabName) {
-    const btn = document.querySelector(`#interactions-tabs .admin-tab-btn[data-tab="${tabName}"]`);
-    if (!btn) return;
-
-    document.querySelectorAll('#interactions-tabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('is-hidden'));
-
-    btn.classList.add('active');
-    const panelId = `tab-panel-${btn.dataset.tab}`;
-    const panel = document.getElementById(panelId);
-    if (panel) panel.classList.remove('is-hidden');
-
-    if (btn.dataset.tab === 'reactions') {
-      window.reactionsController.load(1);
-    } else if (btn.dataset.tab === 'comments') {
-      window.commentsController.load(1);
-    } else if (btn.dataset.tab === 'views') {
-      window.viewsController.load(1);
-    } else if (btn.dataset.tab === 'clicks') {
-      window.clicksController.load(1);
-    } else if (btn.dataset.tab === 'saves') {
-      window.savesController.load(1);
-    } else if (btn.dataset.tab === 'shares') {
-      window.sharesController.load(1);
-    }
-  }
-
   function initTabs() {
-    document.getElementById('interactions-tabs').addEventListener('click', e => {
-      const btn = e.target.closest('.admin-tab-btn');
-      if (!btn) return;
-      switchTab(btn.dataset.tab);
+    initAdminTabs('interactions-tabs', tabName => {
+      if (tabName === 'reactions') window.reactionsController.load(1);
+      else if (tabName === 'comments') window.commentsController.load(1);
+      else if (tabName === 'views') window.viewsController.load(1);
+      else if (tabName === 'clicks') window.clicksController.load(1);
+      else if (tabName === 'saves') window.savesController.load(1);
+      else if (tabName === 'shares') window.sharesController.load(1);
     });
   }
 
   // ── Stats Row ───────────────────────────
   function loadStatsRow() {
-    fetch('/admin/interactions/stats')
+    return fetch('/admin/interactions/stats')
       .then(r => r.json())
       .then(data => {
         const container = document.getElementById('interactions-stats-row');
@@ -60,17 +36,19 @@
 
         const template = document.getElementById('interactions-stat-card-template');
         const cards = [
-          { icon: '💬', label: 'Comments', value: data.comments },
-          { icon: '👍', label: 'Likes',    value: data.likes    },
-          { icon: '👎', label: 'Dislikes', value: data.dislikes },
-          { icon: '👁️', label: 'Views',   value: data.views    },
-          { icon: '🔖', label: 'Saves',    value: data.saves    },
-          { icon: '📤', label: 'Shares',   value: data.shares   },
-          { icon: '🛒', label: 'Clicks',   value: data.item_clicks },
+          { key: 'comments', icon: '💬', label: 'Comments', value: data.comments },
+          { key: 'likes', icon: '👍', label: 'Likes',    value: data.likes    },
+          { key: 'dislikes', icon: '👎', label: 'Dislikes', value: data.dislikes },
+          { key: 'views', icon: '👁️', label: 'Views',   value: data.views    },
+          { key: 'saves', icon: '🔖', label: 'Saves',    value: data.saves    },
+          { key: 'shares', icon: '📤', label: 'Shares',   value: data.shares   },
+          { key: 'item_clicks', icon: '🛒', label: 'Clicks',   value: data.item_clicks },
         ];
 
         cards.forEach(c => {
           const clone = template.content.cloneNode(true);
+          const cardEl = clone.querySelector('.dashboard-stat-card');
+          if (cardEl) cardEl.dataset.statKey = c.key;
           clone.querySelector('.dashboard-stat-icon').textContent  = c.icon;
           clone.querySelector('.dashboard-stat-value').textContent = (c.value || 0).toLocaleString();
           clone.querySelector('.dashboard-stat-label').textContent = c.label;
@@ -122,12 +100,13 @@
   function updateStatsDeltas(deltas) {
     const cards = document.querySelectorAll('.dashboard-stat-card');
     cards.forEach(card => {
-      const label = card.querySelector('.dashboard-stat-label').textContent.toLowerCase();
-      let key = label;
-      if (label === 'likes' || label === 'dislikes') return; // no delta for these specifically
-      if (label === 'item clicks') key = 'clicks';
+      const key = card.dataset.statKey;
+      if (!key || key === 'likes' || key === 'dislikes') return; // no delta for these specifically
       
-      const d = deltas[key];
+      let lookupKey = key;
+      if (key === 'item_clicks') lookupKey = 'clicks';
+      
+      const d = deltas[lookupKey];
       if (d) {
         const span = document.createElement('span');
         span.className = 'text-xs ml-2 font-medium';
@@ -155,12 +134,12 @@
       container.innerHTML = '<p class="text-muted">No saves recorded.</p>';
       return;
     }
-    let html = '<ul class="divide-y divide-[var(--border-color)]">';
+    let html = '<ul class="divide-y">';
     saves.forEach(s => {
       const icon = s.target_type === 'content' ? '📄' : '📦';
-      html += `<li class="py-2 flex justify-between">
+      html += `<li class="py-2 flex justify-between" style="border-bottom: 1px solid var(--border);">
         <span class="truncate pr-4">${icon} ${s.name}</span>
-        <span class="font-semibold text-[var(--accent-color)]">${s.count}</span>
+        <span class="font-semibold" style="color: var(--brand-blue);">${s.count}</span>
       </li>`;
     });
     html += '</ul>';
@@ -427,9 +406,8 @@
     });
 
     initTabs();
-    loadStatsRow();
+    loadStatsRow().then(loadAnalyticsOverview);
     loadInteractionBreakdown();
-    setTimeout(loadAnalyticsOverview, 500); // load after stats
     applyInteractionsUrlFilters();
 
     window.commentsController.bindEvents();
@@ -441,7 +419,8 @@
 
     const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
     const activeTab = params.tab || 'comments';
-    switchTab(activeTab);
+    const tabBtn = document.querySelector(`#interactions-tabs .admin-tab-btn[data-tab="${activeTab}"]`);
+    if (tabBtn) tabBtn.click();
 
 
     // Comment inspect modal: action delegation (rendered by _inspect.html)

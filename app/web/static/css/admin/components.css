@@ -1,3 +1,37 @@
+/* --- Admin Alert Banners --- */
+
+.admin-alert {
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: var(--text-sm);
+    color: var(--foreground);
+    margin-bottom: 1.5rem;
+    gap: 0.75rem;
+}
+
+.admin-alert-warning {
+    background: rgba(var(--brand-orange-rgb), 0.06);
+    border-color: rgba(var(--brand-orange-rgb), 0.3);
+    color: var(--foreground);
+}
+
+.admin-alert-warning strong {
+    color: var(--brand-orange);
+}
+
+.admin-alert-danger {
+    background: rgba(var(--brand-red-rgb), 0.06);
+    border-color: rgba(var(--brand-red-rgb), 0.3);
+    color: var(--foreground);
+}
+
+.admin-alert-danger strong {
+    color: var(--brand-red);
+}
+
+
 /* --- Row Action Buttons (In-Table Controls) --- */
 
 .user-action-btn {

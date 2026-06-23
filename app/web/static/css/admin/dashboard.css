@@ -58,18 +58,7 @@ a.clickable-card:hover .dashboard-stat-value {
     opacity: 0.75;
 }
 
-.dashboard-stat-icon {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    width: 2rem;
-    height: 2rem;
-    font-size: 1rem;
-    border-radius: var(--radius-md);
-    background: var(--secondary);
-    color: var(--muted-foreground);
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
+
 
 .dashboard-stat-card:hover .dashboard-stat-icon {
     background: var(--accent);
@@ -85,7 +74,7 @@ a.clickable-card:hover .dashboard-stat-value {
 
 .overview-top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--card-gap, 1.5rem);
     margin-top: 1.5rem;
 }
@@ -112,6 +101,13 @@ a.clickable-card:hover .dashboard-stat-value {
     font-size: var(--text-xs);
     color: var(--muted-foreground);
     margin: 0;
+}
+
+.overview-panel-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .panel-body-padded {
@@ -414,10 +410,6 @@ a.clickable-card:hover .dashboard-stat-value {
 /* --- Dashboard Responsiveness --- */
 
 @media (max-width: 768px) {
-    .dashboard-stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
     .overview-top-grid {
         grid-template-columns: 1fr;
     }

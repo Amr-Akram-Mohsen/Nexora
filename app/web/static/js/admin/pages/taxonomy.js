@@ -18,23 +18,23 @@
         let missingBrandPct = d.total_content ? Math.round((d.missing_brand / d.total_content) * 100) : 0;
         let missingCategoryPct = d.total_content ? Math.round((d.missing_category / d.total_content) * 100) : 0;
 
-        container.style.display = 'grid';
+        container.className = 'dashboard-stats-grid';
         container.innerHTML = `
-          <div class="dashboard-widget-card" style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="font-size:0.875rem; color:var(--text-muted); margin-bottom:0.5rem;">Total Entities</div>
-            <div style="font-size:1.75rem; font-weight:bold;">${d.total_entities.toLocaleString()}</div>
+          <div class="dashboard-stat-card">
+            <p class="dashboard-stat-label">Total Entities</p>
+            <h3 class="dashboard-stat-value">${d.total_entities.toLocaleString()}</h3>
           </div>
-          <div class="dashboard-widget-card" style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="font-size:0.875rem; color:var(--text-muted); margin-bottom:0.5rem;">Orphaned Entities</div>
-            <div style="font-size:1.75rem; font-weight:bold; color:var(--error);">${d.orphans.toLocaleString()}</div>
+          <div class="dashboard-stat-card">
+            <p class="dashboard-stat-label">Orphaned Entities</p>
+            <h3 class="dashboard-stat-value" style="color: var(--brand-red);">${d.orphans.toLocaleString()}</h3>
           </div>
-          <div class="dashboard-widget-card" style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="font-size:0.875rem; color:var(--text-muted); margin-bottom:0.5rem;">Content w/o Brand</div>
-            <div style="font-size:1.75rem; font-weight:bold; color:${missingBrandPct > 10 ? 'var(--warning)' : 'inherit'};">${missingBrandPct}%</div>
+          <div class="dashboard-stat-card">
+            <p class="dashboard-stat-label">Content w/o Brand</p>
+            <h3 class="dashboard-stat-value" style="color: ${missingBrandPct > 10 ? 'var(--brand-orange)' : 'inherit'};">${missingBrandPct}%</h3>
           </div>
-          <div class="dashboard-widget-card" style="padding:1.5rem; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="font-size:0.875rem; color:var(--text-muted); margin-bottom:0.5rem;">Content w/o Category</div>
-            <div style="font-size:1.75rem; font-weight:bold; color:${missingCategoryPct > 10 ? 'var(--warning)' : 'inherit'};">${missingCategoryPct}%</div>
+          <div class="dashboard-stat-card">
+            <p class="dashboard-stat-label">Content w/o Category</p>
+            <h3 class="dashboard-stat-value" style="color: ${missingCategoryPct > 10 ? 'var(--brand-orange)' : 'inherit'};">${missingCategoryPct}%</h3>
           </div>
         `;
       })
@@ -49,18 +49,18 @@
         const c = document.getElementById('insights-suggestions-container');
         if (!c) return;
         if (!data || data.length === 0) {
-          c.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-muted);">No suggestions found. You're fully tagged!</div>`;
+          c.innerHTML = `<div class="table-empty-state">No suggestions found. You're fully tagged!</div>`;
           return;
         }
-        let html = `<table class="admin-table"><thead><tr><th>Content</th><th>Suggested Tag</th><th>Action</th></tr></thead><tbody>`;
+        let html = `<div class="admin-table-wrapper insights-table-scroll"><table class="admin-table"><thead><tr><th>Content</th><th>Suggested Tag</th><th>Action</th></tr></thead><tbody>`;
         data.forEach(item => {
           html += `<tr>
             <td>${item.content_title}</td>
-            <td><span class="badge badge-info">${item.type}: ${item.suggested_name}</span></td>
-            <td><button class="btn btn-sm btn-primary" onclick="applyInsightSuggestion(${item.content_id}, '${item.type}', ${item.suggested_id})">Apply</button></td>
+            <td><span class="badge badge-blue">${item.type}: ${item.suggested_name}</span></td>
+            <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion(${item.content_id}, '${item.type}', ${item.suggested_id})">Apply</button></td>
           </tr>`;
         });
-        html += `</tbody></table>`;
+        html += `</tbody></table></div>`;
         c.innerHTML = html;
       });
 
@@ -71,20 +71,20 @@
         const c = document.getElementById('insights-coherence-container');
         if (!c) return;
         if (!data || data.length === 0) {
-          c.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--text-muted);">No cross-domain conflicts detected!</div>`;
+          c.innerHTML = `<div class="table-empty-state">No cross-domain conflicts detected!</div>`;
           return;
         }
-        let html = `<table class="admin-table"><thead><tr><th>Content</th><th>Content Brands</th><th>Item</th><th>Item Brand</th><th>Action</th></tr></thead><tbody>`;
+        let html = `<div class="admin-table-wrapper insights-table-scroll"><table class="admin-table"><thead><tr><th>Content</th><th>Content Brands</th><th>Item</th><th>Item Brand</th><th>Action</th></tr></thead><tbody>`;
         data.forEach(item => {
           html += `<tr>
             <td>${item.content_title}</td>
-            <td><span class="badge badge-warning">${item.content_brands.join(', ') || 'None'}</span></td>
+            <td><span class="badge badge-orange">${item.content_brands.join(', ') || 'None'}</span></td>
             <td>${item.item_name}</td>
-            <td><span class="badge badge-error">${item.item_brand}</span></td>
-            <td><button class="btn btn-sm btn-outline-primary" onclick="applyInsightSuggestion(${item.content_id}, 'Brand', ${item.suggested_brand_id})">Fix Content Brand</button></td>
+            <td><span class="badge badge-orange">${item.item_brand}</span></td>
+            <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion(${item.content_id}, 'Brand', ${item.suggested_brand_id})">Fix Content Brand</button></td>
           </tr>`;
         });
-        html += `</tbody></table>`;
+        html += `</tbody></table></div>`;
         c.innerHTML = html;
       });
   }
@@ -124,16 +124,7 @@
 
   // ── Tab Switching ─────────────────────────────────────────────
   function initTabs() {
-    document.getElementById('taxonomy-tabs').addEventListener('click', e => {
-      const btn = e.target.closest('.admin-tab-btn');
-      if (!btn) return;
-      const tab = btn.dataset.tab;
-      document.querySelectorAll('#taxonomy-tabs .admin-tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('is-hidden'));
-      btn.classList.add('active');
-      document.getElementById(`tab-panel-${tab}`).classList.remove('is-hidden');
-      loadTab(tab);
-    });
+    initAdminTabs('taxonomy-tabs', loadTab);
   }
 
   function loadTab(tab) {
@@ -366,7 +357,7 @@
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
 
-      const { action, id, name } = btn.dataset;
+      const { action, id, name, domain, sourceId, targetId } = btn.dataset;
 
       // Delete actions
       if (action === 'delete-category') deleteCategory(id, name, btn);
@@ -383,6 +374,10 @@
       if (action === 'inspect-gender_facet') inspectTaxonomy('gender_facets', 'gender_facet', id);
       if (action === 'inspect-intent_facet') inspectTaxonomy('intent_facets', 'intent_facet', id);
       if (action === 'inspect-price_tier_facet') inspectTaxonomy('price_tier_facets', 'price_tier_facet', id);
+
+      // Duplicate detection actions
+      if (action === 'find-duplicates') openDuplicatesModal(domain);
+      if (action === 'merge-duplicate') mergeDuplicate(domain, sourceId, targetId, btn);
     });
 
     // Toggle checkboxes (use change event)
@@ -396,21 +391,6 @@
       if (action === 'toggle-topic') toggleTopicActive(id, isActive, el);
       if (action === 'toggle-section') toggleSectionActive(id, isActive, el);
     });
-
-    // Find Duplicates
-    document.addEventListener('click', e => {
-      const btn = e.target.closest('[data-action="find-duplicates"]');
-      if (!btn) return;
-      const domain = btn.dataset.domain;
-      openDuplicatesModal(domain);
-    });
-
-    document.addEventListener('click', e => {
-      const btn = e.target.closest('[data-action="merge-duplicate"]');
-      if (!btn) return;
-      const { domain, sourceId, targetId } = btn.dataset;
-      mergeDuplicate(domain, sourceId, targetId, btn);
-    });
   }
 
   // ── DUPLICATES LOGIC ───────────────────────
@@ -418,25 +398,25 @@
     const modal = document.getElementById('admin-duplicates-modal');
     const body = document.getElementById('admin-duplicates-body');
     if (modal) modal.classList.add('active');
-    if (body) body.innerHTML = '<div style="padding: 2rem; text-align: center;">Scanning for duplicates...</div>';
+    if (body) body.innerHTML = '<div class="table-empty-state">Scanning for duplicates...</div>';
 
     fetch(`/admin/taxonomy/duplicates?type=${domain}`)
       .then(r => r.json())
       .then(d => {
         if (d.error) {
-          if (body) body.innerHTML = `<div style="padding: 2rem; color: var(--error);">${d.error}</div>`;
+          if (body) body.innerHTML = `<div class="table-empty-state" style="color: var(--brand-red);">${d.error}</div>`;
           return;
         }
         if (!d.length) {
-          if (body) body.innerHTML = `<div style="padding: 2rem; text-align: center;">No duplicates found!</div>`;
+          if (body) body.innerHTML = '<div class="table-empty-state">No duplicates found!</div>';
           return;
         }
-        let html = `<table class="admin-table"><thead><tr><th>Source (Will be merged & deleted)</th><th>Target (Will be kept)</th><th>Similarity</th><th>Actions</th></tr></thead><tbody>`;
+        let html = `<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Source (Will be merged &amp; deleted)</th><th>Target (Will be kept)</th><th>Similarity</th><th>Actions</th></tr></thead><tbody>`;
         d.forEach(pair => {
           html += `<tr>
-            <td><strong>${pair.source.name}</strong> (ID: ${pair.source.id})</td>
-            <td><strong>${pair.target.name}</strong> (ID: ${pair.target.id})</td>
-            <td>${pair.similarity}%</td>
+            <td><strong>${pair.source.name}</strong> <span class="content-date-row">(ID: ${pair.source.id})</span></td>
+            <td><strong>${pair.target.name}</strong> <span class="content-date-row">(ID: ${pair.target.id})</span></td>
+            <td><span class="badge badge-blue">${pair.similarity}%</span></td>
             <td>
               <div class="flex gap-2">
                 <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="${domain}" data-source-id="${pair.source.id}" data-target-id="${pair.target.id}">Merge S &rarr; T</button>
@@ -445,11 +425,11 @@
             </td>
           </tr>`;
         });
-        html += `</tbody></table>`;
+        html += `</tbody></table></div>`;
         if (body) body.innerHTML = html;
       })
       .catch(() => {
-        if (body) body.innerHTML = `<div style="padding: 2rem; color: var(--error);">Failed to load duplicates.</div>`;
+        if (body) body.innerHTML = `<div class="table-empty-state" style="color: var(--brand-red);">Failed to load duplicates.</div>`;
       });
   }
 

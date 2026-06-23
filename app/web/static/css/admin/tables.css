@@ -3,6 +3,9 @@
 .admin-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+    /* Establish a stacking context so sticky headers clip correctly */
+    position: relative;
 }
 
 .admin-table {
@@ -23,7 +26,13 @@
     border-bottom: 2px solid var(--border);
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    white-space: wrap;
+    white-space: normal;
+    /* Sticky header: keeps column labels visible during vertical scroll */
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    /* Shadow replaces the border-bottom since borders don't render on sticky */
+    box-shadow: 0 1px 0 var(--border);
 }
 
 .admin-table th span {
@@ -93,7 +102,9 @@
 .content-cell-title,
 .item-cell-name {
     line-height: 1.4;
-    width: 250px;
+    min-width: 200px;
+    max-width: 320px;
+    word-break: break-word;
 }
 
 .content-engagement-sub {
@@ -139,6 +150,9 @@
     color: var(--muted-foreground);
     padding: 0.625rem 1rem;
     letter-spacing: normal;
+    /* Key-value label cells must not be sticky — they scroll with rows */
+    position: static;
+    box-shadow: none;
 }
 
 .admin-table.vertical-table td.cell-value {
@@ -156,12 +170,31 @@
     -webkit-overflow-scrolling: touch;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: var(--card-bg);
+    background: var(--card);
 }
 
+.table-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* insights-table-scroll overrides global sticky z-index so nested sticky works */
 .insights-table-scroll thead th {
-    position: sticky;
-    top: 0;
     z-index: 10;
-    box-shadow: 0 1px 0 var(--border);
+}
+
+/* --- Small Button Modifier (used in action columns) --- */
+.admin-btn-sm {
+    padding: 0.25rem 0.625rem;
+    height: 28px;
+    font-size: var(--text-xs);
+}
+
+/* --- Table State Messages (empty, loading, error) --- */
+.table-empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: var(--text-sm);
 }

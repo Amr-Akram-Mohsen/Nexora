@@ -15,7 +15,7 @@
                 {% if item.image_url %}
                     <img src="{{ item.image_url }}" alt="Thumbnail" class="item-thumbnail-small">
                 {% else %}
-                    <span class="badge badge-secondary" title="No Image">🖼</span>
+                    <span class="badge badge-secondary" title="No Image"><i class="fa-regular fa-image"></i></span>
                 {% endif %}
                 <a href="/admin/items?search={{ item.id }}" class="activity-target inspect-link">{{ item.name }}</a>
             </div>

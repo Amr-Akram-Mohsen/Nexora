@@ -1,35 +1,37 @@
-<a href="/admin/contents" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">📰</div>
+<a href="/admin/contents" class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-newspaper"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.contents_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Contents</p>
 </a>
-<a href="/admin/items" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">🛍️</div>
+<a href="/admin/items" class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-bag-shopping"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.items_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Items</p>
 </a>
-<a href="/admin/users" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">👥</div>
+<a href="/admin/users" class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-users"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.users_count or 0) }}</h3>
   <p class="dashboard-stat-label">Total Users</p>
 </a>
-<a href="/admin/moderation" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">📊</div>
+<a href="/admin/moderation" class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-chart-pie"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.total or 0) }}</h3>
   <p class="dashboard-stat-label">Interactions</p>
   {% if stats.interactions %}
   <p class="dashboard-stat-meta">
-    {{ "{:,}".format(stats.interactions.reactions or 0) }} reactions · {{ "{:,}".format(stats.interactions.saves or 0) }} saves
+    {{ "{:,}".format(stats.interactions.reactions or 0) }} reactions · {{ "{:,}".format(stats.interactions.saves or 0)
+    }} saves
   </p>
   {% endif %}
 </a>
-<a href="/admin/contents?sort_by=view_count&sort_dir=desc" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">👁️</div>
+<a href="/admin/contents?sort_by=view_count&sort_dir=desc"
+  class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-eye"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.views or 0) }}</h3>
   <p class="dashboard-stat-label">Total Views</p>
 </a>
-<a href="/admin/moderation?tab=comments" class="dashboard-stat-card clickable-card flex  justify-center">
-  <div class="dashboard-stat-icon inline-flex-center">💬</div>
+<a href="/admin/moderation?tab=comments" class="dashboard-stat-card clickable-card flex flex-col items-center">
+  <i class="fa-solid fa-comments"></i>
   <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.comments or 0) }}</h3>
   <p class="dashboard-stat-label">Total Comments</p>
 </a>

@@ -1,7 +1,7 @@
 {% from "admin/components/ui.html" import admin_panel, admin_crud_table %}
 
 <!-- Left Side: Strategy Accuracy & Failures -->
-{% call admin_panel("🧠 Strategy Accuracy & Failures", "Platform-weighted accuracy index and root-cause diagnoses of
+{% call admin_panel('<i class="fa-solid fa-brain"></i> Strategy Accuracy & Failures', "Platform-weighted accuracy index and root-cause diagnoses of
 underperforming assets.") %}
 <div class="accuracy-panel-body flex gap-6">
     <!-- Strategy Accuracy Widget -->
@@ -32,7 +32,7 @@ underperforming assets.") %}
             'medium' else 'badge-secondary' %}
             <div class="failure-card">
                 <div class="failure-header flex-wrap justify-between flex gap-1 items-center">
-                    <span class="failure-type">⚠️ {{ fail.failure_type|replace('_', ' ') }}</span>
+                    <span class="failure-type"><i class="fa-solid fa-triangle-exclamation"></i> {{ fail.failure_type|replace('_', ' ') }}</span>
                     <span class="status-badge {{ severityBadge }}">{{ fail.severity|upper }}</span>
                 </div>
                 <div class="failure-title">{{ fail.title }}</div>
@@ -47,7 +47,7 @@ underperforming assets.") %}
 {% endcall %}
 
 <!-- Right Side: Evaluations list -->
-{% call admin_panel("📋 Content Evaluations Inventory", "Comparing actual CTR, engagement rate, and conversion rate with
+{% call admin_panel('<i class="fa-solid fa-clipboard-list"></i> Content Evaluations Inventory', "Comparing actual CTR, engagement rate, and conversion rate with
 baseline expectations.") %}
 <div class="insights-table-scroll panel-body-padded">
     {% call admin_crud_table(tables['performance_feedback']) %}
@@ -61,7 +61,7 @@ baseline expectations.") %}
             {% for item in evaluation_results %}
             {% set evalBadgeClass = 'badge-success' if item.evaluation == 'overperforming' else 'badge-danger' if
             item.evaluation == 'underperforming' else 'badge-secondary' %}
-            {% set platformIcon = '📺' if item.platform == 'youtube' else '📌' if item.platform == 'pinterest' else '📝'
+            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if item.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if item.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>'
             %}
             <tr>
                 <td>

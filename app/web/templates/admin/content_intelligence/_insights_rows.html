@@ -186,7 +186,7 @@
                         <li class="asset-mapping-item">
                             <div class="asset-mapping-item-header gap-2 justify-between flex flex-wrap items-center">
                                 <div class="asset-mapping-item-title">
-                                    {% if asset.type == 'video' %}🎥{% elif asset.type == 'article' %}📄{% else %}🛍️{%
+                                    {% if asset.type == 'video' %}<i class="fa-solid fa-video"></i>{% elif asset.type == 'article' %}<i class="fa-regular fa-file-lines"></i>{% else %}<i class="fa-solid fa-bag-shopping"></i>{%
                                     endif %}
                                     {{ asset.title }}
                                 </div>
@@ -282,7 +282,7 @@
 {% if items %}
   {% for item in items %}
     {% set badgeClass = "badge-success" if item.opportunity else "badge-secondary" %}
-    {% set badgeText = "🚀 Expansion Opportunity" if item.opportunity else "Covered" %}
+    {% set badgeText = '<i class="fa-solid fa-rocket"></i> Expansion Opportunity' if item.opportunity else "Covered" %}
     <tr>
       <td><span >{{ item.name }}</span></td>
       <td class="col-metric">{{ "{:,}".format(item.article_volume) }}</td>
@@ -309,7 +309,7 @@
 {% for item in evaluation_results %}
 {% set evalBadgeClass = 'badge-success' if item.evaluation == 'overperforming' else 'badge-danger' if
 item.evaluation == 'underperforming' else 'badge-secondary' %}
-{% set platformIcon = '📺' if item.platform == 'youtube' else '📌' if item.platform == 'pinterest' else '📝'
+{% set platformIcon = '<i class="fa-solid fa-tv"></i>' if item.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if item.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>'
 %}
 <tr>
     <td>

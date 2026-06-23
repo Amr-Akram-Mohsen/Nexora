@@ -25,7 +25,7 @@
 </div>
 
 <div class="overview-top-grid mt-6">
-  {% call admin_panel("📸 Missing Images", "Items with 0 images") %}
+  {% call admin_panel('<i class="fa-solid fa-camera"></i> Missing Images', "Items with 0 images") %}
   <div class="panel-body-padded text-center flex-col gap-2">
     <h2 class="{% if data.metrics.without_images_pct > 10 %}text-danger{% else %}text-success{% endif %}">
       {{ data.metrics.without_images }}
@@ -34,7 +34,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel("🔗 Missing Affiliate Links", "Items with 0 active store links") %}
+  {% call admin_panel('<i class="fa-solid fa-link"></i> Missing Affiliate Links', "Items with 0 active store links") %}
   <div class="panel-body-padded text-center flex-col gap-2">
     <h2 class="{% if data.metrics.without_links_pct > 20 %}text-warning{% else %}text-success{% endif %}">
       {{ data.metrics.without_links }}
@@ -43,7 +43,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel("⏳ Pricing Staleness", "Items with pricing older than 30 days") %}
+  {% call admin_panel('<i class="fa-solid fa-hourglass-half"></i> Pricing Staleness', "Items with pricing older than 30 days") %}
   <div class="panel-body-padded text-center flex-col gap-2">
     <h2 class="{% if data.metrics.stale_pricing_pct > 30 %}text-danger{% else %}text-success{% endif %}">
       {{ data.metrics.stale_pricing }}
@@ -52,7 +52,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel("📝 No Editorial Coverage", "Items with no linked articles") %}
+  {% call admin_panel('<i class="fa-solid fa-pen-to-square"></i> No Editorial Coverage', "Items with no linked articles") %}
   <div class="panel-body-padded text-center flex-col gap-2">
     <h2 class="text-warning">
       {{ data.metrics.without_content }}

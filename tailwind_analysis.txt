@@ -1,0 +1,49 @@
+Found 31 unique tailwind classes.
+.admin-dashboard-page: mt-4
+.NO_SEMANTIC_CLASS: mb-1, mt-4, mb-6, mb-3, mt-6, mt-2
+.text-lg: mb-4, m-0
+.col-span-full: w-full, py-8
+.fa-solid: mb-2
+.card-header: p-4
+.admin-btn-secondary: py-1, px-3
+.overflow-x-auto: p-0
+.dashboard-table: w-full
+.font-bold: p-4
+.text-center: w-full, py-4, p-8, py-8
+.grid: mb-4, mb-6
+.dashboard-stats-grid: mb-4, mb-3, mb-6
+.user-analytics-dashboard: mb-4
+.text-4xl: mb-2
+.card: p-4, mt-4
+.text-sm: pr-2, mb-3, mb-2
+.text-2xl: mt-1
+.border-t: pt-4, mt-4
+.inspect-header-custom: p-4, mb-3
+.text-muted: mt-1, py-2, py-8
+.insight-group-title: mt-5, mt-8, m-0
+.insights-table-scroll: mt-4, mt-6
+.status-badge: mt-1, mb-2, py-0.5, px-1.5
+.alert-title: m-0
+.radius-md: mb-4
+.overview-top-grid: mt-6
+.overview-panel: p-4, p-6, p-12, mt-6
+.items-start: mb-4, mb-2
+.bg-muted: p-3
+.fas: mb-4, mr-2
+.text-xl: mb-3, mb-2
+.admin-table: w-full
+.activity-target: ml-1
+.summary-cards: mb-6
+.coverage-title: m-0
+.coverage-insight: mt-3
+.distribution-health-alerts: mb-4
+.rec-action-issue: mt-2
+.justify-end: mt-3
+.dashboard-header: mb-4
+.dashboard-grid: mt-4
+.card-body: p-0, p-3
+.text-danger: mb-1
+.text-warning: mb-1
+.admin-section-header: mb-4, mt-8
+.dashboard-widgets-grid: mb-6
+.admin-toolbar-row: w-full

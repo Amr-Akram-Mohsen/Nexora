@@ -78,7 +78,7 @@
 }
 
 .badge-orange {
-  background: rgba(245, 158, 11, 0.08);
+  background: rgba(var(--brand-orange-rgb), 0.08);
   color: var(--brand-orange);
 }
 

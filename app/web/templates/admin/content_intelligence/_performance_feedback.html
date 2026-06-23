@@ -1,9 +1,9 @@
 {% from "admin/components/ui.html" import admin_panel, admin_table_panel %}
 <!-- Section 1.98: Content Performance Feedback -->
-<h2 class="insight-group-title flex gap-3 items-center">📉 Content Performance Feedback</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-line fa-flip-vertical"></i> Content Performance Feedback</h2>
 <div class="flex gap-6" id="content-feedback-panel" >
     <!-- Left Side: Strategy Accuracy & Failures -->
-    {% call admin_panel("🧠 Strategy Accuracy & Failures", "Platform-weighted accuracy index and root-cause diagnoses of
+    {% call admin_panel('<i class="fa-solid fa-brain"></i> Strategy Accuracy & Failures', "Platform-weighted accuracy index and root-cause diagnoses of
     underperforming assets.") %}
     <div class="accuracy-panel-body flex gap-6">
         <!-- Strategy Accuracy Widget -->
@@ -31,7 +31,7 @@
     {% endcall %}
 
     <!-- Right Side: Evaluations list -->
-    {% call admin_table_panel("📋 Content Evaluations Inventory", "Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.") %}
+    {% call admin_table_panel('<i class="fa-solid fa-clipboard-list"></i> Content Evaluations Inventory', "Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.") %}
         <table class="admin-table" id="feedback-evaluations-table">
             <thead>
                 <tr>

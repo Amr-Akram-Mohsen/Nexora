@@ -245,3 +245,98 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+
+// ==============================
+// GLOBAL API CONTRACT & UTILITIES
+// ==============================
+/*
+ * Implicit Globals Documentation (provided by base layout / helpers.js):
+ * - getTableSpinnerHtml(colspan): Returns HTML string for table loading row
+ * - getTableErrorStateHtml(colspan, msg): Returns HTML string for table error row
+ * - applyUrlFilters(formId, baseUrl): Redirects browser applying form filters to URL
+ * - showToast(msg, type): Displays a toast notification
+ * - showModal(title, body, onConfirm): Displays a confirmation modal
+ */
+
+/**
+ * Shared utility for admin tab switching logic.
+ * @param {string} tabsId - The ID of the tabs container
+ * @param {function} onSwitch - Callback fired when a tab is selected, receives (tabId)
+ */
+function initAdminTabs(tabsId, onSwitch) {
+  const tabsContainer = document.getElementById(tabsId);
+  if (!tabsContainer) return;
+
+  tabsContainer.addEventListener("click", function(e) {
+    const btn = e.target.closest(".admin-tab-btn");
+    if (!btn || btn.classList.contains("active")) return;
+
+    // Update active tab buttons
+    const container = btn.closest(".admin-tabs");
+    container.querySelectorAll(".admin-tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // Update active panels
+    const tabId = btn.dataset.tab;
+    const wrapper = document.querySelector(".admin-tab-panels") || document;
+    wrapper.querySelectorAll(".admin-tab-panel").forEach(p => {
+      p.classList.add("is-hidden");
+      p.classList.remove("active");
+      p.style.display = ""; // clear inline display if it existed
+    });
+    
+    // Look for ID either exactly as tabId, or prefixed with tab-panel-
+    const activePanel = document.getElementById(`tab-panel-${tabId}`) || document.getElementById(tabId);
+    if (activePanel) {
+      activePanel.classList.remove("is-hidden");
+      activePanel.classList.add("active");
+    }
+
+    if (onSwitch && typeof onSwitch === "function") {
+      onSwitch(tabId);
+    }
+  });
+}
+
+/**
+ * Initializes sidebar toggle and overlay behavior.
+ * Extracted from admin_base.html inline script.
+ */
+function initSidebar() {
+  const sidebar = document.getElementById('admin-sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggleBtn = document.getElementById('sidebar-toggle');
+  const layout = document.querySelector('.admin-layout');
+  const isMobile = window.innerWidth <= 768;
+  
+  if (!sidebar || !layout || !toggleBtn) return;
+
+  // Restore state
+  const savedState = localStorage.getItem('admin-sidebar-collapsed');
+  if (savedState === 'true' && !isMobile) {
+    layout.classList.add('collapsed');
+  } else if (isMobile) {
+    // On mobile, start collapsed
+    layout.classList.add('collapsed');
+  }
+
+  function toggleSidebar() {
+    layout.classList.toggle('collapsed');
+    if (!isMobile) {
+      localStorage.setItem('admin-sidebar-collapsed', layout.classList.contains('collapsed'));
+    }
+  }
+
+  toggleBtn.addEventListener('click', toggleSidebar);
+
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        layout.classList.add('collapsed');
+      }
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initSidebar);
+

@@ -2,7 +2,7 @@
 
 <div class="insights-section">
   <div class="insights-double-grid">
-    {% call admin_panel("🏆 Top Contexts (by Impressions)", "The articles/pages generating the most recommendation widgets.") %}
+    {% call admin_panel('<i class="fa-solid fa-trophy"></i> Top Contexts (by Impressions)', "The articles/pages generating the most recommendation widgets.") %}
       <div class="insights-table-scroll">
         <table class="admin-table">
           <thead>
@@ -21,7 +21,7 @@
       </div>
     {% endcall %}
 
-    {% call admin_panel("⭐ Top Entities (by Clicks)", "The recommended items/articles getting clicked the most.") %}
+    {% call admin_panel('<i class="fa-solid fa-star"></i> Top Entities (by Clicks)', "The recommended items/articles getting clicked the most.") %}
       <div class="insights-table-scroll">
         <table class="admin-table">
           <thead>
@@ -42,7 +42,7 @@
 
 <div class="insights-double-grid">
   <div class="insights-section">
-    {% call admin_panel("📈 Time-Series Trends", "Daily impressions vs clicks over the last 30 days.") %}
+    {% call admin_panel('<i class="fa-solid fa-chart-line"></i> Time-Series Trends', "Daily impressions vs clicks over the last 30 days.") %}
       <div class="dashboard-chart-wrapper">
         <canvas id="recTrendChart"></canvas>
       </div>
@@ -50,7 +50,7 @@
   </div>
 
   <div class="insights-section">
-    {% call admin_panel("📊 Slot Position Performance", "Which recommendation slots get the most clicks.") %}
+    {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Slot Position Performance', "Which recommendation slots get the most clicks.") %}
       <div class="dashboard-chart-wrapper">
         <canvas id="recSlotChart"></canvas>
       </div>

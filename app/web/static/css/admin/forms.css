@@ -244,9 +244,17 @@
 /* --- Responsiveness Overrides --- */
 
 @media (max-width: 768px) {
-    .admin-toolbar {
+    .admin-toolbar,
+    .admin-toolbar-advanced,
+    .admin-toolbar-row {
         flex-wrap: wrap;
         gap: 0.75rem;
+        min-width: 0;
+    }
+    
+    .admin-toolbar-advanced .filter-select-item {
+        flex: 1 1 calc(50% - 0.75rem);
+        min-width: 0;
     }
 
     .filter-sort-group {

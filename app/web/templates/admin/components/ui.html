@@ -51,10 +51,10 @@ current_per_page=20) %}
     </thead>
     <tbody id="{{ table.id }}-table-body">
       {% if caller %}
-        {{ caller() }}
+      {{ caller() }}
       {% else %}
-        {% from "components/ui/spinner.html" import table_spinner %}
-        {{ table_spinner(table.preview_table|length, loading_text, class=height_class) }}
+      {% from "components/ui/spinner.html" import table_spinner %}
+      {{ table_spinner(table.preview_table|length, loading_text, class=height_class) }}
       {% endif %}
     </tbody>
   </table>
@@ -71,9 +71,9 @@ current_per_page=20) %}
         <th class="cell-label">{{ item.label }}</th>
         <td class="cell-value">
           {% if item.is_custom %}
-            {{ item.value|safe }}
+          {{ item.value|safe }}
           {% else %}
-            <span>{{ item.value }}</span>
+          <span>{{ item.value }}</span>
           {% endif %}
         </td>
       </tr>
@@ -99,9 +99,9 @@ current_per_page=20) %}
         {% for item in fields %}
         <td>
           {% if item.is_custom %}
-            {{ item.value|safe }}
+          {{ item.value|safe }}
           {% else %}
-            <span>{{ item.value }}</span>
+          <span>{{ item.value }}</span>
           {% endif %}
         </td>
         {% endfor %}
@@ -113,11 +113,11 @@ current_per_page=20) %}
 
 
 {% macro admin_inspect_section_table(fields, layout='vertical') %}
-  {% if layout == 'horizontal' or layout == 'metrics' %}
-    {{ admin_inspect_metrics_table(fields) }}
-  {% else %}
-    {{ admin_inspect_attributes_table(fields) }}
-  {% endif %}
+{% if layout == 'horizontal' or layout == 'metrics' %}
+{{ admin_inspect_metrics_table(fields) }}
+{% else %}
+{{ admin_inspect_attributes_table(fields) }}
+{% endif %}
 {% endmacro %}
 
 
@@ -152,11 +152,10 @@ current_per_page=current_per_page
 {% endmacro %}
 
 {% macro admin_panel(title, subtitle=None, id=None, header_class="", display_style=None, actions=None) %}
-<div class="overview-panel" {% if id %}id="{{ id }}" {% endif %} {% if display_style
-  %} {% endif %}>
+<div class="overview-panel" {% if id %}id="{{ id }}" {% endif %} {% if display_style %} {% endif %}>
   <div class="overview-panel-header {{ header_class }} flex justify-between items-center">
     <div>
-      <h3 class="overview-panel-title">{{ title }}</h3>
+      <h3 class="overview-panel-title">{{ title|safe }}</h3>
       {% if subtitle %}
       <p class="overview-panel-sub">{{ subtitle }}</p>
       {% endif %}
@@ -171,7 +170,8 @@ current_per_page=current_per_page
 </div>
 {% endmacro %}
 
-{% macro admin_inspect_modal(domain, title="Inspect Details", icon="🔍", modal_class="modal-content-lg") %}
+{% macro admin_inspect_modal(domain, title="Inspect Details", icon='<i class="fa-solid fa-magnifying-glass"></i>',
+modal_class="modal-content-lg") %}
 {% from "components/ui/modal.html" import modal %}
 {% from "admin/components/macros.html" import close_button %}
 {% call modal("inspect-" ~ domain ~ "-modal", title, icon, modal_class) %}

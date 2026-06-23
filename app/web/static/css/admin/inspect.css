@@ -59,7 +59,7 @@
 }
 
 .profile-metric-lbl {
-    font-size: 10px;
+    font-size: var(--text-2xs);
     color: var(--muted-foreground);
     text-transform: uppercase;
     font-weight: var(--weight-bold);
@@ -101,7 +101,7 @@
    Comments Inspect View
 --------------------------------- */
 .inspect-comment-body-text {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--secondary);
     padding: 1rem;
     border-radius: 6px;
     font-style: italic;
@@ -150,11 +150,11 @@
 }
 
 #interest-badge-sm {
-    font-size: 10px;
+    font-size: var(--text-2xs);
 }
 
 .interest-last-interaction {
-    font-size: 10px;
+    font-size: var(--text-2xs);
     opacity: 0.8;
 }
 
@@ -195,4 +195,66 @@
     background: var(--brand-purple);
     border-radius: 4px;
     transition: width 0.3s ease;
+}
+/* --- Refactored Inspect Utilities --- */
+
+.inspect-header-custom {
+    margin-bottom: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.inspect-header-logo {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    padding: 0.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.inspect-header-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    margin-bottom: 0.25rem;
+    margin-top: 0;
+}
+
+.inspect-header-link {
+    font-size: var(--text-sm);
+    color: var(--brand-blue);
+}
+
+.inspect-article-row {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease;
+}
+
+.inspect-article-row:last-child {
+    border-bottom: none;
+}
+
+.inspect-article-row:hover {
+    background-color: var(--secondary);
+}
+
+.inspect-article-title {
+    font-weight: var(--weight-medium);
+    color: var(--brand-blue);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 1rem;
+}
+
+.inspect-article-title:hover {
+    text-decoration: underline;
+}
+
+.inspect-article-views {
+    white-space: nowrap;
 }

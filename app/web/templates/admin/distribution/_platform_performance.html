@@ -21,7 +21,7 @@
                 </td>
                 <td class="text-center">{{ p.post_count }}</td>
                 <td class="text-right font-bold">{{ "{:,}".format(p.views) }}</td>
-                <td class="text-right text-primary font-bold">🔥 {{ "{:,}".format(p.engagement|int) }}</td>
+                <td class="text-right text-primary font-bold"><i class="fa-solid fa-fire"></i> {{ "{:,}".format(p.engagement|int) }}</td>
                 <td class="text-right text-muted">{{ "{:,}".format(p.likes) }}</td>
                 <td class="text-right text-muted">{{ "{:,}".format(p.clicks) }}</td>
                 <td class="text-right text-muted">{{ "{:,}".format(p.shares) }}</td>

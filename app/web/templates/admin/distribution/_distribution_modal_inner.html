@@ -46,11 +46,11 @@
     <div class="distribution-modal-section distribution-performance-summary">
         <h6 class="performance-summary-title">Performance Summary</h6>
         <div class="flex gap-4 items-center">
-            <span title="Views">👁️ {{ post.views_count }}</span>
-            <span title="Likes">❤️ {{ post.likes_count }}</span>
-            <span title="Clicks">🖱️ {{ post.clicks_count }}</span>
-            <span title="Shares">🔄 {{ post.shares_count }}</span>
-            <span class="engagement-score-badge" title="Engagement Score">🔥 Score: {{ engagement|int }}</span>
+            <span title="Views"><i class="fa-solid fa-eye"></i> {{ post.views_count }}</span>
+            <span title="Likes"><i class="fa-solid fa-heart"></i>️ {{ post.likes_count }}</span>
+            <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i>️ {{ post.clicks_count }}</span>
+            <span title="Shares"><i class="fa-solid fa-rotate"></i> {{ post.shares_count }}</span>
+            <span class="engagement-score-badge" title="Engagement Score"><i class="fa-solid fa-fire"></i> Score: {{ engagement|int }}</span>
         </div>
     </div>
     {% endif %}

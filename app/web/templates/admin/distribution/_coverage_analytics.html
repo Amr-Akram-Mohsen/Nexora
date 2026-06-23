@@ -4,7 +4,7 @@
     <div class="distribution-coverage-card rec-stat-card">
         <div class="flex justify-between items-center mb-3">
             <h5 class="coverage-title m-0">Content Distribution Coverage</h5>
-            <span class="status-badge badge-info">📝 CONTENT</span>
+            <span class="status-badge badge-info"><i class="fa-solid fa-pen-to-square"></i> CONTENT</span>
         </div>
         
         <div class="coverage-stats flex items-center justify-between">
@@ -27,7 +27,7 @@
         {% set content_gap = stats.content.total - stats.content.distributed %}
         {% if content_gap > 0 %}
         <p class="coverage-insight mt-3 text-sm text-muted">
-            <span class="text-warning font-bold">⚠️ Action Required:</span> You have {{ content_gap }} pieces of content with zero social distribution.
+            <span class="text-warning font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Action Required:</span> You have {{ content_gap }} pieces of content with zero social distribution.
         </p>
         {% endif %}
     </div>
@@ -36,7 +36,7 @@
     <div class="distribution-coverage-card rec-stat-card">
         <div class="flex justify-between items-center mb-3">
             <h5 class="coverage-title m-0">Item Distribution Coverage</h5>
-            <span class="status-badge badge-secondary">📦 ITEM</span>
+            <span class="status-badge badge-secondary"><i class="fa-solid fa-box"></i> ITEM</span>
         </div>
         
         <div class="coverage-stats flex items-center justify-between">
@@ -59,7 +59,7 @@
         {% set item_gap = stats.item.total - stats.item.distributed %}
         {% if item_gap > 0 %}
         <p class="coverage-insight mt-3 text-sm text-muted">
-            <span class="text-warning font-bold">⚠️ Opportunity:</span> {{ item_gap }} items have not been promoted across social platforms.
+            <span class="text-warning font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Opportunity:</span> {{ item_gap }} items have not been promoted across social platforms.
         </p>
         {% endif %}
     </div>

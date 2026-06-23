@@ -12,14 +12,14 @@
 <div class="settings-grid">
 
   <!-- System Info -->
-  {% call admin_settings_card("System Info", "Live system status and version", "🖥️") %}
+  {% call admin_settings_card("System Info", "Live system status and version", '<i class="fa-solid fa-desktop"></i>') %}
     <div id="system-info">
       {{ spinner("Loading…") }}
     </div>
   {% endcall %}
 
   <!-- Cache Controls -->
-  {% call admin_settings_card("Cache", "Invalidate server-side cache", "🗄️") %}
+  {% call admin_settings_card("Cache", "Invalidate server-side cache", '<i class="fa-solid fa-server"></i>') %}
     <button id="clear-cache-btn" class="admin-btn-primary settings-action-btn gap-2 items-center">
       Clear Cache
     </button>
@@ -27,7 +27,7 @@
   {% endcall %}
 
   <!-- Maintenance Mode -->
-  {% call admin_settings_card("Maintenance Mode", "Take the site offline for maintenance", "🔧") %}
+  {% call admin_settings_card("Maintenance Mode", "Take the site offline for maintenance", '<i class="fa-solid fa-wrench"></i>') %}
     <label class="settings-toggle-row flex items-center justify-between gap-4">
       <span class="settings-toggle-label">Enable maintenance mode</span>
       <span class="settings-toggle-wrapper">

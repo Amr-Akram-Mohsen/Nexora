@@ -22,9 +22,9 @@
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-2">
         {% if item.source_type == 'content' %}
-        <span class="status-badge badge-info" title="Content">📝 CONTENT</span>
+        <span class="status-badge badge-info" title="Content"><i class="fa-solid fa-pen-to-square"></i> CONTENT</span>
         {% else %}
-        <span class="status-badge badge-secondary" title="Item">📦 ITEM</span>
+        <span class="status-badge badge-secondary" title="Item"><i class="fa-solid fa-box"></i> ITEM</span>
         {% endif %}
       </div>
       <div class="source-title-truncate" title="{{ item.source_title }}">{{ item.source_title }}</div>
@@ -62,12 +62,12 @@
   <td>
     <div class="flex flex-col gap-1 performance-metrics-container">
       <div class="flex gap-2 performance-stats">
-        <span title="Views">👁️ {{ item.views }}</span>
-        <span title="Likes">❤️ {{ item.likes }}</span>
-        <span title="Clicks">🖱️ {{ item.clicks }}</span>
-        <span title="Shares">🔄 {{ item.shares }}</span>
+        <span title="Views"><i class="fa-solid fa-eye"></i> {{ item.views }}</span>
+        <span title="Likes"><i class="fa-solid fa-heart"></i>️ {{ item.likes }}</span>
+        <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i>️ {{ item.clicks }}</span>
+        <span title="Shares"><i class="fa-solid fa-rotate"></i> {{ item.shares }}</span>
       </div>
-      <div class="engagement-score" title="Engagement Score">🔥 Score: {{ item.engagement }}</div>
+      <div class="engagement-score" title="Engagement Score"><i class="fa-solid fa-fire"></i> Score: {{ item.engagement }}</div>
     </div>
   </td>
   <td>
@@ -76,7 +76,7 @@
         <span class="url-present" title="URL Present">✓</span>
       {% else %}
         {% if item.status == 'published' %}
-        <span class="url-warning" title="No URL">⚠️</span>
+        <span class="url-warning" title="No URL"><i class="fa-solid fa-triangle-exclamation"></i></span>
         {% else %}
         <span class="url-missing" title="No URL">✗</span>
         {% endif %}

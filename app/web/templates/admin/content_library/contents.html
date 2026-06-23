@@ -18,11 +18,16 @@
   extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-category", None, [("uncategorized", "Uncategorized")], default_val="",
   default_text="All Categories", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-topic", None, [("none", "None (No Topic)")], default_val="", default_text="All Topics", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-brand", None, [("none", "None (No Brand)")], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-intent", None, [], default_val="", default_text="All Intents", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-gender", None, [], default_val="", default_text="All Genders", extra_class="filter-select-item") }}
-  {{ admin_filter_select("filter-price-tier", None, [], default_val="", default_text="All Price Tiers", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-topic", None, [("none", "None (No Topic)")], default_val="", default_text="All Topics",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-brand", None, [("none", "None (No Brand)")], default_val="", default_text="All Brands",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-intent", None, [], default_val="", default_text="All Intents",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-gender", None, [], default_val="", default_text="All Genders",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-price-tier", None, [], default_val="", default_text="All Price Tiers",
+  extra_class="filter-select-item") }}
 </div>
 
 {# Row 2: Ingest Details & Compliance #}
@@ -39,13 +44,13 @@
   {{ admin_filter_select("filter-published", None, [("true", "Published Only"), ("false", "Draft / Review Only")],
   default_val="", default_text="All Visibility", extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-quality", None, [
-  ("missing_category", "⚠️ Missing Category"),
-  ("missing_metadata", "📝 Missing Metadata"),
-  ("duplicate", "👯 Duplicate Title"),
-  ("missing_topics", "⚠️ Missing Topics"),
-  ("missing_brands", "⚠️ Missing Brands"),
-  ("missing_source", "🔴 Missing Source"),
-  ("enrichment_failed", "⛔ Enrichment Failed")
+  ("missing_category", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Category'),
+  ("missing_metadata", '<i class="fa-solid fa-pen-to-square"></i> Missing Metadata'),
+  ("duplicate", '<i class="fa-solid fa-user-group"></i> Duplicate Title'),
+  ("missing_topics", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Topics'),
+  ("missing_brands", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Brands'),
+  ("missing_source", '<i class="fa-solid fa-circle" style="color: var(--brand-red);"></i> Missing Source'),
+  ("enrichment_failed", '<i class="fa-solid fa-ban"></i> Enrichment Failed')
   ], default_val="", default_text="All Health Statuses", extra_class="filter-select-warning") }}
 </div>
 
@@ -62,16 +67,16 @@
   <div class="filter-sort-group flex items-center gap-2">
     <span class="filter-label-xs">Sort:</span>
     {{ admin_filter_select("sort-by", None, [
-      ("id", "ID / Newest"),
-      ("published_at", "Publish Date"),
-      ("ingested_at", "Ingest Date"),
-      ("view_count", "Views"),
-      ("like_count", "Likes"),
-      ("comment_count", "Comments"),
-      ("share_count", "Shares"),
-      ("save_count", "Saves"),
-      ("score", "Engagement Score"),
-      ("title", "Title")
+    ("id", "ID / Newest"),
+    ("published_at", "Publish Date"),
+    ("ingested_at", "Ingest Date"),
+    ("view_count", "Views"),
+    ("like_count", "Likes"),
+    ("comment_count", "Comments"),
+    ("share_count", "Shares"),
+    ("save_count", "Saves"),
+    ("score", "Engagement Score"),
+    ("title", "Title")
     ], default_val="id", default_text=None, extra_class="filter-input-auto") }}
     {{ admin_filter_select("sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc",
     default_text=None, extra_class="filter-input-auto") }}
@@ -85,7 +90,7 @@
 {# Bulk Actions Toolbar (hidden by default) #}
 <div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
   <div class="flex items-center gap-2">
-    <span class="">⚡</span>
+    <span class=""><i class="fa-solid fa-bolt"></i></span>
     <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
   </div>
 
@@ -123,25 +128,26 @@
   </div>
 </div>
 <div class="tip-text ml-auto">
-  💡 Double-click any category to quick recategorize
-</div>
-{% endcall %}
-{% endblock %}
+      <i class="fa-solid fa-lightbulb"></i> Double-click any category to quick recategorize
+  </div>
+  {% endcall %}
+  {% endblock %}
 
-{% block crud_modals %}
-{% call modal("quick-category-modal", "Quick Recategorize", "🏷️", "modal-content-sm") %}
-<p class="dashboard-modal-body">Move this item to a different content category:</p>
-<input type="hidden" id="quick-cat-content-id" />
-{{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None, extra_class="modal-select-full")
-}}
-<div class="dashboard-modal-actions flex justify-center gap-3">
-  <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Cancel</button>
-  <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
-</div>
-{% endcall %}
+  {% block crud_modals %}
+  {% call modal("quick-category-modal", "Quick Recategorize", '<i class="fa-solid fa-tag"></i>', "modal-content-sm") %}
+  <p class="dashboard-modal-body">Move this item to a different content category:</p>
+  <input type="hidden" id="quick-cat-content-id" />
+  {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None,
+  extra_class="modal-select-full")
+  }}
+  <div class="dashboard-modal-actions flex justify-center gap-3">
+    <button id="quick-cat-cancel" class="dashboard-btn dashboard-btn-secondary" data-dismiss="modal">Cancel</button>
+    <button id="quick-cat-confirm" class="dashboard-btn btn-purple">Save Category</button>
+  </div>
+  {% endcall %}
 
-{% endblock %}
+  {% endblock %}
 
-{% block custom_scripts %}
-<script src="{{ url_for('static', filename='js/admin/pages/contents.js') }}"></script>
-{% endblock %}
+  {% block custom_scripts %}
+  <script src="{{ url_for('static', filename='js/admin/pages/contents.js') }}"></script>
+  {% endblock %}

@@ -3,7 +3,7 @@
 {% from "admin/distribution/_components.html" import metric_card %}
 
 <!-- Section 1: Recommendation CTR Dashboard -->
-<h2 class="insight-group-title flex gap-3 items-center">🔗 Recommendation Widget Performance</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-link"></i> Recommendation Widget Performance</h2>
 <div class="dashboard-stats-grid" id="recommendation-ctr-grid">
   {% if metrics %}
     {{ metric_card("Overall CTR", "%.2f"|format(metrics.overall_ctr) ~ "%", "Across all recommendation slots") }}
@@ -19,10 +19,10 @@
 </div>
 
 <!-- Section 1.5: Recommendation Intelligence Summary -->
-<h2 class="insight-group-title flex gap-3 items-center">🧠 Recommendation Intelligence Summary</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-brain"></i> Recommendation Intelligence Summary</h2>
 <div class="insights-double-grid" id="recommendation-intelligence-panel" >
   <!-- Left Side: Quality Scores & Benchmark -->
-  {% call admin_panel("📊 Quality Scores & Benchmarks", "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.") %}
+  {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Quality Scores & Benchmarks', "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.") %}
     <div class="benchmark-list flex gap-3">
       <!-- Cross Category Benchmarking Widget -->
       <div class="benchmark-card">
@@ -33,14 +33,14 @@
           {% if metrics and metrics.benchmarking %}
             {% set bench = metrics.benchmarking %}
             <div class="benchmark- gap-2 flex">
-              <div>🏆 Best Performing Category: 
+              <div><i class="fa-solid fa-trophy"></i> Best Performing Category: 
                 {% if bench.best_category and bench.best_category.name != "N/A" %}
                   <span class="status-badge">{{ bench.best_category.name }}</span> with <strong>{{ "%.2f"|format(bench.best_category.ctr) }}%</strong> CTR (+{{ "%.2f"|format(bench.best_category.deviation) }}% dev)
                 {% else %}
                   <span class="status-badge">N/A</span>
                 {% endif %}
               </div>
-              <div>⚠️ Worst Performing Category: 
+              <div><i class="fa-solid fa-triangle-exclamation"></i> Worst Performing Category: 
                 {% if bench.worst_category and bench.worst_category.name != "N/A" %}
                   <span class="status-badge">{{ bench.worst_category.name }}</span> with <strong>{{ "%.2f"|format(bench.worst_category.ctr) }}%</strong> CTR ({{ "%.2f"|format(bench.worst_category.deviation) }}% dev)
                 {% else %}
@@ -48,7 +48,7 @@
                 {% endif %}
               </div>
               <div class="benchmark-divider">
-                📊 Taxonomy CTR Baseline: <strong>{{ "%.2f"|format(bench.average_baseline) }}%</strong>
+                <i class="fa-solid fa-chart-pie"></i> Taxonomy CTR Baseline: <strong>{{ "%.2f"|format(bench.average_baseline) }}%</strong>
               </div>
             </div>
           {% else %}
@@ -113,7 +113,7 @@
   {% endcall %}
 
   <!-- Right Side: Action Suggestions List -->
-  {% call admin_panel("💡 Action Suggestions Engine", "Behavior-driven diagnoses and recommended actions per recommendation module.") %}
+  {% call admin_panel('<i class="fa-solid fa-lightbulb"></i> Action Suggestions Engine', "Behavior-driven diagnoses and recommended actions per recommendation module.") %}
     <div id="rec-action-suggestions-list" class="suggestions-list-scroll flex gap-3">
       {% if metrics and metrics.diagnoses_list %}
         {% for ddata in metrics.diagnoses_list %}
@@ -130,7 +130,7 @@
             </p>
             <div class="rec-action-box flex">
               <div class="rec-action-box-header flex items-center">
-                <span>💡 Recommended Action:</span>
+                <span><i class="fa-solid fa-lightbulb"></i> Recommended Action:</span>
               </div>
               <div class="rec-action-box-recommendation">
                 {{ ddata.action_suggestion.recommended_action }}

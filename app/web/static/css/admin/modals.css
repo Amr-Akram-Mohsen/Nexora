@@ -63,6 +63,28 @@
     font-size: var(--text-sm);
     margin-bottom: 1.25rem;
     line-height: 1.6;
+    /* Ensure long inspect content scrolls internally on small devices */
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
+    /* Custom scrollbar for inner scroll */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.dashboard-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+.dashboard-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.dashboard-modal-body::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 10px;
+}
+
+/* --- Large Modal Variant (used by inspect views) --- */
+.dashboard-modal-content.modal-content-lg {
+    max-width: 800px;
 }
 
 .modal-select-full {
