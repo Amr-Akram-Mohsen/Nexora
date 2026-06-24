@@ -119,14 +119,7 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
     title_data = {"value": c.title or "", "badges": health_badges}
 
     # Engagement
-    views = f"{c.view_count:,}" if c.view_count else "0"
-    likes = f"{c.like_count:,}" if c.like_count else "0"
-    comments = f"{c.comment_count:,}" if c.comment_count else "0"
-    engagement_data = [
-        {"icon": '<i class="fas fa-eye"></i>', "value": f"{views} views", "title": "Views"},
-        {"icon": '<i class="fas fa-comment"></i>', "value": f"{comments} comments", "title": "Comments"},
-        {"icon": '<i class="fas fa-heart"></i>', "value": f"{likes} likes", "title": "Likes"}
-    ]
+    engagement_data = {"views": c.view_count, "likes": c.like_count, "comments": c.comment_count, "shares": c.share_count, "saves": c.save_count}
 
     # Classification
     cat_name = c.category.name if c.category else "None"

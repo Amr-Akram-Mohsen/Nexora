@@ -46,11 +46,12 @@ current_per_page=20) %}
       <tr>
         {% for column in table.preview_table %}
         {% if column is mapping %}
-        <th{% if column.sort_key %} data-sort="{{ column.sort_key }}"{% endif %}{% if column.class %} class="{{ column.class }}"{% endif %}>{{ column.label }}</th>
-        {% else %}
-        <th>{{ column }}</th>
-        {% endif %}
-        {% endfor %}
+        <th{% if column.sort_key %} data-sort="{{ column.sort_key }}" {% endif %}{% if column.class %}
+          class="{{ column.class }}" {% endif %}>{{ column.label }}</th>
+          {% else %}
+          <th>{{ column }}</th>
+          {% endif %}
+          {% endfor %}
       </tr>
     </thead>
     <tbody id="{{ table.id }}-table-body">
@@ -77,13 +78,16 @@ current_per_page=20) %}
           {% if item.is_list %}
           <ul class="inspect-inline-list">
             {% for entry in item.value %}
-            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{ entry.count }}{% endif %}</li>
+            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
+              entry.count }}{% endif %}</li>
             {% endfor %}
           </ul>
           {% elif item.is_labeled %}
           <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
           {% elif item.is_link %}
-          <a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
+          <a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit" {% if
+            item.value.external %} target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
+              class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
           {% elif item.is_breadcrumb %}
           <div class="flex items-center gap-2 flex-wrap">
             {% for crumb in item.value %}
@@ -124,13 +128,16 @@ current_per_page=20) %}
           {% if item.is_list %}
           <ul class="inspect-inline-list">
             {% for entry in item.value %}
-            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{ entry.count }}{% endif %}</li>
+            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
+              entry.count }}{% endif %}</li>
             {% endfor %}
           </ul>
           {% elif item.is_labeled %}
           <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
           {% elif item.is_link %}
-          <a href="{{ item.value.link }}" class="activity-target inspect-link"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt"></i>{% endif %}</a>
+          <a href="{{ item.value.link }}" class="activity-target inspect-link" {% if item.value.external %}
+            target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
+              class="fas fa-external-link-alt"></i>{% endif %}</a>
           {% elif item.is_breadcrumb %}
           <div class="flex items-center gap-2">
             {% for crumb in item.value %}
@@ -212,7 +219,8 @@ current_per_page=current_per_page
 </div>
 {% endmacro %}
 
-{% macro admin_padded_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None) %}
+{% macro admin_padded_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="",
+display_style=None, actions=None) %}
 {% set outer_caller = caller %}
 {% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}
 <div {% if inner_id %}id="{{ inner_id }}" {% endif %}class="panel-body-padded">
@@ -221,10 +229,12 @@ current_per_page=current_per_page
 {% endcall %}
 {% endmacro %}
 
-{% macro admin_list_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None, scrollable=False) %}
+{% macro admin_list_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None,
+actions=None, scrollable=False) %}
 {% set outer_caller = caller %}
 {% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}
-<div {% if inner_id %}id="{{ inner_id }}" {% endif %}class="panel-body-list {% if scrollable %}panel-scrollable{% endif %}">
+<div {% if inner_id %}id="{{ inner_id }}" {% endif
+  %}class="panel-body-list {% if scrollable %}panel-scrollable{% endif %}">
   {{ outer_caller() }}
 </div>
 {% endcall %}
@@ -254,7 +264,8 @@ modal_class="modal-content-lg") %}
 </div>
 {% endmacro %}
 
-{% macro admin_table_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None,
+{% macro admin_table_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None,
+actions=None,
 scroll_class="admin-table-scrollable") %}
 {% set outer_caller = caller %}
 {% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}

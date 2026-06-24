@@ -24,13 +24,13 @@
       .then(stats => {
         const statsBar = document.getElementById("contents-stats-bar");
         if (statsBar) statsBar.classList.remove("is-hidden");
-        
+
         const elPublished = document.getElementById("stat-published");
         const elDrafts = document.getElementById("stat-drafts");
         const elFailed = document.getElementById("stat-failed");
         const elNoTopics = document.getElementById("stat-no-topics");
         const elNoBrands = document.getElementById("stat-no-brands");
-        
+
         if (elPublished) elPublished.textContent = stats.published.toLocaleString();
         if (elDrafts) elDrafts.textContent = stats.drafts.toLocaleString();
         if (elFailed) elFailed.textContent = stats.failed.toLocaleString();
@@ -496,25 +496,25 @@
     document.body.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-action='delete-content']");
       if (btn) {
-          const id    = parseInt(btn.dataset.id, 10);
-          const title = btn.dataset.title || "this content";
-          showModal(
-            "Safer Catalog Deletion",
-            `Are you sure you want to completely delete "${title}"? This is permanent.`,
-            () => { 
-              performSingleDelete(id); 
-              const modal = document.getElementById("inspect-content-modal");
-              if (modal) modal.classList.remove("active"); 
-            }
-          );
-          return;
+        const id = parseInt(btn.dataset.id, 10);
+        const title = btn.dataset.title || "this content";
+        showModal(
+          "Safer Catalog Deletion",
+          `Are you sure you want to completely delete "${title}"? This is permanent.`,
+          () => {
+            performSingleDelete(id);
+            const modal = document.getElementById("inspect-content-modal");
+            if (modal) modal.classList.remove("active");
+          }
+        );
+        return;
       }
 
       const toggleBtn = e.target.closest("[data-action='toggle-publish']");
       if (toggleBtn) {
-          const contentId = parseInt(toggleBtn.dataset.id, 10);
-          const status = toggleBtn.dataset.status;
-          togglePublish(contentId, status);
+        const contentId = parseInt(toggleBtn.dataset.id, 10);
+        const status = toggleBtn.dataset.status;
+        togglePublish(contentId, status);
       }
     });
   }

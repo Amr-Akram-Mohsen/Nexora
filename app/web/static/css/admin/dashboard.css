@@ -21,7 +21,6 @@
 a.clickable-card {
     text-decoration: none;
     cursor: pointer;
-    display: block;
 }
 
 a.clickable-card:hover .dashboard-stat-card {

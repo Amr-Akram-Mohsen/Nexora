@@ -14,15 +14,15 @@
 {% endset %}
 
 {{ admin_page_header(
-  "Content Details",
-  title,
-  actions=header_actions
+"Content Details",
+title,
+actions=header_actions
 ) }}
 
 <div class="admin-detail-page">
   <div class="admin-card">
     <div class="inspect-details-group flex">
-      
+
       {% if inspect_table and inspect_table is mapping %}
       {% for section_name, fields in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
@@ -37,8 +37,8 @@
 
       {% if article_sources is defined and article_sources %}
       {% call inspect_section('Article Sources') %}
-        {% set sources = article_sources %}
-        {% include "admin/components/content/_article_sources_table.html" %}
+      {% set sources = article_sources %}
+      {% include "admin/components/content/_article_sources_table.html" %}
       {% endcall %}
       {% endif %}
 
@@ -60,7 +60,8 @@
       {% call inspect_section('Management Actions', divider=false) %}
       {% call action_group(extra_class='flex-wrap') %}
       {% for act in actions %}
-      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''), extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
+      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''),
+      extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
       {% endfor %}
       {% endcall %}
       {% endcall %}
