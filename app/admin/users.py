@@ -282,6 +282,15 @@ def users_rows():
     return resp
 
 
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_user(id):
+    data = build_user_inspect_data(id)
+    if not data:
+        return jsonify({"error": "User not found"}), 404
+    data["domain"] = "users"
+    return render_template("admin/components/_inspect.html", **data)
+
+
 def build_user_inspect_data(id):
     """Return dictionary of data needed for the user inspect/detail view."""
     from sqlalchemy.orm import selectinload

@@ -549,6 +549,15 @@ def items_rows():
     )
 
 
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_item(id):
+    data = build_item_inspect_data(id)
+    if not data:
+        return jsonify({"error": "Item not found"}), 404
+    data["domain"] = "items"
+    return render_template("admin/components/_inspect.html", **data)
+
+
 def build_item_inspect_data(id):
     """Return dictionary of data needed for the item inspect/detail view."""
     from sqlalchemy.orm import selectinload, joinedload

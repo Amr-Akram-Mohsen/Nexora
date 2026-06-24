@@ -1,0 +1,9 @@
+{% from "admin/components/macros.html" import ranked_list_item %}
+{% if data %}
+  {% for item in data[:5] %}
+    {% set badge_html = '<span class="badge" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);">' ~ item.avg_discount|round(1) ~ '% off</span>' %}
+    {{ ranked_list_item(loop.index, item.name, badge_html) }}
+  {% endfor %}
+{% else %}
+  <li class="text-center w-full py-4 text-muted">No discount data found.</li>
+{% endif %}

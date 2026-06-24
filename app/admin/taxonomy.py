@@ -809,7 +809,8 @@ def taxonomy_duplicates():
                 
     # Sort by similarity descending
     duplicates.sort(key=lambda x: x["similarity"], reverse=True)
-    return jsonify(duplicates[:50])
+    data = duplicates[:50]
+    return render_template("admin/taxonomy/_duplicates.html", data=data, domain=domain)
 
 @bp.route("/merge", methods=["POST"])
 @admin_required
@@ -940,14 +941,15 @@ def taxonomy_analytics():
         )
     ) or 0
     
-    return jsonify({
+    data = {
         "total_content": total_content,
         "missing_category": missing_category,
         "missing_brand": missing_brand,
         "missing_section": missing_section,
         "total_entities": total_entities,
         "orphans": orphans
-    })
+    }
+    return render_template("admin/taxonomy/_analytics_dashboard.html", data=data)
 
 # ─────────────────────────────────────────────
 # TAXONOMY INSIGHTS (Phase 4)
@@ -1002,7 +1004,8 @@ def insights_suggestions():
                 })
                 break
 
-    return jsonify(suggestions[:50]) # Return top 50
+    data = suggestions[:50] # Return top 50
+    return render_template("admin/taxonomy/_insights_suggestions.html", data=data)
 
 @bp.route("/insights/coherence", methods=["GET"])
 def insights_coherence():
@@ -1037,7 +1040,8 @@ def insights_coherence():
                     "suggested_brand_id": item.brand_id
                 })
                 
-    return jsonify(conflicts[:50])
+    data = conflicts[:50]
+    return render_template("admin/taxonomy/_insights_coherence.html", data=data)
 
 @bp.route("/insights/apply", methods=["POST"])
 @admin_required

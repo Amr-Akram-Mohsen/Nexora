@@ -580,9 +580,11 @@ def get_acquisition_data():
                 row["counts"][s_name] = sources_dict.get(s_name, 0)
             matrix_table["rows"].append(row)
             
+    matrix_html = render_template("admin/content_intelligence/partials/_coverage_matrix.html", data=matrix_table)
+            
     return jsonify({
         "velocity": velocity,
         "contribution": contribution,
         "authority": authority,
-        "matrix": matrix_table
+        "matrix_html": matrix_html
     })

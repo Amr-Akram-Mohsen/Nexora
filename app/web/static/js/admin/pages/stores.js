@@ -31,35 +31,13 @@
         
         // Render Out of Stock Distribution
         const distContainer = document.getElementById('stats-oos-distribution');
-        if (data.oos_by_store && data.oos_by_store.length > 0 && distContainer) {
-            distContainer.innerHTML = '';
-            const colors = ['var(--brand-red)', 'var(--brand-orange)', 'var(--brand-orange)', 'var(--brand-orange)', 'var(--brand-orange)'];
-            const maxCount = Math.max(...data.oos_by_store.map(s => s.count));
-            
-            data.oos_by_store.forEach((item, index) => {
-                const pct = maxCount > 0 ? ((item.count / maxCount) * 100).toFixed(1) : 0;
-                const color = colors[index % colors.length];
-                
-                const row = document.createElement('div');
-                row.className = 'flex items-center w-full gap-3';
-                row.innerHTML = `
-                    <div class="overview-breakdown-icon" style="color: ${color};"><i class="fa-solid fa-store"></i></div>
-                    <div class="overview-breakdown-label truncate" title="${item.name}">${item.name}</div>
-                    <div class="overview-breakdown-bar-track">
-                        <div class="overview-breakdown-bar" style="width: ${pct}%; background-color: ${color};"></div>
-                    </div>
-                    <div class="overview-breakdown-val">${item.count.toLocaleString()}</div>
-                `;
-                distContainer.appendChild(row);
-            });
-        } else if (distContainer) {
-            distContainer.innerHTML = '<div class="text-muted text-sm py-2">No out-of-stock issues detected.</div>';
-        }
+        if (distContainer) distContainer.innerHTML = data.oos_by_store_html || '<div class="text-muted text-sm py-2">No out-of-stock issues detected.</div>';
 
         renderAvailabilityChart(data.availability_breakdown);
         renderSyncCadenceChart(data.sync_cadence);
         renderAvgSyncAgeChart(data.avg_sync_age_by_store);
-        renderTopStaleStores(data.top_stale_stores);
+        const topStaleContainer = document.getElementById('list-stale-stores');
+        if (topStaleContainer) topStaleContainer.innerHTML = data.top_stale_stores_html || '<li class="text-center w-full py-4 text-muted">No stale stores found.</li>';
       })
       .catch(err => {
         console.error('Failed to load stores dashboard stats', err);
@@ -165,29 +143,7 @@
   }
 
   function renderTopStaleStores(storeData) {
-    const container = document.getElementById('list-stale-stores');
-    if (!container) return;
-    
-    if (!storeData || !storeData.length) {
-      container.innerHTML = '<li class="text-center w-full py-4 text-muted">No stale stores found.</li>';
-      return;
-    }
-    
-    container.innerHTML = '';
-    storeData.slice(0, 5).forEach((store, index) => {
-      const li = document.createElement('li');
-      li.className = 'overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0';
-      li.innerHTML = `
-        <div class="flex items-center gap-3">
-          <div class="overview-top-rank text-muted font-mono text-sm">#${index + 1}</div>
-          <div class="overview-top-name truncate font-medium" title="${store.name}">${store.name}</div>
-        </div>
-        <div class="overview-top-value text-right whitespace-nowrap">
-            <span class="badge" style="background: rgba(var(--brand-red-rgb), 0.1); color: var(--brand-red);">${store.avg_age_days} days</span>
-        </div>
-      `;
-      container.appendChild(li);
-    });
+    // Replaced by Jinja partial
   }
 
   function loadCoverageStats() {
@@ -196,51 +152,11 @@
       .then(data => {
         // Render Category Coverage
         const catContainer = document.getElementById('stats-category-coverage');
-        if (data.category_coverage && data.category_coverage.length > 0) {
-            catContainer.innerHTML = '';
-            const maxCat = Math.max(...data.category_coverage.map(s => s.count));
-            
-            data.category_coverage.slice(0, 10).forEach((item, index) => {
-                const pct = maxCat > 0 ? ((item.count / maxCat) * 100).toFixed(1) : 0;
-                
-                const row = document.createElement('div');
-                row.className = 'flex items-center w-full gap-3';
-                row.innerHTML = `
-                    <div class="overview-breakdown-label truncate" title="${item.name}">${item.name}</div>
-                    <div class="overview-breakdown-bar-track">
-                        <div class="overview-breakdown-bar" style="width: ${pct}%; background-color: var(--brand-purple);"></div>
-                    </div>
-                    <div class="overview-breakdown-val">${item.count.toLocaleString()}</div>
-                `;
-                catContainer.appendChild(row);
-            });
-        } else {
-            catContainer.innerHTML = '<div class="text-muted text-sm py-2">No category coverage data available.</div>';
-        }
+        if (catContainer) catContainer.innerHTML = data.category_coverage_html;
         
         // Render Commission Rates
         const commContainer = document.getElementById('stats-commission-rates');
-        if (data.commission_rates && data.commission_rates.length > 0) {
-            commContainer.innerHTML = '';
-            const maxComm = Math.max(...data.commission_rates.map(s => s.avg_rate));
-            
-            data.commission_rates.slice(0, 10).forEach((item, index) => {
-                const pct = maxComm > 0 ? ((item.avg_rate / maxComm) * 100).toFixed(1) : 0;
-                
-                const row = document.createElement('div');
-                row.className = 'flex items-center w-full gap-3';
-                row.innerHTML = `
-                    <div class="overview-breakdown-label truncate" title="${item.name}">${item.name}</div>
-                    <div class="overview-breakdown-bar-track">
-                        <div class="overview-breakdown-bar" style="width: ${pct}%; background-color: var(--brand-teal);"></div>
-                    </div>
-                    <div class="overview-breakdown-val">${item.avg_rate.toFixed(1)}%</div>
-                `;
-                commContainer.appendChild(row);
-            });
-        } else {
-            commContainer.innerHTML = '<div class="text-muted text-sm py-2">No commission rate data available.</div>';
-        }
+        if (commContainer) commContainer.innerHTML = data.commission_rates_html;
       })
       .catch(err => {
         console.error('Failed to load stores coverage stats', err);
@@ -284,7 +200,8 @@
         renderTrackingCoverageChart(data.tracking_coverage);
         renderDeeplinkFreshnessChart(data.deeplink_freshness);
         renderProgramDistributionChart(data.program_distribution);
-        renderTopCommissionStores(data.commission_rate_ranking);
+        const commRankingContainer = document.getElementById('list-commission-stores');
+        if (commRankingContainer) commRankingContainer.innerHTML = data.commission_rate_ranking_html;
       })
       .catch(err => {
         console.error('Failed to load affiliate stats', err);
@@ -371,29 +288,7 @@
   }
 
   function renderTopCommissionStores(storeData) {
-    const container = document.getElementById('list-commission-stores');
-    if (!container) return;
-    
-    if (!storeData || !storeData.length) {
-      container.innerHTML = '<li class="text-center w-full py-4 text-muted">No commission data found.</li>';
-      return;
-    }
-    
-    container.innerHTML = '';
-    storeData.slice(0, 5).forEach((store, index) => {
-      const li = document.createElement('li');
-      li.className = 'overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0';
-      li.innerHTML = `
-        <div class="flex items-center gap-3">
-          <div class="overview-top-rank text-muted font-mono text-sm">#${index + 1}</div>
-          <div class="overview-top-name truncate font-medium" title="${store.name}">${store.name}</div>
-        </div>
-        <div class="overview-top-value text-right whitespace-nowrap">
-            <span class="badge" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);">${store.avg_rate}%</span>
-        </div>
-      `;
-      container.appendChild(li);
-    });
+    // Replaced by Jinja partial
   }
 
   let currencyMixChart = null;
@@ -416,26 +311,15 @@
         const alertsContainer = document.getElementById('pricing-alerts-container');
         const alertsList = document.getElementById('pricing-alerts-list');
         if (alertsContainer && alertsList) {
-            alertsList.innerHTML = '';
-            let showAlert = false;
-            
-            if (data.all_oos_items_count > 0) {
-                showAlert = true;
-                alertsList.innerHTML += `<div><strong>Complete OOS Detected:</strong> ${data.all_oos_items_count} items are entirely Out of Stock across all mapped stores.</div>`;
-            }
-            
-            if (data.high_null_price_stores && data.high_null_price_stores.length > 0) {
-                showAlert = true;
-                data.high_null_price_stores.forEach(store => {
-                    alertsList.innerHTML += `<div><strong>Missing Price Data:</strong> ${store.name} has a ${store.null_rate}% null-price rate. Sync may be broken.</div>`;
-                });
-            }
-            
-            if (showAlert) alertsContainer.style.display = 'block';
+            alertsList.innerHTML = data.pricing_alerts_html || '';
+            if (data.pricing_alerts_html) alertsContainer.style.display = 'block';
         }
         
         renderCurrencyMixChart(data.currency_mix);
-        renderDiscountRanking(data.discount_depth_ranking);
+        
+        const discountContainer = document.getElementById('list-discount-stores');
+        if (discountContainer) discountContainer.innerHTML = data.discount_depth_ranking_html;
+
         renderPriceStalenessChart(data.price_staleness_grid);
       })
       .catch(err => {
@@ -470,29 +354,7 @@
   }
 
   function renderDiscountRanking(storeData) {
-    const container = document.getElementById('list-discount-stores');
-    if (!container) return;
-    
-    if (!storeData || !storeData.length) {
-      container.innerHTML = '<li class="text-center w-full py-4 text-muted">No discount data found.</li>';
-      return;
-    }
-    
-    container.innerHTML = '';
-    storeData.slice(0, 5).forEach((store, index) => {
-      const li = document.createElement('li');
-      li.className = 'overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0';
-      li.innerHTML = `
-        <div class="flex items-center gap-3">
-          <div class="overview-top-rank text-muted font-mono text-sm">#${index + 1}</div>
-          <div class="overview-top-name truncate font-medium" title="${store.name}">${store.name}</div>
-        </div>
-        <div class="overview-top-value text-right whitespace-nowrap">
-            <span class="badge" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);">${store.avg_discount}% off</span>
-        </div>
-      `;
-      container.appendChild(li);
-    });
+    // Replaced by Jinja partial
   }
 
   function renderPriceStalenessChart(gridData) {

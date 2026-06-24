@@ -1,0 +1,16 @@
+{% if not data %}
+<tr><td colspan="3" class="p-8 text-center text-muted">No data available</td></tr>
+{% else %}
+  {% for row in data %}
+    {% set healthClass = "badge-gray" %}
+    {% if row.health == "Healthy" %} {% set healthClass = "badge-success" %}
+    {% elif row.health == "Warning" %} {% set healthClass = "badge-warning" %}
+    {% elif row.health == "Critical" %} {% set healthClass = "badge-danger" %}
+    {% endif %}
+    <tr class="border-b border-border hover:bg-gray-50">
+        <td class="p-4 font-medium">{{ row.source }}</td>
+        <td class="p-4 text-center font-bold">{{ row.scrape_pct }}%</td>
+        <td class="p-4"><span class="status-badge {{ healthClass }}">{{ row.health }}</span></td>
+    </tr>
+  {% endfor %}
+{% endif %}

@@ -501,6 +501,9 @@ def get_store_health_stats():
     avg_sync_age_by_store.sort(key=lambda x: x["avg_age_days"], reverse=True)
     top_stale_stores = avg_sync_age_by_store[:10]
     
+    oos_by_store_html = render_template("admin/product_intelligence/partials/_oos_dist.html", data=oos_by_store)
+    top_stale_stores_html = render_template("admin/product_intelligence/partials/_stale_list.html", data=top_stale_stores)
+
     return jsonify({
         "total_links": total_links,
         "active_links": active_links,
@@ -508,7 +511,7 @@ def get_store_health_stats():
         "synced_this_week": synced_this_week,
         "never_synced": never_synced,
         "out_of_stock": out_of_stock,
-        "oos_by_store": oos_by_store,
+        "oos_by_store_html": oos_by_store_html,
         "checked_in_24h": checked_in_24h,
         "deeplink_refreshed_30d": deeplink_refreshed_30d,
         "never_checked": never_checked,
@@ -516,7 +519,7 @@ def get_store_health_stats():
         "availability_breakdown": availability_breakdown,
         "sync_cadence": sync_cadence,
         "avg_sync_age_by_store": avg_sync_age_by_store,
-        "top_stale_stores": top_stale_stores
+        "top_stale_stores_html": top_stale_stores_html
     })
 
 
@@ -551,9 +554,12 @@ def get_store_coverage_stats():
     
     commission_rates = [{"name": r[0], "avg_rate": round(float(r[1]), 2)} for r in commission_rows]
     
+    category_coverage_html = render_template("admin/product_intelligence/partials/_cat_coverage.html", data=category_coverage)
+    commission_rates_html = render_template("admin/product_intelligence/partials/_comm_rates.html", data=commission_rates)
+
     return jsonify({
-        "category_coverage": category_coverage,
-        "commission_rates": commission_rates
+        "category_coverage_html": category_coverage_html,
+        "commission_rates_html": commission_rates_html
     })
 
 @bp.route("/stores/affiliate_stats", methods=["GET"])
@@ -616,13 +622,15 @@ def get_store_affiliate_stats():
         "Never": never
     }
     
+    commission_rate_ranking_html = render_template("admin/product_intelligence/partials/_comm_ranking.html", data=commission_rate_ranking)
+
     return jsonify({
         "links_with_commission": links_with_commission,
         "links_without_commission": links_without_commission,
         "avg_commission_rate": avg_commission_rate,
         "top_program": top_program,
         "program_distribution": program_distribution,
-        "commission_rate_ranking": commission_rate_ranking,
+        "commission_rate_ranking_html": commission_rate_ranking_html,
         "tracking_coverage": tracking_coverage,
         "deeplink_freshness": deeplink_freshness
     })
@@ -740,15 +748,17 @@ def get_store_pricing_stats():
             if null_rate > 20.0:
                 high_null_price_stores.append({"name": name, "null_rate": round(null_rate, 1)})
 
+    discount_depth_ranking_html = render_template("admin/product_intelligence/partials/_discount_ranking.html", data=discount_depth_ranking)
+    pricing_alerts_html = render_template("admin/product_intelligence/partials/_pricing_alerts.html", oos_items_count=all_oos_items_count, high_null_price_stores=high_null_price_stores)
+
     return jsonify({
         "null_price_count": null_price_count,
         "stale_price_count": stale_price_count,
         "avg_discount_percentage": avg_discount_percentage,
         "currency_mix": currency_mix,
-        "discount_depth_ranking": discount_depth_ranking,
+        "discount_depth_ranking_html": discount_depth_ranking_html,
         "price_staleness_grid": price_staleness_grid,
-        "all_oos_items_count": all_oos_items_count,
-        "high_null_price_stores": high_null_price_stores
+        "pricing_alerts_html": pricing_alerts_html
     })
 
 @bp.route("/sources/rows", methods=["GET"])
@@ -1207,11 +1217,14 @@ def get_sources_quality_data():
         })
     yield_data["labels"] = all_dates
 
+    quality_leaderboard_html = render_template("admin/providers/partials/_quality_leaderboard.html", data=quality_leaderboard[:15])
+    scrape_leaderboard_html = render_template("admin/providers/partials/_scrape_leaderboard.html", data=scrape_leaderboard[:15])
+    freshness_index_html = render_template("admin/providers/partials/_freshness_index.html", data=freshness_index[:15])
+
     return jsonify({
-        "quality_leaderboard": quality_leaderboard[:15],
-        "scrape_leaderboard": scrape_leaderboard[:15],
+        "quality_leaderboard_html": quality_leaderboard_html,
+        "scrape_leaderboard_html": scrape_leaderboard_html,
+        "freshness_index_html": freshness_index_html,
         "word_counts": word_count_data,
-        "freshness_index": freshness_index[:15],
         "yield_rate": yield_data
     })
-

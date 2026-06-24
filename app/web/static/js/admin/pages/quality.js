@@ -10,10 +10,16 @@ function fetchQualityData() {
     fetch("/admin/providers/sources/quality-data")
         .then(res => res.json())
         .then(data => {
-            renderQualityLeaderboard(data.quality_leaderboard);
-            renderScrapeLeaderboard(data.scrape_leaderboard);
+            const qBody = document.getElementById("quality-leaderboard-tbody");
+            if (qBody) qBody.innerHTML = data.quality_leaderboard_html;
+
+            const sBody = document.getElementById("scrape-leaderboard-tbody");
+            if (sBody) sBody.innerHTML = data.scrape_leaderboard_html;
+
+            const fBody = document.getElementById("freshness-index-tbody");
+            if (fBody) fBody.innerHTML = data.freshness_index_html;
+
             renderWordCountChart(data.word_counts);
-            renderFreshnessIndex(data.freshness_index);
             renderYieldRateChart(data.yield_rate);
         })
         .catch(err => {
@@ -27,79 +33,15 @@ function fetchQualityData() {
 }
 
 function renderQualityLeaderboard(data) {
-    const tbody = document.getElementById("quality-leaderboard-tbody");
-    if (!tbody) return;
-    
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-muted">No data available</td></tr>`;
-        return;
-    }
-    
-    let html = "";
-    data.forEach(row => {
-        let tierClass = "badge-gray";
-        if (row.tier === "High") tierClass = "badge-success";
-        else if (row.tier === "Medium") tierClass = "badge-warning";
-        else if (row.tier === "Low") tierClass = "badge-danger";
-        
-        html += `<tr class="border-b border-border hover:bg-gray-50">
-            <td class="p-4 font-medium">${row.source}</td>
-            <td class="p-4 text-center font-bold">${row.avg_quality}</td>
-            <td class="p-4 text-center"><span class="status-badge ${tierClass}">${row.tier}</span></td>
-        </tr>`;
-    });
-    tbody.innerHTML = html;
+    // Replaced by Jinja partial
 }
 
 function renderScrapeLeaderboard(data) {
-    const tbody = document.getElementById("scrape-leaderboard-tbody");
-    if (!tbody) return;
-    
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-muted">No data available</td></tr>`;
-        return;
-    }
-    
-    let html = "";
-    data.forEach(row => {
-        let healthClass = "badge-gray";
-        if (row.health === "Healthy") healthClass = "badge-success";
-        else if (row.health === "Warning") healthClass = "badge-warning";
-        else if (row.health === "Critical") healthClass = "badge-danger";
-        
-        html += `<tr class="border-b border-border hover:bg-gray-50">
-            <td class="p-4 font-medium">${row.source}</td>
-            <td class="p-4 text-center font-bold">${row.scrape_pct}%</td>
-            <td class="p-4"><span class="status-badge ${healthClass}">${row.health}</span></td>
-        </tr>`;
-    });
-    tbody.innerHTML = html;
+    // Replaced by Jinja partial
 }
 
 function renderFreshnessIndex(data) {
-    const tbody = document.getElementById("freshness-index-tbody");
-    if (!tbody) return;
-    
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-muted">No data available</td></tr>`;
-        return;
-    }
-    
-    let html = "";
-    data.forEach(row => {
-        let severityClass = "badge-gray";
-        if (row.severity === "Healthy") severityClass = "badge-success";
-        else if (row.severity === "Warning") severityClass = "badge-warning";
-        else if (row.severity === "Critical") severityClass = "badge-danger";
-        
-        html += `<tr class="border-b border-border hover:bg-gray-50">
-            <td class="p-4 font-medium">${row.source}</td>
-            <td class="p-4 text-sm text-gray-500">${row.latest_ingested}</td>
-            <td class="p-4 font-bold text-gray-700">${row.days_stale}</td>
-            <td class="p-4"><span class="status-badge ${severityClass}">${row.severity}</span></td>
-        </tr>`;
-    });
-    tbody.innerHTML = html;
+    // Replaced by Jinja partial
 }
 
 function renderWordCountChart(data) {

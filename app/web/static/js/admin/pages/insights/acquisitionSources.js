@@ -9,7 +9,10 @@ export function renderAcquisitionSources(timeFrame = "7_days") {
       renderVelocityChart(data.velocity);
       renderContributionChart(data.contribution);
       renderAuthorityChart(data.authority);
-      renderCoverageMatrix(data.matrix);
+      const matrixContainer = document.getElementById("category-source-matrix-container");
+      if (matrixContainer) {
+          matrixContainer.innerHTML = data.matrix_html;
+      }
     })
     .catch(err => console.error("Failed to load acquisition data", err));
 }
@@ -140,46 +143,5 @@ function renderAuthorityChart(data) {
 }
 
 function renderCoverageMatrix(data) {
-    const container = document.getElementById("category-source-matrix-container");
-    if (!container) return;
-    
-    if (data.sources.length === 0) {
-        container.innerHTML = "<div class='text-muted p-4 text-center'>No data available</div>";
-        return;
-    }
-    
-    let html = `
-    <table class="dashboard-table w-full text-left border-collapse whitespace-nowrap">
-        <thead>
-            <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
-                <th class="p-3 font-bold sticky left-0 bg-gray-50 z-10 border-r border-border">Category</th>
-    `;
-    
-    data.sources.forEach(src => {
-        html += `<th class="p-3 font-bold text-center">${src}</th>`;
-    });
-    
-    html += `</tr></thead><tbody>`;
-    
-    data.rows.forEach(row => {
-        html += `<tr class="border-b border-border hover:bg-gray-50">
-            <td class="p-3 font-medium sticky left-0 bg-white z-10 border-r border-border hover:bg-gray-50">${row.category}</td>`;
-            
-        data.sources.forEach(src => {
-            const count = row.counts[src] || 0;
-            // Calculate a color opacity based on count
-            let bgClass = "";
-            let textClass = "text-muted";
-            if (count > 50) { bgClass = "bg-blue-100"; textClass = "text-blue-800 font-bold"; }
-            else if (count > 10) { bgClass = "bg-blue-50"; textClass = "text-blue-700 font-medium"; }
-            else if (count > 0) { textClass = "text-gray-700"; }
-            
-            html += `<td class="p-3 text-center text-sm ${bgClass} ${textClass}">${count}</td>`;
-        });
-        
-        html += `</tr>`;
-    });
-    
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+    // Replaced by Jinja partial from backend
 }

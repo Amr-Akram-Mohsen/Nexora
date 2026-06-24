@@ -592,6 +592,15 @@ def contents_rows():
     )
 
 
+@bp.route("/<int:id>/inspect", methods=["GET"])
+def inspect_content(id):
+    data = build_content_inspect_data(id)
+    if not data:
+        return jsonify({"error": "Content not found"}), 404
+    data["domain"] = "contents"
+    return render_template("admin/components/_inspect.html", **data)
+
+
 def build_content_inspect_data(id):
     """Return dictionary of data needed for the content inspect/detail view."""
     from app.domains.user.models import User

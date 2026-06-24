@@ -1,0 +1,25 @@
+{% from "admin/components/macros.html" import empty_state, badge %}
+{% if not data %}
+  {{ empty_state("No suggestions found. You're fully tagged!") }}
+{% else %}
+  <div class="admin-table-wrapper insights-table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Content</th>
+          <th>Suggested Tag</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td>{{ item.content_title }}</td>
+          <td>{{ badge(item.type ~ ": " ~ item.suggested_name, "blue") }}</td>
+          <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion({{ item.content_id }}, '{{ item.type }}', {{ item.suggested_id }})">Apply</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}

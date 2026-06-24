@@ -1,0 +1,14 @@
+{% from "admin/components/macros.html" import dashboard_stat_card %}
+
+<div class="dashboard-stats-grid">
+  {{ dashboard_stat_card("Total Entities", "{:,}".format(data.total_entities)) }}
+  {{ dashboard_stat_card("Orphaned Entities", "{:,}".format(data.orphans), "var(--brand-red)") }}
+  
+  {% set brand_pct = (data.missing_brand / data.total_content * 100)|round|int if data.total_content > 0 else 0 %}
+  {% set brand_color = "var(--brand-orange)" if brand_pct > 10 else "inherit" %}
+  {{ dashboard_stat_card("Content w/o Brand", brand_pct ~ "%", brand_color) }}
+  
+  {% set cat_pct = (data.missing_category / data.total_content * 100)|round|int if data.total_content > 0 else 0 %}
+  {% set cat_color = "var(--brand-orange)" if cat_pct > 10 else "inherit" %}
+  {{ dashboard_stat_card("Content w/o Category", cat_pct ~ "%", cat_color) }}
+</div>

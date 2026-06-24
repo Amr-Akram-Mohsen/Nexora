@@ -10,33 +10,11 @@
 
   function loadTaxonomyAnalytics() {
     fetch('/admin/taxonomy/analytics')
-      .then(r => r.json())
-      .then(d => {
+      .then(r => r.text())
+      .then(html => {
         const container = document.getElementById('taxonomy-analytics-dashboard');
         if (!container) return;
-
-        let missingBrandPct = d.total_content ? Math.round((d.missing_brand / d.total_content) * 100) : 0;
-        let missingCategoryPct = d.total_content ? Math.round((d.missing_category / d.total_content) * 100) : 0;
-
-        container.className = 'dashboard-stats-grid';
-        container.innerHTML = `
-          <div class="dashboard-stat-card">
-            <p class="dashboard-stat-label">Total Entities</p>
-            <h3 class="dashboard-stat-value">${d.total_entities.toLocaleString()}</h3>
-          </div>
-          <div class="dashboard-stat-card">
-            <p class="dashboard-stat-label">Orphaned Entities</p>
-            <h3 class="dashboard-stat-value" style="color: var(--brand-red);">${d.orphans.toLocaleString()}</h3>
-          </div>
-          <div class="dashboard-stat-card">
-            <p class="dashboard-stat-label">Content w/o Brand</p>
-            <h3 class="dashboard-stat-value" style="color: ${missingBrandPct > 10 ? 'var(--brand-orange)' : 'inherit'};">${missingBrandPct}%</h3>
-          </div>
-          <div class="dashboard-stat-card">
-            <p class="dashboard-stat-label">Content w/o Category</p>
-            <h3 class="dashboard-stat-value" style="color: ${missingCategoryPct > 10 ? 'var(--brand-orange)' : 'inherit'};">${missingCategoryPct}%</h3>
-          </div>
-        `;
+        container.innerHTML = html;
       })
       .catch(e => console.error("Failed to load taxonomy analytics:", e));
   }
@@ -44,48 +22,18 @@
   function loadInsights() {
     // Load Suggestions
     fetch('/admin/taxonomy/insights/suggestions')
-      .then(r => r.json())
-      .then(data => {
+      .then(r => r.text())
+      .then(html => {
         const c = document.getElementById('insights-suggestions-container');
-        if (!c) return;
-        if (!data || data.length === 0) {
-          c.innerHTML = `<div class="table-empty-state">No suggestions found. You're fully tagged!</div>`;
-          return;
-        }
-        let html = `<div class="admin-table-wrapper insights-table-scroll"><table class="admin-table"><thead><tr><th>Content</th><th>Suggested Tag</th><th>Action</th></tr></thead><tbody>`;
-        data.forEach(item => {
-          html += `<tr>
-            <td>${item.content_title}</td>
-            <td><span class="badge badge-blue">${item.type}: ${item.suggested_name}</span></td>
-            <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion(${item.content_id}, '${item.type}', ${item.suggested_id})">Apply</button></td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
-        c.innerHTML = html;
+        if (c) c.innerHTML = html;
       });
 
     // Load Coherence
     fetch('/admin/taxonomy/insights/coherence')
-      .then(r => r.json())
-      .then(data => {
+      .then(r => r.text())
+      .then(html => {
         const c = document.getElementById('insights-coherence-container');
-        if (!c) return;
-        if (!data || data.length === 0) {
-          c.innerHTML = `<div class="table-empty-state">No cross-domain conflicts detected!</div>`;
-          return;
-        }
-        let html = `<div class="admin-table-wrapper insights-table-scroll"><table class="admin-table"><thead><tr><th>Content</th><th>Content Brands</th><th>Item</th><th>Item Brand</th><th>Action</th></tr></thead><tbody>`;
-        data.forEach(item => {
-          html += `<tr>
-            <td>${item.content_title}</td>
-            <td><span class="badge badge-orange">${item.content_brands.join(', ') || 'None'}</span></td>
-            <td>${item.item_name}</td>
-            <td><span class="badge badge-orange">${item.item_brand}</span></td>
-            <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion(${item.content_id}, 'Brand', ${item.suggested_brand_id})">Fix Content Brand</button></td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
-        c.innerHTML = html;
+        if (c) c.innerHTML = html;
       });
   }
 
@@ -401,31 +349,11 @@
     if (body) body.innerHTML = '<div class="table-empty-state">Scanning for duplicates...</div>';
 
     fetch(`/admin/taxonomy/duplicates?type=${domain}`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.error) {
-          if (body) body.innerHTML = `<div class="table-empty-state" style="color: var(--brand-red);">${d.error}</div>`;
-          return;
-        }
-        if (!d.length) {
-          if (body) body.innerHTML = '<div class="table-empty-state">No duplicates found!</div>';
-          return;
-        }
-        let html = `<div class="admin-table-wrapper"><table class="admin-table"><thead><tr><th>Source (Will be merged &amp; deleted)</th><th>Target (Will be kept)</th><th>Similarity</th><th>Actions</th></tr></thead><tbody>`;
-        d.forEach(pair => {
-          html += `<tr>
-            <td><strong>${pair.source.name}</strong> <span class="content-date-row">(ID: ${pair.source.id})</span></td>
-            <td><strong>${pair.target.name}</strong> <span class="content-date-row">(ID: ${pair.target.id})</span></td>
-            <td><span class="badge badge-blue">${pair.similarity}%</span></td>
-            <td>
-              <div class="flex gap-2">
-                <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="${domain}" data-source-id="${pair.source.id}" data-target-id="${pair.target.id}">Merge S &rarr; T</button>
-                <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="${domain}" data-source-id="${pair.target.id}" data-target-id="${pair.source.id}">Merge T &rarr; S</button>
-              </div>
-            </td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load");
+        return r.text();
+      })
+      .then(html => {
         if (body) body.innerHTML = html;
       })
       .catch(() => {

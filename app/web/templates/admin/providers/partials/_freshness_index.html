@@ -1,0 +1,17 @@
+{% if not data %}
+<tr><td colspan="4" class="p-8 text-center text-muted">No data available</td></tr>
+{% else %}
+  {% for row in data %}
+    {% set severityClass = "badge-gray" %}
+    {% if row.severity == "Healthy" %} {% set severityClass = "badge-success" %}
+    {% elif row.severity == "Warning" %} {% set severityClass = "badge-warning" %}
+    {% elif row.severity == "Critical" %} {% set severityClass = "badge-danger" %}
+    {% endif %}
+    <tr class="border-b border-border hover:bg-gray-50">
+        <td class="p-4 font-medium">{{ row.source }}</td>
+        <td class="p-4 text-sm text-gray-500">{{ row.latest_ingested }}</td>
+        <td class="p-4 font-bold text-gray-700">{{ row.days_stale }}</td>
+        <td class="p-4"><span class="status-badge {{ severityClass }}">{{ row.severity }}</span></td>
+    </tr>
+  {% endfor %}
+{% endif %}

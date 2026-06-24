@@ -1,0 +1,29 @@
+{% from "admin/components/macros.html" import empty_state, badge %}
+{% if not data %}
+  {{ empty_state("No cross-domain conflicts detected!") }}
+{% else %}
+  <div class="admin-table-wrapper insights-table-scroll">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Content</th>
+          <th>Content Brands</th>
+          <th>Item</th>
+          <th>Item Brand</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data %}
+        <tr>
+          <td>{{ item.content_title }}</td>
+          <td>{{ badge(item.content_brands | join(', ') if item.content_brands else 'None', "orange") }}</td>
+          <td>{{ item.item_name }}</td>
+          <td>{{ badge(item.item_brand, "orange") }}</td>
+          <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion({{ item.content_id }}, 'Brand', {{ item.suggested_brand_id }})">Fix Content Brand</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}

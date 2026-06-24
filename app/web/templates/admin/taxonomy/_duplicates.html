@@ -1,0 +1,34 @@
+{% from "admin/components/macros.html" import empty_state, badge %}
+{% if error %}
+  {{ empty_state(error, "color: var(--brand-red);") }}
+{% elif not data %}
+  {{ empty_state("No duplicates found!") }}
+{% else %}
+  <div class="admin-table-wrapper">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Source (Will be merged &amp; deleted)</th>
+          <th>Target (Will be kept)</th>
+          <th>Similarity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pair in data %}
+        <tr>
+          <td><strong>{{ pair.source.name }}</strong> <span class="content-date-row">(ID: {{ pair.source.id }})</span></td>
+          <td><strong>{{ pair.target.name }}</strong> <span class="content-date-row">(ID: {{ pair.target.id }})</span></td>
+          <td>{{ badge(pair.similarity ~ "%", "blue") }}</td>
+          <td>
+            <div class="flex gap-2">
+              <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="{{ domain }}" data-source-id="{{ pair.source.id }}" data-target-id="{{ pair.target.id }}">Merge S &rarr; T</button>
+              <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="{{ domain }}" data-source-id="{{ pair.target.id }}" data-target-id="{{ pair.source.id }}">Merge T &rarr; S</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}

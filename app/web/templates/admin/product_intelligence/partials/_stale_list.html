@@ -1,0 +1,9 @@
+{% from "admin/components/macros.html" import ranked_list_item %}
+{% if data %}
+  {% for item in data[:5] %}
+    {% set badge_html = '<span class="badge" style="background: rgba(var(--brand-red-rgb), 0.1); color: var(--brand-red);">' ~ item.avg_age_days ~ ' days</span>' %}
+    {{ ranked_list_item(loop.index, item.name, badge_html) }}
+  {% endfor %}
+{% else %}
+  <li class="text-center w-full py-4 text-muted">No stale stores found.</li>
+{% endif %}
