@@ -1,0 +1,178 @@
+{% from "admin/components/macros.html" import inspect_section, action_group, action_button %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
+{% from "admin/components/ui.html" import admin_inspect_section_table, admin_crud_table %}
+
+{% set linked_items_table = {
+    "id": "linked-items",
+    "preview_table": ["ID", "Name", "Type", "Clicks", "Actions"]
+} %}
+
+<div class="inspect-details-group flex">
+  {% if source_header is defined and source_header %}
+    <div class="inspect-header-custom flex items-center gap-4">
+      <img src="{{ source_header.logo_url }}" alt="{{ source_header.name }} Logo" class="inspect-header-logo">
+      <div>
+        <h2 class="inspect-header-title">{{ source_header.name }}</h2>
+        <a href="https://{{ source_header.domain }}" target="_blank" class="inspect-header-link">{{ source_header.domain }}</a>
+      </div>
+    </div>
+  {% elif inspect_header is defined and inspect_header %}
+    <div class='inspect-header-custom flex items-center gap-2'>
+      {% if inspect_header.badges %}
+        {% for badge in inspect_header.badges %}
+          <span class='badge {{ badge.badge_class }}'>{{ badge.value }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% elif inspect_header_html is defined and inspect_header_html %}
+    <div class='inspect-header-custom'>
+      {{ inspect_header_html|safe }}
+    </div>
+  {% endif %}
+
+  {% if inspect_table and inspect_table is mapping %}
+  {% for section_name, fields in inspect_table.items() %}
+  {% call inspect_section(section_name|title) %}
+  {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
+  {{ admin_inspect_section_table(fields, layout='horizontal') }}
+  {% else %}
+  {{ admin_inspect_section_table(fields, layout='vertical') }}
+  {% endif %}
+  {% endcall %}
+  {% endfor %}
+  {% endif %}
+
+  {% if store_links is defined %}
+  {% call inspect_section('Ingested Stores & Affiliate Links') %}
+  <div class='inspect-links-container'>
+    {% if store_links %}
+    {% for lnk in store_links %}
+    {{ inspect_store_card(lnk) }}
+    {% endfor %}
+    {% else %}
+    <div>No store links mapped.</div>
+    {% endif %}
+  </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if variant_summary is defined and variant_summary %}
+  {% call inspect_section('Variant Summary') %}
+  {{ inspect_variant_summary_table(variant_summary) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if image_strip is defined and image_strip %}
+  {% call inspect_section('Images') %}
+  {{ inspect_image_strip(image_strip) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if specifications is defined and (specifications.structured_details or specifications.quick_details or specifications.searchable_attributes or specifications.specs_list) %}
+  {% call inspect_section('Specifications & Details') %}
+  {{ inspect_specifications_panel(specifications) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if linked_items is defined %}
+  {% call inspect_section('Linked Products') %}
+  {% if linked_items %}
+  {% call admin_crud_table(linked_items_table) %}
+    {% for item in linked_items %}
+    <tr>
+      <td>#{{ item.id }}</td>
+      <td>{{ item.name }}</td>
+      <td><span class='status-badge'>{{ item.type or '—' }}</span></td>
+      <td class='col-metric'>{{ '{:,}'.format(item.clicks) }}</td>
+      <td>
+        {{ action_button('Unlink', action_type='delete', icon='<i class="fa-solid fa-lock-open"></i>', extra_class='user-action-delete',
+           attrs={'data-action': 'unlink-match', 'data-content-id': inspect_id, 'data-item-id': item.id}) }}
+      </td>
+    </tr>
+    {% endfor %}
+  {% endcall %}
+  {% else %}
+  <div class='dashboard-empty loading-height-sm'>
+    <span><i class='fa-regular fa-envelope-open'></i></span>
+    <p>No linked products found.</p>
+  </div>
+  {% endif %}
+  {% endcall %}
+  {% endif %}
+
+  {% if engagement_breakdown is defined and engagement_breakdown %}
+  {% call inspect_section('Engagement Breakdown') %}
+    {% set data = engagement_breakdown %}
+    {% include "admin/components/_user_engagement_breakdown.html" %}
+  {% endcall %}
+  {% endif %}
+
+  {% if user_interests is defined and user_interests %}
+  {% call inspect_section('User Interests & Affinities') %}
+    {% set items = user_interests.items %}
+    {% set affinities = user_interests.affinities %}
+    {% include "admin/components/_user_interests.html" %}
+  {% endcall %}
+  {% endif %}
+
+  {% if top_contents is defined and top_contents %}
+  {% call inspect_section('Top Content (by Views)') %}
+    {% set contents = top_contents %}
+    {% include "admin/components/content/_top_content_table.html" %}
+  {% endcall %}
+  {% endif %}
+
+  {% if top_items is defined and top_items %}
+  {% call inspect_section('Top Products (by Clicks)') %}
+    {% set items = top_items %}
+    {% include "admin/components/_top_items_table.html" %}
+  {% endcall %}
+  {% endif %}
+
+  {% if article_sources is defined and article_sources %}
+  {% call inspect_section('Article Sources') %}
+    {% set sources = article_sources %}
+    {% include "admin/components/content/_article_sources_table.html" %}
+  {% endcall %}
+  {% endif %}
+
+  {% if distribution_history is defined %}
+  {% call inspect_section('Social Distribution History') %}
+  <div class='inspect-links-container'>
+    {% if distribution_history %}
+    {% for post in distribution_history %}
+    {{ inspect_distribution_card(post) }}
+    {% endfor %}
+    {% else %}
+    <div>No distribution history found.</div>
+    {% endif %}
+  </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if top_articles is defined and top_articles %}
+  {% call inspect_section('Top Articles (by Views)') %}
+    <div class='flex flex-col'>
+      {% for article in top_articles %}
+        <div class='inspect-article-row flex justify-between items-center'>
+          <a href='/admin/contents/{{ article.id }}' target='_blank' class='inspect-article-title'>
+            {{ article.title }}
+          </a>
+          <span class='badge badge-secondary inspect-article-views'>{{ '{:,}'.format(article.views) }} views</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endcall %}
+  {% endif %}
+
+  {% if actions is defined and actions %}
+  {% call inspect_section('Management Actions', divider=false) %}
+  {% call action_group(extra_class='flex-wrap') %}
+  {% for act in actions %}
+  {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''),
+  extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
+  {% endfor %}
+  {% endcall %}
+  {% endcall %}
+  {% endif %}
+</div>

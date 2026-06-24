@@ -384,11 +384,14 @@ def build_user_inspect_data(id):
         "Topics": sort_agg(agg_topics)
     }
 
-    interests_html = render_template("admin/components/_user_interests.html", 
-                                     items=interests_data, 
-                                     affinities=aggregated_affinities) if (interests_data or agg_brands) else "—"
+    user_interests_data = None
+    if interests_data or agg_brands:
+        user_interests_data = {
+            "items": interests_data,
+            "affinities": aggregated_affinities
+        }
 
-    engagement_breakdown_html = render_template("admin/components/_user_engagement_breakdown.html", data={
+    engagement_breakdown_data = {
         "Views": views_count,
         "Item Clicks": clicks_count,
         "Saves": saves_count,
@@ -396,7 +399,7 @@ def build_user_inspect_data(id):
         "Comments": comments_count,
         "Shares": shares_count,
         "Recs Clicked": recs_clicked
-    })
+    }
 
     import urllib.parse
     user_email_enc = urllib.parse.quote(user.email) if user.email else ""
@@ -421,10 +424,10 @@ def build_user_inspect_data(id):
     spam = sum(c for s, c in sentiments if s == 'spam')
     comments_str = f"{comments_count} (Pos: {pos}, Neu: {neu}, Neg: {neg}, Spam: {spam})"
 
-    reactions_link = f"<a href='/admin/moderation?reactions_user={user_email_enc}' class='admin-link'>{reactions_str}</a>" if reactions_count > 0 else "0"
-    comments_link = f"<a href='/admin/moderation?comments_user={user_email_enc}' class='admin-link'>{comments_str}</a>" if comments_count > 0 else "0"
-    shares_link = f"<a href='/admin/moderation?shares_user={user_email_enc}' class='admin-link'>{shares_count}</a>" if shares_count > 0 else "0"
-    saves_link = f"<a href='/admin/moderation?saves_user={user_email_enc}' class='admin-link'>{saves_count}</a>" if saves_count > 0 else "0"
+    reactions_link = {"value": reactions_str, "link": f'/admin/moderation?reactions_user={user_email_enc}'} if reactions_count > 0 else {"value": "0"}
+    comments_link = {"value": comments_str, "link": f'/admin/moderation?comments_user={user_email_enc}'} if comments_count > 0 else {"value": "0"}
+    shares_link = {"value": str(shares_count), "link": f'/admin/moderation?shares_user={user_email_enc}'} if shares_count > 0 else {"value": "0"}
+    saves_link = {"value": str(saves_count), "link": f'/admin/moderation?saves_user={user_email_enc}'} if saves_count > 0 else {"value": "0"}
     clicks_link = str(clicks_count) # Clicks are aggregated by target, so no direct user filter yet
 
     counts_dict = {
@@ -451,21 +454,21 @@ def build_user_inspect_data(id):
     latest_click = db.session.scalar(select(ItemClick).where(ItemClick.user_id == id).order_by(ItemClick.created_at.desc()).limit(1))
 
     activities = []
-    if latest_comment: activities.append((latest_comment.created_at, f"<b>Commented:</b> {latest_comment.content[:50]}..."))
+    if latest_comment: activities.append((latest_comment.created_at, f"Commented: {latest_comment.content[:50]}..."))
     if latest_save and latest_save.target:
         title = latest_save.target.title if latest_save.target_type == 'content' else latest_save.target.name
-        activities.append((latest_save.created_at, f"<b>Saved:</b> {title}"))
+        activities.append((latest_save.created_at, f"Saved: {title}"))
     if latest_view and latest_view.target:
         title = latest_view.target.title if latest_view.target_type == 'content' else latest_view.target.name
-        activities.append((latest_view.created_at, f"<b>Viewed:</b> {title}"))
+        activities.append((latest_view.created_at, f"Viewed: {title}"))
     if latest_reaction and latest_reaction.target:
         title = latest_reaction.target.title if latest_reaction.target_type == 'content' else (latest_reaction.target.name if hasattr(latest_reaction.target, 'name') else 'Comment')
-        activities.append((latest_reaction.created_at, f"<b>Reacted ({latest_reaction.type}):</b> {title}"))
+        activities.append((latest_reaction.created_at, f"Reacted ({latest_reaction.type}): {title}"))
     if latest_share and latest_share.target:
         title = latest_share.target.title if latest_share.target_type == 'content' else latest_share.target.name
-        activities.append((latest_share.created_at, f"<b>Shared:</b> {title}"))
+        activities.append((latest_share.created_at, f"Shared: {title}"))
     if latest_click:
-        activities.append((latest_click.created_at, f"<b>Clicked Item Link</b>"))
+        activities.append((latest_click.created_at, f"Clicked Item Link"))
 
     if activities:
         activities.sort(key=lambda x: x[0], reverse=True)
@@ -498,37 +501,35 @@ def build_user_inspect_data(id):
         "verification sent": format_datetime(user.verification_sent_at, fmt='%b %d, %Y %H:%M') if user.verification_sent_at else "—",
         "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else "—",
 
-        "engagement tier": f"<span class='badge bg-primary'>{engagement_tier}</span>",
-        "engagement profile": f"<span class='badge bg-secondary'>{engagement_profile}</span>",
+        "engagement tier": {"value": engagement_tier, "badge": True, "badge_class": "bg-primary"},
+        "engagement profile": {"value": engagement_profile, "badge": True, "badge_class": "bg-secondary"},
         "engagement score": str(engagement_score),
-        "engagement breakdown": {"value": engagement_breakdown_html, "is_custom": True},
         "views": str(views_count),
-        "reactions": {"value": reactions_link, "is_custom": True},
-        "comments": {"value": comments_link, "is_custom": True},
-        "saves": {"value": saves_link, "is_custom": True},
-        "shares": {"value": shares_link, "is_custom": True},
-        "item clicks": {"value": clicks_link, "is_custom": True},
+        "reactions": reactions_link,
+        "comments": comments_link,
+        "saves": saves_link,
+        "shares": shares_link,
+        "item clicks": clicks_link,
         "recommendations shown": str(recs_seen),
         "recommendations clicked": str(recs_clicked),
         
-        "interests": {"value": interests_html, "is_custom": True} if interests_html != "—" else "—",
-        "recent activity": {"value": recent_activity, "is_custom": True} if recent_activity != "—" else "—"
+        "recent activity": recent_activity
     }
     inspect_table = get_inspect_table("users", data)
 
     from datetime import datetime, timezone, timedelta
     now = datetime.now(timezone.utc)
-    recency_badge = ""
+    recency = None
     if user.last_login_at:
         days_ago = (now - user.last_login_at).days
         if days_ago <= 1:
-            recency_badge = "<span class='badge badge-health-high'>Active Today</span>"
+            recency = {"value": "Active Today", "badge_class": "badge-health-high"}
         elif days_ago <= 7:
-            recency_badge = "<span class='badge badge-health-medium'>Active this Week</span>"
+            recency = {"value": "Active this Week", "badge_class": "badge-health-medium"}
         else:
-            recency_badge = "<span class='badge badge-health-low'>Inactive</span>"
+            recency = {"value": "Inactive", "badge_class": "badge-health-low"}
 
-    inspect_header_html = f"<div class='flex items-center gap-2'>{recency_badge}</div>"
+    inspect_header = {"badges": [recency] if recency else []}
 
     actions = [
         {
@@ -561,9 +562,11 @@ def build_user_inspect_data(id):
 
     return {
         "inspect_table": inspect_table,
+        "engagement_breakdown": engagement_breakdown_data,
+        "user_interests": user_interests_data,
         "actions": actions,
         "inspect_id": user.id,
-        "inspect_header_html": inspect_header_html,
+        "inspect_header": inspect_header,
         "user_name": user.name or user.email
     }
 

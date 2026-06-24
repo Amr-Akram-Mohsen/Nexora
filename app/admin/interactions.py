@@ -671,7 +671,7 @@ def build_comment_inspect_data(id):
     latest_replies = "—"
     if comment.replies:
         sorted_replies = sorted(comment.replies, key=lambda r: r.created_at, reverse=True)
-        latest_replies = "<br>".join([f"• {r.content[:40]}..." for r in sorted_replies[:3]])
+        latest_replies = [{"label": f"• {r.content[:40]}..."} for r in sorted_replies[:3]]
 
     total_user_comments = db.session.scalar(select(func.count(Comment.id)).where(Comment.user_id == comment.user_id)) if comment.user_id else 0
 
@@ -687,8 +687,7 @@ def build_comment_inspect_data(id):
     for sentiment, count in target_sentiments:
         pct = (count / total_target_comments * 100) if total_target_comments > 0 else 0
         s_label = sentiment.title() if sentiment else 'Neutral'
-        sentiment_dist.append(f"{s_label}: {count} ({pct:.1f}%)")
-    sentiment_dist_str = "<br>".join(sentiment_dist) if sentiment_dist else "—"
+        sentiment_dist.append({"label": s_label, "count": f"{count} ({pct:.1f}%)"})
 
     recent_reactions = db.session.execute(
         select(Reaction).options(selectinload(Reaction.user))
@@ -699,7 +698,7 @@ def build_comment_inspect_data(id):
     
     reactions_html = "—"
     if recent_reactions:
-        reactions_html = "<br>".join([f"• <b>{r.user.name if r.user else 'User'}</b>: {r.type.title()}" for r in recent_reactions])
+        reactions_html = [{"label": r.user.name if r.user else 'User', "detail": r.type.title()} for r in recent_reactions]
 
     data = {
         "id": f"#{comment.id}",
@@ -710,7 +709,7 @@ def build_comment_inspect_data(id):
         "dislikes": "{:,}".format(comment.dislike_count),
         "shares": "{:,}".format(comment.share_count),
         "replies count": str(comment.replies_count),
-        "recent reactions": {"value": reactions_html, "is_custom": True} if reactions_html != "—" else "—",
+        "recent reactions": {"value": reactions_html, "is_list": True} if reactions_html != "—" else "—",
         
         "user id": str(comment.user_id),
         "user name": comment.user.name if comment.user else "—",
@@ -718,13 +717,13 @@ def build_comment_inspect_data(id):
         "total comments": str(total_user_comments),
         
         "parent context": parent_context,
-        "latest replies": {"value": latest_replies, "is_custom": True} if latest_replies != "—" else "—",
+        "latest replies": {"value": latest_replies, "is_list": True} if latest_replies != "—" else "—",
         
         "target type": comment.target_type,
         "target title": target_title,
         "date": comment.created_at.isoformat()[:10] if comment.created_at else "—",
         "target comments": str(total_target_comments),
-        "sentiment distribution": {"value": sentiment_dist_str, "is_custom": True}
+        "sentiment distribution": {"value": sentiment_dist, "is_list": True} if sentiment_dist else "—"
     }
     inspect_table = get_inspect_table("comments", data)
 
@@ -757,7 +756,7 @@ def inspect_comment(id):
     """Return server-rendered HTML for the comment inspect modal body."""
     data = build_comment_inspect_data(id)
     if not data:
-        return "<p class='text-muted'>Comment not found.</p>", 404
+        return "Comment not found.", 404
     return render_template(
         "admin/components/_inspect.html",
         **data
@@ -779,7 +778,7 @@ def inspect_clicks(link_id):
     link_data = db.session.execute(stmt).mappings().first()
     
     if not link_data:
-         return "<p class='text-muted'>Link data not found.</p>", 404
+         return "Link data not found.", 404
 
     from app.admin.tables import get_inspect_table
     
@@ -804,16 +803,16 @@ def inspect_clicks(link_id):
         .limit(5)
     ).all()
     
-    top_countries_str = "<br>".join([f"{c or 'Unknown'}: {cnt}" for c, cnt in country_stats]) or "No data"
-    top_referrers_str = "<br>".join([f"{r or 'Direct'}: {cnt}" for r, cnt in referrer_stats]) or "No data"
+    top_countries = [{"label": c or 'Unknown', "count": cnt} for c, cnt in country_stats] if country_stats else "—"
+    top_referrers = [{"label": r or 'Direct', "count": cnt} for r, cnt in referrer_stats] if referrer_stats else "—"
 
     data = {
         "store name": link_data["store_name"],
         "item name": link_data["item_name"],
         "total clicks": str(total_clicks),
         "latest click": latest_click.isoformat()[:10] if latest_click else "—",
-        "top countries": {"value": top_countries_str, "is_custom": True},
-        "top referrers": {"value": top_referrers_str, "is_custom": True}
+        "top countries": {"value": top_countries, "is_list": True} if top_countries != "—" else "—",
+        "top referrers": {"value": top_referrers, "is_list": True} if top_referrers != "—" else "—"
     }
         
     inspect_table = get_inspect_table("clicks", data)

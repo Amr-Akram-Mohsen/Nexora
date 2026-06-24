@@ -1,0 +1,44 @@
+
+{% for key, value in row.items() %}
+{% if key not in ["slug", "id", "is_published", "image_url", "has-discount", "is_verified", "recency_days", "logo-url"] %}
+<td class="cell-{{ key|replace(' ', '-') }}" data-field="{{ key }}">
+  {% if key == "user_link" %}
+    {% if value %}
+    <a href="/admin/users?search={{ value }}" class="admin-link">User #{{ value }}</a>
+    {% else %}
+    <span class="text-muted">Anonymous</span>
+    {% endif %}
+  {% elif key == "health" %}
+    {% if value == "unused" %}
+    <span class="badge badge-danger" title="Entity is orphaned (0 linked items/content)">Unused</span>
+    {% elif value == "inactive-linked" %}
+    <span class="badge badge-warning" title="Entity is inactive but has linked items/content">Inactive (Linked)</span>
+    {% elif value == "ok" %}
+    <span class="badge badge-success">OK</span>
+    {% else %}
+    <span class="badge badge-secondary">{{ value }}</span>
+    {% endif %}
+  {% elif key == "filter config" %}
+    {% if value == "Configured" %}
+    <span class="badge badge-success">Configured</span>
+    {% else %}
+    <span class="badge badge-warning">Not Configured</span>
+    {% endif %}
+  {% else %}
+    <span>{{ value }}</span>
+  {% endif %}
+</td>
+{% endif %}
+{% endfor %}
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="{{ domain_type|default('') }}" data-id="{{ row.id }}" data-title="{{ row.name|default(row.title|default('')) }}">
+      <i class="fas fa-eye"></i> Inspect
+  </button>
+  {% if domain_target_type %}
+  <a class="user-action-btn user-action-inspect inspect-btn" href="/admin/{{ domain_target_type }}?source={{ row.get('slug', '') }}">
+      <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title}}
+  </a>
+  {% endif %}
+</td>
+{% endif %}

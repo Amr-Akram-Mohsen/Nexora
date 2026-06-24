@@ -45,7 +45,11 @@ current_per_page=20) %}
     <thead>
       <tr>
         {% for column in table.preview_table %}
-        <th>{{ column.html|safe if column.html is defined else column }}</th>
+        {% if column is mapping %}
+        <th{% if column.sort_key %} data-sort="{{ column.sort_key }}"{% endif %}{% if column.class %} class="{{ column.class }}"{% endif %}>{{ column.label }}</th>
+        {% else %}
+        <th>{{ column }}</th>
+        {% endif %}
         {% endfor %}
       </tr>
     </thead>
@@ -70,8 +74,27 @@ current_per_page=20) %}
       <tr>
         <th class="cell-label">{{ item.label }}</th>
         <td class="cell-value">
-          {% if item.is_custom %}
-          {{ item.value|safe }}
+          {% if item.is_list %}
+          <ul class="inspect-inline-list">
+            {% for entry in item.value %}
+            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{ entry.count }}{% endif %}</li>
+            {% endfor %}
+          </ul>
+          {% elif item.is_labeled %}
+          <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
+          {% elif item.is_link %}
+          <a href="{{ item.value.link }}" class="activity-target inspect-link"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt"></i>{% endif %}</a>
+          {% elif item.is_breadcrumb %}
+          <div class="flex items-center gap-2">
+            {% for crumb in item.value %}
+            <a href="{{ crumb.link }}">{{ crumb.label }}</a>
+            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs"></i>{% endif %}
+            {% endfor %}
+          </div>
+          {% elif item.link %}
+          <a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
+          {% elif item.badge %}
+          <span class="badge {{ item.badge_class }}">{{ item.value }}</span>
           {% else %}
           <span>{{ item.value }}</span>
           {% endif %}
@@ -98,8 +121,27 @@ current_per_page=20) %}
       <tr>
         {% for item in fields %}
         <td>
-          {% if item.is_custom %}
-          {{ item.value|safe }}
+          {% if item.is_list %}
+          <ul class="inspect-inline-list">
+            {% for entry in item.value %}
+            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{ entry.count }}{% endif %}</li>
+            {% endfor %}
+          </ul>
+          {% elif item.is_labeled %}
+          <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
+          {% elif item.is_link %}
+          <a href="{{ item.value.link }}" class="activity-target inspect-link"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt"></i>{% endif %}</a>
+          {% elif item.is_breadcrumb %}
+          <div class="flex items-center gap-2">
+            {% for crumb in item.value %}
+            <a href="{{ crumb.link }}">{{ crumb.label }}</a>
+            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs"></i>{% endif %}
+            {% endfor %}
+          </div>
+          {% elif item.link %}
+          <a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
+          {% elif item.badge %}
+          <span class="badge {{ item.badge_class }}">{{ item.value }}</span>
           {% else %}
           <span>{{ item.value }}</span>
           {% endif %}

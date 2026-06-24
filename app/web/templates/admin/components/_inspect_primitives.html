@@ -153,9 +153,9 @@
   <div class="variant-list-header">
     <div class="v-col v-sku">SKU</div>
     <div class="v-col v-attrs">Attributes</div>
-    <div class="v-col v-price text-right">Price</div>
-    <div class="v-col v-old-price text-right">Old Price</div>
-    <div class="v-col v-stats text-right">Links / Imgs</div>
+    <div class="v-col v-price">Price</div>
+    <div class="v-col v-old-price">Old Price</div>
+    <div class="v-col v-stats">Links / Imgs</div>
   </div>
   <div class="variant-list-body">
     {% for v in variants %}
@@ -176,21 +176,21 @@
               </div>
             {% endfor %}
           {% else %}
-            <span class="text-muted-foreground" style="font-size: 0.75rem;">No attributes</span>
+            <span>No attributes</span>
           {% endif %}
         </div>
       </div>
-      <div class="v-col v-price text-right">
+      <div class="v-col v-price">
         <span class="variant-price">{{ "%.2f"|format(v.price) ~ " " ~ (v.currency or "") if v.price is not none else "—" }}</span>
       </div>
-      <div class="v-col v-old-price text-right">
+      <div class="v-col v-old-price">
         {% if v.old_price is not none %}
           <span class="variant-old-price">{{ "%.2f"|format(v.old_price) ~ " " ~ (v.currency or "") }}</span>
         {% else %}
-          <span class="text-muted-foreground">—</span>
+          <span>—</span>
         {% endif %}
       </div>
-      <div class="v-col v-stats text-right">
+      <div class="v-col v-stats">
         <div class="variant-stats-group">
           <span class="variant-stat" title="Store Links">
             <i class="fa-solid fa-link"></i> {{ v.store_links_count }}
@@ -280,8 +280,8 @@
   {% endif %}
   
   {% if specs.structured_details or specs.specs_list %}
-  <div class="mt-4">
-    <div class="inspect-spec-section-title" style="margin-bottom: 1rem;">Developer & Raw Data</div>
+  <div>
+    <div class="inspect-spec-section-title">Developer & Raw Data</div>
     
     {% if specs.structured_details %}
     <details class="inspect-accordion">

@@ -10,7 +10,9 @@
 {{ admin_page_header("Dashboard Overview", "Platform-wide metrics and at-a-glance system health") }}
 
 <!-- Stats Cards -->
-<div id="dashboard-overview-container" class="flex flex-wrap gap-3"></div>
+<div id="dashboard-overview-container" class="flex flex-wrap gap-3">
+  {% include "admin/dashboard/widgets/_stats_grid.html" %}
+</div>
 
 <!-- New Moderation Queue & Ingestion Hub -->
 <div class="overview-top-grid">
@@ -20,7 +22,7 @@
   header_class="flex items-center
   justify-between") %}
   <div id="catalog-health-container" class="panel-body-padded">
-    {{ spinner("Loading health indicators…") }}
+    {% include "admin/dashboard/widgets/_catalog_health.html" %}
   </div>
   {% endcall %}
 
@@ -29,7 +31,7 @@
   items-center justify-between")
   %}
   <div id="recent-ingest-container" class="panel-body-list">
-    {{ spinner("Loading ingest logs…") }}
+    {% include "admin/dashboard/widgets/_recent_ingest.html" %}
   </div>
   {% endcall %}
 
@@ -37,7 +39,7 @@
   {% call admin_panel('<i class="fa-solid fa-hourglass-half"></i> Review Queue Aging', "Oldest Pending Reviews",
   header_class="flex items-center justify-between") %}
   <div id="review-queue-aging-container" class="panel-body-list">
-    {{ spinner("Loading review queue…") }}
+    {% include "admin/dashboard/widgets/_review_queue_aging.html" %}
   </div>
   {% endcall %}
 
@@ -50,7 +52,7 @@
   {% call admin_panel('<i class="fa-solid fa-tag"></i> Top Categories', "Volume Breakdown", header_class="flex
   items-center justify-between") %}
   <div id="categories-distribution-container" class="panel-body-padded">
-    {{ spinner("Loading category stats…") }}
+    {% include "admin/dashboard/widgets/_categories_distribution.html" %}
   </div>
   {% endcall %}
 
@@ -58,7 +60,7 @@
   {% call admin_panel('<i class="fa-solid fa-satellite-dish"></i> Top Content Sources', "Volume Breakdown",
   header_class="flex items-center justify-between") %}
   <div id="sources-distribution-container" class="panel-body-padded">
-    {{ spinner("Loading source stats…") }}
+    {% include "admin/dashboard/widgets/_sources_distribution.html" %}
   </div>
   {% endcall %}
 
@@ -71,7 +73,8 @@
   {% call admin_panel('<i class="fa-solid fa-newspaper"></i> Top Articles', "by view count", header_class="flex
   items-center justify-between") %}
   <div id="top-articles-container" class="admin-table-scrollable">
-    {{ spinner("Loading articles…") }}
+    {% set items = top_articles %}
+    {% include "admin/dashboard/widgets/_top_articles.html" %}
   </div>
   {% endcall %}
 
@@ -79,7 +82,8 @@
   {% call admin_panel('<i class="fa-solid fa-bag-shopping"></i> Top Items', "by click count", header_class="flex
   items-center justify-between") %}
   <div id="top-items-container" class="admin-table-scrollable">
-    {{ spinner("Loading items…") }}
+    {% set items = top_items %}
+    {% include "admin/dashboard/widgets/_top_items.html" %}
   </div>
   {% endcall %}
 
@@ -91,7 +95,7 @@
   {% call admin_panel('<i class="fa-solid fa-chart-line"></i> Top Content Providers', "By Total Views",
   header_class="flex items-center justify-between") %}
   <div id="top-content-providers-container" class="panel-body-padded admin-table-scrollable">
-    {{ spinner("Loading provider performance…") }}
+    {% include "admin/dashboard/widgets/_top_content_providers.html" %}
   </div>
   {% endcall %}
 
@@ -99,7 +103,7 @@
   header_class="flex items-center
   justify-between") %}
   <div id="top-product-providers-container" class="panel-body-padded admin-table-scrollable">
-    {{ spinner("Loading marketplace performance…") }}
+    {% include "admin/dashboard/widgets/_top_product_providers.html" %}
   </div>
   {% endcall %}
 </div>
@@ -109,7 +113,7 @@
   {% call admin_panel('<i class="fa-solid fa-bag-shopping"></i> Product Sources', "Marketplace Volume",
   header_class="flex items-center justify-between") %}
   <div id="product-sources-distribution-container" class="panel-body-padded">
-    {{ spinner("Loading product sources…") }}
+    {% include "admin/dashboard/widgets/_product_sources_distribution.html" %}
   </div>
   {% endcall %}
 
@@ -118,7 +122,7 @@
   Metadata Tracking", header_class="flex
   items-center justify-between") %}
   <div id="provider-activities-container" class="panel-body-list">
-    {{ spinner("Loading provider status…") }}
+    {% include "admin/dashboard/widgets/_provider_activities.html" %}
   </div>
   {% endcall %}
 </div>
@@ -128,7 +132,7 @@
   {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Interaction Breakdown', "all time", header_class="flex
   items-center justify-between") %}
   <div id="overview-interactions-container" class="panel-body-padded">
-    {{ spinner("Loading breakdown…") }}
+    {% include "admin/dashboard/widgets/_interactions_breakdown.html" %}
   </div>
   {% endcall %}
 </div>
@@ -138,13 +142,4 @@
 {% endblock %}
 
 {% block admin_scripts %}
-<script src="{{ url_for('static', filename='js/admin/pages/overview.js') }}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    renderDashboardOverview("dashboard-overview-container");
-    renderTopArticles("top-articles-container");
-    renderTopItems("top-items-container");
-    renderInteractionBreakdown("overview-interactions-container");
-  });
-</script>
 {% endblock %}

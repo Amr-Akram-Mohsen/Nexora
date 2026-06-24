@@ -5,7 +5,7 @@
   <div class="flex items-center gap-2"><span class="status-badge badge-warning">SCHEDULED: {{ summary_stats.scheduled }}</span></div>
   <div class="flex items-center gap-2"><span class="status-badge badge-success">PUBLISHED: {{ summary_stats.published }}</span></div>
   {% if summary_stats.overdue > 0 %}
-  <div class="flex items-center gap-2 ml-auto"><span class="status-badge badge-danger">OVERDUE: {{ summary_stats.overdue }}</span></div>
+  <div class="flex items-center gap-2"><span class="status-badge badge-danger">OVERDUE: {{ summary_stats.overdue }}</span></div>
   {% endif %}
 </div>
 {% endif %}
@@ -83,13 +83,13 @@
       {% endif %}
     </div>
   </td>
-  <td class="text-right">
+  <td>
     <button class="admin-btn-secondary admin-btn-sm" onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">View</button>
   </td>
 </tr>
 {% else %}
 <tr>
-  <td colspan="7" class="text-center py-4 text-muted">No distribution history found.</td>
+  <td colspan="7">No distribution history found.</td>
 </tr>
 {% endfor %}
 

@@ -1,0 +1,71 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/macros.html" import inspect_section %}
+{% from "admin/components/ui.html" import admin_page_header, admin_inspect_section_table %}
+{% from "admin/components/_inspect_primitives.html" import inspect_mini_content_card %}
+
+{% block title %}Source Details — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{% set header_actions %}
+<a href="{{ url_for('admin.dashboard_providers') }}" class="admin-btn-secondary">
+  ← Back to Providers
+</a>
+{% endset %}
+
+{{ admin_page_header(
+  "Source Details",
+  title,
+  actions=header_actions
+) }}
+
+<div class="admin-detail-page">
+  <div class="admin-card">
+    <div class="inspect-details-group flex">
+      
+      {% if source_header is defined and source_header %}
+      <div class="inspect-header-block flex justify-between items-start">
+        <div>
+          <h2>
+            {{ source_header.name }}
+            <a href="{{ source_header.domain }}" target="_blank">
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </h2>
+          <div>
+            Authority Score: <strong>{{ source_header.authority_score }}</strong>
+          </div>
+        </div>
+        <div>
+          <div>{{ source_header.article_count }}</div>
+          <div>Articles Indexed</div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if inspect_table and inspect_table is mapping %}
+      {% for section_name, fields in inspect_table.items() %}
+      {% call inspect_section(section_name|title) %}
+      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
+      {{ admin_inspect_section_table(fields, layout='horizontal') }}
+      {% else %}
+      {{ admin_inspect_section_table(fields, layout='vertical') }}
+      {% endif %}
+      {% endcall %}
+      {% endfor %}
+      {% endif %}
+
+      {% if top_articles is defined and top_articles %}
+      {% call inspect_section('Top Indexed Articles') %}
+      <div class="flex flex-col gap-2">
+        {% for article in top_articles %}
+        {{ inspect_mini_content_card(article) }}
+        {% endfor %}
+      </div>
+      {% endcall %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

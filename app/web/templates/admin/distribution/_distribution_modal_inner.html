@@ -34,9 +34,9 @@
         <label class="distribution-modal-label">Live URL</label>
         <div class="distribution-modal-readonly-value">
             {% if post.external_url %}
-            <a href="{{ post.external_url }}" target="_blank" class="text-primary">{{ post.external_url }}</a>
+            <a href="{{ post.external_url }}" target="_blank">{{ post.external_url }}</a>
             {% else %}
-            <span class="text-muted">No URL provided</span>
+            <span>No URL provided</span>
             {% endif %}
         </div>
         {% endif %}

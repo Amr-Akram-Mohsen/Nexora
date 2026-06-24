@@ -22,7 +22,7 @@ from app.admin.helpers import parse_pagination_params, parse_sort_params, make_r
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload, selectinload
 from datetime import datetime
-from markupsafe import Markup
+
 
 bp = Blueprint("api_content", __name__, url_prefix="/admin/contents")
 
@@ -103,58 +103,66 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
         
     score = min(score, 100)
     score_class = "badge-health-high" if score >= 80 else ("badge-health-medium" if score >= 50 else "badge-health-low")
-    health_badges.append(f'<span class="badge {score_class} badge-compact">{score}% Health</span>')
+    health_badges.append({"value": f"{score}% Health", "badge_class": f"{score_class} badge-compact"})
 
     if not c.topics:
-        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Topics">⚠️ No Topics</span>')
+        health_badges.append({"value": "No Topics", "badge_class": "status-badge inactive flex items-center gap-1", "title": "No Topics", "icon": "⚠️"})
     if not c.brands:
-        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Brands">⚠️ No Brands</span>')
+        health_badges.append({"value": "No Brands", "badge_class": "status-badge inactive flex items-center gap-1", "title": "No Brands", "icon": "⚠️"})
     if not c.source_id:
-        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="No Source">🔴 No Source</span>')
+        health_badges.append({"value": "No Source", "badge_class": "status-badge inactive flex items-center gap-1", "title": "No Source", "icon": "🔴"})
     if c.object_type == "article" and target and target.status == "failed":
-        health_badges.append('<span class="status-badge inactive flex items-center gap-1" title="Enrichment Failed">⛔ Failed</span>')
+        health_badges.append({"value": "Failed", "badge_class": "status-badge inactive flex items-center gap-1", "title": "Enrichment Failed", "icon": "⛔"})
     if duplicate:
-        health_badges.append('<span class="status-badge user flex items-center gap-1" title="Duplicate Title">👯 Duplicate</span>')
+        health_badges.append({"value": "Duplicate", "badge_class": "status-badge user flex items-center gap-1", "title": "Duplicate Title", "icon": "👯"})
         
-    health_html = f'<div class="flex flex-wrap gap-1">{ "".join(health_badges) }</div>' if health_badges else ""
-    title_html = Markup(f'<div class="flex flex-col gap-2"><strong>{c.title or ""}</strong>{health_html}</div>')
+    title_data = {"value": c.title or "", "badges": health_badges}
 
     # Engagement
     views = f"{c.view_count:,}" if c.view_count else "0"
     likes = f"{c.like_count:,}" if c.like_count else "0"
     comments = f"{c.comment_count:,}" if c.comment_count else "0"
-    engagement_html = Markup(f'<div class="flex flex-col gap-1 text-sm"><span title="Views" class="text-muted"><i class="fas fa-eye"></i> {views} views</span><span title="Comments" class="text-muted"><i class="fas fa-comment"></i> {comments} comments</span><span title="Likes" class="text-muted"><i class="fas fa-heart"></i> {likes} likes</span></div>')
+    engagement_data = [
+        {"icon": '<i class="fas fa-eye"></i>', "value": f"{views} views", "title": "Views"},
+        {"icon": '<i class="fas fa-comment"></i>', "value": f"{comments} comments", "title": "Comments"},
+        {"icon": '<i class="fas fa-heart"></i>', "value": f"{likes} likes", "title": "Likes"}
+    ]
 
     # Classification
     cat_name = c.category.name if c.category else "None"
     sec_name = c.section.name if c.section else "None"
-    classification_html = Markup(f'''
-    <div class="flex flex-col gap-1">
-        <span class="badge badge-type badge-compact w-fit">{c.object_type}</span>
-        <span class="text-sm text-muted">📁 {cat_name}</span>
-        <span class="text-sm text-muted">🏷️ {sec_name}</span>
-    </div>
-    ''')
+    classification_data = {
+        "type": c.object_type,
+        "category": f"📁 {cat_name}",
+        "section": f"🏷️ {sec_name}"
+    }
 
     # Sources
     sources_text = ", ".join(sources)
-    origin_chip = f'<span class="badge badge-origin badge-compact">{c.ingestion_origin}</span>' if c.ingestion_origin else ""
-    sources_html = Markup(f'<div class="flex flex-col gap-1"><span class="text-sm">{sources_text}</span>{origin_chip}</div>')
+    sources_data = {
+        "text": sources_text,
+        "origin_chip": c.ingestion_origin
+    }
 
     # Status
-    pub_status = '<span class="status-badge active w-fit">Live</span>' if c.is_published else '<span class="status-badge inactive w-fit">Draft</span>'
-    action_btn = f'<button data-action="toggle-publish" data-id="{c.id}" data-status="unpublish" class="dashboard-btn dashboard-btn-danger w-fit" title="Unpublish">Unpublish</button>' if c.is_published else f'<button data-action="toggle-publish" data-id="{c.id}" data-status="publish" class="dashboard-btn dashboard-btn-primary w-fit" title="Publish">Publish</button>'
-    status_html = Markup(f'<div class="flex flex-col gap-2">{pub_status}{action_btn}</div>')
+    pub_status = {"value": "Live", "badge_class": "status-badge active w-fit"} if c.is_published else {"value": "Draft", "badge_class": "status-badge inactive w-fit"}
+    action_btn = {
+        "action": "unpublish" if c.is_published else "publish",
+        "id": c.id,
+        "label": "Unpublish" if c.is_published else "Publish",
+        "class": "dashboard-btn-danger" if c.is_published else "dashboard-btn-primary"
+    }
+    status_data = {"status": pub_status, "action": action_btn}
 
     return {
         "id": c.id,
         "is_published": c.is_published,
-        "title": title_html,
-        "classification": classification_html,
-        "engagement": engagement_html,
+        "title": title_data,
+        "classification": classification_data,
+        "engagement": engagement_data,
         "published-at": c.published_at.isoformat() if c.published_at else None,
-        "sources": sources_html,
-        "status": status_html,
+        "sources": sources_data,
+        "status": status_data,
     }
 
 
@@ -633,15 +641,16 @@ def build_content_inspect_data(id):
     sec_name = content.section.name if content.section else 'Unassigned'
     cat_name = content.category.name if content.category else 'Uncategorized'
     
-    sec_link = f'<a href="/admin/contents?section={sec_slug}">{sec_name}</a>'
-    cat_link = f'<a href="/admin/contents?category={cat_slug}">{cat_name}</a>'
-    taxonomy_breadcrumb = f'<div class="flex items-center gap-2">{sec_link} <i class="fas fa-chevron-right fa-xs"></i> {cat_link}</div>'
+    taxonomy_breadcrumb = [
+        {"label": sec_name, "link": f'/admin/contents?section={sec_slug}'},
+        {"label": cat_name, "link": f'/admin/contents?category={cat_slug}'}
+    ]
 
     data = {
         "id": f"#{content.id}",
         "title": content.title or "—",
         "type": content.object_type,
-        "taxonomy path": {"value": taxonomy_breadcrumb, "is_custom": True},
+        "taxonomy path": {"value": taxonomy_breadcrumb, "is_breadcrumb": True},
         "engagement score": str(engagement_score),
         "related brands": ", ".join(b.name for b in content.brands) if content.brands else "—",
         "related topics": ", ".join(t.name for t in content.topics) if content.topics else "—",
@@ -688,24 +697,24 @@ def build_content_inspect_data(id):
     
     if target and hasattr(target, "url") and target.url:
         inspect_table["Related Metadata"].append(
-            {"label": "Source Link", "value": f'<a class="activity-target inspect-link" href="{target.url}" target="_blank">View Original Link <i class="fas fa-external-link-alt"></i></a>', "is_custom": True}
+            {"label": "Source Link", "value": {"label": "View Original Link", "link": target.url, "external": True}, "is_link": True}
         )
         
+    article_sources_data = []
     if content.object_type == "article" and target and target.article_sources:
-        table_html = render_template("admin/components/content/_article_sources_table.html", sources=target.article_sources)
-        inspect_table["Related Metadata"].append(
-            {"label": "Article Sources", "value": table_html, "is_custom": True}
-        )
+        article_sources_data = target.article_sources
         
     recent_comments = sorted(content.comments, key=lambda c: c.created_at or datetime.min, reverse=True)[:3]
     if recent_comments:
+        if "Related Metadata" not in inspect_table:
+            inspect_table["Related Metadata"] = []
         for idx, c in enumerate(recent_comments):
             user_name = c.user.name if c.user else f"User #{c.user_id}"
             preview = c.content[:100] + ("..." if len(c.content) > 100 else "")
             inspect_table["Related Metadata"].append({
                 "label": f"Recent Comment {idx+1}",
-                "value": f"<b>{user_name}</b>: {preview}",
-                "is_custom": True
+                "value": {"label": user_name, "detail": preview},
+                "is_labeled": True
             })
 
     actions = [
@@ -723,6 +732,7 @@ def build_content_inspect_data(id):
         
     return {
         "inspect_table": inspect_table,
+        "article_sources": article_sources_data,
         "distribution_history": distribution_history,
         "actions": actions,
         "inspect_id": content.id

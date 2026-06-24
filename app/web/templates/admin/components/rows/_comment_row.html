@@ -1,0 +1,17 @@
+
+<td class="cell-title">{{ row.get('title', '—') }}</td>
+<td class="cell-type">{{ row.get('type', '—') }}</td>
+<td class="cell-preview">{{ row.get('preview', '—') }}</td>
+<td class="cell-sentiment">{{ row.get('sentiment', '—') }}</td>
+<td class="cell-likes">{{ row.get('likes', '—') }}</td>
+<td class="cell-replies">{{ row.get('replies', '—') }}</td>
+<td class="cell-thread">{{ row.get('thread', '—') }}</td>
+<td class="cell-date">{{ row.get('date', '—') }}</td>
+<td class="cell-user">{{ row.get('user', '—') }}</td>
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/comments/{{ row.id }}" target="_blank">
+      <i class="fas fa-eye"></i> Inspect
+  </a>
+</td>
+{% endif %}

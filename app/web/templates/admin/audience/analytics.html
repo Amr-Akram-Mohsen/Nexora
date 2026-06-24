@@ -5,32 +5,32 @@
 {% from "admin/components/ui.html" import admin_panel %}
 
 {% block crud_filters %}
-<div class="user-analytics-dashboard grid gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-  {% call admin_panel("Recommendation Receptivity", "System-wide CTR for algorithmic recommendations", display_style="padding: 1rem;") %}
-  <div class="text-center py-4">
-    <div class="text-4xl font-bold text-primary mb-2" id="receptivity-ctr">—%</div>
-    <div class="text-sm text-gray-500">
+<div class="user-analytics-dashboard gap-4">
+  {% call admin_panel("Recommendation Receptivity", "System-wide CTR for algorithmic recommendations") %}
+  <div>
+    <div id="receptivity-ctr">—%</div>
+    <div>
       <span id="receptivity-clicks">—</span> Clicks / <span id="receptivity-impressions">—</span> Impressions
     </div>
   </div>
   {% endcall %}
 
-  {% call admin_panel("Power User Segmentation", "Active vs Inactive Account Distribution", display_style="padding: 1rem;") %}
-  <div style="position: relative; height: 200px;">
+  {% call admin_panel("Power User Segmentation", "Active vs Inactive Account Distribution") %}
+  <div>
     <canvas id="powerUserChart"></canvas>
   </div>
   {% endcall %}
 
-  {% call admin_panel("Cohort Retention (Mocked)", "Simplified monthly retention drop-off", display_style="padding: 1rem;") %}
-  <div style="position: relative; height: 200px;">
+  {% call admin_panel("Cohort Retention (Mocked)", "Simplified monthly retention drop-off") %}
+  <div>
     <canvas id="retentionChart"></canvas>
   </div>
   {% endcall %}
 
-  {% call admin_panel("Churn Risk", "Inactive accounts registered > 30 days ago", display_style="padding: 1rem;") %}
-  <div class="text-center py-4">
-    <div class="text-4xl font-bold text-red-500 mb-2" id="churn-risk-count">—</div>
-    <div class="text-sm text-gray-500">Users at risk of churn</div>
+  {% call admin_panel("Churn Risk", "Inactive accounts registered > 30 days ago") %}
+  <div>
+    <div id="churn-risk-count">—</div>
+    <div>Users at risk of churn</div>
   </div>
   {% endcall %}
 </div>

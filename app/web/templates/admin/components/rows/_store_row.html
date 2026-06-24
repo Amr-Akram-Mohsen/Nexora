@@ -1,0 +1,18 @@
+
+<td class="cell-name">{{ row.get('name', '—') }}</td>
+<td class="cell-network">{{ row.get('network', '—') }}</td>
+<td class="cell-product-count">{{ row.get('product-count', '—') }}</td>
+<td class="cell-clicks">{{ row.get('clicks', '—') }}</td>
+<td class="cell-ctr">{{ row.get('ctr', '—') }}</td>
+<td class="cell-active-links">{{ row.get('active-links', '—') }}</td>
+<td class="cell-sync-age">{{ row.get('sync-age', '—') }}</td>
+<td class="cell-oos-rate">{{ row.get('oos-rate', '—') }}</td>
+<td class="cell-avg-commission">{{ row.get('avg-commission', '—') }}</td>
+<td class="cell-status">{{ row.get('status', '—') }}</td>
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/stores/{{ row.id }}" target="_blank">
+      <i class="fas fa-eye"></i> Inspect
+  </a>
+</td>
+{% endif %}

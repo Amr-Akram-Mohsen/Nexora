@@ -5,7 +5,7 @@
     {% set data_attrs = ('data-content-output="' ~ item.content_output|tojson|forceescape ~ '"') if item.content_output else "" %}
     
     {% call opportunity_card(item.title, data_attrs=data_attrs, expandable=true) %}
-      <div class="opp-metrics grid grid-cols-2 gap-2">
+      <div class="opp-metrics gap-2">
         <div class="opp-metric-item flex gap-1 items-center">Target <strong >{{ item.target }}</strong></div>
         <div class="opp-metric-item flex gap-1 items-center">Type <strong >{{ item.type }}</strong></div>
         <div class="opp-metric-item flex gap-1 items-center">Priority <strong class="status-badge {{ priorityBadgeClass }}">{{ item.priority }}</strong></div>
@@ -14,7 +14,7 @@
       <div class="opp-action flex items-center justify-between">
         <span >Impact: {{ item.impact }}</span>
       </div>
-      <div class="action-card-details hidden">
+      <div class="action-card-details is-hidden">
         {% if item.content_output %}
           <strong>Topic:</strong> {{ item.content_output.topic }}<br />
           <strong>Platform:</strong> {{ item.content_output.platform }}<br />

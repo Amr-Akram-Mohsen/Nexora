@@ -1,9 +1,9 @@
-<h2 class="insight-group-title flex gap-3 items-center mt-8"><i class="fa-solid fa-satellite-dish"></i> Acquisition & Sources Analytics</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-satellite-dish"></i> Acquisition & Sources Analytics</h2>
 <div class="overview-top-grid insights-section">
   <!-- Content Acquisition Velocity -->
   {% call admin_panel("Content Acquisition Velocity", "Volume of content ingested over time by top sources.") %}
   <div class="panel-body-padded">
-    <div id="acquisition-velocity-chart" class="insight-chart-container" style="height: 300px;">
+    <div id="acquisition-velocity-chart" class="insight-chart-container">
       {{ spinner("Loading velocity data...") }}
     </div>
   </div>
@@ -12,7 +12,7 @@
   <!-- Source Contribution Analysis -->
   {% call admin_panel("Source Contribution Analysis", "Distribution of total content volume by source.") %}
   <div class="panel-body-padded">
-    <div id="source-contribution-chart" class="insight-chart-container" style="height: 300px;">
+    <div id="source-contribution-chart" class="insight-chart-container">
       {{ spinner("Loading contribution data...") }}
     </div>
   </div>
@@ -23,7 +23,7 @@
   <!-- Authority Distribution -->
   {% call admin_panel("Authority Distribution", "Histogram of source authority scores.") %}
   <div class="panel-body-padded">
-    <div id="authority-distribution-chart" class="insight-chart-container" style="height: 300px;">
+    <div id="authority-distribution-chart" class="insight-chart-container">
       {{ spinner("Loading authority distribution...") }}
     </div>
   </div>
@@ -32,7 +32,7 @@
   <!-- Category x Source Coverage -->
   {% call admin_panel("Category × Source Coverage Matrix", "Content coverage density across top categories and sources.") %}
   <div class="panel-body-padded">
-    <div id="category-source-matrix-container" class="insight-table-container overflow-x-auto">
+    <div id="category-source-matrix-container" class="insight-table-container">
       {{ spinner("Loading coverage matrix...") }}
     </div>
   </div>

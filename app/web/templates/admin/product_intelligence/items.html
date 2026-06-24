@@ -5,72 +5,83 @@
 {% set summary_label = "products" %}
 
 {% block crud_stats %}
-<div class="dashboard-stats-grid" style="margin-bottom: 1.5rem;" id="catalog-health-dashboard">
+<div class="dashboard-stats-grid" id="catalog-health-dashboard">
   <!-- Total Items -->
   <a class="card clickable-card filter-link" data-filter="" data-val="">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-box-open"></i></div>
+    <div class="dashboard-stat-card flex flex-col items-center">
+      <div class="dashboard-stat-icon"><i class="fa-solid fa-box-open"></i></div>
       <p class="dashboard-stat-label">Total Items</p>
-      <h3 class="dashboard-stat-value" id="stats-total-items"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <h3 class="dashboard-stat-value" id="stats-total-items"><i
+          class="fa-solid fa-circle-notch fa-spin"></i></h3>
       <p class="dashboard-stat-meta" id="stats-meta-items">in catalog</p>
     </div>
   </a>
 
   <!-- Image Coverage -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-has-images" data-val="false" title="Click to view items without images">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-regular fa-image"></i></div>
+  <a class="card clickable-card filter-link" data-filter="filter-item-has-images" data-val="false"
+    title="Click to view items without images">
+    <div class="dashboard-stat-card flex flex-col items-center">
+      <div class="dashboard-stat-icon"><i class="fa-regular fa-image"></i></div>
       <p class="dashboard-stat-label">Image Coverage</p>
-      <h3 class="dashboard-stat-value" id="stats-image-coverage"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <h3 class="dashboard-stat-value" id="stats-image-coverage"><i
+          class="fa-solid fa-circle-notch fa-spin"></i></h3>
       <p class="dashboard-stat-meta" id="stats-meta-images">with images</p>
     </div>
   </a>
 
   <!-- Brand Assignment -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-has-brand" data-val="false" title="Click to view unbranded items">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-tag"></i></div>
+  <a class="card clickable-card filter-link" data-filter="filter-item-has-brand" data-val="false"
+    title="Click to view unbranded items">
+    <div class="dashboard-stat-card flex flex-col items-center">
+      <div class="dashboard-stat-icon"><i class="fa-solid fa-tag"></i></div>
       <p class="dashboard-stat-label">Brand Assigned</p>
-      <h3 class="dashboard-stat-value" id="stats-brand-coverage"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <h3 class="dashboard-stat-value" id="stats-brand-coverage"><i
+          class="fa-solid fa-circle-notch fa-spin"></i></h3>
       <p class="dashboard-stat-meta" id="stats-meta-brands">have brand</p>
     </div>
   </a>
 
   <!-- Active Link Coverage -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-availability" data-val="OutOfStock" title="Click to view items with no active links">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-link"></i></div>
+  <a class="card clickable-card filter-link" data-filter="filter-item-availability" data-val="OutOfStock"
+    title="Click to view items with no active links">
+    <div class="dashboard-stat-card flex flex-col items-center">
+      <div class="dashboard-stat-icon"><i class="fa-solid fa-link"></i></div>
       <p class="dashboard-stat-label">Active Links</p>
-      <h3 class="dashboard-stat-value" id="stats-link-coverage"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
+      <h3 class="dashboard-stat-value" id="stats-link-coverage"><i
+          class="fa-solid fa-circle-notch fa-spin"></i></h3>
       <p class="dashboard-stat-meta" id="stats-meta-links">have store link</p>
     </div>
   </a>
 
   <!-- Stale Syncs -->
-  <a class="card clickable-card filter-link" data-filter="item-sort-by" data-val="last_synced_at" title="Click to sort by stalest sync">
-    <div class="dashboard-stat-card" style="border-left: 4px solid var(--brand-red);">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left" style="color: var(--brand-red);"></i></div>
+  <a class="card clickable-card filter-link" data-filter="item-sort-by" data-val="last_synced_at"
+    title="Click to sort by stalest sync">
+    <div class="dashboard-stat-card flex flex-col items-center">
+      <div class="dashboard-stat-icon"><i class="fa-solid fa-clock-rotate-left"></i>
+      </div>
       <p class="dashboard-stat-label">Stale Syncs</p>
-      <h3 class="dashboard-stat-value" id="stats-stale-syncs"><i class="fa-solid fa-circle-notch fa-spin text-sm text-muted"></i></h3>
-      <p class="dashboard-stat-meta" style="color: var(--brand-red); font-weight: bold;">> 7 days old</p>
+      <h3 class="dashboard-stat-value" id="stats-stale-syncs"><i
+          class="fa-solid fa-circle-notch fa-spin"></i></h3>
+      <p class="dashboard-stat-meta">> 7 days old</p>
     </div>
   </a>
 </div>
 
 <!-- Item Type Distribution Panel -->
-<div class="overview-top-grid" style="margin-bottom: 1.5rem;">
+<div class="overview-top-grid">
   <div class="overview-panel card">
     <div class="overview-panel-header flex items-center justify-between">
       <div>
         <h3 class="overview-panel-title">Catalog Breakdown by Item Type</h3>
         <p class="overview-panel-sub">Distribution of items across different categories</p>
       </div>
-      <i class="fa-solid fa-chart-pie text-muted"></i>
+      <i class="fa-solid fa-chart-pie"></i>
     </div>
     <div class="panel-body-padded">
       <div id="stats-type-distribution" class="overview-breakdown-grid flex gap-2">
         <!-- JS will inject progress bars here -->
-        <div class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading distribution...</div>
+        <div><i class="fa-solid fa-circle-notch fa-spin"></i> Loading
+          distribution...</div>
       </div>
     </div>
   </div>
@@ -81,11 +92,12 @@
         <h3 class="overview-panel-title">Top Items by Engagement</h3>
         <p class="overview-panel-sub">Highest performing products (Clickthrough Rate)</p>
       </div>
-      <i class="fa-solid fa-fire text-muted"></i>
+      <i class="fa-solid fa-fire"></i>
     </div>
     <div class="panel-body-list">
       <ul id="stats-engagement-items" class="overview-top-list">
-        <li class="text-center w-full py-4"><i class="fa-solid fa-circle-notch fa-spin text-muted"></i> Loading top items...</li>
+        <li><i class="fa-solid fa-circle-notch fa-spin"></i> Loading top
+          items...</li>
       </ul>
     </div>
   </div>
@@ -94,31 +106,42 @@
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-  {# Row 1: Search & Basic Filters #}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("item-search", "Search by name or ID…") }}
-    {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-item-source", None, [], default_val="", default_text="All Sources", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-item-type", None, [], default_val="", default_text="All Types", extra_class="filter-select-item") }}
-  </div>
+{# Row 1: Search & Basic Filters #}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("item-search", "Search by name or ID…") }}
+  {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-item-source", None, [], default_val="", default_text="All Sources",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-item-type", None, [], default_val="", default_text="All Types",
+  extra_class="filter-select-item") }}
+</div>
 
-  {# Row 1.5: Health & Quality Filters #}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_filter_select("filter-item-has-images", None, [("true", "Has Images"), ("false", "No Images")], default_val="", default_text="Images: All", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-item-has-brand", None, [("true", "Has Brand"), ("false", "No Brand")], default_val="", default_text="Brand: All", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-item-availability", None, [("InStock", "In Stock"), ("OutOfStock", "Out of Stock")], default_val="", default_text="Availability: All", extra_class="filter-select-item") }}
-  </div>
+{# Row 1.5: Health & Quality Filters #}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_filter_select("filter-item-has-images", None, [("true", "Has Images"), ("false", "No Images")],
+  default_val="", default_text="Images: All", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-item-has-brand", None, [("true", "Has Brand"), ("false", "No Brand")], default_val="",
+  default_text="Brand: All", extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-item-availability", None, [("InStock", "In Stock"), ("OutOfStock", "Out of Stock")],
+  default_val="", default_text="Availability: All", extra_class="filter-select-item") }}
+</div>
 
-  {# Row 2: Sorting & Reset #}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    <div class="filter-sort-group gap-2">
-      <span class="filter-label-xs">Sort:</span>
-      {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"), ("min_price", "Lowest Price"), ("store_count", "Store Count"), ("last_synced_at", "Sync Age (Stalest)"), ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None, extra_class="filter-input-auto") }}
-      {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc", default_text=None, extra_class="filter-input-auto") }}
-      {{ admin_reset_button("clear-item-filters-btn", "Reset Filters") }}
-    </div>
+{# Row 2: Sorting & Reset #}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  <div class="filter-sort-group gap-2">
+    <span class="filter-label-xs">Sort:</span>
+    {{ admin_filter_select("item-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"),
+    ("min_price", "Lowest Price"), ("store_count", "Store Count"), ("last_synced_at", "Sync Age (Stalest)"),
+    ("click_count", "Clicks"), ("view_count", "Views")], default_val="id", default_text=None,
+    extra_class="filter-input-auto") }}
+    {{ admin_filter_select("item-sort-dir", None, [("desc", "Descending"), ("asc", "Ascending")], default_val="desc",
+    default_text=None, extra_class="filter-input-auto") }}
+    {{ admin_reset_button("clear-item-filters-btn", "Reset Filters") }}
   </div>
+</div>
 {% endcall %}
 {% endblock %}
 

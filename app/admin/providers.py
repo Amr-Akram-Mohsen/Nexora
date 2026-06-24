@@ -963,7 +963,11 @@ def build_source_inspect_data(id):
     return {
         "inspect_table": inspect_table,
         "inspect_id": source.id,
-        "source": source,
+        "source_header": {
+            "name": source.name,
+            "domain": source.domain,
+            "logo_url": source.logo_url
+        },
         "top_articles": top_articles_data
     }
 
@@ -1080,7 +1084,7 @@ def build_store_inspect_data(id):
 def inspect_source(id):
     data = build_source_inspect_data(id)
     if not data:
-        return "<p class='text-muted'>Source not found.</p>", 404
+        return "Source not found.", 404
     return render_template("admin/components/_inspect.html", **data)
 
 
@@ -1089,7 +1093,7 @@ def inspect_source(id):
 def inspect_store(id):
     data = build_store_inspect_data(id)
     if not data:
-        return "<p class='text-muted'>Store not found.</p>", 404
+        return "Store not found.", 404
     return render_template("admin/components/_inspect.html", **data)
 
 

@@ -1135,7 +1135,7 @@ def price_tier_facets_rows():
 def _get_entity_or_404(model, id, entity_name):
     entity = db.session.get(model, id)
     if not entity:
-        return None, f"<p class='text-muted'>{entity_name} not found.</p>"
+        return None, f"{entity_name} not found."
     return entity, None
 
 def _get_taxonomy_related_metadata(entity, entity_type):
@@ -1204,8 +1204,7 @@ def _get_taxonomy_related_metadata(entity, entity_type):
         top_items = db.session.execute(
             select(Item).where(Item.brand_id == entity.id).order_by(Item.click_count.desc()).limit(5)
         ).scalars().all()
-        if top_items:
-            data["top clicked items"] = {"value": render_template("admin/components/_top_items_table.html", items=top_items), "is_custom": True}
+        data["_top_items"] = top_items
         
         top_contents = db.session.execute(top_contents_query.join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).scalars().all()
         
@@ -1278,7 +1277,7 @@ def _get_taxonomy_related_metadata(entity, entity_type):
         
         top_contents = db.session.execute(top_contents_query.where(field == entity.id)).scalars().all()
 
-    data["top content"] = {"value": render_template("admin/components/content/_top_content_table.html", contents=top_contents), "is_custom": True}
+    data["_top_contents"] = top_contents
     return data
 
 def _get_taxonomy_inspect_table(entity, entity_type, metadata):
@@ -1334,8 +1333,9 @@ def inspect_category(id):
     cat, err = _get_entity_or_404(Category, id, "Category")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(cat, "category")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(cat, "category", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/brands/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1343,8 +1343,10 @@ def inspect_brand(id):
     brand, err = _get_entity_or_404(Brand, id, "Brand")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(brand, "brand")
+    top_contents = metadata.pop("_top_contents", None)
+    top_items = metadata.pop("_top_items", None)
     inspect_table = _get_taxonomy_inspect_table(brand, "brand", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents, top_items=top_items)
 
 @bp.route("/topics/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1352,8 +1354,9 @@ def inspect_topic(id):
     topic, err = _get_entity_or_404(Topic, id, "Topic")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(topic, "topic")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(topic, "topic", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/sections/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1361,8 +1364,9 @@ def inspect_section(id):
     section, err = _get_entity_or_404(Section, id, "Section")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(section, "section")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(section, "section", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/attributes/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1370,8 +1374,9 @@ def inspect_attribute(id):
     attr, err = _get_entity_or_404(AttributeFacet, id, "Attribute")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(attr, "attribute")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(attr, "attribute", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/gender_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1379,8 +1384,9 @@ def inspect_gender_facet(id):
     facet, err = _get_entity_or_404(GenderFacet, id, "Gender Facet")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(facet, "gender_facet")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "gender_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/intent_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1388,8 +1394,9 @@ def inspect_intent_facet(id):
     facet, err = _get_entity_or_404(IntentFacet, id, "Intent Facet")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(facet, "intent_facet")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "intent_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/price_tier_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
@@ -1397,8 +1404,9 @@ def inspect_price_tier_facet(id):
     facet, err = _get_entity_or_404(PriceTierFacet, id, "Price Tier Facet")
     if err: return err, 404
     metadata = _get_taxonomy_related_metadata(facet, "price_tier_facet")
+    top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "price_tier_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table)
+    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
 
 @bp.route("/sources/<int:id>/inspect", methods=["GET"])
 @admin_required

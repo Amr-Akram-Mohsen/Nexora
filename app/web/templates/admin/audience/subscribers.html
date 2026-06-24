@@ -17,29 +17,29 @@
 </div>
 {% endcall %}
 
-<div class="user-analytics-dashboard grid gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-  {% call admin_panel("Subscription Funnel", "Key Metrics", display_style="padding: 1rem;") %}
-  <div class="grid grid-cols-2 gap-4 text-center">
+<div class="user-analytics-dashboard gap-4">
+  {% call admin_panel("Subscription Funnel", "Key Metrics") %}
+  <div class="gap-4">
     <div>
-        <div class="text-3xl font-bold text-gray-800" id="funnel-total">—</div>
-        <div class="text-sm text-gray-500">Total</div>
+        <div id="funnel-total">—</div>
+        <div>Total</div>
     </div>
     <div>
-        <div class="text-3xl font-bold text-green-600" id="funnel-confirmed">—</div>
-        <div class="text-sm text-gray-500">Confirmed</div>
+        <div id="funnel-confirmed">—</div>
+        <div>Confirmed</div>
     </div>
     <div>
-        <div class="text-3xl font-bold text-orange-500" id="funnel-unconfirmed">—</div>
-        <div class="text-sm text-gray-500">Pending</div>
+        <div id="funnel-unconfirmed">—</div>
+        <div>Pending</div>
     </div>
     <div>
-        <div class="text-3xl font-bold text-red-500" id="funnel-unsubscribed">—</div>
-        <div class="text-sm text-gray-500">Unsubscribed</div>
+        <div id="funnel-unsubscribed">—</div>
+        <div>Unsubscribed</div>
     </div>
   </div>
-  <div class="mt-4 pt-4 border-t border-gray-100 text-center">
-    <div class="text-xl font-bold text-blue-600" id="funnel-anonymous">—</div>
-    <div class="text-sm text-gray-500">Anonymous Subscribers</div>
+  <div>
+    <div id="funnel-anonymous">—</div>
+    <div>Anonymous Subscribers</div>
   </div>
   {% endcall %}
 </div>

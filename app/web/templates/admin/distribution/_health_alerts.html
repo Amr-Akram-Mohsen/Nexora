@@ -1,6 +1,6 @@
 {# app/web/templates/admin/distribution/_health_alerts.html #}
 {% if alerts %}
-<div class="distribution-health-alerts flex flex-col gap-2 mb-4" id="distribution-health-alerts-container">
+<div class="distribution-health-alerts flex flex-col gap-2" id="distribution-health-alerts-container">
     {% for alert in alerts %}
     <div class="distribution-alert-card alert-{{ alert.type }} flex gap-3 items-start">
         <span class="distribution-alert-icon">{{ alert.icon }}</span>

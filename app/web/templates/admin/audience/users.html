@@ -20,19 +20,19 @@
 </div>
 {% endcall %}
 
-<div class="user-analytics-dashboard grid gap-4 mb-4" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-  {% call admin_panel("User Growth", "Registrations over time", display_style="padding: 1rem;") %}
-  <div style="position: relative; height: 200px;">
+<div class="user-analytics-dashboard gap-4">
+  {% call admin_panel("User Growth", "Registrations over time") %}
+  <div>
     <canvas id="userGrowthChart"></canvas>
   </div>
   {% endcall %}
 
-  {% call admin_panel("Role & Provider", "Distribution", display_style="padding: 1rem;") %}
-  <div class="flex gap-4" style="height: 200px;">
-    <div style="flex: 1; position: relative;">
+  {% call admin_panel("Role & Provider", "Distribution") %}
+  <div class="flex gap-4">
+    <div>
       <canvas id="roleDistributionChart"></canvas>
     </div>
-    <div style="flex: 1; position: relative;">
+    <div>
       <canvas id="providerSplitChart"></canvas>
     </div>
   </div>
@@ -42,7 +42,7 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar(domain ~ "-count", summary_label | default(domain), summary_id=domain ~ "-summary") %}
-  <div class="flex items-center gap-4 text-sm text-muted">
+  <div class="flex items-center gap-4">
     <span id="summary-active-count" title="Active Users">Active: —</span>
     <span id="summary-admins-count" title="Admin Users">Admins: —</span>
     <span id="summary-subscribed-count" title="Newsletter Subscribers">Subscribed: —</span>

@@ -9,11 +9,11 @@
       {{ '<i class="fa-solid fa-check"></i>' if is_success else '<i class="fa-solid fa-xmark"></i>' }}
     </div>
 
-    <div class="activity-content" style="width: 100%;">
-      <div class="flex  justify-between" style="margin-bottom: 0.25rem;">
-        <p class="activity-text" style="margin: 0; padding-right: 1rem;">
+    <div class="activity-content">
+      <div class="flex justify-between">
+        <p class="activity-text">
           <strong class="log-source">{{ log.source }}</strong>
-          <span style="color: var(--muted-foreground); margin: 0 4px;">fetched</span>
+          <span>fetched</span>
           <span class="activity-target log-category">{{ log.category }}</span>
         </p>
 
@@ -24,11 +24,11 @@
       </div>
 
       <p class="activity-meta log-query">Query: "{{ log.query }}"</p>
-      <div class="activity-meta log-time" style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+      <div class="activity-meta log-time flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span>{{ log.time_formatted }}</span>
         {% if log.failures > 0 %}
-        <span style="color: var(--brand-red);">• Failures: {{ log.failures }}</span>
+        <span>• Failures: {{ log.failures }}</span>
         {% endif %}
       </div>
     </div>

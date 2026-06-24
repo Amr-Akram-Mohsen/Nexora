@@ -14,9 +14,19 @@ def require_admin():
     """Ensure all routes under /admin are strictly admin-only."""
     pass
 
+from app.admin.stats import get_dashboard_stats_data
+
 @bp.route("/")
 def home():
-    return render_template("admin/overview/overview.html", title="Overview", domain="home")
+    stats_data = get_dashboard_stats_data()
+    return render_template(
+        "admin/overview/overview.html", 
+        title="Overview", 
+        domain="home",
+        stats=stats_data,
+        data=stats_data,
+        **stats_data
+    )
 
 @bp.route("/insights")
 def dashboard_insights():
@@ -159,7 +169,7 @@ def content_detail(id):
     data = build_content_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/content_library/content_detail.html", title=f"Content {id}", domain="contents", **data)
+    return render_template("admin/components/_inspect.html", title=f"Content {id}", domain="contents", **data)
 
 
 @bp.route("/items/<int:id>")
@@ -169,7 +179,7 @@ def item_detail(id):
     data = build_item_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/product_intelligence/item_detail.html", title=f"Product {id}", domain="items", **data)
+    return render_template("admin/components/_inspect.html", title=f"Product {id}", domain="items", **data)
 
 
 @bp.route("/users/<int:id>")
@@ -179,7 +189,7 @@ def user_detail(id):
     data = build_user_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/audience/user_detail.html", title=f"User {id}", domain="users", **data)
+    return render_template("admin/components/_inspect.html", title=f"User {id}", domain="users", **data)
 
 
 @bp.route("/stores/<int:id>")
@@ -189,7 +199,7 @@ def store_detail(id):
     data = build_store_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/product_intelligence/store_detail.html", title=f"Store Details {id}", domain="stores", **data)
+    return render_template("admin/components/_inspect.html", title=f"Store Details {id}", domain="stores", **data)
 
 
 @bp.route("/sources/<int:id>")
@@ -199,7 +209,7 @@ def source_detail(id):
     data = build_source_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/acquisition/source_detail.html", title=f"Source Details {id}", domain="sources", **data)
+    return render_template("admin/components/_inspect.html", title=f"Source Details {id}", domain="sources", **data)
 
 
 @bp.route("/comments/<int:id>")
@@ -209,6 +219,6 @@ def comment_detail(id):
     data = build_comment_inspect_data(id)
     if not data:
         abort(404)
-    return render_template("admin/audience/comment_detail.html", title=f"Comment Details {id}", domain="comments", **data)
+    return render_template("admin/components/_inspect.html", title=f"Comment Details {id}", domain="comments", **data)
 
 

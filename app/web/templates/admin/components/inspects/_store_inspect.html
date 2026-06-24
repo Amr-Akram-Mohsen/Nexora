@@ -1,0 +1,40 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/macros.html" import inspect_section %}
+{% from "admin/components/ui.html" import admin_page_header, admin_inspect_section_table %}
+
+{% block title %}Store Details — Nexora Admin{% endblock %}
+
+{% block admin_content %}
+
+{% set header_actions %}
+<a href="{{ url_for('admin.dashboard_providers') }}" class="admin-btn-secondary">
+  ← Back to Providers
+</a>
+{% endset %}
+
+{{ admin_page_header(
+  "Store Details",
+  title,
+  actions=header_actions
+) }}
+
+<div class="admin-detail-page">
+  <div class="admin-card">
+    <div class="inspect-details-group flex">
+      
+      {% if inspect_table and inspect_table is mapping %}
+      {% for section_name, fields in inspect_table.items() %}
+      {% call inspect_section(section_name|title) %}
+      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
+      {{ admin_inspect_section_table(fields, layout='horizontal') }}
+      {% else %}
+      {{ admin_inspect_section_table(fields, layout='vertical') }}
+      {% endif %}
+      {% endcall %}
+      {% endfor %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

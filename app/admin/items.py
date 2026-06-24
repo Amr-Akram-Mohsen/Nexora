@@ -602,9 +602,7 @@ def build_item_inspect_data(id):
     from app.admin.helpers import format_date
     from app.admin.tables import get_inspect_table
     
-    variant_groups_str = "—"
-    if item.variant_groups:
-        variant_groups_str = ", ".join(f"<b>{k.title()}</b>: {', '.join(v)}" for k, v in item.variant_groups.items())
+    variant_groups = [{"label": k.title(), "detail": ", ".join(v)} for k, v in item.variant_groups.items()] if item.variant_groups else "—"
 
     price_str = "—"
     if item.min_price is not None and store_links_data:
@@ -626,7 +624,7 @@ def build_item_inspect_data(id):
         "store count": "{:,}".format(len(store_links_data)),
         "programs": ", ".join(sorted(list(set([lnk["program_name"] for lnk in store_links_data if lnk.get("program_name") and lnk["program_name"] != "—"])))) or "—",
         "price": price_str,
-        "variant groups": {"value": variant_groups_str, "is_custom": True},
+        "variant groups": {"value": variant_groups, "is_list": True} if variant_groups != "—" else "—",
         
         "engagement score": str(engagement_score),
         "views": "{:,}".format(item.view_count or 0),
@@ -657,8 +655,8 @@ def build_item_inspect_data(id):
             preview = c.content[:100] + ("..." if len(c.content) > 100 else "")
             inspect_table["Content & Quality"].append({
                 "label": f"Recent Comment {idx+1}",
-                "value": f"<b>{user_name}</b>: {preview}",
-                "is_custom": True
+                "value": {"label": user_name, "detail": preview},
+                "is_labeled": True
             })
 
     actions = [

@@ -28,7 +28,7 @@
   <div class="overview-breakdown-row flex items-center gap-3">
     <span class="overview-breakdown-icon"><i class="fa-solid fa-bullhorn"></i></span>
     <!-- <span class="overview-breakdown-label">Channels</span> -->
-    <div class="overview-breakdown-bar-track flex gap-2 flex-wrap" style="background: transparent; border: none;">
+    <div class="overview-breakdown-bar-track flex gap-2 flex-wrap">
       {% for ch in share_channels %}
       <span class="status-badge badge-secondary badge-type-compact" title="{{ ch.count }} shares">{{ ch.channel }}: {{
         ch.count }}</span>

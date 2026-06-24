@@ -15,9 +15,9 @@
       <tr>
         <td><strong>{{ item.category_name }}</strong></td>
         <td>{{ item.total }}</td>
-        <td class="text-success">{{ item.positive_pct }}%</td>
-        <td class="text-muted">{{ item.neutral_pct }}%</td>
-        <td class="text-danger">{{ item.negative_pct }}%</td>
+        <td>{{ item.positive_pct }}%</td>
+        <td>{{ item.neutral_pct }}%</td>
+        <td>{{ item.negative_pct }}%</td>
         <td><span class="status-badge {{ item.status_class }}">{{ item.status }}</span></td>
       </tr>
       {% else %}

@@ -1,0 +1,44 @@
+
+<td class="cell-name">
+  <div class="flex items-center gap-2">
+      {% if row.get('image_url') %}
+      <img src="{{ row.get('image_url') }}" alt="Thumbnail" class="item-thumbnail-small">
+      {% else %}
+      <span class="badge badge-secondary" title="No Image"><i class="fa-regular fa-image"></i></span>
+      {% endif %}
+      <span>{{ row.name }}</span>
+  </div>
+</td>
+<td class="cell-category">{{ row.category|default('—') }}</td>
+<td class="cell-price">
+  <div class="flex items-center gap-2">
+      <span>{{ row.price|default('—') }}</span>
+      {% if row.get('has-discount') %}
+      <span class="badge badge-success" title="Discount available"><i class="fa-solid fa-tag"></i> Discount</span>
+      {% endif %}
+  </div>
+</td>
+<td class="cell-store-count">{{ row.get('store-count', '—') }}</td>
+<td class="cell-sync-age">
+  {% set value = row.get('sync-age') %}
+  {% if value is none %}<span>—</span>
+  {% elif value <= 1 %} <span class="badge badge-success">{{ value }}d</span>
+  {% elif value <= 7 %} <span class="badge badge-warning">{{ value }}d</span>
+  {% else %}<span class="badge badge-danger">{{ value }}d</span>{% endif %}
+</td>
+<td class="cell-health">
+  {% set value = row.get('health') %}
+  {% if value is none %}<span>—</span>
+  {% elif value >= 80 %}<span class="badge badge-success" title="Catalog Health: Excellent">{{ value }}%</span>
+  {% elif value >= 50 %}<span class="badge badge-warning" title="Catalog Health: Needs Work">{{ value }}%</span>
+  {% else %}<span class="badge badge-danger" title="Catalog Health: Poor">{{ value }}%</span>{% endif %}
+</td>
+<td class="cell-click-count">{{ row.get('click-count', '—') }}</td>
+<td class="cell-added">{{ row.get('added', '—') }}</td>
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/items/{{ row.id }}" target="_blank">
+      <i class="fas fa-eye"></i> Inspect
+  </a>
+</td>
+{% endif %}

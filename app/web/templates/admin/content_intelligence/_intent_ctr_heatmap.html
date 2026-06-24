@@ -15,9 +15,9 @@
         {% for intent in data.intent_names %}
         {% set ctr = row.intents.get(intent) %}
         {% if ctr == None %}
-        <td class="text-muted text-center">-</td>
+        <td>-</td>
         {% else %}
-        <td class="col-metric text-center {% if ctr > 15 %}text-success{% elif ctr > 5 %}text-warning{% else %}text-danger{% endif %}">
+        <td class="col-metric">
           {{ ctr }}%
         </td>
         {% endif %}

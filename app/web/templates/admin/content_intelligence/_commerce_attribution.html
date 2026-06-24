@@ -16,7 +16,7 @@
         <td>{{ "{:,}".format(att.content_views) }}</td>
         <td>{{ "{:,}".format(att.linked_items_count) }}</td>
         <td>{{ "{:,}".format(att.total_item_clicks) }}</td>
-        <td class="col-metric {% if att.attribution_rate > 5 %}text-success{% endif %}">
+        <td class="col-metric">
           {{ att.attribution_rate }}%
         </td>
       </tr>

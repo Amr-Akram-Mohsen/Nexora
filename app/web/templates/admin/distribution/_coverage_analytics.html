@@ -2,8 +2,8 @@
 <div class="distribution-double-grid insights-double-grid">
     <!-- Content Coverage -->
     <div class="distribution-coverage-card rec-stat-card">
-        <div class="flex justify-between items-center mb-3">
-            <h5 class="coverage-title m-0">Content Distribution Coverage</h5>
+        <div class="flex justify-between items-center">
+            <h5 class="coverage-title">Content Distribution Coverage</h5>
             <span class="status-badge badge-info"><i class="fa-solid fa-pen-to-square"></i> CONTENT</span>
         </div>
         
@@ -12,9 +12,9 @@
                 <span class="coverage-percentage">{{ stats.content.percentage }}%</span>
                 <span class="coverage-meta">of active published content</span>
             </div>
-            <div class="coverage-counts text-right">
-                <div class="coverage-distributed text-success font-bold">{{ stats.content.distributed }} Distributed</div>
-                <div class="coverage-total text-muted text-sm">{{ stats.content.total }} Total Active</div>
+            <div class="coverage-counts">
+                <div class="coverage-distributed">{{ stats.content.distributed }} Distributed</div>
+                <div class="coverage-total">{{ stats.content.total }} Total Active</div>
             </div>
         </div>
         
@@ -26,16 +26,16 @@
         
         {% set content_gap = stats.content.total - stats.content.distributed %}
         {% if content_gap > 0 %}
-        <p class="coverage-insight mt-3 text-sm text-muted">
-            <span class="text-warning font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Action Required:</span> You have {{ content_gap }} pieces of content with zero social distribution.
+        <p class="coverage-insight">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> Action Required:</span> You have {{ content_gap }} pieces of content with zero social distribution.
         </p>
         {% endif %}
     </div>
 
     <!-- Item Coverage -->
     <div class="distribution-coverage-card rec-stat-card">
-        <div class="flex justify-between items-center mb-3">
-            <h5 class="coverage-title m-0">Item Distribution Coverage</h5>
+        <div class="flex justify-between items-center">
+            <h5 class="coverage-title">Item Distribution Coverage</h5>
             <span class="status-badge badge-secondary"><i class="fa-solid fa-box"></i> ITEM</span>
         </div>
         
@@ -44,9 +44,9 @@
                 <span class="coverage-percentage">{{ stats.item.percentage }}%</span>
                 <span class="coverage-meta">of catalog items</span>
             </div>
-            <div class="coverage-counts text-right">
-                <div class="coverage-distributed text-success font-bold">{{ stats.item.distributed }} Distributed</div>
-                <div class="coverage-total text-muted text-sm">{{ stats.item.total }} Total Active</div>
+            <div class="coverage-counts">
+                <div class="coverage-distributed">{{ stats.item.distributed }} Distributed</div>
+                <div class="coverage-total">{{ stats.item.total }} Total Active</div>
             </div>
         </div>
         
@@ -58,8 +58,8 @@
         
         {% set item_gap = stats.item.total - stats.item.distributed %}
         {% if item_gap > 0 %}
-        <p class="coverage-insight mt-3 text-sm text-muted">
-            <span class="text-warning font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Opportunity:</span> {{ item_gap }} items have not been promoted across social platforms.
+        <p class="coverage-insight">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> Opportunity:</span> {{ item_gap }} items have not been promoted across social platforms.
         </p>
         {% endif %}
     </div>

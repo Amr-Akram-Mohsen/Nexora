@@ -11,12 +11,12 @@ icon_class="admin-toolbar-search-icon-inside",
 value=""
 ) %}
 <div class="admin-toolbar-search admin-search-grow flex items-center {{ wrapper_class }}">
-    <span class="{{ icon_class }}">
-        {{ icon }}
-    </span>
+  <span class="{{ icon_class }}">
+    {{ icon }}
+  </span>
 
-    <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" value="{{ value }}" class="{{ input_class }}" {%
-        for key, val in kwargs.items() %} {{ key }}="{{ val }}" {% endfor %} />
+  <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" value="{{ value }}" class="{{ input_class }}" {% for
+    key, val in kwargs.items() %} {{ key }}="{{ val }}" {% endfor %} />
 </div>
 {% endmacro %}
 
@@ -30,8 +30,8 @@ text="Reset",
 extra_class=""
 ) %}
 <button id="{{ id }}" class="dashboard-filter-clear {{ extra_class }}" {% for key, val in kwargs.items() %} {{ key
-    }}="{{ val }}" {% endfor %}>
-    {{ text }}
+  }}="{{ val }}" {% endfor %}>
+  {{ text }}
 </button>
 {% endmacro %}
 
@@ -39,19 +39,20 @@ extra_class=""
 {# ==========================================================
 REFRESH BUTTON
 Used in page header actions on every CRUD control-panel page.
-  Usage: {% set header_actions %}{{ admin_refresh_btn("refresh-sources-btn") }}{% endset %}
+Usage: {% set header_actions %}{{ admin_refresh_btn("refresh-sources-btn") }}{% endset %}
 ========================================================== #}
 {% macro admin_refresh_btn(id, text="↺ Refresh", extra_class="") %}
-<button id="{{ id }}" class="admin-btn-secondary {{ extra_class }}" {% for key, val in kwargs.items() %} {{ key }}="{{ val }}" {% endfor %}>{{ text }}</button>
+<button id="{{ id }}" class="admin-btn-secondary {{ extra_class }}" {% for key, val in kwargs.items() %} {{ key
+  }}="{{ val }}" {% endfor %}>{{ text }}</button>
 {% endmacro %}
 
 
 {# ==========================================================
 TOOLBAR SECTION
 Wraps filter rows in the standard admin-toolbar-advanced container.
-  Usage: {% call admin_toolbar_section() %}
-           <div class="admin-toolbar-row ...">…</div>
-         {% endcall %}
+Usage: {% call admin_toolbar_section() %}
+<div class="admin-toolbar-row ...">…</div>
+{% endcall %}
 ========================================================== #}
 {% macro admin_toolbar_section(extra_class="", extra_style="") %}
 <div class="admin-toolbar-advanced flex gap-3 {{ extra_class }}" {% if extra_style %}{% endif %}>
@@ -71,13 +72,13 @@ wrapper_class="",
 summary_class="admin-summary-bar"
 ) %}
 <div class="flex justify-between items-center {{ wrapper_class }}">
-    <div {% if summary_id %} id="{{ summary_id }}" {% endif %} class="{{ summary_class }}">
-        Showing <strong id="{{ count_id }}">—</strong> {{ label }}
-    </div>
+  <div {% if summary_id %} id="{{ summary_id }}" {% endif %} class="{{ summary_class }}">
+    Showing <strong id="{{ count_id }}">—</strong> {{ label }}
+  </div>
 
-    {% if caller is defined %}
-    {{ caller() }}
-    {% endif %}
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
 </div>
 {% endmacro %}
 
@@ -92,9 +93,9 @@ wrapper_class="dashboard-modal-actions flex justify-center gap-3",
 button_class="dashboard-btn dashboard-btn-secondary"
 ) %}
 <div class="{{ wrapper_class }}">
-    <button {% if button_id %} id="{{ button_id }}" {% endif %} class="{{ button_class }}" data-dismiss="modal">
-        {{ text }}
-    </button>
+  <button {% if button_id %} id="{{ button_id }}" {% endif %} class="{{ button_class }}" data-dismiss="modal">
+    {{ text }}
+  </button>
 </div>
 {% endmacro %}
 
@@ -108,11 +109,11 @@ divider=true,
 wrapper_class=""
 ) %}
 <div class="{{ wrapper_class }}">
-    <strong class="inspect-details-title">
-        {{ title }}
-    </strong>
+  <strong class="inspect-details-title">
+    {{ title }}
+  </strong>
 
-    {{ caller() }}
+  {{ caller() }}
 </div>
 
 {% if divider %}
@@ -137,21 +138,19 @@ button_id="",
 button_type="button"
 ) %}
 <button type="{{ button_type }}" {% if button_id %} data-id="{{ button_id }}" {% endif %} {% if data_action %}
-    data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
-    class="user-action-btn user-action-{{ action_type }} {{ extra_class }}"
-    {% for key, val in kwargs.items() %}
-      {% if key == "attrs" and val is mapping %}
-        {% for k, v in val.items() %} {{ k }}="{{ v }}" {% endfor %}
-      {% else %}
-        {{ key.replace('_', '-') }}="{{ val }}"
-      {% endif %}
-    {% endfor %}>
-    {% if icon %}
-    {{ icon }}
-    {% endif %}
-    {{ text }}
+  data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
+  class="user-action-btn user-action-{{ action_type }} {{ extra_class }}" {% for key, val in kwargs.items() %} {% if
+  key=="attrs" and val is mapping %} {% for k, v in val.items() %} {{ k }}="{{ v }}" {% endfor %} {% else %} {{
+  key.replace('_', '-' ) }}="{{ val }}" {% endif %} {% endfor %}>
+  {% if icon %}
+  {{ icon }}
+  {% endif %}
+  {{ text }}
 </button>
 {% endmacro %}
+
+
+
 
 
 {# ==========================================================
@@ -161,6 +160,16 @@ ACTION GROUP
 wrapper_class="user-actions-group", extra_class=""
 ) %}
 <div class="{{ wrapper_class }}">
-    {{ caller() }}
+  {{ caller() }}
 </div>
+{% endmacro %}
+
+{# ==========================================================
+BADGE MACRO
+========================================================== #}
+{% macro badge(label, type='secondary', extra_class='', icon='') %}
+<span class="badge badge-{{ type }} {{ extra_class }}" {% for key, val in kwargs.items() %}{{ key }}="{{ val }}" {%
+  endfor %}>
+  {% if icon %}{{ icon|safe }} {% endif %}{{ label }}
+</span>
 {% endmacro %}

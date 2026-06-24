@@ -1,0 +1,51 @@
+
+<td class="cell-name">
+  <div class="flex items-center gap-2">
+      <span>{{ row.name|replace('\n', '<br>')|safe }}</span>
+      {% if row.get('is_verified') %}
+      <span class="badge badge-health-high" title="Verified User">✓</span>
+      {% endif %}
+  </div>
+</td>
+<td class="cell-role">{{ row.get('role', '—') }}</td>
+<td class="cell-subscription">
+  {% set value = row.get('subscription') %}
+  {% if value == "subscribed" %}
+  <span class="badge badge-health-high">Subscribed</span>
+  {% else %}
+  <span class="badge badge-secondary">Not Subscribed</span>
+  {% endif %}
+</td>
+<td class="cell-status">{{ row.get('status', '—') }}</td>
+<td class="cell-joined">{{ row.get('joined', '—') }}</td>
+<td class="cell-last-active">
+  {% set value = row.get('last-active') %}
+  {% set days = row.get('recency_days') %}
+  {% if days is none %}
+  <span class="badge badge-health-low">Never</span>
+  {% elif days <= 1 %} <span class="badge badge-health-high" title="{{ value }}">Active Today</span>
+  {% elif days <= 7 %} <span class="badge badge-health-medium" title="{{ value }}">Active this week</span>
+  {% else %}
+  <span class="badge badge-health-low" title="{{ value }}">{{ value }}</span>
+  {% endif %}
+</td>
+<td class="cell-engagement-score">{{ row.get('engagement-score', '—') }}</td>
+<td class="cell-engagement-tier">
+  {% set value = row.get('engagement-tier') %}
+  {% if value == "Power User" %}
+  <span class="badge badge-origin">{{ value }}</span>
+  {% elif value == "High" %}
+  <span class="badge badge-health-high">{{ value }}</span>
+  {% elif value == "Medium" %}
+  <span class="badge badge-health-medium">{{ value }}</span>
+  {% else %}
+  <span class="badge badge-health-low">{{ value }}</span>
+  {% endif %}
+</td>
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/users/{{ row.id }}" target="_blank">
+      <i class="fas fa-eye"></i> Inspect
+  </a>
+</td>
+{% endif %}

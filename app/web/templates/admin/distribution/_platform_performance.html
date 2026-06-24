@@ -3,32 +3,32 @@
     <table class="distribution-table">
         <thead>
             <tr>
-                <th class="text-left">Platform</th>
-                <th class="text-center">Published Posts</th>
-                <th class="text-right">Views</th>
-                <th class="text-right">Engagement</th>
-                <th class="text-right">Likes</th>
-                <th class="text-right">Clicks</th>
-                <th class="text-right">Shares</th>
+                <th>Platform</th>
+                <th>Published Posts</th>
+                <th>Views</th>
+                <th>Engagement</th>
+                <th>Likes</th>
+                <th>Clicks</th>
+                <th>Shares</th>
             </tr>
         </thead>
         <tbody>
             {% for p in platforms %}
             <tr class="distribution-table-row">
-                <td class="text-left font-bold flex items-center gap-2">
+                <td class="flex items-center gap-2">
                     <span class="platform-icon">{{ p.icon }}</span>
                     <span class="platform-name capitalize">{{ p.name }}</span>
                 </td>
-                <td class="text-center">{{ p.post_count }}</td>
-                <td class="text-right font-bold">{{ "{:,}".format(p.views) }}</td>
-                <td class="text-right text-primary font-bold"><i class="fa-solid fa-fire"></i> {{ "{:,}".format(p.engagement|int) }}</td>
-                <td class="text-right text-muted">{{ "{:,}".format(p.likes) }}</td>
-                <td class="text-right text-muted">{{ "{:,}".format(p.clicks) }}</td>
-                <td class="text-right text-muted">{{ "{:,}".format(p.shares) }}</td>
+                <td>{{ p.post_count }}</td>
+                <td>{{ "{:,}".format(p.views) }}</td>
+                <td><i class="fa-solid fa-fire"></i> {{ "{:,}".format(p.engagement|int) }}</td>
+                <td>{{ "{:,}".format(p.likes) }}</td>
+                <td>{{ "{:,}".format(p.clicks) }}</td>
+                <td>{{ "{:,}".format(p.shares) }}</td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" class="text-center py-4 text-muted border-b">
+                <td colspan="7">
                     No published posts data available.
                 </td>
             </tr>

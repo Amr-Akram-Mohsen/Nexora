@@ -71,7 +71,7 @@ def subscribers_rows():
             "id": s.id,
             "email": s.email,
             "status": status_label,
-            "user_link": f"<a href='/admin/users?search={s.user_id}' class='admin-link'>User #{s.user_id}</a>" if s.user_id else "<span class='text-muted'>Anonymous</span>",
+            "user_link": s.user_id,
             "subscribed_at": s.created_at.strftime('%Y-%m-%d') if s.created_at else "—",
             "unsubscribed_at": s.unsubscribed_at.strftime('%Y-%m-%d') if s.unsubscribed_at else "—"
         })

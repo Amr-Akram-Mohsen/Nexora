@@ -209,12 +209,24 @@ def get_dashboard_stats_data():
             lc = latest_c.replace(tzinfo=timezone.utc) if latest_c.tzinfo is None else latest_c
             days_since_last_ingestion = (datetime.now(timezone.utc) - lc).days
 
+        latest_activity_formatted = "No activity"
+        if latest_activity:
+            try:
+                if isinstance(latest_activity, str):
+                    dt = datetime.fromisoformat(latest_activity)
+                else:
+                    dt = latest_activity
+                latest_activity_formatted = dt.strftime("%b %d, %Y")
+            except Exception:
+                latest_activity_formatted = str(latest_activity)
+
         provider_activities.append({
             "name":            src_info["name"],
             "slug":            src_info["slug"],
             "content_count":   c_count,
             "product_count":   i_count,
             "latest_activity": latest_activity.isoformat() if latest_activity else None,
+            "latest_activity_formatted": latest_activity_formatted,
             "days_since_last_ingestion": days_since_last_ingestion,
         })
 
@@ -276,6 +288,33 @@ def get_dashboard_stats_data():
             "time":  time_str,
         })
 
+    # ── Top Articles ──────────────────────────────────────────────────────
+    top_articles_rows = db.session.execute(
+        select(Content.id, Content.title, Content.object_type, Content.view_count)
+        .order_by(Content.view_count.desc())
+        .limit(5)
+    ).mappings().all()
+    top_articles = [{
+        "id":         r["id"],
+        "title":      r["title"] or f"{r['object_type'].capitalize()} #{r['id']}",
+        "type":       r["object_type"],
+        "view_count": r["view_count"] or 0,
+    } for r in top_articles_rows]
+
+    # ── Top Items ─────────────────────────────────────────────────────────
+    top_items_rows = db.session.execute(
+        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
+        .order_by(Item.click_count.desc())
+        .limit(5)
+    ).mappings().all()
+    top_items = [{
+        "id":          r["id"],
+        "name":        r["name"],
+        "item_type":   r["item_type"],
+        "click_count": r["click_count"] or 0,
+        "rating":      r["rating"],
+    } for r in top_items_rows]
+
     return {
         "contents_count":         contents_count,
         "items_count":            items_count,
@@ -305,6 +344,8 @@ def get_dashboard_stats_data():
             "likes":     breakdown.get("_likes", 0),
             "dislikes":  breakdown.get("_dislikes", 0),
         },
+        "top_articles":           top_articles,
+        "top_items":              top_items,
     }
 
 
@@ -316,119 +357,6 @@ def get_dashboard_stats_data():
 def dashboard_stats():
     """Enhanced dashboard metrics, aggregates, distributions, and trends."""
     return jsonify(get_dashboard_stats_data())
-
-
-# ─────────────────────────────────────────────
-# WIDGET ENDPOINTS
-# ─────────────────────────────────────────────
-
-@bp.route("/widget/stats", methods=["GET"])
-def widget_stats():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_stats_grid.html", stats=data)
-
-
-@bp.route("/widget/catalog-health", methods=["GET"])
-def widget_catalog_health():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_catalog_health.html", data=data)
-
-
-@bp.route("/widget/recent-ingest", methods=["GET"])
-def widget_recent_ingest():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_recent_ingest.html", recent_ingested=data.get("recent_ingested", []))
-
-
-@bp.route("/widget/review-queue-aging", methods=["GET"])
-def widget_review_queue_aging():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_review_queue_aging.html", review_queue_aging=data.get("review_queue_aging", []), review_queue_count=data.get("review_queue_count", 0))
-
-
-@bp.route("/widget/categories-distribution", methods=["GET"])
-def widget_categories_distribution():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_categories_distribution.html", by_category=data.get("by_category", []))
-
-
-@bp.route("/widget/sources-distribution", methods=["GET"])
-def widget_sources_distribution():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_sources_distribution.html", by_source=data.get("by_source", []))
-
-
-@bp.route("/widget/product-sources-distribution", methods=["GET"])
-def widget_product_sources_distribution():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_product_sources_distribution.html", product_by_source=data.get("product_by_source", []))
-
-
-@bp.route("/widget/top-content-providers", methods=["GET"])
-def widget_top_content_providers():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_top_content_providers.html", top_performing_content=data.get("top_performing_content", []))
-
-
-@bp.route("/widget/top-product-providers", methods=["GET"])
-def widget_top_product_providers():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_top_product_providers.html", top_performing_product=data.get("top_performing_product", []))
-
-
-@bp.route("/widget/provider-activities", methods=["GET"])
-def widget_provider_activities():
-    data = get_dashboard_stats_data()
-    activities = data.get("provider_activities", [])
-    for act in activities:
-        if act.get("latest_activity"):
-            try:
-                dt = datetime.fromisoformat(act["latest_activity"])
-                act["latest_activity_formatted"] = dt.strftime("%b %d, %Y")
-            except Exception:
-                act["latest_activity_formatted"] = act["latest_activity"]
-        else:
-            act["latest_activity_formatted"] = "No activity"
-    return render_template("admin/dashboard/widgets/_provider_activities.html", provider_activities=activities)
-
-
-@bp.route("/widget/top-articles", methods=["GET"])
-def widget_top_articles():
-    rows = db.session.execute(
-        select(Content.id, Content.title, Content.object_type, Content.view_count)
-        .order_by(Content.view_count.desc())
-        .limit(5)
-    ).mappings().all()
-    items = [{
-        "id":         r["id"],
-        "title":      r["title"] or f"{r['object_type'].capitalize()} #{r['id']}",
-        "type":       r["object_type"],
-        "view_count": r["view_count"] or 0,
-    } for r in rows]
-    return render_template("admin/dashboard/widgets/_top_articles.html", items=items)
-
-
-@bp.route("/widget/top-items", methods=["GET"])
-def widget_top_items():
-    rows = db.session.execute(
-        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
-        .order_by(Item.click_count.desc())
-        .limit(5)
-    ).mappings().all()
-    items = [{
-        "id":          r["id"],
-        "name":        r["name"],
-        "item_type":   r["item_type"],
-        "click_count": r["click_count"] or 0,
-        "rating":      r["rating"],
-    } for r in rows]
-    return render_template("admin/dashboard/widgets/_top_items.html", items=items)
-
-
-@bp.route("/widget/interactions-breakdown", methods=["GET"])
-def widget_interactions_breakdown():
-    data = get_dashboard_stats_data()
-    return render_template("admin/dashboard/widgets/_interactions_breakdown.html", interactions=data.get("interactions", {}))
 
 
 # ─────────────────────────────────────────────

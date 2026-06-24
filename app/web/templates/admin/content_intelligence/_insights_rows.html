@@ -7,7 +7,7 @@
     <td>
       <div class="flex items-center gap-2">
         <strong class="clickable-entity-name">{{ item.entity }}</strong>
-        <span class="status-badge {{ type_badge_class }} text-[10px] px-1.5 py-0.5">{{ item.type }}</span>
+        <span class="status-badge {{ type_badge_class }}">{{ item.type }}</span>
       </div>
     </td>
     <td class="col-metric">{{ "%.2f"|format(item.score) }}</td>
@@ -57,34 +57,34 @@
 {% if items %}
 {% for item in items %}
 <tr {% if item.priority_score %}data-priority-score="{{ item.priority_score }}" {% endif %}>
-    <td><span class="status-badge badge-blue" style="font-size: 1rem;">#{{ item.priority_rank }}</span></td>
+    <td><span class="status-badge badge-blue">#{{ item.priority_rank }}</span></td>
     <td class="strategy-entity-col">
         <strong>{{ item.entity }}</strong><br>
-        <span class="status-badge badge-secondary mt-1" style="font-size: 0.65rem;">{{ item.type|upper }}</span>
+        <span class="status-badge badge-secondary">{{ item.type|upper }}</span>
     </td>
     <td>
         <div class="strategy-reasoning">{{ item.reasoning or '' }}</div>
         {% if item.priority_score %}
-        <small class="text-muted">Priority Score: {{ item.priority_score }}</small>
+        <small>Priority Score: {{ item.priority_score }}</small>
         {% endif %}
     </td>
     <td>
         <div class="strategy-platform-list">
             {% for t in item.youtube or [] %}
             <div class="strategy-platform-item">
-                <span class="status-badge badge-danger" style="font-size: 0.6rem; margin-top: 2px;">YOUTUBE</span>
+                <span class="status-badge badge-danger">YOUTUBE</span>
                 <span class="platform-text">{{ t }}</span>
             </div>
             {% endfor %}
             {% for t in item.pinterest or [] %}
             <div class="strategy-platform-item">
-                <span class="status-badge badge-purple" style="font-size: 0.6rem; margin-top: 2px;">PINTEREST</span>
+                <span class="status-badge badge-purple">PINTEREST</span>
                 <span class="platform-text">{{ t }}</span>
             </div>
             {% endfor %}
             {% for t in item.blog or [] %}
             <div class="strategy-platform-item">
-                <span class="status-badge badge-success" style="font-size: 0.6rem; margin-top: 2px;">BLOG / SEO</span>
+                <span class="status-badge badge-success">BLOG / SEO</span>
                 <span class="platform-text">{{ t }}</span>
             </div>
             {% endfor %}
@@ -178,7 +178,7 @@
     <td colspan="5">
         <div class="asset-mapping-details" >
             <div >
-                <div style="flex: 1; min-width: 0;">
+                <div>
                     <h6 >Existing Assets</h6>
                     <ul class="asset-mapping-list flex gap-3" >
                         {% if item.existing_assets %}
@@ -211,7 +211,7 @@
                         {% endif %}
                     </ul>
                 </div>
-                <div style="flex: 1; min-width: 0;">
+                <div>
                     <h6 >Missing Assets (Gaps)</h6>
                     <ul class="asset-mapping-list flex gap-3" >
                         {% if item.missing_assets %}

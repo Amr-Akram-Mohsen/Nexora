@@ -1,14 +1,14 @@
 <div class="summary-cards gap-4">
   <div class="summary-card flex-col gap-2">
     <div class="summary-title">System-Wide Completeness</div>
-    <div class="summary-value {% if data.overall_average < 60 %}text-danger{% elif data.overall_average < 80 %}text-warning{% else %}text-success{% endif %}">
+    <div class="summary-value">
       {{ data.overall_average }}%
     </div>
     <div class="summary-meta">Average completeness score across all content assets.</div>
   </div>
 </div>
 
-<div class="insights-table-scroll mt-6">
+<div class="insights-table-scroll">
   <table class="admin-table">
     <thead>
       <tr>

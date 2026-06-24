@@ -257,7 +257,7 @@ def inspect_match(content_id):
         select(Content).options(selectinload(Content.linked_items)).where(Content.id == content_id)
     ).scalar_one_or_none()
     if not content:
-        return "<p class='text-muted'>Content not found.</p>", 404
+        return "Content not found.", 404
 
     from app.admin.tables import get_inspect_table
     
@@ -577,7 +577,7 @@ def inspect_user_interests(user_id):
     
     user = db.session.get(User, user_id)
     if not user:
-        return "<p class='text-muted'>User not found.</p>", 404
+        return "User not found.", 404
         
     scores = db.session.execute(
         select(
@@ -608,8 +608,8 @@ def inspect_user_interests(user_id):
             name = f"Topic: {topic.name}" if topic else f"Topic #{row.topic_id}"
             
         data[f"affinity {i+1}"] = {
-            "value": f"<b>{name}</b> - Score: {round(row.total_score, 3)}",
-            "is_custom": True
+            "value": {"label": name, "detail": f"Score: {round(row.total_score, 3)}"},
+            "is_labeled": True
         }
         
     for i in range(len(scores), 5):

@@ -5,16 +5,16 @@ CRUD_TABLES = {
         "id": "users",
         "preview_table": [
             "User", "Role", "Subscription", "Status", 
-            {"html": '<th data-sort="joined" class="cursor-pointer hover:bg-gray-50 select-none">Joined ↕</th>'}, 
-            {"html": '<th data-sort="last_active" class="cursor-pointer hover:bg-gray-50 select-none">Last Active ↕</th>'}, 
-            {"html": '<th data-sort="engagement_score" class="cursor-pointer hover:bg-gray-50 select-none">Engagement Score ↕</th>'}, 
+            {"label": "Joined ↕", "sort_key": "joined", "class": "admin-table-th-sortable"}, 
+            {"label": "Last Active ↕", "sort_key": "last_active", "class": "admin-table-th-sortable"}, 
+            {"label": "Engagement Score ↕", "sort_key": "engagement_score", "class": "admin-table-th-sortable"}, 
             "Tier", "Actions"
         ],
         "detailed_table": {
             "account info": ["id", "name", "email", "role", "status", "provider"],
             "security & auth": ["verified", "verified at", "verification sent", "password changed", "joined", "last active"],
-            "engagement metrics": ["engagement tier", "engagement profile", "engagement score", "engagement breakdown", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown", "recommendations clicked"],
-            "activity & interests": ["recent activity", "interests", "subscription"]
+            "engagement metrics": ["engagement tier", "engagement profile", "engagement score", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown", "recommendations clicked"],
+            "activity & interests": ["recent activity", "subscription"]
         }
     },
     "subscribers": {
@@ -105,7 +105,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "heirarchy level", "Actions"],
         "detailed_table": {
             "category info": ["id", "slug", "name", "status", "sort order", "heirarchy level", "parent name"],
-            "related metadata": ["child categories", "content count", "item count", "top content"],
+            "related metadata": ["child categories", "content count", "item count"],
         }
     },
     "brands": {
@@ -113,7 +113,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Featured", "Actions"],
         "detailed_table": {
             "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
-            "related metadata": ["content count", "item count", "top content"]
+            "related metadata": ["content count", "item count"]
         }
     },
     "topics": {
@@ -121,7 +121,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Featured", "Actions"],
         "detailed_table": {
             "topic info": ["id", "slug", "name", "featured", "status", "sort order"],
-            "related metadata": ["content count", "related categories", "related brands", "top content"],
+            "related metadata": ["content count", "related categories", "related brands"],
         }
     },
     "sections": {
@@ -129,7 +129,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Description", "Actions"],
         "detailed_table": {
             "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
-            "related metadata": ["content count", "category count", "related brands", "top content"],
+            "related metadata": ["content count", "category count", "related brands"],
         }
     },
     "attributes": {
@@ -137,7 +137,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Category", "Content Count", "Health", "Actions"],
         "detailed_table": {
             "attribute info": ["id", "slug", "name", "category"],
-            "related metadata": ["content count", "top content"],
+            "related metadata": ["content count"],
         }
     },
     "gender_facets": {
@@ -145,7 +145,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Content Count", "Health", "Actions"],
         "detailed_table": {
             "facet info": ["id", "slug", "name"],
-            "related metadata": ["content count", "top content"],
+            "related metadata": ["content count"],
         }
     },
     "intent_facets": {
@@ -153,7 +153,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Content Count", "Health", "Actions"],
         "detailed_table": {
             "facet info": ["id", "slug", "name"],
-            "related metadata": ["content count", "top content"],
+            "related metadata": ["content count"],
         }
     },
     "price_tier_facets": {
@@ -161,7 +161,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Content Count", "Health", "Actions"],
         "detailed_table": {
             "facet info": ["id", "slug", "name"],
-            "related metadata": ["content count", "top content"],
+            "related metadata": ["content count"],
         }
     },
     "comments": {
@@ -222,7 +222,7 @@ INSIGHTS_TABLES = {
             "Rank", 
             "Target Entity", 
             "Reasoning & Asset Mapping", 
-            {"html": '<th style="width: 60%; min-width: 500px;">Platform Content Strategies</th>'}
+            {"label": "Platform Content Strategies", "class": "admin-table-th-wide"}
         ]
     },
     "social_distribution": {
@@ -253,7 +253,7 @@ def get_inspect_table(table_name, data):
     for a given domain against a provided data dictionary.
     
     `data` should be a dict where keys are the field labels defined in the schema.
-    Values can be simple strings/numbers, or a dict like {"value": "html", "is_custom": True}
+    Values can be simple strings/numbers, or a dict passing through structured data.
     """
     table = CRUD_TABLES.get(table_name, {}).get('detailed_table', {})
     mapped_table = {}
@@ -262,11 +262,11 @@ def get_inspect_table(table_name, data):
         for field in fields:
             field_data = data.get(field)
             if isinstance(field_data, dict):
-                mapped_table[section_name.title()].append({
-                    "label": field.title(),
-                    "value": field_data.get("value", "—"),
-                    "is_custom": field_data.get("is_custom", False)
-                })
+                entry = {"label": field.title()}
+                entry.update(field_data)
+                if "value" not in entry:
+                    entry["value"] = "—"
+                mapped_table[section_name.title()].append(entry)
             else:
                 mapped_table[section_name.title()].append({
                     "label": field.title(),

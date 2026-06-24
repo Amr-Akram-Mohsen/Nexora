@@ -12,7 +12,7 @@
 {% block admin_content %}
 {{ admin_page_header("Content Analytics Dashboard", "High-level content performance, distribution, and taxonomy coverage metrics.") }}
 
-<div class="dashboard-stats-grid mb-6">
+<div class="dashboard-stats-grid">
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
     <div class="dashboard-stat-label">Total Content</div>
     <div class="dashboard-stat-value">{{ stats.kpi.total }}</div>
@@ -20,22 +20,22 @@
   </div>
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
     <div class="dashboard-stat-label">Published</div>
-    <div class="dashboard-stat-value text-brand-green">{{ stats.kpi.published }}</div>
+    <div class="dashboard-stat-value">{{ stats.kpi.published }}</div>
     <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
   </div>
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
     <div class="dashboard-stat-label">Drafts & Review</div>
-    <div class="dashboard-stat-value text-brand-orange">{{ stats.kpi.drafts }}</div>
+    <div class="dashboard-stat-value">{{ stats.kpi.drafts }}</div>
     <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-edit"></i></div>
   </div>
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
     <div class="dashboard-stat-label">Enrichment Failed</div>
-    <div class="dashboard-stat-value text-brand-red">{{ stats.kpi.failed }}</div>
+    <div class="dashboard-stat-value">{{ stats.kpi.failed }}</div>
     <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-times-circle"></i></div>
   </div>
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
     <div class="dashboard-stat-label">Unclassified</div>
-    <div class="dashboard-stat-value text-brand-purple">{{ stats.kpi.no_tax }}</div>
+    <div class="dashboard-stat-value">{{ stats.kpi.no_tax }}</div>
     <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-tags"></i></div>
   </div>
   <div class="dashboard-stat-card bg-card border border-border radius-md flex flex-col justify-center">
@@ -55,7 +55,7 @@
     <div class="panel-body-padded">
       
       {# Stacked Bar Chart #}
-      <div class="flex radius-md overflow-hidden mb-4" style="height: 1.5rem; background: var(--bg-muted);">
+      <div class="flex radius-md" style="height: 1.5rem; background: var(--bg-muted);">
         {% set colors = ['var(--brand-primary)', 'var(--brand-purple)', 'var(--brand-orange)'] %}
         {% set ns = namespace(idx=0) %}
         {% for ctype, count in stats.type_dist.items() %}
@@ -71,11 +71,11 @@
         {% for ctype, count in stats.type_dist.items() %}
         <div class="flex items-center gap-1">
           <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ colors[ns2.idx % colors|length] }};"></div>
-          <span class="text-sm capitalize">{{ ctype }} <span class="text-muted">({{ count }})</span></span>
+          <span>{{ ctype }} <span>({{ count }})</span></span>
         </div>
         {% set ns2.idx = ns2.idx + 1 %}
         {% else %}
-        <div class="text-muted text-sm">No data available.</div>
+        <div>No data available.</div>
         {% endfor %}
       </div>
     </div>
@@ -98,7 +98,7 @@
           <div class="overview-breakdown-val">{{ count }}</div>
         </div>
         {% else %}
-        <div class="text-muted text-sm">No data available.</div>
+        <div>No data available.</div>
         {% endfor %}
       </div>
     </div>
@@ -113,7 +113,7 @@
     <div class="panel-body-padded">
       
       {# Stacked Bar Chart #}
-      <div class="flex radius-md overflow-hidden mb-4" style="height: 1.5rem; background: var(--bg-muted);">
+      <div class="flex radius-md" style="height: 1.5rem; background: var(--bg-muted);">
         {% set status_colors = {'complete': 'var(--brand-green)', 'failed': 'var(--brand-red)', 'pending': 'var(--brand-orange)', 'enriching': 'var(--brand-blue)'} %}
         {% for status, count in stats.status_dist.items() %}
           {% set pct = (count / stats.kpi.total * 100) if stats.kpi.total > 0 else 0 %}
@@ -126,17 +126,17 @@
         {% for status, count in stats.status_dist.items() %}
         <div class="flex items-center gap-1">
           <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ status_colors.get(status, 'var(--text-muted)') }};"></div>
-          <span class="text-sm capitalize">{{ status }} <span class="text-muted">({{ count }})</span></span>
+          <span>{{ status }} <span>({{ count }})</span></span>
         </div>
         {% else %}
-        <div class="text-muted text-sm">No data available.</div>
+        <div>No data available.</div>
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
 
-<div class="overview-top-grid mt-6">
+<div class="overview-top-grid">
   <!-- Content Freshness -->
   <div class="overview-panel bg-card border border-border radius-md">
     <div class="overview-panel-header">
@@ -145,7 +145,7 @@
     </div>
     <div class="panel-body-padded">
       {# Stacked Bar Chart #}
-      <div class="flex radius-md overflow-hidden mb-4" style="height: 1.5rem; background: var(--bg-muted);">
+      <div class="flex radius-md" style="height: 1.5rem; background: var(--bg-muted);">
         {% set colors = {'< 30 Days': 'var(--brand-green)', '30-90 Days': 'var(--brand-purple)', '> 90 Days': 'var(--brand-orange)'} %}
         {% for age, count in stats.freshness_dist.items() %}
           {% set pct = (count / stats.kpi.total * 100) if stats.kpi.total > 0 else 0 %}
@@ -158,10 +158,10 @@
         {% for age, count in stats.freshness_dist.items() %}
         <div class="flex items-center gap-1">
           <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ colors.get(age, 'var(--text-muted)') }};"></div>
-          <span class="text-sm">{{ age }} <span class="text-muted">({{ count }})</span></span>
+          <span>{{ age }} <span>({{ count }})</span></span>
         </div>
         {% else %}
-        <div class="text-muted text-sm">No data available.</div>
+        <div>No data available.</div>
         {% endfor %}
       </div>
     </div>
@@ -175,7 +175,7 @@
     </div>
     <div class="panel-body-padded">
       {# Stacked Bar Chart #}
-      <div class="flex radius-md overflow-hidden mb-4" style="height: 1.5rem; background: var(--bg-muted);">
+      <div class="flex radius-md" style="height: 1.5rem; background: var(--bg-muted);">
         {% set auth_colors = {'High (67-100)': 'var(--brand-primary)', 'Medium (34-66)': 'var(--brand-blue)', 'Low (0-33)': 'var(--brand-red)'} %}
         {% for tier, count in stats.authority_dist.items() %}
           {% set pct = (count / stats.kpi.total * 100) if stats.kpi.total > 0 else 0 %}
@@ -188,22 +188,22 @@
         {% for tier, count in stats.authority_dist.items() %}
         <div class="flex items-center gap-1">
           <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ auth_colors.get(tier, 'var(--text-muted)') }};"></div>
-          <span class="text-sm">{{ tier }} <span class="text-muted">({{ count }})</span></span>
+          <span>{{ tier }} <span>({{ count }})</span></span>
         </div>
         {% else %}
-        <div class="text-muted text-sm">No data available.</div>
+        <div>No data available.</div>
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
-<div class="overview-panel bg-card border border-border radius-md mt-6">
+<div class="overview-panel bg-card border border-border radius-md">
   <div class="overview-panel-header">
     <h3 class="overview-panel-title">Origin Analytics</h3>
     <p class="overview-panel-sub">Detailed performance and quality metrics by ingestion source</p>
   </div>
   <div class="panel-body-list">
-    <table class="dashboard-table w-full">
+    <table class="dashboard-table">
       <thead>
         <tr>
           <th>Ingestion Origin</th>
@@ -224,7 +224,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="5" class="text-center text-muted">No origin data available.</td>
+          <td colspan="5">No origin data available.</td>
         </tr>
         {% endfor %}
       </tbody>

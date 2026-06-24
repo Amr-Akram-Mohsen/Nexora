@@ -16,7 +16,7 @@
       <tr>
         <td><strong>{{ src.store_name }}</strong></td>
         <td>{{ "{:,}".format(src.active_links) }}</td>
-        <td class="col-metric {% if src.stale_links_pct > 20 %}text-danger{% endif %}">{{ src.stale_links_pct }}%</td>
+        <td class="col-metric">{{ src.stale_links_pct }}%</td>
         <td>{{ "{:,}".format(src.total_clicks) }}</td>
         <td class="col-metric">{{ src.conversion_potential }}% 
           {% if src.is_simulated %}<span class="status-badge">Simulated</span>{% endif %}

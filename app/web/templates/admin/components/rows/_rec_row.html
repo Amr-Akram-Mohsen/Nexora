@@ -1,0 +1,32 @@
+
+<td class="cell-content-title">{{ row.get('content-title', '—') }}</td>
+<td class="cell-widget-impressions">{{ row.get('widget-impressions', '—') }}</td>
+<td class="cell-widget-ctr">
+  {% set value = row.get('widget-ctr') %}
+  {% set ctr_val = value|replace('%', '')|float if value else 0 %}
+  {% if ctr_val >= 3.0 %}
+  <span class="badge badge-success">{{ value }}</span>
+  {% elif ctr_val >= 1.0 %}
+  <span class="badge badge-warning">{{ value }}</span>
+  {% elif ctr_val > 0.0 %}
+  <span class="badge badge-danger">{{ value }}</span>
+  {% else %}
+  <span class="badge badge-secondary">{{ value }}</span>
+  {% endif %}
+</td>
+<td class="cell-last-active">{{ row.get('last-active', '—') }}</td>
+<td class="cell-linked-items-count">{{ row.get('linked-items-count', '—') }}</td>
+<td class="cell-linked-items-list">
+  {% if row.get('linked-items-list') %}
+    {{ row.get('linked-items-list') | join(', ') }}
+  {% else %}
+    —
+  {% endif %}
+</td>
+{% if not hide_action_column %}
+<td class="cell-actions flex flex-col gap-1">
+  <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.get('content-title', '') }}">
+      <i class="fas fa-eye"></i> Inspect
+  </button>
+</td>
+{% endif %}
