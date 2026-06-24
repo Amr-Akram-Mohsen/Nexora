@@ -5,7 +5,8 @@
 
 {% block admin_content %}
 
-{{ admin_page_header("Distribution Intelligence Dashboard", "Track and analyze how content and products spread across external platforms") }}
+{{ admin_page_header("Distribution Intelligence Dashboard", "Track and analyze how content and products spread across
+external platforms") }}
 
 <div class="summary-cards flex gap-4">
   <div class="summary-card flex-col gap-2">
@@ -13,17 +14,19 @@
     <div class="summary-value">
       {{ data.coverage.content_coverage }}%
     </div>
-    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_content) }} / {{ "{:,}".format(data.coverage.total_content) }} content pieces syndicated</div>
+    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_content) }} / {{
+      "{:,}".format(data.coverage.total_content) }} content pieces syndicated</div>
   </div>
-  
+
   <div class="summary-card flex-col gap-2">
     <div class="summary-title">Product Coverage</div>
     <div class="summary-value">
       {{ data.coverage.item_coverage }}%
     </div>
-    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_items) }} / {{ "{:,}".format(data.coverage.total_items) }} items distributed</div>
+    <div class="summary-meta">{{ "{:,}".format(data.coverage.distributed_items) }} / {{
+      "{:,}".format(data.coverage.total_items) }} items distributed</div>
   </div>
-  
+
   <div class="summary-card flex-col gap-2">
     <div class="summary-title">Time-to-Distribution</div>
     <div class="summary-value">
@@ -34,7 +37,8 @@
 </div>
 
 <div>
-  {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Platform Engagement Index', "Platform performance ranked by multi-metric engagement score") %}
+  {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Platform Engagement Index', "Platform performance ranked by
+  multi-metric engagement score") %}
   <div class="insights-table-scroll">
     <table class="admin-table">
       <thead>

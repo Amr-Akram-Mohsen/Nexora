@@ -32,9 +32,9 @@
 <td class="cell-sources">
   {% set value = row.sources %}
   <div class="flex flex-col gap-1">
-      <span>{{ value.text }}</span>
+      <span title="Publisher"><strong>Publisher:</strong> {{ value.text }}</span>
       {% if value.origin_chip %}
-      <span class="badge badge-origin badge-compact">{{ value.origin_chip }}</span>
+      <span class="badge badge-origin badge-compact" title="Acquired Via">Via: {{ value.origin_chip }}</span>
       {% endif %}
   </div>
 </td>

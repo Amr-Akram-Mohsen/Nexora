@@ -2,45 +2,46 @@
 {% from "admin/components/ui.html" import admin_panel, admin_table_panel, admin_crud_table %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
 <div class="flex justify-between items-center">
-    <h2 class="insight-group-title flex gap-3 items-center">
-        <i class="fa-solid fa-mobile-screen"></i> Social Distribution Tracking
-    </h2>
-    <div class="flex gap-2">
-        <select id="dist-filter-platform" class="dashboard-filter-select">
-            <option value="">All Platforms</option>
-            <option value="youtube">YouTube</option>
-            <option value="pinterest">Pinterest</option>
-            <option value="facebook">Facebook</option>
-            <option value="instagram">Instagram</option>
-            <option value="twitter">Twitter</option>
-            <option value="linkedin">LinkedIn</option>
-        </select>
-        <select id="dist-filter-status" class="dashboard-filter-select">
-            <option value="">All Statuses</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="draft">Draft</option>
-        </select>
-        <select id="dist-filter-type" class="dashboard-filter-select">
-            <option value="">All Types</option>
-            <option value="content">Content</option>
-            <option value="item">Item</option>
-        </select>
-    </div>
+  <h2 class="insight-group-title flex gap-3 items-center">
+    <i class="fa-solid fa-mobile-screen"></i> Social Distribution Tracking
+  </h2>
+  <div class="flex gap-2">
+    <select id="dist-filter-platform" class="dashboard-filter-select">
+      <option value="">All Platforms</option>
+      <option value="youtube">YouTube</option>
+      <option value="pinterest">Pinterest</option>
+      <option value="facebook">Facebook</option>
+      <option value="instagram">Instagram</option>
+      <option value="twitter">Twitter</option>
+      <option value="linkedin">LinkedIn</option>
+    </select>
+    <select id="dist-filter-status" class="dashboard-filter-select">
+      <option value="">All Statuses</option>
+      <option value="published">Published</option>
+      <option value="scheduled">Scheduled</option>
+      <option value="draft">Draft</option>
+    </select>
+    <select id="dist-filter-type" class="dashboard-filter-select">
+      <option value="">All Types</option>
+      <option value="content">Content</option>
+      <option value="item">Item</option>
+    </select>
+  </div>
 </div>
 
-{% call admin_table_panel("Distribution Lifecycle", "Track drafted, scheduled, and published content across social platforms.", actions='') %}
-    {{ admin_crud_table(tables['social_distribution'], loading_text="Loading distribution history...") }}
+{% call admin_table_panel("Distribution Lifecycle", "Track drafted, scheduled, and published content across social
+platforms.", actions='') %}
+{{ admin_crud_table(tables['social_distribution'], loading_text="Loading distribution history...") }}
 {% endcall %}
 
 <!-- Social Distribution Modal -->
 {% call modal("distributionDraftModal", "Distribution Post", "lg") %}
 <div id="distribution-draft-content">
-    <div >
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <div >Loading post details...</div>
+  <div>
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <div>Loading post details...</div>
+  </div>
 </div>
 {% endcall %}

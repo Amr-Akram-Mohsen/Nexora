@@ -8,25 +8,26 @@
                 <span class="platform-name font-bold">{{ item.platform }}</span>
             </div>
             {% if item.is_overdue %}
-                <span class="status-badge badge-danger">OVERDUE</span>
+            <span class="status-badge badge-danger">OVERDUE</span>
             {% else %}
-                <span class="status-badge badge-warning">SCHEDULED</span>
+            <span class="status-badge badge-warning">SCHEDULED</span>
             {% endif %}
         </div>
-        
+
         <h4 class="rec-action-title source-title-truncate scheduling-queue-title">
             {{ item.source_title }}
         </h4>
-        
+
         <div class="rec-action-issue flex gap-2 items-center">
             <span class="font-bold">Date:</span>
             <span>
                 {{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}
             </span>
         </div>
-        
+
         <div class="flex justify-end">
-            <button class="admin-btn-secondary admin-btn-sm" onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">Review</button>
+            <button class="admin-btn-secondary admin-btn-sm"
+                onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">Review</button>
         </div>
     </div>
     {% else %}

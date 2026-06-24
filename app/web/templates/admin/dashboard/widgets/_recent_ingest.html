@@ -4,6 +4,7 @@
   <p class="empty-message">No recent ingestions.</p>
 </div>
 {% else %}
+{% from "admin/components/ui.html" import activity_list_item %}
 <ul class="activity-feed">
   {% for r in recent_ingested %}
   {% set badge_class = "user" %}
@@ -15,17 +16,14 @@
   {% set badge_class = "admin" %}
   {% set badge_icon = '<i class="fa-solid fa-comments"></i>' %}
   {% endif %}
-  <li class="activity-item ingest-log-item flex ">
-    <div class="activity-icon icon-save ingest-log-icon flex-center">{{ badge_icon|safe }}</div>
-    <div class="activity-content">
+  {% call activity_list_item(icon_html=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-item") %}
       <p class="activity-text ingest-log-text">
         Successfully ingested <span class="status-badge {{ badge_class }} badge-type-compact">{{ r.type }}</span>
         <a class="activity-target text-deco-none" href="/admin/contents?search={{ r.id }}">#{{ r.id }}</a>
         <span class="activity-meta ingest-log-meta">{{ r.time }}</span>
       </p>
       <p class="activity-meta ingest-log-title">{{ r.title }}</p>
-    </div>
-  </li>
+  {% endcall %}
   {% endfor %}
 </ul>
 {% endif %}

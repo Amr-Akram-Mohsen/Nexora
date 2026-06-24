@@ -83,12 +83,12 @@ current_per_page=20) %}
           {% elif item.is_labeled %}
           <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
           {% elif item.is_link %}
-          <a href="{{ item.value.link }}" class="activity-target inspect-link"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt"></i>{% endif %}</a>
+          <a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit"{% if item.value.external %} target="_blank"{% endif %}>{{ item.value.label }} {% if item.value.external %}<i class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
           {% elif item.is_breadcrumb %}
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             {% for crumb in item.value %}
             <a href="{{ crumb.link }}">{{ crumb.label }}</a>
-            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs"></i>{% endif %}
+            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}
             {% endfor %}
           </div>
           {% elif item.link %}
@@ -193,11 +193,11 @@ current_per_page=current_per_page
 </select>
 {% endmacro %}
 
-{% macro admin_panel(title, subtitle=None, id=None, header_class="", display_style=None, actions=None) %}
+{% macro admin_panel(title, subtitle=None, id=None, icon=None, header_class="", display_style=None, actions=None) %}
 <div class="overview-panel" {% if id %}id="{{ id }}" {% endif %} {% if display_style %} {% endif %}>
   <div class="overview-panel-header {{ header_class }} flex justify-between items-center">
     <div>
-      <h3 class="overview-panel-title">{{ title|safe }}</h3>
+      <h3 class="overview-panel-title">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ title|safe }}</h3>
       {% if subtitle %}
       <p class="overview-panel-sub">{{ subtitle }}</p>
       {% endif %}
@@ -210,6 +210,24 @@ current_per_page=current_per_page
   </div>
   {{ caller() }}
 </div>
+{% endmacro %}
+
+{% macro admin_padded_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None) %}
+{% set outer_caller = caller %}
+{% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}
+<div {% if inner_id %}id="{{ inner_id }}" {% endif %}class="panel-body-padded">
+  {{ outer_caller() }}
+</div>
+{% endcall %}
+{% endmacro %}
+
+{% macro admin_list_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None, scrollable=False) %}
+{% set outer_caller = caller %}
+{% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}
+<div {% if inner_id %}id="{{ inner_id }}" {% endif %}class="panel-body-list {% if scrollable %}panel-scrollable{% endif %}">
+  {{ outer_caller() }}
+</div>
+{% endcall %}
 {% endmacro %}
 
 {% macro admin_inspect_modal(domain, title="Inspect Details", icon='<i class="fa-solid fa-magnifying-glass"></i>',
@@ -236,11 +254,11 @@ modal_class="modal-content-lg") %}
 </div>
 {% endmacro %}
 
-{% macro admin_table_panel(title, subtitle=None, id=None, header_class="", display_style=None, actions=None,
+{% macro admin_table_panel(title, subtitle=None, id=None, icon=None, inner_id=None, header_class="", display_style=None, actions=None,
 scroll_class="admin-table-scrollable") %}
 {% set outer_caller = caller %}
-{% call admin_panel(title, subtitle, id, header_class, display_style, actions) %}
-<div class="{{ scroll_class }}">
+{% call admin_panel(title, subtitle, id, icon, header_class, display_style, actions) %}
+<div {% if inner_id %}id="{{ inner_id }}" {% endif %}class="{{ scroll_class }}">
   {{ outer_caller() }}
 </div>
 {% endcall %}
@@ -264,4 +282,13 @@ scroll_class="admin-table-scrollable") %}
   {{ caller() }}
 </div>
 </div>
+{% endmacro %}
+
+{% macro activity_list_item(icon_html="", icon_class="icon-save", extra_class="") %}
+<li class="activity-item {{ extra_class }} flex">
+  <div class="activity-icon {{ icon_class }} flex-center">{{ icon_html|safe }}</div>
+  <div class="activity-content">
+    {{ caller() }}
+  </div>
+</li>
 {% endmacro %}

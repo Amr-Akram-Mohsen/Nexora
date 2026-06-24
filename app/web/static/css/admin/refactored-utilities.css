@@ -146,13 +146,7 @@
     margin: 0;
 }
 
-.overview-panel {
-    margin-top: 1.5rem;
-}
-
-.overview-top-grid {
-    margin-top: 1.5rem;
-}
+/* overview-panel and overview-top-grid spacing is managed by grid gap in dashboard.css */
 
 .provider-name {
     color: var(--foreground);

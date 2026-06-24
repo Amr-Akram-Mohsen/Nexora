@@ -2,28 +2,28 @@
   <!-- Active contents row -->
   <div>
     <div class="health-row flex justify-between">
-      <span class="">
+      <span class="flex items-center gap-2">
         <span class="status-badge active badge-compact">Active</span>
-        <span class="health-label-text"> Live Index</span>
+        <span class="health-label-text">Live Index</span>
       </span>
       {% set total = data.contents_count or 1 %}
       {% set active_pct = ((data.active_contents or 0) / total * 100) | round | int %}
-      <span class="health-value-text ">{{ "{:,}".format(data.active_contents or 0) }} ({{ active_pct }}%)</span>
+      <span class="health-value-text">{{ "{:,}".format(data.active_contents or 0) }} ({{ active_pct }}%)</span>
     </div>
     <div class="overview-breakdown-bar-track bar-track-health">
-      <div class="overview-breakdown-bar bar-active" style="width: {{ active_pct }}%;"></div>
+      <div class="overview-breakdown-bar bar-active" style="width: {{ active_pct }};"></div>
     </div>
   </div>
 
   <!-- Inactive contents row -->
   <div>
     <div class="health-row flex justify-between">
-      <span class="">
+      <span class="flex items-center gap-2">
         <span class="status-badge inactive badge-compact">Inactive</span>
-        <span class="health-label-text"> Hidden Archive</span>
+        <span class="health-label-text">Hidden Archive</span>
       </span>
       {% set inactive_pct = ((data.inactive_contents or 0) / total * 100) | round | int %}
-      <span class="health-value-text ">{{ "{:,}".format(data.inactive_contents or 0) }} ({{ inactive_pct }}%)</span>
+      <span class="health-value-text">{{ "{:,}".format(data.inactive_contents or 0) }} ({{ inactive_pct }}%)</span>
     </div>
     <div class="overview-breakdown-bar-track bar-track-health">
       <div class="overview-breakdown-bar bar-inactive" style="width: {{ inactive_pct }}%;"></div>
@@ -35,8 +35,8 @@
     <div class="flex items-center gap-sm">
       <span class="text-lg-icon"><i class="fa-solid fa-hourglass-half"></i></span>
       <div>
-        <div class="">Moderation Queue</div>
-        <div class=" ">Unpublished aggregator drafts</div>
+        <div class="activity-text">Moderation Queue</div>
+        <div class="activity-meta">Unpublished aggregator drafts</div>
       </div>
     </div>
     <span class="status-badge badge-pending">{{ data.review_queue_count }} pending</span>
@@ -51,7 +51,7 @@
       {% endif %}
     {% endfor %}
     <div>
-      <h4 class="filter-label-xs  ">7-Day Ingestion Growth</h4>
+      <h4 class="filter-label-xs">7-Day Ingestion Growth</h4>
       <div class="trend-chart-list flex">
         {% for trend in data.growth_trends %}
           {% set pct = ((trend.count / max_count.val) * 100) | round | int %}

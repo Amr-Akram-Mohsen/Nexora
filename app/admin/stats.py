@@ -315,6 +315,16 @@ def get_dashboard_stats_data():
         "rating":      r["rating"],
     } for r in top_items_rows]
 
+    # ── Top Acquisition Channels ──────────────────────────────────────────
+    acquisition_rows = db.session.execute(
+        select(Content.ingestion_origin, func.count(Content.id).label("cnt"))
+        .where(Content.ingestion_origin.is_not(None))
+        .group_by(Content.ingestion_origin)
+        .order_by(func.count(Content.id).desc())
+        .limit(6)
+    ).all()
+    top_acquisition_channels = [{"channel": r.ingestion_origin, "count": r.cnt} for r in acquisition_rows]
+
     return {
         "contents_count":         contents_count,
         "items_count":            items_count,
@@ -346,6 +356,7 @@ def get_dashboard_stats_data():
         },
         "top_articles":           top_articles,
         "top_items":              top_items,
+        "top_acquisition_channels": top_acquisition_channels,
     }
 
 

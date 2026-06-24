@@ -658,7 +658,7 @@ def build_content_inspect_data(id):
         "attributes": ", ".join(a.name for a in content.attributes) if content.attributes else "—",
         "available sources": ", ".join(sources) if sources else "—",
         "primary source": content.source.name if content.source else "—",
-        "ingestion source": content.ingestion_origin if content.ingestion_origin else "—",
+        "acquired via": content.ingestion_origin if content.ingestion_origin else "—",
         "published at": format_datetime(content.published_at) or "—",
         "ingested at": format_datetime(content.ingested_at) or "—",
         "enrichment status": status_val,

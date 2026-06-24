@@ -12,6 +12,10 @@
   visibility: hidden;
 }
 
+.w-fit {
+  width: fit-content;
+}
+
 .text-left {
   text-align: left;
 }

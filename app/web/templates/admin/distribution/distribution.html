@@ -24,9 +24,10 @@
 {% endset %}
 
 {{ admin_page_header(
-  "Editorial Distribution & Publishing",
-  "Manage autonomous distribution pipelines, scheduled content execution, social draft generation, and post publishing controls.",
-  actions=header_actions
+"Editorial Distribution & Publishing",
+"Manage autonomous distribution pipelines, scheduled content execution, social draft generation, and post publishing
+controls.",
+actions=header_actions
 ) }}
 
 <!-- Overview KPIs Section -->
@@ -39,16 +40,18 @@
 
 <!-- Action Queue Section -->
 <div class="overview-top-grid insights-section">
-  {% call admin_table_panel('<i class="fa-solid fa-bolt"></i> Tactical Action Queue', "Immediate tactical actions including content recycles, updates, and creation drafts.") %}
-    <div id="action-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
-      {{ spinner("Compiling tactical actions...") }}
-    </div>
+  {% call admin_table_panel('<i class="fa-solid fa-bolt"></i> Tactical Action Queue', "Immediate tactical actions
+  including content recycles, updates, and creation drafts.") %}
+  <div id="action-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
+    {{ spinner("Compiling tactical actions...") }}
+  </div>
   {% endcall %}
-  
-  {% call admin_table_panel('<i class="fa-solid fa-calendar"></i> Scheduling Queue', "Upcoming distribution events ready to be published.") %}
-    <div id="scheduling-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
-      {{ spinner("Loading scheduled posts...") }}
-    </div>
+
+  {% call admin_table_panel('<i class="fa-solid fa-calendar"></i> Scheduling Queue', "Upcoming distribution events ready
+  to be published.") %}
+  <div id="scheduling-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
+    {{ spinner("Loading scheduled posts...") }}
+  </div>
   {% endcall %}
 </div>
 
@@ -63,34 +66,38 @@
 </div>
 
 <!-- Section 1.99: Autonomous Execution Panel -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel
+</h2>
 <div class="insights-section">
   {% include "admin/distribution/_autonomous_execution.html" %}
 </div>
 
 <!-- Section 1.995: Execution Governance Panel -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance Panel</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance
+  Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_governance.html" %}
 </div>
 
 <!-- Phase 3: Distribution Analytics -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics</h2>
+<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics
+</h2>
 
 <!-- Platform Performance -->
 <div class="insights-section">
-  {% call admin_table_panel("Platform Performance", "Aggregate engagement and reach metrics across all social platforms.", actions='') %}
-    <div id="platform-performance-container">
-      {{ spinner("Loading platform performance data...") }}
-    </div>
+  {% call admin_table_panel("Platform Performance", "Aggregate engagement and reach metrics across all social
+  platforms.", actions='') %}
+  <div id="platform-performance-container">
+    {{ spinner("Loading platform performance data...") }}
+  </div>
   {% endcall %}
 </div>
 
 <!-- Asset Coverage -->
 <div class="insights-section">
-    <div id="coverage-analytics-container">
-      {{ spinner("Loading asset coverage data...") }}
-    </div>
+  <div id="coverage-analytics-container">
+    {{ spinner("Loading asset coverage data...") }}
+  </div>
 </div>
 
 {% endblock %}

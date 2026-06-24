@@ -10,7 +10,7 @@
   <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
   {% endif %}
 </td>
-<td class="cell-volume">{{ row.get('volume', '—') }}</td>
+<td class="cell-volume">{{ row.get('content-count', '—') }}</td>
 <td class="cell-freshness">
   {% set value = row.get('freshness') %}
   {% if value is none %}
@@ -19,17 +19,6 @@
   {% elif value <= 7 %} <span class="badge badge-warning">{{ value }}d</span>
   {% else %}
   <span class="badge badge-danger">{{ value }}d</span>
-  {% endif %}
-</td>
-<td class="cell-success-rate">{{ row.get('success-rate', '—') }}</td>
-<td class="cell-failures">
-  {% set value = row.get('failures') %}
-  {% if value >= 3 %}
-  <span class="badge badge-danger" title="{{ value }} consecutive failures"><i class="fa-solid fa-triangle-exclamation"></i> {{ value }}</span>
-  {% elif value > 0 %}
-  <span class="badge badge-warning">{{ value }}</span>
-  {% else %}
-  <span>{{ value }}</span>
   {% endif %}
 </td>
 <td class="cell-engagement">{{ row.get('engagement', '—') }}</td>

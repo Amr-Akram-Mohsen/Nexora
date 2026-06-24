@@ -42,7 +42,7 @@ CRUD_TABLES = {
             "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count", "read time", "platform upvotes", "platform comments"],
             "quality & scoring": ["base score", "review score", "article quality score"],
             "taxonomy & targeting": ["intent", "gender", "price tier", "attributes"],
-            "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "ingestion source"],
+            "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "acquired via"],
             "status & lifecycle": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "renderation status"]
         }
     },
@@ -58,7 +58,7 @@ CRUD_TABLES = {
     },
     "sources": {
         "id": "sources",
-        "preview_table": ["Name", "Volume", "Last Crawl", "Success Rate", "Failures", "Engagement", "Status", "Actions"],
+        "preview_table": ["Name", "Content Volume", "Freshness", "Engagement", "Status", "Actions"],
         "detailed_table": {
             "source info": ["id", "name", "slug", "domain", "authority score", "status"],
             "performance & quality": ["avg quality score", "avg word count", "scrape coverage", "published date range"],

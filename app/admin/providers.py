@@ -74,20 +74,6 @@ def _fetch_sources_page(page, per_page, search):
         ).all()
         content_agg_map = {r.source_id: r for r in content_agg}
 
-        page_source_slugs = [s.slug for s in pagination.items]
-        fetch_agg = db.session.execute(
-            select(
-                LastAPIFetch.source,
-                func.max(LastAPIFetch.last_fetched_at).label("last_crawl"),
-                func.sum(LastAPIFetch.success_count).label("success_count"),
-                func.sum(LastAPIFetch.failure_count).label("failure_count"),
-                func.max(LastAPIFetch.consecutive_failures).label("consecutive_failures")
-            )
-            .where(func.lower(LastAPIFetch.source).in_([sl.lower() for sl in page_source_slugs]))
-            .group_by(LastAPIFetch.source)
-        ).all()
-        fetch_agg_map = {r.source.lower(): r for r in fetch_agg}
-
         channels_rows = db.session.execute(
             select(Content.source_id, Content.ingestion_origin)
             .where(Content.source_id.in_(page_source_ids))
@@ -98,7 +84,7 @@ def _fetch_sources_page(page, per_page, search):
         for r in channels_rows:
             channels_map.setdefault(r.source_id, []).append(r.ingestion_origin)
     else:
-        content_agg_map, fetch_agg_map, channels_map = {}, {}, {}
+        content_agg_map, channels_map = {}, {}
 
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc)
@@ -117,17 +103,9 @@ def _fetch_sources_page(page, per_page, search):
                 latest = latest.replace(tzinfo=timezone.utc)
             freshness_days = (now - latest).days
 
-        fetch_info      = fetch_agg_map.get(s.slug.lower())
-        last_crawl      = fetch_info.last_crawl.isoformat() if fetch_info and fetch_info.last_crawl else None
-        success_count   = fetch_info.success_count if (fetch_info and fetch_info.success_count is not None) else 0
-        failure_count   = fetch_info.failure_count if (fetch_info and fetch_info.failure_count is not None) else 0
-        consec_failures = fetch_info.consecutive_failures if (fetch_info and fetch_info.consecutive_failures is not None) else 0
-        total_fetches   = success_count + failure_count
-        success_rate    = round((success_count / total_fetches) * 100.0, 1) if total_fetches > 0 else 100.0
-        
         if not s.is_active:
             status_val = "failed"
-        elif content_count == 0 or success_rate < 80.0:
+        elif content_count == 0 or (freshness_days is not None and freshness_days > 7):
             status_val = "warning"
         else:
             status_val = "healthy"
@@ -143,8 +121,7 @@ def _fetch_sources_page(page, per_page, search):
             "channels":        channels,
             "freshness":       freshness_days,
             "content-count":   content_count,
-            "success-rate":    success_rate,
-            "failures":        consec_failures,
+            "engagement":      engagement,
             "status":          status_val,
             "slug":            s.slug,
         })
@@ -181,11 +158,7 @@ def get_source_health_stats():
     ).all()
     content_map = {r[0]: {"count": r[1], "latest": r[2]} for r in content_agg}
     
-    fetch_agg = db.session.execute(
-        select(func.lower(LastAPIFetch.source), func.sum(LastAPIFetch.success_count), func.sum(LastAPIFetch.failure_count))
-        .group_by(func.lower(LastAPIFetch.source))
-    ).all()
-    fetch_map = {r[0]: {"success": r[1] or 0, "failure": r[2] or 0} for r in fetch_agg}
+    content_map = {r[0]: {"count": r[1], "latest": r[2]} for r in content_agg}
     
     healthy = 0
     warning = 0
@@ -198,23 +171,20 @@ def get_source_health_stats():
             continue
             
         c_stats = content_map.get(s_id, {"count": 0, "latest": None})
-        f_stats = fetch_map.get(s_slug.lower(), {"success": 0, "failure": 0})
+        c_stats = content_map.get(s_id, {"count": 0, "latest": None})
         
         c_count = c_stats["count"]
         latest = c_stats["latest"]
         
+        is_silent = False
         if latest:
             if latest.tzinfo is None:
                 latest = latest.replace(tzinfo=timezone.utc)
             if (now - latest) > timedelta(days=7):
                 silent += 1
-            
-        success = f_stats["success"]
-        failure = f_stats["failure"]
-        total_fetches = success + failure
-        success_rate = (success / total_fetches * 100.0) if total_fetches > 0 else 100.0
-        
-        if c_count == 0 or success_rate < 80.0:
+                is_silent = True
+                
+        if c_count == 0 or is_silent:
             warning += 1
         else:
             healthy += 1
