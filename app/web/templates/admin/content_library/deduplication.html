@@ -1,108 +1,183 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header %}
 
-{% block title %}Deduplication Workbench - Nexora Admin{% endblock %}
+{% block title %}Deduplication Workbench — Nexora Admin{% endblock %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard.css') }}">
+{% endblock %}
 
 {% block admin_content %}
+{{ admin_page_header("Deduplication Workbench", "Identify and resolve content with duplicate titles or overlapping sources.") }}
+
 <div class="flex flex-col gap-4">
-
-  {{ admin_page_header("Deduplication Workbench", "Identify and resolve content with duplicate titles or overlapping sources.") }}
-
-  {% include "admin/dashboard/_nav.html" %}
-
-  <div class="flex flex-col gap-4">
-    {% if duplicate_groups %}
-      {% for group in duplicate_groups %}
-      <div class="overview-panel bg-card border border-border radius-md">
-        <div class="flex justify-between items-start mb-4">
-          <div>
-            <h3>{{ group.title }}</h3>
-            <p>{{ group.count }} identical titles found</p>
+  {% if duplicate_groups %}
+    {% for group in duplicate_groups %}
+    <div class="overview-panel bg-card border border-border radius-md dup-group-panel"
+         id="dup-group-{{ loop.index }}">
+      <div class="dup-group-header flex justify-between items-center">
+        <div>
+          <h3 class="dup-group-title">{{ group.title }}</h3>
+          <p class="dup-group-meta">{{ group.count }} identical titles found</p>
+        </div>
+        <button
+          class="user-action-btn user-action-delete"
+          data-action="keep-oldest"
+          data-group="{{ loop.index }}"
+          data-items="{{ group.content_list|tojson|e }}">
+          <i class="fas fa-trash-alt"></i> Keep Oldest Only
+        </button>
+      </div>
+      <div class="dup-group-body">
+        {% for item in group.content_list %}
+        <div class="dup-item-card" id="dup-item-{{ item.id }}" data-id="{{ item.id }}">
+          <div class="flex justify-between items-center">
+            <span class="badge badge-type badge-compact">{{ item.type }}</span>
+            <span class="dup-item-meta">ID: {{ item.id }}</span>
           </div>
-          <div class="flex gap-2">
-            <button class="dashboard-btn dashboard-btn-danger dashboard-btn-sm" onclick="deleteAllButFirst(this, {{ group.content_list|tojson }})">Keep Oldest Only</button>
+          <div class="dup-item-meta">
+            <i class="fas fa-building fa-fw"></i>
+            {{ item.source }}
+          </div>
+          <div class="dup-item-meta">
+            <i class="fas fa-calendar fa-fw"></i>
+            {{ item.published_at[:10] if item.published_at else 'Unknown' }}
+          </div>
+          <div class="dup-item-actions">
+            <a href="/admin/contents/{{ item.id }}" target="_blank"
+               class="user-action-btn flex items-center justify-center gap-1">
+              <i class="fas fa-eye"></i> Inspect
+            </a>
+            <button class="user-action-btn user-action-delete flex items-center justify-center gap-1"
+              data-action="delete-dup" data-id="{{ item.id }}">
+              <i class="fas fa-trash"></i> Delete
+            </button>
           </div>
         </div>
-        
-        <div class="gap-4">
-          {% for item in group.content_list %}
-          <div class="bg-muted border border-border radius-md flex flex-col gap-2">
-            <div class="flex justify-between items-center">
-              <span class="badge badge-type badge-compact">{{ item.type }}</span>
-              <span>ID: {{ item.id }}</span>
-            </div>
-            <div><i class="fas fa-building fa-fw"></i> {{ item.source }}</div>
-            <div><i class="fas fa-calendar fa-fw"></i> {{ item.published_at[:10] if item.published_at else "Unknown" }}</div>
-            
-            <div class="flex gap-2">
-              <a href="/admin/contents/{{ item.id }}" target="_blank" class="dashboard-btn dashboard-btn-outline dashboard-btn-sm flex-1">Inspect</a>
-              <button class="dashboard-btn dashboard-btn-danger dashboard-btn-sm flex-1" onclick="deleteDuplicate({{ item.id }}, this)"><i class="fas fa-trash"></i> Delete</button>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
-    {% else %}
-      <div class="overview-panel bg-card border border-border radius-md">
-        <i class="fas fa-check-circle fa-3x mb-4"></i>
-        <h3>No Duplicates Found</h3>
-        <p>Your content library is clean. No items share identical titles.</p>
-      </div>
-    {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <div class="overview-panel bg-card border border-border radius-md">
+    <div class="dup-empty-state">
+      <i class="fas fa-check-circle dup-empty-icon"></i>
+      <h3 class="dup-empty-title">No Duplicates Found</h3>
+      <p class="dup-empty-sub">Your content library is clean. No items share identical titles.</p>
+    </div>
   </div>
-
+  {% endif %}
 </div>
 
-<script>
-function deleteDuplicate(id, btnElement) {
-  if (!confirm("Are you sure you want to delete this duplicate content?")) return;
-  
-  const card = btnElement.closest('.bg-muted');
-  card.style.opacity = '0.5';
-  
-  fetch('/admin/contents/bulk', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'delete', selected_ids: [id] })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      card.remove();
-    } else {
-      alert(data.error || "Failed to delete item.");
-      card.style.opacity = '1';
-    }
-  });
-}
+{% endblock %}
 
-function deleteAllButFirst(btnElement, items) {
-  if (items.length <= 1) return;
-  
-  // Sort by ID to keep the oldest (smallest ID)
-  const sortedItems = [...items].sort((a, b) => a.id - b.id);
-  const idsToDelete = sortedItems.slice(1).map(i => i.id);
-  
-  if (!confirm(`Are you sure you want to delete ${idsToDelete.length} duplicates? This cannot be undone.`)) return;
-  
-  const panel = btnElement.closest('.overview-panel');
-  panel.style.opacity = '0.5';
-  
-  fetch('/admin/contents/bulk', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'delete', selected_ids: idsToDelete })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      panel.remove();
-    } else {
-      alert(data.error || "Failed to delete items.");
-      panel.style.opacity = '1';
+{% block custom_scripts %}
+<script>
+(function () {
+  'use strict';
+
+  function removeCardById(id) {
+    var card = document.getElementById('dup-item-' + id);
+    if (card) {
+      card.classList.add('is-removing');
+      setTimeout(function () { card.remove(); }, 300);
+    }
+  }
+
+  function removeGroupPanel(groupIndex) {
+    var panel = document.getElementById('dup-group-' + groupIndex);
+    if (panel) {
+      panel.classList.add('is-removing');
+      setTimeout(function () { panel.remove(); }, 300);
+    }
+  }
+
+  function deleteDuplicate(id) {
+    showModal(
+      'Delete Duplicate',
+      'Are you sure you want to delete this duplicate content? This action cannot be undone.',
+      function () {
+        removeCardById(id);
+        fetch('/admin/contents/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', ids: [id] })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.success) {
+              showToast('Duplicate deleted successfully.', 'success');
+            } else {
+              showToast(data.error || 'Failed to delete item.', 'error');
+              var card = document.getElementById('dup-item-' + id);
+              if (card) card.classList.remove('is-removing');
+            }
+          })
+          .catch(function () {
+            showToast('Network error deleting duplicate.', 'error');
+          });
+      }
+    );
+  }
+
+  function deleteAllButFirst(groupIndex, items) {
+    if (!items || items.length <= 1) return;
+
+    var sorted = items.slice().sort(function (a, b) { return a.id - b.id; });
+    var idsToDelete = sorted.slice(1).map(function (i) { return i.id; });
+
+    showModal(
+      'Keep Oldest Only',
+      'Delete ' + idsToDelete.length + ' duplicate(s) and keep only the oldest entry? This cannot be undone.',
+      function () {
+        removeGroupPanel(groupIndex);
+        fetch('/admin/contents/bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', ids: idsToDelete })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.success) {
+              showToast('Kept oldest; removed ' + idsToDelete.length + ' duplicate(s).', 'success');
+            } else {
+              showToast(data.error || 'Failed to delete items.', 'error');
+              var panel = document.getElementById('dup-group-' + groupIndex);
+              if (panel) panel.classList.remove('is-removing');
+            }
+          })
+          .catch(function () {
+            showToast('Network error during bulk deletion.', 'error');
+          });
+      }
+    );
+  }
+
+  // ── Event delegation ──
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    var action = btn.dataset.action;
+
+    if (action === 'delete-dup') {
+      var id = parseInt(btn.dataset.id, 10);
+      deleteDuplicate(id);
+      return;
+    }
+
+    if (action === 'keep-oldest') {
+      var groupIndex = btn.dataset.group;
+      var items;
+      try {
+        items = JSON.parse(btn.dataset.items);
+      } catch (_) {
+        items = [];
+      }
+      deleteAllButFirst(groupIndex, items);
     }
   });
-}
+})();
 </script>
 {% endblock %}

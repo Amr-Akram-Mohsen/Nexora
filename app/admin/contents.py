@@ -126,8 +126,8 @@ def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
     sec_name = c.section.name if c.section else "None"
     classification_data = {
         "type": c.object_type,
-        "category": f"📁 {cat_name}",
-        "section": f"🏷️ {sec_name}"
+        "category": cat_name,
+        "section": sec_name
     }
 
     # Sources
@@ -846,6 +846,43 @@ def pipeline_stats():
             })
             
     return jsonify({"stats": stats})
+
+
+@bp.route("/pipeline/stats/partial", methods=["GET"])
+@admin_required
+def pipeline_stats_partial():
+    """Return a server-rendered HTML partial for the pipeline stats table."""
+    origins = db.session.execute(select(Content.ingestion_origin).distinct()).scalars().all()
+    stats_list = []
+
+    for origin in origins:
+        if not origin:
+            continue
+
+        counts = db.session.execute(
+            select(Article.status, func.count(Article.id))
+            .join(Content, Content.object_id == Article.id)
+            .where(Content.object_type == "article")
+            .where(Content.ingestion_origin == origin)
+            .group_by(Article.status)
+        ).all()
+
+        status_map = {status: count for status, count in counts}
+        total = sum(status_map.values())
+        if total > 0:
+            stats_list.append({
+                "origin": origin,
+                "pending": status_map.get("pending", 0),
+                "enriching": status_map.get("enriching", 0),
+                "failed": status_map.get("failed", 0),
+                "complete": status_map.get("complete", 0),
+                "total": total
+            })
+
+    return render_template(
+        "admin/content_library/_pipeline_stats_partial.html",
+        stats=stats_list
+    )
 
 @bp.route("/pipeline/retry", methods=["POST"])
 @admin_required

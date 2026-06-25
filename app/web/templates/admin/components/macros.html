@@ -12,7 +12,7 @@ value=""
 ) %}
 <div class="admin-toolbar-search admin-search-grow flex items-center {{ wrapper_class }}">
   <span class="{{ icon_class }}">
-    {{ icon }}
+    {{ icon|safe }}
   </span>
 
   <input type="text" id="{{ id }}" placeholder="{{ placeholder }}" value="{{ value }}" class="{{ input_class }}" {% for
@@ -207,7 +207,8 @@ BREAKDOWN PROGRESS BAR
 RANKED LIST ITEM
 ========================================================== #}
 {% macro ranked_list_item(rank, name, value_html, extra_class="") %}
-<li class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
+<li
+  class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
   <div class="flex items-center gap-3">
     <div class="overview-top-rank text-muted font-mono text-sm">#{{ rank }}</div>
     <div class="overview-top-name truncate font-medium" title="{{ name }}">{{ name }}</div>

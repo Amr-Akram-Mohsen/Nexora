@@ -1,104 +1,113 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui.html" import admin_page_header %}
 
-{% block title %}Pipeline Audit - Nexora Admin{% endblock %}
+{% block title %}Pipeline Audit — Nexora Admin{% endblock %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dashboard.css') }}">
+{% endblock %}
 
 {% block admin_content %}
-<div class="flex flex-col gap-4">
+{{ admin_page_header("Pipeline Audit", "Monitor ingestion pipelines, track enrichment health, and manage failed processing tasks.") }}
 
-  {{ admin_page_header("Pipeline Audit", "Monitor ingestion pipelines, track enrichment health, and manage failed processing tasks.") }}
-
-  {% include "admin/dashboard/_nav.html" %}
-
-  <div class="overview-panel bg-card border border-border radius-md">
-    <div class="flex justify-between items-center">
-      <div>
-        <h3>Enrichment Queue Status</h3>
-        <p>Real-time status of articles passing through the ingestion enricher.</p>
-      </div>
-      <button id="refresh-pipeline-btn" class="dashboard-btn dashboard-btn-outline"><i class="fas fa-sync-alt"></i>
-        Refresh Data</button>
+<div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel-header flex justify-between items-center">
+    <div>
+      <h3 class="overview-panel-title">Enrichment Queue Status</h3>
+      <p class="overview-panel-sub">Processing health across all ingestion origins</p>
     </div>
-
-    <div id="pipeline-stats-container" class="flex flex-col gap-4">
-      <div class="flex items-center justify-center">
-        <i class="fas fa-spinner fa-spin"></i> Loading pipeline statistics...
-      </div>
-    </div>
+    <button id="refresh-pipeline-btn" class="user-action-btn flex items-center gap-1">
+      <i class="fas fa-sync-alt"></i> Refresh
+    </button>
   </div>
 
+  <div id="pipeline-stats-container" class="panel-body-padded">
+    <div class="pipeline-loading">
+      <i class="fas fa-spinner fa-spin pipeline-loading-icon"></i>
+      Loading pipeline statistics&hellip;
+    </div>
+  </div>
 </div>
 
+{% endblock %}
+
+{% block custom_scripts %}
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const container = document.getElementById("pipeline-stats-container");
-    const refreshBtn = document.getElementById("refresh-pipeline-btn");
+(function () {
+  'use strict';
 
-    function loadStats() {
-      refreshBtn.disabled = true;
-      container.innerHTML = '<div class="flex items-center justify-center"><i class="fas fa-spinner fa-spin"></i> Loading pipeline statistics...</div>';
+  var container  = document.getElementById('pipeline-stats-container');
+  var refreshBtn = document.getElementById('refresh-pipeline-btn');
 
-      fetch("/admin/contents/pipeline/stats")
-        .then(res => res.json())
-        .then(data => {
-          if (!data.stats || data.stats.length === 0) {
-            container.innerHTML = '<div>No pipeline data available.</div>';
-            refreshBtn.disabled = false;
-            return;
-          }
-
-          let html = '<div class="admin-table-container"><table class="admin-table"><thead><tr>' +
-            '<th>Ingestion Origin</th><th>Pending</th><th>Enriching</th><th>Failed</th><th>Complete</th><th>Actions</th>' +
-            '</tr></thead><tbody>';
-
-          data.stats.forEach(s => {
-            const failedBadge = s.failed > 0 ? `<span class="badge badge-health-low">${s.failed}</span>` : `<span>0</span>`;
-            const pendingBadge = s.pending > 0 ? `<span class="badge badge-health-medium">${s.pending}</span>` : `<span>0</span>`;
-
-            html += `<tr>
-            <td>${s.origin}</td>
-            <td>${pendingBadge}</td>
-            <td>${s.enriching}</td>
-            <td>${failedBadge}</td>
-            <td><span class="badge badge-health-high">${s.complete}</span></td>
-            <td>
-              ${s.failed > 0 ? `<button class="dashboard-btn dashboard-btn-primary dashboard-btn-sm" onclick="retryFailed('${s.origin}')"><i class="fas fa-redo"></i> Retry Failed</button>` : `<span>Healthy</span>`}
-            </td>
-          </tr>`;
-          });
-
-          html += '</tbody></table></div>';
-          container.innerHTML = html;
-          refreshBtn.disabled = false;
-        })
-        .catch(err => {
-          console.error(err);
-          container.innerHTML = '<div>Error loading statistics.</div>';
-          refreshBtn.disabled = false;
-        });
+  function setLoading(active) {
+    refreshBtn.disabled = active;
+    if (active) {
+      refreshBtn.querySelector('i').classList.add('fa-spin');
+    } else {
+      refreshBtn.querySelector('i').classList.remove('fa-spin');
     }
+  }
 
-    window.retryFailed = function (origin) {
-      if (!confirm(`Are you sure you want to requeue all failed articles from ${origin}?`)) return;
+  function loadStats() {
+    setLoading(true);
+    container.innerHTML = '<div class="pipeline-loading"><i class="fas fa-spinner fa-spin pipeline-loading-icon"></i>Loading pipeline statistics&hellip;</div>';
 
-      fetch("/admin/contents/pipeline/retry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ origin: origin })
+    fetch('/admin/contents/pipeline/stats/partial')
+      .then(function (res) {
+        if (!res.ok) throw new Error('Stats fetch failed (' + res.status + ')');
+        return res.text();
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            alert(`Successfully requeued ${data.retried} articles. They will be processed in the background.`);
-            loadStats();
-          } else {
-            alert("Failed to retry items.");
-          }
-        });
-    };
+      .then(function (html) {
+        container.innerHTML = html;
+        setLoading(false);
+      })
+      .catch(function (err) {
+        console.error(err);
+        container.innerHTML = '<div class="table-empty-state">Error loading pipeline statistics. Please try refreshing.</div>';
+        setLoading(false);
+      });
+  }
 
-    refreshBtn.addEventListener("click", loadStats);
-    loadStats();
+  function retryFailed(origin) {
+    var label = origin || 'all origins';
+    showModal(
+      'Retry Failed Articles',
+      'Requeue all failed articles from <strong>' + label + '</strong>? They will be re-processed in the background.',
+      function () {
+        fetch('/admin/contents/pipeline/retry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ origin: origin })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.success) {
+              showToast('Successfully requeued ' + data.retried + ' articles.', 'success');
+              loadStats();
+            } else {
+              showToast('Failed to retry articles.', 'error');
+            }
+          })
+          .catch(function () {
+            showToast('Network error during retry request.', 'error');
+          });
+      }
+    );
+  }
+
+  // ── Event delegation for retry buttons ──
+  container.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action="retry-failed"]');
+    if (btn) {
+      retryFailed(btn.dataset.origin);
+    }
   });
+
+  refreshBtn.addEventListener('click', loadStats);
+
+  // Initial load
+  loadStats();
+})();
 </script>
 {% endblock %}

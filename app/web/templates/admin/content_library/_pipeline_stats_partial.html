@@ -1,0 +1,63 @@
+{# admin/content_library/_pipeline_stats_partial.html
+   Rendered server-side and returned as an HTML partial via fetch.
+   Variables: stats (list of pipeline stat objects) #}
+{% if stats %}
+<div class="admin-table-wrapper">
+  <table class="admin-table" id="pipeline-stats-table">
+    <thead>
+      <tr>
+        <th>Ingestion Origin</th>
+        <th>Pending</th>
+        <th>Enriching</th>
+        <th>Failed</th>
+        <th>Complete</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in stats %}
+      <tr>
+        <td>
+          <span class="badge badge-origin badge-compact">{{ s.origin }}</span>
+        </td>
+        <td>
+          {% if s.pending > 0 %}
+          <span class="badge badge-health-medium badge-compact">{{ s.pending }}</span>
+          {% else %}
+          <span class="content-date-row">0</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="content-date-row">{{ s.enriching }}</span>
+        </td>
+        <td>
+          {% if s.failed > 0 %}
+          <span class="badge badge-health-low badge-compact">{{ s.failed }}</span>
+          {% else %}
+          <span class="content-date-row">0</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="badge badge-health-high badge-compact">{{ s.complete }}</span>
+        </td>
+        <td>
+          {% if s.failed > 0 %}
+          <button class="user-action-btn user-action-toggle-active flex items-center gap-1"
+            data-action="retry-failed"
+            data-origin="{{ s.origin }}">
+            <i class="fas fa-redo"></i> Retry Failed
+          </button>
+          {% else %}
+          <span class="badge badge-health-high badge-compact">Healthy</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="table-empty-state">
+  No pipeline data available.
+</div>
+{% endif %}

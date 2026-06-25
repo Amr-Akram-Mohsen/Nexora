@@ -1,12 +1,11 @@
 <td class="cell-title">
   {% set value = row.title %}
-  <div class="flex flex-col gap-2">
-    <strong>{{ value.value }}</strong>
+  <div class="content-cell-title flex flex-col gap-1">
+    <strong class="cell-primary-text">{{ value.value }}</strong>
     {% if value.badges %}
-    <div class="flex flex-wrap gap-1">
+    <div class="flex flex-wrap gap-1 content-status-group">
       {% for b in value.badges %}
-      <span class="badge {{ b.badge_class }}" {% if b.title %} title="{{ b.title }}" {% endif %}>{% if b.icon %}{{
-        b.icon|safe }} {% endif %}{{ b.value }}</span>
+      <span class="badge {{ b.badge_class }}" {% if b.title %} title="{{ b.title }}" {% endif %}>{% if b.icon %}{{ b.icon|safe }} {% endif %}{{ b.value }}</span>
       {% endfor %}
     </div>
     {% endif %}
@@ -16,27 +15,29 @@
   {% set value = row.classification %}
   <div class="flex flex-col gap-1">
     <span class="badge badge-type badge-compact">{{ value.type }}</span>
-    <span>{{ value.category }}</span>
-    <span>{{ value.section }}</span>
+    <span class="content-date-row">{{ value.category }}</span>
+    <span class="content-date-row">{{ value.section }}</span>
   </div>
 </td>
 <td class="cell-engagement">
   {% set value = row.engagement %}
-  <div class="flex flex-wrap gap-2">
-    <span title="Views"><i class="fas fa-eye"></i> {{ value.views }}</span>
-    <span title="Likes"><i class="fas fa-heart"></i> {{ value.likes }}</span>
-    <span title="Comments"><i class="fas fa-comment"></i> {{ value.comments }}</span>
-    <span title="Shares"><i class="fas fa-share"></i> {{ value.shares }}</span>
-    <span title="Saves"><i class="fas fa-save"></i> {{ value.saves }}</span>
+  <div class="content-engagement-metrics flex flex-wrap gap-2">
+    <span class="content-metric-item" title="Views"><i class="fas fa-eye"></i> {{ value.views }}</span>
+    <span class="content-metric-item" title="Likes"><i class="fas fa-heart"></i> {{ value.likes }}</span>
+    <span class="content-metric-item" title="Comments"><i class="fas fa-comment"></i> {{ value.comments }}</span>
+    <span class="content-metric-item" title="Shares"><i class="fas fa-share"></i> {{ value.shares }}</span>
+    <span class="content-metric-item" title="Saves"><i class="fas fa-save"></i> {{ value.saves }}</span>
   </div>
 </td>
-<td class="cell-published-at">{{ row['published-at'] or '—' }}</td>
+<td class="cell-published-at">
+  <span class="content-date-row">{{ row['published-at'][:10] if row['published-at'] else '—' }}</span>
+</td>
 <td class="cell-sources">
   {% set value = row.sources %}
   <div class="flex flex-col gap-1">
-    <span title="Publisher">{{ value.text }}</span>
+    <span class="cell-primary-text">{{ value.text or '—' }}</span>
     {% if value.origin_chip %}
-    <span class="badge badge-origin badge-compact" title="Acquired Via">Via: {{ value.origin_chip }}</span>
+    <span class="badge badge-origin badge-compact" title="Acquired Via">{{ value.origin_chip }}</span>
     {% endif %}
   </div>
 </td>
@@ -44,25 +45,27 @@
   {% set value = row.status %}
   <div class="flex flex-col gap-2">
     <span class="{{ value.status.badge_class }}">{{ value.status.value }}</span>
-    <button data-action="toggle-publish" data-id="{{ value.action.id }}" data-status="{{ value.action.action }}"
-      class="dashboard-btn {{ value.action.class }}" title="{{ value.action.label }}">{{ value.action.label }}</button>
   </div>
 </td>
 {% if not hide_action_column %}
-<td class="cell-actions flex flex-col gap-1">
-  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/contents/{{ row.id }}" target="_blank">
-    <i class="fas fa-eye"></i> Inspect
-  </a>
-  {% if row.is_published %}
-  <button class="user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1"
-    data-action="toggle-publish" data-id="{{ row.id }}" data-status="unpublish" title="Unpublish">
-    <i class="fas fa-eye-slash"></i> Unpublish
-  </button>
-  {% else %}
-  <button class="user-action-btn user-action-toggle-active flex items-center justify-center gap-1"
-    data-action="toggle-publish" data-id="{{ row.id }}" data-status="publish" title="Publish">
-    <i class="fas fa-upload"></i> Publish
-  </button>
-  {% endif %}
+<td class="cell-actions">
+  <div class="actions-cell-group flex flex-col gap-1">
+    <a class="user-action-btn flex items-center justify-center gap-1"
+       href="/admin/contents/{{ row.id }}" target="_blank"
+       title="Inspect full detail page">
+      <i class="fas fa-eye"></i> Inspect
+    </a>
+    {% if row.is_published %}
+    <button class="user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1"
+      data-action="toggle-publish" data-id="{{ row.id }}" data-status="unpublish" title="Unpublish">
+      <i class="fas fa-eye-slash"></i> Unpublish
+    </button>
+    {% else %}
+    <button class="user-action-btn user-action-toggle-active flex items-center justify-center gap-1"
+      data-action="toggle-publish" data-id="{{ row.id }}" data-status="publish" title="Publish">
+      <i class="fas fa-upload"></i> Publish
+    </button>
+    {% endif %}
+  </div>
 </td>
 {% endif %}

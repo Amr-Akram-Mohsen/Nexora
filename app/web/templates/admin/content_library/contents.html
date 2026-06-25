@@ -44,13 +44,13 @@
   {{ admin_filter_select("filter-published", None, [("true", "Published Only"), ("false", "Draft / Review Only")],
   default_val="", default_text="All Visibility", extra_class="filter-select-item") }}
   {{ admin_filter_select("filter-quality", None, [
-  ("missing_category", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Category'),
-  ("missing_metadata", '<i class="fa-solid fa-pen-to-square"></i> Missing Metadata'),
-  ("duplicate", '<i class="fa-solid fa-user-group"></i> Duplicate Title'),
-  ("missing_topics", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Topics'),
-  ("missing_brands", '<i class="fa-solid fa-triangle-exclamation"></i> Missing Brands'),
-  ("missing_source", '<i class="fa-solid fa-circle"></i> Missing Source'),
-  ("enrichment_failed", '<i class="fa-solid fa-ban"></i> Enrichment Failed')
+  ("missing_category", "⚠ Missing Category"),
+  ("missing_metadata", "✎ Missing Metadata"),
+  ("duplicate", "⊕ Duplicate Title"),
+  ("missing_topics", "⚠ Missing Topics"),
+  ("missing_brands", "⚠ Missing Brands"),
+  ("missing_source", "● Missing Source"),
+  ("enrichment_failed", "✕ Enrichment Failed")
   ], default_val="", default_text="All Health Statuses", extra_class="filter-select-warning") }}
 </div>
 
@@ -90,7 +90,7 @@
 {# Bulk Actions Toolbar (hidden by default) #}
 <div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
   <div class="flex items-center gap-2">
-    <span class=""><i class="fa-solid fa-bolt"></i></span>
+    <span><i class="fa-solid fa-bolt"></i></span>
     <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
   </div>
 
@@ -128,7 +128,7 @@
   </div>
 </div>
 <div class="tip-text">
-  <i class="fa-solid fa-lightbulb"></i> Double-click any category to quick recategorize
+  <i class="fa-solid fa-lightbulb"></i> Double-click any row to quick recategorize
 </div>
 {% endcall %}
 {% endblock %}
