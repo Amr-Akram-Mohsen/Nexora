@@ -659,3 +659,18 @@ a.clickable-card:hover .dashboard-stat-value {
     font-size: var(--text-sm);
     margin: 0;
 }
+
+/* --- Utilities (Migrated) --- */
+
+.activity-item {
+    align-items: flex-start;
+}
+
+.activity-meta {
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
+}
+
+.dashboard-stat-card {
+    flex-direction: column;
+}

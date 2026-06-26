@@ -304,3 +304,9 @@
     align-items: flex-start;
   }
 }
+
+/* --- Utilities (Migrated) --- */
+
+.settings-card-header {
+    align-items: flex-start;
+}

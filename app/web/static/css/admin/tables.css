@@ -218,3 +218,53 @@
     color: var(--muted-foreground);
     font-size: var(--text-sm);
 }
+
+/* --- Utilities (Migrated) --- */
+.cell-link {
+    text-decoration: underline;
+}
+
+.cell-title,
+.cell-name {
+    min-width: 15rem;
+}
+
+.cell-metadata {
+    min-width: 10rem;
+}
+
+[class*="status"] {
+    font-weight: var(--weight-bold);
+}
+
+.admin-table-scrollable {
+    margin-bottom: 0;
+}
+
+.clickable-entity-name {
+    color: var(--foreground);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.clickable-entity-name:hover {
+    color: var(--brand-blue);
+}
+
+.col-metric {
+    color: var(--foreground);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    text-align: right;
+}
+
+.expand-arrow {
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+    margin-left: 0.5rem;
+}
+
+.table {
+    margin-bottom: 0;
+    vertical-align: middle;
+}

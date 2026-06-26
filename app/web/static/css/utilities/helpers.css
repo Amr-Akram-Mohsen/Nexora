@@ -188,3 +188,7 @@ label[data-disabled="true"] * {
     height: 2.5rem;
   }
 }
+
+.small {
+    color: var(--muted-foreground);
+}

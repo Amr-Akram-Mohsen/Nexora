@@ -1,16 +1,1 @@
-.cell-link {
-    text-decoration: underline;
-}
-
-.cell-title,
-.cell-name {
-    min-width: 15rem;
-}
-
-.cell-metadata {
-    min-width: 10rem;
-}
-
-[class*="status"] {
-    font-weight: var(--weight-bold);
-}
+/* Deprecated. Merged into semantic files. */

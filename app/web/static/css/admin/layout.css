@@ -281,3 +281,21 @@
     margin-top: 0.375rem;
     opacity: 0.7;
 }
+
+/* --- Utilities (Migrated) --- */
+
+.admin-card {
+    padding: 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.grid-full-width {
+    text-align: center;
+}
+
+.admin-toolbar-advanced {
+    flex-direction: column;
+}

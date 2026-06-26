@@ -258,3 +258,17 @@
 .inspect-article-views {
     white-space: nowrap;
 }
+
+/* --- Utilities (Migrated) --- */
+
+.inspect-details-group {
+    flex-direction: column;
+}
+
+.inspect-store-card-grid {
+    margin-top: 0.5rem;
+}
+
+.inspect-store-card-links {
+    flex-direction: column;
+}

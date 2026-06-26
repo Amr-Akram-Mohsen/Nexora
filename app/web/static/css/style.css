@@ -28,7 +28,7 @@
 
 @import "components/interactions/interaction.css";
 
-@import "content/cards/shared.css";
+@import "components/cards.css";
 
 @import "content/cards/article.css";
 @import "content/cards/video.css";
@@ -36,7 +36,6 @@
 @import "content/features/content-image.css";
 @import "content/features/video-thumb.css";
 
-@import "commercial/cards/item.css";
 @import "commercial/catalog/compare.css";
 @import "commercial/features/item-image.css";
 @import "commercial/features/rating.css";

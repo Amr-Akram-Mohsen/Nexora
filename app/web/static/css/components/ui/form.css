@@ -109,3 +109,7 @@
   color: var(--muted-foreground);
   margin-top: 0.25rem;
 }
+
+.wrapper_class {
+  margin-bottom: 0.75rem;
+}
