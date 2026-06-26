@@ -8,10 +8,8 @@ from app.core.context import get_newsletter_context
 from app.application.interaction.newsletter import subscribe_workflow, confirm_subscription_workflow, unsubscribe_workflow
 from app.application.interaction.handle_interaction import handle_interaction_workflow
 from app.application.interaction.item_click import record_item_click_workflow
-from app.application.interaction.get_comments import get_comments_html
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items, record_view
-from app.domains.interaction.models import RecommendationImpression, RecommendationClick
 from app.domains.content.service import get_content_by_id
 from app.domains.item.service import get_item_by_id
 from app.shared.utils.logging import log_route_start, log_route_success
@@ -138,7 +136,19 @@ def get_comments():
         abort(400, "Invalid parameters")
     
     parent_id = request.args.get("parent_id", type=int)
-    return get_comments_html(target_type, target_id, parent_id)
+    
+    from app.domains.interaction.service import get_comments_for_target
+    comments = get_comments_for_target(target_type, target_id, parent_id)
+    
+    comments_html = "".join(
+        render_template(
+            'components/interactions/comment-card.html',
+            comment=c,
+            is_reply=parent_id is not None
+        ) for c in comments
+    )
+    
+    return comments_html
 
 @bp.route("/item-click/<int:link_id>", methods=["POST"])
 def item_click(link_id):
@@ -268,20 +278,15 @@ def track_impression():
         
     user_id = current_user.id if current_user.is_authenticated else None
     
-    try:
-        impression = RecommendationImpression(
-            entity_type=entity_type,
-            context_id=str(context_id) if context_id is not None else None,
-            entity_ids=entity_ids,
-            user_id=user_id
-        )
-        db.session.add(impression)
+    from app.domains.interaction.service.tracking import track_recommendation_impression
+    success = track_recommendation_impression(entity_type, entity_ids, context_id, user_id)
+    
+    if success:
         db.session.commit()
         return jsonify({"success": True})
-    except Exception as e:
+    else:
         db.session.rollback()
-        current_app.logger.exception("Failed to track recommendation impression")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Failed to track impression"}), 500
 
 
 @bp.route("/track/click", methods=["POST"])
@@ -297,17 +302,12 @@ def track_click():
         
     user_id = current_user.id if current_user.is_authenticated else None
     
-    try:
-        click = RecommendationClick(
-            entity_type=entity_type,
-            entity_id=str(entity_id),
-            context_id=str(context_id) if context_id is not None else None,
-            user_id=user_id
-        )
-        db.session.add(click)
+    from app.domains.interaction.service.tracking import track_recommendation_click
+    success = track_recommendation_click(entity_type, entity_id, context_id, user_id)
+    
+    if success:
         db.session.commit()
         return jsonify({"success": True})
-    except Exception as e:
+    else:
         db.session.rollback()
-        current_app.logger.exception("Failed to track recommendation click")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Failed to track click"}), 500

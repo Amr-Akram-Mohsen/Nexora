@@ -88,9 +88,3 @@ def serialize_target(obj, session=None):
             data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
 
     return data
-
-
-def unify_common_attrs(obj, session=None):
-    return {
-        "title": getattr(obj, "title", None),
-    }

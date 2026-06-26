@@ -33,3 +33,35 @@ def get_trending_contents(limit=6, days=7, section_ids=None, object_type=None, e
         stmt = stmt.limit(limit)
 
     return fetch_serialized_contents(stmt, session)
+
+def get_popular_contents(
+    section_id: int | None = None,
+    category_slugs: tuple | None = None,
+    brand_slugs: tuple | None = None,
+    intent_slugs: tuple | None = None,
+    limit: int = 6,
+    session=None
+) -> list[dict]:
+    from app.domains.taxonomy.models import Category, Brand, IntentFacet
+    from .utils import build_content_stmt, fetch_serialized_contents
+    
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+
+    stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
+    
+    if section_id:
+        stmt = stmt.where(Content.section_id == section_id)
+    if category_slugs:
+        stmt = stmt.join(Content.category).where(Category.slug.in_(list(category_slugs)))
+    if brand_slugs:
+        stmt = stmt.join(Content.brands).where(Brand.slug.in_(list(brand_slugs)))
+    if intent_slugs:
+        stmt = stmt.join(Content.intent).where(IntentFacet.slug.in_(list(intent_slugs)))
+
+    stmt = stmt.order_by(Content.view_count.desc(), Content.published_at.desc())
+    if limit:
+        stmt = stmt.limit(limit)
+
+    return fetch_serialized_contents(stmt, session)

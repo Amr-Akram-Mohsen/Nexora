@@ -112,21 +112,10 @@ def match_articles_to_items(
     page          = 0
 
     while True:
-        # ── Build article query with pagination ───────────────────
+        from app.domains.content.service.query.matcher_queries import get_unmatched_articles_query
+        
         cutoff = datetime.utcnow() - REPROCESS_AFTER
-        article_q = (
-            db.session.query(Article)
-            .join(Content, (Content.object_type == "article") & (Content.object_id == Article.id))
-            .filter(
-                # Either never matched, or matched long enough ago to re-check
-                db.or_(
-                    Article.last_matched_at.is_(None),
-                    Article.last_matched_at < cutoff,
-                )
-            )
-        )
-        if since:
-            article_q = article_q.filter(Content.published_at >= since)
+        article_q = get_unmatched_articles_query(cutoff=cutoff, since=since, session=db.session)
 
         batch = article_q.offset(page * BATCH_SIZE).limit(BATCH_SIZE).all()
         if not batch:

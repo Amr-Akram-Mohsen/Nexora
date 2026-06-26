@@ -291,3 +291,30 @@ def get_filtered_items_for_home(filter_type="recent", limit=10, exclude_ids=None
 
     return [serialize_item(item) for item in items]
 
+def get_popular_items(
+    category_slugs: tuple | None = None,
+    brand_slugs: tuple | None = None,
+    limit: int = 6,
+    session=None
+) -> list[dict]:
+    from app.domains.item.models import Item
+    from app.domains.taxonomy.models import Category, Brand
+    from app.domains.item.service.utils import build_item_stmt, fetch_items
+    from app.domains.item.service.serializers import serialize_item
+    
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    
+    stmt = build_item_stmt(eager_load="card")
+    if category_slugs:
+        stmt = stmt.join(Item.category).where(Category.slug.in_(list(category_slugs)))
+    if brand_slugs:
+        stmt = stmt.join(Item.brand).where(Brand.slug.in_(list(brand_slugs)))
+        
+    stmt = stmt.order_by(Item.view_count.desc(), Item.created_at.desc())
+    if limit:
+        stmt = stmt.limit(limit)
+        
+    items = fetch_items(stmt, session)
+    return [serialize_item(i) for i in items]
