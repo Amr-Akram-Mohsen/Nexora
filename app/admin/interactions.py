@@ -647,18 +647,16 @@ def comments_rows():
 
 
 def build_comment_inspect_data(id):
-    from sqlalchemy.orm import selectinload
-    stmt = select(Comment).options(
-        selectinload(Comment.user),
-        selectinload(Comment.content_target),
-        selectinload(Comment.item),
-        selectinload(Comment.parent),
-        selectinload(Comment.replies)
-    ).where(Comment.id == id)
-    comment = db.session.scalar(stmt)
+    from app.domains.interaction.service.inspect import get_comment_inspect_metrics
+    metrics = get_comment_inspect_metrics(id)
     
-    if not comment:
+    if not metrics:
         return None
+        
+    comment = metrics["comment"]
+    total_user_comments = metrics["total_user_comments"]
+    target_sentiments = metrics["target_sentiments"]
+    recent_reactions = metrics["recent_reactions"]
     
     from app.admin.tables import get_inspect_table
     
@@ -673,28 +671,12 @@ def build_comment_inspect_data(id):
         sorted_replies = sorted(comment.replies, key=lambda r: r.created_at, reverse=True)
         latest_replies = [{"label": f"• {r.content[:40]}..."} for r in sorted_replies[:3]]
 
-    total_user_comments = db.session.scalar(select(func.count(Comment.id)).where(Comment.user_id == comment.user_id)) if comment.user_id else 0
-
-    target_sentiments = db.session.execute(
-        select(Comment.sentiment, func.count(Comment.id))
-        .where(Comment.target_type == comment.target_type)
-        .where(Comment.target_id == comment.target_id)
-        .group_by(Comment.sentiment)
-    ).all()
-    
     total_target_comments = sum(count for _, count in target_sentiments)
     sentiment_dist = []
     for sentiment, count in target_sentiments:
         pct = (count / total_target_comments * 100) if total_target_comments > 0 else 0
         s_label = sentiment.title() if sentiment else 'Neutral'
         sentiment_dist.append({"label": s_label, "count": f"{count} ({pct:.1f}%)"})
-
-    recent_reactions = db.session.execute(
-        select(Reaction).options(selectinload(Reaction.user))
-        .where(Reaction.target_type == 'comment', Reaction.target_id == comment.id)
-        .order_by(Reaction.created_at.desc())
-        .limit(3)
-    ).scalars().all()
     
     reactions_html = "—"
     if recent_reactions:
@@ -765,43 +747,19 @@ def inspect_comment(id):
 @bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
 def inspect_clicks(link_id):
     """Return server-rendered HTML for recent clicks on a given store link."""
-    from app.domains.item.models import ItemStoreLink, Store, ItemVariant, Item
+    from app.domains.interaction.service.inspect import get_link_clicks_metrics
+    metrics = get_link_clicks_metrics(link_id)
     
-    stmt = (
-        select(ItemStoreLink.id.label("link_id"), ItemStoreLink.affiliate_url, Store.name.label("store_name"), Item.name.label("item_name"))
-        .select_from(ItemStoreLink)
-        .join(Store, ItemStoreLink.store_id == Store.id)
-        .join(ItemVariant, ItemStoreLink.variant_id == ItemVariant.id)
-        .join(Item, ItemVariant.item_id == Item.id)
-        .where(ItemStoreLink.id == link_id)
-    )
-    link_data = db.session.execute(stmt).mappings().first()
-    
-    if not link_data:
+    if not metrics:
          return "Link data not found.", 404
 
     from app.admin.tables import get_inspect_table
     
-    total_clicks = db.session.scalar(select(func.count()).select_from(ItemClick).where(ItemClick.item_store_link_id == link_id)) or 0
-    latest_click = db.session.scalar(select(func.max(ItemClick.created_at)).where(ItemClick.item_store_link_id == link_id))
-    
-    country_stats = db.session.execute(
-        select(ItemClick.country, func.count(ItemClick.id))
-        .where(ItemClick.item_store_link_id == link_id)
-        .group_by(ItemClick.country)
-        .order_by(func.count(ItemClick.id).desc())
-        .limit(5)
-    ).all()
-    
-    referrer_stats = db.session.execute(
-        select(ItemClick.referrer, func.count(ItemClick.id))
-        .where(ItemClick.item_store_link_id == link_id)
-        .where(ItemClick.referrer.isnot(None))
-        .where(ItemClick.referrer != "")
-        .group_by(ItemClick.referrer)
-        .order_by(func.count(ItemClick.id).desc())
-        .limit(5)
-    ).all()
+    link_data = metrics["link_data"]
+    total_clicks = metrics["total_clicks"]
+    latest_click = metrics["latest_click"]
+    country_stats = metrics["country_stats"]
+    referrer_stats = metrics["referrer_stats"]
     
     top_countries = [{"label": c or 'Unknown', "count": cnt} for c, cnt in country_stats] if country_stats else "—"
     top_referrers = [{"label": r or 'Direct', "count": cnt} for r, cnt in referrer_stats] if referrer_stats else "—"

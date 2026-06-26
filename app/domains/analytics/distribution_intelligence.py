@@ -89,3 +89,162 @@ def get_distribution_intelligence_data():
         "platforms": platforms,
         "time_to_distribution_hours": round(time_to_dist_hours, 1)
     }
+
+
+def get_social_distribution_summary():
+    now_utc = datetime.now(timezone.utc)
+    return {
+        "draft": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "draft")),
+        "scheduled": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "scheduled")),
+        "published": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "published")),
+        "overdue": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "scheduled", DistributionPost.publish_date < now_utc)),
+    }
+
+
+def get_overview_kpis():
+    now_utc = datetime.now(timezone.utc)
+    stats = {
+        "total_posts": db.session.scalar(select(func.count()).select_from(DistributionPost)),
+        "published": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "published")),
+        "scheduled": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "scheduled")),
+        "drafts": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "draft")),
+        "overdue": db.session.scalar(select(func.count()).select_from(DistributionPost).where(DistributionPost.status == "scheduled", DistributionPost.publish_date < now_utc)),
+        "total_views": db.session.scalar(select(func.sum(DistributionPost.views_count)).select_from(DistributionPost)) or 0,
+        "total_engagement": db.session.scalar(
+            select(
+                func.sum(
+                    DistributionPost.views_count + 
+                    (DistributionPost.likes_count * 2) + 
+                    (DistributionPost.shares_count * 3) + 
+                    (DistributionPost.clicks_count * 1.5)
+                )
+            ).select_from(DistributionPost)
+        ) or 0
+    }
+    return stats
+
+
+def get_health_alerts():
+    now_utc = datetime.now(timezone.utc)
+    stale_threshold = now_utc - timedelta(days=7)
+    
+    overdue_count = db.session.scalar(
+        select(func.count()).select_from(DistributionPost)
+        .where(DistributionPost.status == "scheduled", DistributionPost.publish_date < now_utc)
+    ) or 0
+    
+    stale_drafts_count = db.session.scalar(
+        select(func.count()).select_from(DistributionPost)
+        .where(DistributionPost.status == "draft", DistributionPost.updated_at < stale_threshold)
+    ) or 0
+    
+    no_url_published_count = db.session.scalar(
+        select(func.count()).select_from(DistributionPost)
+        .where(DistributionPost.status == "published", DistributionPost.external_url.is_(None))
+    ) or 0
+    
+    alerts = []
+    if overdue_count > 0:
+        alerts.append({
+            "type": "danger",
+            "icon": "⚠️",
+            "title": "Overdue Posts",
+            "message": f"There are {overdue_count} scheduled posts that have passed their target publish date."
+        })
+    if stale_drafts_count >= 5:
+        alerts.append({
+            "type": "warning",
+            "icon": "📝",
+            "title": "Stale Drafts",
+            "message": f"You have {stale_drafts_count} drafts that haven't been updated in over 7 days."
+        })
+    if no_url_published_count > 0:
+        alerts.append({
+            "type": "warning",
+            "icon": "🔗",
+            "title": "Missing URLs",
+            "message": f"{no_url_published_count} published posts are missing external verifiable URLs."
+        })
+    return alerts
+
+
+def get_coverage_analytics():
+    total_content = db.session.scalar(
+        select(func.count()).select_from(Content)
+        .where(Content.is_active == True, Content.is_published == True)
+    ) or 0
+    
+    distributed_content = db.session.scalar(
+        select(func.count(func.distinct(Content.id))).select_from(Content)
+        .join(DistributionPost, (
+            (DistributionPost.source_target_type == 'content') &
+            (DistributionPost.source_target_id == Content.id)
+        ))
+        .where(Content.is_active == True, Content.is_published == True, DistributionPost.status == 'published')
+    ) or 0
+    
+    total_items = db.session.scalar(select(func.count()).select_from(Item)) or 0
+    
+    distributed_items = db.session.scalar(
+        select(func.count(func.distinct(Item.id))).select_from(Item)
+        .join(DistributionPost, (
+            (DistributionPost.source_target_type == 'item') &
+            (DistributionPost.source_target_id == Item.id)
+        ))
+        .where(DistributionPost.status == 'published')
+    ) or 0
+    
+    content_coverage_pct = (distributed_content / total_content * 100) if total_content > 0 else 0
+    item_coverage_pct = (distributed_items / total_items * 100) if total_items > 0 else 0
+    
+    return {
+        "content": {
+            "total": total_content,
+            "distributed": distributed_content,
+            "percentage": round(content_coverage_pct, 1)
+        },
+        "item": {
+            "total": total_items,
+            "distributed": distributed_items,
+            "percentage": round(item_coverage_pct, 1)
+        }
+    }
+
+
+def get_platform_performance():
+    query = (
+        select(
+            DistributionPlatform.name.label("platform_name"),
+            func.count(DistributionPost.id).label("post_count"),
+            func.sum(DistributionPost.views_count).label("total_views"),
+            func.sum(DistributionPost.likes_count).label("total_likes"),
+            func.sum(DistributionPost.clicks_count).label("total_clicks"),
+            func.sum(DistributionPost.shares_count).label("total_shares")
+        )
+        .join(DistributionPlatform)
+        .where(DistributionPost.status == 'published')
+        .group_by(DistributionPlatform.name)
+        .order_by(desc(func.sum(DistributionPost.views_count)))
+    )
+    
+    results = db.session.execute(query).all()
+    
+    platforms_data = []
+    for row in results:
+        v = row.total_views or 0
+        l = row.total_likes or 0
+        c = row.total_clicks or 0
+        s = row.total_shares or 0
+        engagement = (l * 2) + (c * 5) + (s * 10) + (v * 0.1)
+        
+        platforms_data.append({
+            "name": row.platform_name,
+            "post_count": row.post_count,
+            "views": v,
+            "likes": l,
+            "clicks": c,
+            "shares": s,
+            "engagement": engagement
+        })
+        
+    return platforms_data

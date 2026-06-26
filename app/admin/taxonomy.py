@@ -352,20 +352,15 @@ def categories_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [c.id for c in pagination.items]
-    content_counts = {}
-    item_counts = {}
-    children_counts = {}
-    
-    if item_ids:
-        content_counts = dict(db.session.execute(select(Content.category_id, func.count(Content.id)).where(Content.category_id.in_(item_ids)).group_by(Content.category_id)).all())
-        item_counts = dict(db.session.execute(select(Item.category_id, func.count(Item.id)).where(Item.category_id.in_(item_ids)).group_by(Item.category_id)).all())
-        children_counts = dict(db.session.execute(select(Category.parent_id, func.count(Category.id)).where(Category.parent_id.in_(item_ids)).group_by(Category.parent_id)).all())
+    from app.domains.taxonomy.service.metrics import get_category_metrics
+    metrics = get_category_metrics(item_ids)
         
     serialized = []
     for c in pagination.items:
-        c_count = content_counts.get(c.id, 0)
-        i_count = item_counts.get(c.id, 0)
-        child_count = children_counts.get(c.id, 0)
+        m = metrics.get(c.id, {})
+        c_count = m.get("content_count", 0)
+        i_count = m.get("item_count", 0)
+        child_count = m.get("children_count", 0)
         
         health = "ok"
         if c_count == 0 and i_count == 0:
@@ -422,18 +417,14 @@ def brands_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [b.id for b in pagination.items]
-    content_counts = {}
-    item_counts = {}
-    
-    if item_ids:
-        from app.domains.relationships import content_brands
-        content_counts = dict(db.session.execute(select(content_brands.c.brand_id, func.count(content_brands.c.content_id)).where(content_brands.c.brand_id.in_(item_ids)).group_by(content_brands.c.brand_id)).all())
-        item_counts = dict(db.session.execute(select(Item.brand_id, func.count(Item.id)).where(Item.brand_id.in_(item_ids)).group_by(Item.brand_id)).all())
+    from app.domains.taxonomy.service.metrics import get_brand_metrics
+    metrics = get_brand_metrics(item_ids)
         
     serialized = []
     for b in pagination.items:
-        c_count = content_counts.get(b.id, 0)
-        i_count = item_counts.get(b.id, 0)
+        m = metrics.get(b.id, {})
+        c_count = m.get("content_count", 0)
+        i_count = m.get("item_count", 0)
         
         health = "ok"
         if c_count == 0 and i_count == 0:
@@ -486,20 +477,14 @@ def topics_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [t.id for t in pagination.items]
-    content_counts = {}
-    category_spread = {}
-    
-    if item_ids:
-        from app.domains.relationships import content_topics
-        content_counts = dict(db.session.execute(select(content_topics.c.topic_id, func.count(content_topics.c.content_id)).where(content_topics.c.topic_id.in_(item_ids)).group_by(content_topics.c.topic_id)).all())
-        
-        cat_spread_query = select(content_topics.c.topic_id, func.count(func.distinct(Content.category_id))).join(Content, Content.id == content_topics.c.content_id).where(content_topics.c.topic_id.in_(item_ids)).group_by(content_topics.c.topic_id)
-        category_spread = dict(db.session.execute(cat_spread_query).all())
+    from app.domains.taxonomy.service.metrics import get_topic_metrics
+    metrics = get_topic_metrics(item_ids)
         
     serialized = []
     for t in pagination.items:
-        c_count = content_counts.get(t.id, 0)
-        cat_count = category_spread.get(t.id, 0)
+        m = metrics.get(t.id, {})
+        c_count = m.get("content_count", 0)
+        cat_count = m.get("category_spread", 0)
         
         health = "ok"
         if c_count == 0:
@@ -551,18 +536,14 @@ def sections_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [s.id for s in pagination.items]
-    content_counts = {}
-    category_spread = {}
-    
-    if item_ids:
-        content_counts = dict(db.session.execute(select(Content.section_id, func.count(Content.id)).where(Content.section_id.in_(item_ids)).group_by(Content.section_id)).all())
-        cat_spread_query = select(Content.section_id, func.count(func.distinct(Content.category_id))).where(Content.section_id.in_(item_ids)).group_by(Content.section_id)
-        category_spread = dict(db.session.execute(cat_spread_query).all())
+    from app.domains.taxonomy.service.metrics import get_section_metrics
+    metrics = get_section_metrics(item_ids)
         
     serialized = []
     for s in pagination.items:
-        c_count = content_counts.get(s.id, 0)
-        cat_count = category_spread.get(s.id, 0)
+        m = metrics.get(s.id, {})
+        c_count = m.get("content_count", 0)
+        cat_count = m.get("category_spread", 0)
         
         health = "ok"
         if c_count == 0:
@@ -678,15 +659,13 @@ def attributes_rows():
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [a.id for a in pagination.items]
-    content_counts = {}
-    
-    if item_ids:
-        from app.domains.relationships import content_attributes
-        content_counts = dict(db.session.execute(select(content_attributes.c.attribute_id, func.count(content_attributes.c.content_id)).where(content_attributes.c.attribute_id.in_(item_ids)).group_by(content_attributes.c.attribute_id)).all())
+    from app.domains.taxonomy.service.metrics import get_attribute_metrics
+    metrics = get_attribute_metrics(item_ids)
         
     serialized = []
     for a in pagination.items:
-        c_count = content_counts.get(a.id, 0)
+        m = metrics.get(a.id, {})
+        c_count = m.get("content_count", 0)
         
         health = "ok"
         if c_count == 0:
@@ -729,15 +708,13 @@ def _get_facet_rows(model_class, domain_type, field_name):
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     
     item_ids = [f.id for f in pagination.items]
-    content_counts = {}
-    
-    if item_ids:
-        field = getattr(Content, field_name)
-        content_counts = dict(db.session.execute(select(field, func.count(Content.id)).where(field.in_(item_ids)).group_by(field)).all())
+    from app.domains.taxonomy.service.metrics import get_facet_metrics
+    metrics = get_facet_metrics(item_ids, field_name)
         
     serialized = []
     for f in pagination.items:
-        c_count = content_counts.get(f.id, 0)
+        m = metrics.get(f.id, {})
+        c_count = m.get("content_count", 0)
         
         health = "ok"
         if c_count == 0:
@@ -767,50 +744,16 @@ def _get_facet_rows(model_class, domain_type, field_name):
 def taxonomy_duplicates():
     domain = request.args.get("type")
     
-    domain_map = {
-        "categories": Category,
-        "brands": Brand,
-        "topics": Topic,
-        "sections": Section,
-        "attributes": AttributeFacet,
-    }
+    from app.domains.taxonomy.service.duplicates import DOMAIN_MAP, detect_taxonomy_duplicates
     
-    if domain not in domain_map:
+    if domain not in DOMAIN_MAP:
         return jsonify({"error": "Invalid domain"}), 400
         
-    model_class = domain_map[domain]
-    
-    # Fetch all records
-    records = db.session.execute(select(model_class)).scalars().all()
-    
-    # O(N^2) similarity search (fine for <10k rows)
-    duplicates = []
-    
-    for i in range(len(records)):
-        for j in range(i + 1, len(records)):
-            r1 = records[i]
-            r2 = records[j]
-            
-            # Simple normalization similarity
-            s1 = r1.name.lower().strip()
-            s2 = r2.name.lower().strip()
-            
-            if s1 == s2:
-                similarity = 100
-            else:
-                similarity = int(difflib.SequenceMatcher(None, s1, s2).ratio() * 100)
-                
-            if similarity > 85:  # threshold
-                duplicates.append({
-                    "source": {"id": r2.id, "name": r2.name},
-                    "target": {"id": r1.id, "name": r1.name},
-                    "similarity": similarity
-                })
-                
-    # Sort by similarity descending
-    duplicates.sort(key=lambda x: x["similarity"], reverse=True)
-    data = duplicates[:50]
-    return render_template("admin/taxonomy/_duplicates.html", data=data, domain=domain)
+    try:
+        data = detect_taxonomy_duplicates(domain)
+        return render_template("admin/taxonomy/_duplicates.html", data=data, domain=domain)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 @bp.route("/merge", methods=["POST"])
 @admin_required
@@ -823,66 +766,13 @@ def taxonomy_merge():
     if not domain or not source_id or not target_id:
         return jsonify({"error": "Missing parameters"}), 400
         
-    domain_map = {
-        "categories": Category,
-        "brands": Brand,
-        "topics": Topic,
-        "sections": Section,
-        "attributes": AttributeFacet,
-    }
-    
-    if domain not in domain_map:
-        return jsonify({"error": "Invalid domain"}), 400
-        
-    model_class = domain_map[domain]
-    
-    source = db.session.get(model_class, source_id)
-    target = db.session.get(model_class, target_id)
-    
-    if not source or not target:
-        return jsonify({"error": "Entities not found"}), 404
-        
+    from app.domains.taxonomy.service.duplicates import merge_taxonomy_entities
     try:
-        if domain == "categories":
-            db.session.execute(update(Content).where(Content.category_id == source.id).values(category_id=target.id))
-            db.session.execute(update(Item).where(Item.category_id == source.id).values(category_id=target.id))
-            
-        elif domain == "brands":
-            from app.domains.relationships import content_brands
-            content_ids = db.session.scalars(select(content_brands.c.content_id).where(content_brands.c.brand_id == source.id)).all()
-            for cid in content_ids:
-                exists = db.session.scalar(select(content_brands.c.content_id).where(content_brands.c.brand_id == target.id, content_brands.c.content_id == cid))
-                if not exists:
-                    db.session.execute(content_brands.insert().values(content_id=cid, brand_id=target.id))
-            db.session.execute(content_brands.delete().where(content_brands.c.brand_id == source.id))
-            db.session.execute(update(Item).where(Item.brand_id == source.id).values(brand_id=target.id))
-            
-        elif domain == "topics":
-            from app.domains.relationships import content_topics
-            content_ids = db.session.scalars(select(content_topics.c.content_id).where(content_topics.c.topic_id == source.id)).all()
-            for cid in content_ids:
-                exists = db.session.scalar(select(content_topics.c.content_id).where(content_topics.c.topic_id == target.id, content_topics.c.content_id == cid))
-                if not exists:
-                    db.session.execute(content_topics.insert().values(content_id=cid, topic_id=target.id))
-            db.session.execute(content_topics.delete().where(content_topics.c.topic_id == source.id))
-            
-        elif domain == "sections":
-            db.session.execute(update(Content).where(Content.section_id == source.id).values(section_id=target.id))
-            
-        elif domain == "attributes":
-            from app.domains.relationships import content_attributes
-            content_ids = db.session.scalars(select(content_attributes.c.content_id).where(content_attributes.c.attribute_id == source.id)).all()
-            for cid in content_ids:
-                exists = db.session.scalar(select(content_attributes.c.content_id).where(content_attributes.c.attribute_id == target.id, content_attributes.c.content_id == cid))
-                if not exists:
-                    db.session.execute(content_attributes.insert().values(content_id=cid, attribute_id=target.id))
-            db.session.execute(content_attributes.delete().where(content_attributes.c.attribute_id == source.id))
-
-        db.session.delete(source)
-        db.session.commit()
+        merge_taxonomy_entities(domain, source_id, target_id)
         return jsonify({"success": True})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
 # ─────────────────────────────────────────────
@@ -957,90 +847,14 @@ def taxonomy_analytics():
 
 @bp.route("/insights/suggestions", methods=["GET"])
 def insights_suggestions():
-    from app.domains.relationships import content_brands
-    # Get last 1000 unmapped contents for brand
-    unmapped_brand = db.session.execute(
-        select(Content).where(
-            ~db.session.query(content_brands.c.brand_id).filter(content_brands.c.content_id == Content.id).exists()
-        ).order_by(Content.id.desc()).limit(1000)
-    ).scalars().all()
-    
-    # Get last 1000 unmapped contents for category
-    unmapped_cat = db.session.execute(
-        select(Content).where(Content.category_id == None).order_by(Content.id.desc()).limit(1000)
-    ).scalars().all()
-
-    brands = db.session.execute(select(Brand)).scalars().all()
-    categories = db.session.execute(select(Category)).scalars().all()
-    
-    suggestions = []
-    
-    for c in unmapped_brand:
-        if not c.title: continue
-        title_lower = c.title.lower()
-        for b in brands:
-            # simple whole word match or strong substring
-            if f" {b.name.lower()} " in f" {title_lower} ":
-                suggestions.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "type": "Brand",
-                    "suggested_id": b.id,
-                    "suggested_name": b.name
-                })
-                break
-                
-    for c in unmapped_cat:
-        if not c.title: continue
-        title_lower = c.title.lower()
-        for cat in categories:
-            if f" {cat.name.lower()} " in f" {title_lower} ":
-                suggestions.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "type": "Category",
-                    "suggested_id": cat.id,
-                    "suggested_name": cat.name
-                })
-                break
-
-    data = suggestions[:50] # Return top 50
+    from app.domains.taxonomy.service.insights import get_taxonomy_insights_suggestions
+    data = get_taxonomy_insights_suggestions()
     return render_template("admin/taxonomy/_insights_suggestions.html", data=data)
 
 @bp.route("/insights/coherence", methods=["GET"])
 def insights_coherence():
-    from app.domains.relationships import content_items
-    
-    # Find items that have a brand mapped, and find their parent contents
-    # To keep it fast, we query contents that have items
-    contents = db.session.execute(
-        select(Content).where(
-            db.session.query(content_items.c.item_id).filter(content_items.c.content_id == Content.id).exists()
-        ).order_by(Content.id.desc()).limit(500)
-    ).scalars().all()
-    
-    conflicts = []
-    for c in contents:
-        # get items for this content
-        item_ids = db.session.scalars(select(content_items.c.item_id).where(content_items.c.content_id == c.id)).all()
-        if not item_ids: continue
-        
-        items = db.session.execute(select(Item).where(Item.id.in_(item_ids))).scalars().all()
-        content_brand_ids = {b.id for b in c.brands}
-        
-        for item in items:
-            if item.brand_id and content_brand_ids and item.brand_id not in content_brand_ids:
-                conflicts.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "content_brands": [b.name for b in c.brands],
-                    "item_id": item.id,
-                    "item_name": item.name,
-                    "item_brand": item.brand.name if item.brand else "Unknown",
-                    "suggested_brand_id": item.brand_id
-                })
-                
-    data = conflicts[:50]
+    from app.domains.taxonomy.service.insights import get_taxonomy_insights_coherence
+    data = get_taxonomy_insights_coherence()
     return render_template("admin/taxonomy/_insights_coherence.html", data=data)
 
 @bp.route("/insights/apply", methods=["POST"])
@@ -1054,22 +868,13 @@ def insights_apply():
     if not content_id or not type_ or not suggested_id:
         return jsonify({"error": "Missing parameters"}), 400
         
-    content = db.session.get(Content, content_id)
-    if not content:
-        return jsonify({"error": "Content not found"}), 404
-        
+    from app.domains.taxonomy.service.insights import apply_taxonomy_insight
+    
     try:
-        if type_ == "Brand":
-            from app.domains.relationships import content_brands
-            # Insert into content_brands
-            exists = db.session.scalar(select(content_brands.c.content_id).where(content_brands.c.content_id == content_id, content_brands.c.brand_id == suggested_id))
-            if not exists:
-                db.session.execute(content_brands.insert().values(content_id=content_id, brand_id=suggested_id))
-        elif type_ == "Category":
-            content.category_id = suggested_id
-            
-        db.session.commit()
+        apply_taxonomy_insight(content_id, type_, suggested_id)
         return jsonify({"success": True})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
