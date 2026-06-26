@@ -1,0 +1,14 @@
+{% macro admin_tab_navigation(id_prefix, tabs) %}
+<div class="admin-tabs flex gap-1" id="{{ id_prefix }}-tabs">
+  {% for tab in tabs %}
+  <button class="admin-tab-btn {% if tab.active %}active{% endif %}" data-tab="{{ tab.id }}">{{ tab.label|safe
+    }}</button>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro admin_tab_panel(id, is_active=False) %}
+<div class="admin-tab-panel {% if not is_active %}is-hidden{% endif %}" id="tab-panel-{{ id }}">
+  {{ caller() }}
+</div>
+{% endmacro %}

@@ -4,7 +4,7 @@
   <p class="empty-message">No recent ingestions.</p>
 </div>
 {% else %}
-{% from "admin/components/ui.html" import activity_list_item %}
+{% from "admin/components/ui/dashboard.html" import activity_list_item %}
 <ul class="activity-feed">
   {% for r in recent_ingested %}
   {% set badge_class = "user" %}

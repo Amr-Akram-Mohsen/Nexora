@@ -1,0 +1,15 @@
+{% macro admin_filter_select(id, name, options, default_val="", default_text="All", extra_class="", attrs="") %}
+<select id="{{ id }}" {% if name %}name="{{ name }}" {% endif %} class="dashboard-filter-select {{ extra_class }}"
+  data-default-value="{{ default_val }}" {{ attrs }}>
+  {% if default_text %}
+  <option value="{{ default_val }}">{{ default_text }}</option>
+  {% endif %}
+  {% for opt in options %}
+  {% if opt is string or opt is number %}
+  <option value="{{ opt }}">{{ opt }}</option>
+  {% else %}
+  <option value="{{ opt[0] }}">{{ opt[1] }}</option>
+  {% endif %}
+  {% endfor %}
+</select>
+{% endmacro %}

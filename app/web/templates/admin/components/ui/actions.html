@@ -1,0 +1,42 @@
+{% macro action_button(
+text,
+action_type="inspect",
+icon="",
+data_action="",
+title="",
+extra_class="",
+button_id="",
+button_type="button"
+) %}
+<button type="{{ button_type }}" {% if button_id %} data-id="{{ button_id }}" {% endif %} {% if data_action %}
+  data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
+  class="user-action-btn user-action-{{ action_type }} {{ extra_class }}" {% for key, val in kwargs.items() %} {% if
+  key=="attrs" and val is mapping %} {% for k, v in val.items() %} {{ k }}="{{ v }}" {% endfor %} {% else %} {{
+  key.replace('_', '-' ) }}="{{ val }}" {% endif %} {% endfor %}>
+  {% if icon %}
+  {{ icon }}
+  {% endif %}
+  {{ text }}
+</button>
+{% endmacro %}
+
+{% macro action_group(
+wrapper_class="user-actions-group", extra_class=""
+) %}
+<div class="{{ wrapper_class }}">
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+{% macro close_button(
+button_id="",
+text="Close Details",
+wrapper_class="dashboard-modal-actions flex justify-center gap-3",
+button_class="dashboard-btn dashboard-btn-secondary"
+) %}
+<div class="{{ wrapper_class }}">
+  <button {% if button_id %} id="{{ button_id }}" {% endif %} class="{{ button_class }}" data-dismiss="modal">
+    {{ text }}
+  </button>
+</div>
+{% endmacro %}

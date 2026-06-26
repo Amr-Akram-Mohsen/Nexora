@@ -1,6 +1,7 @@
-{% from "admin/components/macros.html" import inspect_section, action_group, action_button %}
+{% from "admin/components/ui/inspect.html" import inspect_section %}
+{% from "admin/components/ui/actions.html" import action_group, action_button %}
+{% from "admin/components/ui/tables.html" import admin_inspect_section_table, admin_crud_table %}
 {% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
-{% from "admin/components/ui.html" import admin_inspect_section_table, admin_crud_table %}
 
 {% set linked_items_table = {
     "id": "linked-items",

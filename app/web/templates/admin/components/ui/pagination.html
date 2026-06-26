@@ -1,0 +1,30 @@
+{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100],
+current_per_page=20) %}
+<div class="pagination-container">
+  <div id="{{ info_id }}" class="pagination-info-text">
+    Showing 0 to 0 of 0 items
+  </div>
+  <div class="pagination-controls-group gap-2">
+    <select id="{{ per_page_id }}" class="dashboard-filter-select pagination-per-page-select">
+      {% for opt in per_page_options %}
+      <option value="{{ opt }}" {% if opt==current_per_page %}selected{% endif %}>{{ opt }} per page</option>
+      {% endfor %}
+    </select>
+    <button id="{{ prev_id }}" class="user-action-btn" disabled>← Previous</button>
+    <span id="{{ indicator_id }}" class="pagination-page-indicator">Page 1 of 1</span>
+    <button id="{{ next_id }}" class="user-action-btn" disabled>Next →</button>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro admin_paginator(domain, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
+{{ admin_pagination(
+info_id=domain ~ "-pagination-info",
+per_page_id=domain ~ "-per-page",
+prev_id=domain ~ "-prev-btn",
+indicator_id=domain ~ "-page-indicator",
+next_id=domain ~ "-next-btn",
+per_page_options=per_page_options,
+current_per_page=current_per_page
+) }}
+{% endmacro %}

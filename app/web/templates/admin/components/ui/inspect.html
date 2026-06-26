@@ -1,0 +1,26 @@
+{% macro inspect_section(
+title,
+divider=true,
+wrapper_class=""
+) %}
+<div class="{{ wrapper_class }}">
+  <strong class="inspect-details-title">
+    {{ title }}
+  </strong>
+
+  {{ caller() }}
+</div>
+
+{% if divider %}
+<hr class="inspect-details-divider" />
+{% endif %}
+{% endmacro %}
+
+{% macro admin_inspect_modal(domain, title="Inspect Details", icon='<i class="fa-solid fa-magnifying-glass"></i>',
+modal_class="modal-content-lg") %}
+{% from "components/ui/modal.html" import modal %}
+{% from "admin/components/ui/actions.html" import close_button %}
+{% call modal("inspect-" ~ domain ~ "-modal", title, icon, modal_class) %}
+{{ close_button(button_id="inspect-" ~ domain ~ "-close-btn") }}
+{% endcall %}
+{% endmacro %}

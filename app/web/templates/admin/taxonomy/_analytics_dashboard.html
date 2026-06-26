@@ -1,4 +1,4 @@
-{% from "admin/components/macros.html" import dashboard_stat_card %}
+{% from "admin/components/ui/dashboard.html" import dashboard_stat_card %}
 
 <div class="dashboard-stats-grid">
   {{ dashboard_stat_card("Total Entities", "{:,}".format(data.total_entities)) }}

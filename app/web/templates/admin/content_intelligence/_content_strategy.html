@@ -1,5 +1,6 @@
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
-{% from "admin/components/ui.html" import admin_panel, admin_table_panel, admin_crud_table %}
+{% from "admin/components/ui/panels.html" import admin_panel, admin_table_panel %}
+{% from "admin/components/ui/tables.html" import admin_crud_table %}
 <!-- Section 1.7: Content Strategy Output -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-rocket"></i> Content Strategy Output</h2>
 {% call admin_table_panel("Content Publishing Plan", "Actionable multi-platform content roadmap prioritized by opportunity growth score and behavioral cues.", id="content-strategy-panel", display_style="none") %}

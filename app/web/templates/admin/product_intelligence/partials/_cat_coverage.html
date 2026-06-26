@@ -1,4 +1,4 @@
-{% from "admin/components/macros.html" import breakdown_progress_bar %}
+{% from "admin/components/ui/dashboard.html" import breakdown_progress_bar %}
 {% if data %}
   {% set max_count = data | map(attribute='count') | max %}
   {% for item in data[:10] %}

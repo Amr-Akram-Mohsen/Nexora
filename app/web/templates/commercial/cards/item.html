@@ -1,3 +1,4 @@
+{% extends "components/cards/base-card.html" %}
 {% from "commercial/features/item-image.html" import render_image_url %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/badge.html" import badge %}
@@ -5,92 +6,79 @@
 
 {% set best_link = item.store_links[0] if item.store_links else None %}
 
-<article class="card card--item" data-type="{{ item.item_type }}" data-id="{{ item.id }}" data-domain-type="commercial">
+{% block card_class %}card--item{% endblock %}
+{% block card_type %}{{ item.item_type }}{% endblock %}
+{% block card_id %}{{ item.id }}{% endblock %}
+{% block card_domain %}commercial{% endblock %}
+{% block card_link %}{{ url_for('item.item_page', item_id=item.id) }}{% endblock %}
 
-  {# ── Image Section ── #}
-  <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="card__img-link" tabindex="-1" aria-hidden="true">
-    <div class="card__img-wrapper">
+{% block image_content %}
+  {# Item type tag #}
+  {% if item.item_type %}
+  <div class="card__tag card__tag--{{ item.item_type }}">{{ item.item_type }}</div>
+  {% endif %}
+  {{ render_image_url(item.image_url, item.name) }}
+{% endblock %}
 
-      {# Item type tag #}
-      {% if item.item_type %}
-      <div class="card__tag card__tag--{{ item.item_type }}">{{ item.item_type }}</div>
+{% block image_overlays %}
+  {{ badge('Product', 'badge--card-type') }}
+  {# Compare toggle #}
+  <button class="compare-toggle-btn flex-center" data-id="{{ item.id }}" data-name="{{ item.name }}"
+    title="Add to compare" aria-label="Add {{ item.name }} to compare">
+    <i class="fas fa-balance-scale"></i>
+  </button>
+  {# Discount badge #}
+  {% if best_link and best_link.old_price and best_link.price %}
+  {% set discount = ((best_link.old_price - best_link.price) / best_link.old_price * 100) | int %}
+  {% if discount > 0 %}
+  <span class="card__discount-badge">-{{ discount }}%</span>
+  {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block meta_top %}
+  {{ badge(item.category.name, 'badge--category', 'secondary') if item.category else '' }}
+  {{ badge(item.brand.name, 'badge--brand', 'secondary') if item.brand else '' }}
+{% endblock %}
+
+{% block title_class %}item-name{% endblock %}
+{% block title_text %}{{ item.name }}{% endblock %}
+
+{% block meta_bottom %}
+  <div class="card__rating flex items-center gap-1">
+    {{ render_stars(item.rating or 0) }}
+    <span class="item-rating">({{ item.rating or 0 }})</span>
+  </div>
+  <span class="item-reviews-count">{{ item.review_count or 0 }} reviews</span>
+{% endblock %}
+
+{% block interactions %}
+  {% set content = item %}
+  {% include "components/interactions/interactions-compact.html" %}
+{% endblock %}
+
+{% block actions %}
+  <div class="item-actions flex flex-col gap-3 gap-4 flex-wrap">
+    <div class="item-price-box flex items-center gap-2">
+      {% if best_link %}
+      <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
+      {% if best_link.old_price %}
+      <span class="item-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
       {% endif %}
-
-      {{ render_image_url(item.image_url, item.name) }}
-      <div class="card__img-overlay"></div>
-      {{ badge('Product', 'badge--card-type') }}
-
-      {# Compare toggle #}
-      <button class="compare-toggle-btn flex-center" data-id="{{ item.id }}" data-name="{{ item.name }}"
-        title="Add to compare" aria-label="Add {{ item.name }} to compare">
-        <i class="fas fa-balance-scale"></i>
-      </button>
-
-      {# Discount badge #}
-      {% if best_link and best_link.old_price and best_link.price %}
-      {% set discount = ((best_link.old_price - best_link.price) / best_link.old_price * 100) | int %}
-      {% if discount > 0 %}
-      <span class="card__discount-badge">-{{ discount }}%</span>
+      {% else %}
+      <span class="item-price-unavailable">Check current price</span>
       {% endif %}
-      {% endif %}
-
     </div>
-  </a>
-
-  {# ── Content Section ── #}
-  <div class="card__content">
-
-    {# Category + Brand badges #}
-    <div class="card__meta-top flex items-center gap-2 justify-between">
-      {{ badge(item.category.name, 'badge--category', 'secondary') if item.category else '' }}
-      {{ badge(item.brand.name, 'badge--brand', 'secondary') if item.brand else '' }}
-    </div>
-
-    {# Title #}
-    <a href="{{ url_for('item.item_page', item_id=item.id) }}">
-      <h3 class="card__title item-name">{{ item.name }}</h3>
-    </a>
-
-    {# Ratings row #}
-    <div class="card__meta-bottom flex items-center gap-3 justify-between">
-      <div class="card__rating flex items-center gap-1">
-        {{ render_stars(item.rating or 0) }}
-        <span class="item-rating">({{ item.rating or 0 }})</span>
-      </div>
-      <span class="item-reviews-count">{{ item.review_count or 0 }} reviews</span>
-    </div>
-
-
-    {% set content = item %}
-    {% include "components/interactions/interactions-compact.html" %}
-
-    {# ── Price + Store + CTA ── #}
-    <div class="item-actions flex flex-col gap-3 gap-4 flex-wrap">
-
-      <div class="item-price-box flex items-center gap-2">
-        {% if best_link %}
-        <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
-        {% if best_link.old_price %}
-        <span class="item-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
-        {% endif %}
-        {% else %}
-        <span class="item-price-unavailable">Check current price</span>
+    <div class="item-store-box flex items-center justify-between">
+      <div class="item-store-badge flex items-center">
+        {% if best_link and best_link.store.logo_url %}
+        <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
+          loading="lazy">
         {% endif %}
       </div>
-
-      <div class="item-store-box flex items-center justify-between">
-        <div class="item-store-badge flex items-center">
-          {% if best_link and best_link.store.logo_url %}
-          <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
-            loading="lazy">
-          {% endif %}
-          <!-- <span class="store-name">{{ best_link.store.name if best_link else 'Various stores' }}</span> -->
-        </div>
-        <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item__view-link">
-          {{ button(text="View Deal", class="item__view-btn") }}
-        </a>
-      </div>
-
-    </div>{# end .item-actions #}
-  </div>{# end .card__content #}
-</article>
+      <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item__view-link">
+        {{ button(text="View Deal", class="item__view-btn") }}
+      </a>
+    </div>
+  </div>
+{% endblock %}

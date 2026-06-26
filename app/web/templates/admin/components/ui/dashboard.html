@@ -1,0 +1,59 @@
+{% macro admin_summary_bar(
+count_id,
+label,
+summary_id="",
+wrapper_class="",
+summary_class="admin-summary-bar"
+) %}
+<div class="flex justify-between items-center {{ wrapper_class }}">
+  <div {% if summary_id %} id="{{ summary_id }}" {% endif %} class="{{ summary_class }}">
+    Showing <strong id="{{ count_id }}">—</strong> {{ label }}
+  </div>
+
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro dashboard_stat_card(label, value, value_color="inherit", extra_class="") %}
+<div class="dashboard-stat-card {{ extra_class }}">
+  <p class="dashboard-stat-label">{{ label }}</p>
+  <h3 class="dashboard-stat-value" style="color: {{ value_color }};">{{ value }}</h3>
+</div>
+{% endmacro %}
+
+{% macro breakdown_progress_bar(label, value, percentage, color="var(--brand-purple)", icon="", extra_class="") %}
+<div class="flex items-center w-full gap-3 {{ extra_class }}">
+  {% if icon %}
+  <div class="overview-breakdown-icon" style="color: {{ color }};">{{ icon|safe }}</div>
+  {% endif %}
+  <div class="overview-breakdown-label truncate" title="{{ label }}">{{ label }}</div>
+  <div class="overview-breakdown-bar-track">
+    <div class="overview-breakdown-bar" style="width: {{ percentage }}%; background-color: {{ color }};"></div>
+  </div>
+  <div class="overview-breakdown-val">{{ value }}</div>
+</div>
+{% endmacro %}
+
+{% macro ranked_list_item(rank, name, value_html, extra_class="") %}
+<li
+  class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
+  <div class="flex items-center gap-3">
+    <div class="overview-top-rank text-muted font-mono text-sm">#{{ rank }}</div>
+    <div class="overview-top-name truncate font-medium" title="{{ name }}">{{ name }}</div>
+  </div>
+  <div class="overview-top-value text-right whitespace-nowrap">
+    {{ value_html|safe }}
+  </div>
+</li>
+{% endmacro %}
+
+{% macro activity_list_item(icon_html="", icon_class="icon-save", extra_class="") %}
+<li class="activity-item {{ extra_class }} flex">
+  <div class="activity-icon {{ icon_class }} flex-center">{{ icon_html|safe }}</div>
+  <div class="activity-content">
+    {{ caller() }}
+  </div>
+</li>
+{% endmacro %}

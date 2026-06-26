@@ -1,47 +1,18 @@
-{% from "content/features/content-image.html" import render_image_url %}
-{% from "components/ui/badge.html" import badge %}
-{% from "components/ui/button.html" import button %}
+{% extends "components/cards/base-card.html" %}
 
-{% set content = item %}
+{% block card_type %}{{ item.object_type }}{% endblock %}
+{% block card_id %}{{ item.id }}{% endblock %}
+{% block card_domain %}content{% endblock %}
+{% block card_link %}{{ url_for('content.content_page', content_id=item.id) }}{% endblock %}
 
-<article class="card" data-type="{{ content.object_type }}" data-id="{{ content.id }}" data-domain-type="content">
-  {% block header %}
-  <!-- Image -->
-  <a href="{{ url_for('content.content_page', content_id=content.id) }}" class="card__img-link" tabindex="-1"
-    aria-hidden="true">
+{% block title_text %}{{ item.target.title }}{% endblock %}
 
-    <div class="card__img-wrapper">
-      {% block image_content %}{% endblock %}
-      <div class="card__img-overlay"></div>
-    </div>
-  </a>
-  {% endblock %}
+{% block description %}
+<p class="card__excerpt">{{ item.target.preview_text or '' }}</p>
+{% endblock %}
 
-  <!-- Content -->
-  <div class="card__content">
-
-    <!-- Meta Top -->
-    {% block meta_top %}{% endblock %}
-
-    <!-- Title -->
-    {% block title %}
-    <a href="{{ url_for('content.content_page', content_id=content.id) }}">
-      <h3 class="card__title">{{ content.target.title }}</h3>
-    </a>
-    {% endblock %}
-
-    <!-- Excerpt -->
-    {% block description %}
-    <p class="card__excerpt">{{ content.target.preview_text or '' }}</p>
-    {% endblock %}
-
-    <!-- Meta Bottom -->
-    <div class="card__meta-bottom flex items-center gap-3 justify-between">
-      {% block meta_bottom %}
-      {% endblock %}
-    </div>
-
-    {% include "components/interactions/interactions-compact.html" %}
-
-  </div>
-</article>
+{# Re-export the content variable for interactions-compact.html #}
+{% block interactions %}
+  {% set content = item %}
+  {% include "components/interactions/interactions-compact.html" %}
+{% endblock %}

@@ -1,4 +1,4 @@
-{% from "admin/components/macros.html" import ranked_list_item %}
+{% from "admin/components/ui/dashboard.html" import ranked_list_item %}
 {% if data %}
   {% for item in data[:5] %}
     {% set badge_html = '<span class="badge" style="background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);">' ~ item.avg_rate|round(1) ~ '%</span>' %}
