@@ -43,12 +43,7 @@ window.viewDistributionDraft = function(postId, sourceType, sourceId, platform) 
     if (!modalContent) return;
     
     // Show loading state
-    modalContent.innerHTML = `
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <div class="mt-2 text-muted">Loading post details...</div>
-        </div>
-    `;
+    modalContent.innerHTML = getSpinnerHtml("Loading post details...", "py-5 text-center");
     
     // Open modal using Nexora architecture
     const modalEl = document.getElementById('distributionDraftModal');
@@ -70,11 +65,7 @@ window.viewDistributionDraft = function(postId, sourceType, sourceId, platform) 
         })
     }).catch(err => {
         if (modalContent) {
-            modalContent.innerHTML = `
-                <div class="text-center py-5" style="color: var(--brand-red);">
-                    <div class="mt-2">Failed to load draft: ${err.message}</div>
-                </div>
-            `;
+            modalContent.innerHTML = `<div class="text-center py-5" style="color: var(--brand-red);"><div class="mt-2">Failed to load draft: ${err.message}</div></div>`;
         }
     });
 };
@@ -85,21 +76,11 @@ window.publishDistributionPost = function(postId) {
     const text = textEl ? textEl.value : "";
     const url = urlEl ? urlEl.value : "";
     
-    fetch(`/admin/distribution/social-distribution/${postId}/publish`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": document.querySelector('meta[name="csrf-token"]')?.content || ''
-        },
-        body: JSON.stringify({
-            text: text,
-            external_url: url
-        })
+    window.api.post(`/admin/distribution/social-distribution/${postId}/publish`, {
+        text: text,
+        external_url: url
     })
-    .then(res => res.json())
     .then(data => {
-        if (data.error) throw new Error(data.error);
-        
         // Hide modal using Nexora architecture
         const modalEl = document.getElementById('distributionDraftModal');
         if (modalEl) {

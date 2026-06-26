@@ -11,8 +11,7 @@
 
   // ── Fetch Dashboard Stats ────────────────
   function loadDashboardStats() {
-    fetch('/admin/items/health_stats')
-      .then(r => r.json())
+    window.api.get('/admin/items/health_stats')
       .then(data => {
         const total = data.total_items || 0;
         
@@ -37,7 +36,6 @@
         if (data.item_type_distribution && data.item_type_distribution.length > 0) {
             distContainer.innerHTML = '';
             
-            // Define colors for visual variety
             const colors = ['var(--brand-blue)', 'var(--brand-purple)', 'var(--brand-orange)', 'var(--brand-teal)', 'var(--brand-green)'];
             
             data.item_type_distribution.forEach((item, index) => {
@@ -47,15 +45,40 @@
                 
                 const row = document.createElement('div');
                 row.className = 'flex items-center w-full gap-3';
-                row.innerHTML = `
-                    <div class="overview-breakdown-icon" style="color: ${color};"><i class="fa-solid fa-cube"></i></div>
-                    <div class="overview-breakdown-label truncate" title="${typeName}">${typeName}</div>
-                    <div class="overview-breakdown-bar-track">
-                        <div class="overview-breakdown-bar" style="width: ${pct}%; background-color: ${color};"></div>
-                    </div>
-                    <div class="overview-breakdown-val">${item.count.toLocaleString()}</div>
-                    <div class="overview-breakdown-pct">${pct}%</div>
-                `;
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'overview-breakdown-icon';
+                iconDiv.style.color = color;
+                const iconI = document.createElement('i');
+                iconI.className = 'fa-solid fa-cube';
+                iconDiv.appendChild(iconI);
+                
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'overview-breakdown-label truncate';
+                labelDiv.title = typeName;
+                labelDiv.textContent = typeName;
+                
+                const trackDiv = document.createElement('div');
+                trackDiv.className = 'overview-breakdown-bar-track';
+                const barDiv = document.createElement('div');
+                barDiv.className = 'overview-breakdown-bar';
+                barDiv.style.width = pct + '%';
+                barDiv.style.backgroundColor = color;
+                trackDiv.appendChild(barDiv);
+                
+                const valDiv = document.createElement('div');
+                valDiv.className = 'overview-breakdown-val';
+                valDiv.textContent = item.count.toLocaleString();
+                
+                const pctDiv = document.createElement('div');
+                pctDiv.className = 'overview-breakdown-pct';
+                pctDiv.textContent = pct + '%';
+                
+                row.appendChild(iconDiv);
+                row.appendChild(labelDiv);
+                row.appendChild(trackDiv);
+                row.appendChild(valDiv);
+                row.appendChild(pctDiv);
                 
                 // Make row clickable if it's a specific type
                 if (item.type !== 'Uncategorized') {
@@ -73,7 +96,8 @@
                 distContainer.appendChild(row);
             });
         } else {
-            distContainer.innerHTML = '<div class="text-muted text-sm py-2">No type distribution data available.</div>';
+            distContainer.textContent = 'No type distribution data available.';
+            distContainer.className = 'text-muted text-sm py-2';
         }
         
         // Render Top Engagement Items
@@ -84,23 +108,52 @@
             data.top_engagement_items.forEach((item, index) => {
                 const li = document.createElement('li');
                 li.className = 'overview-top-item flex items-center justify-between';
-                li.innerHTML = `
-                    <div class="overview-top-rank">#${index + 1}</div>
-                    <div class="overview-top-name truncate px-2">
-                        <a href="/admin/items?search=${item.id}" class="overview-top-link-title" title="${item.name}">${item.name}</a>
-                    </div>
-                    <div class="overview-top-value text-right" style="min-width: 60px;">
-                        <div class="text-[var(--brand-green)] font-bold">${item.ctr}% CTR</div>
-                        <div class="text-xs text-muted font-normal mt-1 flex gap-2 justify-end">
-                            <span title="Save Rate"><i class="fa-solid fa-bookmark text-[var(--brand-orange)]"></i> ${item.save_rate}%</span>
-                            <span title="Like Rate"><i class="fa-solid fa-heart text-[var(--brand-red)]"></i> ${item.like_rate}%</span>
-                        </div>
-                    </div>
-                `;
+                
+                const rankDiv = document.createElement('div');
+                rankDiv.className = 'overview-top-rank';
+                rankDiv.textContent = `#${index + 1}`;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'overview-top-name truncate px-2';
+                const link = document.createElement('a');
+                link.href = `/admin/items?search=${item.id}`;
+                link.className = 'overview-top-link-title';
+                link.title = item.name;
+                link.textContent = item.name;
+                nameDiv.appendChild(link);
+                
+                const valDiv = document.createElement('div');
+                valDiv.className = 'overview-top-value text-right';
+                valDiv.style.minWidth = '60px';
+                
+                const ctrDiv = document.createElement('div');
+                ctrDiv.className = 'text-[var(--brand-green)] font-bold';
+                ctrDiv.textContent = `${item.ctr}% CTR`;
+                
+                const ratesDiv = document.createElement('div');
+                ratesDiv.className = 'text-xs text-muted font-normal mt-1 flex gap-2 justify-end';
+                
+                const saveSpan = document.createElement('span');
+                saveSpan.title = 'Save Rate';
+                saveSpan.innerHTML = `<i class="fa-solid fa-bookmark text-[var(--brand-orange)]"></i> ${item.save_rate}%`;
+                
+                const likeSpan = document.createElement('span');
+                likeSpan.title = 'Like Rate';
+                likeSpan.innerHTML = `<i class="fa-solid fa-heart text-[var(--brand-red)]"></i> ${item.like_rate}%`;
+                
+                ratesDiv.appendChild(saveSpan);
+                ratesDiv.appendChild(likeSpan);
+                valDiv.appendChild(ctrDiv);
+                valDiv.appendChild(ratesDiv);
+                
+                li.appendChild(rankDiv);
+                li.appendChild(nameDiv);
+                li.appendChild(valDiv);
                 engContainer.appendChild(li);
             });
         } else {
-            engContainer.innerHTML = '<li class="text-muted text-sm py-2 text-center">No engagement data available.</li>';
+            engContainer.textContent = 'No engagement data available.';
+            engContainer.className = 'text-muted text-sm py-2 text-center';
         }
       })
       .catch(err => {
@@ -110,34 +163,41 @@
 
   // ── Fetch meta for dropdowns ────────────
   function loadMeta() {
-    return fetch('/admin/items/meta')
-      .then(r => r.json())
+    return window.api.get('/admin/items/meta')
       .then(data => {
         const brandSel = document.getElementById('filter-item-brand');
         const catSel = document.getElementById('filter-item-category');
         const sourceSel = document.getElementById('filter-item-source');
         const typeSel = document.getElementById('filter-item-type');
 
-        (data.brands || []).forEach(b => {
-          const opt = document.createElement('option');
-          opt.value = b.slug; opt.textContent = b.name;
-          brandSel.appendChild(opt);
-        });
-        (data.categories || []).forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.slug; opt.textContent = c.name;
-          catSel.appendChild(opt);
-        });
-        (data.sources || []).forEach(s => {
-          const opt = document.createElement('option');
-          opt.value = s.slug; opt.textContent = s.name;
-          sourceSel.appendChild(opt);
-        });
-        (data.item_types || []).forEach(t => {
-          const opt = document.createElement('option');
-          opt.value = t; opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-          typeSel.appendChild(opt);
-        });
+        if(brandSel) {
+          (data.brands || []).forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.slug; opt.textContent = b.name;
+            brandSel.appendChild(opt);
+          });
+        }
+        if(catSel) {
+          (data.categories || []).forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.slug; opt.textContent = c.name;
+            catSel.appendChild(opt);
+          });
+        }
+        if(sourceSel) {
+          (data.sources || []).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.slug; opt.textContent = s.name;
+            sourceSel.appendChild(opt);
+          });
+        }
+        if(typeSel) {
+          (data.item_types || []).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t; opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+            typeSel.appendChild(opt);
+          });
+        }
       });
   }
 
@@ -148,8 +208,7 @@
       `Are you sure you want to permanently delete "${name}"? This will remove all variants and store links.`,
       () => {
         if (btn) { btn.disabled = true; btn.textContent = 'Deleting…'; }
-        fetch(`/admin/items/${id}`, { method: 'DELETE' })
-          .then(r => r.json())
+        window.api.delete(`/admin/items/${id}`)
           .then(d => {
             if (d.success) {
               showToast(d.message || 'Product deleted.', 'success');
@@ -161,7 +220,6 @@
             }
           })
           .catch(() => {
-            showToast('Delete failed. Please try again.', 'error');
             if (btn) { btn.disabled = false; btn.textContent = '🗑 Delete Product'; }
           });
       }
@@ -231,12 +289,18 @@
     });
 
     // Inspect modal or detail page: delete action delegation
-    document.body.addEventListener('click', e => {
+    function itemActionHandler(e) {
       const btn = e.target.closest("[data-action='delete-item']");
       if (!btn) return;
       const modal = document.getElementById("inspect-item-modal");
       deleteItem(parseInt(btn.dataset.id, 10), btn.dataset.name, btn, modal);
-    });
+    }
+    
+    const tableContainer = document.getElementById("items-table");
+    if (tableContainer) tableContainer.addEventListener("click", itemActionHandler);
+
+    const inspectModal = document.getElementById("inspect-item-modal");
+    if (inspectModal) inspectModal.addEventListener("click", itemActionHandler);
   }
 
 

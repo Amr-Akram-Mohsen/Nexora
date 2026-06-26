@@ -27,14 +27,16 @@
 
   // ── Stats Row ───────────────────────────
   function loadStatsRow() {
-    return fetch('/admin/interactions/stats')
-      .then(r => r.json())
+    return window.api.get('/admin/interactions/stats')
       .then(data => {
         const container = document.getElementById('interactions-stats-row');
+        if (!container) return;
         container.innerHTML = '';
         container.className = 'dashboard-stats-grid';
 
         const template = document.getElementById('interactions-stat-card-template');
+        if (!template) return;
+        
         const cards = [
           { key: 'comments', icon: '💬', label: 'Comments', value: data.comments },
           { key: 'likes', icon: '👍', label: 'Likes',    value: data.likes    },
@@ -56,8 +58,14 @@
         });
       })
       .catch(() => {
-        document.getElementById('interactions-stats-row').innerHTML =
-          '<p class="hint grid-full-width">Could not load stats.</p>';
+        const container = document.getElementById('interactions-stats-row');
+        if (container) {
+          container.innerHTML = '';
+          const p = document.createElement('p');
+          p.className = 'hint grid-full-width';
+          p.textContent = 'Could not load stats.';
+          container.appendChild(p);
+        }
       });
   }
 
@@ -71,12 +79,17 @@
   let engagementChart, sentimentChart, countryChart, reactionChart, heatmapChart;
 
   function loadAnalyticsOverview() {
-    fetch('/admin/interactions/analytics')
-      .then(r => r.json())
+    window.api.get('/admin/interactions/analytics')
       .then(data => {
         renderTopSaves(data.top_saves);
         const ctrBadge = document.getElementById('recs-ctr-badge');
-        if(ctrBadge) ctrBadge.innerHTML = `Recommendations CTR: <b>${data.recs_kpi.ctr}%</b>`;
+        if(ctrBadge) {
+            ctrBadge.innerHTML = '';
+            const b = document.createElement('b');
+            b.textContent = `${data.recs_kpi.ctr}%`;
+            ctrBadge.appendChild(document.createTextNode('Recommendations CTR: '));
+            ctrBadge.appendChild(b);
+        }
         
         updateStatsDeltas(data.deltas);
         
@@ -130,37 +143,41 @@
   function renderTopSaves(saves) {
     const container = document.getElementById('top-saves-container');
     if (!container) return;
+    container.innerHTML = '';
+    
     if (!saves || !saves.length) {
-      container.innerHTML = '<p class="text-muted">No saves recorded.</p>';
+      const p = document.createElement('p');
+      p.className = 'text-muted';
+      p.textContent = 'No saves recorded.';
+      container.appendChild(p);
       return;
     }
-    let html = '<ul class="divide-y">';
+    
+    const ul = document.createElement('ul');
+    ul.className = 'divide-y';
+    
     saves.forEach(s => {
       const icon = s.target_type === 'content' ? '📄' : '📦';
-      html += `<li class="py-2 flex justify-between" style="border-bottom: 1px solid var(--border);">
-        <span class="truncate pr-4">${icon} ${s.name}</span>
-        <span class="font-semibold" style="color: var(--brand-blue);">${s.count}</span>
-      </li>`;
+      const li = document.createElement('li');
+      li.className = 'py-2 flex justify-between';
+      li.style.borderBottom = '1px solid var(--border)';
+      
+      const spanName = document.createElement('span');
+      spanName.className = 'truncate pr-4';
+      spanName.textContent = `${icon} ${s.name}`;
+      
+      const spanCount = document.createElement('span');
+      spanCount.className = 'font-semibold';
+      spanCount.style.color = 'var(--brand-blue)';
+      spanCount.textContent = s.count;
+      
+      li.appendChild(spanName);
+      li.appendChild(spanCount);
+      ul.appendChild(li);
     });
-    html += '</ul>';
-    container.innerHTML = html;
+    
+    container.appendChild(ul);
   }
-
-  const defaultChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: '#888' } } },
-    scales: {
-      x: { ticks: { color: '#888' }, grid: { color: 'rgba(128,128,128,0.1)' } },
-      y: { ticks: { color: '#888' }, grid: { color: 'rgba(128,128,128,0.1)' }, beginAtZero: true }
-    }
-  };
-
-  const pieChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'right', labels: { color: '#888' } } }
-  };
 
   function getSortedDates(trendsObj) {
     const allDates = new Set();
@@ -169,10 +186,6 @@
   }
 
   function drawEngagementChart(trends, spamTrend) {
-    const ctx = document.getElementById('engagementTrendChart');
-    if (!ctx) return;
-    if (engagementChart) engagementChart.destroy();
-    
     const dates = getSortedDates(trends);
     const datasets = [
       { label: 'Comments', data: dates.map(d => trends.comments[d] || 0), borderColor: '#4CAF50', tension: 0.4 },
@@ -181,92 +194,56 @@
       { label: 'Spam', data: dates.map(d => spamTrend[d] || 0), borderColor: '#F44336', borderDash: [5, 5], tension: 0.4 },
     ];
     
-    engagementChart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: dates, datasets },
-      options: { ...defaultChartOptions, plugins: { title: { display: true, text: '30-Day Engagement & Spam', color: '#ccc' } } }
-    });
+    window.nexoraCharts.render('engagementTrendChart', 'line', 
+      { labels: dates, datasets },
+      { plugins: { title: { display: true, text: '30-Day Engagement & Spam', color: '#ccc' } } }
+    );
   }
 
   function drawSentimentChart(sentimentDist) {
-    const ctx = document.getElementById('sentimentSpamChart');
-    if (!ctx) return;
-    if (sentimentChart) sentimentChart.destroy();
-    
     const labels = Object.keys(sentimentDist);
     const data = Object.values(sentimentDist);
     const colors = labels.map(l => l === 'positive' ? '#4CAF50' : l === 'negative' ? '#F44336' : l === 'spam' ? '#FF9800' : '#9E9E9E');
 
-    sentimentChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels,
-        datasets: [{ data, backgroundColor: colors }]
-      },
-      options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: 'Comment Sentiment', color: '#ccc' } } }
-    });
+    window.nexoraCharts.render('sentimentSpamChart', 'doughnut', 
+      { labels, datasets: [{ data, backgroundColor: colors }] },
+      { plugins: { legend: { position: 'right' }, title: { display: true, text: 'Comment Sentiment', color: '#ccc' } } }
+    );
   }
 
   function drawCountryChart(countryDist) {
-    const ctx = document.getElementById('countryDistChart');
-    if (!ctx) return;
-    if (countryChart) countryChart.destroy();
-
     const labels = Object.keys(countryDist);
     const data = Object.values(countryDist);
 
-    countryChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{ label: 'Clicks', data, backgroundColor: '#3F51B5' }]
-      },
-      options: { ...defaultChartOptions, plugins: { ...defaultChartOptions.plugins, title: { display: true, text: 'Top Click Countries', color: '#ccc' } } }
-    });
+    window.nexoraCharts.render('countryDistChart', 'bar', 
+      { labels, datasets: [{ label: 'Clicks', data, backgroundColor: '#3F51B5' }] },
+      { plugins: { title: { display: true, text: 'Top Click Countries', color: '#ccc' } } }
+    );
   }
 
   function drawReactionChart(reactionTargets) {
-    const ctx = document.getElementById('reactionTargetChart');
-    if (!ctx) return;
-    if (reactionChart) reactionChart.destroy();
-
     const labels = Object.keys(reactionTargets);
     const data = Object.values(reactionTargets);
 
-    reactionChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels,
-        datasets: [{ data, backgroundColor: ['#00BCD4', '#E91E63', '#FFC107'] }]
-      },
-      options: { ...pieChartOptions, plugins: { ...pieChartOptions.plugins, title: { display: true, text: 'Reactions by Target Type', color: '#ccc' } } }
-    });
+    window.nexoraCharts.render('reactionTargetChart', 'pie', 
+      { labels, datasets: [{ data, backgroundColor: ['#00BCD4', '#E91E63', '#FFC107'] }] },
+      { plugins: { legend: { position: 'right' }, title: { display: true, text: 'Reactions by Target Type', color: '#ccc' } } }
+    );
   }
 
   function drawHeatmapChart(heatmapData) {
-    const ctx = document.getElementById('hourlyHeatmapChart');
-    if (!ctx) return;
-    if (heatmapChart) heatmapChart.destroy();
-
     const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
 
-    heatmapChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-            label: 'Total Engagement',
-            data: heatmapData,
-            backgroundColor: 'rgba(255, 152, 0, 0.6)',
-            borderColor: '#FF9800',
-            borderWidth: 1
-        }]
-      },
-      options: { 
-          ...defaultChartOptions, 
-          plugins: { ...defaultChartOptions.plugins, title: { display: true, text: 'Most Engaged Hour of Day (Last 30 Days)', color: '#ccc' } } 
-      }
-    });
+    window.nexoraCharts.render('hourlyHeatmapChart', 'bar', 
+      { labels, datasets: [{
+          label: 'Total Engagement',
+          data: heatmapData,
+          backgroundColor: 'rgba(255, 152, 0, 0.6)',
+          borderColor: '#FF9800',
+          borderWidth: 1
+      }] },
+      { plugins: { title: { display: true, text: 'Most Engaged Hour of Day (Last 30 Days)', color: '#ccc' } } }
+    );
   }
 
   // ── Comment Moderation Actions ───────────
@@ -276,8 +253,7 @@
       'Are you sure you want to permanently delete this comment and all its replies?',
       () => {
         if (btn) btn.disabled = true;
-        fetch(`/admin/interactions/comments/${id}`, { method: 'DELETE' })
-          .then(r => r.json())
+        window.api.delete(`/admin/interactions/comments/${id}`)
           .then(d => {
             if (d.success) {
               showToast('Comment deleted.', 'success');
@@ -289,15 +265,14 @@
               if (btn) btn.disabled = false;
             }
           })
-          .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
+          .catch(() => { if (btn) btn.disabled = false; });
       }
     );
   }
 
   function flagComment(id, btn, modal) {
     if (btn) btn.disabled = true;
-    fetch(`/admin/interactions/comments/${id}/flag`, { method: 'POST' })
-      .then(r => r.json())
+    window.api.post(`/admin/interactions/comments/${id}/flag`)
       .then(d => {
         if (d.success) {
           showToast('Comment flagged as spam.', 'success');
@@ -308,7 +283,7 @@
           if (btn) btn.disabled = false;
         }
       })
-      .catch(() => { showToast('Flag failed.', 'error'); if (btn) btn.disabled = false; });
+      .catch(() => { if (btn) btn.disabled = false; });
   }
 
 

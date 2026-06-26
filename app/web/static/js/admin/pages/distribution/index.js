@@ -34,7 +34,7 @@ function initDistribution() {
       const timeframe = timeframeSelect ? timeframeSelect.value : "7_days";
       setSelectedEntity(null);
       
-      fetch(`/admin/distribution/recompute?layer=all&time_frame=${timeframe}`, { method: 'POST' })
+      window.api.post(`/admin/distribution/recompute?layer=all&time_frame=${timeframe}`)
         .then(() => loadMainWidgets(timeframe))
         .then(() => {
           renderAllWidgets();

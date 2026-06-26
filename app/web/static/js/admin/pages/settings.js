@@ -37,16 +37,11 @@
       btn.disabled = true;
       btn.textContent = "Clearing…";
 
-      fetch('/admin/system/cache', { method: 'DELETE' })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to clear cache");
-          return res.json();
-        })
+      window.api.delete('/admin/system/cache')
         .then(data => {
           showSettingsToast(data.message || "Cache cleared successfully.", "success");
         })
         .catch(err => {
-          console.error(err);
           showSettingsToast("Failed to clear cache.", "error");
         })
         .finally(() => {
@@ -65,8 +60,7 @@
     if (!toggle) return;
 
     // Fetch current status from backend
-    fetch('/admin/system/maintenance')
-      .then(res => res.json())
+    window.api.get('/admin/system/maintenance')
       .then(data => {
         toggle.checked = data.enabled;
         if (hint) {
@@ -81,17 +75,7 @@
 
       toggle.disabled = true;
 
-      fetch('/admin/system/maintenance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ enabled: on })
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to update maintenance mode");
-          return res.json();
-        })
+      window.api.post('/admin/system/maintenance', { enabled: on })
         .then(data => {
           if (hint) {
             hint.innerHTML = `Maintenance mode is currently <strong>${status}</strong>.`;
@@ -99,7 +83,6 @@
           showSettingsToast(`Maintenance mode ${status}.`, on ? "warning" : "success");
         })
         .catch(err => {
-          console.error(err);
           toggle.checked = !on;
           showSettingsToast("Failed to update maintenance mode.", "error");
         })
@@ -123,18 +106,13 @@
           "WARNING: This will clear all ingestion logs, API usage stats, and system cache. This action is irreversible. Are you absolutely sure?",
           () => {
             resetBtn.disabled = true;
-            fetch('/admin/system/reset', { method: 'POST' })
-              .then(res => {
-                if (!res.ok) throw new Error("Reset failed");
-                return res.json();
-              })
+            window.api.post('/admin/system/reset')
               .then(data => {
                 showSettingsToast(data.message || "System reset completed.", "success");
                 loadIntegrationsStatus();
                 loadIngestionLogs();
               })
               .catch(err => {
-                console.error(err);
                 showSettingsToast("System reset failed.", "error");
               })
               .finally(() => {

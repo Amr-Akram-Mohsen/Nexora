@@ -9,42 +9,21 @@
   const loadedTabs = new Set();
 
   function loadTaxonomyAnalytics() {
-    fetch('/admin/taxonomy/analytics')
-      .then(r => r.text())
-      .then(html => {
-        const container = document.getElementById('taxonomy-analytics-dashboard');
-        if (!container) return;
-        container.innerHTML = html;
-      })
-      .catch(e => console.error("Failed to load taxonomy analytics:", e));
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml('/admin/taxonomy/analytics', 'taxonomy-analytics-dashboard', 'Loading analytics...');
+    }
   }
 
   function loadInsights() {
-    // Load Suggestions
-    fetch('/admin/taxonomy/insights/suggestions')
-      .then(r => r.text())
-      .then(html => {
-        const c = document.getElementById('insights-suggestions-container');
-        if (c) c.innerHTML = html;
-      });
-
-    // Load Coherence
-    fetch('/admin/taxonomy/insights/coherence')
-      .then(r => r.text())
-      .then(html => {
-        const c = document.getElementById('insights-coherence-container');
-        if (c) c.innerHTML = html;
-      });
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml('/admin/taxonomy/insights/suggestions', 'insights-suggestions-container', 'Loading suggestions...');
+      fetchAndInjectHtml('/admin/taxonomy/insights/coherence', 'insights-coherence-container', 'Loading coherence analysis...');
+    }
   }
 
   window.applyInsightSuggestion = function (contentId, type, suggestedId) {
     if (!confirm(`Apply ${type} suggestion?`)) return;
-    fetch('/admin/taxonomy/insights/apply', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content_id: contentId, type: type, suggested_id: suggestedId })
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/insights/apply', { content_id: contentId, type: type, suggested_id: suggestedId })
       .then(d => {
         if (d.success) {
           alert("Applied successfully!");
@@ -52,6 +31,9 @@
         } else {
           alert("Error applying suggestion: " + d.error);
         }
+      })
+      .catch(err => {
+        alert("Error applying suggestion");
       });
   };
 
@@ -105,12 +87,7 @@
     const name = nameInput.value.trim();
     if (!name) { showToast('Category name is required.', 'error'); return; }
 
-    fetch('/admin/taxonomy/categories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/categories', { name })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); return; }
         showToast(`Category "${name}" created.`, 'success');
@@ -124,8 +101,7 @@
   function deleteCategory(id, name, btn) {
     showModal('Delete Category', `Delete "${name}"? This may affect contents and products assigned to it.`, () => {
       if (btn) btn.disabled = true;
-      fetch(`/admin/taxonomy/categories/${id}`, { method: 'DELETE' })
-        .then(r => r.json())
+      window.api.delete(`/admin/taxonomy/categories/${id}`)
         .then(d => {
           if (d.success) { showToast(d.message, 'success'); window.categoriesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
@@ -135,12 +111,7 @@
   }
 
   function toggleCategoryActive(id, isActive, el) {
-    fetch(`/admin/taxonomy/categories/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: isActive }),
-    })
-      .then(r => r.json())
+    window.api.put(`/admin/taxonomy/categories/${id}`, { is_active: isActive })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Category ${isActive ? 'activated' : 'deactivated'}.`, 'success');
@@ -155,12 +126,7 @@
     const industry = document.getElementById('new-brand-industry').value.trim();
     if (!name) { showToast('Brand name is required.', 'error'); return; }
 
-    fetch('/admin/taxonomy/brands', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, industry: industry || null }),
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/brands', { name, industry: industry || null })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); return; }
         showToast(`Brand "${name}" created.`, 'success');
@@ -175,8 +141,7 @@
   function deleteBrand(id, name, btn) {
     showModal('Delete Brand', `Delete "${name}"? Items and content tagged with this brand will lose the association.`, () => {
       if (btn) btn.disabled = true;
-      fetch(`/admin/taxonomy/brands/${id}`, { method: 'DELETE' })
-        .then(r => r.json())
+      window.api.delete(`/admin/taxonomy/brands/${id}`)
         .then(d => {
           if (d.success) { showToast(d.message, 'success'); window.brandsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
@@ -186,12 +151,7 @@
   }
 
   function toggleBrandActive(id, isActive, el) {
-    fetch(`/admin/taxonomy/brands/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: isActive }),
-    })
-      .then(r => r.json())
+    window.api.put(`/admin/taxonomy/brands/${id}`, { is_active: isActive })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Brand ${isActive ? 'activated' : 'deactivated'}.`, 'success');
@@ -205,12 +165,7 @@
     const name = document.getElementById('new-topic-name').value.trim();
     if (!name) { showToast('Topic name is required.', 'error'); return; }
 
-    fetch('/admin/taxonomy/topics', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/topics', { name })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); return; }
         showToast(`Topic "${name}" created.`, 'success');
@@ -224,8 +179,7 @@
   function deleteTopic(id, name, btn) {
     showModal('Delete Topic', `Delete "${name}"? Content tagged with this topic will lose the association.`, () => {
       if (btn) btn.disabled = true;
-      fetch(`/admin/taxonomy/topics/${id}`, { method: 'DELETE' })
-        .then(r => r.json())
+      window.api.delete(`/admin/taxonomy/topics/${id}`)
         .then(d => {
           if (d.success) { showToast(d.message, 'success'); window.topicsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
@@ -235,12 +189,7 @@
   }
 
   function toggleTopicActive(id, isActive, el) {
-    fetch(`/admin/taxonomy/topics/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: isActive }),
-    })
-      .then(r => r.json())
+    window.api.put(`/admin/taxonomy/topics/${id}`, { is_active: isActive })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Topic ${isActive ? 'activated' : 'deactivated'}.`, 'success');
@@ -251,12 +200,7 @@
 
   // ── SECTIONS ─────────────────────────────
   function toggleSectionActive(id, isActive, el) {
-    fetch(`/admin/taxonomy/sections/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ is_active: isActive }),
-    })
-      .then(r => r.json())
+    window.api.put(`/admin/taxonomy/sections/${id}`, { is_active: isActive })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Section ${isActive ? 'activated' : 'deactivated'}.`, 'success');
@@ -270,12 +214,7 @@
     const name = document.getElementById('new-attribute-name').value.trim();
     if (!name) { showToast('Attribute name is required.', 'error'); return; }
 
-    fetch('/admin/taxonomy/attributes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/attributes', { name })
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); return; }
         showToast(`Attribute "${name}" created.`, 'success');
@@ -289,8 +228,7 @@
   function deleteAttribute(id, name, btn) {
     showModal('Delete Attribute', `Delete "${name}"? Content tagged with this attribute will lose the association.`, () => {
       if (btn) btn.disabled = true;
-      fetch(`/admin/taxonomy/attributes/${id}`, { method: 'DELETE' })
-        .then(r => r.json())
+      window.api.delete(`/admin/taxonomy/attributes/${id}`)
         .then(d => {
           if (d.success) { showToast(d.message, 'success'); window.attributesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
@@ -344,33 +282,18 @@
   // ── DUPLICATES LOGIC ───────────────────────
   function openDuplicatesModal(domain) {
     const modal = document.getElementById('admin-duplicates-modal');
-    const body = document.getElementById('admin-duplicates-body');
     if (modal) modal.classList.add('active');
-    if (body) body.innerHTML = '<div class="table-empty-state">Scanning for duplicates...</div>';
-
-    fetch(`/admin/taxonomy/duplicates?type=${domain}`)
-      .then(r => {
-        if (!r.ok) throw new Error("Failed to load");
-        return r.text();
-      })
-      .then(html => {
-        if (body) body.innerHTML = html;
-      })
-      .catch(() => {
-        if (body) body.innerHTML = `<div class="table-empty-state" style="color: var(--brand-red);">Failed to load duplicates.</div>`;
-      });
+    
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml(`/admin/taxonomy/duplicates?type=${domain}`, 'admin-duplicates-body', 'Scanning for duplicates...');
+    }
   }
 
   function mergeDuplicate(domain, sourceId, targetId, btn) {
     if (!confirm(`Are you sure you want to merge ID ${sourceId} into ID ${targetId}? The source entity will be deleted and its contents will be moved to the target.`)) return;
 
     if (btn) btn.disabled = true;
-    fetch('/admin/taxonomy/merge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain, source_id: sourceId, target_id: targetId }),
-    })
-      .then(r => r.json())
+    window.api.post('/admin/taxonomy/merge', { domain, source_id: sourceId, target_id: targetId })
       .then(d => {
         if (d.error) {
           showToast(d.error, 'error');

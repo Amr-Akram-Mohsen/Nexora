@@ -83,11 +83,8 @@ async function initAllReactions() {
     }
 
     try {
-        const res = await fetch(`/check-react-batch?${params.toString()}`);
-
-        if (!res.ok) return;
-
-        const data = await res.json();
+        const data = await window.api.get(`/check-react-batch?${params.toString()}`);
+        if (!data) return;
 
         buttons.forEach(btn => {
             const item = btn.closest("[data-id]");

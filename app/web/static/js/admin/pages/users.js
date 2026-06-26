@@ -9,18 +9,16 @@
 
   window.usersController = null;
 
-  // ── Action Handlers (called via event delegation on body) ─────
+  // ── Action Handlers ─────
   function handleToggleAdmin(id, name, btn, modal) {
     if (btn) { btn.disabled = true; btn.textContent = "…"; }
-    fetch(`/admin/users/${id}/toggle-admin`, { method: "POST" })
-      .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    window.api.post(`/admin/users/${id}/toggle-admin`)
       .then(data => {
         showToast(data.is_admin ? `${name} is now an Admin` : `${name} is now a User`);
         window.usersController.load(window.usersController.currentPage);
         if (modal) modal.classList.remove("active");
       })
       .catch(() => {
-        showToast("Failed to update role.", "error");
         window.usersController.load(window.usersController.currentPage);
         if (modal) modal.classList.remove("active");
       });
@@ -28,17 +26,16 @@
 
   function handleToggleActive(id, isCurrentlyActive, name, btn, modal) {
     const endpoint = isCurrentlyActive ? `/admin/users/${id}` : `/admin/users/${id}/activate`;
-    const method   = isCurrentlyActive ? "DELETE" : "POST";
+    const method = isCurrentlyActive ? window.api.delete : window.api.post;
+    
     if (btn) { btn.disabled = true; btn.textContent = "…"; }
-    fetch(endpoint, { method })
-      .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+    method(endpoint)
       .then(() => {
         showToast(`${name} has been ${isCurrentlyActive ? "deactivated" : "activated"}.`);
         window.usersController.load(window.usersController.currentPage);
         if (modal) modal.classList.remove("active");
       })
       .catch(() => {
-        showToast("Failed to update status.", "error");
         window.usersController.load(window.usersController.currentPage);
         if (modal) modal.classList.remove("active");
       });
@@ -50,15 +47,13 @@
       `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`,
       () => {
         if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
-        fetch(`/admin/users/${id}`, { method: "DELETE" })
-          .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+        window.api.delete(`/admin/users/${id}`)
           .then(() => {
             showToast(`${name} has been removed.`);
             window.usersController.load(window.usersController.currentPage);
             if (modal) modal.classList.remove("active");
           })
           .catch(() => {
-            showToast("Failed to delete user.", "error");
             if (btn) { btn.disabled = false; btn.textContent = "🗑 Delete User"; }
           });
       }
@@ -144,7 +139,7 @@
     });
 
     // Event delegation: inspect modal or detail page action buttons
-    document.body.addEventListener("click", e => {
+    function userActionHandler(e) {
       const btn  = e.target.closest("[data-action]");
       if (!btn) return;
       const { action, id, name } = btn.dataset;
@@ -159,52 +154,49 @@
       } else if (action === "delete-user") {
         handleDeleteUser(uid, name, btn, modal);
       }
-    });
+    }
+
+    const tableContainer = document.getElementById("users-table");
+    if (tableContainer) tableContainer.addEventListener("click", userActionHandler);
+
+    const inspectModal = document.getElementById("inspect-user-modal");
+    if (inspectModal) inspectModal.addEventListener("click", userActionHandler);
 
     // ── Chart Initialization ──────────────────────────────────────
     function initUserCharts() {
-      fetch('/admin/users/stats')
-        .then(res => res.json())
+      window.api.get('/admin/users/stats')
         .then(data => {
-          if (document.getElementById('userGrowthChart') && typeof Chart !== 'undefined') {
-            new Chart(document.getElementById('userGrowthChart'), {
-              type: 'line',
-              data: {
-                labels: Object.keys(data.growth),
-                datasets: [{
-                  label: 'New Registrations',
-                  data: Object.values(data.growth),
-                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#5D5FEF',
-                  backgroundColor: 'rgba(93, 95, 239, 0.1)',
-                  tension: 0.3,
-                  fill: true
-                }]
-              },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+          if (document.getElementById('userGrowthChart')) {
+            window.nexoraCharts.render('userGrowthChart', 'line', {
+              labels: Object.keys(data.growth),
+              datasets: [{
+                label: 'New Registrations',
+                data: Object.values(data.growth),
+                borderColor: window.nexoraCharts.getColors()[0],
+                backgroundColor: 'rgba(93, 95, 239, 0.1)',
+                tension: 0.3,
+                fill: true
+              }]
+            }, { plugins: { legend: { display: false } } });
+          }
 
-            new Chart(document.getElementById('roleDistributionChart'), {
-              type: 'doughnut',
-              data: {
-                labels: Object.keys(data.roles),
-                datasets: [{
-                  data: Object.values(data.roles),
-                  backgroundColor: ['#F2994A', '#2D9CDB']
-                }]
-              },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+          if (document.getElementById('roleDistributionChart')) {
+            window.nexoraCharts.render('roleDistributionChart', 'doughnut', {
+              labels: Object.keys(data.roles),
+              datasets: [{
+                data: Object.values(data.roles),
+                backgroundColor: window.nexoraCharts.getColors().slice(1, 3)
+              }]
             });
+          }
 
-            new Chart(document.getElementById('providerSplitChart'), {
-              type: 'doughnut',
-              data: {
-                labels: Object.keys(data.providers).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
-                datasets: [{
-                  data: Object.values(data.providers),
-                  backgroundColor: ['#27AE60', '#EB5757', '#F2C94C']
-                }]
-              },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+          if (document.getElementById('providerSplitChart')) {
+            window.nexoraCharts.render('providerSplitChart', 'doughnut', {
+              labels: Object.keys(data.providers).map(p => p.charAt(0).toUpperCase() + p.slice(1)),
+              datasets: [{
+                data: Object.values(data.providers),
+                backgroundColor: window.nexoraCharts.getColors().slice(3, 6)
+              }]
             });
           }
         });

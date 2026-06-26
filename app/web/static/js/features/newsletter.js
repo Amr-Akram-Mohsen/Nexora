@@ -4,13 +4,7 @@ async function handleSubscribing(form, btn) {
     const fd = new FormData(form);
 
     try {
-        const response = await fetch(form.action, {
-            method: "POST",
-            body: fd,
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        });
-
-        const data = await response.json();
+        const data = await window.api.post(form.action, fd, { "X-Requested-With": "XMLHttpRequest" });
         const message = data.success ? data.message : data.error;
 
         showInlineTooltip(btn || form, message || "Newsletter request complete.", 2500);
