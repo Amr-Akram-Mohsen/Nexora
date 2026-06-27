@@ -26,7 +26,9 @@ from app.domains.item.service.admin import (
     get_admin_item_health_stats,
     load_admin_item_aggregates,
     build_admin_items_query,
-    get_admin_item_inspect_raw
+    get_admin_item_inspect_raw,
+    get_admin_items_page,
+    get_admin_item
 )
 from app.application.item.admin import delete_item_workflow
 
@@ -81,8 +83,7 @@ def list_items():
     page, per_page = parse_pagination_params(default_per_page=20)
     sort_col, sort_dir = parse_sort_params(_ITEM_SORT_MAP, Item.id)
 
-    stmt = build_admin_items_query(request.args, sort_col, sort_dir)
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    pagination = get_admin_items_page(request.args, sort_col, sort_dir, page, per_page)
     page_ids = [item.id for item in pagination.items]
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
@@ -148,7 +149,7 @@ def get_item_detail(id):
     Used by the admin inspect modal (replaces embedding store_links in
     every listing row).
     """
-    item = db.session.get(Item, id)
+    item = get_admin_item(id)
     if not item:
         return jsonify({"error": "Item not found"}), 404
 
@@ -210,8 +211,7 @@ def items_rows():
     page, per_page = parse_pagination_params(default_per_page=20)
     sort_col, sort_dir = parse_sort_params(_ITEM_SORT_MAP, Item.id)
 
-    stmt = build_admin_items_query(request.args, sort_col, sort_dir)
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    pagination = get_admin_items_page(request.args, sort_col, sort_dir, page, per_page)
     page_ids = [item.id for item in pagination.items]
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)

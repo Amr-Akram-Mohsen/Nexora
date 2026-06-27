@@ -64,7 +64,12 @@
       .then(data => {
         toggle.checked = data.enabled;
         if (hint) {
-          hint.innerHTML = `Maintenance mode is currently <strong>${data.enabled ? "enabled" : "disabled"}</strong>.`;
+          hint.replaceChildren();
+          hint.appendChild(document.createTextNode("Maintenance mode is currently "));
+          const strong = document.createElement("strong");
+          strong.textContent = data.enabled ? "enabled" : "disabled";
+          hint.appendChild(strong);
+          hint.appendChild(document.createTextNode("."));
         }
       })
       .catch(err => console.error("Failed to load maintenance status", err));
@@ -78,7 +83,12 @@
       window.api.post('/admin/system/maintenance', { enabled: on })
         .then(data => {
           if (hint) {
-            hint.innerHTML = `Maintenance mode is currently <strong>${status}</strong>.`;
+            hint.replaceChildren();
+            hint.appendChild(document.createTextNode("Maintenance mode is currently "));
+            const strong = document.createElement("strong");
+            strong.textContent = status;
+            hint.appendChild(strong);
+            hint.appendChild(document.createTextNode("."));
           }
           showSettingsToast(`Maintenance mode ${status}.`, on ? "warning" : "success");
         })

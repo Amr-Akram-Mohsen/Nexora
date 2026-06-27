@@ -230,6 +230,13 @@ def build_admin_items_query(args, sort_col, sort_dir):
 
     return stmt
 
+def get_admin_items_page(args, sort_col, sort_dir, page, per_page):
+    stmt = build_admin_items_query(args, sort_col, sort_dir)
+    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+def get_admin_item(id):
+    return db.session.get(Item, id)
+
 def get_admin_item_inspect_raw(id):
     item = db.session.scalar(
         select(Item).options(

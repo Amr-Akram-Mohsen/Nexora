@@ -132,8 +132,10 @@
       }
       
       // Update arrows
-      document.querySelectorAll("th[data-sort]").forEach(col => col.innerHTML = col.innerHTML.replace(/ [↑↓↕]/, ' ↕'));
-      th.innerHTML = th.innerHTML.replace(/ [↑↓↕]/, currentSortDir === 'desc' ? ' ↓' : ' ↑');
+      document.querySelectorAll("th[data-sort]").forEach(col => {
+          col.textContent = col.textContent.replace(/ [↑↓↕]/, ' ↕');
+      });
+      th.textContent = th.textContent.replace(/ [↑↓↕]/, currentSortDir === 'desc' ? ' ↓' : ' ↑');
       
       window.usersController.load(1);
     });

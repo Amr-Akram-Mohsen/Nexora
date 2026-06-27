@@ -209,56 +209,6 @@ def _serialize_comment(c, users, content_titles, item_names):
     }
 
 
-def _load_interaction_context(items):
-    """Batch-load user info and target titles for a list of interaction items."""
-    from app.domains.content.models import Content
-    from app.domains.item.models import Item
-    user_ids     = {c.user_id for c in items}
-    content_ids  = {c.target_id for c in items if c.target_type == "content"}
-    item_ids     = {c.target_id for c in items if c.target_type == "item"}
-    users, content_titles, item_names = {}, {}, {}
-    if user_ids:
-        rows = db.session.execute(select(User.id, User.name, User.email).where(User.id.in_(user_ids))).mappings().all()
-        users = {r["id"]: r for r in rows}
-    if content_ids:
-        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-    if item_ids:
-        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
-    return users, content_titles, item_names
-
-
-def _load_target_titles(items, type_attr="target_type", id_attr="target_id"):
-    """
-    Batch-load content titles and item names for a list of objects that have
-    a target_type / target_id pair.
-
-    Args:
-        items:     Iterable of ORM instances or mappings.
-        type_attr: Attribute name for the target type string (default "target_type").
-        id_attr:   Attribute name for the target id (default "target_id").
-
-    Returns:
-        (content_titles, item_names) — both are {id: str} dicts.
-    """
-    from app.domains.content.models import Content
-    from app.domains.item.models import Item
-    content_ids = {getattr(obj, id_attr) for obj in items if getattr(obj, type_attr) == "content"}
-    item_ids    = {getattr(obj, id_attr) for obj in items if getattr(obj, type_attr) == "item"}
-    content_titles, item_names = {}, {}
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
-    return content_titles, item_names
-
 
 
 
