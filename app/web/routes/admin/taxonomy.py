@@ -14,13 +14,21 @@ from app.domains.taxonomy.service.admin import (
     get_admin_categories_paginated, get_admin_brands_paginated,
     get_admin_topics_paginated, get_admin_sections_paginated,
     get_admin_attributes_paginated, get_admin_facet_paginated,
-    get_admin_categories, create_admin_category, update_admin_category, delete_admin_category,
-    get_admin_brands, create_admin_brand, update_admin_brand, delete_admin_brand,
-    get_admin_topics, create_admin_topic, update_admin_topic, delete_admin_topic,
-    get_admin_sections, update_admin_section,
-    get_admin_attributes, create_admin_attribute, update_admin_attribute, delete_admin_attribute,
+    get_admin_categories,
+    get_admin_brands,
+    get_admin_topics,
+    get_admin_sections,
+    get_admin_attributes,
     get_admin_taxonomy_analytics, get_admin_entity_or_404, get_admin_taxonomy_related_metadata,
     get_admin_source_metadata
+)
+from app.application.taxonomy.admin import (
+    create_admin_category, update_admin_category, delete_admin_category,
+    create_admin_brand, update_admin_brand, delete_admin_brand,
+    create_admin_topic, update_admin_topic, delete_admin_topic,
+    update_admin_section,
+    create_admin_attribute, update_admin_attribute, delete_admin_attribute,
+    apply_taxonomy_insight_workflow
 )
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
@@ -61,7 +69,6 @@ def create_category():
         return jsonify({"error": "Name is required"}), 400
     try:
         cat = create_admin_category(name, data.get("is_active", True))
-        db.session.commit()
         return jsonify(_serialize_category(cat)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
@@ -74,7 +81,6 @@ def update_category(id):
     cat = update_admin_category(id, data)
     if not cat:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify(_serialize_category(cat))
 
 
@@ -84,7 +90,6 @@ def delete_category(id):
     cat = delete_admin_category(id)
     if not cat:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
 def _serialize_taxonomy(t, counts=None, health=None):
@@ -144,7 +149,6 @@ def create_brand():
         return jsonify({"error": "Name is required"}), 400
     try:
         brand = create_admin_brand(name, data.get("industry"), data.get("is_active", True))
-        db.session.commit()
         return jsonify(_serialize_brand(brand)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
@@ -157,7 +161,6 @@ def update_brand(id):
     brand = update_admin_brand(id, data)
     if not brand:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify(_serialize_brand(brand))
 
 
@@ -167,7 +170,6 @@ def delete_brand(id):
     brand = delete_admin_brand(id)
     if not brand:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify({"success": True, "message": f"Brand '{brand.name}' deleted."})
 
 
@@ -203,7 +205,6 @@ def create_topic():
         return jsonify({"error": "Name is required"}), 400
     try:
         topic = create_admin_topic(name, data.get("is_active", True))
-        db.session.commit()
         return jsonify(_serialize_topic(topic)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
@@ -216,7 +217,6 @@ def update_topic(id):
     topic = update_admin_topic(id, data)
     if not topic:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify(_serialize_topic(topic))
 
 
@@ -226,7 +226,6 @@ def delete_topic(id):
     topic = delete_admin_topic(id)
     if not topic:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify({"success": True, "message": f"Topic '{topic.name}' deleted."})
 
 
@@ -259,7 +258,6 @@ def update_section(id):
     section = update_admin_section(id, data)
     if not section:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify(_serialize_section(section))
 
 
@@ -460,7 +458,6 @@ def create_attribute():
         return jsonify({"error": "Name is required"}), 400
     try:
         attr = create_admin_attribute(name, data.get("category_id"))
-        db.session.commit()
         return jsonify(_serialize_attribute(attr)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -473,7 +470,6 @@ def update_attribute(id):
         attr = update_admin_attribute(id, data)
         if not attr:
             return jsonify({"error": "Not found"}), 404
-        db.session.commit()
         return jsonify(_serialize_attribute(attr))
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -484,7 +480,6 @@ def delete_attribute(id):
     attr = delete_admin_attribute(id)
     if not attr:
         return jsonify({"error": "Not found"}), 404
-    db.session.commit()
     return jsonify({"success": True, "message": f"Attribute '{attr.name}' deleted."})
 
 def _serialize_attribute(a):
@@ -656,15 +651,12 @@ def insights_apply():
     if not content_id or not type_ or not suggested_id:
         return jsonify({"error": "Missing parameters"}), 400
         
-    from app.domains.taxonomy.service.insights import apply_taxonomy_insight
-    
     try:
-        apply_taxonomy_insight(content_id, type_, suggested_id)
+        apply_taxonomy_insight_workflow(content_id, type_, suggested_id)
         return jsonify({"success": True})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
 def _get_facet_rows(model, domain_type, field_id_name):
@@ -672,26 +664,17 @@ def _get_facet_rows(model, domain_type, field_id_name):
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    stmt = select(model).order_by(model.name.asc())
-    if search:
-        stmt = stmt.where(model.name.ilike(f"%{search}%"))
-        
-    field = getattr(Content, field_id_name)
-    
-    if health == "unused":
-        stmt = stmt.where(~db.session.query(field).filter(field == model.id).exists())
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_facet_paginated(model, field_id_name, page, per_page, search, health)
     item_ids = [a.id for a in pagination.items]
-    content_counts = {}
     
-    if item_ids:
-        content_counts = dict(db.session.execute(select(field, func.count(Content.id)).where(field.in_(item_ids)).group_by(field)).all())
-        
+    from app.domains.taxonomy.service.metrics import get_facet_metrics
+    metrics = get_facet_metrics(item_ids, field_id_name)
+    
     serialized = []
     for a in pagination.items:
-        c_count = content_counts.get(a.id, 0)
+        m = metrics.get(a.id, {})
+        c_count = m.get("content_count", 0)
+        
         h_status = "ok"
         if c_count == 0:
             h_status = "unused"

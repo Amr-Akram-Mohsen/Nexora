@@ -233,10 +233,8 @@ def handle_interaction():
         log_route_success(logger, "/handle-interaction")
         return jsonify(result)
     except (ValueError, TypeError):
-        db.session.rollback()
         return jsonify({"success": False, "error": "Invalid interaction request"}), 400
     except Exception:
-        db.session.rollback()
         current_app.logger.exception("Interaction failed")
         return jsonify({"success": False, "error": "Interaction failed"}), 500
 

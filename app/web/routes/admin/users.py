@@ -11,7 +11,8 @@ Refactoring applied:
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.domains.user.models import User
-from app.domains.user.service import deactivate_user as deactivate_user_service, activate_user as activate_user_service
+from app.domains.user.service.admin import get_admin_users_paginated, get_admin_user_inspect_raw_data
+from app.application.user.admin import deactivate_user_workflow, activate_user_workflow, toggle_admin_user_workflow
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
@@ -19,9 +20,9 @@ from sqlalchemy import select, or_, and_, func
 from app.domains.taxonomy.models import Category, Topic, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
 from app.domains.recommendation.models import UserInterest, UserEntityInterest
-from app.domains.user.service.admin import get_admin_users_paginated, toggle_admin_user, get_admin_user_inspect_raw_data
 
 bp = Blueprint("api_user", __name__, url_prefix="/admin/users")
+
 @bp.route("/stats", methods=["GET"])
 def users_stats():
     """Return JSON metrics for the users dashboard charts."""
@@ -78,19 +79,17 @@ def list_users():
 
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_user(id):
-    success = deactivate_user_service(id)
+    success = deactivate_user_workflow(id)
     if not success:
         return jsonify({"error": "User not found"}), 404
-    db.session.commit()
     return jsonify({"success": True})
 
 
 @bp.route("/<int:id>/activate", methods=["POST"])
 def activate_user(id):
-    success = activate_user_service(id)
+    success = activate_user_workflow(id)
     if not success:
         return jsonify({"error": "User not found"}), 404
-    db.session.commit()
     return jsonify({"success": True})
 
 
@@ -402,8 +401,7 @@ def build_user_inspect_data(id):
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])
 def toggle_admin(id):
-    user = toggle_admin_user(id)
+    user = toggle_admin_user_workflow(id)
     if not user:
         return jsonify({"error": "User not found"}), 404
-    db.session.commit()
     return jsonify({"success": True, "is_admin": user.is_admin})

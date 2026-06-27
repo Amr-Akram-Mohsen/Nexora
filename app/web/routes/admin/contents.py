@@ -30,9 +30,14 @@ from app.domains.content.service.admin import (
     get_admin_content_stats,
     get_admin_content_dashboard_stats,
     get_admin_pipeline_stats,
-    retry_admin_pipeline,
     get_admin_deduplication_groups,
     get_admin_content_inspect_raw
+)
+from app.application.content.admin import (
+    delete_content_workflow,
+    toggle_publish_workflow,
+    bulk_actions_workflow,
+    retry_pipeline_workflow
 )
 
 
@@ -241,32 +246,26 @@ def list_contents():
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_content(id):
     """Safely delete a content item and its interactions and polymorphic target."""
-    content = db.session.get(Content, id)
-    if not content:
+    success = delete_content_workflow(id)
+    if not success:
         return jsonify({"error": "Content not found"}), 404
 
-    _delete_content_and_relations(content)
-    db.session.commit()
     return jsonify({"success": True, "message": "Content deleted successfully"})
 
 
 @bp.route("/<int:id>/toggle-publish", methods=["POST"])
 def toggle_publish(id):
     """Quickly toggle the publish status of a content item."""
-    content = db.session.get(Content, id)
-    if not content:
-        return jsonify({"error": "Content not found"}), 404
-
     data = request.get_json() or {}
     action = data.get("action")
-    if action == "publish":
-        content.is_published = True
-    elif action == "unpublish":
-        content.is_published = False
-    else:
-        return jsonify({"error": "Invalid action parameter"}), 400
+    
+    try:
+        content = toggle_publish_workflow(id, action)
+        if not content:
+            return jsonify({"error": "Content not found"}), 404
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
-    db.session.commit()
     return jsonify({"success": True, "message": f"Content {'published' if content.is_published else 'unpublished'}."})
 
 
@@ -440,60 +439,24 @@ def bulk_actions():
     if not action or not ids:
         return jsonify({"error": "Invalid input parameters"}), 400
 
-    contents = db.session.query(Content).filter(Content.id.in_(ids)).all()
-    if not contents:
-        return jsonify({"error": "No matching contents found"}), 404
-
-    if action == "activate":
-        for c in contents:
-            c.is_active = True
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Activated {len(contents)} content items."})
-
-    elif action == "deactivate":
-        for c in contents:
-            c.is_active = False
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Deactivated {len(contents)} content items."})
-
-    elif action == "publish":
-        for c in contents:
-            c.is_published = True
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Published {len(contents)} content items."})
-
-    elif action == "unpublish":
-        for c in contents:
-            c.is_published = False
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Unpublished {len(contents)} content items."})
-
-    elif action == "review":
-        for c in contents:
-            c.is_published = False
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Marked {len(contents)} content items for review."})
-
-    elif action == "recategorize":
-        category_id = data.get("category_id")
-        if category_id is None:
-            return jsonify({"error": "Category ID is required for recategorize action"}), 400
-        category = db.session.get(Category, int(category_id))
-        if not category:
-            return jsonify({"error": "Target category not found"}), 404
-        for c in contents:
-            c.category_id = category.id
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Moved {len(contents)} content items to category '{category.name}'."})
-
-    elif action == "delete":
-        # Reuse shared helper — single source of truth for deletion logic (R-25)
-        for c in contents:
-            _delete_content_and_relations(c)
-        db.session.commit()
-        return jsonify({"success": True, "message": f"Successfully deleted {len(contents)} content items and associated data."})
-
-    return jsonify({"error": "Unsupported bulk action"}), 400
+    category_id = data.get("category_id")
+    try:
+        count = bulk_actions_workflow(action, ids, category_id)
+        if count == 0:
+            return jsonify({"error": "No matching contents found"}), 404
+        
+        msg_map = {
+            "activate": f"Activated {count} content items.",
+            "deactivate": f"Deactivated {count} content items.",
+            "publish": f"Published {count} content items.",
+            "unpublish": f"Unpublished {count} content items.",
+            "review": f"Marked {count} content items for review.",
+            "recategorize": f"Moved {count} content items to new category.",
+            "delete": f"Successfully deleted {count} content items and associated data."
+        }
+        return jsonify({"success": True, "message": msg_map.get(action, "Operation completed")})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 # ─────────────────────────────────────────────
 # PIPELINE AUDIT
@@ -524,8 +487,7 @@ def pipeline_stats_partial():
 def pipeline_retry():
     data = request.get_json() or {}
     origin = data.get("origin")
-    retried = retry_admin_pipeline(origin)
-    db.session.commit()
+    retried = retry_pipeline_workflow(origin)
     return jsonify({"success": True, "retried": retried})
 
 # ─────────────────────────────────────────────

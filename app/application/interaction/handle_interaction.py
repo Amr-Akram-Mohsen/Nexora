@@ -10,50 +10,54 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
     """
     Orchestrates a user interaction (react, save, comment, share).
     """
-    target = None
-    if comment_id:
-        target = get_comment_by_id(comment_id)
-    elif target_type == TargetType.CONTENT:
-        target = db.session.get(Content, target_id)
-    elif target_type == TargetType.ITEM:
-        target = get_item_by_id(target_id, load="minimal")
-
-    if not target:
-        return {"success": False, "error": "Target not found"}
-
-    result = None
-    action = interaction_type
-    
-    if interaction_type == INTERACTION_TYPE.REACT:
+    try:
+        target = None
         if comment_id:
-            result = react(user, 'comment', comment_id, reaction_type, target)
-        else:
-            result = react(user, target_type, target_id, reaction_type)
-        action = reaction_type
-    elif interaction_type == INTERACTION_TYPE.SAVE:
-        result = save_item(user, target_type, target_id)
-    elif interaction_type == INTERACTION_TYPE.COMMENT:
-        result = post_comment(
-            user,
-            target_type,
-            target_id,
-            comment_content,
-            comment_id
-        )
-    elif interaction_type == INTERACTION_TYPE.SHARE:
-        result = record_share(user, target_type, target_id)
+            target = get_comment_by_id(comment_id)
+        elif target_type == TargetType.CONTENT:
+            target = db.session.get(Content, target_id)
+        elif target_type == TargetType.ITEM:
+            target = get_item_by_id(target_id, load="minimal")
 
-    if not result:
-        return {"success": False, "error": "Invalid interaction type"}
+        if not target:
+            return {"success": False, "error": "Target not found"}
 
-    if not result.get("success"):
+        result = None
+        action = interaction_type
+        
+        if interaction_type == INTERACTION_TYPE.REACT:
+            if comment_id:
+                result = react(user, 'comment', comment_id, reaction_type, target)
+            else:
+                result = react(user, target_type, target_id, reaction_type)
+            action = reaction_type
+        elif interaction_type == INTERACTION_TYPE.SAVE:
+            result = save_item(user, target_type, target_id)
+        elif interaction_type == INTERACTION_TYPE.COMMENT:
+            result = post_comment(
+                user,
+                target_type,
+                target_id,
+                comment_content,
+                comment_id
+            )
+        elif interaction_type == INTERACTION_TYPE.SHARE:
+            result = record_share(user, target_type, target_id)
+
+        if not result:
+            return {"success": False, "error": "Invalid interaction type"}
+
+        if not result.get("success"):
+            return result
+
+        # Post-interaction logic (tracking)
+        if not comment_id:
+            handle_interaction_interest(user=user, target=target, action=action)
+            if interaction_type == INTERACTION_TYPE.COMMENT:
+                handle_comment_interaction(user=user, target=target, comment_sentiment=result.get("sentiment"))
+        
+        db.session.commit()
         return result
-
-    # Post-interaction logic (tracking)
-    if not comment_id:
-        handle_interaction_interest(user=user, target=target, action=action)
-        if interaction_type == INTERACTION_TYPE.COMMENT:
-            handle_comment_interaction(user=user, target=target, comment_sentiment=result.get("sentiment"))
-    
-    db.session.commit()
-    return result
+    except Exception as e:
+        db.session.rollback()
+        raise e

@@ -6,7 +6,8 @@
 {% set summary_label = "matches" %}
 {% set per_page_options = [25, 50] %}
 {% set current_per_page = 25 %}
-{% set table = {"id": "rec", "preview_table": ["Content Title", "Widget Impressions", "Widget CTR", "Last Active", "Linked Items Count", "Items", "Actions"]} %}
+{% set table = {"id": "rec", "preview_table": ["Content Title", "Widget Impressions", "Widget CTR", "Last Active",
+"Linked Items Count", "Items", "Actions"]} %}
 
 {% block crud_stats %}
 {% include "admin/content_intelligence/_recommendation_health.html" %}
@@ -20,20 +21,23 @@
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("rec-search", "Search by content title or item name…") }}
-    {{ admin_filter_select("filter-entity-type", None, [("related_content", "Related Content"), ("related_product", "Related Product"), ("shop_product", "Shop Product")], default_val="", default_text="All Rec Types", extra_class="filter-select-item") }}
-    {{ admin_filter_select("filter-ctr-range", None, [("high", "High CTR (>3%)"), ("medium", "Medium CTR (1-3%)"), ("low", "Low CTR (<1%)"), ("zero", "No Clicks")], default_val="", default_text="All CTRs", extra_class="filter-select-item") }}
-    {{ admin_reset_button("clear-rec-filters-btn", "Reset") }}
-  </div>
-{% endcall %}
-{% endblock %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("rec-search", "Search by content title or item name…") }}
+  {{ admin_filter_select("filter-entity-type", None, [("related_content", "Related Content"), ("related_product",
+  "Related Product"), ("shop_product", "Shop Product")], default_val="", default_text="All Rec Types",
+  extra_class="filter-select-item") }}
+  {{ admin_filter_select("filter-ctr-range", None, [("high", "High CTR (>3%)"), ("medium", "Medium CTR (1-3%)"), ("low",
+  "Low CTR (<1%)"), ("zero", "No Clicks" )], default_val="" , default_text="All CTRs" , extra_class="filter-select-item"
+    ) }} {{ admin_reset_button("clear-rec-filters-btn", "Reset" ) }} </div>
+    {% endcall %}
+    {% endblock %}
 
-{% block crud_modals %}
-{{ admin_inspect_modal("rec", "Content–Product Recommendation Details", "<i class="fa-solid fa-satellite-dish"></i>") }}
-{% endblock %}
+    {% block crud_modals %}
+    {{ admin_inspect_modal("rec", "Content–Product Recommendation Details", '<i
+      class="fa-solid fa-satellite-dish"></i>') }}
+    {% endblock %}
 
-{% block custom_scripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/admin/pages/recommendations.js') }}"></script>
-{% endblock %}
+    {% block custom_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/admin/pages/recommendations.js') }}"></script>
+    {% endblock %}

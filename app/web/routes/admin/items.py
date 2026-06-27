@@ -28,6 +28,7 @@ from app.domains.item.service.admin import (
     build_admin_items_query,
     get_admin_item_inspect_raw
 )
+from app.application.item.admin import delete_item_workflow
 
 bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
 
@@ -196,13 +197,11 @@ def get_item_detail(id):
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_item(id):
     """Delete an item and all its variants, store links, and images."""
-    item = db.session.get(Item, id)
-    if not item:
+    deleted_name = delete_item_workflow(id)
+    if not deleted_name:
         return jsonify({"error": "Item not found"}), 404
 
-    db.session.delete(item)
-    db.session.commit()
-    return jsonify({"success": True, "message": f"Item '{item.name}' deleted successfully."})
+    return jsonify({"success": True, "message": f"Item '{deleted_name}' deleted successfully."})
 
 
 @bp.route("/rows", methods=["GET"])

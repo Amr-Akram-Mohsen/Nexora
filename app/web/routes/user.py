@@ -15,6 +15,7 @@ from app.application.user.password import request_password_reset, reset_user_pas
 from app.domains.user.service import (
     get_user_by_email,
     get_newsletter_subscriber_by_email,
+    get_user_by_id,
 )
 from app.application.user.profile import (
     update_profile_name_workflow,
@@ -385,8 +386,7 @@ def logout():
         
         if existing_accounts:
             next_user_id = existing_accounts[0]
-            from app.domains.user.models import User
-            next_user = db.session.get(User, next_user_id)
+            next_user = get_user_by_id(next_user_id)
             if next_user:
                 login_user(next_user)
                 session['multi_accounts'] = existing_accounts
@@ -424,8 +424,7 @@ def switch_account(user_id):
         existing_accounts = session.get('multi_accounts', [])
         
         if user_id in existing_accounts:
-            from app.domains.user.models import User
-            target_user = db.session.get(User, user_id)
+            target_user = get_user_by_id(user_id)
             if target_user:
                 logout_user()
                 login_user(target_user)
