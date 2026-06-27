@@ -56,4 +56,7 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
     else:
         logger.warning("[AUTH] Verification email FAILED to send to %s (user_id=%s)", email, user.id)
 
+    from app.core.extensions import db
+    db.session.commit()
+
     return user, newsletter_msg, sent

@@ -2,10 +2,7 @@
 import time
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
-from app.core.extensions import db
-from sqlalchemy import select, func, Date, cast, desc
-from app.domains.taxonomy.models import Source, Category
-from app.domains.content.models import Content
+
 from app.domains.analytics import (
     get_decision_intelligence_data,
     get_intent_opportunity_data,
@@ -76,7 +73,7 @@ def invalidate_cache(layer, key=None):
 
 
 @bp.before_request
-# @admin_required
+@admin_required
 def require_admin():
     """Ensure all insights endpoints require admin privilege."""
     pass

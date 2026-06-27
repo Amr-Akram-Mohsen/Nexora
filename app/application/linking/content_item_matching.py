@@ -8,49 +8,21 @@ from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.relationships import content_items
 from app.domains.recommendation.ranking import score_content_item_link
+from app.domains.item.service.query import (
+    get_candidate_items_for_content,
+    get_items_for_matching,
+    get_existing_content_item_links_by_items,
+)
+from app.domains.content.service.query.filtering import (
+    get_candidate_contents_for_item,
+    get_contents_for_matching_batch,
+    get_existing_content_item_links_by_contents,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def get_candidate_items_for_content(content, session):
-    """
-    Get a candidate pool of items for a given content.
-    Includes items in the same category or belonging to the same brand.
-    """
-    brand_ids = [b.id for b in content.brands] if content.brands else []
-    conditions = []
-    if content.category_id:
-        conditions.append(Item.category_id == content.category_id)
-    if brand_ids:
-        conditions.append(Item.brand_id.in_(brand_ids))
 
-    if not conditions:
-        return []
-
-    stmt = select(Item).where(or_(*conditions))
-    return session.execute(stmt).scalars().all()
-
-
-def get_candidate_contents_for_item(item, session):
-    """
-    Get a candidate pool of contents for a given item.
-    Includes contents in the same category or belonging to the same brand.
-    """
-    conditions = []
-    if item.category_id:
-        conditions.append(Content.category_id == item.category_id)
-
-    stmt = select(Content)
-    if item.brand_id:
-        from app.domains.relationships import content_brands
-        stmt = stmt.outerjoin(content_brands, Content.id == content_brands.c.content_id)
-        conditions.append(content_brands.c.brand_id == item.brand_id)
-
-    if not conditions:
-        return []
-
-    stmt = stmt.where(or_(*conditions)).order_by(Content.published_at.desc()).limit(1000)
-    return session.execute(stmt).scalars().all()
 
 
 def run_content_item_matching(
@@ -94,19 +66,16 @@ def run_content_item_matching(
     )
 
     # ── PASS 1: Process Content against Items ────────────────────────────────
-    # Query contents to evaluate
-    content_stmt = select(Content).where(Content.is_active == True)
+    cutoff_naive = None
     if cutoff:
         cutoff_naive = datetime.utcnow() - timedelta(days=since_days)
-        content_stmt = content_stmt.where(
-            or_(Content.ingested_at >= cutoff, Content.ingested_at >= cutoff_naive)
-        )
 
     # Fetch contents page by page
     offset = 0
     while True:
-        batch_stmt = content_stmt.offset(offset).limit(batch_size)
-        contents = session.execute(batch_stmt).scalars().all()
+        contents = get_contents_for_matching_batch(
+            offset, batch_size, cutoff=cutoff, cutoff_naive=cutoff_naive, session=session
+        )
         if not contents:
             break
 
@@ -114,10 +83,7 @@ def run_content_item_matching(
 
         # Pre-fetch existing links for this batch to prevent N+1 queries
         content_ids = [c.id for c in contents]
-        existing_links = session.execute(
-            select(content_items.c.content_id, content_items.c.item_id)
-            .where(content_items.c.content_id.in_(content_ids))
-        ).all()
+        existing_links = get_existing_content_item_links_by_contents(content_ids, session)
         existing_set = {(row.content_id, row.item_id) for row in existing_links}
 
         for content in contents:
@@ -141,24 +107,13 @@ def run_content_item_matching(
         offset += batch_size
 
     # ── PASS 2: Process Items against Contents ──────────────────────────────
-    # Query items to evaluate
-    item_stmt = select(Item)
-    if cutoff:
-        cutoff_naive = datetime.utcnow() - timedelta(days=since_days)
-        item_stmt = item_stmt.where(
-            or_(Item.created_at >= cutoff, Item.created_at >= cutoff_naive)
-        )
-
-    items = session.execute(item_stmt).scalars().all()
+    items = get_items_for_matching(cutoff=cutoff, cutoff_naive=cutoff_naive, session=session)
     summary["processed_items"] = len(items)
 
     if items:
         # Pre-fetch existing links for all items in Pass 2
         item_ids = [item.id for item in items]
-        existing_links = session.execute(
-            select(content_items.c.content_id, content_items.c.item_id)
-            .where(content_items.c.item_id.in_(item_ids))
-        ).all()
+        existing_links = get_existing_content_item_links_by_items(item_ids, session)
         existing_set = {(row.content_id, row.item_id) for row in existing_links}
 
         for item in items:

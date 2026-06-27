@@ -92,3 +92,188 @@ def get_distribution_history(target_type: str, target_id: int) -> list[dict]:
         })
 
     return distribution_history
+
+def get_admin_social_distribution(status_filter=None, platform_filter=None, source_type_filter=None, page=1, per_page=50):
+    from app.core.extensions import db
+    from sqlalchemy import select, desc
+    from app.domains.distribution.models import DistributionPost, DistributionPlatform
+    from app.domains.analytics.distribution_intelligence import get_social_distribution_summary
+    from datetime import datetime, timezone
+    
+    query = (
+        select(DistributionPost, DistributionPlatform.name.label("platform_name"))
+        .join(DistributionPlatform)
+    )
+    
+    if status_filter:
+        query = query.where(DistributionPost.status == status_filter)
+    if platform_filter:
+        query = query.where(DistributionPlatform.name == platform_filter)
+    if source_type_filter:
+        query = query.where(DistributionPost.source_target_type == source_type_filter)
+        
+    query = query.order_by(desc(DistributionPost.created_at))
+    
+    posts_paginated = db.paginate(query, page=page, per_page=per_page, error_out=False)
+    
+    view_models = []
+    now_utc = datetime.now(timezone.utc)
+    
+    platform_icons = {
+        "youtube": "📺",
+        "pinterest": "📌",
+        "instagram": "📷",
+        "facebook": "📘",
+        "twitter": "🐦",
+        "linkedin": "💼",
+        "blog": "📝"
+    }
+    
+    summary_stats = get_social_distribution_summary()
+    
+    for post, p_name in posts_paginated.items:
+        source_title = "Unknown"
+        if post.source:
+            source_title = getattr(post.source, "title", getattr(post.source, "name", f"ID: {post.source_target_id}"))
+            
+        is_overdue = False
+        if post.status == "scheduled" and post.publish_date and post.publish_date < now_utc:
+            is_overdue = True
+            
+        icon = platform_icons.get(p_name.lower(), "🌐")
+        engagement = post.views_count + (post.likes_count * 2) + (post.shares_count * 3) + int(post.clicks_count * 1.5)
+            
+        view_models.append({
+            "id": post.id,
+            "platform": p_name,
+            "platform_icon": icon,
+            "source_title": source_title,
+            "source_type": post.source_target_type,
+            "source_id": post.source_target_id,
+            "status": post.status,
+            "publish_date": post.publish_date,
+            "updated_at": post.updated_at,
+            "is_overdue": is_overdue,
+            "has_url": bool(post.external_url),
+            "views": post.views_count,
+            "likes": post.likes_count,
+            "clicks": post.clicks_count,
+            "shares": post.shares_count,
+            "engagement": engagement
+        })
+        
+    return {
+        "view_models": view_models,
+        "summary_stats": summary_stats,
+        "pagination": posts_paginated
+    }
+
+def get_admin_scheduling_queue():
+    from app.core.extensions import db
+    from sqlalchemy import select
+    from app.domains.distribution.models import DistributionPost, DistributionPlatform
+    from datetime import datetime, timezone
+    from app.web.routes.admin.helpers import get_platform_icon, get_source_title
+    
+    query = (
+        select(DistributionPost, DistributionPlatform.name.label("platform_name"))
+        .join(DistributionPlatform)
+        .where(DistributionPost.status == "scheduled")
+        .order_by(DistributionPost.publish_date.asc())
+        .limit(10)
+    )
+    
+    scheduled_posts = db.session.execute(query).all()
+    
+    view_models = []
+    now_utc = datetime.now(timezone.utc)
+    for post, platform_name in scheduled_posts:
+        platform_icon = get_platform_icon(platform_name)
+        is_overdue = post.publish_date and post.publish_date < now_utc
+        
+        view_models.append({
+            "id": post.id,
+            "platform": platform_name,
+            "platform_icon": platform_icon,
+            "source_type": post.source_target_type,
+            "source_title": get_source_title(post.source_target_type, post.source_target_id),
+            "publish_date": post.publish_date,
+            "is_overdue": is_overdue
+        })
+        
+    return view_models
+
+def generate_admin_distribution_draft(source_type, source_id, platform_name):
+    from app.core.extensions import db
+    from sqlalchemy import select
+    from app.domains.distribution.models import DistributionPost, DistributionPlatform
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    from app.web.routes.admin.helpers import get_source_title
+
+    platform = db.session.execute(select(DistributionPlatform).filter_by(name=platform_name)).scalar_one_or_none()
+    if not platform:
+        platform = DistributionPlatform(name=platform_name)
+        db.session.add(platform)
+        db.session.commit()
+        
+    asset = None
+    if source_type == "content":
+        asset = db.session.get(Content, source_id)
+    elif source_type == "item":
+        asset = db.session.get(Item, source_id)
+        
+    if not asset:
+        return None
+        
+    generated = generate_social_post_template(asset, platform_name)
+    
+    post = db.session.execute(
+        select(DistributionPost).filter_by(
+            platform_id=platform.id, 
+            source_target_type=source_type, 
+            source_target_id=source_id
+        )
+    ).scalar_one_or_none()
+    
+    if not post:
+        post = DistributionPost(
+            platform_id=platform.id,
+            source_target_type=source_type,
+            source_target_id=source_id,
+            status="draft",
+            platform_specific_text=generated["suggested_text"]
+        )
+        db.session.add(post)
+        db.session.commit()
+        
+    engagement = post.views_count + (post.likes_count * 2) + (post.shares_count * 3) + int(post.clicks_count * 1.5)
+    
+    return {
+        "post_id": post.id,
+        "platform": platform_name,
+        "post_type": generated["post_type"],
+        "text": post.platform_specific_text,
+        "status": post.status,
+        "post": post,
+        "engagement": engagement,
+        "source_title": get_source_title(source_type, source_id)
+    }
+
+def publish_admin_distribution_post(post_id, external_url, text):
+    from app.core.extensions import db
+    from app.domains.distribution.models import DistributionPost
+    from datetime import datetime, timezone
+    
+    post = db.session.get(DistributionPost, post_id)
+    if not post:
+        return None
+        
+    post.status = "published"
+    post.publish_date = datetime.now(timezone.utc)
+    post.external_url = external_url
+    if text:
+        post.platform_specific_text = text
+        
+    db.session.commit()
+    return post

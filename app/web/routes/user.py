@@ -15,10 +15,13 @@ from app.application.user.password import request_password_reset, reset_user_pas
 from app.domains.user.service import (
     get_user_by_email,
     get_newsletter_subscriber_by_email,
-    update_user_name,
-    update_user_password,
-    record_login,
 )
+from app.application.user.profile import (
+    update_profile_name_workflow,
+    update_profile_password_workflow,
+)
+from app.application.user.login import handle_successful_login, handle_google_oauth_login
+
 from app.shared.validators import validate_email, validate_password_strength
 from app.shared.sanitizer import sanitize_text
 import secrets
@@ -87,10 +90,7 @@ def login():
                 
                 session['multi_accounts'] = existing_accounts
 
-                # Track last login
-                record_login(user)
-                db.session.commit()
-
+                handle_successful_login(user)
                 if user.is_admin:
                     log_route_success(logger, "/login", status=302)
                     return redirect(url_for('system.home'))
@@ -157,31 +157,8 @@ def google_authorize():
             log_route_success(logger, "/auth/google/authorize", status=302)
             return redirect(url_for("user.login"))
 
-        from app.domains.user.models import User
-        from app.domains.user.service import mark_user_verified
+        user = handle_google_oauth_login(user_info)
 
-        user = get_user_by_email(email)
-        if user:
-            if not user.google_id:
-                user.google_id  = user_info.get('sub')
-                user.provider   = 'google'
-                if not user.is_verified:
-                    mark_user_verified(user)
-                else:
-                    db.session.commit()
-        else:
-            from app.domains.user.service import create_user, mark_user_verified as _mv
-            user = User(
-                email=email,
-                name=user_info.get('name'),
-                provider='google',
-                google_id=user_info.get('sub'),
-                is_verified=True,
-            )
-            user.set_password(secrets.token_urlsafe(24))
-            db.session.add(user)
-            db.session.commit()
-            _mv(user)
 
         existing_accounts = session.get('multi_accounts', [])
         is_add_account = session.pop('add_account_flow', False)
@@ -196,8 +173,6 @@ def google_authorize():
             existing_accounts.append(user.id)
             
         session['multi_accounts'] = existing_accounts
-        record_login(user)
-        db.session.commit()
         flash("Signed in with Google!", "success")
         log_route_success(logger, "/auth/google/authorize", status=302)
         return redirect(url_for('system.home'))
@@ -254,7 +229,6 @@ def register():
             if newsletter_msg:
                 flash(newsletter_msg, "info")
 
-            db.session.commit()
             if email_sent:
                 flash(
                     "Account created! Please check your email to verify your account before logging in. 📧",
@@ -300,8 +274,7 @@ def verify_email(token: str):
 
         session.clear()
         login_user(user)
-        record_login(user)
-        db.session.commit()
+        handle_successful_login(user)
         flash("Your email has been verified! Welcome to Nexora 🎉", "success")
         log_route_success(logger, f"/verify-email/{token[:8]}...", status=302)
         return redirect(url_for('system.home'))
@@ -318,7 +291,6 @@ def resend_verification():
         email = request.form.get('email', '').strip().lower()
         if email:
             resend_verification_email_workflow(email)
-            db.session.commit()
         flash(
             "If that email exists and is unverified, a new link has been sent. "
             "Check your spam folder if you don't see it within a few minutes.",
@@ -342,7 +314,6 @@ def forgot_password():
         if request.method == 'POST':
             email = request.form.get('email', '').strip().lower()
             request_password_reset(email)
-            db.session.commit()
             flash(
                 "If an account with that email exists, a password reset link has been sent. "
                 "The link expires in 1 hour.",
@@ -379,7 +350,6 @@ def reset_password(token: str):
 
             success, msg = reset_user_password(token, password)
             if success:
-                db.session.commit()
                 flash(msg, "success")
                 log_route_success(logger, f"/reset-password/{token[:8]}...", status=302)
                 return redirect(url_for('user.login'))
@@ -503,8 +473,7 @@ def update_profile():
             if not sanitized_name:
                 flash("Display name cannot be empty.", "error")
             else:
-                update_user_name(current_user, sanitized_name)
-                db.session.commit()
+                update_profile_name_workflow(current_user, sanitized_name)
                 flash("Display name updated.", "success")
 
         elif action == 'password':
@@ -526,8 +495,7 @@ def update_profile():
                 if not is_strong:
                     flash(pwd_err, "error")
                 else:
-                    update_user_password(current_user, new_pwd)
-                    db.session.commit()
+                    update_profile_password_workflow(current_user, new_pwd)
                     flash("Password changed successfully!", "success")
 
         log_route_success(logger, "/update-profile", status=302)

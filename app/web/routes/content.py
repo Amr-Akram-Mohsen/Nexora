@@ -67,7 +67,6 @@ def content_page(content_id):
             logger.warning("[ROUTE][/contents/%d] no data returned — 404", content_id)
             abort(404)
         record_content_view(content_id, user, ip_address)
-        db.session.commit()
 
         log_route_success(logger, f"/contents/{content_id}", template="page.html")
 

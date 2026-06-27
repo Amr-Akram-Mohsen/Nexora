@@ -18,7 +18,16 @@ import warnings
 # Register every ORM model before admin/routes import eager-load or mapper setup.
 from app import domains  # noqa: F401
 
-from app.admin import (
+
+from app.domains.user.models import User
+
+from app.web.routes import (
+    user_bp,
+    system_bp,
+    content_bp,
+    item_bp,
+    interaction_bp,
+    recommendation_bp,
     api_user_bp,
     api_content_bp,
     api_item_bp,
@@ -33,18 +42,7 @@ from app.admin import (
     api_distribution_bp,
     api_subscribers_bp,
     api_audience_analytics_bp,
-)
-
-from app.domains.user.models import User
-
-from app.web.routes import (
-    admin_bp,
-    user_bp,
-    system_bp,
-    content_bp,
-    item_bp,
-    interaction_bp,
-    recommendation_bp,
+    api_admin_bp
 )
 
 load_dotenv()
@@ -214,9 +212,7 @@ def create_app():
     app.register_blueprint(api_distribution_bp)
     app.register_blueprint(api_subscribers_bp)
     app.register_blueprint(api_audience_analytics_bp)
-
-    # app.register_blueprint(dashboard_bp)
-    app.register_blueprint(admin_bp)
+    app.register_blueprint(api_admin_bp)
 
     @app.before_request
     def check_maintenance():

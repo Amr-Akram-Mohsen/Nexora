@@ -118,5 +118,111 @@ def get_filtered_contents(
     }
 
 
+def get_all_contents_metadata(session=None):
+    from sqlalchemy import select
+    from ...models import Content
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    stmt = select(Content.id, Content.updated_at, Content.published_at)
+    return session.execute(stmt).all()
 
 
+def get_candidate_contents_for_item(item, session=None):
+    from sqlalchemy import select, or_
+    from ...models import Content
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    conditions = []
+    if item.category_id:
+        conditions.append(Content.category_id == item.category_id)
+    stmt = select(Content)
+    if item.brand_id:
+        from app.domains.relationships import content_brands
+        stmt = stmt.outerjoin(content_brands, Content.id == content_brands.c.content_id)
+        conditions.append(content_brands.c.brand_id == item.brand_id)
+    if not conditions:
+        return []
+    stmt = stmt.where(or_(*conditions)).order_by(Content.published_at.desc()).limit(1000)
+    return session.execute(stmt).scalars().all()
+
+
+def get_contents_for_matching_batch(offset, batch_size, cutoff=None, cutoff_naive=None, session=None):
+    from sqlalchemy import select, or_
+    from ...models import Content
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    stmt = select(Content).where(Content.is_active == True)
+    if cutoff and cutoff_naive:
+        stmt = stmt.where(or_(Content.ingested_at >= cutoff, Content.ingested_at >= cutoff_naive))
+    stmt = stmt.offset(offset).limit(batch_size)
+    return session.execute(stmt).scalars().all()
+
+
+def get_existing_content_item_links_by_contents(content_ids, session=None):
+    from sqlalchemy import select
+    from app.domains.relationships import content_items
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    stmt = select(content_items.c.content_id, content_items.c.item_id).where(content_items.c.content_id.in_(content_ids))
+    return session.execute(stmt).all()
+
+
+def get_contents_by_ids(content_ids, session=None):
+    from sqlalchemy import select
+    from ...models import Content
+    from .options import CONTENT_LIST_EAGER_LOADS
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    if not content_ids:
+        return []
+    stmt = (
+        select(Content)
+        .options(*CONTENT_LIST_EAGER_LOADS)
+        .where(Content.id.in_(content_ids))
+    )
+    return session.execute(stmt).scalars().all()
+
+
+def get_unscraped_articles(limit, retry_threshold, session=None):
+    from sqlalchemy import select
+    from ...models import Article, Content
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    stmt = (
+        select(Article)
+        .join(
+            Content,
+            (Content.object_type == "article")
+            & (Content.object_id == Article.id)
+            & (Content.is_active),
+        )
+        .where(
+            (Article.status == "pending")
+            | (
+                (Article.status == "failed")
+                & (Article.last_enrichment_attempt < retry_threshold)
+            )
+        )
+        .order_by(Content.published_at.desc())
+        .limit(limit)
+    )
+    return session.execute(stmt).scalars().all()
+
+
+def get_content_by_object(object_type, object_id, session=None):
+    from sqlalchemy import select
+    from ...models import Content
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+    stmt = select(Content).where(
+        Content.object_type == object_type,
+        Content.object_id == object_id
+    )
+    return session.execute(stmt).scalars().first()

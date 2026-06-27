@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from sqlalchemy import select, desc
-from app.admin.insights import get_cached, set_cached, invalidate_cache
+from app.web.routes.admin.insights import get_cached, set_cached, invalidate_cache
 from app.domains.analytics import (
     get_decision_intelligence_data,
     get_intent_opportunity_data,
@@ -326,7 +326,7 @@ def widget_governance():
 
 @bp.route("/widget/social-distribution", methods=["GET"])
 def widget_social_distribution():
-    from app.domains.distribution.models import DistributionPost, DistributionPlatform
+    from app.domains.distribution.services import get_admin_social_distribution
     
     page = request.args.get("page", 1, type=int)
     per_page = 50
@@ -335,77 +335,15 @@ def widget_social_distribution():
     platform_filter = request.args.get("platform")
     source_type_filter = request.args.get("source_type")
     
-    query = (
-        select(DistributionPost, DistributionPlatform.name.label("platform_name"))
-        .join(DistributionPlatform)
-    )
+    data = get_admin_social_distribution(status_filter, platform_filter, source_type_filter, page, per_page)
     
-    if status_filter:
-        query = query.where(DistributionPost.status == status_filter)
-    if platform_filter:
-        query = query.where(DistributionPlatform.name == platform_filter)
-    if source_type_filter:
-        query = query.where(DistributionPost.source_target_type == source_type_filter)
-        
-    query = query.order_by(desc(DistributionPost.created_at))
-    
-    posts_paginated = db.paginate(query, page=page, per_page=per_page, error_out=False)
-    
-    view_models = []
-    now_utc = datetime.now(timezone.utc)
-    
-    platform_icons = {
-        "youtube": "📺",
-        "pinterest": "📌",
-        "instagram": "📷",
-        "facebook": "📘",
-        "twitter": "🐦",
-        "linkedin": "💼",
-        "blog": "📝"
-    }
-    
-    # Calculate status summary for this specific view (could also be global)
-    from app.domains.analytics.distribution_intelligence import get_social_distribution_summary
-    summary_stats = get_social_distribution_summary()
-    
-    for post, p_name in posts_paginated.items:
-        source_title = "Unknown"
-        if post.source:
-            source_title = getattr(post.source, "title", getattr(post.source, "name", f"ID: {post.source_target_id}"))
-            
-        is_overdue = False
-        if post.status == "scheduled" and post.publish_date and post.publish_date < now_utc:
-            is_overdue = True
-            
-        icon = platform_icons.get(p_name.lower(), "🌐")
-        engagement = post.views_count + (post.likes_count * 2) + (post.shares_count * 3) + int(post.clicks_count * 1.5)
-            
-        view_models.append({
-            "id": post.id,
-            "platform": p_name,
-            "platform_icon": icon,
-            "source_title": source_title,
-            "source_type": post.source_target_type,
-            "source_id": post.source_target_id,
-            "status": post.status,
-            "publish_date": post.publish_date,
-            "updated_at": post.updated_at,
-            "is_overdue": is_overdue,
-            "has_url": bool(post.external_url),
-            "views": post.views_count,
-            "likes": post.likes_count,
-            "clicks": post.clicks_count,
-            "shares": post.shares_count,
-            "engagement": engagement
-        })
-        
-    headers = {"X-Empty": "true"} if not view_models else {}
+    headers = {"X-Empty": "true"} if not data["view_models"] else {}
     return render_template(
         "admin/distribution/_social_distribution_rows.html",
         widget_type="social_distribution",
-        items=view_models,
-        summary_stats=summary_stats,
-        pagination=posts_paginated
+        items=data["view_models"],
+        summary_stats=data["summary_stats"],
+        pagination=data["pagination"]
     ), 200, headers
 
 
@@ -418,35 +356,8 @@ def widget_overview_kpis():
 
 @bp.route("/widget/scheduling-queue", methods=["GET"])
 def widget_scheduling_queue():
-    from app.domains.distribution.models import DistributionPost, DistributionPlatform
-    
-    # Get all scheduled posts ordered by publish_date ascending
-    query = (
-        select(DistributionPost, DistributionPlatform.name.label("platform_name"))
-        .join(DistributionPlatform)
-        .where(DistributionPost.status == "scheduled")
-        .order_by(DistributionPost.publish_date.asc())
-        .limit(10)
-    )
-    
-    scheduled_posts = db.session.execute(query).all()
-    
-    view_models = []
-    now_utc = datetime.now(timezone.utc)
-    for post, platform_name in scheduled_posts:
-        platform_icon = get_platform_icon(platform_name)
-        is_overdue = post.publish_date and post.publish_date < now_utc
-        
-        view_models.append({
-            "id": post.id,
-            "platform": platform_name,
-            "platform_icon": platform_icon,
-            "source_type": post.source_target_type,
-            "source_title": get_source_title(post.source_target_type, post.source_target_id),
-            "publish_date": post.publish_date,
-            "is_overdue": is_overdue
-        })
-        
+    from app.domains.distribution.services import get_admin_scheduling_queue
+    view_models = get_admin_scheduling_queue()
     return render_template("admin/distribution/_scheduling_queue.html", items=view_models)
 
 
@@ -479,10 +390,7 @@ def widget_platform_performance():
 
 @bp.route("/social-distribution/generate", methods=["POST"])
 def generate_distribution_draft():
-    from app.domains.distribution.services import generate_social_post_template
-    from app.domains.distribution.models import DistributionPost, DistributionPlatform
-    from app.domains.content.models import Content
-    from app.domains.item.models import Item
+    from app.domains.distribution.services import generate_admin_distribution_draft
     
     data = request.json
     source_type = data.get("source_type") # 'content' or 'item'
@@ -492,80 +400,28 @@ def generate_distribution_draft():
     if not all([source_type, source_id, platform_name]):
         return jsonify({"error": "Missing parameters"}), 400
         
-    # Get platform
-    platform = db.session.execute(select(DistributionPlatform).filter_by(name=platform_name)).scalar_one_or_none()
-    if not platform:
-        platform = DistributionPlatform(name=platform_name)
-        db.session.add(platform)
-        db.session.commit()
-        
-    # Get source asset
-    asset = None
-    if source_type == "content":
-        asset = db.session.get(Content, source_id)
-    elif source_type == "item":
-        asset = db.session.get(Item, source_id)
-        
-    if not asset:
+    result = generate_admin_distribution_draft(source_type, source_id, platform_name)
+    if not result:
         return jsonify({"error": "Source asset not found"}), 404
-        
-    # Generate content
-    generated = generate_social_post_template(asset, platform_name)
-    
-    # Create or update Draft
-    post = db.session.execute(
-        select(DistributionPost).filter_by(
-            platform_id=platform.id, 
-            source_target_type=source_type, 
-            source_target_id=source_id
-        )
-    ).scalar_one_or_none()
-    
-    if not post:
-        post = DistributionPost(
-            platform_id=platform.id,
-            source_target_type=source_type,
-            source_target_id=source_id,
-            status="draft",
-            platform_specific_text=generated["suggested_text"]
-        )
-        db.session.add(post)
-        db.session.commit()
-        
-    engagement = post.views_count + (post.likes_count * 2) + (post.shares_count * 3) + int(post.clicks_count * 1.5)
         
     return render_template(
         "admin/distribution/_distribution_modal_inner.html",
-        post_id=post.id,
-        platform=platform_name,
-        post_type=generated["post_type"],
-        text=post.platform_specific_text,
-        status=post.status,
-        post=post,
-        engagement=engagement,
-        source_title=get_source_title(source_type, source_id)
+        **result
     )
 
 
 @bp.route("/social-distribution/<int:post_id>/publish", methods=["POST"])
 def publish_distribution_post(post_id):
-    from app.domains.distribution.models import DistributionPost
+    from app.domains.distribution.services import publish_admin_distribution_post
     
     data = request.json
     external_url = data.get("external_url", "")
     text = data.get("text", "")
     
-    post = db.session.get(DistributionPost, post_id)
+    post = publish_admin_distribution_post(post_id, external_url, text)
     if not post:
         return jsonify({"error": "Post not found"}), 404
         
-    post.status = "published"
-    post.publish_date = datetime.now(timezone.utc)
-    post.external_url = external_url
-    if text:
-        post.platform_specific_text = text
-        
-    db.session.commit()
     return jsonify({"success": True, "status": post.status})
 
 

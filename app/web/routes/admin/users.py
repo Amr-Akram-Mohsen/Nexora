@@ -19,6 +19,7 @@ from sqlalchemy import select, or_, and_, func
 from app.domains.taxonomy.models import Category, Topic, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
 from app.domains.recommendation.models import UserInterest, UserEntityInterest
+from app.domains.user.service.admin import get_admin_users_paginated, toggle_admin_user, get_admin_user_inspect_raw_data
 
 bp = Blueprint("api_user", __name__, url_prefix="/admin/users")
 @bp.route("/stats", methods=["GET"])
@@ -36,31 +37,7 @@ def require_admin():
 
 
 def _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page):
-    stmt, count_stmt = _build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
-            
-    total = db.session.scalar(count_stmt) or 0
-    
-    # Calculate summary stats based on current query
-    from app.domains.user.models import NewsletterSubscriber
-    stats = {
-        "active": db.session.scalar(count_stmt.where(User.is_active == True)) or 0,
-        "admins": db.session.scalar(count_stmt.where(User.is_admin == True)) or 0,
-        "verified": db.session.scalar(count_stmt.where(User.is_verified == True)) or 0,
-        "subscribed": db.session.scalar(
-            count_stmt.outerjoin(NewsletterSubscriber, User.id == NewsletterSubscriber.user_id)
-            .where(NewsletterSubscriber.is_confirmed == True, NewsletterSubscriber.unsubscribed_at.is_(None))
-        ) or 0
-    }
-    
-    # items query
-    offset = (page - 1) * per_page
-    items_stmt = stmt.limit(per_page).offset(offset)
-    items = db.session.execute(items_stmt).all() # returns list of Rows: (User, score)
-    
-    import math
-    pages = math.ceil(total / per_page) if per_page else 1
-    return items, total, pages, stats
-
+    return get_admin_users_paginated(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
 @bp.route("/", methods=["GET"])
 def list_users():
@@ -118,7 +95,6 @@ def activate_user(id):
 
 
 def _build_user_query(search, role, status, verified, subscription, provider, sort_by=None, sort_dir=None):
-    """Shared query builder for users listing and rows endpoint."""
     from app.domains.user.service.analytics import build_user_query as domain_build_user_query
     return domain_build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
 
@@ -186,18 +162,18 @@ def inspect_user(id):
 
 def build_user_inspect_data(id):
     """Return dictionary of data needed for the user inspect/detail view."""
-    from sqlalchemy.orm import selectinload
-    stmt_user = select(User).options(
-        selectinload(User.user_interests).selectinload(UserInterest.entity_scores),
-        selectinload(User.newsletter_subscription)
-    ).where(User.id == id)
-    user = db.session.scalar(stmt_user)
-    
-    if not user:
+    raw_data = get_admin_user_inspect_raw_data(id)
+    if not raw_data:
         return None
+        
+    user = raw_data["user"]
+    metrics = raw_data["metrics"]
+    brands_map = raw_data["brands_map"]
+    categories_map = raw_data["categories_map"]
+    topics_map = raw_data["topics_map"]
+    items_map = raw_data["items_map"]
+    articles_map = raw_data["articles_map"]
 
-    from app.domains.user.service.analytics import get_user_analytics_metrics
-    metrics = get_user_analytics_metrics(id)
     views_count = metrics["views_count"]
     clicks_count = metrics["clicks_count"]
     saves_count = metrics["saves_count"]
@@ -213,31 +189,6 @@ def build_user_inspect_data(id):
     
     provider = user.provider.title() if user.provider else "Local"
     verified_str = "Yes" if user.is_verified else "No"
-    
-    brand_ids = set()
-    category_ids = set()
-    topic_ids = set()
-    for ui in user.user_interests:
-        for score in ui.entity_scores:
-            if score.brand_id: brand_ids.add(score.brand_id)
-            if score.category_id: category_ids.add(score.category_id)
-            if score.topic_id: topic_ids.add(score.topic_id)
-            
-    brands_map = {b.id: b.name for b in db.session.execute(select(Brand).where(Brand.id.in_(brand_ids))).scalars()} if brand_ids else {}
-    categories_map = {c.id: c.name for c in db.session.execute(select(Category).where(Category.id.in_(category_ids))).scalars()} if category_ids else {}
-    topics_map = {t.id: t.name for t in db.session.execute(select(Topic).where(Topic.id.in_(topic_ids))).scalars()} if topic_ids else {}
-
-    item_ids = {ui.target_id for ui in user.user_interests if ui.target_type == 'item'}
-    article_ids = {ui.target_id for ui in user.user_interests if ui.target_type in ('article', 'content')}
-    items_map = {}
-    articles_map = {}
-    if item_ids:
-        from app.domains.item.models import Item
-        items_map = {i.id: i.name for i in db.session.execute(select(Item).where(Item.id.in_(item_ids))).scalars()}
-    if article_ids:
-        from app.domains.content.models import Content
-        articles_map = {c.id: c.title for c in db.session.execute(select(Content).where(Content.id.in_(article_ids))).scalars()}
-
     interests_data = []
     agg_brands = {}
     agg_categories = {}
@@ -451,9 +402,8 @@ def build_user_inspect_data(id):
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])
 def toggle_admin(id):
-    user = db.session.get(User, id)
+    user = toggle_admin_user(id)
     if not user:
         return jsonify({"error": "User not found"}), 404
-    user.is_admin = not user.is_admin
     db.session.commit()
     return jsonify({"success": True, "is_admin": user.is_admin})

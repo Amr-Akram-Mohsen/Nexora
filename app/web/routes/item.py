@@ -71,7 +71,6 @@ def item_page(item_id):
         abort(404)
 
     record_item_view(item_id, user, ip_address)
-    db.session.commit()
 
     log_route_success(logger, f"/items/{item_id}", template="item.html")
 

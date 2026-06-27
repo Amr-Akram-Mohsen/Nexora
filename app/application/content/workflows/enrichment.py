@@ -25,25 +25,12 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
     # Only retry 'failed' articles after 24 hours
     retry_threshold = datetime.utcnow() - timedelta(hours=24)
 
-    unscraped = (
-        db.session.query(Article)
-        .join(
-            Content,
-            (Content.object_type == "article")
-            & (Content.object_id == Article.id)
-            & (Content.is_active),
-        )
-        .filter(
-            (Article.status == "pending")
-            | (
-                (Article.status == "failed")
-                & (Article.last_enrichment_attempt < retry_threshold)
-            )
-        )
-        .order_by(Content.published_at.desc())
-        .limit(limit)
-        .all()
+    from app.domains.content.service.query.filtering import (
+        get_unscraped_articles,
+        get_content_by_object,
     )
+
+    unscraped = get_unscraped_articles(limit, retry_threshold)
 
     if not unscraped:
         return 0
@@ -121,9 +108,7 @@ def reprocess_unscraped_articles(limit: int = 50) -> int:
                 )
 
             # Sync with Content record
-            content_rec = Content.query.filter_by(
-                object_type="article", object_id=article.id
-            ).first()
+            content_rec = get_content_by_object("article", article.id)
             if content_rec:
                 content_rec.is_published = article.status == "complete"
 

@@ -20,7 +20,11 @@ def request_password_reset(email: str) -> bool:
             logger.info("[AUTH] Password reset email sent to %s (user_id=%s)", email, user.id)
         else:
             logger.warning("[AUTH] Password reset email FAILED for %s (user_id=%s)", email, user.id)
+
+    from app.core.extensions import db
+    db.session.commit()
     return True
+
 
 
 def reset_user_password(token: str, new_password: str) -> tuple[bool, str]:
@@ -50,5 +54,8 @@ def reset_user_password(token: str, new_password: str) -> tuple[bool, str]:
         return False, "This password reset link has already been used."
 
     reset_password(user, new_password)
+    from app.core.extensions import db
+    db.session.commit()
     logger.info("[AUTH] Password successfully reset for user_id=%s", user.id)
     return True, "Password updated successfully!"
+

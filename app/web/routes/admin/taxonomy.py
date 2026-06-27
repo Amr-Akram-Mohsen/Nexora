@@ -10,6 +10,18 @@ import difflib
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.analytics.taxonomy_intelligence import get_taxonomy_intelligence
+from app.domains.taxonomy.service.admin import (
+    get_admin_categories_paginated, get_admin_brands_paginated,
+    get_admin_topics_paginated, get_admin_sections_paginated,
+    get_admin_attributes_paginated, get_admin_facet_paginated,
+    get_admin_categories, create_admin_category, update_admin_category, delete_admin_category,
+    get_admin_brands, create_admin_brand, update_admin_brand, delete_admin_brand,
+    get_admin_topics, create_admin_topic, update_admin_topic, delete_admin_topic,
+    get_admin_sections, update_admin_section,
+    get_admin_attributes, create_admin_attribute, update_admin_attribute, delete_admin_attribute,
+    get_admin_taxonomy_analytics, get_admin_entity_or_404, get_admin_taxonomy_related_metadata,
+    get_admin_source_metadata
+)
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
 
@@ -36,10 +48,7 @@ def intelligence_dashboard():
 @bp.route("/categories", methods=["GET"])
 def list_categories():
     search = request.args.get("search", "").strip()
-    stmt = select(Category).order_by(Category.name.asc())
-    if search:
-        stmt = stmt.where(Category.name.ilike(f"%{search}%"))
-    cats = db.session.execute(stmt).scalars().all()
+    cats = get_admin_categories(search)
     return jsonify([_serialize_category(c) for c in cats])
 
 
@@ -50,29 +59,21 @@ def create_category():
     name = (data.get("name") or "").strip()
     if not name:
         return jsonify({"error": "Name is required"}), 400
-    slug = generate_slug(name)
-    if db.session.execute(select(Category).where(Category.slug == slug)).scalar_one_or_none():
-        return jsonify({"error": f"Category with slug '{slug}' already exists"}), 409
-    cat = Category(name=name, slug=slug, is_active=data.get("is_active", True))
-    db.session.add(cat)
-    db.session.commit()
-    return jsonify(_serialize_category(cat)), 201
+    try:
+        cat = create_admin_category(name, data.get("is_active", True))
+        db.session.commit()
+        return jsonify(_serialize_category(cat)), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 409
 
 
 @bp.route("/categories/<int:id>", methods=["PATCH"])
 @admin_required
 def update_category(id):
-    cat = db.session.get(Category, id)
+    data = request.get_json() or {}
+    cat = update_admin_category(id, data)
     if not cat:
         return jsonify({"error": "Not found"}), 404
-    data = request.get_json() or {}
-    if "name" in data and data["name"].strip():
-        cat.name = data["name"].strip()
-        cat.slug = generate_slug(cat.name)
-    if "is_active" in data:
-        cat.is_active = bool(data["is_active"])
-    if "sort_order" in data:
-        cat.sort_order = int(data["sort_order"])
     db.session.commit()
     return jsonify(_serialize_category(cat))
 
@@ -80,10 +81,9 @@ def update_category(id):
 @bp.route("/categories/<int:id>", methods=["DELETE"])
 @admin_required
 def delete_category(id):
-    cat = db.session.get(Category, id)
+    cat = delete_admin_category(id)
     if not cat:
         return jsonify({"error": "Not found"}), 404
-    db.session.delete(cat)
     db.session.commit()
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
@@ -131,10 +131,7 @@ def _serialize_category(c):
 @bp.route("/brands", methods=["GET"])
 def list_brands():
     search = request.args.get("search", "").strip()
-    stmt = select(Brand).order_by(Brand.name.asc())
-    if search:
-        stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
-    brands = db.session.execute(stmt).scalars().all()
+    brands = get_admin_brands(search)
     return jsonify([_serialize_brand(b) for b in brands])
 
 
@@ -145,36 +142,21 @@ def create_brand():
     name = (data.get("name") or "").strip()
     if not name:
         return jsonify({"error": "Name is required"}), 400
-    slug = generate_slug(name)
-    if db.session.execute(select(Brand).where(Brand.slug == slug)).scalar_one_or_none():
-        return jsonify({"error": f"Brand with slug '{slug}' already exists"}), 409
-    brand = Brand(
-        name=name,
-        slug=slug,
-        industry=data.get("industry"),
-        is_active=data.get("is_active", True),
-    )
-    db.session.add(brand)
-    db.session.commit()
-    return jsonify(_serialize_brand(brand)), 201
+    try:
+        brand = create_admin_brand(name, data.get("industry"), data.get("is_active", True))
+        db.session.commit()
+        return jsonify(_serialize_brand(brand)), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 409
 
 
 @bp.route("/brands/<int:id>", methods=["PATCH"])
 @admin_required
 def update_brand(id):
-    brand = db.session.get(Brand, id)
+    data = request.get_json() or {}
+    brand = update_admin_brand(id, data)
     if not brand:
         return jsonify({"error": "Not found"}), 404
-    data = request.get_json() or {}
-    if "name" in data and data["name"].strip():
-        brand.name = data["name"].strip()
-        brand.slug = generate_slug(brand.name)
-    if "is_active" in data:
-        brand.is_active = bool(data["is_active"])
-    if "industry" in data:
-        brand.industry = data["industry"]
-    if "sort_order" in data:
-        brand.sort_order = int(data["sort_order"])
     db.session.commit()
     return jsonify(_serialize_brand(brand))
 
@@ -182,10 +164,9 @@ def update_brand(id):
 @bp.route("/brands/<int:id>", methods=["DELETE"])
 @admin_required
 def delete_brand(id):
-    brand = db.session.get(Brand, id)
+    brand = delete_admin_brand(id)
     if not brand:
         return jsonify({"error": "Not found"}), 404
-    db.session.delete(brand)
     db.session.commit()
     return jsonify({"success": True, "message": f"Brand '{brand.name}' deleted."})
 
@@ -209,10 +190,7 @@ def _serialize_brand(b):
 @bp.route("/topics", methods=["GET"])
 def list_topics():
     search = request.args.get("search", "").strip()
-    stmt = select(Topic).order_by(Topic.name.asc())
-    if search:
-        stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
-    topics = db.session.execute(stmt).scalars().all()
+    topics = get_admin_topics(search)
     return jsonify([_serialize_topic(t) for t in topics])
 
 
@@ -223,31 +201,21 @@ def create_topic():
     name = (data.get("name") or "").strip()
     if not name:
         return jsonify({"error": "Name is required"}), 400
-    slug = generate_slug(name)
-    if db.session.execute(select(Topic).where(Topic.slug == slug)).scalar_one_or_none():
-        return jsonify({"error": f"Topic with slug '{slug}' already exists"}), 409
-    topic = Topic(name=name, slug=slug, is_active=data.get("is_active", True))
-    db.session.add(topic)
-    db.session.commit()
-    return jsonify(_serialize_topic(topic)), 201
+    try:
+        topic = create_admin_topic(name, data.get("is_active", True))
+        db.session.commit()
+        return jsonify(_serialize_topic(topic)), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 409
 
 
 @bp.route("/topics/<int:id>", methods=["PATCH"])
 @admin_required
 def update_topic(id):
-    topic = db.session.get(Topic, id)
+    data = request.get_json() or {}
+    topic = update_admin_topic(id, data)
     if not topic:
         return jsonify({"error": "Not found"}), 404
-    data = request.get_json() or {}
-    if "name" in data and data["name"].strip():
-        topic.name = data["name"].strip()
-        topic.slug = generate_slug(topic.name)
-    if "is_active" in data:
-        topic.is_active = bool(data["is_active"])
-    if "is_featured" in data:
-        topic.is_featured = bool(data["is_featured"])
-    if "sort_order" in data:
-        topic.sort_order = int(data["sort_order"])
     db.session.commit()
     return jsonify(_serialize_topic(topic))
 
@@ -255,10 +223,9 @@ def update_topic(id):
 @bp.route("/topics/<int:id>", methods=["DELETE"])
 @admin_required
 def delete_topic(id):
-    topic = db.session.get(Topic, id)
+    topic = delete_admin_topic(id)
     if not topic:
         return jsonify({"error": "Not found"}), 404
-    db.session.delete(topic)
     db.session.commit()
     return jsonify({"success": True, "message": f"Topic '{topic.name}' deleted."})
 
@@ -281,26 +248,17 @@ def _serialize_topic(t):
 @bp.route("/sections", methods=["GET"])
 def list_sections():
     search = request.args.get("search", "").strip()
-    stmt = select(Section).order_by(Section.name.asc())
-    if search:
-        stmt = stmt.where(Section.name.ilike(f"%{search}%"))
-    sections = db.session.execute(stmt).scalars().all()
+    sections = get_admin_sections(search)
     return jsonify([_serialize_section(s) for s in sections])
 
 
 @bp.route("/sections/<int:id>", methods=["PATCH"])
 @admin_required
 def update_section(id):
-    section = db.session.get(Section, id)
+    data = request.get_json() or {}
+    section = update_admin_section(id, data)
     if not section:
         return jsonify({"error": "Not found"}), 404
-    data = request.get_json() or {}
-    if "is_active" in data:
-        section.is_active = bool(data["is_active"])
-    if "description" in data:
-        section.description = data["description"]
-    if "sort_order" in data:
-        section.sort_order = int(data["sort_order"])
     db.session.commit()
     return jsonify(_serialize_section(section))
 
@@ -328,29 +286,7 @@ def categories_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    stmt = select(Category).order_by(Category.name.asc())
-    if search:
-        stmt = stmt.where(Category.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Category.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Category.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Category.is_active == False).where(
-            db.session.query(Content.id).filter(Content.category_id == Category.id).exists() |
-            db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_categories_paginated(page, per_page, search, status, health)
     item_ids = [c.id for c in pagination.items]
     from app.domains.taxonomy.service.metrics import get_category_metrics
     metrics = get_category_metrics(item_ids)
@@ -393,29 +329,7 @@ def brands_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    stmt = select(Brand).order_by(Brand.name.asc())
-    if search:
-        stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Brand.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Brand.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Brand.is_active == False).where(
-            db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists() |
-            db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_brands_paginated(page, per_page, search, status, health)
     item_ids = [b.id for b in pagination.items]
     from app.domains.taxonomy.service.metrics import get_brand_metrics
     metrics = get_brand_metrics(item_ids)
@@ -456,26 +370,7 @@ def topics_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    stmt = select(Topic).order_by(Topic.name.asc())
-    if search:
-        stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Topic.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Topic.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Topic.is_active == False).where(
-            db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_topics_paginated(page, per_page, search, status, health)
     item_ids = [t.id for t in pagination.items]
     from app.domains.taxonomy.service.metrics import get_topic_metrics
     metrics = get_topic_metrics(item_ids)
@@ -515,26 +410,7 @@ def sections_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    stmt = select(Section).order_by(Section.name.asc())
-    if search:
-        stmt = stmt.where(Section.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Section.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Section.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Section.is_active == False).where(
-            db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_sections_paginated(page, per_page, search, status, health)
     item_ids = [s.id for s in pagination.items]
     from app.domains.taxonomy.service.metrics import get_section_metrics
     metrics = get_section_metrics(item_ids)
@@ -572,10 +448,7 @@ def sections_rows():
 @bp.route("/attributes", methods=["GET"])
 def list_attributes():
     search = request.args.get("search", "").strip()
-    stmt = select(AttributeFacet).order_by(AttributeFacet.name.asc())
-    if search:
-        stmt = stmt.where(AttributeFacet.name.ilike(f"%{search}%"))
-    attrs = db.session.execute(stmt).scalars().all()
+    attrs = get_admin_attributes(search)
     return jsonify([_serialize_attribute(a) for a in attrs])
 
 @bp.route("/attributes", methods=["POST"])
@@ -585,49 +458,32 @@ def create_attribute():
     name = (data.get("name") or "").strip()
     if not name:
         return jsonify({"error": "Name is required"}), 400
-    slug = generate_slug(name)
-    if db.session.execute(select(AttributeFacet).where(AttributeFacet.slug == slug)).scalar_one_or_none():
-        return jsonify({"error": f"Attribute with slug '{slug}' already exists"}), 409
-    
-    category_id = data.get("category_id")
-    if category_id:
-        if not db.session.get(Category, category_id):
-            return jsonify({"error": "Invalid category ID"}), 400
-            
-    attr = AttributeFacet(name=name, slug=slug, category_id=category_id)
-    db.session.add(attr)
-    db.session.commit()
-    return jsonify(_serialize_attribute(attr)), 201
+    try:
+        attr = create_admin_attribute(name, data.get("category_id"))
+        db.session.commit()
+        return jsonify(_serialize_attribute(attr)), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 @bp.route("/attributes/<int:id>", methods=["PATCH"])
 @admin_required
 def update_attribute(id):
-    attr = db.session.get(AttributeFacet, id)
-    if not attr:
-        return jsonify({"error": "Not found"}), 404
     data = request.get_json() or {}
-    if "name" in data and data["name"].strip():
-        attr.name = data["name"].strip()
-        attr.slug = generate_slug(attr.name)
-    if "category_id" in data:
-        cat_id = data["category_id"]
-        if cat_id:
-            if not db.session.get(Category, cat_id):
-                return jsonify({"error": "Invalid category ID"}), 400
-            attr.category_id = cat_id
-        else:
-            attr.category_id = None
-            
-    db.session.commit()
-    return jsonify(_serialize_attribute(attr))
+    try:
+        attr = update_admin_attribute(id, data)
+        if not attr:
+            return jsonify({"error": "Not found"}), 404
+        db.session.commit()
+        return jsonify(_serialize_attribute(attr))
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
 @bp.route("/attributes/<int:id>", methods=["DELETE"])
 @admin_required
 def delete_attribute(id):
-    attr = db.session.get(AttributeFacet, id)
+    attr = delete_admin_attribute(id)
     if not attr:
         return jsonify({"error": "Not found"}), 404
-    db.session.delete(attr)
     db.session.commit()
     return jsonify({"success": True, "message": f"Attribute '{attr.name}' deleted."})
 
@@ -647,17 +503,7 @@ def attributes_rows():
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    stmt = select(AttributeFacet).order_by(AttributeFacet.name.asc())
-    if search:
-        stmt = stmt.where(AttributeFacet.name.ilike(f"%{search}%"))
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_attributes.c.content_id).filter(content_attributes.c.attribute_id == AttributeFacet.id).exists()
-        )
-        
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_attributes_paginated(page, per_page, search, health)
     item_ids = [a.id for a in pagination.items]
     from app.domains.taxonomy.service.metrics import get_attribute_metrics
     metrics = get_attribute_metrics(item_ids)
@@ -697,16 +543,7 @@ def _get_facet_rows(model_class, domain_type, field_name):
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    stmt = select(model_class).order_by(model_class.name.asc())
-    if search:
-        stmt = stmt.where(model_class.name.ilike(f"%{search}%"))
-    
-    if health == "unused":
-        field = getattr(Content, field_name)
-        stmt = stmt.where(~db.session.query(Content.id).filter(field == model_class.id).exists())
-
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    
+    pagination = get_admin_facet_paginated(model_class, field_name, page, per_page, search, health)
     item_ids = [f.id for f in pagination.items]
     from app.domains.taxonomy.service.metrics import get_facet_metrics
     metrics = get_facet_metrics(item_ids, field_name)
@@ -781,63 +618,14 @@ def taxonomy_merge():
 
 @bp.route("/analytics", methods=["GET"])
 def taxonomy_analytics():
-    total_content = db.session.scalar(select(func.count(Content.id))) or 0
-    
-    missing_category = db.session.scalar(select(func.count(Content.id)).where(Content.category_id == None)) or 0
-    missing_section = db.session.scalar(select(func.count(Content.id)).where(Content.section_id == None)) or 0
-    
-    from app.domains.relationships import content_brands
-    content_with_brands = db.session.scalar(select(func.count(func.distinct(content_brands.c.content_id)))) or 0
-    missing_brand = total_content - content_with_brands
-
-    total_entities = 0
-    orphans = 0
-    
-    # Quick count of unused entities using NOT EXISTS
-    # Categories
-    total_entities += db.session.scalar(select(func.count(Category.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Category.id)).where(
-            ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-    ) or 0
-    
-    # Brands
-    total_entities += db.session.scalar(select(func.count(Brand.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Brand.id)).where(
-            ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-    ) or 0
-    
-    # Topics
-    from app.domains.relationships import content_topics
-    total_entities += db.session.scalar(select(func.count(Topic.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Topic.id)).where(
-            ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-    ) or 0
-    
-    # Sections
-    total_entities += db.session.scalar(select(func.count(Section.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Section.id)).where(
-            ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-    ) or 0
-    
+    metrics = get_admin_taxonomy_analytics()
     data = {
-        "total_content": total_content,
-        "missing_category": missing_category,
-        "missing_brand": missing_brand,
-        "missing_section": missing_section,
-        "total_entities": total_entities,
-        "orphans": orphans
+        "total_content": metrics["content_coverage"]["total_content"],
+        "missing_category": metrics["content_coverage"]["missing_category"],
+        "missing_brand": metrics["content_coverage"]["missing_brand"],
+        "missing_section": metrics["content_coverage"]["missing_section"],
+        "total_entities": metrics["health"]["total_entities"],
+        "orphans": metrics["health"]["orphan_entities"]
     }
     return render_template("admin/taxonomy/_analytics_dashboard.html", data=data)
 
@@ -942,152 +730,10 @@ def price_tier_facets_rows():
 # ─────────────────────────────────────────────
 
 def _get_entity_or_404(model, id, entity_name):
-    entity = db.session.get(model, id)
+    entity = get_admin_entity_or_404(model, id)
     if not entity:
         return None, f"{entity_name} not found."
     return entity, None
-
-def _get_taxonomy_related_metadata(entity, entity_type):
-    from app.domains.relationships import content_brands, content_topics, content_items
-    from app.domains.item.models import ItemVariant, ItemImage
-    data = {}
-    
-    top_contents_query = select(Content).order_by(Content.view_count.desc()).limit(5)
-    
-    def _format_breakdown_and_engagement(type_breakdown, engagement):
-        type_strs = [f"{count} {type_.capitalize()}{'s' if count != 1 else ''}" for type_, count in type_breakdown]
-        data["content types"] = ", ".join(type_strs) if type_strs else "—"
-        
-        views, likes, shares = engagement if engagement else (0, 0, 0)
-        data["total engagement"] = f"{int(views or 0)} views, {int(likes or 0)} likes, {int(shares or 0)} shares"
-    
-    if entity_type == "category":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.category_id == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(Content.category_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(Content.category_id == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0
-        data["item count"] = str(total_items)
-        
-        data["child categories"] = str(db.session.scalar(select(func.count()).select_from(Category).where(Category.parent_id == entity.id)) or 0)
-        
-        variants_count = db.session.scalar(
-            select(func.count(ItemVariant.id)).join(Item, Item.id == ItemVariant.item_id).where(Item.category_id == entity.id)
-        ) or 0
-        data["avg variants per item"] = str(round(variants_count / total_items, 1) if total_items > 0 else 0)
-        
-        items_with_images = db.session.scalar(
-            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.category_id == entity.id)
-        ) or 0
-        data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
-        
-        items_with_content = db.session.scalar(
-            select(func.count(func.distinct(content_items.c.item_id))).join(Item, Item.id == content_items.c.item_id).where(Item.category_id == entity.id)
-        ) or 0
-        data["items without content"] = str(total_items - items_with_content)
-        
-        top_contents = db.session.execute(top_contents_query.where(Content.category_id == entity.id)).scalars().all()
-        
-    elif entity_type == "brand":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0
-        data["item count"] = str(total_items)
-        
-        avg_price = db.session.scalar(
-            select(func.avg(ItemVariant.price)).join(Item, Item.id == ItemVariant.item_id).where(Item.brand_id == entity.id)
-        )
-        data["average price"] = f"${avg_price:.2f}" if avg_price else "—"
-        
-        items_with_images = db.session.scalar(
-            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.brand_id == entity.id)
-        ) or 0
-        data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
-        
-        top_items = db.session.execute(
-            select(Item).where(Item.brand_id == entity.id).order_by(Item.click_count.desc()).limit(5)
-        ).scalars().all()
-        data["_top_items"] = top_items
-        
-        top_contents = db.session.execute(top_contents_query.join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).scalars().all()
-        
-    elif entity_type == "topic":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_topics).where(content_topics.c.topic_id == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        rel_cats = db.session.scalar(
-            select(func.count(func.distinct(Content.category_id)))
-            .join(content_topics, content_topics.c.content_id == Content.id)
-            .filter(content_topics.c.topic_id == entity.id)
-        ) or 0
-        data["related categories"] = str(rel_cats)
-        
-        rel_brands = db.session.scalar(
-            select(func.count(func.distinct(content_brands.c.brand_id)))
-            .join(content_topics, content_topics.c.content_id == content_brands.c.content_id)
-            .filter(content_topics.c.topic_id == entity.id)
-        ) or 0
-        data["related brands"] = str(rel_brands)
-        top_contents = db.session.execute(top_contents_query.join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id)).scalars().all()
-        
-    elif entity_type == "section":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.section_id == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(Content.section_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(Content.section_id == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        cat_count = db.session.scalar(
-            select(func.count(func.distinct(Content.category_id)))
-            .filter(Content.section_id == entity.id)
-        ) or 0
-        data["category count"] = str(cat_count)
-        
-        rel_brands = db.session.scalar(
-            select(func.count(func.distinct(content_brands.c.brand_id)))
-            .join(Content, Content.id == content_brands.c.content_id)
-            .filter(Content.section_id == entity.id)
-        ) or 0
-        data["related brands"] = str(rel_brands)
-        top_contents = db.session.execute(top_contents_query.where(Content.section_id == entity.id)).scalars().all()
-        
-    elif entity_type == "attribute":
-        from app.domains.relationships import content_attributes
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_attributes).where(content_attributes.c.attribute_id == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        top_contents = db.session.execute(top_contents_query.join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id)).scalars().all()
-
-    elif entity_type in ["gender_facet", "intent_facet", "price_tier_facet"]:
-        field_mapping = {
-            "gender_facet": Content.gender_id,
-            "intent_facet": Content.intent_id,
-            "price_tier_facet": Content.price_tier_id
-        }
-        field = field_mapping[entity_type]
-        
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(field == entity.id)) or 0)
-        
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(field == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(field == entity.id)).first()
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        top_contents = db.session.execute(top_contents_query.where(field == entity.id)).scalars().all()
-
-    data["_top_contents"] = top_contents
-    return data
 
 def _get_taxonomy_inspect_table(entity, entity_type, metadata):
     from app.admin.helpers import format_status, format_featured
@@ -1141,7 +787,7 @@ def _get_taxonomy_inspect_table(entity, entity_type, metadata):
 def inspect_category(id):
     cat, err = _get_entity_or_404(Category, id, "Category")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(cat, "category")
+    metadata = get_admin_taxonomy_related_metadata(cat, "category")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(cat, "category", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1151,7 +797,7 @@ def inspect_category(id):
 def inspect_brand(id):
     brand, err = _get_entity_or_404(Brand, id, "Brand")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(brand, "brand")
+    metadata = get_admin_taxonomy_related_metadata(brand, "brand")
     top_contents = metadata.pop("_top_contents", None)
     top_items = metadata.pop("_top_items", None)
     inspect_table = _get_taxonomy_inspect_table(brand, "brand", metadata)
@@ -1162,7 +808,7 @@ def inspect_brand(id):
 def inspect_topic(id):
     topic, err = _get_entity_or_404(Topic, id, "Topic")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(topic, "topic")
+    metadata = get_admin_taxonomy_related_metadata(topic, "topic")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(topic, "topic", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1172,7 +818,7 @@ def inspect_topic(id):
 def inspect_section(id):
     section, err = _get_entity_or_404(Section, id, "Section")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(section, "section")
+    metadata = get_admin_taxonomy_related_metadata(section, "section")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(section, "section", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1182,7 +828,7 @@ def inspect_section(id):
 def inspect_attribute(id):
     attr, err = _get_entity_or_404(AttributeFacet, id, "Attribute")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(attr, "attribute")
+    metadata = get_admin_taxonomy_related_metadata(attr, "attribute")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(attr, "attribute", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1192,7 +838,7 @@ def inspect_attribute(id):
 def inspect_gender_facet(id):
     facet, err = _get_entity_or_404(GenderFacet, id, "Gender Facet")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(facet, "gender_facet")
+    metadata = get_admin_taxonomy_related_metadata(facet, "gender_facet")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "gender_facet", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1202,7 +848,7 @@ def inspect_gender_facet(id):
 def inspect_intent_facet(id):
     facet, err = _get_entity_or_404(IntentFacet, id, "Intent Facet")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(facet, "intent_facet")
+    metadata = get_admin_taxonomy_related_metadata(facet, "intent_facet")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "intent_facet", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1212,7 +858,7 @@ def inspect_intent_facet(id):
 def inspect_price_tier_facet(id):
     facet, err = _get_entity_or_404(PriceTierFacet, id, "Price Tier Facet")
     if err: return err, 404
-    metadata = _get_taxonomy_related_metadata(facet, "price_tier_facet")
+    metadata = get_admin_taxonomy_related_metadata(facet, "price_tier_facet")
     top_contents = metadata.pop("_top_contents", None)
     inspect_table = _get_taxonomy_inspect_table(facet, "price_tier_facet", metadata)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
@@ -1222,42 +868,9 @@ def inspect_price_tier_facet(id):
 def inspect_source(id):
     source, err = _get_entity_or_404(Source, id, "Source")
     if err: return err, 404
-    from app.admin.helpers import format_status
     from app.admin.tables import get_inspect_table
-    from app.domains.content.models import Article
     
-    article_count = db.session.scalar(
-        select(func.count()).select_from(Content).where(Content.source_id == source.id)
-    ) or 0
-    
-    analytics = db.session.query(
-        func.avg(Article.quality_score),
-        func.avg(Article.word_count),
-        func.count(Article.id).filter(Article.is_content_scraped == True),
-        func.min(Content.published_at),
-        func.max(Content.published_at)
-    ).select_from(Content).join(Article, Content.object_id == Article.id).filter(Content.source_id == source.id, Content.object_type == 'article').first()
-    
-    avg_quality = round(analytics[0], 1) if analytics and analytics[0] else 0
-    avg_words = int(analytics[1]) if analytics and analytics[1] else 0
-    scraped_count = analytics[2] if analytics and analytics[2] else 0
-    scrape_cov = round((scraped_count / article_count * 100), 1) if article_count > 0 else 0
-    date_min = analytics[3].strftime('%Y-%m-%d') if analytics and analytics[3] else "—"
-    date_max = analytics[4].strftime('%Y-%m-%d') if analytics and analytics[4] else "—"
-    
-    data = {
-        "id": f"#{source.id}",
-        "name": source.name,
-        "slug": source.slug,
-        "domain": source.domain,
-        "authority score": str(source.authority_score),
-        "status": format_status(source.is_active),
-        "avg quality score": str(avg_quality),
-        "avg word count": str(avg_words),
-        "scrape coverage": f"{scrape_cov}%",
-        "published date range": f"{date_min} to {date_max}",
-        "article count": str(article_count)
-    }
+    data = get_admin_source_metadata(source)
     
     inspect_table = get_inspect_table("sources", data)
     return render_template("admin/components/_inspect.html", inspect_table=inspect_table)

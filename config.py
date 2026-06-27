@@ -73,9 +73,9 @@ class Config:
 # ================================================
 SOCIAL_LINKS = [
   ("facebook", "https://www.facebook.com/profile.php?id=61590735370977"),
-  ("youtube", "https://youtube.com/@nexorasignals"),
   ("instagram", "https://instagram.com/nexorasignals"),
-  ("x", "https://x.com/nexorasignals"),
+  ("pinterest", "https://pinterest.com/nexorasignals"),
+  ("youtube", "https://youtube.com/@nexorasignals"),
   ("tiktok", "https://tiktok.com/@nexora.signals"),
-  ("pinterest", "https://pinterest.com/nexorasignals")
+  ("x", "https://x.com/nexorasignals")
 ]

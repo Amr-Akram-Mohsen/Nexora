@@ -13,7 +13,7 @@ import flask
 from flask import Blueprint, jsonify, current_app, request, render_template
 from app.core.extensions import db, cache
 from app.core.decorators import admin_required
-from app.admin.ingestions import get_integrations_status_data, get_integrations_logs_data
+from app.domains.external.service.admin import get_admin_integrations_status_data, get_admin_integrations_logs_data
 
 bp = Blueprint("api_system", __name__, url_prefix="/admin/system")
 
@@ -93,11 +93,9 @@ def toggle_maintenance():
 @bp.route("/reset", methods=["POST"])
 def reset_system():
     """Wipe external API logs, stats and cache to reset state."""
-    from app.domains.external.models import APIUsage, LastAPIFetch
+    from app.domains.external.service.admin import reset_admin_system_external_logs
     try:
-        db.session.execute(LastAPIFetch.__table__.delete())
-        db.session.execute(APIUsage.__table__.delete())
-        db.session.commit()
+        reset_admin_system_external_logs()
         cache.clear()
         current_app.logger.warning("[SYSTEM] Administrative system state reset has been executed.")
         return jsonify({"success": True, "message": "System logs, statistics, and cache cleared successfully."}), 200
@@ -119,7 +117,7 @@ def widget_system_info():
 
 @bp.route("/widget/integrations", methods=["GET"])
 def widget_integrations():
-    data = get_integrations_status_data()
+    data = get_admin_integrations_status_data()
     from datetime import datetime
     for intg in data:
         last_fetch = intg.get("last_fetch")
@@ -137,7 +135,7 @@ def widget_integrations():
 @bp.route("/widget/ingestion-logs", methods=["GET"])
 def widget_ingestion_logs():
     log_type = request.args.get("type", "all")
-    data = get_integrations_logs_data()
+    data = get_admin_integrations_logs_data()
     
     if log_type != "all":
         data = [log for log in data if log.get("type") == log_type]

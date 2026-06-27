@@ -60,3 +60,5 @@ def record_item_view(item_id, user, ip_address):
         user=user,
         ip_address=ip_address,
     )
+    from app.core.extensions import db
+    db.session.commit()

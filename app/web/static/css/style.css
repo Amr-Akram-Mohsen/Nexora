@@ -5,6 +5,7 @@
 
 /* 1. Base - Variables & Fundamentals */
 @import "all.min.css";
+@import "icons.css";
 @import "base/variables.css";
 @import "base/reset.css";
 @import "base/typography.css";

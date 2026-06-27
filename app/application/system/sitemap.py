@@ -1,10 +1,9 @@
 import os
 from datetime import datetime, timezone
 from flask import url_for
-from app.core.extensions import db
-from app.domains.content.models import Content
-from app.domains.item.models import Item
-from app.domains.taxonomy.models import Section
+from app.domains.taxonomy.service.query import get_active_sections
+from app.domains.content.service.query.filtering import get_all_contents_metadata
+from app.domains.item.service.query import get_all_items_metadata
 
 
 def generate_static_sitemap(app):
@@ -28,24 +27,24 @@ def generate_static_sitemap(app):
                     continue
 
         # 2. Sections (Catalog pages)
-        sections = Section.query.filter_by(is_active=True).all()
+        sections = get_active_sections()
         for section in sections:
             pages.append(
                 [
                     url_for(
-                        "content.sections", section_slug=section.slug, _external=True
+                        "content.sections", section_slug=section["slug"], _external=True
                     ),
                     today,
                 ]
             )
 
         # 3. Contents
-        contents = Content.query.all()
-        for content in contents:
+        contents = get_all_contents_metadata()
+        for content_id, updated_at, published_at in contents:
             last_mod = (
                 (
-                    content.updated_at
-                    or content.published_at
+                    updated_at
+                    or published_at
                     or datetime.now(timezone.utc)
                 )
                 .date()
@@ -54,14 +53,14 @@ def generate_static_sitemap(app):
             pages.append(
                 [
                     url_for(
-                        "content.content_page", content_id=content.id, _external=True
+                        "content.content_page", content_id=content_id, _external=True
                     ),
                     last_mod,
                 ]
             )
 
         # 4. Items (id + created_at only — avoid loading full item graphs)
-        item_rows = db.session.query(Item.id, Item.created_at).all()
+        item_rows = get_all_items_metadata()
         for item_id, created_at in item_rows:
             last_mod = (
                 (created_at or datetime.now(timezone.utc)).date().isoformat()
@@ -69,6 +68,7 @@ def generate_static_sitemap(app):
             pages.append(
                 [url_for("item.item_page", item_id=item_id, _external=True), last_mod]
             )
+
 
         # Render Sitemap XML
         from flask import render_template

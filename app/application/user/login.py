@@ -53,3 +53,51 @@ def clear_failed_logins(email: str) -> None:
     """
     cache.delete(f"login_attempts:{email}")
     cache.delete(f"login_lockout:{email}")
+
+
+def handle_successful_login(user) -> None:
+    """
+    Handles side effects of a successful login.
+    """
+    from app.core.extensions import db
+    from app.domains.user.service import record_login
+    record_login(user)
+    db.session.commit()
+
+
+def handle_google_oauth_login(user_info: dict):
+    """
+    Handles Google OAuth login workflow.
+    Creates or updates the user and returns the user object.
+    """
+    from app.core.extensions import db
+    from app.domains.user.service import get_user_by_email, create_user, mark_user_verified
+    from app.domains.user.models import User
+    import secrets
+
+    email = user_info.get('email')
+    user = get_user_by_email(email)
+    
+    if user:
+        if not user.google_id:
+            user.google_id  = user_info.get('sub')
+            user.provider   = 'google'
+            if not user.is_verified:
+                mark_user_verified(user)
+            else:
+                db.session.commit()
+    else:
+        user = User(
+            email=email,
+            name=user_info.get('name'),
+            provider='google',
+            google_id=user_info.get('sub'),
+            is_verified=True,
+        )
+        user.set_password(secrets.token_urlsafe(24))
+        db.session.add(user)
+        db.session.commit()
+        mark_user_verified(user)
+    
+    handle_successful_login(user)
+    return user

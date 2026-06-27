@@ -9,9 +9,10 @@ from app.application.interaction.newsletter import subscribe_workflow, confirm_s
 from app.application.interaction.handle_interaction import handle_interaction_workflow
 from app.application.interaction.item_click import record_item_click_workflow
 from app.domains.interaction.constants import INTERACTION_TYPE
-from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items, record_view
+from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items
 from app.domains.content.service import get_content_by_id
 from app.domains.item.service import get_item_by_id
+from app.application.interaction.tracking import track_view_workflow, track_impression_workflow, track_click_workflow
 from app.shared.utils.logging import log_route_start, log_route_success
 import logging
 
@@ -189,8 +190,7 @@ def add_view():
     if not target:
         abort(404)
         
-    result = record_view(target_id, target_type, user, ip)
-    db.session.commit()
+    result = track_view_workflow(target_id, target_type, user, ip)
     return jsonify(result)
 
 @bp.route("/handle-interaction", methods=["POST"])
@@ -278,14 +278,11 @@ def track_impression():
         
     user_id = current_user.id if current_user.is_authenticated else None
     
-    from app.domains.interaction.service.tracking import track_recommendation_impression
-    success = track_recommendation_impression(entity_type, entity_ids, context_id, user_id)
+    success = track_impression_workflow(entity_type, entity_ids, context_id, user_id)
     
     if success:
-        db.session.commit()
         return jsonify({"success": True})
     else:
-        db.session.rollback()
         return jsonify({"success": False, "error": "Failed to track impression"}), 500
 
 
@@ -302,12 +299,9 @@ def track_click():
         
     user_id = current_user.id if current_user.is_authenticated else None
     
-    from app.domains.interaction.service.tracking import track_recommendation_click
-    success = track_recommendation_click(entity_type, entity_id, context_id, user_id)
+    success = track_click_workflow(entity_type, entity_id, context_id, user_id)
     
     if success:
-        db.session.commit()
         return jsonify({"success": True})
     else:
-        db.session.rollback()
         return jsonify({"success": False, "error": "Failed to track click"}), 500

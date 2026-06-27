@@ -72,15 +72,38 @@ border-bottom: 1px dashed var(--border);
   gap: 0.65rem;
 }
 
+.facebook {
+    --icon-color: #1877F2;
+}
+
+.instagram {
+    --icon-color: #E4405F;
+    /* or use a gradient, see below */
+}
+
+.pinterest {
+    --icon-color: #BD081C;
+}
+
+.x,
+.tiktok {
+    --icon-color: #000000;
+}
+
+.youtube {
+    --icon-color: #FF0000;
+}
+
 .footer-social {
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: var(--radius-full);
-  background: var(--border);
-  color: var(--muted-foreground);
+  border-radius: 50%;
+  color: var(--icon-color);
+  background-color: rgba(var(--accent-rgb), 0.8);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid transparent;
+  
 }
 
 .footer-social i {

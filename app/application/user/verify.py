@@ -37,8 +37,11 @@ def verify_user_email(token: str):
         return user, None
 
     mark_user_verified(user)
+    from app.core.extensions import db
+    db.session.commit()
     logger.info("[AUTH] Email verified for user_id=%s (%s)", user_id, user.email)
     return user, None
+
 
 
 def resend_verification_email_workflow(email: str) -> bool:
@@ -58,5 +61,8 @@ def resend_verification_email_workflow(email: str) -> bool:
         logger.info("[AUTH] Resent verification email to %s (user_id=%s)", email, user.id)
     else:
         logger.warning("[AUTH] Resend verification email FAILED for %s (user_id=%s)", email, user.id)
+
+    from app.core.extensions import db
+    db.session.commit()
 
     return True

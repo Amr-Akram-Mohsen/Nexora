@@ -14,11 +14,11 @@ def require_admin():
     """Ensure all routes under /admin are strictly admin-only."""
     pass
 
-from app.admin.stats import get_dashboard_stats_data
+from app.domains.analytics.service.admin import get_admin_dashboard_stats_data
 
 @bp.route("/")
 def home():
-    stats_data = get_dashboard_stats_data()
+    stats_data = get_admin_dashboard_stats_data()
     return render_template(
         "admin/overview/overview.html", 
         title="Overview", 
@@ -164,7 +164,7 @@ def settings():
 
 @bp.route("/contents/<int:id>")
 def content_detail(id):
-    from app.admin.contents import build_content_inspect_data
+    from app.web.routes.admin.contents import build_content_inspect_data
     from flask import abort
     data = build_content_inspect_data(id)
     if not data:
@@ -174,7 +174,7 @@ def content_detail(id):
 
 @bp.route("/items/<int:id>")
 def item_detail(id):
-    from app.admin.items import build_item_inspect_data
+    from app.web.routes.admin.items import build_item_inspect_data
     from flask import abort
     data = build_item_inspect_data(id)
     if not data:
@@ -184,7 +184,7 @@ def item_detail(id):
 
 @bp.route("/users/<int:id>")
 def user_detail(id):
-    from app.admin.users import build_user_inspect_data
+    from app.web.routes.admin.users import build_user_inspect_data
     from flask import abort
     data = build_user_inspect_data(id)
     if not data:
@@ -194,7 +194,7 @@ def user_detail(id):
 
 @bp.route("/stores/<int:id>")
 def store_detail(id):
-    from app.admin.providers import build_store_inspect_data
+    from app.web.routes.admin.providers import build_store_inspect_data
     from flask import abort
     data = build_store_inspect_data(id)
     if not data:
@@ -204,7 +204,7 @@ def store_detail(id):
 
 @bp.route("/sources/<int:id>")
 def source_detail(id):
-    from app.admin.providers import build_source_inspect_data
+    from app.web.routes.admin.providers import build_source_inspect_data
     from flask import abort
     data = build_source_inspect_data(id)
     if not data:
@@ -214,7 +214,7 @@ def source_detail(id):
 
 @bp.route("/comments/<int:id>")
 def comment_detail(id):
-    from app.admin.interactions import build_comment_inspect_data
+    from app.web.routes.admin.interactions import build_comment_inspect_data
     from flask import abort
     data = build_comment_inspect_data(id)
     if not data:

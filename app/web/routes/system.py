@@ -73,10 +73,6 @@ def send_contact_message():
         data, request.remote_addr, request.headers.get("User-Agent")
     )
 
-    if success:
-        from app.core.extensions import db
-        db.session.commit()
-
     return jsonify({"success": success, "message" if success else "error": message})
 
 

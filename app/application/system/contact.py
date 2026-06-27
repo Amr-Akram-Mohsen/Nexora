@@ -25,5 +25,6 @@ def send_contact_message_workflow(data, ip_address, user_agent):
         reply_to=data["email"],
         body=f"New contact message from {data['name']} <{data['email']}>\n\n{data['message']}"
     )
-    
+    from app.core.extensions import db
+    db.session.commit()
     return True, "Message sent successfully!!"
