@@ -34,7 +34,7 @@
         // Render Item Type Distribution
         const distContainer = document.getElementById('stats-type-distribution');
         if (data.item_type_distribution && data.item_type_distribution.length > 0) {
-            distContainer.innerHTML = '';
+            distContainer.replaceChildren();
             
             const colors = ['var(--brand-blue)', 'var(--brand-purple)', 'var(--brand-orange)', 'var(--brand-teal)', 'var(--brand-green)'];
             
@@ -103,7 +103,7 @@
         // Render Top Engagement Items
         const engContainer = document.getElementById('stats-engagement-items');
         if (data.top_engagement_items && data.top_engagement_items.length > 0) {
-            engContainer.innerHTML = '';
+            engContainer.replaceChildren();
             
             data.top_engagement_items.forEach((item, index) => {
                 const li = document.createElement('li');
@@ -135,11 +135,17 @@
                 
                 const saveSpan = document.createElement('span');
                 saveSpan.title = 'Save Rate';
-                saveSpan.innerHTML = `<i class="fa-solid fa-bookmark text-[var(--brand-orange)]"></i> ${item.save_rate}%`;
+                const saveIcon = document.createElement('i');
+                saveIcon.className = 'fa-solid fa-bookmark text-[var(--brand-orange)]';
+                saveSpan.appendChild(saveIcon);
+                saveSpan.appendChild(document.createTextNode(` ${item.save_rate}%`));
                 
                 const likeSpan = document.createElement('span');
                 likeSpan.title = 'Like Rate';
-                likeSpan.innerHTML = `<i class="fa-solid fa-heart text-[var(--brand-red)]"></i> ${item.like_rate}%`;
+                const likeIcon = document.createElement('i');
+                likeIcon.className = 'fa-solid fa-heart text-[var(--brand-red)]';
+                likeSpan.appendChild(likeIcon);
+                likeSpan.appendChild(document.createTextNode(` ${item.like_rate}%`));
                 
                 ratesDiv.appendChild(saveSpan);
                 ratesDiv.appendChild(likeSpan);

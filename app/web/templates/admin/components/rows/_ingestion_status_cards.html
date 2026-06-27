@@ -1,0 +1,21 @@
+{% if items %}
+    {% for channel in items %}
+        {% set is_healthy = channel.errors == 0 %}
+        {% set status_color = "success" if is_healthy else "danger" %}
+        {% set status_icon = "fa-check-circle" if is_healthy else "fa-triangle-exclamation" %}
+        <a href="/admin/sources?search={{ channel.name }}" class="card clickable-card">
+            <div class="dashboard-stat-card border-l-4 border-{{ status_color }}">
+                <div class="dashboard-stat-icon flex items-center justify-center bg-{{ status_color }}-light text-{{ status_color }}">
+                    <i class="fa-solid {{ status_icon }}"></i>
+                </div>
+                <p class="dashboard-stat-label">{{ channel.name|upper }}</p>
+                <h3 class="dashboard-stat-value">{{ channel.requests_today }} <span class="text-sm text-muted font-normal">reqs today</span></h3>
+                <p class="dashboard-stat-meta font-bold text-{{ status_color }}">
+                    {{ channel.errors }} errors &bull; Last: {{ channel.last_fetch|datetimeformat if channel.last_fetch else "Never" }}
+                </p>
+            </div>
+        </a>
+    {% endfor %}
+{% else %}
+    <div class="col-span-full py-4 text-center text-muted">No channels found.</div>
+{% endif %}

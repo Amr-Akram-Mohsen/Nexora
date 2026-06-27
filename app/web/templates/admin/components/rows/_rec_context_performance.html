@@ -1,0 +1,13 @@
+{% if items %}
+    {% for r in items %}
+    <tr>
+        <td><span class="badge badge-secondary">{{ r.context_id }}</span></td>
+        <td><span class="status-badge badge-type-compact">{{ r.entity_type }}</span></td>
+        <td>{{ r.impressions }}</td>
+        <td>{{ r.clicks }}</td>
+        <td class="col-metric font-bold">{{ r.ctr }}</td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr><td colspan="5" class="text-center text-muted">No data available.</td></tr>
+{% endif %}

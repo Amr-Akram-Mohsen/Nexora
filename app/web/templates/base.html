@@ -140,6 +140,18 @@
   <button id="back-to-top" class="back-to-top is-hidden" aria-label="Go to top">
     <i class="fas fa-chevron-up"></i>
   </button>
+  
+  <!-- Floating Compare Bar (hidden by default) -->
+  <div id="compare-floating-bar" class="compare-bar flex items-center justify-between" style="display: none;">
+      <div class="compare-bar__info flex items-center">
+          <div class="compare-bar__count">0</div>
+          <span class="compare-bar__text">Items selected for comparison</span>
+      </div>
+      <div class="compare-bar__actions flex items-center">
+          <button class="compare-bar__clear btn btn--link">Clear All</button>
+          <a href="/compare" class="compare-bar__link btn btn--primary">Compare Now</a>
+      </div>
+  </div>
   {% endblock %}
 
 </body>

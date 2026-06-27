@@ -31,7 +31,7 @@
       .then(data => {
         const container = document.getElementById('interactions-stats-row');
         if (!container) return;
-        container.innerHTML = '';
+        container.replaceChildren();
         container.className = 'dashboard-stats-grid';
 
         const template = document.getElementById('interactions-stat-card-template');
@@ -60,7 +60,7 @@
       .catch(() => {
         const container = document.getElementById('interactions-stats-row');
         if (container) {
-          container.innerHTML = '';
+          container.replaceChildren();
           const p = document.createElement('p');
           p.className = 'hint grid-full-width';
           p.textContent = 'Could not load stats.';
@@ -84,7 +84,7 @@
         renderTopSaves(data.top_saves);
         const ctrBadge = document.getElementById('recs-ctr-badge');
         if(ctrBadge) {
-            ctrBadge.innerHTML = '';
+            ctrBadge.replaceChildren();
             const b = document.createElement('b');
             b.textContent = `${data.recs_kpi.ctr}%`;
             ctrBadge.appendChild(document.createTextNode('Recommendations CTR: '));
@@ -143,7 +143,7 @@
   function renderTopSaves(saves) {
     const container = document.getElementById('top-saves-container');
     if (!container) return;
-    container.innerHTML = '';
+    container.replaceChildren();
     
     if (!saves || !saves.length) {
       const p = document.createElement('p');

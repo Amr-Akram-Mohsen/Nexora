@@ -1,0 +1,18 @@
+<td class="p-4 text-sm text-muted whitespace-nowrap">
+    {% if item.time %}
+        {{ item.time|datetimeformat }}
+    {% else %}
+        —
+    {% endif %}
+</td>
+<td class="p-4 font-medium"><span class="badge badge-secondary">{{ item.source }}</span></td>
+<td class="p-4 text-sm capitalize">{{ item.type }}</td>
+<td class="p-4 text-sm max-w-xs truncate" title="{{ item.query or '—' }}">{{ item.query or "—" }}</td>
+<td class="p-4 text-sm">{{ item.category or "—" }}</td>
+<td class="p-4">
+    {% if item.status == "Success" %}
+        <span class="badge badge-success">Success</span>
+    {% else %}
+        <span class="badge badge-danger" title="{{ item.failures }} failures">Error</span>
+    {% endif %}
+</td>

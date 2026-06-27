@@ -21,7 +21,7 @@
           <td>{{ badge(item.content_brands | join(', ') if item.content_brands else 'None', "orange") }}</td>
           <td>{{ item.item_name }}</td>
           <td>{{ badge(item.item_brand, "orange") }}</td>
-          <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion({{ item.content_id }}, 'Brand', {{ item.suggested_brand_id }})">Fix Content Brand</button></td>
+          <td><button class="admin-btn-secondary admin-btn-sm" data-action="apply-insight" data-id="{{ item.content_id }}" data-insight-type="Brand" data-suggested-id="{{ item.suggested_brand_id }}">Fix Content Brand</button></td>
         </tr>
         {% endfor %}
       </tbody>

@@ -64,37 +64,31 @@ class CompareManager {
 
     renderCompareBar() {
         let bar = document.getElementById('compare-floating-bar');
+        if (!bar) return;
         
         if (this.compareIds.length === 0) {
-            if (bar) bar.remove();
+            bar.style.display = 'none';
             return;
         }
 
-        if (!bar) {
-            bar = document.createElement('div');
-            bar.id = 'compare-floating-bar';
-            bar.className = 'compare-bar flex items-center justify-between';
-            document.body.appendChild(bar);
-        }
-
+        bar.style.display = 'flex';
         const compareUrl = `/compare?ids=${this.compareIds.join(',')}`;
         
-        bar.innerHTML = `
-            <div class="compare-bar__info flex items-center">
-                <div class="compare-bar__count">${this.compareIds.length}</div>
-                <span class="compare-bar__text">Items selected for comparison</span>
-            </div>
-            <div class="compare-bar__actions flex items-center">
-                <button class="compare-bar__clear btn btn--link">Clear All</button>
-                <a href="${compareUrl}" class="btn btn--primary">Compare Now</a>
-            </div>
-        `;
+        const countEl = bar.querySelector('.compare-bar__count');
+        if (countEl) countEl.textContent = this.compareIds.length;
+        
+        const linkEl = bar.querySelector('.compare-bar__link');
+        if (linkEl) linkEl.href = compareUrl;
 
-        bar.querySelector('.compare-bar__clear').onclick = () => {
-            this.compareIds = [];
-            this.saveIds();
-            this.updateUI();
-        };
+        const clearBtn = bar.querySelector('.compare-bar__clear');
+        if (clearBtn && !clearBtn.dataset.bound) {
+            clearBtn.dataset.bound = 'true';
+            clearBtn.addEventListener('click', () => {
+                this.compareIds = [];
+                this.saveIds();
+                this.updateUI();
+            });
+        }
     }
 }
 

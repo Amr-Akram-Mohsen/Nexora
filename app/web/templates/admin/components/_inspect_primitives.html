@@ -79,7 +79,7 @@
     <div class="inspect-url-group">
       <span class="inspect-url-label">Original URL</span>
       <div class="inspect-url-container">
-        <input class="inspect-url-input" type="text" readonly value="{{ lnk.original_url or '' }}" onclick="this.select();">
+        <input class="inspect-url-input" type="text" readonly value="{{ lnk.original_url or '' }}" data-action="select-text">
         {% if lnk.original_url %}
         <a target="_blank" href="{{ lnk.original_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
         {% endif %}
@@ -88,7 +88,7 @@
     <div class="inspect-url-group">
       <span class="inspect-url-label">Affiliate URL</span>
       <div class="inspect-url-container">
-        <input class="inspect-url-input" type="text" readonly value="{{ lnk.affiliate_url or '' }}" onclick="this.select();">
+        <input class="inspect-url-input" type="text" readonly value="{{ lnk.affiliate_url or '' }}" data-action="select-text">
         {% if lnk.affiliate_url %}
         <a target="_blank" href="{{ lnk.affiliate_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
         {% endif %}

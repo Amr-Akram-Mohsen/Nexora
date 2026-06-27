@@ -27,7 +27,7 @@
 
         <div class="flex justify-end">
             <button class="admin-btn-secondary admin-btn-sm"
-                onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">Review</button>
+                data-action="view-distribution-draft" data-id="{{ item.id }}" data-source-type="{{ item.source_type }}" data-source-id="{{ item.source_id }}" data-platform="{{ item.platform }}">Review</button>
         </div>
     </div>
     {% else %}

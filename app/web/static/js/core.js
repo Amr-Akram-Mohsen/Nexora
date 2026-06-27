@@ -38,7 +38,7 @@ function initUserAuth() {
     initPasswordStrength();
     initConfirmMatch();
     initAuthFormLoading();
+    if (typeof initProfileForms === "function") initProfileForms();
 }
 
 const generalMsg = 'please sign in to ';
-

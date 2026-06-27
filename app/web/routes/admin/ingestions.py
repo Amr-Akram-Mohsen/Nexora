@@ -40,11 +40,24 @@ def require_admin():
 def integrations_status():
     """Return live API usage and last-fetch data for all known ingestion sources."""
     from app.domains.external.service.admin import get_admin_integrations_status_data
-    return jsonify(get_admin_integrations_status_data())
+    from flask import render_template
+    
+    data = get_admin_integrations_status_data()
+    if request.args.get('format') == 'html':
+        return render_template("admin/components/rows/_ingestion_status_cards.html", items=data)
+        
+    return jsonify(data)
 
 
 @bp.route("/logs", methods=["GET"])
 def integrations_logs():
     """Return the 15 most recent ingestion log entries."""
     from app.domains.external.service.admin import get_admin_integrations_logs_data
-    return jsonify(get_admin_integrations_logs_data())
+    from flask import render_template
+    
+    data = get_admin_integrations_logs_data()
+    if request.args.get('format') == 'html':
+        # Add domain_type so _rows.html knows which row template to load
+        return render_template("admin/components/_rows.html", items=data, domain_type="ingestion_log", empty_text="No recent events.")
+        
+    return jsonify(data)

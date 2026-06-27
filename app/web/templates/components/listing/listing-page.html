@@ -52,42 +52,5 @@
   </div>{# end .listing-layout #}
 </section>
 
-<script>
-  (function () {
-    const sidebar = document.getElementById('listingSidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const closeBtn = document.getElementById('sidebarClose');
-    const openBtn = document.getElementById('filterToggleBtn');
 
-    function openSidebar() {
-      sidebar.classList.add('is-open');
-      overlay.classList.add('is-visible');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeSidebar() {
-      sidebar.classList.remove('is-open');
-      overlay.classList.remove('is-visible');
-      document.body.style.overflow = '';
-    }
-
-    if (openBtn) openBtn.addEventListener('click', openSidebar);
-    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-    if (overlay) overlay.addEventListener('click', closeSidebar);
-
-    window.toggleMoreFilters = function (btn) {
-      const section = btn.closest('.filter-section');
-      const extras = section.querySelectorAll('.filter-item--extra');
-      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-
-      extras.forEach(el => {
-        el.style.display = isExpanded ? 'none' : 'flex';
-      });
-
-      btn.setAttribute('aria-expanded', !isExpanded);
-      btn.innerHTML = isExpanded
-        ? '<i class="fas fa-plus"></i> Show more (+' + extras.length + ')'
-        : '<i class="fas fa-minus"></i> Show less';
-    };
-  })();
-</script>
 {% endmacro %}

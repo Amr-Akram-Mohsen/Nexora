@@ -58,7 +58,7 @@
     <div class="distribution-modal-actions flex justify-end gap-3 items-center">
         <button type="button" class="admin-btn-secondary" data-bs-dismiss="modal">Close</button>
         {% if status != 'published' %}
-        <button type="button" class="admin-btn-primary" onclick="publishDistributionPost({{ post_id }})">Publish Post</button>
+        <button type="button" class="admin-btn-primary" data-action="publish-distribution-post" data-id="{{ post_id }}">Publish Post</button>
         {% else %}
         <button type="button" class="admin-btn-success" disabled>Published</button>
         {% endif %}

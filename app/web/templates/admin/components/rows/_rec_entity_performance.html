@@ -1,0 +1,11 @@
+{% if items %}
+    {% for r in items %}
+    <tr>
+        <td class="font-bold">{{ r.entity_name }}</td>
+        <td><span class="status-badge badge-type-compact">{{ r.entity_type }}</span></td>
+        <td class="col-metric">{{ r.clicks }}</td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr><td colspan="3" class="text-center text-muted">No data available.</td></tr>
+{% endif %}

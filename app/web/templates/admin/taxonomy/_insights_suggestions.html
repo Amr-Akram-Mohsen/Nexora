@@ -17,7 +17,7 @@
         <tr>
           <td>{{ item.content_title }}</td>
           <td>{{ badge(item.type ~ ": " ~ item.suggested_name, "blue") }}</td>
-          <td><button class="admin-btn-secondary admin-btn-sm" onclick="applyInsightSuggestion({{ item.content_id }}, '{{ item.type }}', {{ item.suggested_id }})">Apply</button></td>
+          <td><button class="admin-btn-secondary admin-btn-sm" data-action="apply-insight" data-id="{{ item.content_id }}" data-insight-type="{{ item.type }}" data-suggested-id="{{ item.suggested_id }}">Apply</button></td>
         </tr>
         {% endfor %}
       </tbody>

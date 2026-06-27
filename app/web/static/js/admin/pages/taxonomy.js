@@ -21,7 +21,7 @@
     }
   }
 
-  window.applyInsightSuggestion = function (contentId, type, suggestedId) {
+  function applyInsightSuggestion(contentId, type, suggestedId) {
     if (!confirm(`Apply ${type} suggestion?`)) return;
     window.api.post('/admin/taxonomy/insights/apply', { content_id: contentId, type: type, suggested_id: suggestedId })
       .then(d => {
@@ -264,6 +264,11 @@
       // Duplicate detection actions
       if (action === 'find-duplicates') openDuplicatesModal(domain);
       if (action === 'merge-duplicate') mergeDuplicate(domain, sourceId, targetId, btn);
+      
+      // Insight suggestions
+      if (action === 'apply-insight') {
+          applyInsightSuggestion(id, btn.dataset.insightType, btn.dataset.suggestedId);
+      }
     });
 
     // Toggle checkboxes (use change event)

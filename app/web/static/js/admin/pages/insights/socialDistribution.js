@@ -38,12 +38,16 @@ export function initSocialDistributionFilters() {
 }
 
 // Attach modal handlers globally so inline onclick works
-window.viewDistributionDraft = function(postId, sourceType, sourceId, platform) {
+function viewDistributionDraft(postId, sourceType, sourceId, platform) {
     const modalContent = document.getElementById("distribution-draft-content");
     if (!modalContent) return;
     
     // Show loading state
-    modalContent.innerHTML = getSpinnerHtml("Loading post details...", "py-5 text-center");
+    modalContent.replaceChildren();
+    const loadDiv = document.createElement('div');
+    loadDiv.className = 'py-5 text-center';
+    loadDiv.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2 text-muted"></i><p>Loading post details...</p>';
+    modalContent.appendChild(loadDiv);
     
     // Open modal using Nexora architecture
     const modalEl = document.getElementById('distributionDraftModal');
@@ -65,12 +69,17 @@ window.viewDistributionDraft = function(postId, sourceType, sourceId, platform) 
         })
     }).catch(err => {
         if (modalContent) {
-            modalContent.innerHTML = `<div class="text-center py-5" style="color: var(--brand-red);"><div class="mt-2">Failed to load draft: ${err.message}</div></div>`;
+            modalContent.replaceChildren();
+            const errDiv = document.createElement('div');
+            errDiv.className = 'text-center py-5';
+            errDiv.style.color = 'var(--brand-red)';
+            errDiv.innerHTML = `<div class="mt-2">Failed to load draft: ${err.message}</div>`;
+            modalContent.appendChild(errDiv);
         }
     });
-};
+}
 
-window.publishDistributionPost = function(postId) {
+function publishDistributionPost(postId) {
     const textEl = document.getElementById("distribution-post-text");
     const urlEl = document.getElementById("distribution-external-url");
     const text = textEl ? textEl.value : "";
@@ -91,4 +100,20 @@ window.publishDistributionPost = function(postId) {
         renderSocialDistribution();
     })
     .catch(err => alert("Error publishing: " + err.message));
-};
+}
+
+document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const { action, id, sourceType, sourceId, platform, url, target, loadingMsg, colspan } = btn.dataset;
+    
+    if (action === 'view-distribution-draft') {
+        viewDistributionDraft(id, sourceType, sourceId, platform);
+    } else if (action === 'publish-distribution-post') {
+        publishDistributionPost(id);
+    } else if (action === 'fetch-and-inject-html') {
+        if (typeof fetchAndInjectHtml === 'function') {
+            fetchAndInjectHtml(url, target, loadingMsg, parseInt(colspan) || null);
+        }
+    }
+});

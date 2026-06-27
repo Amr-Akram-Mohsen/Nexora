@@ -17,6 +17,8 @@
     {% include "admin/components/rows/_store_row.html" %}
   {% elif domain_type == "rec" %}
     {% include "admin/components/rows/_rec_row.html" %}
+  {% elif domain_type == "ingestion_log" %}
+    {% include "admin/components/rows/_ingestion_log_row.html" %}
   {% else %}
     {% include "admin/components/rows/_generic_row.html" %}
   {% endif %}

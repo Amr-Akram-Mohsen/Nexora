@@ -97,3 +97,58 @@ function initConfirmMatch() {
     confirmInput.addEventListener("input", checkMatch);
     pwdInput.addEventListener("input", checkMatch);
 }
+
+function togglePasswordForm() {
+    const collapsible = document.getElementById('password-collapsible');
+    const arrow = document.getElementById('accordion-arrow');
+    const btn = document.getElementById('password-toggle-btn');
+    if (!collapsible || !arrow || !btn) return;
+
+    if (collapsible.classList.contains('collapsed')) {
+      collapsible.classList.remove('collapsed');
+      arrow.style.transform = 'rotate(180deg)';
+      btn.classList.add('active');
+    } else {
+      collapsible.classList.add('collapsed');
+      arrow.style.transform = 'rotate(0deg)';
+      btn.classList.remove('active');
+    }
+}
+
+function handlePasswordClick(e) {
+    const toggleBtn = e.target.closest('[data-action="toggle-password-form"]');
+    if (toggleBtn) {
+        togglePasswordForm();
+        return true;
+    }
+    return false;
+}
+
+function initProfileForms() {
+    const forms = document.querySelectorAll('.ajax-form, .profile-form');
+    forms.forEach(form => {
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.classList.add('is-loading');
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const result = await response.json();
+          if (result.success) {
+            window.location.reload();
+          } else {
+            alert(result.error || "Update failed");
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          if (btn) btn.classList.remove('is-loading');
+        }
+      });
+    });
+}

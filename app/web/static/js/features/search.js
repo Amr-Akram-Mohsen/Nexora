@@ -57,6 +57,8 @@ function initSearch() {
             searchToggleBtn?.focus();
         }
     });
+
+    initListingSidebar();
 }
 
 function filterContent(chip) {
@@ -113,6 +115,52 @@ function handleSortChange(e) {
     return true;
 }
 
+function handleMoreFiltersClick(e) {
+    const btn = e.target.closest('[data-action="toggle-more-filters"]');
+    if (!btn) return false;
+    
+    const section = btn.closest('.filter-section');
+    const extras = section.querySelectorAll('.filter-item--extra');
+    const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+    extras.forEach(el => {
+        el.style.display = isExpanded ? 'none' : 'flex';
+    });
+
+    btn.setAttribute('aria-expanded', !isExpanded);
+    
+    // Avoid string construction
+    btn.replaceChildren();
+    const icon = document.createElement('i');
+    icon.className = isExpanded ? 'fas fa-plus' : 'fas fa-minus';
+    btn.appendChild(icon);
+    btn.appendChild(document.createTextNode(isExpanded ? ` Show more (+${extras.length})` : ' Show less'));
+    
+    return true;
+}
+
+function initListingSidebar() {
+    const sidebar = document.getElementById('listingSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.getElementById('sidebarClose');
+    const openBtn = document.getElementById('filterToggleBtn');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.add('is-open');
+      if (overlay) overlay.classList.add('is-visible');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.remove('is-open');
+      if (overlay) overlay.classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+}
+
 function initSearchHighlighting() {
     // Initial Search Highlighting
     if (window.SEARCH_QUERY) {
@@ -120,7 +168,34 @@ function initSearchHighlighting() {
         const escapedQuery = String(window.SEARCH_QUERY).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedQuery})`, 'gi');
         cards.forEach(card => {
-            card.innerHTML = card.innerHTML.replace(regex, '<mark class="search-highlight">$1</mark>');
+            const walk = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
+            const nodesToReplace = [];
+            let n;
+            while (n = walk.nextNode()) {
+                if (regex.test(n.nodeValue)) nodesToReplace.push(n);
+                regex.lastIndex = 0;
+            }
+            nodesToReplace.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                let lastIndex = 0;
+                let match;
+                regex.lastIndex = 0;
+                while ((match = regex.exec(node.nodeValue)) !== null) {
+                    if (match.index > lastIndex) {
+                        fragment.appendChild(document.createTextNode(node.nodeValue.substring(lastIndex, match.index)));
+                    }
+                    const mark = document.createElement('mark');
+                    mark.className = 'search-highlight';
+                    mark.textContent = match[0];
+                    fragment.appendChild(mark);
+                    lastIndex = regex.lastIndex;
+                    if (!regex.global) break; 
+                }
+                if (lastIndex < node.nodeValue.length) {
+                    fragment.appendChild(document.createTextNode(node.nodeValue.substring(lastIndex)));
+                }
+                node.parentNode.replaceChild(fragment, node);
+            });
         });
     }
 }

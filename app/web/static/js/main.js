@@ -12,6 +12,10 @@ function handleGlobalClicks(e) {
     if (handleCommentsClick(e)) return;
 
     if (handleFilterClick(e)) return;
+    
+    if (typeof handleMoreFiltersClick === "function" && handleMoreFiltersClick(e)) return;
+
+    if (handleSelectText(e)) return;
 
     if (handleSearchClick(e)) return;
 
@@ -27,6 +31,7 @@ function handleGlobalClicks(e) {
 
     if (typeof handleSavedItemsFilterClick === "function" && handleSavedItemsFilterClick(e)) return;
     if (typeof handleProgressiveRevealClick === "function" && handleProgressiveRevealClick(e)) return;
+    if (typeof handlePasswordClick === "function" && handlePasswordClick(e)) return;
 }
 
 
@@ -42,4 +47,13 @@ function handleGlobalChanges(e) {
     if (handleCountryChange(e)) return;
 
     if (handleSortChange(e)) return;
+}
+
+function handleSelectText(e) {
+    const input = e.target.closest('[data-action="select-text"]');
+    if (input && typeof input.select === 'function') {
+        input.select();
+        return true;
+    }
+    return false;
 }

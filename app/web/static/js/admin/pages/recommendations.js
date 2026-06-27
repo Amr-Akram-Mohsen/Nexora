@@ -67,49 +67,15 @@
 
 
   function loadContextPerformance() {
-    fetch('/admin/recommendations/context-performance')
-      .then(r => r.json())
-      .then(d => {
-        const tbody = document.getElementById('context-performance-tbody');
-        if (!d.data || d.data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No data available.</td></tr>';
-          return;
-        }
-        tbody.innerHTML = d.data.map(r => `
-          <tr>
-            <td><span class="badge badge-secondary">${r.context_id}</span></td>
-            <td><span class="status-badge badge-type-compact">${r.entity_type}</span></td>
-            <td>${r.impressions}</td>
-            <td>${r.clicks}</td>
-            <td class="col-metric font-bold">${r.ctr}</td>
-          </tr>
-        `).join('');
-      })
-      .catch(() => {
-        document.getElementById('context-performance-tbody').innerHTML = '<tr><td colspan="5" class="text-center text-muted">Failed to load data.</td></tr>';
-      });
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml('/admin/recommendations/context-performance?format=html', 'context-performance-tbody', 'Loading data...', 5);
+    }
   }
 
   function loadEntityPerformance() {
-    fetch('/admin/recommendations/entity-performance')
-      .then(r => r.json())
-      .then(d => {
-        const tbody = document.getElementById('entity-performance-tbody');
-        if (!d.data || d.data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No data available.</td></tr>';
-          return;
-        }
-        tbody.innerHTML = d.data.map(r => `
-          <tr>
-            <td class="font-bold">${r.entity_name}</td>
-            <td><span class="status-badge badge-type-compact">${r.entity_type}</span></td>
-            <td class="col-metric">${r.clicks}</td>
-          </tr>
-        `).join('');
-      })
-      .catch(() => {
-        document.getElementById('entity-performance-tbody').innerHTML = '<tr><td colspan="3" class="text-center text-muted">Failed to load data.</td></tr>';
-      });
+    if (typeof fetchAndInjectHtml === 'function') {
+      fetchAndInjectHtml('/admin/recommendations/entity-performance?format=html', 'entity-performance-tbody', 'Loading data...', 3);
+    }
   }
 
   function loadSystemHealth() {
@@ -123,29 +89,52 @@
         
         if (!container || !list) return;
 
-        list.innerHTML = d.signals.map(s => {
-          let icon = 'ℹ️';
+        list.replaceChildren();
+        d.signals.forEach(s => {
+          let iconStr = 'ℹ️';
           let cls = 'text-muted';
-          if (s.level === 'critical') { icon = '🚨'; cls = 'text-danger font-bold'; }
-          else if (s.level === 'warning') { icon = '⚠️'; cls = 'text-warning font-bold'; }
-          else if (s.level === 'success') { icon = '✅'; cls = 'text-success'; }
-          return `<div class="${cls}"><span class="mr-1">${icon}</span> ${s.message}</div>`;
-        }).join('');
+          if (s.level === 'critical') { iconStr = '🚨'; cls = 'text-danger font-bold'; }
+          else if (s.level === 'warning') { iconStr = '⚠️'; cls = 'text-warning font-bold'; }
+          else if (s.level === 'success') { iconStr = '✅'; cls = 'text-success'; }
+          
+          const div = document.createElement('div');
+          div.className = cls;
+          
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'mr-1';
+          iconSpan.textContent = iconStr;
+          
+          div.appendChild(iconSpan);
+          div.appendChild(document.createTextNode(` ${s.message}`));
+          
+          list.appendChild(div);
+        });
 
+        iconContainer.replaceChildren();
+        const mainIconSpan = document.createElement('span');
+        
+        banner.classList.remove('alert-danger', 'alert-warning', 'alert-success');
         if (d.status === 'critical') {
           banner.classList.add('alert-danger');
-          iconContainer.innerHTML = '<span>🚨</span>';
+          mainIconSpan.textContent = '🚨';
         } else if (d.status === 'warning') {
           banner.classList.add('alert-warning');
-          iconContainer.innerHTML = '<span>⚠️</span>';
+          mainIconSpan.textContent = '⚠️';
         } else {
           banner.classList.add('alert-success');
-          iconContainer.innerHTML = '<span>✅</span>';
+          mainIconSpan.textContent = '✅';
         }
+        iconContainer.appendChild(mainIconSpan);
       })
       .catch(() => {
         const list = document.getElementById('health-signals-list');
-        if (list) list.innerHTML = '<div class="text-muted">Failed to load health status.</div>';
+        if (list) {
+          list.replaceChildren();
+          const errDiv = document.createElement('div');
+          errDiv.className = 'text-muted';
+          errDiv.textContent = 'Failed to load health status.';
+          list.appendChild(errDiv);
+        }
       });
   }
 

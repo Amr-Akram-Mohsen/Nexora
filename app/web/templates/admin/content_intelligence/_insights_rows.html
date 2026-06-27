@@ -146,7 +146,7 @@
     </td>
     <td>
         <button type="button" class="btn btn-sm btn-outline-secondary" 
-                onclick="viewDistributionDraft({{ item.id }}, '{{ item.source_type }}', {{ item.source_id }}, '{{ item.platform }}')">
+                data-action="view-distribution-draft" data-id="{{ item.id }}" data-source-type="{{ item.source_type }}" data-source-id="{{ item.source_id }}" data-platform="{{ item.platform }}">
             <i class="bi bi-eye"></i> View
         </button>
     </td>
