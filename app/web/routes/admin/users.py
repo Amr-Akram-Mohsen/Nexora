@@ -14,7 +14,7 @@ from app.domains.user.models import User
 from app.domains.user.service import deactivate_user as deactivate_user_service, activate_user as activate_user_service
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, or_, and_, func
 from app.domains.taxonomy.models import Category, Topic, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
@@ -184,8 +184,8 @@ def build_user_inspect_data(id):
     recs_clicked = metrics["recs_clicked"]
     engagement_score = metrics["engagement_score"]
 
-    from app.admin.helpers import format_date, format_datetime
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.helpers import format_date, format_datetime
+    from app.web.routes.admin.tables import get_inspect_table
     
     provider = user.provider.title() if user.provider else "Local"
     verified_str = "Yes" if user.is_verified else "No"

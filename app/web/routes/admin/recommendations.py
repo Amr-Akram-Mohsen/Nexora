@@ -13,7 +13,7 @@ from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.relationships import content_items
-from app.admin.helpers import paginate_manual, make_rows_response
+from app.web.routes.admin.helpers import paginate_manual, make_rows_response
 from sqlalchemy import select, func
 
 bp = Blueprint("api_recommendation", __name__, url_prefix="/admin/recommendations")
@@ -259,7 +259,7 @@ def inspect_match(content_id):
     if not content:
         return "Content not found.", 404
 
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     
     data = {
         "content id": f"#{content.id}",
@@ -615,7 +615,7 @@ def inspect_user_interests(user_id):
     for i in range(len(scores), 5):
         data[f"affinity {i+1}"] = "—"
         
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     inspect_table = get_inspect_table("user_interests", data)
     
     return render_template(

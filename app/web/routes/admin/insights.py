@@ -452,7 +452,7 @@ def widget_performance_feedback():
         cached = evaluate_content_performance_feedback()
         set_cached("performance", time_frame, cached)
 
-    from app.admin.tables import INSIGHTS_TABLES
+    from app.web.routes.admin.tables import INSIGHTS_TABLES
     eval_results = cached.get("evaluation_results", [])
     failures = cached.get("failures_detected", [])
     

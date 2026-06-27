@@ -6,7 +6,7 @@ from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Section, Source, Topic, Brand, IntentFacet, GenderFacet, PriceTierFacet
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.relationships import ArticleSource
-from app.admin.helpers import parse_sort_params
+from app.web.routes.admin.helpers import parse_sort_params
 
 _CONTENT_SORT_MAP = {
     "id": Content.id,

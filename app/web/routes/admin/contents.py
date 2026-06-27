@@ -9,7 +9,7 @@ Refactoring applied:
 - Extracted _delete_content_and_relations() helper shared by single and bulk delete (R-25).
 - Removed unconditional per-page duplicate-title batch query (R-05).
 - Removed ingestion_origin and object_id from serialized output (R-13).
-- Shared pagination helpers from app.admin.helpers (R-18, R-21).
+- Shared pagination helpers from app.web.routes.admin.helpers (R-18, R-21).
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
@@ -18,7 +18,7 @@ from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Section, Source
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.relationships import ArticleSource
-from app.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload, selectinload
 from datetime import datetime
@@ -321,8 +321,8 @@ def build_content_inspect_data(id):
 
     status_val = target.status if target and hasattr(target, "status") else "complete"
 
-    from app.admin.helpers import format_datetime
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.helpers import format_datetime
+    from app.web.routes.admin.tables import get_inspect_table
     
     from app.domains.interaction.service.scoring import get_content_engagement_score
     engagement_score = get_content_engagement_score(content.id)

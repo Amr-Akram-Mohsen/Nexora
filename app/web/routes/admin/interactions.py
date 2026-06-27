@@ -7,7 +7,7 @@ Refactoring applied:
 - Interaction stats endpoint reads from the 60-second cached
   get_interactions_breakdown() instead of issuing 8 independent queries (R-03).
 - All queries use modern select() style (R-07).
-- Shared pagination helpers from app.admin.helpers (R-18, R-21).
+- Shared pagination helpers from app.web.routes.admin.helpers (R-18, R-21).
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
@@ -33,7 +33,7 @@ from app.domains.interaction.service.admin import (
     get_admin_shares_page
 )
 from app.domains.user.models import User
-from app.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func, or_
 from datetime import datetime
 
@@ -306,7 +306,7 @@ def build_comment_inspect_data(id):
     if not raw_data:
         return None
         
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     inspect_table = get_inspect_table("comments", raw_data["raw_data"])
     
     return {
@@ -336,7 +336,7 @@ def inspect_clicks(link_id):
     if not metrics:
          return "Link data not found.", 404
 
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     
     link_data = metrics["link_data"]
     total_clicks = metrics["total_clicks"]

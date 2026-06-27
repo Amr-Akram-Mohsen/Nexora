@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint
-from app.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
+from app.web.routes.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
 from app.core.decorators import admin_required
 
 bp = Blueprint(

@@ -381,7 +381,7 @@ def widget_platform_performance():
     platforms_data = get_platform_performance()
     
     # Attach icons which are view-specific
-    from app.admin.helpers import get_platform_icon
+    from app.web.routes.admin.helpers import get_platform_icon
     for p in platforms_data:
         p["icon"] = get_platform_icon(p["name"])
         

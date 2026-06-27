@@ -8,14 +8,14 @@ Refactoring applied:
   endpoint serves the inspect modal (R-14).
 - min_price and store_count computed via SQL subqueries instead of ORM
   relationship traversal during serialization (R-15).
-- Shared helpers from app.admin.helpers for pagination and sort parsing (R-18, R-21).
+- Shared helpers from app.web.routes.admin.helpers for pagination and sort parsing (R-18, R-21).
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store, ItemImage
 from app.domains.taxonomy.models import Category, Brand, Source
-from app.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
 from sqlalchemy import select, func, or_
 from sqlalchemy.orm import joinedload
 from app.domains.item.models import ItemSpecification
@@ -323,8 +323,8 @@ def build_item_inspect_data(id):
 
     last_synced = max(last_synced_dates) if last_synced_dates else None
 
-    from app.admin.helpers import format_date
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.helpers import format_date
+    from app.web.routes.admin.tables import get_inspect_table
     
     variant_groups = [{"label": k.title(), "detail": ", ".join(v)} for k, v in item.variant_groups.items()] if item.variant_groups else "—"
 

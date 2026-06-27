@@ -7,7 +7,7 @@ Refactoring applied:
 - N+1 loops replaced with aggregate subqueries for content/item counts and
   latest activity per provider (R-04).
 - All queries use modern select() style (R-07).
-- Shared pagination helpers from app.admin.helpers (R-18, R-21).
+- Shared pagination helpers from app.web.routes.admin.helpers (R-18, R-21).
 - Extracted _fetch_sources_page() and _fetch_stores_page() helpers to
   eliminate duplication between JSON listing and HTML partial endpoints.
 """
@@ -19,7 +19,7 @@ from app.domains.content.models import Content
 from app.domains.item.models import Store, Item, ItemVariant, ItemStoreLink
 from app.domains.external.models import LastAPIFetch
 from app.domains.interaction.models import View, ItemClick
-from app.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func, or_, case
 
 bp = Blueprint("api_provider", __name__, url_prefix="/admin/providers")
@@ -169,7 +169,7 @@ def stores_rows():
 @bp.route("/sources/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_source(id):
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     from app.domains.taxonomy.service.admin_providers_source import build_admin_source_inspect_data
     data_dict = build_admin_source_inspect_data(id)
     if not data_dict:
@@ -181,7 +181,7 @@ def inspect_source(id):
 @bp.route("/stores/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_store(id):
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     from app.domains.item.service.admin_providers_store import build_admin_store_inspect_data
     data_dict = build_admin_store_inspect_data(id)
     if not data_dict:

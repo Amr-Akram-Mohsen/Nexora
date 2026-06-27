@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, render_template
 from app.domains.user.models import NewsletterSubscriber, User
 from app.core.decorators import admin_required
 from app.core.extensions import db
-from app.admin.helpers import parse_pagination_params
+from app.web.routes.admin.helpers import parse_pagination_params
 from sqlalchemy import select, or_, and_, func
 
 bp = Blueprint("api_subscribers", __name__, url_prefix="/admin/subscribers")

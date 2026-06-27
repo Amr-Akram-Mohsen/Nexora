@@ -4,7 +4,7 @@ from app.core.decorators import admin_required
 from app.core.extensions import db
 from app.domains.taxonomy.models import Category, Brand, Topic, Section, Source, AttributeFacet, GenderFacet, IntentFacet, PriceTierFacet
 from app.shared.utils.slug import generate_slug
-from app.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, func, update
 import difflib
 from app.domains.content.models import Content
@@ -736,8 +736,8 @@ def _get_entity_or_404(model, id, entity_name):
     return entity, None
 
 def _get_taxonomy_inspect_table(entity, entity_type, metadata):
-    from app.admin.helpers import format_status, format_featured
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.helpers import format_status, format_featured
+    from app.web.routes.admin.tables import get_inspect_table
     
     data = {
         "id": f"#{entity.id}",
@@ -868,7 +868,7 @@ def inspect_price_tier_facet(id):
 def inspect_source(id):
     source, err = _get_entity_or_404(Source, id, "Source")
     if err: return err, 404
-    from app.admin.tables import get_inspect_table
+    from app.web.routes.admin.tables import get_inspect_table
     
     data = get_admin_source_metadata(source)
     
