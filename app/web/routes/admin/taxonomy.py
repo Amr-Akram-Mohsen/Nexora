@@ -96,21 +96,21 @@ def _serialize_taxonomy(t, counts=None, health=None):
     data = {
         "id": t.id,
         "name": t.name,
-        "status": 'active' if t.is_active else 'inactive',
+        "is_active": getattr(t, 'is_active', False),
     }
     if isinstance(t, Category):
-        data["type"] = "Leaf" if t.is_leaf else "Parent"
+        data["heirarchy level"] = "Leaf" if t.is_leaf else "Parent"
     if isinstance(t, Section):
         data['description'] = t.description
-        data['filter config'] = "Configured" if t.allowed_filters else "Not Configured"
+        data['is_configured'] = bool(t.allowed_filters)
     if isinstance(t, Brand):
         data['industry'] = t.industry or "—"
     if isinstance(t, (Brand, Topic)):
-        data['featured'] = "Featured" if t.is_featured else "Not Featured"
+        data['is_featured'] = getattr(t, 'is_featured', False)
         
     if counts:
         for k, v in counts.items():
-            data[k] = str(v)
+            data[k] = v
             
     if health:
         data["health"] = health

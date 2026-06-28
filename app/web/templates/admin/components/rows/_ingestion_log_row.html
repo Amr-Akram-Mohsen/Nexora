@@ -1,18 +1,20 @@
-<td class="p-4 text-sm text-muted whitespace-nowrap">
-    {% if item.time %}
-        {{ item.time|datetimeformat }}
+<td data-field="time">
+    {% if row.time %}
+        {{ row.time|datetimeformat }}
     {% else %}
         —
     {% endif %}
 </td>
-<td class="p-4 font-medium"><span class="badge badge-secondary">{{ item.source }}</span></td>
-<td class="p-4 text-sm capitalize">{{ item.type }}</td>
-<td class="p-4 text-sm max-w-xs truncate" title="{{ item.query or '—' }}">{{ item.query or "—" }}</td>
-<td class="p-4 text-sm">{{ item.category or "—" }}</td>
-<td class="p-4">
-    {% if item.status == "Success" %}
-        <span class="badge badge-success">Success</span>
+<td data-field="source">{{ badge(row.source, variant="secondary") }}</td>
+<td data-field="type"><span class="capitalize">{{ row.type }}</span></td>
+<td data-field="query">
+    <span class="max-w-xs truncate block" title="{{ row.query or '—' }}">{{ row.query or "—" }}</span>
+</td>
+<td data-field="category">{{ row.category or "—" }}</td>
+<td data-field="status">
+    {% if row.status == "success" %}
+        {{ badge("Success", variant="success") }}
     {% else %}
-        <span class="badge badge-danger" title="{{ item.failures }} failures">Error</span>
+        <span title="{{ row.failures }} failures">{{ badge("Error", variant="danger") }}</span>
     {% endif %}
 </td>

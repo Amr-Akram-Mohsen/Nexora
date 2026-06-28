@@ -1,37 +1,45 @@
-
-<td class="cell-link">
-  {% set value = row.link %}
-  {% if row.get('logo-url') %}
+<td data-field="name">
   <div class="flex items-center gap-2">
-      <img src="{{ row.get('logo-url') }}" alt="Logo" class="item-thumbnail-small">
-      <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+    {% if row.logo_url %}
+    <img src="{{ row.logo_url }}" alt="Logo" class="item-thumbnail-small">
+    {% else %}
+    {{ badge(icon="fa-solid fa-tower-broadcast", class="badge-secondary", variant=none) }}
+    {% endif %}
+    <strong class="cell-primary-text">{{ row.name }}</strong>
+    {% if row.domain %}
+    <a target="_blank" href="https://{{ row.domain }}" title="Visit Domain"><i
+        class="fas fa-external-link-alt fa-xs"></i></a>
+    {% endif %}
   </div>
+</td>
+<td data-field="content-count">{{ row.content_count|default(0) }}</td>
+<td data-field="freshness">
+  {% set freshness = row.freshness %}
+  {% if freshness is none %}{{ badge("Never", class="badge-health-low") }}
+  {% elif freshness <= 1 %}{{ badge(freshness ~ "d" , variant="success" ) }} {% elif freshness <=7 %}{{ badge(freshness
+    ~ "d" , variant="warning" ) }} {% else %}{{ badge(freshness ~ "d" , variant="danger" ) }} {% endif %} </td>
+<td data-field="engagement">{{ row.engagement|default(0) }}</td>
+<td data-field="status">
+  {% set status = row.status %}
+  {% if status == "failed" %}
+  {{ badge(status|title, variant="danger") }}
   {% else %}
-  <a target="_blank" href="{{ value.url }}">{{ value.name }}</a>
+  {{ badge(status|title, variant=status) }}
   {% endif %}
 </td>
-<td class="cell-volume">{{ row.get('content-count', '—') }}</td>
-<td class="cell-freshness">
-  {% set value = row.get('freshness') %}
-  {% if value is none %}
-  <span class="badge badge-health-low">Never</span>
-  {% elif value <= 1 %} <span class="badge badge-success">{{ value }}d</span>
-  {% elif value <= 7 %} <span class="badge badge-warning">{{ value }}d</span>
-  {% else %}
-  <span class="badge badge-danger">{{ value }}d</span>
-  {% endif %}
-</td>
-<td class="cell-engagement">{{ row.get('engagement', '—') }}</td>
-<td class="cell-status">{{ row.get('status', '—') }}</td>
 {% if not hide_action_column %}
-<td class="cell-actions flex flex-col gap-1">
-  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/sources/{{ row.id }}" target="_blank">
+<td data-field="actions">
+  <div class="actions-cell-group flex flex-col gap-1">
+    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/sources/{{ row.id }}"
+      target="_blank">
       <i class="fas fa-eye"></i> Inspect
-  </a>
-  {% if domain_target_type %}
-  <a class="user-action-btn user-action-inspect inspect-btn" href="/admin/{{ domain_target_type }}?source={{ row.slug }}">
+    </a>
+    {% if domain_target_type %}
+    <a class="user-action-btn user-action-inspect inspect-btn"
+      href="/admin/{{ domain_target_type }}?source={{ row.slug }}">
       <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title}}
-  </a>
-  {% endif %}
+    </a>
+    {% endif %}
+  </div>
 </td>
 {% endif %}

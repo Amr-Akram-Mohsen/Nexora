@@ -1,26 +1,28 @@
 {% from "admin/components/ui/actions.html" import action_group, action_button %}
 {% from "admin/components/crud.html" import admin_crud_rows %}
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
 
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">
   {% if domain_type == "content" %}
-    {% include "admin/components/rows/_content_row.html" %}
+  {% include "admin/components/rows/_content_row.html" %}
   {% elif domain_type == "item" %}
-    {% include "admin/components/rows/_item_row.html" %}
+  {% include "admin/components/rows/_item_row.html" %}
   {% elif domain_type == "user" %}
-    {% include "admin/components/rows/_user_row.html" %}
+  {% include "admin/components/rows/_user_row.html" %}
   {% elif domain_type == "comment" %}
-    {% include "admin/components/rows/_comment_row.html" %}
+  {% include "admin/components/rows/_comment_row.html" %}
   {% elif domain_type == "source" %}
-    {% include "admin/components/rows/_source_row.html" %}
+  {% include "admin/components/rows/_source_row.html" %}
   {% elif domain_type == "store" %}
-    {% include "admin/components/rows/_store_row.html" %}
+  {% include "admin/components/rows/_store_row.html" %}
   {% elif domain_type == "rec" %}
-    {% include "admin/components/rows/_rec_row.html" %}
+  {% include "admin/components/rows/_rec_row.html" %}
   {% elif domain_type == "ingestion_log" %}
-    {% include "admin/components/rows/_ingestion_log_row.html" %}
+  {% include "admin/components/rows/_ingestion_log_row.html" %}
   {% else %}
-    {% include "admin/components/rows/_generic_row.html" %}
+  {% include "admin/components/rows/_generic_row.html" %}
   {% endif %}
 </tr>
 {% endmacro %}

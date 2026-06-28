@@ -1,71 +1,87 @@
-<td class="cell-title">
-  {% set value = row.title %}
+<td data-field="title">
   <div class="content-cell-title flex flex-col gap-1">
-    <strong class="cell-primary-text">{{ value.value }}</strong>
-    {% if value.badges %}
+    <strong class="cell-primary-text">{{ row.title }}</strong>
+
     <div class="flex flex-wrap gap-1 content-status-group">
-      {% for b in value.badges %}
-      <span class="badge {{ b.badge_class }}" {% if b.title %} title="{{ b.title }}" {% endif %}>{% if b.icon %}{{ b.icon|safe }} {% endif %}{{ b.value }}</span>
-      {% endfor %}
+      {% set health_variant = 'success' if row.health_score >= 80 else ('warning' if row.health_score >= 50 else 'danger') %}
+      {{ badge(row.health_score ~ "% Health", variant=health_variant, class="badge-compact") }}
+
+      {% if not row.has_topics %}
+      {{ badge("No Topics", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Topics"}, variant=none) }}
+      {% endif %}
+
+      {% if not row.has_brands %}
+      {{ badge("No Brands", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Brands"}, variant=none) }}
+      {% endif %}
+
+      {% if not row.has_source %}
+      {{ badge("No Source", icon='fas fa-times-circle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Source"}, variant=none) }}
+      {% endif %}
+
+      {% if row.object_type == "article" and row.enrichment_status == "failed" %}
+      {{ badge("Failed", icon='fas fa-ban', class="status-badge inactive flex items-center gap-1", attrs={"title": "Enrichment Failed"}, variant=none) }}
+      {% endif %}
+
+      {% if row.is_duplicate %}
+      {{ badge("Duplicate", icon='fas fa-copy', class="status-badge user flex items-center gap-1", attrs={"title": "Duplicate Title"}, variant=none) }}
+      {% endif %}
     </div>
-    {% endif %}
   </div>
 </td>
-<td class="cell-classification">
-  {% set value = row.classification %}
+<td data-field="classification">
   <div class="flex flex-col gap-1">
-    <span class="badge badge-type badge-compact">{{ value.type }}</span>
-    <span class="content-date-row">{{ value.category }}</span>
-    <span class="content-date-row">{{ value.section }}</span>
+    {{ badge(row.object_type, class="badge-type badge-compact", variant=none) }}
+    <span class="content-date-row">{{ row.category }}</span>
+    <span class="content-date-row">{{ row.section }}</span>
   </div>
 </td>
-<td class="cell-engagement">
-  {% set value = row.engagement %}
+<td data-field="engagement">
   <div class="content-engagement-metrics flex flex-wrap gap-2">
-    <span class="content-metric-item" title="Views"><i class="fas fa-eye"></i> {{ value.views }}</span>
-    <span class="content-metric-item" title="Likes"><i class="fas fa-heart"></i> {{ value.likes }}</span>
-    <span class="content-metric-item" title="Comments"><i class="fas fa-comment"></i> {{ value.comments }}</span>
-    <span class="content-metric-item" title="Shares"><i class="fas fa-share"></i> {{ value.shares }}</span>
-    <span class="content-metric-item" title="Saves"><i class="fas fa-save"></i> {{ value.saves }}</span>
+    {% set metrics = [
+      {'icon': 'fas fa-eye', 'val': row.engagement.views, 'title': 'Views'},
+      {'icon': 'fas fa-heart', 'val': row.engagement.likes, 'title': 'Likes'},
+      {'icon': 'fas fa-comment', 'val': row.engagement.comments, 'title': 'Comments'},
+      {'icon': 'fas fa-share', 'val': row.engagement.shares, 'title': 'Shares'},
+      {'icon': 'fas fa-save', 'val': row.engagement.saves, 'title': 'Saves'}
+    ] %}
+    {% for m in metrics %}
+    <span class="content-metric-item" title="{{ m.title }}"><i class="{{ m.icon }}"></i> {{ m.val }}</span>
+    {% endfor %}
   </div>
 </td>
-<td class="cell-published-at">
-  <span class="content-date-row">{{ row['published-at'][:10] if row['published-at'] else '—' }}</span>
+<td data-field="published-at">
+  <span class="content-date-row">{{ row.published_at[:10] if row.published_at else '—' }}</span>
 </td>
-<td class="cell-sources">
-  {% set value = row.sources %}
+<td data-field="sources">
   <div class="flex flex-col gap-1">
-    <span class="cell-primary-text">{{ value.text or '—' }}</span>
-    {% if value.origin_chip %}
-    <span class="badge badge-origin badge-compact" title="Acquired Via">{{ value.origin_chip }}</span>
+    <span class="cell-primary-text">{{ row.sources_text or '—' }}</span>
+    {% if row.ingestion_origin %}
+    {{ badge(row.ingestion_origin, class="badge-origin badge-compact", attrs={"title": "Acquired Via"}, variant=none) }}
     {% endif %}
   </div>
 </td>
-<td class="cell-status">
-  {% set value = row.status %}
+<td data-field="status">
   <div class="flex flex-col gap-2">
-    <span class="{{ value.status.badge_class }}">{{ value.status.value }}</span>
+    {% set is_pub = row.is_published %}
+    {% set status_text = 'Live' if is_pub else 'Draft' %}
+    {% set status_class = 'status-badge active w-fit' if is_pub else 'status-badge inactive w-fit' %}
+    <span class="{{ status_class }}">{{ status_text }}</span>
   </div>
 </td>
 {% if not hide_action_column %}
-<td class="cell-actions">
+<td data-field="actions">
   <div class="actions-cell-group flex flex-col gap-1">
-    <a class="user-action-btn flex items-center justify-center gap-1"
-       href="/admin/contents/{{ row.id }}" target="_blank"
-       title="Inspect full detail page">
+    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/contents/{{ row.id }}" target="_blank" title="Inspect full detail page">
       <i class="fas fa-eye"></i> Inspect
     </a>
-    {% if row.is_published %}
-    <button class="user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1"
-      data-action="toggle-publish" data-id="{{ row.id }}" data-status="unpublish" title="Unpublish">
-      <i class="fas fa-eye-slash"></i> Unpublish
-    </button>
-    {% else %}
-    <button class="user-action-btn user-action-toggle-active flex items-center justify-center gap-1"
-      data-action="toggle-publish" data-id="{{ row.id }}" data-status="publish" title="Publish">
-      <i class="fas fa-upload"></i> Publish
-    </button>
-    {% endif %}
+
+    {% set is_pub = row.is_published %}
+    {% set btn_status = 'unpublish' if is_pub else 'publish' %}
+    {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
+    {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else 'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
+    {% set btn_icon = 'fas fa-eye-slash' if is_pub else 'fas fa-upload' %}
+
+    {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id, "data-status": btn_status, "title": btn_label}, variant=none) }}
   </div>
 </td>
 {% endif %}

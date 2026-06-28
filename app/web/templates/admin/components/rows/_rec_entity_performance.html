@@ -2,7 +2,7 @@
     {% for r in items %}
     <tr>
         <td class="font-bold">{{ r.entity_name }}</td>
-        <td><span class="status-badge badge-type-compact">{{ r.entity_type }}</span></td>
+        <td>{{ badge(r.entity_type, variant="secondary") }}</td>
         <td class="col-metric">{{ r.clicks }}</td>
     </tr>
     {% endfor %}

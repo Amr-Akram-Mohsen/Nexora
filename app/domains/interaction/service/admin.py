@@ -143,31 +143,31 @@ def build_admin_comment_inspect_data(id):
         s_label = sentiment.title() if sentiment else 'Neutral'
         sentiment_dist.append({"label": s_label, "count": f"{count} ({pct:.1f}%)"})
     
-    reactions_html = "—"
+    reactions_html = None
     if recent_reactions:
         reactions_html = [{"label": r.user.name if r.user else 'User', "detail": r.type.title()} for r in recent_reactions]
 
     data = {
-        "id": f"#{comment.id}",
+        "id": comment.id,
         "comment": comment.content,
         "sentiment": comment.sentiment or "neutral",
-        "confidence": str(round(comment.confidence, 2)) if comment.confidence else "—",
-        "likes": "{:,}".format(comment.like_count),
-        "dislikes": "{:,}".format(comment.dislike_count),
-        "shares": "{:,}".format(comment.share_count),
-        "replies count": str(comment.replies_count),
-        "recent reactions": {"value": reactions_html, "is_list": True} if reactions_html != "—" else "—",
-        "user id": str(comment.user_id),
-        "user name": comment.user.name if comment.user else "—",
-        "user email": comment.user.email if comment.user else "—",
-        "total comments": str(total_user_comments),
+        "confidence": round(comment.confidence, 2) if comment.confidence else None,
+        "likes": comment.like_count,
+        "dislikes": comment.dislike_count,
+        "shares": comment.share_count,
+        "replies count": comment.replies_count,
+        "recent reactions": reactions_html,
+        "user id": comment.user_id,
+        "user name": comment.user.name if comment.user else None,
+        "user email": comment.user.email if comment.user else None,
+        "total comments": total_user_comments,
         "parent context": parent_context,
-        "latest replies": {"value": latest_replies, "is_list": True} if latest_replies != "—" else "—",
+        "latest replies": latest_replies if latest_replies != "—" else None,
         "target type": comment.target_type,
         "target title": target_title,
-        "date": comment.created_at.isoformat()[:10] if comment.created_at else "—",
-        "target comments": str(total_target_comments),
-        "sentiment distribution": {"value": sentiment_dist, "is_list": True} if sentiment_dist else "—"
+        "date": comment.created_at.isoformat() if comment.created_at else None,
+        "target comments": total_target_comments,
+        "sentiment distribution": sentiment_dist if sentiment_dist else None
     }
     actions = [
         {

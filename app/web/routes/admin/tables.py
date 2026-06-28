@@ -267,6 +267,12 @@ def get_inspect_table(table_name, data):
                 if "value" not in entry:
                     entry["value"] = "—"
                 mapped_table[section_name.title()].append(entry)
+            elif isinstance(field_data, list):
+                mapped_table[section_name.title()].append({
+                    "label": field.title(),
+                    "value": field_data,
+                    "is_list": True
+                })
             else:
                 mapped_table[section_name.title()].append({
                     "label": field.title(),

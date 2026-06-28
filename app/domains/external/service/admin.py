@@ -60,7 +60,7 @@ def get_admin_integrations_logs_data():
     for log in logs:
         source_name = (log.source or "Unknown").lower()
         log_type    = "item" if source_name in _ITEM_SOURCE_NAMES else "article"
-        status      = "Error" if log.failure_count > 0 else "Success"
+        status      = "error" if log.failure_count > 0 else "success"
         result.append({
             "source":   source_name.upper(),
             "type":     log_type,

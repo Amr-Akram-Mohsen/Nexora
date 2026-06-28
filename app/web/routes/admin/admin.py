@@ -194,21 +194,25 @@ def user_detail(id):
 
 @bp.route("/stores/<int:id>")
 def store_detail(id):
-    from app.web.routes.admin.providers import build_store_inspect_data
+    from app.domains.item.service.admin_providers_store import build_admin_store_inspect_data
+    from app.web.routes.admin.tables import get_inspect_table
     from flask import abort
-    data = build_store_inspect_data(id)
+    data = build_admin_store_inspect_data(id)
     if not data:
         abort(404)
+    data["inspect_table"] = get_inspect_table("stores", data.pop("raw_data"))
     return render_template("admin/components/_inspect.html", title=f"Store Details {id}", domain="stores", **data)
 
 
 @bp.route("/sources/<int:id>")
 def source_detail(id):
-    from app.web.routes.admin.providers import build_source_inspect_data
+    from app.domains.taxonomy.service.admin_providers_source import build_admin_source_inspect_data
+    from app.web.routes.admin.tables import get_inspect_table
     from flask import abort
-    data = build_source_inspect_data(id)
+    data = build_admin_source_inspect_data(id)
     if not data:
         abort(404)
+    data["inspect_table"] = get_inspect_table("sources", data.pop("raw_data"))
     return render_template("admin/components/_inspect.html", title=f"Source Details {id}", domain="sources", **data)
 
 

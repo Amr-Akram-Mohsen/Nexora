@@ -69,15 +69,14 @@ def matches_rows():
     
     display_items = []
     for r in serialized:
-        item_ids_str = ", ".join(f"{i['id']}" for i in r['items'])
         display_items.append({
             "id": r["content_id"],
-            "content-title": f"{r['content_title']} (#{r['content_id']})",
-            "widget-impressions": "{:,}".format(r["widget_impressions"]),
-            "widget-ctr": r["widget_ctr"],
-            "last-active": r["last_active"],
-            "linked-items-count": r["linked_items_count"],
-            "linked-items-list": [i['id'] for i in r["items"]]
+            "content_title": r['content_title'],
+            "widget_impressions": r["widget_impressions"],
+            "widget_ctr": r["widget_ctr"],
+            "last_active": r["last_active"],
+            "linked_items_count": r["linked_items_count"],
+            "linked_items_list": [i['id'] for i in r["items"]]
         })
 
     html = render_template("admin/components/_rows.html", items=display_items, domain_type="rec")

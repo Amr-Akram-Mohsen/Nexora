@@ -141,17 +141,18 @@ def get_admin_stores_page(page, per_page, search, network, country, sync_stalene
             
         serialized.append({
             "id":                  st.id,
-            "link":                {'url': st.website, 'name': st.name},
-            "affiliate-network": st.affiliate_network,
-            "product-count":     product_count,
-            "clicks":            clicks,
-            "ctr":               ctr,
-            "active-links":      oos_data["active_links"],
-            "sync-age":          sync_age_days,
-            "oos-rate":          f"{oos_rate}%",
-            "avg-commission":    f"{round(float(avg_comm), 2)}%" if avg_comm is not None else "—",
-            "status":            status_val,
-            "slug":              st.slug,
+            "name":                st.name,
+            "website":             st.website,
+            "affiliate_network":   st.affiliate_network,
+            "product_count":       product_count,
+            "clicks":              clicks,
+            "ctr":                 ctr,
+            "active_links":        oos_data["active_links"],
+            "sync_age":            sync_age_days,
+            "oos_rate":            oos_rate,
+            "avg_commission":      float(avg_comm) if avg_comm is not None else None,
+            "status":              status_val,
+            "slug":                st.slug,
         })
     return pagination, serialized
 
@@ -530,7 +531,7 @@ def build_admin_store_inspect_data(id):
         .where(ItemStoreLink.currency != None)
         .group_by(ItemStoreLink.currency)
     ).all()
-    currency_mix = ", ".join(f"{c[0]}: {c[1]}" for c in currency_mix_rows) if currency_mix_rows else "—"
+    currency_mix_list = [{"label": c[0], "detail": c[1]} for c in currency_mix_rows] if currency_mix_rows else []
 
     all_syncs = db.session.execute(
         select(ItemStoreLink.last_synced_at)
@@ -542,45 +543,43 @@ def build_admin_store_inspect_data(id):
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=timezone.utc)
         total_days += (now - dt).days
-    avg_sync_age = round(total_days / len(all_syncs), 1) if all_syncs else "—"
-
-    
+    avg_sync_age = round(total_days / len(all_syncs), 1) if all_syncs else None
 
     data = {
-        "id": f"#{store.id}",
+        "id": store.id,
         "name": store.name,
         "slug": store.slug,
         "website": store.website,
-        "status": "active" if store.is_active else "inactive",
-        "affiliate network": store.affiliate_network or "—",
-        "product count": str(product_count),
-        "active links": str(stats.active_links or 0),
-        "avg commission": f"{round(float(stats.avg_commission), 2)}%" if stats.avg_commission is not None else "—",
-        "country": store.country or "—",
-        "currency": store.currency or "—",
-        "api enabled": "Yes" if store.api_enabled else "No",
-        "total links": str(stats.total_links or 0),
-        "inactive links": str(stats.inactive_links or 0),
-        "never synced": str(stats.never_synced or 0),
-        "stale links (7d)": str(stats.stale_links or 0),
-        "out of stock": str(stats.out_of_stock or 0),
-        "avg sync age (days)": str(avg_sync_age),
-        "last synced at": stats.last_synced.strftime('%Y-%m-%d %H:%M') if stats.last_synced else "—",
-        "feed enabled": "Yes" if store.feed_enabled else "No",
-        "network slug": store.network_slug or "—",
-        "program count": str(stats.program_count or 0),
-        "avg commission rate": f"{round(float(stats.avg_commission), 2)}%" if stats.avg_commission is not None else "—",
-        "max commission rate": f"{round(float(stats.max_commission), 2)}%" if stats.max_commission is not None else "—",
-        "links with commission": str(stats.with_commission or 0),
-        "links without commission": str(stats.without_commission or 0),
-        "links with tracking code": str(stats.with_tracking or 0),
-        "min price": str(round(float(stats.min_price), 2)) if stats.min_price is not None else "—",
-        "avg price": str(round(float(stats.avg_price), 2)) if stats.avg_price is not None else "—",
-        "max price": str(round(float(stats.max_price), 2)) if stats.max_price is not None else "—",
-        "links with discount": str(stats.with_discount or 0),
-        "avg discount %": f"{round(float(stats.avg_discount_pct), 1)}%" if stats.avg_discount_pct is not None else "—",
-        "links with null price": str(stats.null_price or 0),
-        "currency mix": currency_mix
+        "status": "Active" if store.is_active else "Inactive",
+        "affiliate network": store.affiliate_network,
+        "product count": product_count,
+        "active links": stats.active_links or 0,
+        "avg commission": float(stats.avg_commission) if stats.avg_commission is not None else None,
+        "country": store.country,
+        "currency": store.currency,
+        "api enabled": store.api_enabled,
+        "total links": stats.total_links or 0,
+        "inactive links": stats.inactive_links or 0,
+        "never synced": stats.never_synced or 0,
+        "stale links (7d)": stats.stale_links or 0,
+        "out of stock": stats.out_of_stock or 0,
+        "avg sync age (days)": avg_sync_age,
+        "last synced at": stats.last_synced.isoformat() if stats.last_synced else None,
+        "feed enabled": store.feed_enabled,
+        "network slug": store.network_slug,
+        "program count": stats.program_count or 0,
+        "avg commission rate": float(stats.avg_commission) if stats.avg_commission is not None else None,
+        "max commission rate": float(stats.max_commission) if stats.max_commission is not None else None,
+        "links with commission": stats.with_commission or 0,
+        "links without commission": stats.without_commission or 0,
+        "links with tracking code": stats.with_tracking or 0,
+        "min price": float(stats.min_price) if stats.min_price is not None else None,
+        "avg price": float(stats.avg_price) if stats.avg_price is not None else None,
+        "max price": float(stats.max_price) if stats.max_price is not None else None,
+        "links with discount": stats.with_discount or 0,
+        "avg discount %": float(stats.avg_discount_pct) if stats.avg_discount_pct is not None else None,
+        "links with null price": stats.null_price or 0,
+        "currency mix": currency_mix_list
     }
     return {
         "raw_data": data,

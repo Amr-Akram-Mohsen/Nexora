@@ -1,32 +1,38 @@
-
-<td class="cell-content-title">{{ row.get('content-title', '—') }}</td>
-<td class="cell-widget-impressions">{{ row.get('widget-impressions', '—') }}</td>
-<td class="cell-widget-ctr">
-  {% set value = row.get('widget-ctr') %}
-  {% set ctr_val = value|replace('%', '')|float if value else 0 %}
-  {% if ctr_val >= 3.0 %}
-  <span class="badge badge-success">{{ value }}</span>
-  {% elif ctr_val >= 1.0 %}
-  <span class="badge badge-warning">{{ value }}</span>
-  {% elif ctr_val > 0.0 %}
-  <span class="badge badge-danger">{{ value }}</span>
-  {% else %}
-  <span class="badge badge-secondary">{{ value }}</span>
+<td data-field="content-title">
+  <div class="flex flex-col gap-1">
+    <strong class="cell-primary-text">{{ row.content_title }}</strong>
+    <span class="text-xs text-muted">#{{ row.id }}</span>
+  </div>
+</td>
+<td data-field="widget-impressions">{{ "{:,}".format(row.widget_impressions|default(0)) }}</td>
+<td data-field="widget-ctr">
+  {% set ctr_val = row.widget_ctr %}
+  {% if ctr_val is none %}{{ badge("—", variant="secondary") }}
+  {% elif ctr_val >= 3.0 %}{{ badge(ctr_val ~ "%", variant="success") }}
+  {% elif ctr_val >= 1.0 %}{{ badge(ctr_val ~ "%", variant="warning") }}
+  {% elif ctr_val > 0.0 %}{{ badge(ctr_val ~ "%", variant="danger") }}
+  {% else %}{{ badge("0.0%", variant="secondary") }}
   {% endif %}
 </td>
-<td class="cell-last-active">{{ row.get('last-active', '—') }}</td>
-<td class="cell-linked-items-count">{{ row.get('linked-items-count', '—') }}</td>
-<td class="cell-linked-items-list">
-  {% if row.get('linked-items-list') %}
-    {{ row.get('linked-items-list') | join(', ') }}
+<td data-field="last-active">{{ row.last_active|default('—') }}</td>
+<td data-field="linked-items-count">{{ row.linked_items_count|default(0) }}</td>
+<td data-field="linked-items-list">
+  {% if row.linked_items_list %}
+    <div class="flex flex-wrap gap-1">
+      {% for item_id in row.linked_items_list %}
+        {{ badge("#" ~ item_id, variant="secondary") }}
+      {% endfor %}
+    </div>
   {% else %}
     —
   {% endif %}
 </td>
 {% if not hide_action_column %}
-<td class="cell-actions flex flex-col gap-1">
-  <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.get('content-title', '') }}">
-      <i class="fas fa-eye"></i> Inspect
-  </button>
+<td data-field="actions">
+  <div class="actions-cell-group flex flex-col gap-1">
+    <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.content_title }}">
+        <i class="fas fa-eye"></i> Inspect
+    </button>
+  </div>
 </td>
 {% endif %}

@@ -27,11 +27,22 @@
       {% if inspect_header is defined and inspect_header %}
       <div class="inspect-header-block">
         <h2>{{ inspect_header.name }}</h2>
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-4 items-center">
           <span><strong>Email:</strong> {{ inspect_header.email }}</span>
-          <span><strong>Joined:</strong> {{ inspect_header.joined }}</span>
+          <span><strong>Joined:</strong> {{ inspect_header.joined|truncate(10, True, '') if inspect_header.joined else '—' }}</span>
           {% if inspect_header.last_active %}
-          <span><strong>Last Active:</strong> {{ inspect_header.last_active }}</span>
+          <span><strong>Last Active:</strong> {{ inspect_header.last_active|truncate(16, True, '')|replace('T', ' ') }}</span>
+          {% endif %}
+          
+          {% set days = inspect_header.recency_days %}
+          {% if days is none %}
+            {{ badge("Never", variant="danger") }}
+          {% elif days <= 1 %}
+            {{ badge("Active Today", variant="success") }}
+          {% elif days <= 7 %}
+            {{ badge("Active this week", variant="warning") }}
+          {% else %}
+            {{ badge("Inactive", variant="danger") }}
           {% endif %}
         </div>
       </div>

@@ -231,6 +231,7 @@ a.clickable-card:hover .dashboard-stat-value {
     border-radius: var(--radius-full);
     transition: width 0.5s ease;
     min-width: 2px;
+    width: var(--seg-width, 0%);
 }
 
 .overview-breakdown-val {
@@ -452,6 +453,7 @@ a.clickable-card:hover .dashboard-stat-value {
     height: 100%;
     transition: width 0.4s ease;
     min-width: 0;
+    width: var(--seg-width, 0%);
 }
 
 .stacked-bar-segment--primary  { background: var(--brand-primary, var(--brand-blue)); }

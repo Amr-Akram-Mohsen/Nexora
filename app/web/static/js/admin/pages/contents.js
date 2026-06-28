@@ -1,9 +1,8 @@
-// app/web/static/js/admin/control_panel/contents.js
+// app/web/static/js/admin/pages/contents.js
 
 (function () {
   'use strict';
 
-  // Page-level State Management
   // Page-level State Management
   window.contentsController = null;
   let selectedIds = new Set();
@@ -19,8 +18,7 @@
   });
 
   function loadStats() {
-    fetch("/admin/contents/stats")
-      .then(res => res.json())
+    window.api.get("/admin/contents/stats")
       .then(stats => {
         const statsBar = document.getElementById("contents-stats-bar");
         if (statsBar) statsBar.classList.remove("is-hidden");
@@ -44,11 +42,7 @@
   // LOAD DYNAMIC FILTERS DATA
   // ==============================
   function loadMetadata() {
-    fetch("/admin/contents/meta")
-      .then((res) => {
-        if (!res.ok) throw new Error("Metadata fetch failed");
-        return res.json();
-      })
+    window.api.get("/admin/contents/meta")
       .then((meta) => {
         categoriesList = meta.categories || [];
 
@@ -182,13 +176,9 @@
   // ACTIONS EXECUTION
   // ==============================
   function performSingleDelete(id) {
-    fetch(`/admin/contents/${id}`, { method: "DELETE" })
+    window.api.delete(`/admin/contents/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Delete failed");
-        return res.json();
-      })
-      .then((res) => {
-        if (res.success) {
+        if (res && res.success) {
           showToast(res.message || "Content safely deleted.", "success");
           selectedIds.delete(parseInt(id, 10));
           updateBulkToolbar();
@@ -231,17 +221,9 @@
       "Confirm Bulk Action",
       `Are you sure you want to execute ${actionText} on the ${selectedIds.size} selected items?`,
       () => {
-        fetch("/admin/contents/bulk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        })
+        window.api.post("/admin/contents/bulk", payload)
           .then((res) => {
-            if (!res.ok) throw new Error("Bulk action failed");
-            return res.json();
-          })
-          .then((res) => {
-            if (res.success) {
+            if (res && res.success) {
               showToast(res.message || "Bulk operation completed.", "success");
               selectedIds.clear();
               document.getElementById("bulk-action-select").value = "";
@@ -251,7 +233,7 @@
               window.contentsController.load(window.contentsController.currentPage);
               loadStats();
             } else {
-              showToast(res.error || "Bulk action failed.", "error");
+              showToast((res && res.error) || "Bulk action failed.", "error");
             }
           })
           .catch((err) => {
@@ -288,24 +270,19 @@
       return;
     }
 
-    fetch("/admin/contents/bulk", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "recategorize",
-        ids: [parseInt(contentId, 10)],
-        category_id: parseInt(categoryId, 10)
-      })
+    window.api.post("/admin/contents/bulk", {
+      action: "recategorize",
+      ids: [parseInt(contentId, 10)],
+      category_id: parseInt(categoryId, 10)
     })
-      .then((res) => res.json())
       .then((res) => {
-        if (res.success) {
+        if (res && res.success) {
           showToast("Category quick-updated successfully.", "success");
           hideQuickCategoryModal();
           window.contentsController.load(window.contentsController.currentPage);
           loadStats();
         } else {
-          showToast(res.error || "Recategorization failed.", "error");
+          showToast((res && res.error) || "Recategorization failed.", "error");
         }
       })
       .catch((err) => {
@@ -318,22 +295,14 @@
   // QUICK PUBLISH ACTION
   // ==============================
   function togglePublish(id, action) {
-    fetch(`/admin/contents/${id}/toggle-publish`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: action })
-    })
+    window.api.post(`/admin/contents/${id}/toggle-publish`, { action: action })
       .then((res) => {
-        if (!res.ok) throw new Error("Toggle publish failed");
-        return res.json();
-      })
-      .then((res) => {
-        if (res.success) {
+        if (res && res.success) {
           showToast(res.message, "success");
           window.contentsController.load(window.contentsController.currentPage);
           loadStats();
         } else {
-          showToast(res.error || "Failed to toggle status.", "error");
+          showToast((res && res.error) || "Failed to toggle status.", "error");
         }
       })
       .catch((err) => {

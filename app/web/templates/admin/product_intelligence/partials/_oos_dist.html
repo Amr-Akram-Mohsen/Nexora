@@ -6,7 +6,7 @@
   {% for item in data %}
     {% set pct = (item.count / max_count * 100)|round(1) if max_count > 0 else 0 %}
     {% set color = colors[loop.index0 % colors|length] %}
-    {{ breakdown_progress_bar(item.name, "{:,}".format(item.count), pct, color, '<i class="fa-solid fa-store"></i>') }}
+    {{ breakdown_progress_bar(item.name, item.count, pct, color, '<i class="fa-solid fa-store"></i>') }}
   {% endfor %}
 {% else %}
   <div class="text-muted text-sm py-2">No out-of-stock issues detected.</div>

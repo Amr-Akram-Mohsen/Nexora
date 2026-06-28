@@ -226,9 +226,9 @@ def items_rows():
         has_image = image_info_map.get(item.id, False)
         has_specs = spec_info_map.get(item.id, False)
         
-        price_str = f'{price_info.get("price")} {price_info.get("currency")}'
-        if price_info.get("max_price") and price_info.get("max_price") > price_info.get("price"):
-            price_str = f'{price_info.get("price")} – {price_info.get("max_price")} {price_info.get("currency")}'
+        price_min = price_info.get("price")
+        price_max = price_info.get("max_price")
+        currency = price_info.get("currency")
 
         # Compute sync age
         sync_age_days = None
@@ -256,14 +256,17 @@ def items_rows():
             "id":          item.id,
             "name":        item.name,
             "image_url":   item.image_url if has_image else None,
-            "taxonomy":    f'{item.category.name} / {item.brand.name}' if item.brand else item.category.name,
-            "price":       price_str,
-            "store-count": store_info.get("active_links", 0),
-            "sync-age":    sync_age_days,
-            "has-discount": store_info.get("has_discount", False),
+            "category_name": item.category.name if item.category else None,
+            "brand_name":  item.brand.name if item.brand else None,
+            "min_price":   price_min,
+            "max_price":   price_max,
+            "currency":    currency,
+            "store_count": store_info.get("active_links", 0),
+            "sync_age":    sync_age_days,
+            "has_discount": store_info.get("has_discount", False),
             "health":      completeness_score,
-            "click-count": item.click_count or 0,
-            "created-at":  item.created_at.isoformat() if item.created_at else None,
+            "click_count": item.click_count or 0,
+            "created_at":  item.created_at.isoformat() if item.created_at else None,
         })
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='item')
@@ -327,43 +330,40 @@ def build_item_inspect_data(id):
     
     variant_groups = [{"label": k.title(), "detail": ", ".join(v)} for k, v in item.variant_groups.items()] if item.variant_groups else "—"
 
-    price_str = "—"
-    if item.min_price is not None and store_links_data:
-        curr = store_links_data[0]["currency"] if store_links_data else ""
-        price_str = f"{item.min_price} {curr}"
+    # price_str removed, raw price passed below
 
     from app.domains.interaction.service.scoring import get_item_engagement_score
     engagement_score = get_item_engagement_score(item.id)
 
     data = {
-        "id": f"#{item.id}",
+        "id": item.id,
         "name": item.name,
         "category": item.category.name if item.category else "—",
         "brand": item.brand.name if item.brand else "—",
         "source": item.source.name if item.source else "—",
-        "added": format_date(item.created_at, fmt='%b %d, %Y') if item.created_at else "—",
-        "last synced": format_date(last_synced, fmt='%b %d, %Y') if last_synced else "—",
-        "variants count": "{:,}".format(len(item.variants)),
-        "store count": "{:,}".format(len(store_links_data)),
-        "programs": ", ".join(sorted(list(set([lnk["program_name"] for lnk in store_links_data if lnk.get("program_name") and lnk["program_name"] != "—"])))) or "—",
-        "price": price_str,
-        "variant groups": {"value": variant_groups, "is_list": True} if variant_groups != "—" else "—",
+        "added": item.created_at.isoformat() if item.created_at else None,
+        "last synced": last_synced.isoformat() if last_synced else None,
+        "variants count": len(item.variants),
+        "store count": len(store_links_data),
+        "programs": list(set([lnk["program_name"] for lnk in store_links_data if lnk.get("program_name") and lnk["program_name"] != "—"])),
+        "price": item.min_price,
+        "variant groups": variant_groups if variant_groups != "—" else [],
         
-        "engagement score": str(engagement_score),
-        "views": "{:,}".format(item.view_count or 0),
-        "likes": "{:,}".format(item.like_count or 0),
-        "dislikes": "{:,}".format(item.dislike_count or 0),
-        "comments": "{:,}".format(item.comment_count or 0),
-        "shares": "{:,}".format(item.share_count or 0),
-        "saves": "{:,}".format(item.save_count or 0),
-        "click count": "{:,}".format(item.click_count or 0),
+        "engagement score": engagement_score,
+        "views": item.view_count or 0,
+        "likes": item.like_count or 0,
+        "dislikes": item.dislike_count or 0,
+        "comments": item.comment_count or 0,
+        "shares": item.share_count or 0,
+        "saves": item.save_count or 0,
+        "click count": item.click_count or 0,
         
-        "linked contents": "{:,}".format(len(item.linked_contents)),
-        "description": f"{item.description[:200]}..." if item.description and len(item.description) > 200 else (item.description or "No"),
-        "rating": str(item.rating) if item.rating is not None else "—",
-        "review count": "{:,}".format(item.review_count or 0),
-        "images count": "{:,}".format(len(item.images)),
-        "specs count": "{:,}".format(len(item.specifications)),
+        "linked contents": len(item.linked_contents),
+        "description": item.description or "—",
+        "rating": item.rating,
+        "review count": item.review_count or 0,
+        "images count": len(item.images),
+        "specs count": len(item.specifications),
     }
     
     inspect_table = get_inspect_table("items", data)
@@ -382,15 +382,7 @@ def build_item_inspect_data(id):
                 "is_labeled": True
             })
 
-    actions = [
-        {
-            "label": "Delete Product",
-            "action_type": "delete",
-            "icon": "🗑",
-            "extra_class": "user-action-delete",
-            "attrs": {"data-action": "delete-item", "data-id": item.id, "data-name": item.name}
-        }
-    ]
+    # Actions are hardcoded in the template.
 
     from app.domains.distribution.services import get_distribution_history
     distribution_history = get_distribution_history("item", id)
@@ -433,7 +425,7 @@ def build_item_inspect_data(id):
         "image_strip": image_strip,
         "specifications": specifications,
         "distribution_history": distribution_history,
-        "actions": actions,
-        "inspect_id": item.id
+        "inspect_id": item.id,
+        "item_name": item.name
     }
 

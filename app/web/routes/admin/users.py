@@ -120,16 +120,16 @@ def users_rows():
         recency_days = (now - u.last_login_at).days if u.last_login_at else None
         users.append({
             "id": u.id,
-            "name": f"{u.name}\n{u.email}",
+            "name": u.name,
+            "email": u.email,
             "is_verified": u.is_verified,
-            "role": 'admin' if u.is_admin else 'user',
-            "subscription": 'subscribed' if u.newsletter_subscription and u.newsletter_subscription.is_active else 'not subscribed',
-            "status": 'active' if u.is_active else 'inactive',
-            "joined": u.created_at.strftime('%Y-%m-%d') if u.created_at else "—",
-            "last-active": u.last_login_at.strftime('%Y-%m-%d %H:%M') if u.last_login_at else "Never",
+            "is_admin": u.is_admin,
+            "is_subscribed": bool(u.newsletter_subscription and u.newsletter_subscription.is_active),
+            "is_active": u.is_active,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+            "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
             "recency_days": recency_days,
-            "engagement-score": round(score, 1) if score else 0,
-            "engagement-tier": "Power User" if score and score >= 200 else ("High" if score and score >= 50 else ("Medium" if score and score >= 10 else "Low"))
+            "engagement_score": float(score) if score else 0.0,
         })
 
     html = render_template(
@@ -314,50 +314,48 @@ def build_user_inspect_data(id):
             subscription_status += f" [Unsubbed: {sub_unsubbed}]"
 
     data = {
-        "id": f"#{user.id}",
-        "name": user.name or "—",
+        "id": user.id,
+        "name": user.name,
         "email": user.email,
         "role": "Admin" if user.is_admin else "User",
         "subscription": subscription_status,
         "status": "Active" if user.is_active else "Inactive",
-        "joined": format_date(user.created_at, fmt='%b %d, %Y') if user.created_at else "—",
-        "last active": format_datetime(user.last_login_at, fmt='%b %d, %Y %H:%M') if user.last_login_at else "Never",
+        "joined": format_date(user.created_at, fmt='%b %d, %Y') if user.created_at else None,
+        "last active": format_datetime(user.last_login_at, fmt='%b %d, %Y %H:%M') if user.last_login_at else None,
         
         "provider": provider,
-        "verified": verified_str,
-        "verified at": format_datetime(user.verified_at, fmt='%b %d, %Y %H:%M') if user.verified_at else "—",
-        "verification sent": format_datetime(user.verification_sent_at, fmt='%b %d, %Y %H:%M') if user.verification_sent_at else "—",
-        "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else "—",
+        "verified": user.is_verified,
+        "verified at": format_datetime(user.verified_at, fmt='%b %d, %Y %H:%M') if user.verified_at else None,
+        "verification sent": format_datetime(user.verification_sent_at, fmt='%b %d, %Y %H:%M') if user.verification_sent_at else None,
+        "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else None,
 
-        "engagement tier": {"value": engagement_tier, "badge": True, "badge_class": "bg-primary"},
-        "engagement profile": {"value": engagement_profile, "badge": True, "badge_class": "bg-secondary"},
-        "engagement score": str(engagement_score),
-        "views": str(views_count),
-        "reactions": reactions_link,
-        "comments": comments_link,
-        "saves": saves_link,
-        "shares": shares_link,
-        "item clicks": clicks_link,
-        "recommendations shown": str(recs_seen),
-        "recommendations clicked": str(recs_clicked),
+        "engagement tier": engagement_tier,
+        "engagement profile": engagement_profile,
+        "engagement score": engagement_score,
+        "views": views_count,
+        "reactions": reactions_str,
+        "comments": comments_str,
+        "saves": saves_count,
+        "shares": shares_count,
+        "item clicks": clicks_count,
+        "recommendations shown": recs_seen,
+        "recommendations clicked": recs_clicked,
         
         "recent activity": recent_activity
     }
     inspect_table = get_inspect_table("users", data)
 
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timezone
     now = datetime.now(timezone.utc)
-    recency = None
-    if user.last_login_at:
-        days_ago = (now - user.last_login_at).days
-        if days_ago <= 1:
-            recency = {"value": "Active Today", "badge_class": "badge-health-high"}
-        elif days_ago <= 7:
-            recency = {"value": "Active this Week", "badge_class": "badge-health-medium"}
-        else:
-            recency = {"value": "Inactive", "badge_class": "badge-health-low"}
+    days_ago = (now - user.last_login_at).days if user.last_login_at else None
 
-    inspect_header = {"badges": [recency] if recency else []}
+    inspect_header = {
+        "name": user.name or user.email,
+        "email": user.email,
+        "joined": user.created_at.isoformat() if user.created_at else None,
+        "last_active": user.last_login_at.isoformat() if user.last_login_at else None,
+        "recency_days": days_ago
+    }
 
     actions = [
         {

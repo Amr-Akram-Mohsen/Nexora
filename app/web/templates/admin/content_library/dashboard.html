@@ -58,8 +58,8 @@
     <div class="panel-body-padded">
       <div class="content-chart-canvas-wrap">
         <canvas id="chart-content-type"
-          data-labels="{{ stats.type_dist.keys()|list|tojson }}"
-          data-values="{{ stats.type_dist.values()|list|tojson }}">
+          data-chart-labels="{{ stats.type_dist.keys()|list|tojson }}"
+          data-chart-values="{{ stats.type_dist.values()|list|tojson }}">
         </canvas>
       </div>
     </div>
@@ -98,8 +98,8 @@
     <div class="panel-body-padded">
       <div class="content-chart-canvas-wrap">
         <canvas id="chart-enrichment-status"
-          data-labels="{{ stats.status_dist.keys()|list|tojson }}"
-          data-values="{{ stats.status_dist.values()|list|tojson }}">
+          data-chart-labels="{{ stats.status_dist.keys()|list|tojson }}"
+          data-chart-values="{{ stats.status_dist.values()|list|tojson }}">
         </canvas>
       </div>
     </div>
@@ -226,135 +226,5 @@
 
 {% block custom_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<script>
-(function () {
-  'use strict';
-
-  // ── Apply data-pct widths to stacked bar segments ──
-  document.querySelectorAll('.stacked-bar-segment[data-pct]').forEach(function (el) {
-    el.style.width = el.dataset.pct + '%';
-  });
-
-  // ── Apply data-pct widths to breakdown bars ──
-  document.querySelectorAll('.overview-breakdown-bar[data-pct]').forEach(function (el) {
-    el.style.width = el.dataset.pct + '%';
-  });
-
-  // ── Read theme CSS variable as RGB string ──
-  function cssVar(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  }
-
-  const brandBlue   = 'rgb(' + cssVar('--brand-blue-rgb') + ')';
-  const brandPurple = 'rgb(' + cssVar('--brand-purple-rgb') + ')';
-  const brandOrange = '#f59e0b';
-  const brandGreen  = 'rgb(' + cssVar('--brand-green-rgb') + ')';
-  const brandRed    = '#ef4444';
-  const brandTeal   = 'rgb(' + cssVar('--brand-teal-rgb') + ')';
-
-  const STATUS_COLORS = {
-    complete:  brandGreen,
-    failed:    brandRed,
-    pending:   brandOrange,
-    enriching: brandBlue
-  };
-
-  const TYPE_PALETTE = [brandBlue, brandPurple, brandOrange, brandTeal, brandGreen];
-
-  // ── Chart defaults ──
-  Chart.defaults.font.family = 'inherit';
-  Chart.defaults.color = cssVar('--muted-foreground') || '#6b7280';
-
-  // ── Content by Type — Doughnut ──
-  const typeCanvas = document.getElementById('chart-content-type');
-  if (typeCanvas) {
-    const labels = JSON.parse(typeCanvas.dataset.labels || '[]');
-    const values = JSON.parse(typeCanvas.dataset.values || '[]');
-    new Chart(typeCanvas, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: values,
-          backgroundColor: labels.map(function (_, i) { return TYPE_PALETTE[i % TYPE_PALETTE.length]; }),
-          borderWidth: 0,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '62%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: { boxWidth: 12, padding: 16, font: { size: 12 } }
-          },
-          tooltip: {
-            callbacks: {
-              label: function (ctx) {
-                var total = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
-                var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
-                return ' ' + ctx.label + ': ' + ctx.parsed.toLocaleString() + ' (' + pct + '%)';
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // ── Enrichment Status — Horizontal Bar ──
-  const enrichCanvas = document.getElementById('chart-enrichment-status');
-  if (enrichCanvas) {
-    const labels = JSON.parse(enrichCanvas.dataset.labels || '[]');
-    const values = JSON.parse(enrichCanvas.dataset.values || '[]');
-    const colors = labels.map(function (l) { return STATUS_COLORS[l] || brandTeal; });
-    new Chart(enrichCanvas, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Articles',
-          data: values,
-          backgroundColor: colors.map(function (c) { return c.replace(')', ', 0.8)').replace('rgb(', 'rgba('); }),
-          borderColor: colors,
-          borderWidth: 1,
-          borderRadius: 4
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: function (ctx) { return ' ' + ctx.parsed.x.toLocaleString() + ' articles'; }
-            }
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: { color: 'rgba(128,128,128,0.08)' },
-            ticks: { font: { size: 11 } }
-          },
-          y: {
-            grid: { display: false },
-            ticks: {
-              font: { size: 12 },
-              callback: function (val, idx) {
-                var label = this.getLabelForValue(idx);
-                return label.charAt(0).toUpperCase() + label.slice(1);
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-})();
-</script>
+<script src="{{ url_for('static', filename='js/admin/pages/dashboard.js') }}"></script>
 {% endblock %}

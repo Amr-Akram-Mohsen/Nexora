@@ -1,51 +1,68 @@
-
-<td class="cell-name">
+<td data-field="name">
   <div class="flex items-center gap-2">
-      <span>{{ row.name|replace('\n', '<br>')|safe }}</span>
-      {% if row.get('is_verified') %}
-      <span class="badge badge-health-high" title="Verified User">✓</span>
-      {% endif %}
+    <div class="flex flex-col">
+      <strong class="cell-primary-text">{{ row.name }}</strong>
+      <span class="text-xs text-muted">{{ row.email }}</span>
+    </div>
+    {% if row.is_verified %}
+    <span title="Verified User">{{ badge(icon="fa-solid fa-check", variant="success") }}</span>
+    {% endif %}
   </div>
 </td>
-<td class="cell-role">{{ row.get('role', '—') }}</td>
-<td class="cell-subscription">
-  {% set value = row.get('subscription') %}
-  {% if value == "subscribed" %}
-  <span class="badge badge-health-high">Subscribed</span>
+<td data-field="role">
+  {% if row.is_admin %}
+  {{ badge("Admin", variant="primary") }}
   {% else %}
-  <span class="badge badge-secondary">Not Subscribed</span>
+  {{ badge("User", variant="secondary") }}
   {% endif %}
 </td>
-<td class="cell-status">{{ row.get('status', '—') }}</td>
-<td class="cell-joined">{{ row.get('joined', '—') }}</td>
-<td class="cell-last-active">
-  {% set value = row.get('last-active') %}
-  {% set days = row.get('recency_days') %}
+<td data-field="subscription">
+  {% if row.is_subscribed %}
+  {{ badge("Subscribed", variant="success") }}
+  {% else %}
+  {{ badge("Not Subscribed", variant="secondary") }}
+  {% endif %}
+</td>
+<td data-field="status">
+  {% if row.is_active %}
+  {{ badge("Active", variant="success") }}
+  {% else %}
+  {{ badge("Inactive", variant="secondary") }}
+  {% endif %}
+</td>
+<td data-field="joined">
+  {{ row.created_at|truncate(10, True, '') if row.created_at else '—' }}
+</td>
+<td data-field="last-active">
+  {% set days = row.recency_days %}
+  {% set value = row.last_login_at|truncate(16, True, '')|replace('T', ' ') if row.last_login_at else 'Never' %}
   {% if days is none %}
-  <span class="badge badge-health-low">Never</span>
-  {% elif days <= 1 %} <span class="badge badge-health-high" title="{{ value }}">Active Today</span>
-  {% elif days <= 7 %} <span class="badge badge-health-medium" title="{{ value }}">Active this week</span>
-  {% else %}
-  <span class="badge badge-health-low" title="{{ value }}">{{ value }}</span>
-  {% endif %}
+  {{ badge("Never", variant="danger") }}
+  {% elif days <= 1 %} <span title="{{ value }}">{{ badge("Active Today", variant="success") }}</span>
+    {% elif days <= 7 %} <span title="{{ value }}">{{ badge("Active this week", variant="warning") }}</span>
+      {% else %}
+      {{ badge(value, variant="danger") }}
+      {% endif %}
 </td>
-<td class="cell-engagement-score">{{ row.get('engagement-score', '—') }}</td>
-<td class="cell-engagement-tier">
-  {% set value = row.get('engagement-tier') %}
-  {% if value == "Power User" %}
-  <span class="badge badge-origin">{{ value }}</span>
-  {% elif value == "High" %}
-  <span class="badge badge-health-high">{{ value }}</span>
-  {% elif value == "Medium" %}
-  <span class="badge badge-health-medium">{{ value }}</span>
+<td data-field="engagement-score">{{ "%.1f"|format(row.engagement_score) if row.engagement_score else 0 }}</td>
+<td data-field="engagement-tier">
+  {% set score = row.engagement_score %}
+  {% if score >= 200 %}
+  {{ badge("Power User", class="badge-origin") }}
+  {% elif score >= 50 %}
+  {{ badge("High", variant="success") }}
+  {% elif score >= 10 %}
+  {{ badge("Medium", variant="warning") }}
   {% else %}
-  <span class="badge badge-health-low">{{ value }}</span>
+  {{ badge("Low", variant="danger") }}
   {% endif %}
 </td>
 {% if not hide_action_column %}
-<td class="cell-actions flex flex-col gap-1">
-  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/users/{{ row.id }}" target="_blank">
+<td data-field="actions">
+  <div class="actions-cell-group flex flex-col gap-1">
+    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/users/{{ row.id }}" target="_blank">
       <i class="fas fa-eye"></i> Inspect
-  </a>
+    </a>
+  </div>
 </td>
 {% endif %}

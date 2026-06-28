@@ -10,19 +10,31 @@
     {% endif %}
   {% elif key == "health" %}
     {% if value == "unused" %}
-    <span class="badge badge-danger" title="Entity is orphaned (0 linked items/content)">Unused</span>
+    <span title="Entity is orphaned (0 linked items/content)">{{ badge("Unused", variant="danger") }}</span>
     {% elif value == "inactive-linked" %}
-    <span class="badge badge-warning" title="Entity is inactive but has linked items/content">Inactive (Linked)</span>
+    <span title="Entity is inactive but has linked items/content">{{ badge("Inactive (Linked)", variant="warning") }}</span>
     {% elif value == "ok" %}
-    <span class="badge badge-success">OK</span>
+    {{ badge("OK", variant="success") }}
     {% else %}
-    <span class="badge badge-secondary">{{ value }}</span>
+    {{ badge(value|title, variant="secondary") }}
     {% endif %}
-  {% elif key == "filter config" %}
-    {% if value == "Configured" %}
-    <span class="badge badge-success">Configured</span>
+  {% elif key == "is_configured" or key == "filter config" %}
+    {% if value == "Configured" or value == True %}
+    {{ badge("Configured", variant="success") }}
     {% else %}
-    <span class="badge badge-warning">Not Configured</span>
+    {{ badge("Not Configured", variant="warning") }}
+    {% endif %}
+  {% elif key == "is_active" or key == "status" %}
+    {% if value == "active" or value == True %}
+    {{ badge("Active", variant="success") }}
+    {% else %}
+    {{ badge("Inactive", variant="secondary") }}
+    {% endif %}
+  {% elif key == "is_featured" or key == "featured" %}
+    {% if value == "Featured" or value == True %}
+    {{ badge("Featured", variant="primary") }}
+    {% else %}
+    <span class="text-muted">—</span>
     {% endif %}
   {% else %}
     <span>{{ value }}</span>

@@ -234,10 +234,11 @@ def comments_rows():
             "target_type": c["target_type"],
             "preview": c["preview"],
             "sentiment": c["sentiment"],
-            "likes": f"👍 {c['like_count']} 👎 {c['dislike_count']}",
-            "replies": str(c["replies_count"]),
-            "thread?": "Reply" if c["parent_id"] else "—",
-            "date": c["created_at"][:10] if c["created_at"] else "—",
+            "like_count": c['like_count'],
+            "dislike_count": c['dislike_count'],
+            "replies_count": c["replies_count"],
+            "is_reply": bool(c["parent_id"]),
+            "created_at": c["created_at"],
             "username": c["user_name"],
         } for c in serialized
     ]
@@ -363,10 +364,10 @@ def views_rows():
             "id": f"{v['target_type']}-{v['target_id']}",
             "target": v["target_title"],
             "target_type": v["target_type"],
-            "total-views": "{:,}".format(v["view_count"] or 0),
-            "auth-views": "{:,}".format(v["auth_views"] or 0),
-            "anon-views": "{:,}".format(v["anon_views"] or 0),
-            "date": v["latest_view"][:10] if v["latest_view"] else "—"
+            "view_count": v["view_count"] or 0,
+            "auth_views": v["auth_views"] or 0,
+            "anon_views": v["anon_views"] or 0,
+            "latest_view": v["latest_view"]
         })
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type="view", hide_action_column=True)
@@ -385,13 +386,11 @@ def clicks_rows():
     serialized = [{
         "id": r["link_id"],
         "name": r["item_name"],
-        "store-name": {"name": r["store_name"], "url": r["affiliate_url"]},
-        "click-count": "{:,}".format(r["click_count"] or 0),
-        "date": r["latest_click"][:10] if r["latest_click"] else "—",
+        "store_name": r["store_name"],
+        "store_url": r["affiliate_url"],
+        "click_count": r["click_count"] or 0,
+        "latest_click": r["latest_click"],
     } for r in data["items"]]
-
-    for d in serialized:
-        d["link"] = d.pop("store-name")
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type="click", hide_action_column=False)
     return make_rows_response(html, total=data["total"], pages=data["pages"], page=data["page"])

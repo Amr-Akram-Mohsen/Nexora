@@ -1,18 +1,44 @@
-
-<td class="cell-name">{{ row.get('name', '—') }}</td>
-<td class="cell-network">{{ row.get('network', '—') }}</td>
-<td class="cell-product-count">{{ row.get('product-count', '—') }}</td>
-<td class="cell-clicks">{{ row.get('clicks', '—') }}</td>
-<td class="cell-ctr">{{ row.get('ctr', '—') }}</td>
-<td class="cell-active-links">{{ row.get('active-links', '—') }}</td>
-<td class="cell-sync-age">{{ row.get('sync-age', '—') }}</td>
-<td class="cell-oos-rate">{{ row.get('oos-rate', '—') }}</td>
-<td class="cell-avg-commission">{{ row.get('avg-commission', '—') }}</td>
-<td class="cell-status">{{ row.get('status', '—') }}</td>
+<td data-field="name">
+  <div class="flex items-center gap-2">
+    <strong class="cell-primary-text">{{ row.name }}</strong>
+    {% if row.website %}
+    <a href="{{ row.website }}" target="_blank" title="Visit Website"><i class="fas fa-external-link-alt fa-xs"></i></a>
+    {% endif %}
+  </div>
+</td>
+<td data-field="network">{{ row.affiliate_network|default('—') }}</td>
+<td data-field="product-count">{{ row.product_count|default(0) }}</td>
+<td data-field="clicks">{{ row.clicks|default(0) }}</td>
+<td data-field="ctr">{{ row.ctr ~ '%' if row.ctr is not none else '—' }}</td>
+<td data-field="active-links">{{ row.active_links|default(0) }}</td>
+<td data-field="sync-age">
+  {% set age = row.sync_age %}
+  {% if age is none %}<span>—</span>
+  {% elif age <= 1 %}{{ badge(age ~ "d", variant="success") }}
+  {% elif age <= 7 %}{{ badge(age ~ "d", variant="warning") }}
+  {% else %}{{ badge(age ~ "d", variant="danger") }}{% endif %}
+</td>
+<td data-field="oos-rate">
+  {% set oos = row.oos_rate %}
+  {% if oos is none %}<span>—</span>
+  {% elif oos <= 5.0 %}{{ badge(oos ~ "%", variant="success") }}
+  {% elif oos <= 20.0 %}{{ badge(oos ~ "%", variant="warning") }}
+  {% else %}{{ badge(oos ~ "%", variant="danger") }}{% endif %}
+</td>
+<td data-field="avg-commission">{{ row.avg_commission ~ '%' if row.avg_commission is not none else '—' }}</td>
+<td data-field="status">
+  {% set status = row.status %}
+  {% if status == 'healthy' %}{{ badge('Healthy', variant='success') }}
+  {% elif status == 'warning' %}{{ badge('Warning', variant='warning') }}
+  {% elif status == 'failed' %}{{ badge('Failed', variant='danger') }}
+  {% else %}{{ badge(status|title, variant='secondary') }}{% endif %}
+</td>
 {% if not hide_action_column %}
-<td class="cell-actions flex flex-col gap-1">
-  <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/stores/{{ row.id }}" target="_blank">
+<td data-field="actions">
+  <div class="actions-cell-group flex flex-col gap-1">
+    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/stores/{{ row.id }}" target="_blank">
       <i class="fas fa-eye"></i> Inspect
-  </a>
+    </a>
+  </div>
 </td>
 {% endif %}

@@ -1,15 +1,18 @@
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/badge.html" import badge %}
+
 {% if domain == 'contents' %}
-  {% include "admin/components/inspects/_content_inspect.html" %}
+{% include "admin/components/inspects/_content_inspect.html" %}
 {% elif domain == 'items' %}
-  {% include "admin/components/inspects/_item_inspect.html" %}
+{% include "admin/components/inspects/_item_inspect.html" %}
 {% elif domain == 'users' %}
-  {% include "admin/components/inspects/_user_inspect.html" %}
+{% include "admin/components/inspects/_user_inspect.html" %}
 {% elif domain == 'stores' %}
-  {% include "admin/components/inspects/_store_inspect.html" %}
+{% include "admin/components/inspects/_store_inspect.html" %}
 {% elif domain == 'sources' %}
-  {% include "admin/components/inspects/_source_inspect.html" %}
+{% include "admin/components/inspects/_source_inspect.html" %}
 {% elif domain == 'comments' %}
-  {% include "admin/components/inspects/_comment_inspect.html" %}
+{% include "admin/components/inspects/_comment_inspect.html" %}
 {% else %}
-  {% include "admin/components/inspects/_generic_inspect.html" %}
+{% include "admin/components/inspects/_generic_inspect.html" %}
 {% endif %}

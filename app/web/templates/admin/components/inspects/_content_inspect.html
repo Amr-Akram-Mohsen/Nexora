@@ -1,6 +1,5 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/inspect.html" import inspect_section %}
-{% from "admin/components/ui/actions.html" import action_group, action_button %}
 {% from "admin/components/ui/panels.html" import admin_page_header %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
 {% from "admin/components/_inspect_primitives.html" import inspect_distribution_card %}
@@ -58,16 +57,13 @@ actions=header_actions
       {% endcall %}
       {% endif %}
 
-      {% if actions is defined and actions %}
       {% call inspect_section('Management Actions', divider=false) %}
-      {% call action_group(extra_class='flex-wrap') %}
-      {% for act in actions %}
-      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''),
-      extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
-      {% endfor %}
+      <div class="flex flex-wrap gap-2">
+        {{ button(text="Delete Content", type="button", variant="danger", icon="fas fa-trash",
+        class="user-action-delete", attrs={"data-action": "delete-content", "data-id": inspect_id, "data-title":
+        content_title}) }}
+      </div>
       {% endcall %}
-      {% endcall %}
-      {% endif %}
 
     </div>
   </div>

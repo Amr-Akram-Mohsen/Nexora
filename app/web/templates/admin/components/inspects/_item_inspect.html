@@ -3,7 +3,8 @@
 {% from "admin/components/ui/actions.html" import action_group, action_button %}
 {% from "admin/components/ui/panels.html" import admin_page_header %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
-{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card,
+inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
 
 {% block title %}Product Details — Nexora Admin{% endblock %}
 
@@ -16,15 +17,15 @@
 {% endset %}
 
 {{ admin_page_header(
-  "Product Details",
-  title,
-  actions=header_actions
+"Product Details",
+title,
+actions=header_actions
 ) }}
 
 <div class="admin-detail-page">
   <div class="admin-card">
     <div class="inspect-details-group flex">
-      
+
       {% if inspect_table and inspect_table is mapping %}
       {% for section_name, fields in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
@@ -63,7 +64,8 @@
       {% endcall %}
       {% endif %}
 
-      {% if specifications is defined and (specifications.structured_details or specifications.quick_details or specifications.searchable_attributes or specifications.specs_list) %}
+      {% if specifications is defined and (specifications.structured_details or specifications.quick_details or
+      specifications.searchable_attributes or specifications.specs_list) %}
       {% call inspect_section('Specifications & Details') %}
       {{ inspect_specifications_panel(specifications) }}
       {% endcall %}
@@ -83,15 +85,11 @@
       {% endcall %}
       {% endif %}
 
-      {% if actions is defined and actions %}
       {% call inspect_section('Management Actions', divider=false) %}
-      {% call action_group(extra_class='flex-wrap') %}
-      {% for act in actions %}
-      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''), extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
-      {% endfor %}
+      <div class="flex flex-wrap gap-2">
+      {{ button(text="Delete Product", type="button", variant="danger", icon="fas fa-trash", class="user-action-delete", attrs={"data-action": "delete-item", "data-id": inspect_id, "data-name": item_name}) }}
+      </div>
       {% endcall %}
-      {% endcall %}
-      {% endif %}
 
     </div>
   </div>

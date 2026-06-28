@@ -81,12 +81,13 @@ def get_admin_sources_page(page, per_page, search):
         
         serialized.append({
             "id":              s.id,
-            "logo-url":        s.logo_url,
-            "link":            {'url': f'https://{s.domain}', 'name': s.name},
+            "logo_url":        s.logo_url,
+            "name":            s.name,
+            "domain":          s.domain,
             "tier":            tier,
             "channels":        channels,
             "freshness":       freshness_days,
-            "content-count":   content_count,
+            "content_count":   content_count,
             "engagement":      engagement,
             "status":          status_val,
             "slug":            s.slug,
@@ -235,40 +236,40 @@ def build_admin_source_inspect_data(id):
     top_articles_data = [{"id": r[0], "title": r[1] or "Untitled", "views": r[2]} for r in top_articles]
     
     data = {
-        "id": f"#{source.id}",
+        "id": source.id,
         "name": source.name,
         "slug": source.slug,
         "domain": source.domain,
-        "status": "active" if source.is_active else "inactive",
-        "authority score": str(source.authority_score),
-        "avg quality score": str(avg_quality),
-        "avg word count": str(avg_words),
-        "scrape coverage": f"{scrape_cov}%",
+        "status": "Active" if source.is_active else "Inactive",
+        "authority score": source.authority_score,
+        "avg quality score": avg_quality,
+        "avg word count": avg_words,
+        "scrape coverage": scrape_cov,
         "published date range": f"{date_min} to {date_max}",
         
-        "channels": ", ".join(channels) if channels else "None",
-        "last fetch": fetch_health.last_fetch.strftime('%Y-%m-%d %H:%M') if fetch_health and fetch_health.last_fetch else "—",
-        "success count": str(fetch_health.success or 0),
-        "failure count": str(fetch_health.failures or 0),
-        "consecutive failures": str(fetch_health.consecutive or 0),
+        "channels": channels,
+        "last fetch": fetch_health.last_fetch.isoformat() if fetch_health and fetch_health.last_fetch else None,
+        "success count": fetch_health.success or 0 if fetch_health else 0,
+        "failure count": fetch_health.failures or 0 if fetch_health else 0,
+        "consecutive failures": fetch_health.consecutive or 0 if fetch_health else 0,
         
-        "article count": str(type_breakdown.get('article', 0)),
-        "video count": str(type_breakdown.get('video', 0)),
-        "post count": str(type_breakdown.get('post', 0)),
-        "categories covered": str(category_counts),
+        "article count": type_breakdown.get('article', 0),
+        "video count": type_breakdown.get('video', 0),
+        "post count": type_breakdown.get('post', 0),
+        "categories covered": category_counts,
         
-        "pending": str(pipeline_status.get('pending', 0)),
-        "enriching": str(pipeline_status.get('enriching', 0)),
-        "complete": str(pipeline_status.get('complete', 0)),
-        "failed": str(pipeline_status.get('failed', 0)),
+        "pending": pipeline_status.get('pending', 0),
+        "enriching": pipeline_status.get('enriching', 0),
+        "complete": pipeline_status.get('complete', 0),
+        "failed": pipeline_status.get('failed', 0),
         
-        "total views": str(eng_stats.views or 0) if eng_stats else "0",
-        "total likes": str(eng_stats.likes or 0) if eng_stats else "0",
-        "total saves": str(eng_stats.saves or 0) if eng_stats else "0",
-        "total comments": str(eng_stats.comments or 0) if eng_stats else "0",
+        "total views": eng_stats.views or 0 if eng_stats else 0,
+        "total likes": eng_stats.likes or 0 if eng_stats else 0,
+        "total saves": eng_stats.saves or 0 if eng_stats else 0,
+        "total comments": eng_stats.comments or 0 if eng_stats else 0,
         
-        "primary attribution count": str(primary_count),
-        "secondary attribution count": str(secondary_count)
+        "primary attribution count": primary_count,
+        "secondary attribution count": secondary_count
     }
     return {
         "raw_data": data,
@@ -276,7 +277,9 @@ def build_admin_source_inspect_data(id):
         "source_header": {
             "name": source.name,
             "domain": source.domain,
-            "logo_url": source.logo_url
+            "logo_url": source.logo_url,
+            "authority_score": source.authority_score,
+            "article_count": type_breakdown.get('article', 0)
         },
         "top_articles": top_articles_data
     }

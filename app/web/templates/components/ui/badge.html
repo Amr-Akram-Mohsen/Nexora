@@ -1,7 +1,8 @@
-{% macro badge(text="", class="", variant="primary", attrs={}) %}
+{% macro badge(text="", class="", variant="primary", icon=None, attrs={}) %}
 
 <span
   class="badge{% if variant is not none %} variant--{{ variant }} badge--{{ variant }}{% endif %} {{ class }} inline-flex-center"
-  {% for key, value in attrs.items() %} {{ key }}={{"{}".format(value) }} {%- endfor %}>{{ text|safe }}
+  {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
+  {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}{{ text|safe }}
 </span>
 {% endmacro %}
