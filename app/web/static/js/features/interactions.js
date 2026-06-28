@@ -258,6 +258,12 @@ function handleInteractionClick(e) {
     if (interactionType === 'save') {
         const isUnsaving = interactionBtn.classList.contains('active');
         if (!isUnsaving) {
+            const predefinedCollection = interactionBtn.dataset.collection;
+            if (predefinedCollection) {
+                submitUserInteraction(item, interactionType, interactionBtn, null, { collection_name: predefinedCollection });
+                return true;
+            }
+
             promptCollectionName(interactionBtn).then(collection => {
                 if (collection !== null) {
                     submitUserInteraction(item, interactionType, interactionBtn, null, { collection_name: collection });

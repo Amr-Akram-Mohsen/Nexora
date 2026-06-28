@@ -28,15 +28,23 @@ background: rgba(0, 0, 0, 0.2);
       background: var(--domain-primary);
       color: white;
       border: none;
-transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       z-index: 2;
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(var(--domain-primary-rgb, 220,38,38), 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(var(--domain-primary-rgb, 220,38,38), 0); }
+      100% { box-shadow: 0 0 0 0 rgba(var(--domain-primary-rgb, 220,38,38), 0); }
     }
 
     .video-preview-container:hover .video-preview__play-btn {
       transform: scale(1.15);
       background: white;
       color: var(--domain-primary);
+      animation: none;
     }
 
     .play-icon-wrapper {

@@ -26,15 +26,8 @@ function initFlashMessages() {
     // ------------------------------
     // Global messages (top-right)
     // ------------------------------
-    const globalMessages = document.querySelectorAll('.flash-messages .alert');
-    globalMessages.forEach(msg => {
-        setTimeout(() => {
-            msg.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            msg.style.opacity = '0';
-            msg.style.transform = 'translateX(100%)';
-            setTimeout(() => msg.remove(), 500);
-        }, 2500);
-    });
+    // Timers have been intentionally removed per user request.
+    // Flash messages now persist until dismissed manually.
 }
 
 // ------------------------------

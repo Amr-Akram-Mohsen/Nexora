@@ -98,14 +98,15 @@ function handleSavedItemsFilterClick(e) {
     const filterItem = filterLink.closest('.filter-item');
     if (!filterItem) return false;
 
-    e.preventDefault();
     const href = filterLink.getAttribute('href');
     
     if (href === '#all') {
+        e.preventDefault();
         showSavedAll();
         window.location.hash = 'all';
         return true;
     } else if (href.startsWith('#collection-')) {
+        e.preventDefault();
         showCollection(href);
         window.location.hash = href.substring(1);
         return true;

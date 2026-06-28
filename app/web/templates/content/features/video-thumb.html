@@ -48,11 +48,17 @@
 
             let embedUrl = '';
             if (platform === 'youtube') {
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1`;
             }
 
             if (embedUrl) {
                 container.innerHTML = `
+                    <button class="video-sticky-close" aria-label="Close sticky video">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="video-resize-handle">
+                        <i class="fas fa-arrows-alt-v"></i>
+                    </div>
                     <div class="video-player-wrapper">
                         <iframe class="video-player-iframe" 
                                 src="${embedUrl}" 

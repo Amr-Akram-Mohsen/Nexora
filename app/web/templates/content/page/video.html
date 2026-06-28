@@ -17,6 +17,13 @@
 {% endblock %}
 
 {% block base_header %}
+<div class="video-content">
+  <div class="video-player-container">
+    {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url or video.external_id, platform=video.platform,
+    wrapper_class='video-main-player') }}
+  </div>
+</div>
+
 <div class="video-header flex flex-col">
   <div class="video-header__badges flex flex-wrap items-center gap-3">
     <div class="platform-badge flex items-center platform-badge--{{ video.platform }} gap-2">
@@ -63,11 +70,6 @@
 
 {% block base_content %}
 <div class="video-content">
-  <div class="video-player-container">
-    {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url or video.external_id, platform=video.platform,
-    wrapper_class='video-main-player') }}
-  </div>
-
   {% if video.description %}
   <div class="video-description-box">
     <h3 class="video-description-box__title">Description</h3>
@@ -77,5 +79,10 @@
   </div>
   {% endif %}
 </div>
+{% endblock %}
 
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/features/video-sticky.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/video-player.js') }}" defer></script>
 {% endblock %}

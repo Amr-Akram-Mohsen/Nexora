@@ -21,11 +21,21 @@
 
   <div class="interaction-panel__actions interaction-panel__actions--compact flex items-center gap-2 gap-1">
 
+    {% if content.object_type == 'video' %}
     {{ button(
     variant=none,
     class="interaction-btn save-btn",
-    icon="fa-regular fa-bookmark interaction-icon"
+    icon="fa-regular fa-clock interaction-icon",
+    attrs={"data-collection": "Watch Later", "title": "Watch Later"}
     ) }}
+    {% else %}
+    {{ button(
+    variant=none,
+    class="interaction-btn save-btn",
+    icon="fa-regular fa-bookmark interaction-icon",
+    attrs={"title": "Save to Collection"}
+    ) }}
+    {% endif %}
 
     {{ button(
     variant=none,
