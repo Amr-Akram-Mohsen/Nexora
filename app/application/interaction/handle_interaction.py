@@ -6,7 +6,7 @@ from app.domains.recommendation.interest_service import handle_interaction_inter
 from app.shared.constants.core import TargetType
 from app.core.extensions import db
 
-def handle_interaction_workflow(user, target_type, target_id, interaction_type, reaction_type=None, comment_content=None, comment_id=None):
+def handle_interaction_workflow(user, target_type, target_id, interaction_type, reaction_type=None, comment_content=None, comment_id=None, collection_name=None):
     """
     Orchestrates a user interaction (react, save, comment, share).
     """
@@ -32,7 +32,7 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
                 result = react(user, target_type, target_id, reaction_type)
             action = reaction_type
         elif interaction_type == INTERACTION_TYPE.SAVE:
-            result = save_item(user, target_type, target_id)
+            result = save_item(user, target_type, target_id, collection_name=collection_name)
         elif interaction_type == INTERACTION_TYPE.COMMENT:
             result = post_comment(
                 user,

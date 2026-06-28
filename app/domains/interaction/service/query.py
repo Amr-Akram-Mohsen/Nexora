@@ -65,6 +65,20 @@ def get_saved_items(user_id, target_type):
             .order_by(Save.created_at.desc()).all()
 
 
+def get_recent_views(user_id, limit=20):
+    from sqlalchemy.orm import selectinload
+    # Get the latest view for each target to avoid duplicates
+    from sqlalchemy import select
+    from app.core.extensions import db
+    
+    # We will just fetch the latest views for this user
+    # A simple approach is to query views ordered by created_at desc
+    return View.query.options(
+        selectinload(View.content),
+        selectinload(View.item)
+    ).filter_by(user_id=user_id).order_by(View.created_at.desc()).limit(limit).all()
+
+
 # ─────────────────────────────────────────────
 # INDIVIDUAL COUNTERS
 # Used by tests and isolated callers; kept as thin helpers.

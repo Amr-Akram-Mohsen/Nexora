@@ -70,17 +70,42 @@ def generate_static_sitemap(app):
             )
 
 
-        # Render Sitemap XML
+        # Render Sitemap XML Chunks
         from flask import render_template
-
-        sitemap_xml = render_template("sitemap_xml.html", pages=pages)
-
-        static_folder = app.static_folder
+        
+        static_folder = os.path.join(app.static_folder, "sitemaps")
         if not os.path.exists(static_folder):
             os.makedirs(static_folder)
+            
+        # Clean existing chunks
+        for f in os.listdir(static_folder):
+            if f.endswith(".xml"):
+                os.remove(os.path.join(static_folder, f))
 
-        output_path = os.path.join(static_folder, "sitemap.xml")
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(sitemap_xml)
+        chunk_size = 1000
+        chunks = []
+        
+        for i in range(0, len(pages), chunk_size):
+            chunk_pages = pages[i:i + chunk_size]
+            chunk_idx = (i // chunk_size) + 1
+            
+            sitemap_xml = render_template("sitemap_xml.html", pages=chunk_pages)
+            chunk_filename = f"sitemap_{chunk_idx}.xml"
+            output_path = os.path.join(static_folder, chunk_filename)
+            
+            with open(output_path, "w", encoding="utf-8") as f:
+                f.write(sitemap_xml)
+                
+            chunks.append({
+                "url": url_for("system.sitemap_chunk", chunk=chunk_idx, _external=True),
+                "lastmod": today
+            })
+            
+        # Write Index
+        index_xml = render_template("sitemap_index_xml.html", chunks=chunks)
+        index_path = os.path.join(static_folder, "sitemap_index.xml")
+        
+        with open(index_path, "w", encoding="utf-8") as f:
+            f.write(index_xml)
 
         return len(pages)

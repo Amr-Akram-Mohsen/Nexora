@@ -33,3 +33,44 @@
 
 /* --- Responsive Overrides for Saved Items Page --- */
 
+.collection-group .section-title {
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.collection-group .section-title i {
+  margin-right: 0.5rem;
+}
+
+.saved-collection-title {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+/* Move Collection Select */
+.move-collection-wrapper {
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+.move-item-select {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 1.5rem 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.move-item-select-icon {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  pointer-events: none;
+  color: var(--text-muted);
+}

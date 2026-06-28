@@ -162,6 +162,7 @@ class Save(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     target_type = db.Column(db.String(50), nullable=False)
     target_id = db.Column(db.Integer, nullable=False)
+    collection_name = db.Column(db.String(100), nullable=True, default='General')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     content = db.relationship(
@@ -184,7 +185,7 @@ class Save(db.Model):
     user = db.relationship("User", back_populates="saves")
 
     __table_args__ = (
-        db.UniqueConstraint("user_id", "target_type", "target_id", name="uq_user_save"),
+        db.UniqueConstraint("user_id", "target_type", "target_id", "collection_name", name="uq_user_save_collection"),
         db.Index("ix_save_target", "target_type", "target_id"),
         db.CheckConstraint("target_type IN ('content', 'item')", name="ck_save_target_type"),
     )

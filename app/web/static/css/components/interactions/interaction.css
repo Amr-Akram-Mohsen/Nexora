@@ -73,14 +73,14 @@ font-size: var(--text-sm);
   font-size: .9rem;
 }
 .item-actions {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  margin-top: .5rem;
+  padding-top: .5rem;
+  border-top: 1px dashed var(--border);
 }
 
 
 .interaction-panel--compact {
-  margin-top: 0.75rem;
+  margin-top: 0.375rem;
 }
 .interaction-panel__actions--compact {
   padding: 0;

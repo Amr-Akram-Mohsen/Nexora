@@ -96,3 +96,29 @@
   text-align: right;
   font-weight: 500;
 }
+
+/* About Page CTA */
+.about-cta {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.about-cta__title {
+  margin-bottom: 1rem;
+  color: var(--foreground);
+}
+
+.about-cta__text {
+  margin-bottom: 1.5rem;
+  color: var(--muted-foreground);
+}
+
+.about-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}

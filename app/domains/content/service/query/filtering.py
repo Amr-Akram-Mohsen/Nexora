@@ -124,7 +124,7 @@ def get_all_contents_metadata(session=None):
     if session is None:
         from app.core.extensions import db
         session = db.session
-    stmt = select(Content.id, Content.updated_at, Content.published_at)
+    stmt = select(Content.id, Content.ingested_at, Content.published_at)
     return session.execute(stmt).all()
 
 

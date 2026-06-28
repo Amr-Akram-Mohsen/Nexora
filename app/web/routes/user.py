@@ -452,10 +452,37 @@ def profile():
     try:
         log_route_start(logger, "/profile")
         subscriber = get_newsletter_subscriber_by_email(current_user.email)
+        
+        # Load collections
+        from app.application.interaction.get_saved import get_saved_articles_workflow, get_saved_products_workflow
+        saved_articles = get_saved_articles_workflow(current_user.id)
+        saved_items = get_saved_products_workflow(current_user.id)
+        
+        collections_map = {}
+        for item in saved_articles + saved_items:
+            c_name = item.get("collection_name", "General")
+            collections_map[c_name] = collections_map.get(c_name, 0) + 1
+            
+        collections = [{"name": k, "count": v} for k, v in collections_map.items()]
+        collections.sort(key=lambda x: x["name"])
+        
         log_route_success(logger, "/profile", template="profile.html")
-        return render_template('profile.html', subscriber=subscriber)
+        return render_template('profile.html', subscriber=subscriber, collections=collections)
     except Exception as e:
         log_route_error(logger, "/profile", e)
+        raise
+
+@bp.route('/history')
+@login_required
+def history():
+    try:
+        log_route_start(logger, "/history")
+        from app.application.interaction.get_history import get_reading_history_workflow
+        history_items = get_reading_history_workflow(current_user.id, limit=50)
+        log_route_success(logger, "/history", template="history.html")
+        return render_template('history.html', history_items=history_items)
+    except Exception as e:
+        log_route_error(logger, "/history", e)
         raise
 
 
@@ -502,3 +529,28 @@ def update_profile():
     except Exception as e:
         log_route_error(logger, "/update-profile", e)
         raise
+@bp.route('/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    try:
+        log_route_start(logger, "/delete-account")
+        password = request.form.get('password')
+        
+        if current_user.provider != 'google':
+            if not password or not current_user.check_password(password):
+                flash("Incorrect password. Account deletion failed.", "error")
+                return redirect(url_for('user.profile'))
+                
+        # Delete user
+        from app.core.extensions import db
+        db.session.delete(current_user)
+        db.session.commit()
+        
+        logout_user()
+        flash("Your account has been permanently deleted.", "success")
+        log_route_success(logger, "/delete-account", status=302)
+        return redirect(url_for('system.home'))
+    except Exception as e:
+        log_route_error(logger, "/delete-account", e)
+        flash("An error occurred during account deletion.", "error")
+        return redirect(url_for('user.profile'))

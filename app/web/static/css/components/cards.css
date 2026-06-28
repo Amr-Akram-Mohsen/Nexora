@@ -152,7 +152,7 @@ font-size: 0.75rem;
   }
 }
 .card--item {
-  --card-aspect-ratio: 1 / 1;
+  --card-aspect-ratio: 16 / 9;
 }
 
 /* Image overlays & indicators */
@@ -257,8 +257,8 @@ font-size: 0.75rem;
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
   line-height: 1.4;
-  margin-top: 0.25rem;
-  margin-bottom: 0.5rem;
+  /* margin-top: 0.25rem; */
+  /* margin-bottom: 0.5rem; */
   height: 2.8em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -289,13 +289,6 @@ font-size: 0.75rem;
 }
 
 /* Item actions section (Price + Store + CTA) */
-
-.item-actions {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed var(--border);
-}
-
 
 .item-price-current {
   font-weight: var(--weight-xbold);
@@ -360,5 +353,4 @@ font-size: 0.75rem;
   color: #fff;
   border-color: var(--domain-primary);
 }
-.card__meta-bottom {margin-top: 10px;
-}
+.card__meta-bottom {margin-top: 10px;}

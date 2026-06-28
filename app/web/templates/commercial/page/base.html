@@ -34,30 +34,8 @@ product
 {% endblock %}
 
 {% block structured_data %}
-<script type="application/ld+json">
-{
-    "@context":"https://schema.org",
-    "@type":"Product",
-    "name":"{{ item.name }}",
-    "image":[
-        {% for img in item.images[:3] %}
-        "{{ img.image_url }}"{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ],
-    "description":"{{ item.description or '' }}",
-    "brand":{
-        "@type":"Brand",
-        "name":"{{ item.brand.name if item.brand else 'Unknown' }}"
-    },
-    "offers":{
-        "@type":"Offer",
-        "priceCurrency":"SAR",
-        "price":"{{ item.min_price or '' }}",
-        "availability":"https://schema.org/InStock",
-        "url":"{{ request.url }}"
-    }
-}
-</script>
+{% from "components/seo/jsonld-product.html" import render_product_jsonld %}
+{{ render_product_jsonld(item) }}
 {% endblock %}
 
 {% block content %}

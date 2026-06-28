@@ -41,7 +41,7 @@
   <span class="card__meta-dot" aria-hidden="true"></span>
 
   <time class="card__date">
-    {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+    {{ content.published_at | format_date('%b %d') }}
   </time>
 </div>
 

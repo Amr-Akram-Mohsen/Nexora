@@ -46,6 +46,14 @@ def home():
     data = get_home_page_data()
     data.setdefault("sections", [])
     data.setdefault("trending", [])
+    
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        from app.application.interaction.get_history import get_reading_history_workflow
+        from app.application.recommendation.personalization import get_personalized_feed_workflow
+        data["recently_viewed"] = get_reading_history_workflow(current_user.id, limit=8)
+        data["recommended_items"] = get_personalized_feed_workflow(current_user.id, limit=12)
+        
     log_route_success(logger, "/", template="index.html")
     return render_template("index.html", **data)
 
@@ -95,36 +103,25 @@ def newsletter():
     return render_template("newsletter.html")
 
 
+from flask import send_from_directory
+
 @bp.route("/sitemap.xml")
 def sitemap():
-    try:
-        sitemap_path = os.path.join(current_app.static_folder, "sitemap.xml")
-        if os.path.exists(sitemap_path):
-            with open(sitemap_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            return make_response(content, 200, {"Content-Type": "application/xml"})
-    except Exception as e:
-        current_app.logger.error("Error serving static sitemap: %s", e)
+    static_folder = os.path.join(current_app.static_folder, "sitemaps")
+    index_path = os.path.join(static_folder, "sitemap_index.xml")
+    
+    if os.path.exists(index_path):
+        return send_from_directory(static_folder, "sitemap_index.xml", mimetype="application/xml")
+        
+    # Fallback if no static sitemap exists (can happen before first cron run)
+    return make_response("Sitemap not generated yet. Run flask generate-sitemap.", 503)
 
-    pages = []
-    for rule in current_app.url_map.iter_rules():
-        if "GET" in rule.methods and len(rule.arguments) == 0:
-            pages.append(
-                [
-                    url_for(rule.endpoint, _external=True),
-                    datetime.now().date().isoformat(),
-                ]
-            )
-
-    contents = get_latest_contents(limit=100)
-    for content in contents:
-        pages.append(
-            [
-                url_for("content.content_page", content_id=content.id, _external=True),
-                (content.published_at or datetime.now()).date().isoformat(),
-            ]
-        )
-
-    response = make_response(render_template("sitemap_xml.html", pages=pages))
-    response.headers["Content-Type"] = "application/xml"
-    return response
+@bp.route("/sitemap_<int:chunk>.xml")
+def sitemap_chunk(chunk):
+    static_folder = os.path.join(current_app.static_folder, "sitemaps")
+    chunk_filename = f"sitemap_{chunk}.xml"
+    
+    if os.path.exists(os.path.join(static_folder, chunk_filename)):
+        return send_from_directory(static_folder, chunk_filename, mimetype="application/xml")
+        
+    return make_response("Sitemap chunk not found.", 404)

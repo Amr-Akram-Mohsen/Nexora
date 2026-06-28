@@ -19,6 +19,7 @@ def get_saved_articles_workflow(user_id):
         return []
     
     content_ids = [s.target_id for s in saves]
+    saves_map = {s.target_id: s for s in saves}
     
     # Load all contents with eager loads in a single query
     contents = get_contents_by_ids(content_ids, session=db.session)
@@ -28,7 +29,15 @@ def get_saved_articles_workflow(user_id):
     sorted_contents = [content_map[cid] for cid in content_ids if cid in content_map]
     
     # Batch resolve polymorphic targets
-    return assign_target_to_contents(sorted_contents, session=db.session)
+    serialized = assign_target_to_contents(sorted_contents, session=db.session)
+    
+    # Add collection_name
+    for item in serialized:
+        save_obj = saves_map.get(item["id"])
+        if save_obj:
+            item["collection_name"] = save_obj.collection_name
+            
+    return serialized
 
 def get_saved_products_workflow(user_id):
     """
@@ -40,6 +49,15 @@ def get_saved_products_workflow(user_id):
         return []
     
     item_ids = [s.target_id for s in saves]
+    saves_map = {s.target_id: s for s in saves}
     
     # Load all items and serialize with all card relations eager loaded
-    return get_items_by_ids(item_ids, serialize=True, load="card")
+    serialized = get_items_by_ids(item_ids, serialize=True, load="card")
+    
+    # Add collection_name
+    for item in serialized:
+        save_obj = saves_map.get(item["id"])
+        if save_obj:
+            item["collection_name"] = save_obj.collection_name
+            
+    return serialized

@@ -35,11 +35,12 @@ border-bottom: 1px dashed var(--border);
 
 @media (min-width: 992px) {
   .footer-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    grid-template-columns: 3fr 2fr 2fr 3fr;
+    gap: 2.5rem;
   }
-.footer-brand {
+  .footer-brand {
     border: none;
+    padding-bottom: 0;
   }
 }
 
@@ -156,9 +157,9 @@ border-bottom: 1px dashed var(--border);
 
 /* --- Bottom Separator --- */
 .footer-bottom {
-  padding: 0.5rem 0;
+  padding: 1.5rem 0 1rem;
+  margin-top: 1.5rem;
   border-top: 1px solid var(--border);
-  text-align: center;
 }
 
 .footer-copy {
@@ -169,3 +170,63 @@ border-bottom: 1px dashed var(--border);
   margin: 0;
 }
 
+/* --- Footer Contact --- */
+.footer-contact {
+  color: var(--muted-foreground);
+  margin-top: 0.5rem;
+}
+
+/* --- Trust Badges --- */
+.footer-trust {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.trust-badge {
+  display: inline-flex;
+}
+
+/* --- New Additions --- */
+.footer-slogan {
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.footer-text {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.footer-email {
+  font-weight: 500;
+  text-transform: initial;
+  
+}
+
+.footer-newsletter__btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.footer-disclaimer {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  text-align: center;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.footer-bottom__row {
+  width: 100%;
+}
+
+.footer-brand-link {
+  color: var(--foreground);
+  font-weight: 600;
+  text-decoration: none;
+}

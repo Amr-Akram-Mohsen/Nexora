@@ -14,33 +14,8 @@
 {% block og_image %}{{ article.image_url }}{% endblock %}
 
 {% block structured_data %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "TechArticle",
-  "headline": "{{ article.title }}",
-  "image": "{{ article.image_url }}",
-  "description": "{{ article.preview_text }}",
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "{{ request.url }}"
-  },  
-  "author": {
-    "@type": "Organization",
-    "name": "Nexora"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Nexora",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "{{ url_for('static', filename='img/logo-full.png', _external=True) }}"
-    }
-  },
-  "datePublished": "{{ content.published_at.isoformat() if content.published_at }}",
-  "dateModified": "{{ content.published_at.isoformat() if content.published_at }}"
-}
-</script>
+{% from "components/seo/jsonld-article.html" import render_article_jsonld %}
+{{ render_article_jsonld(content) }}
 {% endblock %}
 
 {% block base_header %}
@@ -67,8 +42,7 @@
 
     <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar"></i>
-      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
-        }}</span>
+      <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
     </div>
 
     {% if article.is_content_scraped %}

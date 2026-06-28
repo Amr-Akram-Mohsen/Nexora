@@ -216,7 +216,8 @@ def handle_interaction():
             interaction_type=interaction_type,
             reaction_type=request.form.get("reaction"),
             comment_content=request.form.get("comment", "").strip(),
-            comment_id=request.form.get('comment_id', type=int)
+            comment_id=request.form.get('comment_id', type=int),
+            collection_name=request.form.get("collection_name")
         )
 
         if not result.get("success"):
@@ -250,6 +251,14 @@ def saved_items():
     
     saved_articles = get_saved_articles_workflow(current_user.id)
     saved_items = get_saved_products_workflow(current_user.id)
+    
+    # Extract collections
+    collections = set()
+    for item in saved_articles + saved_items:
+        if item.get("collection_name"):
+            collections.add(item["collection_name"])
+    
+    collections = sorted(list(collections))
 
     log_route_success(
         logger, "/saved",
@@ -260,6 +269,7 @@ def saved_items():
         'saved-items.html',
         saved_articles=saved_articles,
         saved_items=saved_items,
+        collections=collections
     )
 
 
@@ -303,3 +313,56 @@ def track_click():
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": "Failed to track click"}), 500
+
+@bp.route("/collection/rename", methods=["POST"])
+@login_required
+@csrf.exempt
+def rename_collection_route():
+    data = request.get_json() or {}
+    old_name = data.get("old_name")
+    new_name = data.get("new_name")
+    
+    if not old_name or not new_name:
+        return jsonify({"success": False, "error": "Missing parameters"}), 400
+        
+    from app.domains.interaction.service.command import rename_collection
+    result = rename_collection(current_user, old_name, new_name)
+    return jsonify(result), (200 if result.get("success") else 400)
+
+@bp.route("/collection/delete", methods=["POST"])
+@login_required
+@csrf.exempt
+def delete_collection_route():
+    data = request.get_json() or {}
+    collection_name = data.get("collection_name")
+    move_to_global = data.get("move_to_global", False)
+    
+    if not collection_name:
+        return jsonify({"success": False, "error": "Missing parameters"}), 400
+        
+    from app.domains.interaction.service.command import delete_collection
+    result = delete_collection(current_user, collection_name, move_to_global)
+    return jsonify(result), (200 if result.get("success") else 400)
+
+@bp.route("/save/move", methods=["POST"])
+@login_required
+@csrf.exempt
+def move_save_route():
+    data = request.get_json() or {}
+    target_type = data.get("target_type")
+    target_id = data.get("target_id")
+    new_collection_name = data.get("new_collection_name")
+    old_collection_name = data.get("old_collection_name")
+    
+    if not target_type or not target_id or not new_collection_name:
+        return jsonify({"success": False, "error": "Missing parameters"}), 400
+        
+    try:
+        from app.shared.parsing import parse_target_type
+        target_type_parsed = parse_target_type(target_type)
+    except ValueError:
+        return jsonify({"success": False, "error": "Invalid target type"}), 400
+        
+    from app.domains.interaction.service.command import move_save_collection
+    result = move_save_collection(current_user, target_type_parsed, target_id, new_collection_name, old_collection_name)
+    return jsonify(result), (200 if result.get("success") else 400)

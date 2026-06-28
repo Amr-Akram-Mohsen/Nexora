@@ -34,12 +34,25 @@ block content %} {% from"components/page.html" import page %}
   <li>Continuous learning and innovation</li>
 </ul>
 
+<h2 class="page__subtitle">Our Story</h2>
+<p class="page__text">
+  Nexora started with a simple observation: navigating the fast-paced world of consumer technology in the Middle East can be overwhelming. From finding the best deals across regional stores to understanding complex tech specifications, consumers often struggle to find reliable, independent advice. We launched Nexora to bridge this gap, building a trusted hub that empowers everyday users to make informed digital decisions without the jargon.
+</p>
+
 <h2 class="page__subtitle">Our Vision</h2>
 <p class="page__text">
   We aim to become a trusted digital hub where people can explore the
   latest technologies, improve their skills, and stay informed in a
   fast-growing digital world.
 </p>
+
+<div class="about-cta">
+  <h3 class="about-cta__title">Want to learn more?</h3>
+  <p class="about-cta__text">We are always open to feedback, partnerships, and questions.</p>
+  <a href="{{ url_for('system.contact') }}" class="btn btn--primary about-cta__btn">
+    <i class="far fa-envelope"></i> Get in Touch
+  </a>
+</div>
 
 {% endcall %}
 {% endblock %}

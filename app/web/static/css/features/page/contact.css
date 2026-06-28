@@ -25,6 +25,12 @@
   margin: 0;
 }
 
+.contact-fallback {
+  margin-top: 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr;

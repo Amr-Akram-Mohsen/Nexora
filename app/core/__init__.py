@@ -158,6 +158,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
+    from app.shared.filters import format_date
+    app.jinja_env.filters['format_date'] = format_date
+
     from app import domains
 
     # Initialize Flask-Login

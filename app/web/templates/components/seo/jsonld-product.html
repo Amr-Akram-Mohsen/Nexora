@@ -1,0 +1,25 @@
+{% macro render_product_jsonld(item) %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ item.name | e }}",
+  "image": [
+    "{{ url_for('static', filename=item.image_url, _external=True) if item.image_url else '' }}"
+  ],
+  "description": "{{ item.quick_details | e if item.quick_details else '' }}",
+  "sku": "{{ item.default_variant.sku if item.default_variant else '' }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ item.brand.name if item.brand else '' }}"
+  },
+  "offers": {
+    "@type": "AggregateOffer",
+    "url": "{{ request.url }}",
+    "priceCurrency": "{{ item.default_variant.currency if item.default_variant else 'USD' }}",
+    "lowPrice": "{{ item.min_price if item.min_price else (item.price if item.price else '0.00') }}",
+    "offerCount": "{{ item.stores | length }}"
+  }
+}
+</script>
+{% endmacro %}

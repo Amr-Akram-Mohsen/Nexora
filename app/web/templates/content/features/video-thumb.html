@@ -1,12 +1,11 @@
 {% from "content/features/content-image.html" import render_image_url %}
 
-{% macro render_video_thumbnail(thumbnail_url, title, video_url_or_id, duration=None, platform='youtube',
-wrapper_class='card__img-wrapper') %}
+{% macro render_video_thumbnail(thumbnail_url, title, video_url_or_id, duration=None, platform='youtube', wrapper_class='card__img-wrapper', priority='low') %}
 <div class="video-preview-container {{ wrapper_class }}" data-video-ref="{{ video_url_or_id }}"
     data-platform="{{ platform }}">
 
     <div class="video-preview__surface">
-        {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img') }}
+        {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img', priority=priority) }}
 
         <div class="video-preview__overlay flex justify-center items-center">
             <button class="video-preview__play-btn flex justify-center items-center" aria-label="Play {{ title }}" data-action="lazy-play">

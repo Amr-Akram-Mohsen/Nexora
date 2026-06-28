@@ -1,8 +1,9 @@
 {% macro grid(items, target_type="content", carousel=false) %}
-<div class="{{ 'grid-carousel' if carousel else 'grid-auto' }}"
+<div class="{{ 'grid-carousel flex gap-6' if carousel else 'grid-auto' }}"
   data-expandable-grid="{{ 'false' if carousel else 'true' }}">
   {% for item in items %}
-  {% include target_type ~ "/dispatcher/card.html" %}
+  {% set current_target_type = item.domain_type if item.domain_type else target_type %}
+  {% include current_target_type ~ "/dispatcher/card.html" %}
   {% endfor %}
 </div>
 {% endmacro %}

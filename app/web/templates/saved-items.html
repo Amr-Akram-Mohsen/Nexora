@@ -35,22 +35,13 @@
           <span class="filter-section__badge">{{ saved_items|length + saved_articles|length }}</span>
         </a>
       </li>
-      {% if saved_items %}
-      <li class="filter-item" id="filter-products" data-domain-type="commercial">
-        <a href="#products" class="filter-item__link flex items-center justify-between">
-          <span>Saved Products</span>
-          <span class="filter-section__badge">{{ saved_items|length }}</span>
+      {% for collection in collections %}
+      <li class="filter-item">
+        <a href="#collection-{{ loop.index }}" class="filter-item__link flex items-center justify-between">
+          <span>{{ collection }}</span>
         </a>
       </li>
-      {% endif %}
-      {% if saved_articles %}
-      <li class="filter-item" id="filter-articles" data-domain-type="content">
-        <a href="#articles" class="filter-item__link flex items-center justify-between">
-          <span>Saved Articles</span>
-          <span class="filter-section__badge">{{ saved_articles|length }}</span>
-        </a>
-      </li>
-      {% endif %}
+      {% endfor %}
     </ul>
   </div>
 </div>
@@ -84,25 +75,37 @@
 {% else %}
 
 <div class="saved-collections flex flex-col gap-12">
-  {% if saved_items %}
-  <section class="saved-collection flex flex-col gap-6" data-domain-type="commercial" id="products-section">
-    <h2 class="section-title flex justify-between items-center">
-      <span>Saved Products</span>
-      <span class="count-badge">({{ saved_items|length }})</span>
+  {% for collection in collections %}
+  {% set coll_articles = saved_articles | selectattr('collection_name', 'equalto', collection) | list %}
+  {% set coll_items = saved_items | selectattr('collection_name', 'equalto', collection) | list %}
+  <div class="collection-group flex flex-col gap-8" id="collection-{{ loop.index }}">
+    <h2 class="section-title text-2xl font-bold">
+      <i class="far fa-folder"></i> {{ collection }}
     </h2>
-    {{ grid(saved_items, "commercial") }}
-  </section>
-  {% endif %}
-
-  {% if saved_articles %}
-  <section class="saved-collection flex flex-col gap-6" data-domain-type="content" id="articles-section">
-    <h2 class="section-title flex justify-between items-center">
-      <span>Saved Articles</span>
-      <span class="count-badge">({{ saved_articles|length }})</span>
-    </h2>
-    {{ grid(saved_articles) }}
-  </section>
-  {% endif %}
+    
+    <div class="flex flex-col gap-10">
+      {% if coll_items %}
+      <section class="saved-collection flex flex-col gap-4" data-domain-type="commercial">
+        <h3 class="saved-collection-title flex justify-between items-center">
+          <span>Products</span>
+          <span class="count-badge text-sm">({{ coll_items|length }})</span>
+        </h3>
+        {{ grid(coll_items, "commercial") }}
+      </section>
+      {% endif %}
+      
+      {% if coll_articles %}
+      <section class="saved-collection flex flex-col gap-4" data-domain-type="content">
+        <h3 class="saved-collection-title flex justify-between items-center">
+          <span>Articles</span>
+          <span class="count-badge text-sm">({{ coll_articles|length }})</span>
+        </h3>
+        {{ grid(coll_articles) }}
+      </section>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
 {% endif %}

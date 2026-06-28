@@ -5,9 +5,7 @@
 <header class="site-header">
 
   <div class="container">
-
     <div class="header flex items-center justify-between">
-
       <!-- Logo -->
       <a href="/" class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex">
         {% include "logos/nexora-logo.html" %}
@@ -30,6 +28,26 @@
       <div class="header-actions flex items-center">
         {% set v = 'ghost' %}
         {% set class = 'btn--icon ' %}
+
+        <!-- Country Toggle -->
+        <div class="header-country">
+          {% set current_country = request.cookies.get('country') %}
+          <span class="header-country__label flex items-center gap-2">
+            {% if current_country == 'sa' %}
+            KSA
+            {% elif current_country == 'ae' %}
+            UAE
+            {% else %}
+            Global
+            {% endif %}
+            <i class="fas fa-chevron-down"></i>
+          </span>
+          <select class="country-toggle header-country__select" aria-label="Select Country">
+            <option value="">Global</option>
+            <option value="sa" {% if current_country=='sa' %}selected{% endif %}>KSA</option>
+            <option value="ae" {% if current_country=='ae' %}selected{% endif %}>UAE</option>
+          </select>
+        </div>
 
         <!-- Search -->
         {{ button(variant=v,
@@ -194,11 +212,6 @@
       <a href="{{ url_for('item.deals') }}" class="mobile-nav__link flex gap-3 items-center">
         <i class="fas fa-tag"></i>Deals
       </a>
-      {% if is_authenticated %}
-      <a href="{{ url_for('interaction.saved_items') }}" class="mobile-nav__link flex gap-3 items-center">
-        <i class="far fa-bookmark"></i>Saved Items
-      </a>
-      {% endif %}
     </nav>
 
   </div>

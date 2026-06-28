@@ -15,20 +15,8 @@
 {% endblock %}
 
 {% block structured_data %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SocialMediaPosting",
-  "headline": "{{ post.title }}",
-  "postBody": "{{ post.body }}",
-  "datePublished": "{{ content.published_at.isoformat() if content.published_at }}",
-  "author": {
-    "@type": "Person",
-    "name": "{{ post.author }}"
-  },
-  "url": "{{ post.url }}"
-}
-</script>
+{% from "components/seo/jsonld-article.html" import render_article_jsonld %}
+{{ render_article_jsonld(content) }}
 {% endblock %}
 
 {% block base_header %}
@@ -61,8 +49,7 @@
 
     <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar-alt"></i>
-      <span class="meta-pill__text">{{ content.published_at.strftime('%b %d, %Y') if content.published_at else 'Recent'
-        }}</span>
+      <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
     </div>
   </div>
 </div>

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% from "components/listing/listing-page.html" import listing_page %}
+{% from "components/ui/grid.html" import grid %}
+{% from "components/ui/button.html" import button %}
+
+{% block title %}Nexora | Reading History{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/catalog-page.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/commercial/catalog/saved-items.css') }}" />
+{% endblock %}
+
+{% block content %}
+
+{% call(slot) listing_page("history-page") %}
+
+{% if slot == 'sidebar' %}
+<div class="sidebar-accent"></div>
+<div class="sidebar-heading flex items-center justify-between">
+  <span class="sidebar-heading__label flex items-center">
+    <i class="fas fa-history"></i> History
+  </span>
+</div>
+
+<div class="filter-sidebar">
+  <div class="filter-section">
+    <ul class="filter-list flex flex-col">
+      <li class="filter-item is-active" id="filter-all">
+        <a href="#all" class="filter-item__link flex items-center justify-between">
+          <span>Recently Viewed</span>
+          <span class="filter-section__badge">{{ history_items|length }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+{% if slot == 'header' %}
+<div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
+  <div class="listing-summary flex">
+    <h1 class="listing-title">Your Reading History</h1>
+    <p class="listing-count">
+      <span class="listing-count__num" id="total-count">{{ history_items|length }}</span>
+      <span id="total-count-label">items</span> viewed recently
+    </p>
+  </div>
+</div>
+{% endif %}
+
+{% if slot == 'results' %}
+{% if not history_items %}
+<div class="empty-state flex flex-col items-center gap-4">
+  <div class="empty-state__icon-wrapper flex-center">
+    <i class="fas fa-history"></i>
+    <div class="empty-state__pulse"></div>
+  </div>
+  <h3 class="empty-state__title">No history yet</h3>
+  <p class="empty-state__message">Explore articles and products. They will appear here.</p>
+  <a href="{{ url_for('system.home') }}">
+    {{ button(text="Explore Now", class="empty-state__btn", variant="primary") }}
+  </a>
+</div>
+{% else %}
+
+<div class="saved-collections flex flex-col gap-12">
+  <section class="saved-collection flex flex-col gap-6" id="history-section">
+    {{ grid(history_items) }}
+  </section>
+</div>
+
+{% endif %}
+{% endif %}
+
+{% endcall %}
+
+{% endblock %}

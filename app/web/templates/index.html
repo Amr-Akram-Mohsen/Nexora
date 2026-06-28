@@ -12,6 +12,18 @@
 {% include "components/hero-sliders.html" %}
 <div class="container">
 
+  {% if recently_viewed %}
+  {% call section("Continue Reading", more_url=url_for('user.history')) %}
+  {{ grid(recently_viewed, target_type='content', carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
+  {% if recommended_items %}
+  {% call section("Recommended for You", more_url=false) %}
+  {{ grid(recommended_items, carousel=true) }}
+  {% endcall %}
+  {% endif %}
+
   {# ── Core editorial sections (existing) ─────────────────────────────── #}
   {% set core_sections = [
   {"section": "deals", "section_title": "top deals", "cards": top_deals, "target_type": "commercial", "carousel": true

@@ -32,7 +32,7 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
   {% endif %}
 
   <time class="card__date">
-    {{ content.published_at.strftime('%b %d') if content.published_at else 'Recent' }}
+    {{ content.published_at | format_date('%b %d') }}
   </time>
 </div>
 {% endblock %}
