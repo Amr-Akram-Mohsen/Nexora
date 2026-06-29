@@ -31,6 +31,9 @@ class Config:
     GNEWS_API_KEY = os.environ.get("GNEWS_API_KEY")
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
+    FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY")
+    JINA_AI_API_KEY = os.environ.get("JINA_AI_API_KEY")
+
     # ── Reddit API ────────────────────────────────────────────────
     # Create an app at: https://www.reddit.com/prefs/apps  (type: "script")
     REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID")

@@ -156,6 +156,19 @@ class Category(db.Model):
     def get_by_slug(slug, session):
         return session.query(Category).filter_by(slug=slug).first()
 
+    @staticmethod
+    def get_or_create(name: str, session, parent=None, is_leaf=True):
+        """Checks for category existence by slug, creates if missing."""
+        if not name:
+            return None
+        slug = generate_slug(name)
+        category = Category.get_by_slug(slug, session)
+        if not category:
+            category = Category.create(name=name, parent=parent, is_leaf=is_leaf)
+            session.add(category)
+            session.flush()
+        return category
+
     parent = db.relationship("Category", remote_side=[id], backref="children")
     contents = db.relationship("Content", back_populates="category")
     items = db.relationship("Item", back_populates="category")

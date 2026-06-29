@@ -71,17 +71,20 @@ def resolve_taxonomy(data, session=None):
     if not category and raw_cat_slug and raw_cat_slug != leaf:
         category = Category.get_by_slug(raw_cat_slug, session)
 
-    # 3. Parent slug  (broad category fallback, e.g. "electronics")
-    if not category:
-        parent = _parent_slug(raw_cat_slug)
-        if parent:
-            category = Category.get_by_slug(parent, session)
-            if category:
-                logger.debug(
-                    "[TAXONOMY] category_fallback  raw=%s  resolved_as=parent(%s)",
-                    raw_cat_slug,
-                    parent,
-                )
+    # 3. Create missing category dynamically
+    if not category and leaf and leaf != "uncategorized":
+        logger.info(
+            "[TAXONOMY] creating_missing_category  raw=%s  leaf=%s",
+            raw_cat_slug,
+            leaf,
+        )
+        name = leaf.replace("-", " ").title()
+        
+        # Try to resolve parent to link it properly
+        parent_slug = _parent_slug(raw_cat_slug)
+        parent_cat = Category.get_by_slug(parent_slug, session) if parent_slug and parent_slug != leaf else None
+        
+        category = Category.get_or_create(name=name, session=session, parent=parent_cat, is_leaf=True)
 
     # 4. Uncategorized  (absolute last resort)
     if not category:

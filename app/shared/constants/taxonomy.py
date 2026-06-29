@@ -60,6 +60,16 @@ TAXONOMY = {
           "name": "Cameras",
           "is_leaf": True,
           "search_keywords": ["dslr", "mirrorless", "photography gear", "vlogging cameras"]
+        },
+        {
+          "name": "PC Components",
+          "is_leaf": True,
+          "search_keywords": ["gpu", "cpu", "motherboard", "graphics card", "processor"]
+        },
+        {
+          "name": "Gaming Consoles",
+          "is_leaf": True,
+          "search_keywords": ["ps5", "xbox series x", "nintendo switch", "steam deck"]
         }
       ]
     },
@@ -76,6 +86,11 @@ TAXONOMY = {
           "name": "Oud & Oriental",
           "is_leaf": True,
           "search_keywords": ["oud perfume", "arabic fragrance", "oriental scent", "attar"]
+        },
+        {
+          "name": "Designer Fragrances",
+          "is_leaf": True,
+          "search_keywords": ["designer cologne", "mainstream perfume", "popular fragrance"]
         }
       ]
     },
@@ -102,6 +117,21 @@ TAXONOMY = {
           "name": "Jewelry",
           "is_leaf": True,
           "search_keywords": ["fine jewelry", "rings", "necklaces", "bracelets"]
+        },
+        {
+          "name": "Sneakers",
+          "is_leaf": True,
+          "search_keywords": ["running shoes", "trainers", "kicks", "sneakerhead"]
+        },
+        {
+          "name": "Wallets",
+          "is_leaf": True,
+          "search_keywords": ["minimalist wallet", "leather wallet", "cardholder"]
+        },
+        {
+          "name": "Mechanical Keyboards",
+          "is_leaf": True,
+          "search_keywords": ["custom keyboard", "hot swappable", "mechanical switches"]
         }
       ]
     },
@@ -187,6 +217,42 @@ TAXONOMY = {
     {
       "name": "Chanel",
       "aliases": ["no. 5", "bleu de chanel", "chance"]
+    },
+    {
+      "name": "NVIDIA",
+      "aliases": ["rtx", "geforce", "gpu"]
+    },
+    {
+      "name": "AMD",
+      "aliases": ["ryzen", "radeon"]
+    },
+    {
+      "name": "Nintendo",
+      "aliases": ["switch", "zelda", "mario"]
+    },
+    {
+      "name": "New Balance",
+      "aliases": ["990", "574"]
+    },
+    {
+      "name": "ASICS",
+      "aliases": ["gel-kayano", "nimbus"]
+    },
+    {
+      "name": "Bellroy",
+      "aliases": ["slim wallet", "hide & seek"]
+    },
+    {
+      "name": "Keychron",
+      "aliases": ["q1", "k2", "mechanical keyboard"]
+    },
+    {
+      "name": "YSL",
+      "aliases": ["yves saint laurent", "la nuit de l'homme", "y edp"]
+    },
+    {
+      "name": "Tom Ford",
+      "aliases": ["ombre leather", "tobacco vanille", "oud wood"]
     }
   ],
   "facets": {
@@ -316,6 +382,38 @@ TAXONOMY = {
       {
         "name": "Wireless",
         "category": "Electronics"
+      },
+      {
+        "name": "Ray Tracing",
+        "category": "Electronics"
+      },
+      {
+        "name": "Overclocking",
+        "category": "Electronics"
+      },
+      {
+        "name": "Handheld",
+        "category": "Electronics"
+      },
+      {
+        "name": "Mechanical",
+        "category": "Accessories"
+      },
+      {
+        "name": "Minimalist",
+        "category": "Accessories"
+      },
+      {
+        "name": "RFID Blocking",
+        "category": "Accessories"
+      },
+      {
+        "name": "Region: KSA",
+        "category": "Regional"
+      },
+      {
+        "name": "Region: UAE",
+        "category": "Regional"
       }
     ]
   }

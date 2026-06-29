@@ -50,44 +50,6 @@ def _extract_diffbot(url: str, api_key: str) -> dict | None:
     return None
 
 
-def _extract_mercury(url: str, api_key: str) -> dict | None:
-    try:
-        import requests
-
-        # Placeholder for Mercury API if self-hosted or using a service like Postlight Parser
-        api_url = "https://mercury.postlight.com/parser"
-        headers = {"x-api-key": api_key}
-        params = {"url": url}
-        response = requests.get(api_url, headers=headers, params=params, timeout=2.5)
-        response.raise_for_status()
-        data = response.json()
-
-        content_html = data.get("content", "")
-        content_text = data.get(
-            "title", ""
-        )  # Mercury sometimes only returns HTML, text extraction might be needed
-
-        if not content_html and not content_text:
-            return None
-
-        word_count = data.get(
-            "word_count", len(content_text.split()) if content_text else 0
-        )
-        quality = score_content_quality(content_html, content_text)
-
-        return {
-            "content_html": content_html,
-            "content_text": content_text,
-            "image_url": data.get("lead_image_url"),
-            "word_count": word_count,
-            "quality_score": quality,
-            "source": "mercury",
-        }
-    except Exception as e:
-        log_scrape_error(logger, url, f"mercury_failed: {e}")
-    return None
-
-
 def extract_with_apis(url: str) -> dict | None:
     """
     Try external extractor APIs (Diffbot, Mercury, etc.).
@@ -102,17 +64,6 @@ def extract_with_apis(url: str) -> dict | None:
             if result:
                 log_scrape_success(
                     logger, url, words=result.get("word_count", 0), source="diffbot"
-                )
-                return result
-
-        # Check Mercury
-        mercury_key = current_app.config.get("MERCURY_API_KEY")
-        if mercury_key:
-            log_scrape_start(logger, url)
-            result = _extract_mercury(url, mercury_key)
-            if result:
-                log_scrape_success(
-                    logger, url, words=result.get("word_count", 0), source="mercury"
                 )
                 return result
 

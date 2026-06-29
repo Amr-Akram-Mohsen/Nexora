@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Dict
 from app.shared.constants.query_intelligence import (
     QUERY_TEMPLATES,
@@ -9,42 +9,48 @@ from app.shared.constants.query_intelligence import (
     FACET_QUERY_TEMPLATES,
     TEMPORAL_MODIFIERS,
     EXPLORATION_MODIFIERS,
-    QUERY_SUFFIX_ROTATIONS,
+    CATEGORY_SOURCE_SUFFIXES,
     BOOLEAN_SUPPORTED_SOURCES,
     CATEGORY_PROBLEM_MAP,
     FEATURE_MAP,
     SEARCH_KEYWORD_EXPANSIONS,
+    CATEGORY_VELOCITY,
 )
 
 CURRENT_YEAR = datetime.now().year
 
 # ---------------------------------------------------------------------------
 # Deterministic modifier slots
-# Each slot is a fixed (temporal, exploration, suffix) tuple drawn from the
-# cross-product of the modifier lists.  The query position index selects the
-# slot, so queries are completely stable across runs and the cooldown table
-# can key on query_text correctly.
+# Each slot is a fixed (temporal, exploration) tuple drawn from the
+# cross-product of the modifier lists. The suffix is picked dynamically 
+# based on source and category.
 # ---------------------------------------------------------------------------
 
-def _build_modifier_slots() -> list[tuple[str, str, str]]:
-    """Pre-compute all (temporal, exploration, suffix) combinations."""
-    slots: list[tuple[str, str, str]] = []
+def _build_modifier_slots() -> list[tuple[str, str]]:
+    """Pre-compute all (temporal, exploration) combinations."""
+    slots: list[tuple[str, str]] = []
     temporals    = [""] + TEMPORAL_MODIFIERS
     explorations = [""] + EXPLORATION_MODIFIERS
-    suffixes     = [""] + [s for s in QUERY_SUFFIX_ROTATIONS if s]  # skip blank dupe
     for t in temporals:
         for e in explorations:
-            for s in suffixes:
-                slots.append((t, e, s))
+            slots.append((t, e))
     return slots
 
 
 _MODIFIER_SLOTS = _build_modifier_slots()
 
 
-def _pick_modifiers(position: int) -> tuple[str, str, str]:
+def _pick_modifiers(position: int, source: str, category_slug: str) -> tuple[str, str, str]:
     """Return a (temporal, exploration, suffix) tuple deterministically from position."""
-    return _MODIFIER_SLOTS[position % len(_MODIFIER_SLOTS)]
+    t, e = _MODIFIER_SLOTS[position % len(_MODIFIER_SLOTS)]
+    
+    suffixes = [""]
+    if source in CATEGORY_SOURCE_SUFFIXES:
+        if category_slug in CATEGORY_SOURCE_SUFFIXES[source]:
+            suffixes = CATEGORY_SOURCE_SUFFIXES[source][category_slug]
+            
+    s = suffixes[position % len(suffixes)]
+    return t, e, s
 
 
 def dedupe_queries(queries: List[Dict]) -> List[Dict]:
@@ -117,6 +123,20 @@ def build_query_variants(
     """
 
     queries = []
+
+    from datetime import datetime, timedelta
+    
+    velocity = CATEGORY_VELOCITY.get(category_slug, "medium")
+    to_date = datetime.utcnow()
+    if velocity == "high":
+        from_date = to_date - timedelta(days=7)
+    elif velocity == "medium":
+        from_date = to_date - timedelta(days=30)
+    else:
+        from_date = to_date - timedelta(days=90)
+        
+    from_iso = from_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+    to_iso = to_date.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     intent_terms = INTENT_KEYWORDS.get(intent, [intent.lower()])
 
@@ -209,8 +229,10 @@ def build_query_variants(
             
             if source == "gnews":
                 toks = q_str.split()
-                if len(toks) > 12:
-                    q_str = " ".join(toks[:12])
+                # Strict limit for GNews to avoid 400 errors: max 8 tokens total
+                if len(toks) > 8:
+                    # Try to keep the first few tokens which usually have the intent/brand
+                    q_str = " ".join(toks[:8])
                 # Explicitly insert AND between parenthesis groups for GNews
                 q_str = re.sub(r"\)\s*\(", ") AND (", q_str)
 
@@ -269,7 +291,7 @@ def build_query_variants(
                 if not is_bool_source:
                     query = _safe_query(query, False)
 
-                temporal, exploration, suffix = _pick_modifiers(position)
+                temporal, exploration, suffix = _pick_modifiers(position, source, category_slug)
 
                 if source == "gnews":
                     # GNews: temporal modifiers like "this month" break text search.
@@ -301,6 +323,8 @@ def build_query_variants(
                         "topics": topics,
                         "brands": [selected_brand] if selected_brand else [],
                         "intent": intent,
+                        "from": from_iso,
+                        "to": to_iso,
                     }
                 )
 

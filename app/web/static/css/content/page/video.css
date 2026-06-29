@@ -4,7 +4,8 @@
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
-.platform-badge {padding: 0.5rem 1rem;
+.platform-badge {
+  padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 700;
@@ -16,13 +17,16 @@
 }
 
 .video-header__title {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  font-weight: 800;
-  line-height: 1.2;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.25;
   color: var(--foreground);
   margin: 0;
+  letter-spacing: -0.015em;
 }
-.meta-pill {background: var(--muted);
+
+.meta-pill {
+  background: var(--muted);
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.875rem;
@@ -129,6 +133,10 @@
 
 .video-main-player.is-sticky .video-resize-handle {
   display: flex;
+}
+
+.video-main-player.is-resizing iframe {
+  pointer-events: none;
 }
 
 @keyframes slideUpSticky {

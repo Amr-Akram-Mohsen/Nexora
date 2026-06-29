@@ -42,6 +42,12 @@ CATEGORY_VELOCITY: dict[str, str] = {
     "bags": "low",
     "sunglasses": "low",
     "jewelry": "low",
+    "pc-components": "medium",
+    "gaming-consoles": "high",
+    "sneakers": "high",
+    "wallets": "low",
+    "mechanical-keyboards": "medium",
+    "designer-fragrances": "low",
 }
 
 # Multipliers applied to the source profile's base cooldown_hours.
@@ -73,6 +79,12 @@ CATEGORY_TOPIC_MAP = {
     "bags": ["travel-gear", "everyday-carry"],
     "sunglasses": ["fashion", "summer"],
     "jewelry": ["luxury", "fashion"],
+    "pc-components": ["gaming", "home-office"],
+    "gaming-consoles": ["gaming"],
+    "sneakers": ["fitness", "fashion"],
+    "wallets": ["travel-gear", "everyday-carry"],
+    "mechanical-keyboards": ["gaming", "home-office"],
+    "designer-fragrances": ["luxury"],
 }
 
 
@@ -325,6 +337,12 @@ CATEGORY_BRAND_MAP = {
         "Van Cleef",
         "Mejuri",
     ],
+    "pc-components": ["NVIDIA", "AMD", "Intel", "ASUS ROG", "MSI"],
+    "gaming-consoles": ["PlayStation", "Xbox", "Nintendo", "Steam Deck", "ROG Ally"],
+    "sneakers": ["Nike", "Adidas", "New Balance", "ASICS", "Salomon", "Jordan"],
+    "wallets": ["Bellroy", "Ridge", "Secrid", "Ekster"],
+    "mechanical-keyboards": ["Keychron", "Logitech", "Razer", "NuPhy"],
+    "designer-fragrances": ["YSL", "Tom Ford", "Prada", "Versace", "Dior"],
 }
 
 
@@ -414,6 +432,38 @@ CATEGORY_PROBLEM_MAP = {
         "tarnish resistance",
         "hypoallergenic",
         "gold plating durability",
+    ],
+    "pc-components": [
+        "thermal throttling",
+        "bottleneck",
+        "coil whine",
+        "compatibility",
+    ],
+    "gaming-consoles": [
+        "stick drift",
+        "overheating",
+        "storage space",
+    ],
+    "sneakers": [
+        "heel slip",
+        "narrow toe box",
+        "crease easily",
+        "durability",
+    ],
+    "wallets": [
+        "too bulky",
+        "cards falling out",
+        "leather wear",
+    ],
+    "mechanical-keyboards": [
+        "switch ping",
+        "stabilizer rattle",
+        "keycap shine",
+    ],
+    "designer-fragrances": [
+        "reformulation",
+        "poor performance",
+        "generic scent",
     ],
 }
 
@@ -510,6 +560,41 @@ FEATURE_MAP = {
         "sterling silver",
         "diamond",
         "minimalist design",
+    ],
+    "pc-components": [
+        "ray tracing",
+        "DLSS",
+        "overclocking",
+        "water cooling",
+    ],
+    "gaming-consoles": [
+        "handheld mode",
+        "OLED screen",
+        "exclusive games",
+        "backward compatibility",
+    ],
+    "sneakers": [
+        "Gore-Tex",
+        "carbon plate",
+        "daily trainer",
+        "retro release",
+    ],
+    "wallets": [
+        "RFID blocking",
+        "pop-up cards",
+        "minimalist leather",
+    ],
+    "mechanical-keyboards": [
+        "hot-swappable",
+        "wireless",
+        "low-profile",
+        "PBT keycaps",
+    ],
+    "designer-fragrances": [
+        "clubbing scent",
+        "fresh out the shower",
+        "mass appealing",
+        "office safe",
     ],
 }
 
@@ -670,16 +755,40 @@ SEARCH_KEYWORD_EXPANSIONS = {
     "bags": "(backpack review OR leather bag OR travel bag OR everyday carry)",
     "sunglasses": "(polarized sunglasses OR UV protection OR designer sunglasses)",
     "jewelry": "(gold jewelry OR silver jewelry OR minimalist jewelry OR fine jewelry)",
+    "sneakers": "(sneakers OR running shoes OR trainers OR kicks)",
+    "wallets": "(minimalist wallet OR leather wallet OR cardholder)",
+    "mechanical-keyboards": "(custom keyboard OR mechanical keyboard OR hot swappable)",
+    "pc-components": "(gpu OR graphics card OR cpu OR processor OR motherboard)",
+    "gaming-consoles": "(ps5 OR xbox OR nintendo switch OR steam deck)",
+    "designer-fragrances": "(designer cologne OR mainstream perfume OR popular fragrance)",
 }
 
 
-# Suffix rotations — added to queries on a deterministic slot cycle.
-# Keep these category-neutral and realistic. Do NOT add category-specific
-# terms here (those belong in FEATURE_MAP / CATEGORY_PROBLEM_MAP).
-QUERY_SUFFIX_ROTATIONS = [
-    "",  # No suffix (most common — keeps query clean)
-    "under $500",
-    "for beginners",
-    "for travel",
-    "worth buying",
-]
+# ==========================================================
+# CATEGORY / SOURCE SPECIFIC SUFFIXES
+# ==========================================================
+# Suffixes added to queries based on the category and source.
+# This prevents generic suffixes like "under $500" polluting perfume queries
+# or ruining News API exact phrase matches.
+# Defaults to [""] (no suffix) if category/source combo is not explicitly mapped.
+
+CATEGORY_SOURCE_SUFFIXES = {
+    "youtube": {
+        "smartphones": ["", "under 500", "battery test", "camera test"],
+        "laptops": ["", "for students", "for gaming", "budget"],
+        "pc-components": ["", "build", "benchmarks"],
+        "sneakers": ["", "on feet", "sizing guide", "comfort test"],
+        "perfumes": ["", "compliment getter", "blind buy", "clone"],
+        "designer-fragrances": ["", "compliments", "clubbing scent"],
+        "niche-artisanal": ["", "collection", "review"],
+        "watches": ["", "under 1000", "wrist roll"],
+    },
+    "reddit": {
+        "smartphones": ["", "worth it", "issues", "recommendation"],
+        "perfumes": ["", "clone", "recommendation", "thoughts"],
+        "sneakers": ["", "sizing", "creasing", "legit check"],
+        "pc-components": ["", "build help", "compatibility", "temps"],
+    },
+    # For newsapi and gnews, we deliberately omit mappings here so they default 
+    # to [""] (no suffix) preserving phrase match precision.
+}

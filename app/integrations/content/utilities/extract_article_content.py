@@ -381,8 +381,36 @@ def _fetch_rendered(url: str) -> str | None:
             )
             page = ctx.new_page()
             page.goto(url, timeout=45000, wait_until="domcontentloaded")
-            page.evaluate("window.scrollTo(0, document.body.scrollHeight / 3)")
-            time.sleep(0.8)
+            
+            # Smart DOM Hydration: wait for main content container
+            try:
+                page.wait_for_selector('article, [role="main"], .post-content, main, .article-body, .story-body', timeout=5000)
+            except Exception:
+                pass
+
+            # Smooth Scroll to trigger all lazy-loaded elements
+            try:
+                page.evaluate("""
+                    async () => {
+                        await new Promise((resolve) => {
+                            let totalHeight = 0;
+                            let distance = 400;
+                            let timer = setInterval(() => {
+                                let scrollHeight = document.body.scrollHeight;
+                                window.scrollBy(0, distance);
+                                totalHeight += distance;
+                                if(totalHeight >= scrollHeight - window.innerHeight || totalHeight > 10000) {
+                                    clearInterval(timer);
+                                    resolve();
+                                }
+                            }, 100);
+                        });
+                    }
+                """)
+            except Exception as e:
+                logger.debug(f"[SCRAPE] smooth_scroll_failed: {e}")
+            
+            time.sleep(0.5)
             result = page.content()
             browser.close()
             return result
@@ -498,16 +526,46 @@ def scrape_article_content(url: str) -> str | None:
         log_scrape_error(logger, url, "fetch_failed")
         return None
 
-    # ── Step 2: Pre-process lazy images on the raw source ────────
+    # ── Step 2: Pre-process lazy images and iframes on the raw source ────────
+    import base64
     try:
         raw_soup = BeautifulSoup(html_source, "html.parser")
         _normalize_images(raw_soup, base_url=url)
+        
+        # Preserve Iframes
+        for iframe in raw_soup.find_all("iframe"):
+            src = iframe.get("src", "")
+            if "youtube" in src or "twitter" in src or "instagram" in src:
+                encoded_src = base64.b64encode(src.encode("utf-8")).decode("utf-8")
+                placeholder = raw_soup.new_tag("p")
+                placeholder.string = f"___EMBED_{encoded_src}___"
+                iframe.replace_with(placeholder)
+
+        # Inline Noise Pre-Processor: Remove related articles and sidebars
+        noise_classes = ["related", "read-more", "promo", "aside", "newsletter", "recommendation"]
+        for element in raw_soup.find_all(class_=lambda c: c and any(n in c.lower() for n in noise_classes for c in (c if isinstance(c, list) else [c]))):
+            element.decompose()
+
+        for p in raw_soup.find_all(["p", "div", "strong", "em", "b", "h3", "h4"]):
+            text = p.get_text(strip=True).lower()
+            if text.startswith(("read also:", "related:", "watch:", "also read:")):
+                # remove the element and occasionally its parent if it's just a wrapper
+                parent = p.find_parent("div")
+                if parent and len(parent.get_text(strip=True)) < len(text) + 20:
+                    parent.decompose()
+                else:
+                    p.decompose()
+                
         html_source = str(raw_soup)
     except Exception:
         pass  # Non-critical; Trafilatura will still work on original
 
     # ── Step 3: Extract structured content ───────────────────────
-    extracted = _extract_via_trafilatura(html_source, url)
+    from .site_extractors import apply_site_specific_extractor
+    
+    extracted = apply_site_specific_extractor(html_source, url)
+    if not extracted:
+        extracted = _extract_via_trafilatura(html_source, url)
 
     if not extracted or len(extracted.strip()) < 250:
         extracted = _extract_via_json_ld(html_source)
@@ -518,8 +576,19 @@ def scrape_article_content(url: str) -> str | None:
         log_scrape_error(logger, url, "insufficient_content")
         return None
 
-    # ── Step 4: Clean, normalize, enhance ────────────────────────
+    # ── Step 4: Clean, normalize, enhance, restore iframes ───────────────
     cleaned = clean_html(extracted, base_url=url)
+    
+    # Restore Iframes
+    def restore_iframe_match(m):
+        try:
+            import base64
+            src = base64.b64decode(m.group(1)).decode("utf-8")
+            return f'<div class="article-full-text__embed-wrapper"><iframe src="{src}" class="article-full-text__embed" allowfullscreen="true" frameborder="0"></iframe></div>'
+        except Exception:
+            return ""
+    cleaned = re.sub(r"___EMBED_([A-Za-z0-9+/=]+)___", restore_iframe_match, cleaned)
+    
     enhanced = enhance_article_html(cleaned)
 
     if enhanced and enhanced.strip():

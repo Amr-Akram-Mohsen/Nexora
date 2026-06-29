@@ -1,10 +1,10 @@
 {
-  "gnews_electronics": 0,
-  "newsapi_electronics": 10,
-  "youtube_electronics": 5,
-  "newsapi_accessories": 5,
-  "youtube_accessories": 2,
+  "gnews_electronics": 1,
+  "newsapi_electronics": 11,
+  "youtube_electronics": 6,
+  "newsapi_accessories": 6,
+  "youtube_accessories": 3,
   "youtube_perfumes": 3,
   "gnews_perfumes": 1,
-  "gnews_accessories": 2
+  "gnews_accessories": 3
 }

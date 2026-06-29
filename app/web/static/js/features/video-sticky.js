@@ -65,13 +65,13 @@ function initVideoSticky() {
         let startX = e.clientX;
         let startWidth = player.getBoundingClientRect().width;
         
+        // Prevent iframe from eating mouse events during drag
+        player.classList.add('is-resizing');
+        
         const onMouseMove = (moveEvent) => {
-            // Dragging left increases width, dragging right decreases width
-            // because the handle is on the top-left of a bottom-right anchored element
             const dx = startX - moveEvent.clientX;
             let newWidth = startWidth + dx;
             
-            // Constrain width
             if (newWidth < 240) newWidth = 240;
             if (newWidth > 800) newWidth = 800;
             if (newWidth > window.innerWidth - 40) newWidth = window.innerWidth - 40;
@@ -83,6 +83,7 @@ function initVideoSticky() {
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
             document.body.style.userSelect = '';
+            player.classList.remove('is-resizing');
         };
         
         document.body.style.userSelect = 'none';

@@ -66,9 +66,16 @@ def classify_content_metadata(
             title, description, category_slug, query_intent=query_intent
         )
 
-        # 5. Metadata Traceability
-        if q_obj.get("region"):
-            data["region"] = q_obj["region"]
+        # 5. Metadata Traceability & Regional Attributes
+        region_val = data.get("region") or q_obj.get("region")
+        if region_val:
+            data["region"] = region_val
+            region_attr = f"Region: {str(region_val).upper()}"
+            if "attributes" not in data["facets"]:
+                data["facets"]["attributes"] = []
+            if region_attr not in data["facets"]["attributes"]:
+                data["facets"]["attributes"].append(region_attr)
+            
         if q_obj.get("query"):
             data["discovery_query"] = q_obj["query"]
 

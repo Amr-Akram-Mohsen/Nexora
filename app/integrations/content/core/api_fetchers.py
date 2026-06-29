@@ -31,16 +31,22 @@ def fetch_newsapi_query(q_obj, **kwargs):
     time.sleep(2.5)
     session = _get_session()
 
+    params = {
+        "q": q_text,
+        "language": "en",
+        "sortBy": "publishedAt",
+        "pageSize": 20,
+        "apiKey": api_key,
+    }
+    if q_obj.get("from"):
+        params["from"] = q_obj["from"]
+    if q_obj.get("to"):
+        params["to"] = q_obj["to"]
+
     data = safe_get_json(
         session,
         "https://newsapi.org/v2/everything",
-        params={
-            "q": q_text,
-            "language": "en",
-            "sortBy": "publishedAt",
-            "pageSize": 20,
-            "apiKey": api_key,
-        },
+        params=params,
         timeout=(5, 15),
         logger=logger,
         source_name="newsapi",
@@ -72,22 +78,30 @@ def fetch_gnews_query(q_obj, **kwargs):
     q_text = q_text.replace("-", " ")
     q_text = re.sub(r"[^\w\s\(\)\"\'OR]", " ", q_text)
     q_text = re.sub(r"\s+", " ", q_text).strip()
-    country = q_obj.get("region", "sa").lower()
+    
+    fallback_country = "sa" if len(q_text) % 2 == 0 else "ae"
+    country = q_obj.get("region", fallback_country).lower()
     lang = "ar" if any(c in q_text for c in _ARABIC_CHARS) else "en"
 
     log_integration_start(logger, "gnews", query=q_text, country=country, lang=lang)
     session = _get_session()
 
+    params = {
+        "q": q_text,
+        "lang": lang,
+        "country": country,
+        "max": 10,
+        "apikey": api_key,
+    }
+    if q_obj.get("from"):
+        params["from"] = q_obj["from"]
+    if q_obj.get("to"):
+        params["to"] = q_obj["to"]
+
     data = safe_get_json(
         session,
         "https://gnews.io/api/v4/search",
-        params={
-            "q": q_text,
-            "lang": lang,
-            "country": country,
-            "max": 10,
-            "apikey": api_key,
-        },
+        params=params,
         timeout=(5, 15),
         logger=logger,
         source_name="gnews",
@@ -114,7 +128,8 @@ def fetch_youtube_query(q_obj, **kwargs):
     _ARABIC_CHARS = set("ءآأؤإئبةتثجحخدذرزسشصضطظعغفقكلمنهوي")
 
     q_text = q_obj.get("query", "")
-    region_code = q_obj.get("region", "SA")
+    fallback_region = "SA" if len(q_text) % 2 == 0 else "AE"
+    region_code = q_obj.get("region", fallback_region).upper()
     category = q_obj.get("category", "")
     video_category_id = "28" if "electronics" in category.lower() else None
 

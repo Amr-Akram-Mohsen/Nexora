@@ -25,131 +25,32 @@ logger = logging.getLogger(__name__)
 _NAME = "enrichment"
 
 # ── Trusted sources (eligible for full-content scraping) ───────────────────────
-TRUSTED_DOMAINS = {
-    # Technology & Gadgets
+TRUSTED_DOMAINS_FALLBACK = {
     "theverge.com",
-    "wired.com",
-    "engadget.com",
-    "techcrunch.com",
-    "gsmarena.com",
-    "macrumors.com",
-    "9to5mac.com",
-    "androidcentral.com",
-    "tomsguide.com",
-    "digitaltrends.com",
-    "cnet.com",
-    "zdnet.com",
-    "arstechnica.com",
-    "venturebeat.com",
-    "gizmodo.com",
-    "slashgear.com",
-    "pocket-lint.com",
-    "trustedreviews.com",
-    "whathifi.com",
-    "stuff.tv",
-    "pcgamer.com",
-    "eurogamer.net",
-    "ign.com",
-    "gamespot.com",
-    "polygon.com",
-    "tweaktown.com",
-    "techpowerup.com",
-    "anandtech.com",
-    "hardwarecanucks.com",
-    "overclockers.co.uk",
-    "guru3d.com",
-    "phoronix.com",
-    "extremetech.com",
-    "techspot.com",
-    "notebookcheck.net",
-    "liliputing.com",
-    "cnx-software.com",
-    "neowin.net",
-    "winbeta.org",
-    "thurrott.com",
-    "petapixel.com",
-    "dpreview.com",
-    "imaging-resource.com",
-    "thephoblographer.com",
-    "canonrumors.com",
-    "fujirumors.com",
-    "sonyalpharumors.com",
-    "43rumors.com",
-    "photorumors.com",
-    # Gaming & Entertainment
-    "comicbook.com",
-    "screenrant.com",
-    "variety.com",
-    "hollywoodreporter.com",
-    "deadline.com",
-    "thewrap.com",
-    "indiewire.com",
-    "collider.com",
-    "slashfilm.com",
-    "darkhorizons.com",
-    "comingsoon.net",
-    "denofgeek.com",
-    "bleedingcool.com",
-    "newsarama.com",
-    "cbr.com",
-    "kotaku.com",
-    "destructoid.com",
-    "shacknews.com",
-    "siliconera.com",
-    "gematsu.com",
-    "vg247.com",
-    "videogamer.com",
-    "pushsquare.com",
-    "nintendolife.com",
-    "purexbox.com",
-    "vgc.com",
-    "fanbyte.com",
-    "rockpapershotgun.com",
-    # Lifestyle & General News
-    "dailymail.com",
-    "dailymail.co.uk",
-    "nypost.com",
-    "foxnews.com",
-    "cnn.com",
-    "nbcnews.com",
-    "abcnews.go.com",
-    "cbsnews.com",
-    "reuters.com",
-    "apnews.com",
     "bloomberg.com",
-    "forbes.com",
-    "fortune.com",
-    "businessinsider.com",
     "wsj.com",
     "nytimes.com",
-    "theguardian.com",
-    "telegraph.co.uk",
-    "independent.co.uk",
-    "bbc.com",
-    "bbc.co.uk",
-    "aljazeera.com",
-    "ndtv.com",
-    "indiatimes.com",
-    "economictimes.indiatimes.com",
-    "thehindu.com",
-    "yahoo.com",
-    "sports.yahoo.com",
-    "robbreport.com",
-    "gentlemansjournal.com",
-    "gq.com",
-    "esquire.com",
-    "vogue.com",
-    "hypebeast.com",
-    "highsnobiety.com",
-    "inputmag.com",
+    "wired.com",
+    "techcrunch.com",
 }
 
 
 def is_trusted(url: str) -> bool:
     try:
+        from urllib.parse import urlparse
         domain = urlparse(url).netloc.lower()
-        return domain in TRUSTED_DOMAINS or any(
-            domain.endswith("." + d) for d in TRUSTED_DOMAINS
+        if domain.startswith("www."):
+            domain = domain[4:]
+
+        from app.domains.taxonomy.models import Source
+        from app.core.extensions import db
+        
+        source = db.session.query(Source).filter(Source.domain == domain).first()
+        if source and source.authority_score >= 80:
+            return True
+            
+        return domain in TRUSTED_DOMAINS_FALLBACK or any(
+            domain.endswith("." + d) for d in TRUSTED_DOMAINS_FALLBACK
         )
     except Exception:
         return False
@@ -250,49 +151,56 @@ def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
             }
         )
 
-    # 2. Candidate: Extractor APIs
-    best_existing_wc = candidates[0]["word_count"] if candidates else 0
-    if trusted or best_existing_wc < 200:
-        extractor_result = extract_with_apis(url)
-        if extractor_result:
-            candidates.append(
-                {
-                    "content_html": extractor_result["content_html"],
-                    "content_text": extractor_result["content_text"],
-                    "image_url": extractor_result.get("image_url"),
-                    "word_count": extractor_result["word_count"],
-                    "quality_score": extractor_result["quality_score"],
-                    "is_content_scraped": False,
-                    "content_source": extractor_result["source"],
-                }
-            )
+    # Concurrent Fetching using ThreadPoolExecutor
+    import concurrent.futures
 
-    # 3. Candidate: Scraper (Playwright)
-    best_wc_so_far = max((c["word_count"] for c in candidates), default=0)
-    if trusted or best_wc_so_far < 150:
+    def _fetch_api():
+        res = extract_with_apis(url)
+        if res:
+            return {
+                "content_html": res["content_html"],
+                "content_text": res["content_text"],
+                "image_url": res.get("image_url"),
+                "word_count": res["word_count"],
+                "quality_score": res["quality_score"],
+                "is_content_scraped": False,
+                "content_source": res["source"],
+            }
+        return None
+
+    def _fetch_scraper():
         try:
             log_scrape_start(logger, url)
-            scraped_html = scrape_article_content(url)
-            if scraped_html:
-                norm = normalize_content(scraped_html, None)
-                score = score_content_quality(
-                    norm["content_html"], norm["content_text"]
-                )
-                candidates.append(
-                    {
-                        "content_html": norm["content_html"],
-                        "content_text": norm["content_text"],
-                        "word_count": norm["word_count"],
-                        "quality_score": score,
-                        "is_content_scraped": True,
-                        "content_source": "scraper",
-                    }
-                )
-                log_scrape_success(
-                    logger, url, words=norm["word_count"], source="scraper"
-                )
+            scraped = scrape_article_content(url)
+            if scraped:
+                norm = normalize_content(scraped, None)
+                score = score_content_quality(norm["content_html"], norm["content_text"])
+                log_scrape_success(logger, url, words=norm["word_count"], source="scraper")
+                return {
+                    "content_html": norm["content_html"],
+                    "content_text": norm["content_text"],
+                    "word_count": norm["word_count"],
+                    "quality_score": score,
+                    "is_content_scraped": True,
+                    "content_source": "scraper",
+                }
         except Exception as e:
             log_scrape_error(logger, url, reason=str(e))
+        return None
+
+    best_existing_wc = candidates[0]["word_count"] if candidates else 0
+    futures = []
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        if trusted or best_existing_wc < 200:
+            futures.append(executor.submit(_fetch_api))
+        if trusted or best_existing_wc < 150:
+            futures.append(executor.submit(_fetch_scraper))
+            
+        for future in concurrent.futures.as_completed(futures):
+            res = future.result()
+            if res:
+                candidates.append(res)
 
     # 4. Fallback (Local)
     if not candidates and description:
