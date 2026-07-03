@@ -56,7 +56,8 @@ def apply_content_section_filters(
 def execute_mapped_query(stmt, session=None):
     if session is None:
         session = db.session
-    return session.execute(stmt).mappings().all()
+    rows = session.execute(stmt).mappings().all()
+    return [dict(row) for row in rows]
 
 
 @cache.memoize(timeout=3600)

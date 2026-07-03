@@ -8,30 +8,31 @@
 <td data-field="widget-ctr">
   {% set ctr_val = row.widget_ctr %}
   {% set text, variant = ('—', 'secondary') if ctr_val is none else
-                         (ctr_val ~ '%', 'success') if ctr_val >= 3.0 else
-                         (ctr_val ~ '%', 'warning') if ctr_val >= 1.0 else
-                         (ctr_val ~ '%', 'danger') if ctr_val > 0.0 else
-                         ('0.0%', 'secondary') %}
+  (ctr_val ~ '%', 'success') if ctr_val >= 3.0 else
+  (ctr_val ~ '%', 'warning') if ctr_val >= 1.0 else
+  (ctr_val ~ '%', 'danger') if ctr_val > 0.0 else
+  ('0.0%', 'secondary') %}
   {{ badge(text, variant=variant) }}
 </td>
 <td data-field="last-active">{{ row.last_active|default('') }}</td>
 <td data-field="linked-items-count">{{ row.linked_items_count }}</td>
 <td data-field="linked-items-list">
   {% if row.linked_items_list %}
-    <div class="flex flex-wrap gap-1">
-      {% for item_id in row.linked_items_list %}
-        {{ badge("#" ~ item_id, variant="secondary") }}
-      {% endfor %}
-    </div>
+  <div class="flex flex-wrap gap-1">
+    {% for item_id in row.linked_items_list %}
+    {{ badge("#" ~ item_id, variant="secondary") }}
+    {% endfor %}
+  </div>
   {% else %}
-    —
+  —
   {% endif %}
 </td>
 {% if not hide_action_column %}
 <td data-field="actions">
   <div class="actions-cell-group flex flex-col gap-1">
-    <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.content_title }}">
-        <i class="fas fa-eye"></i> Inspect
+    <button class="inspect-action flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect"
+      data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.content_title }}">
+      <i class="fas fa-eye"></i> Inspect
     </button>
   </div>
 </td>

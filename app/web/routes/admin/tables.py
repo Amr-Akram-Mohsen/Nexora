@@ -3,13 +3,7 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "preview_table": [
-            "User", "Role", "Subscription", "Status", 
-            {"label": "Joined ↕", "sort_key": "joined", "class": "admin-table-th-sortable"}, 
-            {"label": "Last Active ↕", "sort_key": "last_active", "class": "admin-table-th-sortable"}, 
-            {"label": "Engagement Score ↕", "sort_key": "engagement_score", "class": "admin-table-th-sortable"}, 
-            "Tier", "Actions"
-        ],
+        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score", "Tier", "Actions"],
         "detailed_table": {
             "account info": ["id", "name", "email", "role", "status", "provider"],
             "security & auth": ["verified", "verified at", "verification sent", "password changed", "joined", "last active"],

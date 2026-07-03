@@ -33,8 +33,7 @@
 
 
 /* --- Row Action Buttons (In-Table Controls) --- */
-
-.user-action-btn {
+[data-field="actions"] .inspect-action {
     padding: 0.3rem 0.625rem;
     font-size: var(--text-xs);
     font-weight: var(--weight-bold);
@@ -47,11 +46,11 @@
     white-space: nowrap;
 }
 
-.user-action-btn:hover {
+[data-field="actions"] .inspect-action:hover {
     background: var(--secondary);
 }
 
-.user-action-btn:disabled {
+[data-field="actions"] .inspect-action:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }

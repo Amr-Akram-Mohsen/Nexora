@@ -3,27 +3,33 @@
     <strong class="cell-primary-text">{{ row.title }}</strong>
 
     <div class="flex flex-wrap gap-1 content-status-group">
-      {% set health_variant = 'success' if row.health_score >= 80 else ('warning' if row.health_score >= 50 else 'danger') %}
+      {% set health_variant = 'success' if row.health_score >= 80 else ('warning' if row.health_score >= 50 else
+      'danger') %}
       {{ badge(row.health_score ~ "% Health", variant=health_variant, class="badge-compact") }}
 
       {% if not row.has_topics %}
-      {{ badge("No Topics", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Topics"}, variant=none) }}
+      {{ badge("No Topics", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1",
+      attrs={"title": "No Topics"}, variant=none) }}
       {% endif %}
 
       {% if not row.has_brands %}
-      {{ badge("No Brands", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Brands"}, variant=none) }}
+      {{ badge("No Brands", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1",
+      attrs={"title": "No Brands"}, variant=none) }}
       {% endif %}
 
       {% if not row.has_source %}
-      {{ badge("No Source", icon='fas fa-times-circle', class="status-badge inactive flex items-center gap-1", attrs={"title": "No Source"}, variant=none) }}
+      {{ badge("No Source", icon='fas fa-times-circle', class="status-badge inactive flex items-center gap-1",
+      attrs={"title": "No Source"}, variant=none) }}
       {% endif %}
 
       {% if row.object_type == "article" and row.enrichment_status == "failed" %}
-      {{ badge("Failed", icon='fas fa-ban', class="status-badge inactive flex items-center gap-1", attrs={"title": "Enrichment Failed"}, variant=none) }}
+      {{ badge("Failed", icon='fas fa-ban', class="status-badge inactive flex items-center gap-1", attrs={"title":
+      "Enrichment Failed"}, variant=none) }}
       {% endif %}
 
       {% if row.is_duplicate %}
-      {{ badge("Duplicate", icon='fas fa-copy', class="status-badge user flex items-center gap-1", attrs={"title": "Duplicate Title"}, variant=none) }}
+      {{ badge("Duplicate", icon='fas fa-copy', class="status-badge user flex items-center gap-1", attrs={"title":
+      "Duplicate Title"}, variant=none) }}
       {% endif %}
     </div>
   </div>
@@ -38,11 +44,11 @@
 <td data-field="engagement">
   <div class="content-engagement-metrics flex flex-wrap gap-2">
     {% set metrics = [
-      {'icon': 'fas fa-eye', 'val': row.engagement.views, 'title': 'Views'},
-      {'icon': 'fas fa-heart', 'val': row.engagement.likes, 'title': 'Likes'},
-      {'icon': 'fas fa-comment', 'val': row.engagement.comments, 'title': 'Comments'},
-      {'icon': 'fas fa-share', 'val': row.engagement.shares, 'title': 'Shares'},
-      {'icon': 'fas fa-save', 'val': row.engagement.saves, 'title': 'Saves'}
+    {'icon': 'fas fa-eye', 'val': row.engagement.views, 'title': 'Views'},
+    {'icon': 'fas fa-heart', 'val': row.engagement.likes, 'title': 'Likes'},
+    {'icon': 'fas fa-comment', 'val': row.engagement.comments, 'title': 'Comments'},
+    {'icon': 'fas fa-share', 'val': row.engagement.shares, 'title': 'Shares'},
+    {'icon': 'fas fa-save', 'val': row.engagement.saves, 'title': 'Saves'}
     ] %}
     {% for m in metrics %}
     <span class="content-metric-item" title="{{ m.title }}"><i class="{{ m.icon }}"></i> {{ m.val }}</span>
@@ -71,17 +77,20 @@
 {% if not hide_action_column %}
 <td data-field="actions">
   <div class="actions-cell-group flex flex-col gap-1">
-    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/contents/{{ row.id }}" target="_blank" title="Inspect full detail page">
+    <a class="inspect-action flex items-center justify-center gap-1" href="/admin/contents/{{ row.id }}" target="_blank"
+      title="Inspect full detail page">
       <i class="fas fa-eye"></i> Inspect
     </a>
 
     {% set is_pub = row.is_published %}
     {% set btn_status = 'unpublish' if is_pub else 'publish' %}
     {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
-    {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else 'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
+    {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else
+    'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
     {% set btn_icon = 'fas fa-eye-slash' if is_pub else 'fas fa-upload' %}
 
-    {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id, "data-status": btn_status, "title": btn_label}, variant=none) }}
+    {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id,
+    "data-status": btn_status, "title": btn_label}, variant=none) }}
   </div>
 </td>
 {% endif %}

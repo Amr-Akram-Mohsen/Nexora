@@ -12,9 +12,9 @@
 <td data-field="replies">{{ row.replies_count }}</td>
 <td data-field="thread">
   {% if row.is_reply %}
-    {{ badge("Reply", variant="secondary") }}
+  {{ badge("Reply", variant="secondary") }}
   {% else %}
-    —
+  —
   {% endif %}
 </td>
 <td data-field="date">{{ row.created_at if row.created_at else '' }}</td>
@@ -22,8 +22,9 @@
 {% if not hide_action_column %}
 <td data-field="actions">
   <div class="actions-cell-group flex flex-col gap-1">
-    <button class="user-action-btn flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect" data-domain="comments" data-id="{{ row.id }}" data-title="{{ row.title }}">
-        <i class="fas fa-eye"></i> Inspect
+    <button class="inspect-action flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect"
+      data-domain="comments" data-id="{{ row.id }}" data-title="{{ row.title }}">
+      <i class="fas fa-eye"></i> Inspect
     </button>
   </div>
 </td>

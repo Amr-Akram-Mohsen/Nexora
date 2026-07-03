@@ -174,7 +174,8 @@ def get_distinct_stores(session=None):
         .distinct()
         .order_by(Store.name)
     )
-    return session.execute(stmt).mappings().all()
+    rows = session.execute(stmt).mappings().all()
+    return [dict(row) for row in rows]
 
 
 @cache.memoize(timeout=3600)
@@ -306,7 +307,8 @@ def get_distinct_stores(session=None):
         .distinct()
         .order_by(Store.name)
     )
-    return session.execute(stmt).mappings().all()
+    rows = session.execute(stmt).mappings().all()
+    return [dict(row) for row in rows]
 
 
 @cache.memoize(timeout=3600)
