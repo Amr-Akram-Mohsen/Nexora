@@ -63,6 +63,17 @@ def populate_content_search_fields(content, obj, object_type):
                 ]
             )
         )
+        
+    elif object_type == "article":
+        source = " ".join(
+            filter(
+                None,
+                [
+                    getattr(obj, "author", ""),
+                    getattr(obj, "source_name", "")
+                ]
+            )
+        )
     
     canonical = getattr(obj, "canonical_url", "")
 

@@ -63,8 +63,6 @@ class Content(db.Model):
     comment_count = db.Column(db.Integer, default=0)
     view_count = db.Column(db.Integer, default=0)
 
-    
-
     # Optional (future-proofing)
     score = db.Column(db.Float, default=0.0, index=True)
     
@@ -181,22 +179,6 @@ class Content(db.Model):
             "title"
         ),
     )
-
-    # -------- Helper --------
-    # @property
-    # def target(self):
-    #     session = object_session(self)
-    #     if not session:
-    #         return None
-    #     return resolve_content_object(session, self)
-
-    # @property
-    # def title(self):
-    #     return getattr(self.target, "title", None)
-
-    # @property
-    # def preview_text(self):
-    #     return getattr(self.target, "preview_text", None)
 
     # ---------------- Convenience helpers ----------------
     def add_brand(self, brand_obj) -> bool:

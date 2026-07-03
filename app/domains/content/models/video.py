@@ -1,4 +1,5 @@
 from app.core.extensions import db
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Video(db.Model):
     __tablename__ = "videos"
@@ -22,21 +23,67 @@ class Video(db.Model):
     thumbnail_url = db.Column(db.Text)
     channel_name = db.Column(db.String(150))
 
+    url = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    creator = db.Column(
+        db.String(150)
+    )
+
+    published_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        index=True
+    )
+
+    duration_seconds = db.Column(
+        db.Integer
+    )
+
+    view_count = db.Column(
+        db.BigInteger,
+        default=0
+    )
+
+    like_count = db.Column(
+        db.BigInteger,
+        default=0
+    )
+
+    comments_count = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    platform_metadata = db.Column(
+        JSONB,
+        nullable=True
+    )
+
     __table_args__ = (
         db.UniqueConstraint(
             "external_id",
             "platform",
             name="uq_videos_external_platform"
         ),
+
+        db.Index(
+            "ix_videos_platform_published",
+            "platform",
+            "published_at"
+        ),
+
+        db.Index(
+            "ix_videos_platform_creator",
+            "platform",
+            "creator"
+        ),
+
     )
 
     # -------- Helpers --------
-    @property
-    def url(self):
-        if self.platform == "youtube":
-            return f"https://www.youtube.com/watch?v={self.external_id}"
-        return None
-
     @property
     def preview_text(self):
         return self.description

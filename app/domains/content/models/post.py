@@ -1,4 +1,5 @@
 from app.core.extensions import db
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Post(db.Model):
     __tablename__ = "posts"
@@ -20,10 +21,37 @@ class Post(db.Model):
     )  # reddit, etc
 
     author = db.Column(db.String(100))
-    subreddit = db.Column(db.String(100), index=True)
 
     upvotes = db.Column(db.Integer, default=0)
     comments_count = db.Column(db.Integer, default=0)
+
+
+    # Newly added fields
+    community = db.Column(
+        db.String(150),
+        index=True
+    )
+
+    url = db.Column(
+        db.Text,
+        nullable=True
+    )
+    
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        index=True
+    )
+
+    platform_metadata = db.Column(
+        JSONB,
+        nullable=True
+    )
+
+    thumbnail_url = db.Column(
+        db.Text,
+        nullable=True
+    )
 
     __table_args__ = (
         db.UniqueConstraint(
@@ -31,15 +59,20 @@ class Post(db.Model):
             "platform",
             name="uq_posts_external_platform"
         ),
+        db.Index(
+            "ix_posts_platform_created_at",
+            "platform",
+            "created_at"
+        ),
+
+        db.Index(
+            "ix_posts_platform_community",
+            "platform",
+            "community"
+        ),
     )
 
     # -------- Helpers --------
-    @property
-    def url(self):
-        if self.platform == "reddit":
-            return f"https://reddit.com/comments/{self.external_id}"
-        return None
-
     @property
     def preview_text(self):
         return self.body[:160] if self.body else None

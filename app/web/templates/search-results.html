@@ -115,7 +115,7 @@ icon="fa-search-minus"
 
 {% if query %}
 <script>
-  window.SEARCH_QUERY = "{{ query }}";
+  window.SEARCH_QUERY = {{ query | tojson | safe }};
 </script>
 {% endif %}
 
