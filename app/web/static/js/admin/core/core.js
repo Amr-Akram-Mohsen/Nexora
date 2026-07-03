@@ -8,6 +8,7 @@ class AdminListController {
     this.tbodyId = config.tbodyId || `${config.domain}-table-body`;
     this.searchId = config.searchId || `${config.domain}-search`;
     this.filterIds = config.filterIds || [];
+    this.filterKeys = config.filterKeys || {};
     this.perPageId = config.perPageId || `${config.domain}-per-page`;
     this.prevBtnId = config.prevBtnId || `${config.domain}-prev-btn`;
     this.nextBtnId = config.nextBtnId || `${config.domain}-next-btn`;
@@ -44,7 +45,13 @@ class AdminListController {
     this.filterIds.forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-        const cleanKey = id.replace(/^(filter-item-|filter-|item-sort-|item-)/, '').replace(/-/g, '_');
+        let cleanKey;
+        if (this.filterKeys && this.filterKeys[id]) {
+          cleanKey = this.filterKeys[id];
+        } else {
+          // Fallback legacy regex mapping
+          cleanKey = id.replace(/^(filter-item-|filter-|item-sort-|item-|user-)/, '').replace(/-/g, '_');
+        }
         filters[cleanKey] = el.value;
       }
     });
@@ -160,6 +167,16 @@ class AdminListController {
     const refreshEl = document.getElementById(this.refreshBtnId);
     if (refreshEl) {
       refreshEl.addEventListener("click", () => this.load(this.currentPage));
+    }
+  }
+
+  updateStatsUI(stats, mapping) {
+    if (!stats || !mapping) return;
+    for (const [key, id] of Object.entries(mapping)) {
+      const el = document.getElementById(id);
+      if (el && stats[key] !== undefined && stats[key] !== null) {
+        el.textContent = Number(stats[key]).toLocaleString();
+      }
     }
   }
 }

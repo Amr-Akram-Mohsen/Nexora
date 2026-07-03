@@ -4,7 +4,8 @@ from app.domains.taxonomy.models import Category, Brand, Topic, Section, Attribu
 from app.shared.utils.slug import generate_slug
 from app.domains.content.models import Content
 from app.domains.item.models import Item
-from app.domains.relationships import content_brands, content_topics, content_attributes
+from app.domains.relationships import content_brands, content_topics, content_attributes, ArticleSource
+from app.domains.external.models import LastAPIFetch
 
 def get_admin_categories_paginated(page, per_page, search="", status=None, health=None):
     stmt = select(Category).order_by(Category.name.asc())
@@ -525,3 +526,90 @@ def get_admin_source_metadata(source):
         "article count": str(article_count)
     }
 
+def get_admin_source_inspect_raw(id):
+    from app.domains.taxonomy.models import Source
+    source = db.session.get(Source, id)
+    if not source:
+        return None
+        
+    content_count = db.session.scalar(select(func.count(Content.id)).filter(Content.source_id == id)) or 0
+    
+    from app.domains.content.models import Article
+    analytics = db.session.query(
+        func.avg(Article.quality_score),
+        func.avg(Article.word_count),
+        func.count(Article.id).filter(Article.is_content_scraped == True),
+        func.min(Content.published_at),
+        func.max(Content.published_at)
+    ).select_from(Content).join(Article, Content.object_id == Article.id).filter(Content.source_id == id, Content.object_type == 'article').first()
+    
+    type_counts = db.session.execute(
+        select(Content.object_type, func.count(Content.id))
+        .where(Content.source_id == id)
+        .group_by(Content.object_type)
+    ).all()
+    
+    channel_counts = db.session.execute(
+        select(Content.ingestion_origin, func.count(Content.id))
+        .where(Content.source_id == id)
+        .where(Content.ingestion_origin.is_not(None))
+        .group_by(Content.ingestion_origin)
+    ).all()
+    
+    category_counts = db.session.scalar(
+        select(func.count(func.distinct(Content.category_id)))
+        .where(Content.source_id == id)
+    ) or 0
+    
+    status_counts = db.session.execute(
+        select(Article.status, func.count(Article.id))
+        .join(Content, Content.object_id == Article.id)
+        .where(Content.source_id == id)
+        .where(Content.object_type == 'article')
+        .group_by(Article.status)
+    ).all()
+    
+    eng_stats = db.session.execute(
+        select(
+            func.sum(Content.view_count).label("views"),
+            func.sum(Content.like_count).label("likes"),
+            func.sum(Content.save_count).label("saves"),
+            func.sum(Content.comment_count).label("comments")
+        ).where(Content.source_id == id)
+    ).first()
+    
+    fetch_health = db.session.execute(
+        select(
+            func.sum(LastAPIFetch.success_count).label("success"),
+            func.sum(LastAPIFetch.failure_count).label("failures"),
+            func.max(LastAPIFetch.consecutive_failures).label("consecutive"),
+            func.max(LastAPIFetch.last_fetched_at).label("last_fetch")
+        )
+        .where(func.lower(LastAPIFetch.source) == source.slug.lower())
+    ).first()
+    
+    primary_count = db.session.scalar(
+        select(func.count(Article.id))
+        .where(Article.primary_source_id != None)
+        .join(ArticleSource, Article.primary_source_id == ArticleSource.id)
+        .where(ArticleSource.source_id == id)
+    ) or 0
+    
+    secondary_count = db.session.scalar(
+        select(func.count(ArticleSource.id))
+        .where(ArticleSource.source_id == id)
+    ) or 0
+    
+    top_articles = db.session.execute(
+        select(Content.id, Content.title, Content.view_count)
+        .where(Content.source_id == id)
+        .where(Content.object_type == 'article')
+        .order_by(Content.view_count.desc())
+        .limit(5)
+    ).all()
+    
+    return (
+        source, content_count, analytics, type_counts, channel_counts,
+        category_counts, status_counts, eng_stats, fetch_health,
+        primary_count, secondary_count, top_articles
+    )

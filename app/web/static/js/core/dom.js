@@ -2,6 +2,13 @@
 // GLOBAL MODAL SYSTEM
 // ==============================
 let activeModalCallback = null;
+let previousActiveElement = null;
+
+function getFocusableElements(container) {
+  return Array.from(container.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  )).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+}
 
 function initModalSystem() {
   const overlay = document.getElementById("dashboard-modal-overlay");
@@ -26,6 +33,31 @@ function initModalSystem() {
     if (e.key === "Escape") closeModal();
   });
 
+  overlay.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab') return;
+
+    const focusableElements = getFocusableElements(overlay);
+    if (focusableElements.length === 0) {
+      e.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstElement) {
+        lastElement.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === lastElement) {
+        firstElement.focus();
+        e.preventDefault();
+      }
+    }
+  });
+
   overlay._initialized = true;
 }
 
@@ -37,13 +69,25 @@ function showModal(title, body, callback) {
   if (titleEl) titleEl.textContent = title;
   if (bodyEl) bodyEl.textContent = body;
   activeModalCallback = callback;
-  if (overlay) overlay.classList.add("active");
+  previousActiveElement = document.activeElement;
+  if (overlay) {
+    overlay.classList.add("active");
+    // Set focus to the first focusable element inside the modal
+    setTimeout(() => {
+      const focusable = getFocusableElements(overlay);
+      if (focusable.length > 0) focusable[0].focus();
+    }, 50);
+  }
 }
 
 function closeModal() {
   const overlay = document.getElementById("dashboard-modal-overlay");
   if (overlay) overlay.classList.remove("active");
   activeModalCallback = null;
+  if (previousActiveElement) {
+    previousActiveElement.focus();
+    previousActiveElement = null;
+  }
 }
 
 // ==============================

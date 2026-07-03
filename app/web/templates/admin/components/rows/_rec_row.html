@@ -4,18 +4,18 @@
     <span class="text-xs text-muted">#{{ row.id }}</span>
   </div>
 </td>
-<td data-field="widget-impressions">{{ "{:,}".format(row.widget_impressions|default(0)) }}</td>
+<td data-field="widget-impressions">{{ "{:,}".format(row.widget_impressions) }}</td>
 <td data-field="widget-ctr">
   {% set ctr_val = row.widget_ctr %}
-  {% if ctr_val is none %}{{ badge("—", variant="secondary") }}
-  {% elif ctr_val >= 3.0 %}{{ badge(ctr_val ~ "%", variant="success") }}
-  {% elif ctr_val >= 1.0 %}{{ badge(ctr_val ~ "%", variant="warning") }}
-  {% elif ctr_val > 0.0 %}{{ badge(ctr_val ~ "%", variant="danger") }}
-  {% else %}{{ badge("0.0%", variant="secondary") }}
-  {% endif %}
+  {% set text, variant = ('—', 'secondary') if ctr_val is none else
+                         (ctr_val ~ '%', 'success') if ctr_val >= 3.0 else
+                         (ctr_val ~ '%', 'warning') if ctr_val >= 1.0 else
+                         (ctr_val ~ '%', 'danger') if ctr_val > 0.0 else
+                         ('0.0%', 'secondary') %}
+  {{ badge(text, variant=variant) }}
 </td>
-<td data-field="last-active">{{ row.last_active|default('—') }}</td>
-<td data-field="linked-items-count">{{ row.linked_items_count|default(0) }}</td>
+<td data-field="last-active">{{ row.last_active|default('') }}</td>
+<td data-field="linked-items-count">{{ row.linked_items_count }}</td>
 <td data-field="linked-items-list">
   {% if row.linked_items_list %}
     <div class="flex flex-wrap gap-1">

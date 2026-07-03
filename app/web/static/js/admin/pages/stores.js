@@ -12,8 +12,7 @@
 
   // ── Fetch Dashboard Stats ────────────────
   function loadDashboardStats() {
-    fetch('/admin/providers/stores/health_stats')
-      .then(r => r.json())
+    window.api.get('/admin/providers/stores/health_stats')
       .then(data => {
         document.getElementById('stats-active-links').textContent = (data.active_links || 0).toLocaleString();
         document.getElementById('stats-total-links').textContent = `${(data.total_links || 0).toLocaleString()} total recorded links`;
@@ -48,11 +47,8 @@
     const ctx = document.getElementById('chart-availability');
     if (!ctx || !breakdown || typeof Chart === 'undefined') return;
     
-    if (availabilityChart) availabilityChart.destroy();
-    
-    availabilityChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    availabilityChart = window.nexoraCharts.render('chart-availability', 'doughnut', {
         labels: ['InStock', 'OutOfStock', 'PreOrder', 'Unknown'],
         datasets: [{
           data: [
@@ -61,45 +57,32 @@
             breakdown.PreOrder || 0, 
             breakdown.Unknown || 0
           ],
-          backgroundColor: ['#10b981', '#f97316', '#3b82f6', '#9ca3af'],
+          backgroundColor: [palette[3], palette[1], palette[2], '#9ca3af'],
           borderWidth: 0
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { position: 'right' }
         }
-      }
-    });
+      });
   }
 
   function renderSyncCadenceChart(cadenceData) {
     const ctx = document.getElementById('chart-sync-cadence');
     if (!ctx || !cadenceData || !cadenceData.length || typeof Chart === 'undefined') return;
     
-    if (syncCadenceChart) syncCadenceChart.destroy();
-    
-    const labels = cadenceData.map(d => d.date);
-    const dataPoints = cadenceData.map(d => d.count);
-    
-    syncCadenceChart = new Chart(ctx, {
-      type: 'line',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    syncCadenceChart = window.nexoraCharts.render('chart-sync-cadence', 'line', {
         labels: labels,
         datasets: [{
           label: 'Sync Volume',
           data: dataPoints,
-          borderColor: '#8b5cf6',
+          borderColor: palette[5],
           backgroundColor: 'rgba(139, 92, 246, 0.1)',
           fill: true,
           tension: 0.4
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         scales: {
           y: { beginAtZero: true, display: false },
           x: { display: false }
@@ -107,39 +90,27 @@
         plugins: {
           legend: { display: false }
         }
-      }
-    });
+      });
   }
 
   function renderAvgSyncAgeChart(storeData) {
     const ctx = document.getElementById('chart-sync-age');
     if (!ctx || !storeData || !storeData.length || typeof Chart === 'undefined') return;
     
-    if (syncAgeChart) syncAgeChart.destroy();
-    
-    const topData = storeData.slice(0, 10);
-    const labels = topData.map(d => d.name);
-    const dataPoints = topData.map(d => d.avg_age_days);
-    
-    syncAgeChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    syncAgeChart = window.nexoraCharts.render('chart-sync-age', 'bar', {
         labels: labels,
         datasets: [{
           label: 'Avg Sync Age (Days)',
           data: dataPoints,
-          backgroundColor: '#3b82f6',
+          backgroundColor: palette[2],
           borderRadius: 4
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { display: false }
         }
-      }
-    });
+      });
   }
 
   function renderTopStaleStores(storeData) {
@@ -147,8 +118,7 @@
   }
 
   function loadCoverageStats() {
-    fetch('/admin/providers/stores/coverage_stats')
-      .then(r => r.json())
+    window.api.get('/admin/providers/stores/coverage_stats')
       .then(data => {
         // Render Category Coverage
         const catContainer = document.getElementById('stats-category-coverage');
@@ -168,8 +138,7 @@
   let programDistributionChart = null;
 
   function loadAffiliateStats() {
-    fetch('/admin/providers/stores/affiliate_stats')
-      .then(r => r.json())
+    window.api.get('/admin/providers/stores/affiliate_stats')
       .then(data => {
         const statsAvg = document.getElementById('stats-avg-commission');
         if (statsAvg) statsAvg.textContent = (data.avg_commission_rate || 0).toFixed(2) + '%';
@@ -192,7 +161,7 @@
                 const alertText = document.getElementById('commission-gap-alert-text');
                 if (alertContainer && alertText) {
                     alertText.textContent = `${gapPct.toFixed(1)}% of your tracked links are missing a commission rate. You are likely losing attribution on these products.`;
-                    alertContainer.style.display = 'flex';
+                    alertContainer.classList.remove('is-hidden');
                 }
             }
         }
@@ -212,79 +181,58 @@
     const ctx = document.getElementById('chart-tracking-coverage');
     if (!ctx || !coverage || typeof Chart === 'undefined') return;
     
-    if (trackingCoverageChart) trackingCoverageChart.destroy();
-    
-    trackingCoverageChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    trackingCoverageChart = window.nexoraCharts.render('chart-tracking-coverage', 'doughnut', {
         labels: Object.keys(coverage),
         datasets: [{
           data: Object.values(coverage),
-          backgroundColor: ['#10b981', '#f97316'],
+          backgroundColor: [palette[3], palette[1]],
           borderWidth: 0
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { position: 'right' }
         }
-      }
-    });
+      });
   }
 
   function renderDeeplinkFreshnessChart(freshness) {
     const ctx = document.getElementById('chart-deeplink-freshness');
     if (!ctx || !freshness || typeof Chart === 'undefined') return;
     
-    if (deeplinkFreshnessChart) deeplinkFreshnessChart.destroy();
-    
-    deeplinkFreshnessChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    deeplinkFreshnessChart = window.nexoraCharts.render('chart-deeplink-freshness', 'doughnut', {
         labels: Object.keys(freshness),
         datasets: [{
           data: Object.values(freshness),
-          backgroundColor: ['#10b981', '#3b82f6', '#f97316', '#ef4444'],
+          backgroundColor: [palette[3], palette[2], palette[1], palette[4]],
           borderWidth: 0
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { position: 'right' }
         }
-      }
-    });
+      });
   }
 
   function renderProgramDistributionChart(distribution) {
     const ctx = document.getElementById('chart-program-distribution');
     if (!ctx || !distribution || !distribution.length || typeof Chart === 'undefined') return;
     
-    if (programDistributionChart) programDistributionChart.destroy();
-    
-    programDistributionChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    programDistributionChart = window.nexoraCharts.render('chart-program-distribution', 'bar', {
         labels: distribution.map(d => d.name),
         datasets: [{
           label: 'Number of Links',
           data: distribution.map(d => d.count),
-          backgroundColor: '#8b5cf6',
+          backgroundColor: palette[5],
           borderRadius: 4
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { display: false }
         }
-      }
-    });
+      });
   }
 
   function renderTopCommissionStores(storeData) {
@@ -295,8 +243,7 @@
   let priceStalenessChart = null;
 
   function loadPricingStats() {
-    fetch('/admin/providers/stores/pricing_stats')
-      .then(r => r.json())
+    window.api.get('/admin/providers/stores/pricing_stats')
       .then(data => {
         const statsNull = document.getElementById('stats-null-prices');
         if (statsNull) statsNull.textContent = (data.null_price_count || 0).toLocaleString();
@@ -312,7 +259,7 @@
         const alertsList = document.getElementById('pricing-alerts-list');
         if (alertsContainer && alertsList) {
             alertsList.innerHTML = data.pricing_alerts_html || '';
-            if (data.pricing_alerts_html) alertsContainer.style.display = 'block';
+            if (data.pricing_alerts_html) alertsContainer.classList.remove('is-hidden');
         }
         
         renderCurrencyMixChart(data.currency_mix);
@@ -331,26 +278,19 @@
     const ctx = document.getElementById('chart-currency-mix');
     if (!ctx || !currencyData || typeof Chart === 'undefined') return;
     
-    if (currencyMixChart) currencyMixChart.destroy();
-    
-    currencyMixChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    currencyMixChart = window.nexoraCharts.render('chart-currency-mix', 'doughnut', {
         labels: Object.keys(currencyData),
         datasets: [{
           data: Object.values(currencyData),
-          backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ef4444'],
+          backgroundColor: [palette[2], palette[3], palette[1], palette[5], palette[4]],
           borderWidth: 0
         }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         plugins: {
           legend: { position: 'right' }
         }
-      }
-    });
+      });
   }
 
   function renderDiscountRanking(storeData) {
@@ -361,32 +301,22 @@
     const ctx = document.getElementById('chart-price-staleness');
     if (!ctx || !gridData || !gridData.length || typeof Chart === 'undefined') return;
     
-    if (priceStalenessChart) priceStalenessChart.destroy();
-    
-    const labels = gridData.map(d => d.name);
-    const freshData = gridData.map(d => d.fresh);
-    const staleData = gridData.map(d => d.stale);
-    
-    priceStalenessChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
+    const palette = window.nexoraCharts.getColors();
+    priceStalenessChart = window.nexoraCharts.render('chart-price-staleness', 'bar', {
         labels: labels,
         datasets: [
           {
             label: 'Fresh (< 7 days)',
             data: freshData,
-            backgroundColor: '#10b981'
+            backgroundColor: palette[3]
           },
           {
             label: 'Stale (> 7 days)',
             data: staleData,
-            backgroundColor: '#f97316'
+            backgroundColor: palette[1]
           }
         ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+      }, {
         scales: {
           x: { stacked: true },
           y: { stacked: true }
@@ -394,8 +324,7 @@
         plugins: {
           legend: { position: 'top' }
         }
-      }
-    });
+      });
   }
 
   function applyStoreUrlFilters() {

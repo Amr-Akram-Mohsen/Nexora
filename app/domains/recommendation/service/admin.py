@@ -137,7 +137,7 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
                 .where(RecommendationClick.context_id == context_id_val)
             ) or 0
             
-            widget_ctr = f"{(widget_clicks / widget_impressions * 100):.1f}%" if widget_impressions > 0 else "0.0%"
+            widget_ctr = round((widget_clicks / widget_impressions * 100), 1) if widget_impressions > 0 else 0.0
             
             last_impression = db.session.scalar(
                 select(func.max(RecommendationImpression.created_at))
@@ -171,25 +171,17 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
             })
     return total, pages, serialized
 
-def build_admin_match_inspect_data(content_id):
+def get_admin_match_inspect_raw(content_id):
     from sqlalchemy.orm import selectinload
     content = db.session.execute(
         select(Content).options(selectinload(Content.linked_items)).where(Content.id == content_id)
     ).scalar_one_or_none()
     if not content:
         return None
-
-    data = {
-        "content id": f"#{content.id}",
-        "title": content.title or "—",
-        "type": content.object_type,
-        "views count": str(content.view_count or 0),
-    }
-    
+        
     from app.domains.interaction.models import ItemClick
     from app.domains.item.models import ItemStoreLink, ItemVariant
     
-    linked_items_data = []
     referrer_pattern = f"%{content.object_type}/{content.object_id}%" if content.object_id else f"%/{content.id}%"
     context_id_val = f"{content.object_type}/{content.object_id}" if content.object_id else f"article/{content.id}"
     
@@ -208,12 +200,8 @@ def build_admin_match_inspect_data(content_id):
         select(func.max(RecommendationImpression.created_at))
         .where(RecommendationImpression.context_id == context_id_val)
     )
-    last_active = last_impression.strftime("%Y-%m-%d %H:%M") if last_impression else "Never"
     
-    data["widget impressions"] = "{:,}".format(widget_impressions)
-    data["unique users reached"] = "{:,}".format(unique_users)
-    data["last active"] = last_active
-
+    linked_items_stats = []
     for i in content.linked_items:
         context_clicks = db.session.scalar(
             select(func.count(ItemClick.id))
@@ -229,21 +217,9 @@ def build_admin_match_inspect_data(content_id):
             .where(RecommendationClick.entity_id == str(i.id))
         ) or 0
         
-        widget_ctr = f"{(widget_clicks / widget_impressions * 100):.1f}%" if widget_impressions > 0 else "0.0%"
-        affiliate_ctr = f"{(context_clicks / content.view_count * 100):.1f}%" if content.view_count and content.view_count > 0 else "0.0%"
+        linked_items_stats.append((i, context_clicks, widget_clicks))
         
-        linked_items_data.append({
-            "id": i.id,
-            "name": i.name or f"Item #{i.id}",
-            "type": i.item_type,
-            "clicks": f"{widget_clicks} ({widget_ctr} Widget) | {context_clicks} ({affiliate_ctr} Affiliate) | {i.click_count or 0} Total"
-        })
-
-    return {
-        "raw_data": data,
-        "linked_items": linked_items_data,
-        "inspect_id": content.id
-    }
+    return (content, widget_impressions, unique_users, last_impression, linked_items_stats)
 
 def get_admin_context_performance():
     stmt = (
@@ -460,7 +436,7 @@ def get_admin_slot_analysis():
     
     return {"labels": labels, "data": data}
 
-def build_admin_user_interests_data(user_id):
+def get_admin_user_interests_raw(user_id):
     from app.domains.user.models import User
     from app.domains.recommendation.models import UserInterest, UserEntityInterest
     from app.domains.taxonomy.models import Brand, Category, Topic
@@ -483,29 +459,7 @@ def build_admin_user_interests_data(user_id):
         .limit(5)
     ).all()
     
-    data = {}
-    for i, row in enumerate(scores):
-        name = "Unknown"
-        if row.brand_id:
-            brand = db.session.get(Brand, row.brand_id)
-            name = f"Brand: {brand.name}" if brand else f"Brand #{row.brand_id}"
-        elif row.category_id:
-            category = db.session.get(Category, row.category_id)
-            name = f"Category: {category.name}" if category else f"Category #{row.category_id}"
-        elif row.topic_id:
-            topic = db.session.get(Topic, row.topic_id)
-            name = f"Topic: {topic.name}" if topic else f"Topic #{row.topic_id}"
-            
-        data[f"affinity {i+1}"] = {
-            "value": {"label": name, "detail": f"Score: {round(row.total_score, 3)}"},
-            "is_labeled": True
-        }
-        
-    for i in range(len(scores), 5):
-        data[f"affinity {i+1}"] = "—"
-    return {
-        "raw_data": data
-    }
+    return (user, scores)
 
 def delete_admin_match(content_id, item_id):
     db.session.execute(

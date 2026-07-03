@@ -15,7 +15,9 @@
   letter-spacing: -0.015em;
   margin: 0;
 }
-.meta-pill {background: var(--muted);
+
+.meta-pill {
+  background: var(--muted);
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);
   font-size: 0.875rem;
@@ -129,4 +131,150 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* ── Markdown Dynamic Content Styles ─────────────────────────────────────── */
+.article-rich-text img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+  margin: 2rem auto;
+  display: block;
+  box-shadow: var(--shadow-md);
+}
+
+.article-rich-text ul,
+.article-rich-text ol {
+  margin: 1.5rem 0 1.5rem 2.5rem;
+}
+
+.article-rich-text ul {
+  list-style-type: disc;
+}
+
+.article-rich-text ol {
+  list-style-type: decimal;
+}
+
+.article-rich-text li {
+  margin-bottom: 0.5rem;
+  line-height: 1.7;
+}
+
+.article-rich-text h4,
+.article-rich-text h5,
+.article-rich-text h6 {
+  margin: 2rem 0 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.article-rich-text a {
+  color: var(--brand-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.article-rich-text a:hover {
+  color: var(--brand-blue-dark);
+}
+
+/* ── Content Blocks Renderer ──────────────────────────────────────────────── */
+
+/* Figures / Images */
+.article-blocks figure.article-figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.article-blocks figure.article-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.article-blocks figure.article-figure figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+/* Blockquotes */
+.article-blocks blockquote {
+  border-left: 3px solid var(--domain-primary);
+  padding: 0.75rem 1.25rem;
+  margin: 1.75rem 0;
+  background: rgba(var(--domain-primary-rgb, 99, 102, 241), 0.05);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.article-blocks blockquote p {
+  margin: 0;
+}
+
+/* Code blocks */
+.article-blocks pre {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.75rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.article-blocks pre code {
+  background: none;
+  padding: 0;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Tables */
+.article-table-wrapper {
+  overflow-x: auto;
+  margin: 2rem 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.article-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.article-table-wrapper th {
+  background: var(--muted);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+}
+
+.article-table-wrapper td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.article-table-wrapper tr:last-child td {
+  border-bottom: none;
+}
+
+/* Dividers */
+hr.article-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+  opacity: 0.6;
 }

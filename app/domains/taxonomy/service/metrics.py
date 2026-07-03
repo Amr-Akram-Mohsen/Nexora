@@ -12,7 +12,6 @@ def get_category_metrics(category_ids: list[int]) -> dict:
     return {cid: {
         "content_count": content_counts.get(cid, 0), 
         "item_count": item_counts.get(cid, 0), 
-        "children_count": children_counts.get(cid, 0)
     } for cid in category_ids}
 
 def get_brand_metrics(brand_ids: list[int]) -> dict:

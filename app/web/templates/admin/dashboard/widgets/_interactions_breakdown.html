@@ -1,4 +1,5 @@
 <div class="overview-breakdown-grid flex gap-3 flex-col">
+  {% set interactions = stats.interactions %}
   {% set total = interactions.total or 1 %}
 
   {% set items = [
@@ -12,17 +13,11 @@
   if interactions.item_clicks is defined else 0)), 'icon': '<i class="fa-solid fa-cart-shopping"></i>' }
   ] %}
 
+  {% from "admin/components/ui/dashboard.html" import breakdown_progress_bar %}
   {% for it in items %}
   {% set pct = ((it.val / total) * 100) | round | int %}
-  <div class="overview-breakdown-row flex items-center gap-3">
-    <span class="overview-breakdown-icon">{{ it.icon|safe }}</span>
-    <span class="overview-breakdown-label">{{ it.label }}</span>
-    <div class="overview-breakdown-bar-track">
-      <div class="overview-breakdown-bar" style="width: {{ pct }}%;"></div>
-    </div>
-    <span class="overview-breakdown-val">{{ "{:,}".format(it.val) }}</span>
-    <span class="overview-breakdown-pct">{{ pct }}%</span>
-  </div>
+  {% set val_str = "{:,} ({}%)".format(it.val, pct) %}
+  {{ breakdown_progress_bar(it.label, val_str, pct, "var(--brand-purple)", it.icon, "overview-breakdown-row") }}
   {% endfor %}
 
   {% if share_channels %}

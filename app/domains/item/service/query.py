@@ -291,69 +291,6 @@ def get_filtered_items_for_home(filter_type="recent", limit=10, exclude_ids=None
 
     return [serialize_item(item) for item in items]
 
-def get_popular_items(
-    category_slugs: tuple | None = None,
-    brand_slugs: tuple | None = None,
-    limit: int = 6,
-    session=None
-) -> list[dict]:
-    from app.domains.item.models import Item
-    from app.domains.taxonomy.models import Category, Brand
-    from app.domains.item.service.utils import build_item_stmt, fetch_items
-    from app.domains.item.service.serializers import serialize_item
-    
-    if session is None:
-        from app.core.extensions import db
-        session = db.session
-    
-    stmt = build_item_stmt(eager_load="card")
-    if category_slugs:
-        stmt = stmt.join(Item.category).where(Category.slug.in_(list(category_slugs)))
-    if brand_slugs:
-        stmt = stmt.join(Item.brand).where(Brand.slug.in_(list(brand_slugs)))
-        item.variants.append(variant)
-        return variant
-
-    if not any(v.is_default for v in item.variants):
-        item.variants[0].is_default = True
-
-
-def get_active_store_links(item):
-    return [
-        link
-        for variant in item.variants
-        for link in variant.store_links
-        if link.is_active
-    ]
-
-
-def count_items(session=None):
-    from sqlalchemy import func
-    if session is None:
-        session = db.session
-    return session.execute(select(func.count(Item.id))).scalar() or 0
-
-
-def get_items(search=None, brand=None, rows_count=10, session=None):
-    from .utils import build_item_stmt, fetch_items
-    
-    stmt = build_item_stmt(eager_load="card")
-    stmt = stmt.order_by(Item.created_at.desc())
-
-    if search and search.strip():
-        stmt = stmt.where(
-            or_(Item.name.ilike(f"%{search}%"), Item.description.ilike(f"%{search}%"))
-        )
-
-    if brand:
-        stmt = stmt.join(Item.brand).where(Brand.slug == brand)
-
-    if rows_count:
-        stmt = stmt.limit(rows_count)
-
-    return fetch_items(stmt, session)
-
-
 @cache.memoize(timeout=3600)
 def get_distinct_stores(session=None):
     from ..models import Store

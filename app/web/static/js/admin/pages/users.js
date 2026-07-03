@@ -131,12 +131,14 @@
         currentSortDir = 'desc';
       }
       
-      // Update arrows
+      // Update arrows and aria-sort
       document.querySelectorAll("th[data-sort]").forEach(col => {
           col.textContent = col.textContent.replace(/ [↑↓↕]/, ' ↕');
+          col.removeAttribute('aria-sort');
       });
       th.textContent = th.textContent.replace(/ [↑↓↕]/, currentSortDir === 'desc' ? ' ↓' : ' ↑');
-      
+      th.setAttribute('aria-sort', currentSortDir === 'desc' ? 'descending' : 'ascending');
+
       window.usersController.load(1);
     });
 
@@ -201,7 +203,19 @@
               }]
             });
           }
-        });
+
+          if (document.getElementById('engagementTierChart')) {
+            window.nexoraCharts.render('engagementTierChart', 'bar', {
+              labels: Object.keys(data.engagement_tiers),
+              datasets: [{
+                label: 'Users',
+                data: Object.values(data.engagement_tiers),
+                backgroundColor: window.nexoraCharts.getColors(),
+              }]
+            }, { plugins: { legend: { display: false } }, indexAxis: 'y' });
+          }
+        })
+        .catch(err => console.error("Error loading user charts", err));
     }
 
     initUserCharts();

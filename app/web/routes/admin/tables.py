@@ -43,7 +43,7 @@ CRUD_TABLES = {
             "quality & scoring": ["base score", "review score", "article quality score"],
             "taxonomy & targeting": ["intent", "gender", "price tier", "attributes"],
             "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "acquired via"],
-            "status & lifecycle": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "renderation status"]
+            "status & lifecycle": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "rendering status"]
         }
     },
     "items": {
@@ -97,20 +97,20 @@ CRUD_TABLES = {
         "preview_table": ["Content Title", "Content Views", "Linked Items Count", "Linked Items IDs", "Actions"],
         "detailed_table": {
             "content info": ["id", "title", "type", "category", "views count"],
-            "item info": ["id", "name", "category", "brand", "price", "store count", "totle clicks"],
+            "item info": ["id", "name", "category", "brand", "price", "store count", "total clicks"],
         }
     },
     "categories": {
         "id": "categories",
-        "preview_table": ["Name", "Status", "heirarchy level", "Actions"],
+        "preview_table": ["Name", "Status", "Hierarchy Level", "Content Count", "Product Count", "Health Status", "Actions"],
         "detailed_table": {
-            "category info": ["id", "slug", "name", "status", "sort order", "heirarchy level", "parent name"],
+            "category info": ["id", "slug", "name", "status", "sort order", "hierarchy level", "parent name"],
             "related metadata": ["child categories", "content count", "item count"],
         }
     },
     "brands": {
         "id": "brands",
-        "preview_table": ["Name", "Status", "Featured", "Actions"],
+        "preview_table": ["Name", "Industry", "Status", "Content Count", "Product Count", "Health Status", "Actions"],
         "detailed_table": {
             "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
             "related metadata": ["content count", "item count"]
@@ -118,7 +118,7 @@ CRUD_TABLES = {
     },
     "topics": {
         "id": "topics",
-        "preview_table": ["Name", "Status", "Featured", "Actions"],
+        "preview_table": ["Name", "Status", "Content Count", "Category Count", "Health Status", "Actions"],
         "detailed_table": {
             "topic info": ["id", "slug", "name", "featured", "status", "sort order"],
             "related metadata": ["content count", "related categories", "related brands"],
@@ -126,7 +126,7 @@ CRUD_TABLES = {
     },
     "sections": {
         "id": "sections",
-        "preview_table": ["Name", "Status", "Description", "Actions"],
+        "preview_table": ["Name", "Description", "Status", "Content Count", "Category Count", "Health Status", "Actions"],
         "detailed_table": {
             "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
             "related metadata": ["content count", "category count", "related brands"],
@@ -260,8 +260,16 @@ def get_inspect_table(table_name, data):
     for section_name, fields in table.items():
         mapped_table[section_name.title()] = []
         for field in fields:
-            field_data = data.get(field)
-            if isinstance(field_data, dict):
+            if field not in data:
+                continue
+            field_data = data[field]
+            
+            if field_data is None:
+                mapped_table[section_name.title()].append({
+                    "label": field.title(),
+                    "value": "—"
+                })
+            elif isinstance(field_data, dict):
                 entry = {"label": field.title()}
                 entry.update(field_data)
                 if "value" not in entry:
@@ -276,6 +284,9 @@ def get_inspect_table(table_name, data):
             else:
                 mapped_table[section_name.title()].append({
                     "label": field.title(),
-                    "value": str(field_data) if field_data is not None else "—"
+                    "value": str(field_data)
                 })
+        # Remove empty sections
+        if not mapped_table[section_name.title()]:
+            del mapped_table[section_name.title()]
     return mapped_table

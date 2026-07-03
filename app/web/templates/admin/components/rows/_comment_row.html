@@ -17,7 +17,7 @@
     —
   {% endif %}
 </td>
-<td data-field="date">{{ row.created_at|truncate(10, True, '') if row.created_at else '—' }}</td>
+<td data-field="date">{{ row.created_at if row.created_at else '' }}</td>
 <td data-field="user">{{ row.username }}</td>
 {% if not hide_action_column %}
 <td data-field="actions">

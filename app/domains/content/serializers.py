@@ -1,0 +1,82 @@
+from typing import Optional, Dict, Any
+
+def serialize_content_inspect_dto(content, target) -> Optional[Dict[str, Any]]:
+    """
+    Serializes a Content ORM model and its polymorphic target into a flat, 
+    presentation-agnostic DTO dictionary.
+    """
+    if not content:
+        return None
+
+    sources = []
+    if content.object_type == "article" and target and hasattr(target, "sorted_source_relations"):
+        sources = [s.source.name for s in target.sorted_source_relations if s.source]
+    elif content.source:
+        sources = [content.source.name]
+
+    status_val = getattr(target, "status", "complete") if target else "complete"
+
+    dto = {
+        "id": content.id,
+        "title": content.title,
+        "object_type": content.object_type,
+        "is_published": content.is_published,
+        "is_active": content.is_active,
+        "published_at": content.published_at.strftime("%Y-%m-%d") if content.published_at else None,
+        "ingested_at": content.ingested_at.isoformat() if content.ingested_at else None,
+        "ingestion_origin": content.ingestion_origin,
+        
+        "section": {"slug": content.section.slug, "name": content.section.name} if content.section else None,
+        "category": {"slug": content.category.slug, "name": content.category.name} if content.category else None,
+        "source": {"name": content.source.name} if content.source else None,
+        
+        "intent": content.intent.name if content.intent else None,
+        "gender": content.gender.name if content.gender else None,
+        "price_tier": content.price_tier.name if content.price_tier else None,
+        
+        "brands": [b.name for b in content.brands],
+        "topics": [t.name for t in content.topics],
+        "attributes": [a.name for a in content.attributes],
+        "linked_items": [{"id": i.id, "name": i.name} for i in content.linked_items],
+        "sources": sources,
+        
+        "enrichment_status": status_val,
+        "view_count": content.view_count,
+        "like_count": content.like_count,
+        "dislike_count": content.dislike_count,
+        "comment_count": content.comment_count,
+        "share_count": content.share_count,
+        "save_count": content.save_count,
+        "score": content.score,
+        "review_score": content.review_score,
+        
+        "comments": [
+            {
+                "user_name": c.user.name if getattr(c, "user", None) else f"User #{c.user_id}",
+                "content": c.content,
+                "created_at": c.created_at.isoformat() if c.created_at else None
+            }
+            for c in content.comments
+        ]
+    }
+
+    if content.object_type == "video" and target:
+        dto["platform"] = getattr(target, "platform", None)
+        dto["channel_name"] = getattr(target, "channel_name", None)
+    elif content.object_type == "post" and target:
+        dto["platform"] = getattr(target, "platform", None)
+        dto["author"] = getattr(target, "author", None)
+        dto["subreddit"] = getattr(target, "subreddit", None)
+        dto["upvotes"] = getattr(target, "upvotes", 0)
+        dto["platform_comments_count"] = getattr(target, "comments_count", 0)
+    elif content.object_type == "article" and target:
+        dto["is_content_scraped"] = getattr(target, "is_content_scraped", False)
+        dto["word_count"] = getattr(target, "word_count", 0)
+        dto["read_time_minutes"] = getattr(target, "read_time_minutes", None)
+        dto["article_quality_score"] = getattr(target, "quality_score", 0)
+        dto["last_enrichment_attempt"] = target.last_enrichment_attempt.isoformat() if getattr(target, "last_enrichment_attempt", None) else None
+        
+        # Original Link
+        dto["original_url"] = getattr(target, "url", None)
+
+    return dto

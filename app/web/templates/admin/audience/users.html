@@ -37,6 +37,12 @@
     </div>
   </div>
   {% endcall %}
+
+  {% call admin_panel("Engagement", "User Activity Tiers") %}
+  <div>
+    <canvas id="engagementTierChart"></canvas>
+  </div>
+  {% endcall %}
 </div>
 {% endblock %}
 

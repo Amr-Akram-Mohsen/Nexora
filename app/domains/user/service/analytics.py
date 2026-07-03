@@ -29,10 +29,45 @@ def get_user_dashboard_stats():
     
     growth = {m: c for m, c in growth_data if m}
 
+    views_sub = select(View.user_id, func.count(View.id).label("cnt")).where(View.user_id.isnot(None)).group_by(View.user_id).subquery()
+    clicks_sub = select(ItemClick.user_id, func.count(ItemClick.id).label("cnt")).where(ItemClick.user_id.isnot(None)).group_by(ItemClick.user_id).subquery()
+    saves_sub = select(Save.user_id, func.count(Save.id).label("cnt")).group_by(Save.user_id).subquery()
+    reactions_sub = select(Reaction.user_id, func.count(Reaction.id).label("cnt")).group_by(Reaction.user_id).subquery()
+    comments_sub = select(Comment.user_id, func.count(Comment.id).label("cnt")).group_by(Comment.user_id).subquery()
+    shares_sub = select(Share.user_id, func.count(Share.id).label("cnt")).group_by(Share.user_id).subquery()
+
+    engagement_score_expr = (
+        func.coalesce(views_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['views'] +
+        func.coalesce(clicks_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['clicks'] +
+        func.coalesce(saves_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['saves'] +
+        func.coalesce(reactions_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['reactions'] +
+        func.coalesce(comments_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['comments'] +
+        func.coalesce(shares_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['shares']
+    )
+
+    stmt = select(engagement_score_expr.label("score")).select_from(User)\
+        .outerjoin(views_sub, User.id == views_sub.c.user_id)\
+        .outerjoin(clicks_sub, User.id == clicks_sub.c.user_id)\
+        .outerjoin(saves_sub, User.id == saves_sub.c.user_id)\
+        .outerjoin(reactions_sub, User.id == reactions_sub.c.user_id)\
+        .outerjoin(comments_sub, User.id == comments_sub.c.user_id)\
+        .outerjoin(shares_sub, User.id == shares_sub.c.user_id)
+        
+    scores = db.session.execute(stmt).scalars().all()
+    
+    tiers = {
+        "Power User (200+)": sum(1 for s in scores if s >= 200),
+        "High (50+)": sum(1 for s in scores if 50 <= s < 200),
+        "Medium (10+)": sum(1 for s in scores if 10 <= s < 50),
+        "Low (1-9)": sum(1 for s in scores if 0 < s < 10),
+        "Inactive (0)": sum(1 for s in scores if s == 0)
+    }
+
     return {
         "roles": roles,
         "providers": providers,
-        "growth": growth
+        "growth": growth,
+        "engagement_tiers": tiers
     }
 
 

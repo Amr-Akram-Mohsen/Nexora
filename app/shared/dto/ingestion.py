@@ -40,11 +40,16 @@ class EnrichedItemDTO(ClassifiedItemDTO):
 
     content_html: Optional[str] = None
     content_text: Optional[str] = None
+    content_markdown: Optional[str] = None
+    content_blocks: Optional[list] = None  # canonical structured representation
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0
     is_content_scraped: Optional[bool] = False
     content_source: Optional[str] = None
     content: Optional[str] = None  # legacy key for body/html
+    author: Optional[str] = None
+    extended_metadata: Optional[dict] = None
+    extracted_images: Optional[list] = None
 
 
 class ArticleCreateDTO(BaseModel):
@@ -64,11 +69,16 @@ class ArticleCreateDTO(BaseModel):
     source_name: Optional[str] = None
     content_html: Optional[str] = None
     content_text: Optional[str] = None
+    content_markdown: Optional[str] = None
+    content_blocks: Optional[list] = None  # canonical structured representation
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0
     is_content_scraped: Optional[bool] = False
     content_source: Optional[str] = None
     content: Optional[str] = None  # legacy key for body
+    author: Optional[str] = None
+    extended_metadata: Optional[dict] = None
+    extracted_images: Optional[list] = None
 
     # Metadata preserved from Classification/Enrichment
     section_slug: Optional[str] = None

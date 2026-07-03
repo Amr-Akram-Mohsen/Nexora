@@ -1,17 +1,4 @@
 /* Premium Aesthetics for Insights Module */
-:root {
-    --insights-violet: #6366f1;
-    --insights-violet-light: rgba(99, 102, 241, 0.04);
-    --insights-violet-border: rgba(99, 102, 241, 0.15);
-    --insights-orange: #f59e0b;
-    --insights-orange-light: rgba(245, 158, 11, 0.04);
-    --insights-orange-border: rgba(245, 158, 11, 0.15);
-    --insights-gradient-indigo: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%);
-    --insights-gradient-orange: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, rgba(239, 68, 68, 0.04) 100%);
-    --insights-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --insights-hover-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
 .insights-section {
     margin-bottom: 1.5rem;
 }
@@ -22,20 +9,20 @@
     border-radius: var(--radius-md);
     padding: 1rem;
     position: relative;
-    box-shadow: var(--insights-card-shadow);
+    box-shadow: var(--shadow-sm);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .insights-opp-card:hover {
     border-color: rgba(var(--brand-blue-rgb), 0.35);
-    box-shadow: var(--insights-hover-shadow);
+    box-shadow: var(--shadow-md);
 }
 
 .opp-tag {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    font-size: 10px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
     padding: 0.2rem 0.6rem;
     border-radius: var(--radius-full);
@@ -45,7 +32,7 @@
 
 .opp-tag.cat {
     background: rgba(99, 102, 241, 0.08);
-    color: var(--insights-violet);
+    color: var(--brand-purple);
 }
 
 .opp-title {
@@ -99,10 +86,10 @@
 }
 
 .trend-badge {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
     gap: 3px;
     letter-spacing: 0.02em;
 }
@@ -180,13 +167,13 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    box-shadow: var(--insights-card-shadow);
+    box-shadow: var(--shadow-sm);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .rec-stat-card:hover {
     border-color: rgba(var(--brand-blue-rgb), 0.35);
-    box-shadow: var(--insights-hover-shadow);
+    box-shadow: var(--shadow-md);
 }
 
 /* Benchmark widget improvements */
@@ -250,18 +237,18 @@
     border-radius: var(--radius-md);
     padding: 1rem;
     position: relative;
-    box-shadow: var(--insights-card-shadow);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .rec-action-card:hover {
     border-color: rgba(var(--brand-blue-rgb), 0.35);
-    box-shadow: var(--insights-hover-shadow);
+    box-shadow: var(--shadow-md);
 }
 
 .rec-action-tag-wrap {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
     border-radius: var(--radius-sm);
 }
@@ -297,7 +284,7 @@
 }
 
 .rec-action-box-recommendation {
-    color: var(--insights-violet);
+    color: var(--brand-purple);
     font-weight: var(--weight-bold);
 }
 
@@ -341,14 +328,14 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 1rem;
-    box-shadow: var(--insights-card-shadow);
+    box-shadow: var(--shadow-sm);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     position: relative;
 }
 
 .kanban-task-card:hover {
     border-color: rgba(var(--brand-blue-rgb), 0.35);
-    box-shadow: var(--insights-hover-shadow);
+    box-shadow: var(--shadow-md);
 }
 
 .kanban-task-header {
@@ -356,7 +343,7 @@
 }
 
 .kanban-task-platform {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
     color: var(--muted-foreground);
 }
@@ -370,7 +357,7 @@
 }
 
 .kanban-task-meta {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     color: var(--muted-foreground);
     margin: 0 0 0.5rem 0;
 }
@@ -381,14 +368,14 @@
     color: var(--foreground);
     padding: 0.5rem 0.6rem;
     background: rgba(99, 102, 241, 0.03);
-    border-left: 3px solid var(--insights-violet);
+    border-left: 3px solid var(--brand-purple);
     border-radius: 2px;
     margin-top: 0.5rem;
 }
 
 .kanban-task-risk {
     margin-top: 0.6rem;
-    font-size: 11px;
+    font-size: var(--text-2xs);
     color: var(--brand-red);
     font-weight: var(--weight-bold);
     line-height: 1.3;
@@ -401,7 +388,7 @@
     background: rgba(16, 185, 129, 0.02);
     border: 1px solid var(--border);
     border-radius: 4px;
-    font-size: 10px;
+    font-size: var(--text-2xs);
     font-family: var(--font-mono, monospace);
     line-height: 1.4;
     color: var(--brand-green-dark);
@@ -418,7 +405,7 @@
     list-style: none;
     padding-left: 0;
     margin: 0;
-    font-size: 13px;
+    font-size: var(--text-sm);
     flex-direction: column;
 }
 
@@ -462,7 +449,7 @@
 }
 
 .asset-mapping-item-meta {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     color: var(--muted-foreground);
 }
 
@@ -497,7 +484,7 @@
 .insights-accuracy-score {
     font-size: 2.25rem;
     font-weight: var(--weight-xbold);
-    color: var(--insights-violet);
+    color: var(--brand-purple);
     letter-spacing: -0.02em;
     line-height: 1;
 }
@@ -515,7 +502,7 @@
     background: var(--card);
     position: relative;
     width: 100%;
-    box-shadow: var(--insights-card-shadow);
+    box-shadow: var(--shadow-sm);
 }
 
 .failure-header {
@@ -523,7 +510,7 @@
 }
 
 .failure-type {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
     color: var(--brand-red);
     text-transform: uppercase;
@@ -532,13 +519,13 @@
 
 .failure-title {
     font-weight: var(--weight-bold);
-    font-size: 12px;
+    font-size: var(--text-xs);
     margin-bottom: 0.35rem;
     color: var(--foreground);
 }
 
 .failure-cause {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     color: var(--muted-foreground);
     margin: 0 0 0.6rem 0;
     line-height: 1.35;
@@ -547,7 +534,7 @@
 .failure-recommendation {
     background: var(--background);
     border: 1px solid var(--border);
-    font-size: 11px;
+    font-size: var(--text-2xs);
     padding: 0.6rem;
     border-radius: var(--radius-md);
     color: var(--foreground);
@@ -558,7 +545,7 @@
 .strategy-table-rank {
     font-size: 1.25rem;
     font-weight: var(--weight-bold);
-    color: var(--insights-violet);
+    color: var(--brand-purple);
 }
 
 
@@ -850,7 +837,7 @@
 
 .distribution-modal-label {
     display: block;
-    font-size: 11px;
+    font-size: var(--text-2xs);
     font-weight: var(--weight-bold);
     color: var(--muted-foreground);
     text-transform: uppercase;
@@ -902,7 +889,7 @@
 }
 
 .coverage-meta {
-    font-size: 11px;
+    font-size: var(--text-2xs);
     color: var(--muted-foreground);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -918,7 +905,7 @@
 }
 
 .coverage-total {
-    font-size: 11px;
+    font-size: var(--text-2xs);
 }
 
 .coverage-progress-bar-wrap {

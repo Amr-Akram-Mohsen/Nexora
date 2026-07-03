@@ -2,7 +2,7 @@
 import time
 from datetime import datetime, timezone, timedelta
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from sqlalchemy import select, desc
 from app.web.routes.admin.insights import get_cached, set_cached, invalidate_cache
@@ -23,11 +23,7 @@ from app.domains.analytics import (
 bp = Blueprint("api_distribution", __name__, url_prefix="/admin/distribution")
 
 
-@bp.before_request
-# @admin_required
-def require_admin():
-    """Ensure all distribution endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 @bp.route("/publishing-plan", methods=["GET"])

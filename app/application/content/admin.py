@@ -1,7 +1,34 @@
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category
-from app.domains.content.service.admin import delete_admin_content_and_relations, retry_admin_pipeline
+from app.domains.content.service.admin import delete_admin_content_and_relations, retry_admin_pipeline, get_admin_content_inspect_raw
+from app.domains.interaction.service.scoring import get_content_engagement_score
+from app.domains.distribution.services import get_distribution_history
+from app.domains.content.serializers import serialize_content_inspect_dto
+
+def get_content_inspect_workflow(content_id: int) -> dict:
+    raw_data = get_admin_content_inspect_raw(content_id)
+    if not raw_data:
+        return None
+    
+    content = raw_data["content"]
+    target = raw_data["target"]
+    
+    dto = serialize_content_inspect_dto(content, target)
+    engagement_score = get_content_engagement_score(content_id)
+    distribution_history = get_distribution_history("content", content_id)
+    
+    # Optional: fetch raw article_sources for the UI if needed
+    article_sources_data = []
+    if content.object_type == "article" and target and hasattr(target, "article_sources"):
+        article_sources_data = target.article_sources
+        
+    return {
+        "content_dto": dto,
+        "engagement_score": engagement_score,
+        "distribution_history": distribution_history,
+        "article_sources": article_sources_data
+    }
 
 def delete_content_workflow(content_id):
     content = db.session.get(Content, content_id)

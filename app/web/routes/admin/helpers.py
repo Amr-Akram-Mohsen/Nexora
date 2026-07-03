@@ -3,6 +3,20 @@
 Shared admin utilities: pagination envelopes, param parsing, and sort helpers.
 """
 from flask import request
+from app.core.decorators import admin_required
+
+# ──────────────────────────────────────────────
+# GUARDS
+# ──────────────────────────────────────────────
+
+def apply_admin_guard(bp):
+    """
+    Apply the @admin_required guard to all routes in a blueprint via before_request.
+    """
+    @bp.before_request
+    @admin_required
+    def require_admin():
+        pass
 
 
 # ──────────────────────────────────────────────
@@ -121,19 +135,41 @@ def make_rows_response(html: str, *, total: int, pages: int, page: int):
 # ──────────────────────────────────────────────
 # FIELD FORMATTERS
 # ──────────────────────────────────────────────
+# Canonical implementations live in app.shared.utils.format so that domain
+# services and serializers can import them without a dependency on app.web.
+# These re-exports exist for backward compatibility with existing web-layer
+# imports from this module.
+from app.shared.utils.format import (  # noqa: F401
+    format_date,
+    format_datetime,
+    format_status,
+    format_featured,
+)
 
-def format_date(dt, default="—", fmt="%Y-%m-%d"):
-    """Format a datetime object consistently."""
-    return dt.strftime(fmt) if dt else default
+def get_platform_icon(platform_name):
+    platform_icons = {
+        "youtube": "📺",
+        "pinterest": "📌",
+        "instagram": "📷",
+        "facebook": "📘",
+        "twitter": "🐦",
+        "linkedin": "💼",
+        "blog": "📝"
+    }
+    return platform_icons.get(platform_name.lower(), "🌐") if platform_name else "🌐"
 
-def format_datetime(dt, default="—", fmt="%Y-%m-%d %H:%M"):
-    """Format a datetime object consistently with time."""
-    return dt.strftime(fmt) if dt else default
-
-def format_status(is_active: bool) -> str:
-    """Format a boolean status to 'active' or 'inactive'."""
-    return "active" if is_active else "inactive"
-
-def format_featured(is_featured: bool) -> str:
-    """Format a boolean featured flag to 'featured' or 'standard'."""
-    return "featured" if is_featured else "standard"
+def get_source_title(source_type, source_id):
+    from app.core.extensions import db
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    
+    if source_type == "content":
+        asset = db.session.get(Content, source_id)
+        if asset:
+            return asset.title or f"Content #{asset.id}"
+    elif source_type == "item":
+        asset = db.session.get(Item, source_id)
+        if asset:
+            return asset.name or f"Item #{asset.id}"
+            
+    return f"Unknown {source_type}"

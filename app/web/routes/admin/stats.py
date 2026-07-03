@@ -10,9 +10,9 @@ Performance optimisations applied:
 - Interaction breakdown reads from the 60-second cached get_interactions_breakdown() (R-03).
 - All queries use SQLAlchemy 2.0-style select() (R-07).
 """
-from flask import Blueprint, jsonify, render_template
+from flask import Blueprint, jsonify
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
-from app.core.decorators import admin_required
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category, Source
 from app.domains.item.models import Item
@@ -25,11 +25,7 @@ from datetime import datetime, timedelta, timezone
 bp = Blueprint("api_dashboard", __name__, url_prefix="/admin/dashboard")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all dashboard endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 

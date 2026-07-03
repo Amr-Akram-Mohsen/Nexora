@@ -1,4 +1,5 @@
 from app.core.extensions import db
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Article(db.Model):
     __tablename__ = "articles"
@@ -11,11 +12,16 @@ class Article(db.Model):
     # New layered content fields
     content_text = db.Column(db.Text)
     content_html = db.Column(db.Text)
+    content_markdown = db.Column(db.Text)
+    content_blocks = db.Column(JSONB, nullable=True)  # canonical structured representation
     word_count = db.Column(db.Integer)
 
     quality_score = db.Column(db.Float, default=0.0)
     is_content_scraped = db.Column(db.Boolean, default=False)
     content_source = db.Column(db.String(50))
+    author = db.Column(db.String(255))
+    extended_metadata = db.Column(db.JSON)
+    extracted_images = db.Column(db.JSON)
 
     # Staged ingestion fields
     status = db.Column(

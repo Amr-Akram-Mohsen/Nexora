@@ -1,6 +1,7 @@
 # app/admin/taxonomy.py
 from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.taxonomy.models import Category, Brand, Topic, Section, Source, AttributeFacet, GenderFacet, IntentFacet, PriceTierFacet
 from app.shared.utils.slug import generate_slug
@@ -30,15 +31,15 @@ from app.application.taxonomy.admin import (
     create_admin_attribute, update_admin_attribute, delete_admin_attribute,
     apply_taxonomy_insight_workflow
 )
+from app.domains.taxonomy.serializers import (
+    serialize_taxonomy, serialize_category, serialize_brand,
+    serialize_topic, serialize_section, serialize_attribute
+)
 
 bp = Blueprint("api_taxonomy", __name__, url_prefix="/admin/taxonomy")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all taxonomy management endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 # ─────────────────────────────────────────────
@@ -49,6 +50,19 @@ def intelligence_dashboard():
     data = get_taxonomy_intelligence()
     return render_template("admin/taxonomy/intelligence.html", data=data)
 
+@bp.route("/stats", methods=["GET"])
+def taxonomy_stats():
+    """Returns top-level KPI stats for the taxonomy dashboard."""
+    data = get_admin_taxonomy_analytics()
+    return jsonify({
+        "total_entities": data["health"]["total_entities"],
+        "orphan_entities": data["health"]["orphan_entities"],
+        "orphan_pct": data["health"]["orphan_pct"],
+        "missing_category": data["content_coverage"]["missing_category"],
+        "missing_section": data["content_coverage"]["missing_section"],
+        "missing_brand": data["content_coverage"]["missing_brand"]
+    })
+
 # ─────────────────────────────────────────────
 # CATEGORIES
 # ─────────────────────────────────────────────
@@ -57,7 +71,7 @@ def intelligence_dashboard():
 def list_categories():
     search = request.args.get("search", "").strip()
     cats = get_admin_categories(search)
-    return jsonify([_serialize_category(c) for c in cats])
+    return jsonify([serialize_category(c) for c in cats])
 
 
 @bp.route("/categories", methods=["POST"])
@@ -69,7 +83,7 @@ def create_category():
         return jsonify({"error": "Name is required"}), 400
     try:
         cat = create_admin_category(name, data.get("is_active", True))
-        return jsonify(_serialize_category(cat)), 201
+        return jsonify(serialize_category(cat)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
 
@@ -81,7 +95,7 @@ def update_category(id):
     cat = update_admin_category(id, data)
     if not cat:
         return jsonify({"error": "Not found"}), 404
-    return jsonify(_serialize_category(cat))
+    return jsonify(serialize_category(cat))
 
 
 @bp.route("/categories/<int:id>", methods=["DELETE"])
@@ -92,30 +106,6 @@ def delete_category(id):
         return jsonify({"error": "Not found"}), 404
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
-def _serialize_taxonomy(t, counts=None, health=None):
-    data = {
-        "id": t.id,
-        "name": t.name,
-        "is_active": getattr(t, 'is_active', False),
-    }
-    if isinstance(t, Category):
-        data["heirarchy level"] = "Leaf" if t.is_leaf else "Parent"
-    if isinstance(t, Section):
-        data['description'] = t.description
-        data['is_configured'] = bool(t.allowed_filters)
-    if isinstance(t, Brand):
-        data['industry'] = t.industry or "—"
-    if isinstance(t, (Brand, Topic)):
-        data['is_featured'] = getattr(t, 'is_featured', False)
-        
-    if counts:
-        for k, v in counts.items():
-            data[k] = v
-            
-    if health:
-        data["health"] = health
-        
-    return data
 
 def _serialize_category(c):
     return {
@@ -137,7 +127,7 @@ def _serialize_category(c):
 def list_brands():
     search = request.args.get("search", "").strip()
     brands = get_admin_brands(search)
-    return jsonify([_serialize_brand(b) for b in brands])
+    return jsonify([serialize_brand(b) for b in brands])
 
 
 @bp.route("/brands", methods=["POST"])
@@ -149,7 +139,7 @@ def create_brand():
         return jsonify({"error": "Name is required"}), 400
     try:
         brand = create_admin_brand(name, data.get("industry"), data.get("is_active", True))
-        return jsonify(_serialize_brand(brand)), 201
+        return jsonify(serialize_brand(brand)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
 
@@ -161,7 +151,7 @@ def update_brand(id):
     brand = update_admin_brand(id, data)
     if not brand:
         return jsonify({"error": "Not found"}), 404
-    return jsonify(_serialize_brand(brand))
+    return jsonify(serialize_brand(brand))
 
 
 @bp.route("/brands/<int:id>", methods=["DELETE"])
@@ -173,18 +163,6 @@ def delete_brand(id):
     return jsonify({"success": True, "message": f"Brand '{brand.name}' deleted."})
 
 
-def _serialize_brand(b):
-    return {
-        "id": b.id,
-        "name": b.name,
-        "slug": b.slug,
-        "industry": b.industry,
-        "is_active": b.is_active,
-        "is_featured": b.is_featured,
-        "sort_order": b.sort_order,
-    }
-
-
 # ─────────────────────────────────────────────
 # TOPICS
 # ─────────────────────────────────────────────
@@ -193,7 +171,7 @@ def _serialize_brand(b):
 def list_topics():
     search = request.args.get("search", "").strip()
     topics = get_admin_topics(search)
-    return jsonify([_serialize_topic(t) for t in topics])
+    return jsonify([serialize_topic(t) for t in topics])
 
 
 @bp.route("/topics", methods=["POST"])
@@ -205,7 +183,7 @@ def create_topic():
         return jsonify({"error": "Name is required"}), 400
     try:
         topic = create_admin_topic(name, data.get("is_active", True))
-        return jsonify(_serialize_topic(topic)), 201
+        return jsonify(serialize_topic(topic)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 409
 
@@ -217,7 +195,7 @@ def update_topic(id):
     topic = update_admin_topic(id, data)
     if not topic:
         return jsonify({"error": "Not found"}), 404
-    return jsonify(_serialize_topic(topic))
+    return jsonify(serialize_topic(topic))
 
 
 @bp.route("/topics/<int:id>", methods=["DELETE"])
@@ -229,17 +207,6 @@ def delete_topic(id):
     return jsonify({"success": True, "message": f"Topic '{topic.name}' deleted."})
 
 
-def _serialize_topic(t):
-    return {
-        "id": t.id,
-        "name": t.name,
-        "slug": t.slug,
-        "is_active": t.is_active,
-        "is_featured": t.is_featured,
-        "sort_order": t.sort_order,
-    }
-
-
 # ─────────────────────────────────────────────
 # SECTIONS
 # ─────────────────────────────────────────────
@@ -248,7 +215,7 @@ def _serialize_topic(t):
 def list_sections():
     search = request.args.get("search", "").strip()
     sections = get_admin_sections(search)
-    return jsonify([_serialize_section(s) for s in sections])
+    return jsonify([serialize_section(s) for s in sections])
 
 
 @bp.route("/sections/<int:id>", methods=["PATCH"])
@@ -258,18 +225,7 @@ def update_section(id):
     section = update_admin_section(id, data)
     if not section:
         return jsonify({"error": "Not found"}), 404
-    return jsonify(_serialize_section(section))
-
-
-def _serialize_section(s):
-    return {
-        "id": s.id,
-        "name": s.name,
-        "slug": s.slug,
-        "description": s.description,
-        "is_active": s.is_active,
-        "sort_order": s.sort_order,
-    }
+    return jsonify(serialize_section(section))
 
 
 # ─────────────────────────────────────────────
@@ -294,7 +250,6 @@ def categories_rows():
         m = metrics.get(c.id, {})
         c_count = m.get("content_count", 0)
         i_count = m.get("item_count", 0)
-        child_count = m.get("children_count", 0)
         
         health = "ok"
         if c_count == 0 and i_count == 0:
@@ -304,10 +259,9 @@ def categories_rows():
             
         counts = {
             "content count": c_count,
-            "item count": i_count,
-            "children count": child_count
+            "item count": i_count
         }
-        serialized.append(_serialize_taxonomy(c, counts=counts, health=health))
+        serialized.append(serialize_taxonomy(c, counts=counts, health=health))
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='category')
     return make_rows_response(
@@ -348,7 +302,7 @@ def brands_rows():
             "content count": c_count,
             "item count": i_count,
         }
-        serialized.append(_serialize_taxonomy(b, counts=counts, health=health))
+        serialized.append(serialize_taxonomy(b, counts=counts, health=health))
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='brand')
     return make_rows_response(
@@ -389,7 +343,7 @@ def topics_rows():
             "content count": c_count,
             "category spread": cat_count
         }
-        serialized.append(_serialize_taxonomy(t, counts=counts, health=health))
+        serialized.append(serialize_taxonomy(t, counts=counts, health=health))
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='topic')
     return make_rows_response(
@@ -429,7 +383,7 @@ def sections_rows():
             "content count": c_count,
             "category count": cat_count
         }
-        serialized.append(_serialize_taxonomy(s, counts=counts, health=health))
+        serialized.append(serialize_taxonomy(s, counts=counts, health=health))
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='section')
     return make_rows_response(
@@ -447,7 +401,7 @@ def sections_rows():
 def list_attributes():
     search = request.args.get("search", "").strip()
     attrs = get_admin_attributes(search)
-    return jsonify([_serialize_attribute(a) for a in attrs])
+    return jsonify([serialize_attribute(a) for a in attrs])
 
 @bp.route("/attributes", methods=["POST"])
 @admin_required
@@ -458,7 +412,7 @@ def create_attribute():
         return jsonify({"error": "Name is required"}), 400
     try:
         attr = create_admin_attribute(name, data.get("category_id"))
-        return jsonify(_serialize_attribute(attr)), 201
+        return jsonify(serialize_attribute(attr)), 201
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -470,7 +424,7 @@ def update_attribute(id):
         attr = update_admin_attribute(id, data)
         if not attr:
             return jsonify({"error": "Not found"}), 404
-        return jsonify(_serialize_attribute(attr))
+        return jsonify(serialize_attribute(attr))
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -482,14 +436,6 @@ def delete_attribute(id):
         return jsonify({"error": "Not found"}), 404
     return jsonify({"success": True, "message": f"Attribute '{attr.name}' deleted."})
 
-def _serialize_attribute(a):
-    return {
-        "id": a.id,
-        "name": a.name,
-        "slug": a.slug,
-        "category_id": a.category_id,
-        "category_name": a.category.name if a.category else "Global",
-    }
 
 @bp.route("/attributes/rows", methods=["GET"])
 def attributes_rows():
@@ -732,7 +678,7 @@ def _get_taxonomy_inspect_table(entity, entity_type, metadata):
     
     if entity_type == "category":
         data["slug"] = entity.slug
-        data["heirarchy level"] = "Leaf" if entity.is_leaf else "Parent"
+        data["hierarchy level"] = "Leaf" if entity.is_leaf else "Parent"
         if entity.is_leaf and entity.parent:
             data["parent name"] = entity.parent.name
         return get_inspect_table("categories", data)

@@ -1,12 +1,7 @@
 <td data-field="name">
-  <div class="flex items-center gap-2">
-    <div class="flex flex-col">
-      <strong class="cell-primary-text">{{ row.name }}</strong>
-      <span class="text-xs text-muted">{{ row.email }}</span>
-    </div>
-    {% if row.is_verified %}
-    <span title="Verified User">{{ badge(icon="fa-solid fa-check", variant="success") }}</span>
-    {% endif %}
+  <div class="flex flex-col">
+    <span data-field="full-name">{{ row.name }}</span>
+    <span data-field="email">{{ row.email }}</span>
   </div>
 </td>
 <td data-field="role">
@@ -24,45 +19,32 @@
   {% endif %}
 </td>
 <td data-field="status">
-  {% if row.is_active %}
-  {{ badge("Active", variant="success") }}
-  {% else %}
-  {{ badge("Inactive", variant="secondary") }}
-  {% endif %}
+  <div class="flex flex-col gap-2">
+    {% set text, variant = ('Active', 'success') if row.is_active else ('Inactive', 'secondary') %}
+    {{ badge(text, variant=variant) }}
+
+    {% set text, variant = ('Verified', 'success') if row.is_verified else ('Not Verified', 'danger') %}
+    {{ badge(text, variant=variant) }}
+  </div>
 </td>
 <td data-field="joined">
   {{ row.created_at|truncate(10, True, '') if row.created_at else '—' }}
 </td>
 <td data-field="last-active">
   {% set days = row.recency_days %}
-  {% set value = row.last_login_at|truncate(16, True, '')|replace('T', ' ') if row.last_login_at else 'Never' %}
-  {% if days is none %}
-  {{ badge("Never", variant="danger") }}
-  {% elif days <= 1 %} <span title="{{ value }}">{{ badge("Active Today", variant="success") }}</span>
-    {% elif days <= 7 %} <span title="{{ value }}">{{ badge("Active this week", variant="warning") }}</span>
-      {% else %}
-      {{ badge(value, variant="danger") }}
-      {% endif %}
-</td>
+  {% set value = row.last_login_at if row.last_login_at else 'Never' %}
+  {% set text, variant = ('Never', 'danger') if days is none else
+  ('Active Today', 'success') if days <= 1 else ('Active this week', 'warning' ) if days <=7 else (value, 'danger' ) %}
+    {{ badge(text, variant=variant) }} </td>
 <td data-field="engagement-score">{{ "%.1f"|format(row.engagement_score) if row.engagement_score else 0 }}</td>
 <td data-field="engagement-tier">
   {% set score = row.engagement_score %}
-  {% if score >= 200 %}
-  {{ badge("Power User", class="badge-origin") }}
-  {% elif score >= 50 %}
-  {{ badge("High", variant="success") }}
-  {% elif score >= 10 %}
-  {{ badge("Medium", variant="warning") }}
-  {% else %}
-  {{ badge("Low", variant="danger") }}
-  {% endif %}
+  {% set text, variant = ('Power User', 'origin') if score >= 200 else
+  ('High', 'success') if score >= 50 else
+  ('Medium', 'warning') if score >= 10 else
+  ('Low', 'danger') %}
+  {{ badge(text, variant=variant) }}
 </td>
 {% if not hide_action_column %}
-<td data-field="actions">
-  <div class="actions-cell-group flex flex-col gap-1">
-    <a class="user-action-btn flex items-center justify-center gap-1" href="/admin/users/{{ row.id }}" target="_blank">
-      <i class="fas fa-eye"></i> Inspect
-    </a>
-  </div>
-</td>
+{{ action_cell("users", row.id) }}
 {% endif %}

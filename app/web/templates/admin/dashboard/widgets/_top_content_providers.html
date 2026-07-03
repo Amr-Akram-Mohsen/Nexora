@@ -1,8 +1,6 @@
+{% from "admin/components/ui/dashboard.html" import dashboard_empty, distribution_link_bar %}
 {% if not top_performing_content or top_performing_content | length == 0 %}
-<div class="dashboard-empty loading-height-sm">
-  <span class="dashboard-state-icon"><i class="fa-regular fa-envelope-open"></i></span>
-  <p class="empty-message">No provider data.</p>
-</div>
+{{ dashboard_empty("No provider stats.") }}
 {% else %}
 {% set max_val = namespace(val=1) %}
 {% for s in top_performing_content %}
@@ -13,15 +11,7 @@
 <div class="dist-list flex">
   {% for s in top_performing_content %}
     {% set pct = ((s.views / max_val.val) * 100) | round | int %}
-    <a class="dist-row-link" href="/admin/contents?source={{ s.slug }}&sort_by=view_count&sort_dir=desc">
-      <div class="dist-row flex justify-between">
-        <span class="dist-row-name  ">{{ s.name }}</span>
-        <span class="dist-row-count ">{{ "{:,}".format(s.views) }} views</span>
-      </div>
-      <div class="overview-breakdown-bar-track bar-track-health">
-        <div class="overview-breakdown-bar bar-trend" style="width: {{ pct }}%;"></div>
-      </div>
-    </a>
+    {{ distribution_link_bar(s.name, "{:,} views".format(s.views), pct, "/admin/contents?source=" ~ s.slug ~ "&sort_by=view_count&sort_dir=desc", "bar-trend") }}
   {% endfor %}
 </div>
 {% endif %}

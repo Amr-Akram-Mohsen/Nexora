@@ -117,7 +117,7 @@ def ingest_enrichment_router(item: ClassifiedItemDTO) -> EnrichedItemDTO:
 # ── PHASE 2: HEAVY ENRICHMENT (Scraping / Articles Only) ──────────────────────
 
 
-def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
+def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecrawl") -> EnrichedItemDTO:
     """
     Entry point for Phase 2 Background Worker.
     Performs heavy network-based enrichment (Scraping, Extractor APIs).
@@ -153,37 +153,50 @@ def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
 
     # Concurrent Fetching using ThreadPoolExecutor
     import concurrent.futures
+    from app.application.content.ingestion.scraper_pipeline import fetch_and_clean_firecrawl, fetch_and_clean_jina
 
-    def _fetch_api():
-        res = extract_with_apis(url)
-        if res:
-            return {
-                "content_html": res["content_html"],
-                "content_text": res["content_text"],
-                "image_url": res.get("image_url"),
-                "word_count": res["word_count"],
-                "quality_score": res["quality_score"],
-                "is_content_scraped": False,
-                "content_source": res["source"],
-            }
-        return None
-
-    def _fetch_scraper():
+    def _fetch_extractor():
         try:
             log_scrape_start(logger, url)
-            scraped = scrape_article_content(url)
-            if scraped:
-                norm = normalize_content(scraped, None)
-                score = score_content_quality(norm["content_html"], norm["content_text"])
-                log_scrape_success(logger, url, words=norm["word_count"], source="scraper")
-                return {
-                    "content_html": norm["content_html"],
-                    "content_text": norm["content_text"],
-                    "word_count": norm["word_count"],
-                    "quality_score": score,
-                    "is_content_scraped": True,
-                    "content_source": "scraper",
-                }
+
+            if extractor_service.lower() == "jina":
+                res = fetch_and_clean_jina(url, hero_image_url=data.get("image_url"))
+            else:
+                res = fetch_and_clean_firecrawl(url, hero_image_url=data.get("image_url"))
+
+            norm = normalize_content(res["content_html"], None)
+            score = score_content_quality(res["content_html"], res["content_markdown"])
+
+            # Boost quality score when content_blocks were produced (structured output)
+            blocks = res.get("content_blocks")
+            if blocks and len(blocks) >= 5:
+                score = min(1.0, score * 1.15)
+
+            source_name = res.get("content_source", extractor_service)
+            block_count = len(blocks) if blocks else 0
+            log_scrape_success(logger, url, words=len(res["content_markdown"].split()), source=source_name)
+            logger.debug(
+                "[enrich] url=%s  blocks=%d  words=%d  score=%.3f",
+                url[:80], block_count, len(res["content_markdown"].split()), score,
+            )
+
+            author    = res["metadata"].get("author") or res["metadata"].get("article:author")
+            image_url = res["metadata"].get("og:image") or res["metadata"].get("ogImage")
+
+            return {
+                "content_html":     res["content_html"],
+                "content_markdown": res["content_markdown"],
+                "content_blocks":   res.get("content_blocks"),
+                "content_text":     res["content_markdown"],
+                "word_count":       len(res["content_markdown"].split()),
+                "quality_score":    score,
+                "is_content_scraped": True,
+                "content_source":   source_name,
+                "author":           author,
+                "extended_metadata": res["metadata"],
+                "extracted_images": res["extracted_images"],
+                "image_url":        image_url,
+            }
         except Exception as e:
             log_scrape_error(logger, url, reason=str(e))
         return None
@@ -193,9 +206,7 @@ def full_article_scraping_pipeline(item: Any) -> EnrichedItemDTO:
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         if trusted or best_existing_wc < 200:
-            futures.append(executor.submit(_fetch_api))
-        if trusted or best_existing_wc < 150:
-            futures.append(executor.submit(_fetch_scraper))
+            futures.append(executor.submit(_fetch_extractor))
             
         for future in concurrent.futures.as_completed(futures):
             res = future.result()

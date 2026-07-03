@@ -87,14 +87,17 @@
 
 .sentiment-pos {
     background: var(--brand-green, #10b981);
+    width: var(--seg-width, 0%);
 }
 
 .sentiment-neu {
     background: var(--muted-foreground, #6b7280);
+    width: var(--seg-width, 0%);
 }
 
 .sentiment-neg {
     background: var(--brand-red, #ef4444);
+    width: var(--seg-width, 0%);
 }
 
 /* ---------------------------------

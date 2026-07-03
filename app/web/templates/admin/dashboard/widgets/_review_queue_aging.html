@@ -1,12 +1,9 @@
-{% from "admin/components/ui/dashboard.html" import activity_list_item %}
-{% if not review_queue_aging or review_queue_aging | length == 0 %}
-<div class="dashboard-empty loading-height-sm">
-  <span class="dashboard-state-icon"><i class="fa-regular fa-envelope-open"></i></span>
-  <p class="empty-message">No pending reviews.</p>
-</div>
+{% from "admin/components/ui/dashboard.html" import activity_list_item, dashboard_empty %}
+{% if not stats.review_queue_aging or stats.review_queue_aging | length == 0 %}
+{{ dashboard_empty("No pending reviews.") }}
 {% else %}
 <ul class="activity-feed">
-  {% for r in review_queue_aging %}
+  {% for r in stats.review_queue_aging %}
   {% set badge_class = "user" %}
   {% set badge_icon = '<i class="fa-solid fa-newspaper"></i>' %}
   {% if r.type == "video" %}

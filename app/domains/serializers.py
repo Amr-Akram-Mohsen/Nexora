@@ -1,10 +1,6 @@
 from datetime import datetime
 
 
-def dt_iso(dt):
-    return dt.isoformat() if dt else None
-
-
 def serialize_model(m):
     if not m:
         return None
@@ -46,6 +42,11 @@ def serialize_target(obj, session=None):
                 "read_time_minutes": obj.read_time_minutes,
                 "is_content_scraped": getattr(obj, "is_content_scraped", False),
                 "content_html": getattr(obj, "content_html", None),
+                "content_markdown": getattr(obj, "content_markdown", None),
+                "content_blocks": getattr(obj, "content_blocks", None),
+                "extracted_images": getattr(obj, "extracted_images", None),
+                "extended_metadata": getattr(obj, "extended_metadata", None),
+                "author": getattr(obj, "author", None),
                 "content_text": getattr(obj, "content_text", None),
                 "body": getattr(obj, "body", None),
                 "description": getattr(obj, "description", None),

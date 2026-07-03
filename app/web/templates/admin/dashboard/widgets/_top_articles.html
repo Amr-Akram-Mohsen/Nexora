@@ -1,20 +1,12 @@
+{% from "admin/components/ui/dashboard.html" import dashboard_empty, ranked_list_item %}
 {% if not items or items | length == 0 %}
-<div class="dashboard-empty loading-height-sm">
-  <span class="dashboard-state-icon"><i class="fa-regular fa-envelope-open"></i></span>
-  <p class="empty-message">No data yet.</p>
-</div>
+{{ dashboard_empty("No data yet.") }}
 {% else %}
 <ol class="overview-top-list">
   {% for item in items %}
-    <li class="overview-top-item flex items-center">
-      <span class="overview-top-rank">{{ loop.index }}</span>
-      <span class="overview-top-name">
-        <a class="overview-top-link-title" href="/admin/contents?search={{ item.id }}" title="{{ item.title or '—' }}">
-          {{ item.title or '—' }}
-        </a>
-      </span>
-      <span class="overview-top-value">{{ "{:,}".format(item.view_count or 0) }} views</span>
-    </li>
+    {% set value_html = "{:,} views".format(item.view_count or 0) %}
+    {% set link_html = '<a class="overview-top-link-title" href="/admin/contents?search=' ~ item.id ~ '" title="' ~ item.title ~ '">' ~ item.title ~ '</a>' %}
+    {{ ranked_list_item(loop.index, link_html, value_html, extra_class="") }}
   {% endfor %}
 </ol>
 {% endif %}

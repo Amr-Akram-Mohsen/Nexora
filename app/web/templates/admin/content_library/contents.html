@@ -118,8 +118,13 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar("contents-count", "items", summary_id="contents-summary") %}
-<div class="flex items-center gap-3">
+<div class="flex flex-col gap-2">
   <div id="contents-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden">
+    <div class="overview-breakdown-bar-track flex" style="width: 250px;">
+      <div id="stat-bar-published" class="overview-breakdown-bar bar-active" style="--seg-width: 0%;"></div>
+      <div id="stat-bar-drafts" class="overview-breakdown-bar" style="--bar-color: var(--brand-purple); --seg-width: 0%;"></div>
+      <div id="stat-bar-failed" class="overview-breakdown-bar bar-inactive" style="--seg-width: 0%;"></div>
+    </div>
     <span class="status-badge active">Live: <span id="stat-published">0</span></span>
     <span class="status-badge user">Drafts: <span id="stat-drafts">0</span></span>
     <span class="status-badge inactive">Failed: <span id="stat-failed">0</span></span>

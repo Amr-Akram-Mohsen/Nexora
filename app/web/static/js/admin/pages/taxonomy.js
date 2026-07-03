@@ -22,20 +22,44 @@
   }
 
   function applyInsightSuggestion(contentId, type, suggestedId) {
-    if (!confirm(`Apply ${type} suggestion?`)) return;
-    window.api.post('/admin/taxonomy/insights/apply', { content_id: contentId, type: type, suggested_id: suggestedId })
-      .then(d => {
-        if (d.success) {
-          alert("Applied successfully!");
-          loadInsights(); // reload tables
-        } else {
-          alert("Error applying suggestion: " + d.error);
-        }
-      })
-      .catch(err => {
-        alert("Error applying suggestion");
-      });
+    showModal('Apply Suggestion', `Apply ${type} suggestion?`, () => {
+      window.api.post('/admin/taxonomy/insights/apply', { content_id: contentId, type: type, suggested_id: suggestedId })
+        .then(d => {
+          if (d.success) {
+            showToast("Applied successfully!", 'success');
+            loadInsights(); // reload tables
+          } else {
+            showToast("Error applying suggestion: " + d.error, 'error');
+          }
+        })
+        .catch(err => {
+          showToast("Error applying suggestion", 'error');
+        });
+    });
   };
+
+  function loadStats() {
+    window.api.get("/admin/taxonomy/stats")
+      .then(stats => {
+        const statsBar = document.getElementById("taxonomy-stats-bar");
+        if (statsBar) statsBar.classList.remove("is-hidden");
+
+        const elTotal = document.getElementById("stat-total-entities");
+        const elOrphans = document.getElementById("stat-orphan-entities");
+        const elOrphanPct = document.getElementById("stat-orphan-pct");
+        const elMissCat = document.getElementById("stat-missing-category");
+        const elMissSec = document.getElementById("stat-missing-section");
+        const elMissBrand = document.getElementById("stat-missing-brand");
+
+        if (elTotal) elTotal.textContent = (stats.total_entities || 0).toLocaleString();
+        if (elOrphans) elOrphans.textContent = (stats.orphan_entities || 0).toLocaleString();
+        if (elOrphanPct) elOrphanPct.textContent = stats.orphan_pct || 0;
+        if (elMissCat) elMissCat.textContent = (stats.missing_category || 0).toLocaleString();
+        if (elMissSec) elMissSec.textContent = (stats.missing_section || 0).toLocaleString();
+        if (elMissBrand) elMissBrand.textContent = (stats.missing_brand || 0).toLocaleString();
+      })
+      .catch(err => console.error("Error loading taxonomy stats:", err));
+  }
 
   window.categoriesController = null;
   window.brandsController = null;
@@ -57,27 +81,29 @@
     initAdminTabs('taxonomy-tabs', loadTab);
   }
 
+  const controllers = {
+    'categories': () => window.categoriesController,
+    'brands': () => window.brandsController,
+    'topics': () => window.topicsController,
+    'sections': () => window.sectionsController,
+    'attributes': () => window.attributesController,
+    'gender_facets': () => window.genderFacetsController,
+    'intent_facets': () => window.intentFacetsController,
+    'price_tier_facets': () => window.priceTierFacetsController
+  };
+
   function loadTab(tab) {
-    const targetId = tab;
-    if (!loadedTabs.has(targetId)) {
-      if (targetId === 'categories') window.categoriesController.init();
-      if (targetId === 'brands') window.brandsController.init();
-      if (targetId === 'topics') window.topicsController.init();
-      if (targetId === 'sections') window.sectionsController.init();
-      if (targetId === 'attributes') window.attributesController.init();
-      if (targetId === 'gender_facets') window.genderFacetsController.init();
-      if (targetId === 'intent_facets') window.intentFacetsController.init();
-      if (targetId === 'price_tier_facets') window.priceTierFacetsController.init();
-      loadedTabs.add(targetId);
+    const getController = controllers[tab];
+    if (!getController) return;
+    
+    const controller = getController();
+    if (!controller) return;
+
+    if (!loadedTabs.has(tab)) {
+      controller.init();
+      loadedTabs.add(tab);
     } else {
-      if (tab === 'categories') window.categoriesController.load(1);
-      if (tab === 'brands') window.brandsController.load(1);
-      if (tab === 'topics') window.topicsController.load(1);
-      if (tab === 'sections') window.sectionsController.load(1);
-      if (tab === 'attributes') window.attributesController.load(1);
-      if (tab === 'gender_facets') window.genderFacetsController.load(1);
-      if (tab === 'intent_facets') window.intentFacetsController.load(1);
-      if (tab === 'price_tier_facets') window.priceTierFacetsController.load(1);
+      controller.load(1);
     }
   }
 
@@ -445,6 +471,7 @@
 
     // Load analytics on init
     loadTaxonomyAnalytics();
+    loadStats();
 
     // Load insights if we default to insights tab
     loadInsights();

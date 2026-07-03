@@ -79,44 +79,6 @@ def get_recent_views(user_id, limit=20):
     ).filter_by(user_id=user_id).order_by(View.created_at.desc()).limit(limit).all()
 
 
-# ─────────────────────────────────────────────
-# INDIVIDUAL COUNTERS
-# Used by tests and isolated callers; kept as thin helpers.
-# Do NOT use these inside get_interactions_breakdown() — that function
-# issues a single consolidated query instead.
-# ─────────────────────────────────────────────
-
-def count_likes() -> int:
-    return db.session.execute(
-        select(func.count(Reaction.id)).where(Reaction.type == "like")
-    ).scalar() or 0
-
-
-def count_dislikes() -> int:
-    return db.session.execute(
-        select(func.count(Reaction.id)).where(Reaction.type == "dislike")
-    ).scalar() or 0
-
-
-def count_views() -> int:
-    return db.session.execute(select(func.count(View.id))).scalar() or 0
-
-
-def count_comments() -> int:
-    return db.session.execute(select(func.count(Comment.id))).scalar() or 0
-
-
-def count_saves() -> int:
-    return db.session.execute(select(func.count(Save.id))).scalar() or 0
-
-
-def count_shares() -> int:
-    return db.session.execute(select(func.count(Share.id))).scalar() or 0
-
-
-def count_item_clicks() -> int:
-    return db.session.execute(select(func.count(ItemClick.id))).scalar() or 0
-
 
 # ─────────────────────────────────────────────
 # CONSOLIDATED BREAKDOWN  (1 query, 60 s cache)

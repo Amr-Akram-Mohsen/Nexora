@@ -1,10 +1,10 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_tab_panel %}
 {% from "admin/components/ui/pagination.html" import admin_paginator %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
-{% from "admin/components/ui/inspect.html" import admin_inspect_modal %}
-{% from "admin/components/ui/tabs.html" import admin_tab_navigation, admin_tab_panel %}
+{% from "admin/components/ui/tabs.html" import admin_tab_navigation %}
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
+{% from "admin/components/ui/inspect.html" import admin_inspect_modal %}
 
 {% set header_title = "Taxonomy Management" %}
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
@@ -20,6 +20,14 @@
 <div id="taxonomy-analytics-dashboard" class="dashboard-widgets-grid"
   style="display: none;">
   <!-- Filled dynamically by JS -->
+</div>
+
+<div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden mb-4">
+  <span class="status-badge active">Total Entities: <span id="stat-total-entities">0</span></span>
+  <span class="status-badge inactive">Orphans: <span id="stat-orphan-entities">0</span> (<span id="stat-orphan-pct">0</span>%)</span>
+  <span class="badge badge-orange badge-compact">Missing Category: <span id="stat-missing-category">0</span></span>
+  <span class="badge badge-orange badge-compact">Missing Section: <span id="stat-missing-section">0</span></span>
+  <span class="badge badge-orange badge-compact">Missing Brand: <span id="stat-missing-brand">0</span></span>
 </div>
 
 {# Tab Navigation #}

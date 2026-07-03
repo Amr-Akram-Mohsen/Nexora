@@ -10,7 +10,7 @@ Refactoring applied:
 - Shared pagination helpers from app.web.routes.admin.helpers (R-18, R-21).
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick
 from app.domains.interaction.service.query import (
@@ -25,7 +25,6 @@ from app.domains.interaction.service.admin import (
     get_admin_comments_page,
     delete_admin_comment,
     flag_admin_comment_as_spam,
-    build_admin_comment_inspect_data,
     get_admin_reactions_page,
     get_admin_views_page,
     get_admin_clicks_page,
@@ -40,11 +39,7 @@ from datetime import datetime
 bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all interaction management endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 # ─────────────────────────────────────────────
@@ -205,7 +200,7 @@ def _serialize_comment(c, users, content_titles, item_names):
         "replies_count": c.replies_count,
         "replies":      c.replies,
         "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
-        "created_at":   c.created_at.isoformat() if c.created_at else None,
+        "created_at":   c.created_at.strftime("%Y-%m-%d") if c.created_at else None,
     }
 
 
@@ -252,67 +247,36 @@ def comments_rows():
     )
 
 
-def build_comment_inspect_data(id):
-    raw_data = build_admin_comment_inspect_data(id)
-    if not raw_data:
-        return None
-        
-    from app.web.routes.admin.tables import get_inspect_table
-    inspect_table = get_inspect_table("comments", raw_data["raw_data"])
-    
-    return {
-        "inspect_table": inspect_table,
-        "actions": raw_data["actions"],
-        "inspect_id": raw_data["inspect_id"]
-    }
-
 
 @bp.route("/comments/<int:id>/inspect", methods=["GET"])
 def inspect_comment(id):
     """Return server-rendered HTML for the comment inspect modal body."""
-    data = build_comment_inspect_data(id)
-    if not data:
+    from app.application.interaction.admin import get_comment_inspect_workflow
+    from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
+    
+    aggregated_data = get_comment_inspect_workflow(id)
+    if not aggregated_data:
         return "Comment not found.", 404
+        
+    data = build_comment_inspect_view_model(aggregated_data)
     return render_template(
         "admin/components/_inspect.html",
         **data
     )
-
 @bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
 def inspect_clicks(link_id):
     """Return server-rendered HTML for recent clicks on a given store link."""
-    from app.domains.interaction.service.inspect import get_link_clicks_metrics
-    metrics = get_link_clicks_metrics(link_id)
+    from app.application.interaction.admin import get_link_clicks_workflow
+    from app.web.routes.admin.builders.interaction_builder import build_link_clicks_view_model
     
-    if not metrics:
+    aggregated_data = get_link_clicks_workflow(link_id)
+    if not aggregated_data:
          return "Link data not found.", 404
 
-    from app.web.routes.admin.tables import get_inspect_table
-    
-    link_data = metrics["link_data"]
-    total_clicks = metrics["total_clicks"]
-    latest_click = metrics["latest_click"]
-    country_stats = metrics["country_stats"]
-    referrer_stats = metrics["referrer_stats"]
-    
-    top_countries = [{"label": c or 'Unknown', "count": cnt} for c, cnt in country_stats] if country_stats else "—"
-    top_referrers = [{"label": r or 'Direct', "count": cnt} for r, cnt in referrer_stats] if referrer_stats else "—"
-
-    data = {
-        "store name": link_data["store_name"],
-        "item name": link_data["item_name"],
-        "total clicks": str(total_clicks),
-        "latest click": latest_click.isoformat()[:10] if latest_click else "—",
-        "top countries": {"value": top_countries, "is_list": True} if top_countries != "—" else "—",
-        "top referrers": {"value": top_referrers, "is_list": True} if top_referrers != "—" else "—"
-    }
-        
-    inspect_table = get_inspect_table("clicks", data)
-    
+    data = build_link_clicks_view_model(aggregated_data)
     return render_template(
         "admin/components/_inspect.html",
-        inspect_table=inspect_table,
-        actions=[]
+        **data
     )
 
 

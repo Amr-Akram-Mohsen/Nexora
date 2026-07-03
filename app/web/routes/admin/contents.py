@@ -13,9 +13,10 @@ Refactoring applied:
 - Moved build_content_inspect_data() to domain service (R-26).
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
-from app.domains.content.models import Content
+from app.web.routes.admin.helpers import apply_admin_guard
+from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.domains.content.models import Content
 from app.domains.content.service.admin import (
     build_admin_contents_query,
     load_admin_content_relations,
@@ -26,24 +27,22 @@ from app.domains.content.service.admin import (
     get_admin_pipeline_stats,
     get_admin_deduplication_groups,
     get_admin_content_inspect_raw,
-    build_content_inspect_data,
+    serialize_content_row,
 )
 from app.application.content.admin import (
     delete_content_workflow,
     toggle_publish_workflow,
     bulk_actions_workflow,
-    retry_pipeline_workflow
+    retry_pipeline_workflow,
+    get_content_inspect_workflow
 )
+from app.web.routes.admin.builders.content_builder import build_content_inspect_view_model
 
 
 bp = Blueprint("api_content", __name__, url_prefix="/admin/contents")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all content management endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 # ─────────────────────────────────────────────
@@ -52,82 +51,6 @@ def require_admin():
 
 
 
-def _serialize_content_row(c, target, duplicate_titles: set) -> dict:
-    """
-    Serialize a single Content row for the admin listing.
-
-    Args:
-        c: The Content ORM instance.
-        target: The polymorphic target (Article / Video / Post) or None.
-        duplicate_titles: Set of titles known to be duplicated on the current page.
-
-    Returns:
-        A dict suitable for JSON serialization.
-    """
-    source_name  = c.source.name if c.source else "Unknown"
-    source_slug  = c.source.slug if c.source else "unknown"
-    status_val   = "complete"
-    canonical_url = None
-
-    if c.object_type == "article" and target:
-        status_val    = target.status
-        canonical_url = target.canonical_url
-        sources = [s.source.name for s in target.article_sources if s.source]
-    else:
-        if target:
-            canonical_url = target.url
-        sources = [c.source.name] if c.source else []
-
-    # Quality flags
-    duplicate = c.title and c.title in duplicate_titles
-    
-    # Compute Health Score
-    score = 0
-    if c.title: score += 10
-    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
-    if c.category and c.category.slug != 'uncategorized': score += 10
-    if c.topics: score += 15
-    if c.brands: score += 15
-    if c.source_id: score += 10
-    if not duplicate: score += 5
-    
-    if c.object_type == "article" and target:
-        if getattr(target, 'is_content_scraped', False): score += 10
-        if getattr(target, 'status', '') == 'complete': score += 10
-        if getattr(target, 'quality_score', 0) > 0: score += 5
-    elif c.object_type in ("video", "post"):
-        score += 25
-        
-    score = min(score, 100)
-
-    cat_name = c.category.name if c.category else "None"
-    sec_name = c.section.name if c.section else "None"
-    sources_text = ", ".join(sources)
-
-    return {
-        "id": c.id,
-        "is_published": c.is_published,
-        "title": c.title or "",
-        "object_type": c.object_type,
-        "category": cat_name,
-        "section": sec_name,
-        "has_topics": bool(c.topics),
-        "has_brands": bool(c.brands),
-        "has_source": bool(c.source_id),
-        "is_duplicate": bool(duplicate),
-        "enrichment_status": status_val,
-        "health_score": score,
-        "engagement": {
-            "views": c.view_count, 
-            "likes": c.like_count, 
-            "comments": c.comment_count, 
-            "shares": c.share_count, 
-            "saves": c.save_count
-        },
-        "published_at": c.published_at.isoformat() if c.published_at else None,
-        "sources_text": sources_text,
-        "ingestion_origin": c.ingestion_origin,
-    }
 
 
 def _build_contents_query(args):
@@ -168,7 +91,7 @@ def get_stats():
 @bp.route("/dashboard", methods=["GET"])
 def content_dashboard():
     """Render the high-level content analytics dashboard."""
-    return render_template("admin/content_library/dashboard.html", stats=get_admin_content_dashboard_stats())
+    return render_template("admin/content_library/dashboard.html", stats=get_admin_content_dashboard_stats(), domain="content_dashboard")
 
 
 @bp.route("/", methods=["GET"])
@@ -184,7 +107,7 @@ def list_contents():
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 
     serialized = [
-        _serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
+        serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
         for c in page_items
     ]
 
@@ -235,7 +158,7 @@ def contents_rows():
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 
     serialized = [
-        _serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
+        serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
         for c in page_items
     ]
 
@@ -252,9 +175,11 @@ def contents_rows():
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_content(id):
     """Render the inspect partial for a single content item."""
-    data = build_content_inspect_data(id)
-    if not data:
+    aggregated_data = get_content_inspect_workflow(id)
+    if not aggregated_data:
         return jsonify({"error": "Content not found"}), 404
+        
+    data = build_content_inspect_view_model(aggregated_data)
     data["domain"] = "contents"
     return render_template("admin/components/_inspect.html", **data)
 
@@ -294,7 +219,7 @@ def bulk_actions():
 
 @bp.route("/pipeline", methods=["GET"])
 def pipeline_view():
-    return render_template("admin/content_library/pipeline.html")
+    return render_template("admin/content_library/pipeline.html", domain="pipeline")
 
 @bp.route("/pipeline/stats", methods=["GET"])
 def pipeline_stats():
@@ -322,4 +247,4 @@ def pipeline_retry():
 
 @bp.route("/deduplication", methods=["GET"])
 def deduplication_view():
-    return render_template("admin/content_library/deduplication.html", duplicate_groups=get_admin_deduplication_groups())
+    return render_template("admin/content_library/deduplication.html", duplicate_groups=get_admin_deduplication_groups(), domain="deduplication")

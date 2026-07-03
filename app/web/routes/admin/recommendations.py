@@ -8,7 +8,7 @@ Refactoring applied:
   guard for the DELETE operation (R-19).
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
@@ -17,24 +17,18 @@ from app.web.routes.admin.helpers import paginate_manual, make_rows_response
 from app.domains.recommendation.service.admin import (
     get_recommendation_stats,
     fetch_admin_matches_page,
-    build_admin_match_inspect_data,
     get_admin_context_performance,
     get_admin_entity_performance,
     get_admin_recommendation_health,
     get_admin_recommendation_trend,
-    get_admin_slot_analysis,
-    build_admin_user_interests_data
+    get_admin_slot_analysis
 )
 from app.application.recommendation.admin import unlink_match_workflow
 
 bp = Blueprint("api_recommendation", __name__, url_prefix="/admin/recommendations")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all recommendation management endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 @bp.route("/stats", methods=["GET"])
@@ -86,18 +80,18 @@ def matches_rows():
 @bp.route("/matches/<int:content_id>/inspect", methods=["GET"])
 def inspect_match(content_id):
     """Return server-rendered HTML for the recommendation inspect modal body."""
-    data = build_admin_match_inspect_data(content_id)
-    if not data:
+    from app.application.recommendation.admin import get_match_inspect_workflow
+    from app.web.routes.admin.builders.recommendation_builder import build_match_inspect_view_model
+    
+    aggregated_data = get_match_inspect_workflow(content_id)
+    if not aggregated_data:
         return "Content not found.", 404
 
-    from app.web.routes.admin.tables import get_inspect_table
-    inspect_table = get_inspect_table("recommendations", data["raw_data"])
+    data = build_match_inspect_view_model(aggregated_data)
     
     return render_template(
         "admin/components/_inspect.html",
-        inspect_table=inspect_table,
-        linked_items=data["linked_items"],
-        inspect_id=data["inspect_id"]
+        **data
     )
 
 @bp.route("/context-performance", methods=["GET"])
@@ -124,17 +118,18 @@ def slot_analysis():
 
 @bp.route("/user_interests/<int:user_id>/inspect", methods=["GET"])
 def inspect_user_interests(user_id):
-    data = build_admin_user_interests_data(user_id)
-    if not data:
+    from app.application.recommendation.admin import get_user_interests_workflow
+    from app.web.routes.admin.builders.recommendation_builder import build_user_interests_view_model
+    
+    aggregated_data = get_user_interests_workflow(user_id)
+    if not aggregated_data:
         return "User not found.", 404
         
-    from app.web.routes.admin.tables import get_inspect_table
-    inspect_table = get_inspect_table("user_interests", data["raw_data"])
+    data = build_user_interests_view_model(aggregated_data)
     
     return render_template(
         "admin/components/_inspect.html",
-        inspect_table=inspect_table,
-        actions=[]
+        **data
     )
 
 

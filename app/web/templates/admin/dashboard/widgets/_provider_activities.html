@@ -1,12 +1,9 @@
-{% from "admin/components/ui/dashboard.html" import activity_list_item %}
-{% if not provider_activities or provider_activities | length == 0 %}
-<div class="dashboard-empty loading-height-sm">
-  <span class="dashboard-state-icon"><i class="fa-regular fa-envelope-open"></i></span>
-  <p class="empty-message">No active providers.</p>
-</div>
+{% from "admin/components/ui/dashboard.html" import activity_list_item, dashboard_empty %}
+{% if not stats.provider_activities or stats.provider_activities | length == 0 %}
+{{ dashboard_empty("No active providers.") }}
 {% else %}
 <ul class="activity-feed">
-  {% for s in provider_activities %}
+  {% for s in stats.provider_activities %}
   {% call activity_list_item(icon_html='<i class="fa-solid fa-satellite-dish"></i>', icon_class="icon-comment ingest-log-icon", extra_class="ingest-log-item") %}
     <p class="activity-text ingest-log-text">
       <strong class="provider-name">{{ s.name }}</strong>

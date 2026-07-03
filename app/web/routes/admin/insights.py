@@ -1,7 +1,7 @@
 # app/admin/insights.py
 import time
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 
 from app.domains.analytics import (
     get_decision_intelligence_data,
@@ -13,70 +13,35 @@ from app.domains.analytics import (
     map_content_strategy_to_assets,
     evaluate_content_performance_feedback,
     get_content_completeness_report,
-    get_source_intelligence,
-    get_source_intelligence,
-    get_content_commerce_attribution,
-    get_intent_recommendation_heatmap,
-    get_user_interest_coverage_gap,
     get_source_authority_validation,
     get_geographic_demand_data,
     get_category_sentiment_health,
-    get_recommendation_commerce_chain
+    get_recommendation_commerce_chain,
+    get_source_intelligence
 )
+from app.infrastructure import cache
 
 bp = Blueprint("api_insights", __name__, url_prefix="/admin/insights")
-
-INSIGHTS_CACHE = {
-    "strategy": {},
-    "assets": {},
-    "publishing_plan": {},
-    "performance": {},
-    "governance": {},
-    "execution_plan": {}
-}
 
 # Cache TTL: 10 minutes (600 seconds)
 CACHE_TTL = 600
 
-
 def get_cached(layer, key):
-    cache = INSIGHTS_CACHE.get(layer, {})
-    if key in cache:
-        entry = cache[key]
-        if time.time() - entry["timestamp"] < CACHE_TTL:
-            return entry["data"]
-    return None
-
+    return cache.get(f"insights:{layer}:{key}")
 
 def set_cached(layer, key, data):
-    if layer not in INSIGHTS_CACHE:
-        INSIGHTS_CACHE[layer] = {}
-    INSIGHTS_CACHE[layer][key] = {
-        "data": data,
-        "timestamp": time.time()
-    }
-
+    cache.set(f"insights:{layer}:{key}", data, timeout=CACHE_TTL)
 
 def invalidate_cache(layer, key=None):
     if layer == "all":
-        for l in INSIGHTS_CACHE:
-            if key:
-                INSIGHTS_CACHE[l].pop(key, None)
-            else:
-                INSIGHTS_CACHE[l] = {}
-    else:
-        if layer in INSIGHTS_CACHE:
-            if key:
-                INSIGHTS_CACHE[layer].pop(key, None)
-            else:
-                INSIGHTS_CACHE[layer] = {}
+        # Ideally would use a pattern delete, but clearing cache is safe for now
+        # given this is an explicit admin action.
+        cache.clear()
+    elif key:
+        cache.delete(f"insights:{layer}:{key}")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all insights endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 @bp.route("/data", methods=["GET"])
@@ -85,16 +50,11 @@ def get_insights_data():
     return jsonify({"status": "deprecated"})
 
 
-@bp.route("/strategy", methods=["GET"])
-def get_strategy():
-    time_frame = request.args.get("time_frame", "7_days")
-    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
-        time_frame = "7_days"
-
+def _compute_strategy(time_frame):
     cached = get_cached("strategy", time_frame)
     if cached is not None:
-        return jsonify(cached)
-        
+        return cached
+
     dec_data = get_decision_intelligence_data(lightweight=True)
     categories_data = get_content_coverage_matrix()
     brands_data = get_brand_opportunity_data()
@@ -110,6 +70,16 @@ def get_strategy():
     }
     strategy = generate_content_strategy(opps_payload)
     set_cached("strategy", time_frame, strategy)
+    return strategy
+
+
+@bp.route("/strategy", methods=["GET"])
+def get_strategy():
+    time_frame = request.args.get("time_frame", "7_days")
+    if time_frame not in ["today", "7_days", "30_days", "all_time"]:
+        time_frame = "7_days"
+
+    strategy = _compute_strategy(time_frame)
     return jsonify(strategy)
 
 
@@ -123,25 +93,7 @@ def get_assets():
     if cached is not None:
         return jsonify(cached)
         
-    strategy = get_cached("strategy", time_frame)
-    if strategy is None:
-        # Generate and cache strategy
-        dec_data = get_decision_intelligence_data(lightweight=True)
-        categories_data = get_content_coverage_matrix()
-        brands_data = get_brand_opportunity_data()
-        intent_data = get_intent_opportunity_data()
-        rec_perf = get_recommendation_performance_data()
-        
-        opps_payload = {
-            "top_opportunities": dec_data["top_opportunities"],
-            "categories_data": categories_data,
-            "brands_data": brands_data,
-            "intent_data": intent_data,
-            "recommendation_performance": rec_perf
-        }
-        strategy = generate_content_strategy(opps_payload)
-        set_cached("strategy", time_frame, strategy)
-        
+    strategy = _compute_strategy(time_frame)
     assets = map_content_strategy_to_assets(strategy)
     set_cached("assets", time_frame, assets)
     return jsonify(assets)

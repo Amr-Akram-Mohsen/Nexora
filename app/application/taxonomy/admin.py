@@ -1,4 +1,9 @@
+from sqlalchemy import select, func, cast
 from app.core.extensions import db
+from app.domains.relationships import ArticleSource
+from app.domains.taxonomy.models import Source
+from app.domains.content.models import Content, Article
+from app.domains.external.models import LastAPIFetch
 from app.domains.taxonomy.service.admin import (
     create_admin_category as domain_create_category,
     update_admin_category as domain_update_category,
@@ -100,3 +105,15 @@ def apply_taxonomy_insight_workflow(content_id, type_, suggested_id):
     except Exception as e:
         db.session.rollback()
         raise e
+
+
+def get_source_inspect_workflow(id):
+    from app.domains.taxonomy.service.admin import get_admin_source_inspect_raw
+    from app.domains.taxonomy.serializers import serialize_source_inspect_dto
+    
+    raw_tuple = get_admin_source_inspect_raw(id)
+    if not raw_tuple:
+        return None
+        
+    dto = serialize_source_inspect_dto(raw_tuple)
+    return {"source_dto": dto}

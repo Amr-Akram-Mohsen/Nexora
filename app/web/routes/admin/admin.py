@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint
 from app.web.routes.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 
 bp = Blueprint(
     "admin",
@@ -8,13 +8,9 @@ bp = Blueprint(
     url_prefix="/admin"
 )
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all routes under /admin are strictly admin-only."""
-    pass
+apply_admin_guard(bp)
 
-from app.domains.analytics.service.admin import get_admin_dashboard_stats_data
+from app.application.analytics.admin import get_admin_dashboard_stats_data
 
 @bp.route("/")
 def home():
@@ -23,9 +19,7 @@ def home():
         "admin/overview/overview.html", 
         title="Overview", 
         domain="home",
-        stats=stats_data,
-        data=stats_data,
-        **stats_data
+        stats=stats_data
     )
 
 @bp.route("/insights")
@@ -164,65 +158,85 @@ def settings():
 
 @bp.route("/contents/<int:id>")
 def content_detail(id):
-    from app.web.routes.admin.contents import build_content_inspect_data
+    from app.application.content.admin import get_content_inspect_workflow
+    from app.web.routes.admin.builders.content_builder import build_content_inspect_view_model
     from flask import abort
-    data = build_content_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_content_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
+        
+    data = build_content_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Content {id}", domain="contents", **data)
 
 
 @bp.route("/items/<int:id>")
 def item_detail(id):
-    from app.web.routes.admin.items import build_item_inspect_data
+    from app.application.item.admin import get_item_inspect_workflow
+    from app.web.routes.admin.builders.item_builder import build_item_inspect_view_model
     from flask import abort
-    data = build_item_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_item_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
+        
+    data = build_item_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Product {id}", domain="items", **data)
 
 
 @bp.route("/users/<int:id>")
 def user_detail(id):
-    from app.web.routes.admin.users import build_user_inspect_data
+    from app.application.user.admin import get_user_inspect_workflow
+    from app.web.routes.admin.builders.user_builder import build_user_inspect_view_model
     from flask import abort
-    data = build_user_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_user_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
+        
+    data = build_user_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"User {id}", domain="users", **data)
 
 
 @bp.route("/stores/<int:id>")
 def store_detail(id):
-    from app.domains.item.service.admin_providers_store import build_admin_store_inspect_data
-    from app.web.routes.admin.tables import get_inspect_table
+    from app.application.item.admin import get_store_inspect_workflow
+    from app.web.routes.admin.builders.item_builder import build_store_inspect_view_model
     from flask import abort
-    data = build_admin_store_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_store_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
-    data["inspect_table"] = get_inspect_table("stores", data.pop("raw_data"))
+        
+    data = build_store_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Store Details {id}", domain="stores", **data)
 
 
 @bp.route("/sources/<int:id>")
 def source_detail(id):
-    from app.domains.taxonomy.service.admin_providers_source import build_admin_source_inspect_data
-    from app.web.routes.admin.tables import get_inspect_table
+    from app.application.taxonomy.admin import get_source_inspect_workflow
+    from app.web.routes.admin.builders.taxonomy_builder import build_source_inspect_view_model
     from flask import abort
-    data = build_admin_source_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_source_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
-    data["inspect_table"] = get_inspect_table("sources", data.pop("raw_data"))
+        
+    data = build_source_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Source Details {id}", domain="sources", **data)
 
 
 @bp.route("/comments/<int:id>")
 def comment_detail(id):
-    from app.web.routes.admin.interactions import build_comment_inspect_data
+    from app.application.interaction.admin import get_comment_inspect_workflow
+    from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
     from flask import abort
-    data = build_comment_inspect_data(id)
-    if not data:
+    
+    aggregated_data = get_comment_inspect_workflow(id)
+    if not aggregated_data:
         abort(404)
+        
+    data = build_comment_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Comment Details {id}", domain="comments", **data)
 
 

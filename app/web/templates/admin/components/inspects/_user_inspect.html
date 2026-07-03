@@ -29,7 +29,7 @@
         <h2>{{ inspect_header.name }}</h2>
         <div class="flex flex-wrap gap-4 items-center">
           <span><strong>Email:</strong> {{ inspect_header.email }}</span>
-          <span><strong>Joined:</strong> {{ inspect_header.joined|truncate(10, True, '') if inspect_header.joined else '—' }}</span>
+          <span><strong>Joined:</strong> {{ inspect_header.joined|truncate(10, True, '') if inspect_header.joined else '' }}</span>
           {% if inspect_header.last_active %}
           <span><strong>Last Active:</strong> {{ inspect_header.last_active|truncate(16, True, '')|replace('T', ' ') }}</span>
           {% endif %}

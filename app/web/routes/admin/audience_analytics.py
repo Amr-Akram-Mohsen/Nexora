@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, render_template
-from app.core.decorators import admin_required
+from flask import Blueprint, jsonify
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.user.models import User
 from app.domains.interaction.models import RecommendationImpression, RecommendationClick
@@ -7,10 +7,7 @@ from sqlalchemy import select, func, text
 
 bp = Blueprint("api_audience_analytics", __name__, url_prefix="/admin/audience-analytics")
 
-@bp.before_request
-@admin_required
-def require_admin():
-    pass
+apply_admin_guard(bp)
 
 @bp.route("/stats", methods=["GET"])
 def get_analytics_stats():

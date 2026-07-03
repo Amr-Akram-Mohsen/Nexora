@@ -9,27 +9,19 @@
     <span class="text-muted">Anonymous</span>
     {% endif %}
   {% elif key == "health" %}
-    {% if value == "unused" %}
-    <span title="Entity is orphaned (0 linked items/content)">{{ badge("Unused", variant="danger") }}</span>
-    {% elif value == "inactive-linked" %}
-    <span title="Entity is inactive but has linked items/content">{{ badge("Inactive (Linked)", variant="warning") }}</span>
-    {% elif value == "ok" %}
-    {{ badge("OK", variant="success") }}
-    {% else %}
-    {{ badge(value|title, variant="secondary") }}
-    {% endif %}
+    {% set tooltip, text, variant = ('Entity is orphaned (0 linked items/content)', 'Unused', 'danger') if value == 'unused' else
+                                    ('Entity is inactive but has linked items/content', 'Inactive (Linked)', 'warning') if value == 'inactive-linked' else
+                                    (None, 'OK', 'success') if value == 'ok' else
+                                    (None, value|title, 'secondary') %}
+    {% if tooltip %}<span title="{{ tooltip }}">{% endif %}
+    {{ badge(text, variant=variant) }}
+    {% if tooltip %}</span>{% endif %}
   {% elif key == "is_configured" or key == "filter config" %}
-    {% if value == "Configured" or value == True %}
-    {{ badge("Configured", variant="success") }}
-    {% else %}
-    {{ badge("Not Configured", variant="warning") }}
-    {% endif %}
+    {% set is_conf = (value == "Configured" or value == True) %}
+    {{ badge("Configured" if is_conf else "Not Configured", variant="success" if is_conf else "warning") }}
   {% elif key == "is_active" or key == "status" %}
-    {% if value == "active" or value == True %}
-    {{ badge("Active", variant="success") }}
-    {% else %}
-    {{ badge("Inactive", variant="secondary") }}
-    {% endif %}
+    {% set is_act = (value == "active" or value == True) %}
+    {{ badge("Active" if is_act else "Inactive", variant="success" if is_act else "secondary") }}
   {% elif key == "is_featured" or key == "featured" %}
     {% if value == "Featured" or value == True %}
     {{ badge("Featured", variant="primary") }}

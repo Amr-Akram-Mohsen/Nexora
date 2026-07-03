@@ -15,7 +15,12 @@
       .then(data => {
         const total = data.total_items || 0;
         
-        document.getElementById('stats-total-items').textContent = total.toLocaleString();
+        if (window.itemsController) {
+          window.itemsController.updateStatsUI(data, {
+            total_items: 'stats-total-items',
+            stale_sync_items: 'stats-stale-syncs'
+          });
+        }
         
         const imgPct = total > 0 ? Math.round((data.items_with_images / total) * 100) : 0;
         document.getElementById('stats-image-coverage').textContent = imgPct + '%';
@@ -29,7 +34,7 @@
         document.getElementById('stats-link-coverage').textContent = linkPct + '%';
         document.getElementById('stats-meta-links').textContent = `${(total - data.items_with_links).toLocaleString()} missing links`;
         
-        document.getElementById('stats-stale-syncs').textContent = (data.stale_sync_items || 0).toLocaleString();
+
         
         // Render Item Type Distribution
         const distContainer = document.getElementById('stats-type-distribution');

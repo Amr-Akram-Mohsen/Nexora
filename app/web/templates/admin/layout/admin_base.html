@@ -18,7 +18,7 @@
 <div class='admin-layout'>
   <div id='sidebar-overlay' class='sidebar-overlay'></div>
 
-  <aside class='admin-sidebar'>
+  <aside id='admin-sidebar' class='admin-sidebar'>
     {% include 'admin/dashboard/_nav.html' %}
   </aside>
 
@@ -37,7 +37,7 @@
 {% block additional_content %}
 {{ super() }}
 <div id='dashboard-modal-overlay' class='dashboard-modal-overlay flex-center'>
-  <div class='dashboard-modal-content'>
+  <div class='dashboard-modal-content' role='dialog' aria-modal='true' aria-labelledby='modal-title'>
     <div class='dashboard-modal-icon'><i class="fa-solid fa-triangle-exclamation"></i></div>
     <h3 id='modal-title' class='dashboard-modal-title'>Confirm</h3>
     <p id='modal-body' class='dashboard-modal-body'></p>

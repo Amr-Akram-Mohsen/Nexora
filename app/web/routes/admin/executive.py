@@ -1,13 +1,10 @@
 from flask import Blueprint, render_template, jsonify
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.domains.analytics import get_executive_summary
 
 bp = Blueprint("admin_executive", __name__, url_prefix="/admin/executive")
 
-@bp.before_request
-@admin_required
-def require_admin():
-    pass
+apply_admin_guard(bp)
 
 @bp.route("/", methods=["GET"])
 def index():

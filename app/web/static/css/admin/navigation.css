@@ -40,7 +40,7 @@
     gap: 0;
 }
 
-.admin-sidebar .dashboard-nav a {
+.admin-sidebar .dashboard-nav .nav-link {
     display: block;
     width: calc(100% - 1rem);
     padding: 0.625rem 0.875rem;

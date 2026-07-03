@@ -251,3 +251,69 @@ def get_admin_item_inspect_raw(id):
         ).where(Item.id == id)
     )
     return item
+
+def get_admin_store_inspect_raw(id):
+    from sqlalchemy import select, func, case
+    from datetime import datetime, timezone, timedelta
+    from app.domains.item.models import Store, ItemStoreLink, ItemVariant
+    
+    store = db.session.get(Store, id)
+    if not store:
+        return None
+        
+    product_count = db.session.scalar(
+        select(func.count(func.distinct(ItemVariant.item_id)))
+        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
+        .where(ItemStoreLink.store_id == id)
+    ) or 0
+    
+    now = datetime.now(timezone.utc)
+    stale_date = now - timedelta(days=7)
+
+    stats = db.session.execute(
+        select(
+            func.count(ItemStoreLink.id).label("total_links"),
+            func.sum(case((ItemStoreLink.is_active == True, 1), else_=0)).label("active_links"),
+            func.sum(case((ItemStoreLink.is_active == False, 1), else_=0)).label("inactive_links"),
+            func.sum(case((ItemStoreLink.last_synced_at == None, 1), else_=0)).label("never_synced"),
+            func.sum(case((ItemStoreLink.last_synced_at < stale_date, 1), else_=0)).label("stale_links"),
+            func.sum(case((ItemStoreLink.availability == 'OutOfStock', 1), else_=0)).label("out_of_stock"),
+            func.max(ItemStoreLink.last_synced_at).label("last_synced"),
+            func.count(func.distinct(ItemStoreLink.program_name)).label("program_count"),
+            func.avg(ItemStoreLink.commission_rate).label("avg_commission"),
+            func.max(ItemStoreLink.commission_rate).label("max_commission"),
+            func.sum(case((ItemStoreLink.commission_rate != None, 1), else_=0)).label("with_commission"),
+            func.sum(case((ItemStoreLink.commission_rate == None, 1), else_=0)).label("without_commission"),
+            func.sum(case((ItemStoreLink.tracking_code != None, 1), else_=0)).label("with_tracking"),
+            func.min(ItemStoreLink.price).label("min_price"),
+            func.avg(ItemStoreLink.price).label("avg_price"),
+            func.max(ItemStoreLink.price).label("max_price"),
+            func.sum(case(((ItemStoreLink.old_price != None) & (ItemStoreLink.old_price > ItemStoreLink.price), 1), else_=0)).label("with_discount"),
+            func.avg(case(((ItemStoreLink.old_price != None) & (ItemStoreLink.old_price > ItemStoreLink.price), (ItemStoreLink.old_price - ItemStoreLink.price) / ItemStoreLink.old_price * 100), else_=None)).label("avg_discount_pct"),
+            func.sum(case((ItemStoreLink.price == None, 1), else_=0)).label("null_price")
+        )
+        .where(ItemStoreLink.store_id == id)
+    ).first()
+    
+    currency_mix_rows = db.session.execute(
+        select(ItemStoreLink.currency, func.count(ItemStoreLink.id))
+        .where(ItemStoreLink.store_id == id)
+        .where(ItemStoreLink.currency != None)
+        .group_by(ItemStoreLink.currency)
+    ).all()
+    currency_mix_list = [{"label": c[0], "detail": c[1]} for c in currency_mix_rows] if currency_mix_rows else []
+
+    all_syncs = db.session.execute(
+        select(ItemStoreLink.last_synced_at)
+        .where(ItemStoreLink.store_id == id)
+        .where(ItemStoreLink.last_synced_at != None)
+    ).all()
+    total_days = 0
+    for (dt,) in all_syncs:
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        total_days += (now - dt).days
+    avg_sync_age = round(total_days / len(all_syncs), 1) if all_syncs else None
+
+    return store, stats, product_count, currency_mix_list, avg_sync_age
+

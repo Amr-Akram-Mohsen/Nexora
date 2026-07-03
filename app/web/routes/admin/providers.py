@@ -12,7 +12,7 @@ Refactoring applied:
   eliminate duplication between JSON listing and HTML partial endpoints.
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.taxonomy.models import Source
 from app.domains.content.models import Content
@@ -25,11 +25,7 @@ from sqlalchemy import select, func, or_, case
 bp = Blueprint("api_provider", __name__, url_prefix="/admin/providers")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all provider endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 # ─────────────────────────────────────────────
@@ -167,27 +163,31 @@ def stores_rows():
 # ─────────────────────────────────────────────
 
 @bp.route("/sources/<int:id>/inspect", methods=["GET"])
-@admin_required
 def inspect_source(id):
-    from app.web.routes.admin.tables import get_inspect_table
-    from app.domains.taxonomy.service.admin_providers_source import build_admin_source_inspect_data
-    data_dict = build_admin_source_inspect_data(id)
-    if not data_dict:
+    from app.application.taxonomy.admin import get_source_inspect_workflow
+    from app.web.routes.admin.builders.taxonomy_builder import build_source_inspect_view_model
+    
+    aggregated_data = get_source_inspect_workflow(id)
+    if not aggregated_data:
         return "Source not found.", 404
         
-    data_dict["inspect_table"] = get_inspect_table("sources", data_dict.pop("raw_data"))
+    data_dict = build_source_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", **data_dict)
 
 @bp.route("/stores/<int:id>/inspect", methods=["GET"])
-@admin_required
 def inspect_store(id):
-    from app.web.routes.admin.tables import get_inspect_table
-    from app.domains.item.service.admin_providers_store import build_admin_store_inspect_data
-    data_dict = build_admin_store_inspect_data(id)
-    if not data_dict:
+    from app.domains.item.service.admin import get_admin_store_inspect_raw
+    from app.domains.item.serializers import serialize_store_inspect_dto
+    from app.web.routes.admin.builders.item_builder import build_store_inspect_view_model
+    
+    raw_result = get_admin_store_inspect_raw(id)
+    if not raw_result:
         return "Store not found.", 404
         
-    data_dict["inspect_table"] = get_inspect_table("stores", data_dict.pop("raw_data"))
+    store, stats, product_count, currency_mix_list, avg_sync_age = raw_result
+    dto = serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, avg_sync_age)
+    data_dict = build_store_inspect_view_model(dto)
+    
     return render_template("admin/components/_inspect.html", **data_dict)
 
 

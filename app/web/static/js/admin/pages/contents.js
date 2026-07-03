@@ -23,17 +23,31 @@
         const statsBar = document.getElementById("contents-stats-bar");
         if (statsBar) statsBar.classList.remove("is-hidden");
 
-        const elPublished = document.getElementById("stat-published");
-        const elDrafts = document.getElementById("stat-drafts");
-        const elFailed = document.getElementById("stat-failed");
-        const elNoTopics = document.getElementById("stat-no-topics");
-        const elNoBrands = document.getElementById("stat-no-brands");
+        const mapping = {
+          published: "stat-published",
+          drafts: "stat-drafts",
+          failed: "stat-failed",
+          no_topics: "stat-no-topics",
+          no_brands: "stat-no-brands"
+        };
+        if (window.contentsController) {
+          window.contentsController.updateStatsUI(stats, mapping);
+        }
 
-        if (elPublished) elPublished.textContent = stats.published.toLocaleString();
-        if (elDrafts) elDrafts.textContent = stats.drafts.toLocaleString();
-        if (elFailed) elFailed.textContent = stats.failed.toLocaleString();
-        if (elNoTopics) elNoTopics.textContent = stats.no_topics.toLocaleString();
-        if (elNoBrands) elNoBrands.textContent = stats.no_brands.toLocaleString();
+        const total = (stats.published || 0) + (stats.drafts || 0) + (stats.failed || 0);
+        if (total > 0) {
+          const pubPct = ((stats.published || 0) / total) * 100;
+          const draftPct = ((stats.drafts || 0) / total) * 100;
+          const failPct = ((stats.failed || 0) / total) * 100;
+
+          const barPub = document.getElementById("stat-bar-published");
+          const barDraft = document.getElementById("stat-bar-drafts");
+          const barFail = document.getElementById("stat-bar-failed");
+
+          if (barPub) barPub.style.setProperty('--seg-width', `${pubPct}%`);
+          if (barDraft) barDraft.style.setProperty('--seg-width', `${draftPct}%`);
+          if (barFail) barFail.style.setProperty('--seg-width', `${failPct}%`);
+        }
       })
       .catch(err => console.error("Error loading stats:", err));
   }

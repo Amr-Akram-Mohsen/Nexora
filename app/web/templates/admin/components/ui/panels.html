@@ -86,3 +86,9 @@ scroll_class="admin-table-scrollable") %}
 </div>
 </div>
 {% endmacro %}
+
+{% macro admin_tab_panel(id, is_active=False) %}
+<div class="admin-tab-panel {% if not is_active %}is-hidden{% endif %}" id="tab-panel-{{ id }}">
+  {{ caller() }}
+</div>
+{% endmacro %}

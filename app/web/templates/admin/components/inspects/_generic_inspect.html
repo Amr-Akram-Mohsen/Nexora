@@ -83,7 +83,7 @@
     <tr>
       <td>#{{ item.id }}</td>
       <td>{{ item.name }}</td>
-      <td><span class='status-badge'>{{ item.type or '—' }}</span></td>
+      <td><span class='status-badge'>{{ item.type }}</span></td>
       <td class='col-metric'>{{ '{:,}'.format(item.clicks) }}</td>
       <td>
         {{ action_button('Unlink', action_type='delete', icon='<i class="fa-solid fa-lock-open"></i>', extra_class='user-action-delete',

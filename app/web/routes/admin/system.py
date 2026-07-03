@@ -12,17 +12,13 @@ import sys
 import flask
 from flask import Blueprint, jsonify, current_app, request, render_template
 from app.core.extensions import db, cache
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.domains.external.service.admin import get_admin_integrations_status_data, get_admin_integrations_logs_data
 
 bp = Blueprint("api_system", __name__, url_prefix="/admin/system")
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all system configuration routes are strictly admin-only."""
-    pass
+apply_admin_guard(bp)
 
 
 def _build_system_info() -> list:
@@ -112,7 +108,7 @@ def reset_system():
 @bp.route("/widget/info", methods=["GET"])
 def widget_system_info():
     info = _build_system_info()
-    return render_template("admin/control_panel/settings/widgets/_info.html", info=info)
+    return render_template("admin/settings/widgets/_info.html", info=info)
 
 
 @bp.route("/widget/integrations", methods=["GET"])
@@ -129,7 +125,7 @@ def widget_integrations():
                 intg["last_fetch_formatted"] = last_fetch
         else:
             intg["last_fetch_formatted"] = "Never"
-    return render_template("admin/control_panel/settings/widgets/_integrations.html", data=data)
+    return render_template("admin/settings/widgets/_integrations.html", data=data)
 
 
 @bp.route("/widget/ingestion-logs", methods=["GET"])
@@ -152,4 +148,4 @@ def widget_ingestion_logs():
         else:
             log["time_formatted"] = "Recently"
             
-    return render_template("admin/control_panel/settings/widgets/_ingestion_logs.html", logs=data)
+    return render_template("admin/settings/widgets/_ingestion_logs.html", logs=data)

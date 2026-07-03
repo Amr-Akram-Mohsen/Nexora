@@ -26,11 +26,11 @@ summary_class="admin-summary-bar"
 {% macro breakdown_progress_bar(label, value, percentage, color="var(--brand-purple)", icon="", extra_class="") %}
 <div class="flex items-center w-full gap-3 {{ extra_class }}">
   {% if icon %}
-  <div class="overview-breakdown-icon" style="color: {{ color }};">{{ icon|safe }}</div>
+  <div class="overview-breakdown-icon" style="--icon-color: {{ color }};">{{ icon|safe }}</div>
   {% endif %}
   <div class="overview-breakdown-label truncate" title="{{ label }}">{{ label }}</div>
   <div class="overview-breakdown-bar-track">
-    <div class="overview-breakdown-bar" style="width: {{ percentage }}%; background-color: {{ color }};"></div>
+    <div class="overview-breakdown-bar" style="--seg-width: {{ percentage }}%; --bar-color: {{ color }};"></div>
   </div>
   <div class="overview-breakdown-val">{{ value }}</div>
 </div>
@@ -56,4 +56,23 @@ summary_class="admin-summary-bar"
     {{ caller() }}
   </div>
 </li>
+{% endmacro %}
+
+{% macro dashboard_empty(message="No data yet.", icon="fa-regular fa-envelope-open", height_class="loading-height-sm") %}
+<div class="dashboard-empty {{ height_class }}">
+  <span class="dashboard-state-icon"><i class="{{ icon }}"></i></span>
+  <p class="empty-message">{{ message }}</p>
+</div>
+{% endmacro %}
+
+{% macro distribution_link_bar(name, count_label, percentage, href, bar_class="bar-purple") %}
+<a class="dist-row-link" href="{{ href }}">
+  <div class="dist-row flex justify-between">
+    <span class="dist-row-name">{{ name }}</span>
+    <span class="dist-row-count">{{ count_label }}</span>
+  </div>
+  <div class="overview-breakdown-bar-track bar-track-health">
+    <div class="overview-breakdown-bar {{ bar_class }}" style="width: {{ percentage }}%;"></div>
+  </div>
+</a>
 {% endmacro %}

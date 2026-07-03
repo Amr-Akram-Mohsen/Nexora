@@ -43,9 +43,9 @@
 </div>
 <div class="profile-sentiment-bar flex">
   {% if total > 0 %}
-    {% if pos > 0 %}<div class="sentiment-pos" style="width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>{% endif %}
-    {% if neu > 0 %}<div class="sentiment-neu" style="width: {{ neu_pct }}%" title="Neutral: {{ neu_pct }}%"></div>{% endif %}
-    {% if neg > 0 %}<div class="sentiment-neg" style="width: {{ neg_pct }}%" title="Negative: {{ neg_pct }}%"></div>{% endif %}
+    {% if pos > 0 %}<div class="sentiment-pos" style="--seg-width: {{ pos_pct }}%" title="Positive: {{ pos_pct }}%"></div>{% endif %}
+    {% if neu > 0 %}<div class="sentiment-neu" style="--seg-width: {{ neu_pct }}%" title="Neutral: {{ neu_pct }}%"></div>{% endif %}
+    {% if neg > 0 %}<div class="sentiment-neg" style="--seg-width: {{ neg_pct }}%" title="Negative: {{ neg_pct }}%"></div>{% endif %}
   {% else %}
     <div class="sentiment-empty" title="No Sentiment Data"></div>
   {% endif %}
@@ -57,7 +57,7 @@
   <div class="inspect-store-card-header flex justify-between items-center flex-wrap gap-2">
     <div>
       <strong class="inspect-store-card-name">{{ lnk.store_name }}</strong>
-      <span class="inspect-store-card- status-badge">{{ lnk.affiliate_network }}</span>
+      <span class="status-badge">{{ lnk.affiliate_network }}</span>
     </div>
     <div>
       <span class="inspect-store-availability status-badge {{ 'active' if lnk.availability == 'in_stock' else 'inactive' }}">

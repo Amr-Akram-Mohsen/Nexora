@@ -12,6 +12,7 @@
     min-height: 100px;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
     cursor: default;
+    flex-direction: column;
 }
 
 .dashboard-stat-card:hover {
@@ -207,6 +208,7 @@ a.clickable-card:hover .dashboard-stat-value {
     width: 1.25rem;
     flex-shrink: 0;
     text-align: center;
+    color: var(--icon-color, inherit);
 }
 
 .overview-breakdown-label {
@@ -227,11 +229,11 @@ a.clickable-card:hover .dashboard-stat-value {
 
 .overview-breakdown-bar {
     height: 100%;
-    background: var(--brand-blue);
+    background: var(--bar-color, var(--brand-blue));
+    width: var(--seg-width, 0%);
     border-radius: var(--radius-full);
     transition: width 0.5s ease;
     min-width: 2px;
-    width: var(--seg-width, 0%);
 }
 
 .overview-breakdown-val {
@@ -373,6 +375,7 @@ a.clickable-card:hover .dashboard-stat-value {
 .activity-item {
     gap: 0.875rem;
     padding: 0.875rem 1.25rem;
+    align-items: flex-start;
     border-bottom: 1px solid var(--border);
 }
 
@@ -664,15 +667,7 @@ a.clickable-card:hover .dashboard-stat-value {
 
 /* --- Utilities (Migrated) --- */
 
-.activity-item {
-    align-items: flex-start;
-}
-
 .activity-meta {
     color: var(--muted-foreground);
     margin-top: 0.25rem;
-}
-
-.dashboard-stat-card {
-    flex-direction: column;
 }

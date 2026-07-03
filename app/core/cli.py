@@ -72,15 +72,17 @@ def register_commands(app):
         app.logger.info("--- Starting Limited Test Run (5 queries/source) ---")
         run_content_fetch()
 
+    import click
     @app.cli.command("enrich-articles")
-    def enrich_articles_command():
+    @click.option("--extractor", default="firecrawl", help="Extractor service to use (e.g. firecrawl, jina)")
+    def enrich_articles_command(extractor):
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import (
             reprocess_unscraped_articles,
         )
 
-        app.logger.info("Starting full-body enrichment for pending articles...")
-        count = reprocess_unscraped_articles(10)
+        app.logger.info(f"Starting full-body enrichment using {extractor}...")
+        count = reprocess_unscraped_articles(30, extractor_service=extractor)
         app.logger.info("Done! Successfully published %d articles.", count)
 
     @app.cli.command("init-content-status")

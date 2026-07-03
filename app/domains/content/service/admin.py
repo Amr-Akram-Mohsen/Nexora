@@ -409,133 +409,82 @@ def get_admin_content_inspect_raw(id):
     return {"content": content, "target": target}
 
 
-def build_content_inspect_data(content_id: int) -> dict | None:
+
+
+
+def serialize_content_row(c, target, duplicate_titles: set) -> dict:
     """
-    Assemble the full inspect-view payload for a single content item.
+    Serialize a single Content row for the admin listing.
 
-    Delegates raw ORM fetching to get_admin_content_inspect_raw, then enriches
-    the result with engagement scoring, taxonomy breadcrumbs, distribution history,
-    and a structured inspect_table.  Returns None if the content is not found.
+    Args:
+        c: The Content ORM instance.
+        target: The polymorphic target (Article / Video / Post) or None.
+        duplicate_titles: Set of titles known to be duplicated on the current page.
+
+    Returns:
+        A dict suitable for JSON serialization.
     """
-    raw_data = get_admin_content_inspect_raw(content_id)
-    if not raw_data:
-        return None
+    source_name  = c.source.name if c.source else "Unknown"
+    source_slug  = c.source.slug if c.source else "unknown"
+    status_val   = "complete"
+    canonical_url = None
 
-    content = raw_data["content"]
-    target  = raw_data["target"]
-
-    sources: list[str] = []
-    if content.object_type == "article" and target:
-        sources = [s.source.name for s in target.sorted_source_relations if s.source]
+    if c.object_type == "article" and target:
+        status_val    = target.status
+        canonical_url = target.canonical_url
+        sources = [s.source.name for s in target.article_sources if s.source]
     else:
-        sources = [content.source.name] if content.source else []
+        if target:
+            canonical_url = target.url
+        sources = [c.source.name] if c.source else []
 
-    status_val = target.status if target and hasattr(target, "status") else "complete"
+    # Quality flags
+    duplicate = c.title and c.title in duplicate_titles
+    
+    # Compute Health Score
+    score = 0
+    if c.title: score += 10
+    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
+    if c.category and c.category.slug != 'uncategorized': score += 10
+    if c.topics: score += 15
+    if c.brands: score += 15
+    if c.source_id: score += 10
+    if not duplicate: score += 5
+    
+    if c.object_type == "article" and target:
+        if getattr(target, 'is_content_scraped', False): score += 10
+        if getattr(target, 'status', '') == 'complete': score += 10
+        if getattr(target, 'quality_score', 0) > 0: score += 5
+    elif c.object_type in ("video", "post"):
+        score += 25
+        
+    score = min(score, 100)
 
-    # Lazy imports to avoid circular dependencies with route-layer helpers
-    from app.web.routes.admin.helpers import format_datetime
-    from app.web.routes.admin.tables import get_inspect_table
-    from app.domains.interaction.service.scoring import get_content_engagement_score
-    from app.domains.distribution.services import get_distribution_history
-
-    engagement_score = get_content_engagement_score(content.id)
-
-    sec_slug = content.section.slug  if content.section  else ""
-    cat_slug = content.category.slug if content.category else ""
-    sec_name = content.section.name  if content.section  else "Unassigned"
-    cat_name = content.category.name if content.category else "Uncategorized"
-
-    taxonomy_breadcrumb = [
-        {"label": sec_name, "link": f"/admin/contents?section={sec_slug}"},
-        {"label": cat_name, "link": f"/admin/contents?category={cat_slug}"},
-    ]
-
-    data = {
-        "id":                 f"#{content.id}",
-        "title":              content.title or "—",
-        "type":               content.object_type,
-        "taxonomy path":      {"value": taxonomy_breadcrumb, "is_breadcrumb": True},
-        "engagement score":   str(engagement_score),
-        "related brands":     ", ".join(b.name for b in content.brands)      if content.brands      else "—",
-        "related topics":     ", ".join(t.name for t in content.topics)      if content.topics      else "—",
-        "mentioned products": ", ".join(i.name for i in content.linked_items) if content.linked_items else "—",
-        "attributes":         ", ".join(a.name for a in content.attributes)  if content.attributes  else "—",
-        "available sources":  ", ".join(sources) if sources else "—",
-        "primary source":     content.source.name if content.source else "—",
-        "acquired via":       content.ingestion_origin or "—",
-        "published at":       format_datetime(content.published_at) or "—",
-        "ingested at":        format_datetime(content.ingested_at)  or "—",
-        "enrichment status":  status_val,
-        "status":             "Live Index" if content.is_published else "Draft",
-        "renderation status": "Active"     if content.is_active    else "Inactive",
-        "views":    "{:,}".format(content.view_count    or 0),
-        "likes":    "{:,}".format(content.like_count    or 0),
-        "dislikes": "{:,}".format(content.dislike_count or 0),
-        "comments": "{:,}".format(content.comment_count or 0),
-        "shares":   "{:,}".format(content.share_count   or 0),
-        "saves":    "{:,}".format(content.save_count    or 0),
-        "intent":      content.intent.name     if content.intent      else "—",
-        "gender":      content.gender.name     if content.gender      else "—",
-        "price tier":  content.price_tier.name if content.price_tier  else "—",
-        "base score":  str(content.score        or 0),
-        "review score": str(content.review_score or 0),
-    }
-
-    if content.object_type == "video" and target:
-        data["platform"] = target.platform
-        data["channel"]  = target.channel_name or "—"
-    elif content.object_type == "post" and target:
-        data["platform"]          = target.platform
-        data["author"]            = target.author    or "—"
-        data["subreddit"]         = target.subreddit or "—"
-        data["platform upvotes"]  = str(target.upvotes        or 0)
-        data["platform comments"] = str(target.comments_count or 0)
-    elif content.object_type == "article" and target:
-        data["is scraped"]               = "Yes" if target.is_content_scraped else "No"
-        data["word count"]               = "{:,}".format(target.word_count or 0)
-        data["read time"]                = f"{target.read_time_minutes} min" if hasattr(target, "read_time_minutes") else "—"
-        data["article quality score"]    = str(target.quality_score or 0)
-        data["last enrichment attempt"]  = (
-            format_datetime(target.last_enrichment_attempt)
-            if target.last_enrichment_attempt else "—"
-        )
-
-    inspect_table = get_inspect_table("contents", data)
-
-    if target and hasattr(target, "url") and target.url:
-        inspect_table["Related Metadata"].append({
-            "label": "Source Link",
-            "value": {"label": "View Original Link", "link": target.url, "external": True},
-            "is_link": True,
-        })
-
-    article_sources_data = []
-    if content.object_type == "article" and target and target.article_sources:
-        article_sources_data = target.article_sources
-
-    recent_comments = sorted(
-        content.comments,
-        key=lambda c: c.created_at or datetime.min,
-        reverse=True
-    )[:3]
-    if recent_comments:
-        inspect_table.setdefault("Related Metadata", [])
-        for idx, c in enumerate(recent_comments):
-            user_name = c.user.name if c.user else f"User #{c.user_id}"
-            preview   = c.content[:100] + ("..." if len(c.content) > 100 else "")
-            inspect_table["Related Metadata"].append({
-                "label": f"Recent Comment {idx + 1}",
-                "value": {"label": user_name, "detail": preview},
-                "is_labeled": True,
-            })
-
-    distribution_history = get_distribution_history("content", content_id)
+    cat_name = c.category.name if c.category else "None"
+    sec_name = c.section.name if c.section else "None"
+    sources_text = ", ".join(sources)
 
     return {
-        "inspect_table":      inspect_table,
-        "article_sources":    article_sources_data,
-        "distribution_history": distribution_history,
-        "inspect_id":         content.id,
-        "content_title":      content.title or "",
+        "id": c.id,
+        "is_published": c.is_published,
+        "title": c.title or "",
+        "object_type": c.object_type,
+        "category": cat_name,
+        "section": sec_name,
+        "has_topics": bool(c.topics),
+        "has_brands": bool(c.brands),
+        "has_source": bool(c.source_id),
+        "is_duplicate": bool(duplicate),
+        "enrichment_status": status_val,
+        "health_score": score,
+        "engagement": {
+            "views": c.view_count, 
+            "likes": c.like_count, 
+            "comments": c.comment_count, 
+            "shares": c.share_count, 
+            "saves": c.save_count
+        },
+        "published_at": c.published_at.isoformat() if c.published_at else None,
+        "sources_text": sources_text,
+        "ingestion_origin": c.ingestion_origin,
     }
-

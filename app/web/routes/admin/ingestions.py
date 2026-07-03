@@ -11,8 +11,8 @@ Refactoring applied:
   source_type field; falls back to a configurable default set when not present.
 - All queries use modern select() style (R-07).
 """
-from flask import Blueprint, jsonify, request
-from app.core.decorators import admin_required
+from flask import Blueprint, jsonify, request, render_template
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.external.models import APIUsage, LastAPIFetch
 from sqlalchemy import select, func
@@ -26,11 +26,7 @@ bp = Blueprint("api_ingestion", __name__, url_prefix="/admin/ingestions")
 _ITEM_SOURCE_NAMES = frozenset({"amazon_sa", "amazon_ae", "noon"})
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all ingestion monitoring endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 

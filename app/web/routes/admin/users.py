@@ -11,9 +11,9 @@ Refactoring applied:
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.domains.user.models import User
-from app.domains.user.service.admin import get_admin_users_paginated, get_admin_user_inspect_raw_data
+from app.domains.user.service.admin import get_admin_users_paginated
 from app.application.user.admin import deactivate_user_workflow, activate_user_workflow, toggle_admin_user_workflow
-from app.core.decorators import admin_required
+from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
 from sqlalchemy import select, or_, and_, func
@@ -30,11 +30,7 @@ def users_stats():
     return jsonify(get_user_dashboard_stats())
 
 
-@bp.before_request
-@admin_required
-def require_admin():
-    """Ensure all user management endpoints require admin privilege."""
-    pass
+apply_admin_guard(bp)
 
 
 def _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page):
@@ -126,8 +122,8 @@ def users_rows():
             "is_admin": u.is_admin,
             "is_subscribed": bool(u.newsletter_subscription and u.newsletter_subscription.is_active),
             "is_active": u.is_active,
-            "created_at": u.created_at.isoformat() if u.created_at else None,
-            "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
+            "created_at": u.created_at.strftime("%Y-%m-%d") if u.created_at else None,
+            "last_login_at": u.last_login_at.strftime("%Y-%m-%d %H:%M") if u.last_login_at else None,
             "recency_days": recency_days,
             "engagement_score": float(score) if score else 0.0,
         })
@@ -152,249 +148,19 @@ def users_rows():
 
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_user(id):
-    data = build_user_inspect_data(id)
-    if not data:
+    from app.application.user.admin import get_user_inspect_workflow
+    from app.web.routes.admin.builders.user_builder import build_user_inspect_view_model
+    
+    aggregated_data = get_user_inspect_workflow(id)
+    if not aggregated_data:
         return jsonify({"error": "User not found"}), 404
+        
+    data = build_user_inspect_view_model(aggregated_data)
     data["domain"] = "users"
     return render_template("admin/components/_inspect.html", **data)
 
 
-def build_user_inspect_data(id):
-    """Return dictionary of data needed for the user inspect/detail view."""
-    raw_data = get_admin_user_inspect_raw_data(id)
-    if not raw_data:
-        return None
-        
-    user = raw_data["user"]
-    metrics = raw_data["metrics"]
-    brands_map = raw_data["brands_map"]
-    categories_map = raw_data["categories_map"]
-    topics_map = raw_data["topics_map"]
-    items_map = raw_data["items_map"]
-    articles_map = raw_data["articles_map"]
 
-    views_count = metrics["views_count"]
-    clicks_count = metrics["clicks_count"]
-    saves_count = metrics["saves_count"]
-    reactions_count = metrics["reactions_count"]
-    comments_count = metrics["comments_count"]
-    shares_count = metrics["shares_count"]
-    recs_seen = metrics["recs_seen"]
-    recs_clicked = metrics["recs_clicked"]
-    engagement_score = metrics["engagement_score"]
-
-    from app.web.routes.admin.helpers import format_date, format_datetime
-    from app.web.routes.admin.tables import get_inspect_table
-    
-    provider = user.provider.title() if user.provider else "Local"
-    verified_str = "Yes" if user.is_verified else "No"
-    interests_data = []
-    agg_brands = {}
-    agg_categories = {}
-    agg_topics = {}
-
-    for ui in user.user_interests:
-        target_name = f"{ui.target_type.title()} #{ui.target_id}"
-        if ui.target_type == 'item' and ui.target_id in items_map:
-            target_name = items_map[ui.target_id]
-        elif ui.target_type in ('article', 'content') and ui.target_id in articles_map:
-            target_name = articles_map[ui.target_id]
-        
-        item_score = 0
-        for s in ui.entity_scores:
-            item_score += s.score
-            if s.brand_id and s.brand_id in brands_map:
-                agg_brands[brands_map[s.brand_id]] = agg_brands.get(brands_map[s.brand_id], 0) + s.score
-            if s.category_id and s.category_id in categories_map:
-                agg_categories[categories_map[s.category_id]] = agg_categories.get(categories_map[s.category_id], 0) + s.score
-            if s.topic_id and s.topic_id in topics_map:
-                agg_topics[topics_map[s.topic_id]] = agg_topics.get(topics_map[s.topic_id], 0) + s.score
-        
-        interests_data.append({
-            "target_name": target_name,
-            "target_type": ui.target_type,
-            "interaction_count": ui.interaction_count,
-            "last_interaction": format_date(ui.last_interaction_at),
-            "score": round(item_score, 1)
-        })
-    
-    interests_data.sort(key=lambda x: x["last_interaction"], reverse=True)
-
-    def sort_agg(d):
-        return [{"name": k, "score": round(v, 1)} for k, v in sorted(d.items(), key=lambda item: item[1], reverse=True)[:5]]
-
-    aggregated_affinities = {
-        "Brands": sort_agg(agg_brands),
-        "Categories": sort_agg(agg_categories),
-        "Topics": sort_agg(agg_topics)
-    }
-
-    user_interests_data = None
-    if interests_data or agg_brands:
-        user_interests_data = {
-            "items": interests_data,
-            "affinities": aggregated_affinities
-        }
-
-    engagement_breakdown_data = {
-        "Views": views_count,
-        "Item Clicks": clicks_count,
-        "Saves": saves_count,
-        "Reactions": reactions_count,
-        "Comments": comments_count,
-        "Shares": shares_count,
-        "Recs Clicked": recs_clicked
-    }
-
-    import urllib.parse
-    user_email_enc = urllib.parse.quote(user.email) if user.email else ""
-
-    reactions_str = f"{reactions_count} (👍 {metrics['likes']}, 👎 {metrics['dislikes']})"
-    comments_str = f"{comments_count} (Pos: {metrics['pos']}, Neu: {metrics['neu']}, Neg: {metrics['neg']}, Spam: {metrics['spam']})"
-
-    reactions_link = {"value": reactions_str, "link": f'/admin/moderation?reactions_user={user_email_enc}'} if reactions_count > 0 else {"value": "0"}
-    comments_link = {"value": comments_str, "link": f'/admin/moderation?comments_user={user_email_enc}'} if comments_count > 0 else {"value": "0"}
-    shares_link = {"value": str(shares_count), "link": f'/admin/moderation?shares_user={user_email_enc}'} if shares_count > 0 else {"value": "0"}
-    saves_link = {"value": str(saves_count), "link": f'/admin/moderation?saves_user={user_email_enc}'} if saves_count > 0 else {"value": "0"}
-    clicks_link = str(clicks_count) # Clicks are aggregated by target, so no direct user filter yet
-
-    counts_dict = {
-        "Commenter": comments_count,
-        "Saver": saves_count,
-        "Sharer": shares_count,
-        "Clicker": clicks_count,
-        "Viewer": views_count
-    }
-    max_count = max(counts_dict.values()) if any(counts_dict.values()) else 0
-    engagement_profile = "Inactive"
-    if max_count > 0:
-        for profile, count in counts_dict.items():
-            if count == max_count:
-                engagement_profile = profile
-                break
-
-    recent_activity = "—"
-    latest_comment = metrics["latest_comment"]
-    latest_save = metrics["latest_save"]
-    latest_view = metrics["latest_view"]
-    latest_reaction = metrics["latest_reaction"]
-    latest_share = metrics["latest_share"]
-    latest_click = metrics["latest_click"]
-
-    activities = []
-    if latest_comment: activities.append((latest_comment.created_at, f"Commented: {latest_comment.content[:50]}..."))
-    if latest_save and latest_save.target:
-        title = latest_save.target.title if latest_save.target_type == 'content' else latest_save.target.name
-        activities.append((latest_save.created_at, f"Saved: {title}"))
-    if latest_view and latest_view.target:
-        title = latest_view.target.title if latest_view.target_type == 'content' else latest_view.target.name
-        activities.append((latest_view.created_at, f"Viewed: {title}"))
-    if latest_reaction and latest_reaction.target:
-        title = latest_reaction.target.title if latest_reaction.target_type == 'content' else (latest_reaction.target.name if hasattr(latest_reaction.target, 'name') else 'Comment')
-        activities.append((latest_reaction.created_at, f"Reacted ({latest_reaction.type}): {title}"))
-    if latest_share and latest_share.target:
-        title = latest_share.target.title if latest_share.target_type == 'content' else latest_share.target.name
-        activities.append((latest_share.created_at, f"Shared: {title}"))
-    if latest_click:
-        activities.append((latest_click.created_at, f"Clicked Item Link"))
-
-    if activities:
-        activities.sort(key=lambda x: x[0], reverse=True)
-        recent_activity = activities[0][1]
-
-    engagement_tier = "Power User" if engagement_score >= 200 else ("High" if engagement_score >= 50 else ("Medium" if engagement_score >= 10 else "Low"))
-
-    subscription_status = "Not Subscribed"
-    if user.newsletter_subscription:
-        sub_status_text = "Active" if user.newsletter_subscription.is_active else ("Unsubscribed" if user.newsletter_subscription.unsubscribed_at else "Unconfirmed")
-        sub_created = format_date(user.newsletter_subscription.created_at, fmt='%b %d, %Y') if user.newsletter_subscription.created_at else "—"
-        sub_unsubbed = format_date(user.newsletter_subscription.unsubscribed_at, fmt='%b %d, %Y') if user.newsletter_subscription.unsubscribed_at else ""
-        subscription_status = f"{sub_status_text} (Joined: {sub_created})"
-        if sub_unsubbed:
-            subscription_status += f" [Unsubbed: {sub_unsubbed}]"
-
-    data = {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email,
-        "role": "Admin" if user.is_admin else "User",
-        "subscription": subscription_status,
-        "status": "Active" if user.is_active else "Inactive",
-        "joined": format_date(user.created_at, fmt='%b %d, %Y') if user.created_at else None,
-        "last active": format_datetime(user.last_login_at, fmt='%b %d, %Y %H:%M') if user.last_login_at else None,
-        
-        "provider": provider,
-        "verified": user.is_verified,
-        "verified at": format_datetime(user.verified_at, fmt='%b %d, %Y %H:%M') if user.verified_at else None,
-        "verification sent": format_datetime(user.verification_sent_at, fmt='%b %d, %Y %H:%M') if user.verification_sent_at else None,
-        "password changed": format_datetime(user.password_changed_at, fmt='%b %d, %Y %H:%M') if user.password_changed_at else None,
-
-        "engagement tier": engagement_tier,
-        "engagement profile": engagement_profile,
-        "engagement score": engagement_score,
-        "views": views_count,
-        "reactions": reactions_str,
-        "comments": comments_str,
-        "saves": saves_count,
-        "shares": shares_count,
-        "item clicks": clicks_count,
-        "recommendations shown": recs_seen,
-        "recommendations clicked": recs_clicked,
-        
-        "recent activity": recent_activity
-    }
-    inspect_table = get_inspect_table("users", data)
-
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
-    days_ago = (now - user.last_login_at).days if user.last_login_at else None
-
-    inspect_header = {
-        "name": user.name or user.email,
-        "email": user.email,
-        "joined": user.created_at.isoformat() if user.created_at else None,
-        "last_active": user.last_login_at.isoformat() if user.last_login_at else None,
-        "recency_days": days_ago
-    }
-
-    actions = [
-        {
-            "label": "Demote to User" if user.is_admin else "Promote to Admin",
-            "action_type": "toggle-admin",
-            "extra_class": "user-action-toggle-admin",
-            "attrs": {"data-action": "toggle-admin", "data-id": user.id, "data-name": (user.name or user.email)}
-        },
-        {
-            "label": "Deactivate Account" if user.is_active else "Activate Account",
-            "action_type": "toggle-active",
-            "extra_class": "user-action-toggle-active",
-            "attrs": {"data-action": "toggle-active", "data-id": user.id, "data-is-active": str(user.is_active).lower(), "data-name": (user.name or user.email)}
-        },
-        {
-            "label": "Debug Personalization",
-            "action_type": "view",
-            "icon": "🧠",
-            "extra_class": "inspect-action-debug-recs",
-            "attrs": {"data-action": "inspect", "data-domain": "recommendations/user_interests", "data-id": user.id}
-        },
-        {
-            "label": "Delete User",
-            "action_type": "delete",
-            "icon": "🗑",
-            "extra_class": "user-action-delete",
-            "attrs": {"data-action": "delete-user", "data-id": user.id, "data-name": (user.name or user.email)}
-        }
-    ]
-
-    return {
-        "inspect_table": inspect_table,
-        "engagement_breakdown": engagement_breakdown_data,
-        "user_interests": user_interests_data,
-        "actions": actions,
-        "inspect_id": user.id,
-        "inspect_header": inspect_header,
-        "user_name": user.name or user.email
-    }
 
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])
