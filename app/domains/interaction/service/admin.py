@@ -66,6 +66,68 @@ def _serialize_comment(c, users, content_titles, item_names):
         "created_at":   c.created_at.isoformat() if c.created_at else None,
     }
 
+def _serialize_reaction(r, users, content_titles, item_names, comment_previews):
+    user = users.get(r.user_id)
+    if r.target_type == "content":
+        target_title = content_titles.get(r.target_id)
+        icon = "📄 Content"
+    elif r.target_type == "item":
+        target_title = item_names.get(r.target_id)
+        icon = "📦 Item"
+    else:
+        target_title = comment_previews.get(r.target_id)
+        icon = "💬 Comment"
+
+    return {
+        "id":          r.id,
+        "type":        r.type,
+        "user_id":     r.user_id,
+        "username":   user["name"] if user else f"User #{r.user_id}",
+        "user_email":  user["email"] if user else None,
+        "target_type": r.target_type,
+        "target_icon": icon,
+        "target_id":   r.target_id,
+        "target_title": target_title or f"{r.target_type.capitalize()} #{r.target_id}",
+        "created_at":  r.created_at.isoformat() if r.created_at else None,
+    }
+
+def _serialize_save(s, users, content_titles, item_names):
+    user = users.get(s.user_id)
+    target_title = (
+        content_titles.get(s.target_id)
+        if s.target_type == "content"
+        else item_names.get(s.target_id)
+    )
+    return {
+        "id": s.id,
+        "user_id": s.user_id,
+        "user_name": user["name"] if user else f"User #{s.user_id}",
+        "user_email": user["email"] if user else None,
+        "target_type": s.target_type,
+        "target_id": s.target_id,
+        "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
+        "created_at": s.created_at.isoformat() if s.created_at else None
+    }
+
+def _serialize_share(s, users, content_titles, item_names):
+    user = users.get(s.user_id)
+    target_title = (
+        content_titles.get(s.target_id)
+        if s.target_type == "content"
+        else item_names.get(s.target_id)
+    )
+    return {
+        "id": s.id,
+        "user_id": s.user_id,
+        "user_name": user["name"] if user else f"User #{s.user_id}",
+        "user_email": user["email"] if user else None,
+        "target_type": s.target_type,
+        "target_id": s.target_id,
+        "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
+        "channel": s.channel or "—",
+        "created_at": s.created_at.isoformat() if s.created_at else None
+    }
+
 def get_admin_comments_page(page, per_page, sentiment, target_type, search, user_search, start_date, end_date):
     stmt = select(Comment).order_by(Comment.id.desc())
     if user_search:
@@ -149,31 +211,7 @@ def get_admin_reactions_page(page, per_page, reaction_type, target, user_search)
         ).mappings().all()
         comment_previews = {r["id"]: r["content"][:60] + ("…" if len(r["content"]) > 60 else "") for r in rows}
 
-    serialized = []
-    for r in pagination.items:
-        user = users.get(r.user_id)
-        if r.target_type == "content":
-            target_title = content_titles.get(r.target_id)
-            icon = "📄 Content"
-        elif r.target_type == "item":
-            target_title = item_names.get(r.target_id)
-            icon = "📦 Item"
-        else:
-            target_title = comment_previews.get(r.target_id)
-            icon = "💬 Comment"
-
-        serialized.append({
-            "id":          r.id,
-            "type":        r.type,
-            "user_id":     r.user_id,
-            "username":   user["name"] if user else f"User #{r.user_id}",
-            "user_email":  user["email"] if user else None,
-            "target_type": r.target_type,
-            "target_icon": icon,
-            "target_id":   r.target_id,
-            "target_title": target_title or f"{r.target_type.capitalize()} #{r.target_id}",
-            "created_at":  r.created_at.isoformat() if r.created_at else None,
-        })
+    serialized = [_serialize_reaction(r, users, content_titles, item_names, comment_previews) for r in pagination.items]
     return pagination, serialized
 
 def get_admin_views_page(page, per_page, target, start_date, end_date):
@@ -320,24 +358,7 @@ def get_admin_saves_page(page, per_page, target, user_search):
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, content_titles, item_names = _load_interaction_context(pagination.items)
 
-    serialized = []
-    for s in pagination.items:
-        user = users.get(s.user_id)
-        target_title = (
-            content_titles.get(s.target_id)
-            if s.target_type == "content"
-            else item_names.get(s.target_id)
-        )
-        serialized.append({
-            "id": s.id,
-            "user_id": s.user_id,
-            "user_name": user["name"] if user else f"User #{s.user_id}",
-            "user_email": user["email"] if user else None,
-            "target_type": s.target_type,
-            "target_id": s.target_id,
-            "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
-            "created_at": s.created_at.isoformat() if s.created_at else None
-        })
+    serialized = [_serialize_save(s, users, content_titles, item_names) for s in pagination.items]
 
     return pagination, serialized
 
@@ -366,24 +387,6 @@ def get_admin_shares_page(page, per_page, target, user_search):
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, content_titles, item_names = _load_interaction_context(pagination.items)
 
-    serialized = []
-    for s in pagination.items:
-        user = users.get(s.user_id)
-        target_title = (
-            content_titles.get(s.target_id)
-            if s.target_type == "content"
-            else item_names.get(s.target_id)
-        )
-        serialized.append({
-            "id": s.id,
-            "user_id": s.user_id,
-            "user_name": user["name"] if user else f"User #{s.user_id}",
-            "user_email": user["email"] if user else None,
-            "target_type": s.target_type,
-            "target_id": s.target_id,
-            "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
-            "channel": s.channel or "—",
-            "created_at": s.created_at.isoformat() if s.created_at else None
-        })
+    serialized = [_serialize_share(s, users, content_titles, item_names) for s in pagination.items]
 
     return pagination, serialized

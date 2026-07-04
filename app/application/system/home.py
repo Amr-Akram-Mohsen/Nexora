@@ -50,54 +50,41 @@ def get_home_page_data():
     seen_content_ids = set()
     seen_item_ids = set()
 
-    def filter_and_track_contents(contents, limit):
-        if not contents:
+    def filter_and_track(items_list, seen_set, limit):
+        if not items_list:
             return []
         result = []
-        for c in contents:
-            cid = c.get("id")
-            if cid and cid not in seen_content_ids:
-                result.append(c)
-                seen_content_ids.add(cid)
-            if len(result) >= limit:
-                break
-        return result
-
-    def filter_and_track_items(items, limit):
-        if not items:
-            return []
-        result = []
-        for i in items:
-            iid = i.get("id")
-            if iid and iid not in seen_item_ids:
-                result.append(i)
-                seen_item_ids.add(iid)
+        for item in items_list:
+            item_id = item.get("id")
+            if item_id and item_id not in seen_set:
+                result.append(item)
+                seen_set.add(item_id)
             if len(result) >= limit:
                 break
         return result
 
     # ── Priority 1: High-Intent & Curated ─────────────────────────────────
-    editors_picks = filter_and_track_contents(get_editors_picks_cached(limit=12), limit=6)
-    hero_contents = filter_and_track_contents(get_contents_render_cached(filter_values=("trends",), rows_count=10), limit=5)
+    editors_picks = filter_and_track(get_editors_picks_cached(limit=12), seen_content_ids, limit=6)
+    hero_contents = filter_and_track(get_contents_render_cached(filter_values=("trends",), rows_count=10), seen_content_ids, limit=5)
 
     # ── Priority 2: High-Value Contextual (Deals) ─────────────────────────
-    top_deals = filter_and_track_items(get_filtered_items_for_home(filter_type="deals", limit=20), limit=10)
+    top_deals = filter_and_track(get_filtered_items_for_home(filter_type="deals", limit=20), seen_item_ids, limit=10)
 
     # ── Priority 3: Trending & Algorithmic ────────────────────────────────
-    popular_this_week = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=7), limit=8)
-    featured_products = filter_and_track_items(get_trending_items_cached(limit=24, days=7), limit=8)
+    popular_this_week = filter_and_track(get_trending_contents_cached_v2(limit=24, days=7), seen_content_ids, limit=8)
+    featured_products = filter_and_track(get_trending_items_cached(limit=24, days=7), seen_item_ids, limit=8)
 
-    recommended_videos = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=14, object_type="video"), limit=8)
-    recommended_articles = filter_and_track_contents(get_trending_contents_cached_v2(limit=24, days=14, object_type="article"), limit=8)
+    recommended_videos = filter_and_track(get_trending_contents_cached_v2(limit=24, days=14, object_type="video"), seen_content_ids, limit=8)
+    recommended_articles = filter_and_track(get_trending_contents_cached_v2(limit=24, days=14, object_type="article"), seen_content_ids, limit=8)
 
     # Trending brands is taxonomy, no exclusion needed
     trending_brands = get_trending_brands_cached(limit=6, days=7)
 
     # ── Priority 4: Chronological & Fillers ───────────────────────────────
-    latest_reviews = filter_and_track_contents(get_contents_render_cached(filter_values=("reviews",), rows_count=36), limit=24)
-    tech_news = filter_and_track_contents(get_contents_render_cached(filter_values=("news",), rows_count=36), limit=24)
-    tutorials = filter_and_track_contents(get_contents_render_cached(filter_values=("tutorials",), rows_count=36), limit=24)
-    recently_added = filter_and_track_items(get_filtered_items_for_home(filter_type="recent", limit=30), limit=10)
+    latest_reviews = filter_and_track(get_contents_render_cached(filter_values=("reviews",), rows_count=36), seen_content_ids, limit=24)
+    tech_news = filter_and_track(get_contents_render_cached(filter_values=("news",), rows_count=36), seen_content_ids, limit=24)
+    tutorials = filter_and_track(get_contents_render_cached(filter_values=("tutorials",), rows_count=36), seen_content_ids, limit=24)
+    recently_added = filter_and_track(get_filtered_items_for_home(filter_type="recent", limit=30), seen_item_ids, limit=10)
 
     return {
         # ── Hero ───────────────────────────────────────────────────────────

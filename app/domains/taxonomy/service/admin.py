@@ -299,35 +299,19 @@ def get_admin_taxonomy_analytics():
     total_entities = 0
     orphans = 0
     
-    total_entities += db.session.scalar(select(func.count(Category.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Category.id)).where(
-            ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists(),
-            ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-    ) or 0
+    entities_config = [
+        (Category, ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists(), ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()),
+        (Brand, ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists(), ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()),
+        (Topic, ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists(), None),
+        (Section, ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists(), None)
+    ]
     
-    total_entities += db.session.scalar(select(func.count(Brand.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Brand.id)).where(
-            ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists(),
-            ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-    ) or 0
-    
-    total_entities += db.session.scalar(select(func.count(Topic.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Topic.id)).where(
-            ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-    ) or 0
-    
-    total_entities += db.session.scalar(select(func.count(Section.id))) or 0
-    orphans += db.session.scalar(
-        select(func.count(Section.id)).where(
-            ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-    ) or 0
+    for model, cond1, cond2 in entities_config:
+        total_entities += db.session.scalar(select(func.count(model.id))) or 0
+        orphan_query = select(func.count(model.id)).where(cond1)
+        if cond2 is not None:
+            orphan_query = orphan_query.where(cond2)
+        orphans += db.session.scalar(orphan_query) or 0
 
     return {
         "content_coverage": {

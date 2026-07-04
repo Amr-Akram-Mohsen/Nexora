@@ -4,14 +4,10 @@ from app.core.extensions import db
 from app.domains.item.models import Item, Store, ItemStoreLink, ItemVariant
 from app.domains.item.models import Item
 
+from app.shared.utils.admin_helpers import delete_model_workflow
+
 def delete_item_workflow(item_id):
-    item = db.session.get(Item, item_id)
-    if not item:
-        return None
-    name = item.name
-    db.session.delete(item)
-    db.session.commit()
-    return name
+    return delete_model_workflow(Item, item_id, 'name')
 
 
 from app.domains.item.service.admin import get_admin_item_inspect_raw

@@ -43,29 +43,17 @@ def get_user_inspect_workflow(user_id: int) -> dict:
     
     return {"user_dto": dto}
 
+from app.shared.utils.admin_helpers import execute_admin_workflow, delete_model_workflow
+
 def deactivate_user_workflow(user_id):
-    success = domain_deactivate_user(user_id)
-    if success:
-        db.session.commit()
-    return success
+    return execute_admin_workflow(domain_deactivate_user, user_id)
 
 def activate_user_workflow(user_id):
-    success = domain_activate_user(user_id)
-    if success:
-        db.session.commit()
-    return success
+    return execute_admin_workflow(domain_activate_user, user_id)
 
 def toggle_admin_user_workflow(user_id):
-    user = domain_toggle_admin_user(user_id)
-    if user:
-        db.session.commit()
-    return user
+    return execute_admin_workflow(domain_toggle_admin_user, user_id)
 
 def delete_subscriber_workflow(sub_id):
     from app.domains.user.models import NewsletterSubscriber
-    sub = db.session.get(NewsletterSubscriber, sub_id)
-    if not sub:
-        return False
-    db.session.delete(sub)
-    db.session.commit()
-    return True
+    return delete_model_workflow(NewsletterSubscriber, sub_id)

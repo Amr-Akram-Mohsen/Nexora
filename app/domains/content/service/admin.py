@@ -245,6 +245,32 @@ def get_admin_content_stats():
         "no_brands": no_brands
     }
 
+def _calculate_freshness_distribution(freshness_counts):
+    now = datetime.now(timezone.utc)
+    d30 = now - timedelta(days=30)
+    d90 = now - timedelta(days=90)
+    
+    dist = {"< 30 Days": 0, "30-90 Days": 0, "> 90 Days": 0}
+    for (pub_at,) in freshness_counts:
+        if pub_at.tzinfo is None:
+            pub_at = pub_at.replace(tzinfo=timezone.utc)
+        if pub_at > d30:
+            dist["< 30 Days"] += 1
+        elif pub_at > d90:
+            dist["30-90 Days"] += 1
+        else:
+            dist["> 90 Days"] += 1
+    return dist
+
+def _calculate_authority_distribution(source_scores):
+    dist = {"High (67-100)": 0, "Medium (34-66)": 0, "Low (0-33)": 0}
+    for score, count in source_scores:
+        s = score or 0
+        if s >= 67: dist["High (67-100)"] += count
+        elif s >= 34: dist["Medium (34-66)"] += count
+        else: dist["Low (0-33)"] += count
+    return dist
+
 def get_admin_content_dashboard_stats():
     type_counts = db.session.execute(select(Content.object_type, func.count(Content.id)).group_by(Content.object_type)).all()
     origin_counts = db.session.execute(select(Content.ingestion_origin, func.count(Content.id)).group_by(Content.ingestion_origin)).all()
@@ -277,29 +303,11 @@ def get_admin_content_dashboard_stats():
             "avg_views": int(row[4]) if row[4] else 0
         })
         
-    now = datetime.now(timezone.utc)
-    d30 = now - timedelta(days=30)
-    d90 = now - timedelta(days=90)
-    
     freshness_counts = db.session.query(Content.published_at).filter(Content.published_at != None).all()
-    freshness_dist = {"< 30 Days": 0, "30-90 Days": 0, "> 90 Days": 0}
-    for (pub_at,) in freshness_counts:
-        if pub_at.tzinfo is None:
-            pub_at = pub_at.replace(tzinfo=timezone.utc)
-        if pub_at > d30:
-            freshness_dist["< 30 Days"] += 1
-        elif pub_at > d90:
-            freshness_dist["30-90 Days"] += 1
-        else:
-            freshness_dist["> 90 Days"] += 1
+    freshness_dist = _calculate_freshness_distribution(freshness_counts)
             
-    authority_dist = {"High (67-100)": 0, "Medium (34-66)": 0, "Low (0-33)": 0}
     source_scores = db.session.query(Source.authority_score, func.count(Content.id)).join(Content, Content.source_id == Source.id).group_by(Source.authority_score).all()
-    for score, count in source_scores:
-        s = score or 0
-        if s >= 67: authority_dist["High (67-100)"] += count
-        elif s >= 34: authority_dist["Medium (34-66)"] += count
-        else: authority_dist["Low (0-33)"] += count
+    authority_dist = _calculate_authority_distribution(source_scores)
 
     return {
         "kpi": {
@@ -412,6 +420,25 @@ def get_admin_content_inspect_raw(id):
 
 
 
+def _calculate_content_health_score(c, target, duplicate):
+    score = 0
+    if c.title: score += 10
+    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
+    if c.category and c.category.slug != 'uncategorized': score += 10
+    if c.topics: score += 15
+    if c.brands: score += 15
+    if c.source_id: score += 10
+    if not duplicate: score += 5
+    
+    if c.object_type == "article" and target:
+        if getattr(target, 'is_content_scraped', False): score += 10
+        if getattr(target, 'status', '') == 'complete': score += 10
+        if getattr(target, 'quality_score', 0) > 0: score += 5
+    elif c.object_type in ("video", "post"):
+        score += 25
+        
+    return min(score, 100)
+
 def serialize_content_row(c, target, duplicate_titles: set) -> dict:
     """
     Serialize a single Content row for the admin listing.
@@ -441,24 +468,7 @@ def serialize_content_row(c, target, duplicate_titles: set) -> dict:
     # Quality flags
     duplicate = c.title and c.title in duplicate_titles
     
-    # Compute Health Score
-    score = 0
-    if c.title: score += 10
-    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
-    if c.category and c.category.slug != 'uncategorized': score += 10
-    if c.topics: score += 15
-    if c.brands: score += 15
-    if c.source_id: score += 10
-    if not duplicate: score += 5
-    
-    if c.object_type == "article" and target:
-        if getattr(target, 'is_content_scraped', False): score += 10
-        if getattr(target, 'status', '') == 'complete': score += 10
-        if getattr(target, 'quality_score', 0) > 0: score += 5
-    elif c.object_type in ("video", "post"):
-        score += 25
-        
-    score = min(score, 100)
+    score = _calculate_content_health_score(c, target, duplicate)
 
     cat_name = c.category.name if c.category else "None"
     sec_name = c.section.name if c.section else "None"

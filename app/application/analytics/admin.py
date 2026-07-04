@@ -7,6 +7,106 @@ from app.domains.item.models import Item
 from app.domains.user.models import User
 from app.domains.interaction.service.query import get_interactions_breakdown
 from app.domains.interaction.models import Share
+from app.domains.analytics.service.admin import get_admin_top_contents, get_admin_top_items
+
+def _format_time_ago(dt, now):
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    diff = now - dt
+    if diff.days > 0:
+        return f"{diff.days}d ago"
+    elif diff.seconds >= 3600:
+        return f"{diff.seconds // 3600}h ago"
+    elif diff.seconds >= 60:
+        return f"{diff.seconds // 60}m ago"
+    else:
+        return "Just now"
+
+def _build_review_queue_aging(rows, now):
+    review_queue_aging = []
+    for r in rows:
+        time_str = _format_time_ago(r["ingested_at"], now)
+        review_queue_aging.append({
+            "id":    r["id"],
+            "title": r["title"] or f"Untitled ({r['object_type']})",
+            "type":  r["object_type"],
+            "age":   time_str,
+        })
+    return review_queue_aging
+
+def _build_provider_activities(all_source_ids, source_map, content_by_sid, item_by_sid, now):
+    provider_activities = []
+    for sid in all_source_ids:
+        src_info = source_map.get(sid)
+        if not src_info:
+            continue
+        c_row = content_by_sid.get(sid)
+        i_row = item_by_sid.get(sid)
+        c_count = c_row.c_count if c_row else 0
+        i_count = i_row.i_count if i_row else 0
+        if c_count == 0 and i_count == 0:
+            continue
+
+        latest_c = c_row.latest_content if c_row else None
+        latest_i = i_row.latest_item if i_row else None
+        if latest_c and latest_i:
+            latest_activity = max(latest_c, latest_i)
+        else:
+            latest_activity = latest_c or latest_i
+
+        days_since_last_ingestion = None
+        if latest_c:
+            lc = latest_c.replace(tzinfo=timezone.utc) if latest_c.tzinfo is None else latest_c
+            days_since_last_ingestion = (now - lc).days
+
+        latest_activity_formatted = "No activity"
+        if latest_activity:
+            try:
+                if isinstance(latest_activity, str):
+                    dt = datetime.fromisoformat(latest_activity)
+                else:
+                    dt = latest_activity
+                latest_activity_formatted = dt.strftime("%b %d, %Y")
+            except Exception:
+                latest_activity_formatted = str(latest_activity)
+
+        provider_activities.append({
+            "name":            src_info["name"],
+            "slug":            src_info["slug"],
+            "content_count":   c_count,
+            "product_count":   i_count,
+            "latest_activity": latest_activity.isoformat() if latest_activity else None,
+            "latest_activity_formatted": latest_activity_formatted,
+            "days_since_last_ingestion": days_since_last_ingestion,
+        })
+
+    provider_activities.sort(
+        key=lambda x: x["content_count"] + x["product_count"],
+        reverse=True
+    )
+    return provider_activities[:10]
+
+def _build_growth_trends(trend_map, today):
+    growth_trends = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        growth_trends.append({
+            "date":  day.strftime("%b %d"),
+            "count": trend_map.get(day, 0),
+        })
+    return growth_trends
+
+def _build_recent_ingested(recent_rows, now):
+    recent_ingested = []
+    for r in recent_rows:
+        time_str = _format_time_ago(r["ingested_at"], now)
+        recent_ingested.append({
+            "id":    r["id"],
+            "title": r["title"] or f"Untitled ({r['object_type']})",
+            "type":  r["object_type"],
+            "time":  time_str,
+        })
+    return recent_ingested
 
 def get_admin_dashboard_stats_data():
     """Consolidated helper to compute all dashboard statistics."""
@@ -46,27 +146,7 @@ def get_admin_dashboard_stats_data():
     ).mappings().all()
 
     now = datetime.now(timezone.utc)
-    review_queue_aging = []
-    for r in review_queue_aging_rows:
-        ingested_at = r["ingested_at"]
-        if ingested_at.tzinfo is None:
-            ingested_at = ingested_at.replace(tzinfo=timezone.utc)
-        diff = now - ingested_at
-        if diff.days > 0:
-            time_str = f"{diff.days}d ago"
-        elif diff.seconds >= 3600:
-            time_str = f"{diff.seconds // 3600}h ago"
-        elif diff.seconds >= 60:
-            time_str = f"{diff.seconds // 60}m ago"
-        else:
-            time_str = "Just now"
-
-        review_queue_aging.append({
-            "id":    r["id"],
-            "title": r["title"] or f"Untitled ({r['object_type']})",
-            "type":  r["object_type"],
-            "age":   time_str,
-        })
+    review_queue_aging = _build_review_queue_aging(review_queue_aging_rows, now)
 
     # ── Content breakdown by type ─────────────────────────────────────────
     by_type_rows = db.session.execute(
@@ -161,56 +241,7 @@ def get_admin_dashboard_stats_data():
 
     content_by_sid = {r.source_id: r for r in content_agg}
     item_by_sid    = {r.source_id: r for r in item_agg}
-    provider_activities = []
-    for sid in all_source_ids:
-        src_info = source_map.get(sid)
-        if not src_info:
-            continue
-        c_row = content_by_sid.get(sid)
-        i_row = item_by_sid.get(sid)
-        c_count = c_row.c_count if c_row else 0
-        i_count = i_row.i_count if i_row else 0
-        if c_count == 0 and i_count == 0:
-            continue
-
-        latest_c = c_row.latest_content if c_row else None
-        latest_i = i_row.latest_item if i_row else None
-        if latest_c and latest_i:
-            latest_activity = max(latest_c, latest_i)
-        else:
-            latest_activity = latest_c or latest_i
-
-        days_since_last_ingestion = None
-        if latest_c:
-            lc = latest_c.replace(tzinfo=timezone.utc) if latest_c.tzinfo is None else latest_c
-            days_since_last_ingestion = (datetime.now(timezone.utc) - lc).days
-
-        latest_activity_formatted = "No activity"
-        if latest_activity:
-            try:
-                if isinstance(latest_activity, str):
-                    dt = datetime.fromisoformat(latest_activity)
-                else:
-                    dt = latest_activity
-                latest_activity_formatted = dt.strftime("%b %d, %Y")
-            except Exception:
-                latest_activity_formatted = str(latest_activity)
-
-        provider_activities.append({
-            "name":            src_info["name"],
-            "slug":            src_info["slug"],
-            "content_count":   c_count,
-            "product_count":   i_count,
-            "latest_activity": latest_activity.isoformat() if latest_activity else None,
-            "latest_activity_formatted": latest_activity_formatted,
-            "days_since_last_ingestion": days_since_last_ingestion,
-        })
-
-    provider_activities.sort(
-        key=lambda x: x["content_count"] + x["product_count"],
-        reverse=True
-    )
-    provider_activities = provider_activities[:10]
+    provider_activities = _build_provider_activities(all_source_ids, source_map, content_by_sid, item_by_sid, now)
 
     # ── 7-day growth trend ────────────────────────────────────────────────
     today = datetime.now(timezone.utc).date()
@@ -226,13 +257,7 @@ def get_admin_dashboard_stats_data():
     ).all()
 
     trend_map = {r.day: r.cnt for r in trend_rows}
-    growth_trends = []
-    for i in range(6, -1, -1):
-        day = today - timedelta(days=i)
-        growth_trends.append({
-            "date":  day.strftime("%b %d"),
-            "count": trend_map.get(day, 0),
-        })
+    growth_trends = _build_growth_trends(trend_map, today)
 
     # ── Recently ingested (latest 5) ──────────────────────────────────────
     recent_rows = db.session.execute(
@@ -241,55 +266,13 @@ def get_admin_dashboard_stats_data():
         .limit(5)
     ).mappings().all()
 
-    now = datetime.now(timezone.utc)
-    recent_ingested = []
-    for r in recent_rows:
-        ingested_at = r["ingested_at"]
-        if ingested_at.tzinfo is None:
-            ingested_at = ingested_at.replace(tzinfo=timezone.utc)
-        diff = now - ingested_at
-        if diff.days > 0:
-            time_str = f"{diff.days}d ago"
-        elif diff.seconds >= 3600:
-            time_str = f"{diff.seconds // 3600}h ago"
-        elif diff.seconds >= 60:
-            time_str = f"{diff.seconds // 60}m ago"
-        else:
-            time_str = "Just now"
-
-        recent_ingested.append({
-            "id":    r["id"],
-            "title": r["title"] or f"Untitled ({r['object_type']})",
-            "type":  r["object_type"],
-            "time":  time_str,
-        })
+    recent_ingested = _build_recent_ingested(recent_rows, now)
 
     # ── Top Articles ──────────────────────────────────────────────────────
-    top_articles_rows = db.session.execute(
-        select(Content.id, Content.title, Content.object_type, Content.view_count)
-        .order_by(Content.view_count.desc())
-        .limit(5)
-    ).mappings().all()
-    top_articles = [{
-        "id":         r["id"],
-        "title":      r["title"] or f"{r['object_type'].capitalize()} #{r['id']}",
-        "type":       r["object_type"],
-        "view_count": r["view_count"] or 0,
-    } for r in top_articles_rows]
+    top_articles = get_admin_top_contents()
 
     # ── Top Items ─────────────────────────────────────────────────────────
-    top_items_rows = db.session.execute(
-        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
-        .order_by(Item.click_count.desc())
-        .limit(5)
-    ).mappings().all()
-    top_items = [{
-        "id":          r["id"],
-        "name":        r["name"],
-        "item_type":   r["item_type"],
-        "click_count": r["click_count"] or 0,
-        "rating":      r["rating"],
-    } for r in top_items_rows]
+    top_items = get_admin_top_items()
 
     # ── Top Acquisition Channels ──────────────────────────────────────────
     acquisition_rows = db.session.execute(

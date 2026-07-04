@@ -88,9 +88,9 @@ def get_types_for_section(section_slug, session=None):
     )
     rows = execute_mapped_query(stmt, session)
     return [
-        {"slug": r.object_type.lower(), "name": r.object_type.title()}
+        {"slug": r["object_type"].lower(), "name": r["object_type"].title()}
         for r in rows
-        if r.object_type
+        if r.get("object_type")
     ]
 
 
@@ -173,27 +173,25 @@ def get_trending_brands(limit: int = 6, days: int = 7, session=None):
     return execute_mapped_query(stmt, session)
 
 
-@cache.memoize(timeout=3600)
-def get_distinct_item_categories(session=None):
+def _get_distinct_item_taxonomy(model_class, session=None):
     from app.domains.item.models import Item
-
     stmt = (
-        select(Category.slug, Category.name)
+        select(model_class.slug, model_class.name)
         .join(Item)
         .distinct()
-        .order_by(Category.name)
+        .order_by(model_class.name)
     )
     return execute_mapped_query(stmt, session)
+
+
+@cache.memoize(timeout=3600)
+def get_distinct_item_categories(session=None):
+    return _get_distinct_item_taxonomy(Category, session)
 
 
 @cache.memoize(timeout=3600)
 def get_distinct_item_brands(session=None):
-    from app.domains.item.models import Item
-
-    stmt = (
-        select(Brand.slug, Brand.name).join(Item).distinct().order_by(Brand.name)
-    )
-    return execute_mapped_query(stmt, session)
+    return _get_distinct_item_taxonomy(Brand, session)
 
 
 def get_attributes_for_section(section_slug, category_slugs=None, limit=20, session=None):

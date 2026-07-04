@@ -1,5 +1,33 @@
 from typing import Optional, Dict, Any
 
+def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
+    if not target:
+        return {}
+    
+    if object_type == "video":
+        return {
+            "platform": getattr(target, "platform", None),
+            "channel_name": getattr(target, "channel_name", None)
+        }
+    elif object_type == "post":
+        return {
+            "platform": getattr(target, "platform", None),
+            "author": getattr(target, "author", None),
+            "subreddit": getattr(target, "subreddit", None),
+            "upvotes": getattr(target, "upvotes", 0),
+            "platform_comments_count": getattr(target, "comments_count", 0)
+        }
+    elif object_type == "article":
+        return {
+            "is_content_scraped": getattr(target, "is_content_scraped", False),
+            "word_count": getattr(target, "word_count", 0),
+            "read_time_minutes": getattr(target, "read_time_minutes", None),
+            "article_quality_score": getattr(target, "quality_score", 0),
+            "last_enrichment_attempt": target.last_enrichment_attempt.isoformat() if getattr(target, "last_enrichment_attempt", None) else None,
+            "original_url": getattr(target, "url", None)
+        }
+    return {}
+
 def serialize_content_inspect_dto(content, target) -> Optional[Dict[str, Any]]:
     """
     Serializes a Content ORM model and its polymorphic target into a flat, 
@@ -60,23 +88,6 @@ def serialize_content_inspect_dto(content, target) -> Optional[Dict[str, Any]]:
         ]
     }
 
-    if content.object_type == "video" and target:
-        dto["platform"] = getattr(target, "platform", None)
-        dto["channel_name"] = getattr(target, "channel_name", None)
-    elif content.object_type == "post" and target:
-        dto["platform"] = getattr(target, "platform", None)
-        dto["author"] = getattr(target, "author", None)
-        dto["subreddit"] = getattr(target, "subreddit", None)
-        dto["upvotes"] = getattr(target, "upvotes", 0)
-        dto["platform_comments_count"] = getattr(target, "comments_count", 0)
-    elif content.object_type == "article" and target:
-        dto["is_content_scraped"] = getattr(target, "is_content_scraped", False)
-        dto["word_count"] = getattr(target, "word_count", 0)
-        dto["read_time_minutes"] = getattr(target, "read_time_minutes", None)
-        dto["article_quality_score"] = getattr(target, "quality_score", 0)
-        dto["last_enrichment_attempt"] = target.last_enrichment_attempt.isoformat() if getattr(target, "last_enrichment_attempt", None) else None
-        
-        # Original Link
-        dto["original_url"] = getattr(target, "url", None)
+    dto.update(_serialize_inspect_target(target, content.object_type))
 
     return dto

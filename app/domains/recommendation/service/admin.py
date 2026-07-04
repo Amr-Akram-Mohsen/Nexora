@@ -89,12 +89,11 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
     
     base_stmt = base_stmt.group_by(Content.id).order_by(func.max(Content.view_count).desc())
 
+    from app.shared.utils.admin_helpers import execute_paginated_query
+    
     total_stmt = select(func.count()).select_from(base_stmt.subquery())
-    total = db.session.execute(total_stmt).scalar() or 0
-    pages = max(1, (total + per_page - 1) // per_page)
-
-    stmt = base_stmt.limit(per_page).offset((page - 1) * per_page)
-    content_ids = db.session.execute(stmt).scalars().all()
+    items, total, pages = execute_paginated_query(base_stmt, total_stmt, page, per_page)
+    content_ids = [i[0] for i in items]
 
     if not content_ids:
         return total, pages, []

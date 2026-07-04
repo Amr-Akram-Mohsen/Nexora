@@ -5,6 +5,35 @@ from app.domains.interaction.models import Comment, Reaction, View, Save, Share,
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 
+def _get_trend_data(model, date_col, thirty_days_ago):
+    stmt = (
+        select(
+            cast(date_col, Date).label("date"),
+            func.count().label("count")
+        )
+        .where(date_col >= thirty_days_ago)
+        .group_by(cast(date_col, Date))
+    )
+    return {r.date.isoformat(): r.count for r in db.session.execute(stmt)}
+
+def _get_delta_data(model, date_col, fourteen_days_ago, seven_days_ago):
+    current_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= seven_days_ago)) or 0
+    prev_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= fourteen_days_ago, date_col < seven_days_ago)) or 0
+    if prev_7 == 0:
+        return {"current": current_7, "prev": prev_7, "delta": 100 if current_7 > 0 else 0}
+    return {"current": current_7, "prev": prev_7, "delta": round(((current_7 - prev_7) / prev_7) * 100, 1)}
+
+def _get_hour_counts_data(model, date_col, thirty_days_ago):
+    stmt = (
+        select(
+            cast(extract('hour', date_col), db.Integer).label("hour"),
+            func.count().label("cnt")
+        )
+        .where(date_col >= thirty_days_ago)
+        .group_by("hour")
+    )
+    return {r.hour: r.cnt for r in db.session.execute(stmt)}
+
 @cache.cached(timeout=300, key_prefix="interactions_analytics_dashboard")
 def get_analytics_dashboard_data() -> dict:
     """
@@ -16,42 +45,22 @@ def get_analytics_dashboard_data() -> dict:
     seven_days_ago = now - timedelta(days=7)
     fourteen_days_ago = now - timedelta(days=14)
 
-    # Helper: Get 30-day trend
-    def get_trend(model, date_col):
-        stmt = (
-            select(
-                cast(date_col, Date).label("date"),
-                func.count().label("count")
-            )
-            .where(date_col >= thirty_days_ago)
-            .group_by(cast(date_col, Date))
-        )
-        return {r.date.isoformat(): r.count for r in db.session.execute(stmt)}
-
     trends = {
-        "comments": get_trend(Comment, Comment.created_at),
-        "reactions": get_trend(Reaction, Reaction.created_at),
-        "views": get_trend(View, View.created_at),
-        "saves": get_trend(Save, Save.created_at),
-        "shares": get_trend(Share, Share.created_at),
-        "clicks": get_trend(ItemClick, ItemClick.created_at),
+        "comments": _get_trend_data(Comment, Comment.created_at, thirty_days_ago),
+        "reactions": _get_trend_data(Reaction, Reaction.created_at, thirty_days_ago),
+        "views": _get_trend_data(View, View.created_at, thirty_days_ago),
+        "saves": _get_trend_data(Save, Save.created_at, thirty_days_ago),
+        "shares": _get_trend_data(Share, Share.created_at, thirty_days_ago),
+        "clicks": _get_trend_data(ItemClick, ItemClick.created_at, thirty_days_ago),
     }
 
-    # Helper: Get rolling 7-day delta (+N%)
-    def get_delta(model, date_col):
-        current_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= seven_days_ago)) or 0
-        prev_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= fourteen_days_ago, date_col < seven_days_ago)) or 0
-        if prev_7 == 0:
-            return {"current": current_7, "prev": prev_7, "delta": 100 if current_7 > 0 else 0}
-        return {"current": current_7, "prev": prev_7, "delta": round(((current_7 - prev_7) / prev_7) * 100, 1)}
-
     deltas = {
-        "comments": get_delta(Comment, Comment.created_at),
-        "reactions": get_delta(Reaction, Reaction.created_at),
-        "views": get_delta(View, View.created_at),
-        "saves": get_delta(Save, Save.created_at),
-        "shares": get_delta(Share, Share.created_at),
-        "clicks": get_delta(ItemClick, ItemClick.created_at),
+        "comments": _get_delta_data(Comment, Comment.created_at, fourteen_days_ago, seven_days_ago),
+        "reactions": _get_delta_data(Reaction, Reaction.created_at, fourteen_days_ago, seven_days_ago),
+        "views": _get_delta_data(View, View.created_at, fourteen_days_ago, seven_days_ago),
+        "saves": _get_delta_data(Save, Save.created_at, fourteen_days_ago, seven_days_ago),
+        "shares": _get_delta_data(Share, Share.created_at, fourteen_days_ago, seven_days_ago),
+        "clicks": _get_delta_data(ItemClick, ItemClick.created_at, fourteen_days_ago, seven_days_ago),
     }
 
     # P3-3: Sentiment Distribution
@@ -168,24 +177,11 @@ def get_hourly_engagement_heatmap() -> list:
     now = datetime.now(timezone.utc)
     thirty_days_ago = now - timedelta(days=30)
     
-    # PostgreSQL uses EXTRACT(hour from date_col)
-    # Cast to integer to get 0-23
-    def get_hour_counts(model, date_col):
-        stmt = (
-            select(
-                cast(extract('hour', date_col), db.Integer).label("hour"),
-                func.count().label("cnt")
-            )
-            .where(date_col >= thirty_days_ago)
-            .group_by("hour")
-        )
-        return {r.hour: r.cnt for r in db.session.execute(stmt)}
-
-    views_hc = get_hour_counts(View, View.created_at)
-    comments_hc = get_hour_counts(Comment, Comment.created_at)
-    reactions_hc = get_hour_counts(Reaction, Reaction.created_at)
-    saves_hc = get_hour_counts(Save, Save.created_at)
-    shares_hc = get_hour_counts(Share, Share.created_at)
+    views_hc = _get_hour_counts_data(View, View.created_at, thirty_days_ago)
+    comments_hc = _get_hour_counts_data(Comment, Comment.created_at, thirty_days_ago)
+    reactions_hc = _get_hour_counts_data(Reaction, Reaction.created_at, thirty_days_ago)
+    saves_hc = _get_hour_counts_data(Save, Save.created_at, thirty_days_ago)
+    shares_hc = _get_hour_counts_data(Share, Share.created_at, thirty_days_ago)
     
     heatmap = []
     for hour in range(24):

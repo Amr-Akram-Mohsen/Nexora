@@ -44,36 +44,18 @@ def populate_content_search_fields(content, obj, object_type):
     Populate denormalized search fields for Content.
     """
 
-    source = ""
-
-    if object_type == "video":
-        source = getattr(
-            obj,
-            "channel_name",
-            ""
-        ) or ""
-
-    elif object_type == "post":
-        source = " ".join(
-            filter(
-                None,
-                [
-                    getattr(obj, "author", ""),
-                    getattr(obj, "subreddit", "")
-                ]
-            )
+    target_fields_map = {
+        "video": ["channel_name"],
+        "post": ["author", "subreddit"],
+        "article": ["author", "source_name"]
+    }
+    
+    source = " ".join(
+        filter(
+            None,
+            [getattr(obj, field, "") for field in target_fields_map.get(object_type, [])]
         )
-        
-    elif object_type == "article":
-        source = " ".join(
-            filter(
-                None,
-                [
-                    getattr(obj, "author", ""),
-                    getattr(obj, "source_name", "")
-                ]
-            )
-        )
+    )
     
     canonical = getattr(obj, "canonical_url", "")
 

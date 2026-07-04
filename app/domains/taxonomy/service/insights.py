@@ -4,6 +4,23 @@ from app.domains.taxonomy.models import Category, Brand, Topic, Section
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 
+def _generate_suggestions_for_entities(unmapped_content, entities, entity_type):
+    suggestions = []
+    for c in unmapped_content:
+        if not c.title: continue
+        title_lower = f" {c.title.lower()} "
+        for ent in entities:
+            if f" {ent.name.lower()} " in title_lower:
+                suggestions.append({
+                    "content_id": c.id,
+                    "content_title": c.title,
+                    "type": entity_type,
+                    "suggested_id": ent.id,
+                    "suggested_name": ent.name
+                })
+                break
+    return suggestions
+
 def get_taxonomy_insights_suggestions(limit: int = 50):
     from app.domains.relationships import content_brands
     
@@ -21,34 +38,8 @@ def get_taxonomy_insights_suggestions(limit: int = 50):
     categories = db.session.execute(select(Category)).scalars().all()
     
     suggestions = []
-    
-    for c in unmapped_brand:
-        if not c.title: continue
-        title_lower = c.title.lower()
-        for b in brands:
-            if f" {b.name.lower()} " in f" {title_lower} ":
-                suggestions.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "type": "Brand",
-                    "suggested_id": b.id,
-                    "suggested_name": b.name
-                })
-                break
-                
-    for c in unmapped_cat:
-        if not c.title: continue
-        title_lower = c.title.lower()
-        for cat in categories:
-            if f" {cat.name.lower()} " in f" {title_lower} ":
-                suggestions.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "type": "Category",
-                    "suggested_id": cat.id,
-                    "suggested_name": cat.name
-                })
-                break
+    suggestions.extend(_generate_suggestions_for_entities(unmapped_brand, brands, "Brand"))
+    suggestions.extend(_generate_suggestions_for_entities(unmapped_cat, categories, "Category"))
 
     return suggestions[:limit]
 

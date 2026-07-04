@@ -7,6 +7,21 @@ from app.domains.item.models import Item
 from app.domains.external.models import LastAPIFetch, APIUsage
 from app.domains.relationships import content_brands, content_topics, content_attributes, ArticleSource
 
+def _calculate_quality_tier(score):
+    if score >= 70: return "High"
+    if score >= 40: return "Medium"
+    return "Low"
+
+def _calculate_scrape_health(pct):
+    if pct >= 90: return "Healthy"
+    if pct >= 50: return "Warning"
+    return "Critical"
+
+def _calculate_freshness_severity(days_stale):
+    if days_stale > 30: return "Critical"
+    if days_stale > 7: return "Warning"
+    return "Healthy"
+
 def get_admin_sources_page(page, per_page, search):
     stmt = select(Source)
     if search:
@@ -171,23 +186,13 @@ def get_admin_sources_quality_data():
 
     for name, avg_q, total_art, scraped_art, avg_w, latest_ingest in rows:
         q_score = round(avg_q, 1) if avg_q else 0
-        if q_score >= 70:
-            tier = "High"
-        elif q_score >= 40:
-            tier = "Medium"
-        else:
-            tier = "Low"
+        tier = _calculate_quality_tier(q_score)
         quality_leaderboard.append({"source": name, "avg_quality": q_score, "tier": tier})
 
         total = total_art or 0
         scraped = scraped_art or 0
         scrape_pct = round((scraped / total * 100), 1) if total > 0 else 0
-        if scrape_pct >= 90:
-            health = "Healthy"
-        elif scrape_pct >= 50:
-            health = "Warning"
-        else:
-            health = "Critical"
+        health = _calculate_scrape_health(scrape_pct)
         scrape_leaderboard.append({"source": name, "scrape_pct": scrape_pct, "health": health})
 
         words = int(avg_w) if avg_w else 0
@@ -198,12 +203,7 @@ def get_admin_sources_quality_data():
             if latest.tzinfo is None:
                 latest = latest.replace(tzinfo=timezone.utc)
             days_stale = (now - latest).days
-            if days_stale > 30:
-                severity = "Critical"
-            elif days_stale > 7:
-                severity = "Warning"
-            else:
-                severity = "Healthy"
+            severity = _calculate_freshness_severity(days_stale)
             freshness_index.append({
                 "source": name,
                 "latest_ingested": latest.strftime('%Y-%m-%d %H:%M'),

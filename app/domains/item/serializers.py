@@ -46,11 +46,7 @@ def serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, 
         "currency_mix": currency_mix_list
     }
 
-def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
-    """Serializes an Item ORM model and its eagerly loaded relations into a DTO."""
-    if not item:
-        return None
-
+def _build_inspect_store_links(item):
     store_links_data = []
     last_synced_dates = []
     
@@ -79,7 +75,9 @@ def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
                 "metadata": lnk.network_metadata or {},
                 "commission_rate": float(lnk.commission_rate) if lnk.commission_rate is not None else None,
             })
+    return store_links_data, last_synced_dates
 
+def _build_inspect_variant_summary(item):
     variant_summary = []
     for v in item.variants:
         variant_summary.append({
@@ -93,7 +91,9 @@ def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
             "store_links_count": len(v.store_links),
             "images_count": len(v.images)
         })
+    return variant_summary
 
+def _build_inspect_image_strip(item):
     image_strip = []
     for img in item.images:
         image_strip.append({
@@ -103,15 +103,18 @@ def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
             "variant_id": img.variant_id,
             "position": img.position
         })
+    return image_strip
 
-    specifications = {
+def _build_inspect_specifications(item):
+    return {
         "structured_details": item.structured_details,
         "quick_details": item.quick_details,
         "searchable_attributes": item.searchable_attributes,
         "specs_list": [{"key": s.category, "value": s.spec_json} for s in item.specifications]
     }
 
-    recent_comments = [
+def _build_inspect_comments(item):
+    return [
         {
             "user_name": c.user.name if getattr(c, "user", None) else f"User #{c.user_id}",
             "content": c.content,
@@ -119,6 +122,17 @@ def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
         }
         for c in item.comments
     ]
+
+def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
+    """Serializes an Item ORM model and its eagerly loaded relations into a DTO."""
+    if not item:
+        return None
+
+    store_links_data, last_synced_dates = _build_inspect_store_links(item)
+    variant_summary = _build_inspect_variant_summary(item)
+    image_strip = _build_inspect_image_strip(item)
+    specifications = _build_inspect_specifications(item)
+    recent_comments = _build_inspect_comments(item)
 
     return {
         "id": item.id,

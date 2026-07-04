@@ -27,20 +27,12 @@ def get_feed_data(section_slug, active_filters, page=1):
     )
 
     filter_options = {}
-    if "category" in allowed_filters:
-        filter_options["category"] = get_relationships_for_section(
-            section_slug, "category"
-        )
-    if "brand" in allowed_filters:
-        filter_options["brand"] = get_relationships_for_section(section_slug, "brand")
-    if "topic" in allowed_filters:
-        filter_options["topic"] = get_relationships_for_section(section_slug, "topic")
-    if "intent" in allowed_filters:
-        filter_options["intent"] = get_relationships_for_section(section_slug, "intent")
-    if "price_tier" in allowed_filters:
-        filter_options["price_tier"] = get_relationships_for_section(
-            section_slug, "price_tier"
-        )
+    relationship_filters = ["category", "brand", "topic", "intent", "price_tier"]
+    
+    for f in relationship_filters:
+        if f in allowed_filters:
+            filter_options[f] = get_relationships_for_section(section_slug, f)
+            
     if "type" in allowed_filters:
         filter_options["type"] = get_types_for_section(section_slug)
     if "attributes" in allowed_filters:

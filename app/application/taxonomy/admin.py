@@ -20,79 +20,46 @@ from app.domains.taxonomy.service.admin import (
     delete_admin_attribute as domain_delete_attribute,
 )
 
+from app.shared.utils.admin_helpers import execute_admin_workflow
+
 def create_admin_category(name, is_active=True):
-    cat = domain_create_category(name, is_active)
-    db.session.commit()
-    return cat
+    return execute_admin_workflow(domain_create_category, name, is_active)
 
 def update_admin_category(cat_id, data):
-    cat = domain_update_category(cat_id, data)
-    if cat:
-        db.session.commit()
-    return cat
+    return execute_admin_workflow(domain_update_category, cat_id, data)
 
 def delete_admin_category(cat_id):
-    cat = domain_delete_category(cat_id)
-    if cat:
-        db.session.commit()
-    return cat
+    return execute_admin_workflow(domain_delete_category, cat_id)
 
 def create_admin_brand(name, industry=None, is_active=True):
-    brand = domain_create_brand(name, industry, is_active)
-    db.session.commit()
-    return brand
+    return execute_admin_workflow(domain_create_brand, name, industry, is_active)
 
 def update_admin_brand(brand_id, data):
-    brand = domain_update_brand(brand_id, data)
-    if brand:
-        db.session.commit()
-    return brand
+    return execute_admin_workflow(domain_update_brand, brand_id, data)
 
 def delete_admin_brand(brand_id):
-    brand = domain_delete_brand(brand_id)
-    if brand:
-        db.session.commit()
-    return brand
+    return execute_admin_workflow(domain_delete_brand, brand_id)
 
 def create_admin_topic(name, is_active=True):
-    topic = domain_create_topic(name, is_active)
-    db.session.commit()
-    return topic
+    return execute_admin_workflow(domain_create_topic, name, is_active)
 
 def update_admin_topic(topic_id, data):
-    topic = domain_update_topic(topic_id, data)
-    if topic:
-        db.session.commit()
-    return topic
+    return execute_admin_workflow(domain_update_topic, topic_id, data)
 
 def delete_admin_topic(topic_id):
-    topic = domain_delete_topic(topic_id)
-    if topic:
-        db.session.commit()
-    return topic
+    return execute_admin_workflow(domain_delete_topic, topic_id)
 
 def update_admin_section(section_id, data):
-    section = domain_update_section(section_id, data)
-    if section:
-        db.session.commit()
-    return section
+    return execute_admin_workflow(domain_update_section, section_id, data)
 
 def create_admin_attribute(name, category_id=None):
-    attr = domain_create_attribute(name, category_id)
-    db.session.commit()
-    return attr
+    return execute_admin_workflow(domain_create_attribute, name, category_id)
 
 def update_admin_attribute(attr_id, data):
-    attr = domain_update_attribute(attr_id, data)
-    if attr:
-        db.session.commit()
-    return attr
+    return execute_admin_workflow(domain_update_attribute, attr_id, data)
 
 def delete_admin_attribute(attr_id):
-    attr = domain_delete_attribute(attr_id)
-    if attr:
-        db.session.commit()
-    return attr
+    return execute_admin_workflow(domain_delete_attribute, attr_id)
 
 def apply_taxonomy_insight_workflow(content_id, type_, suggested_id):
     from app.domains.taxonomy.service.insights import apply_taxonomy_insight

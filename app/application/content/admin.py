@@ -30,28 +30,20 @@ def get_content_inspect_workflow(content_id: int) -> dict:
         "article_sources": article_sources_data
     }
 
+from app.shared.utils.admin_helpers import execute_admin_workflow, toggle_model_flag_workflow
+
 def delete_content_workflow(content_id):
     content = db.session.get(Content, content_id)
     if not content:
         return False
-    delete_admin_content_and_relations(content)
-    db.session.commit()
+    execute_admin_workflow(delete_admin_content_and_relations, content)
     return True
 
 def toggle_publish_workflow(content_id, action):
-    content = db.session.get(Content, content_id)
-    if not content:
-        return None
-    
-    if action == "publish":
-        content.is_published = True
-    elif action == "unpublish":
-        content.is_published = False
-    else:
+    if action not in ["publish", "unpublish"]:
         raise ValueError("Invalid action parameter")
-
-    db.session.commit()
-    return content
+    target_value = action == "publish"
+    return toggle_model_flag_workflow(Content, content_id, "is_published", target_value)
 
 def bulk_actions_workflow(action, ids, category_id=None):
     contents = db.session.query(Content).filter(Content.id.in_(ids)).all()

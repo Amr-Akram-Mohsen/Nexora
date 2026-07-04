@@ -4,6 +4,61 @@ from app.domains.item.models import Store, Item, ItemVariant, ItemStoreLink
 from app.domains.interaction.models import View, ItemClick
 from datetime import datetime, timezone, timedelta
 
+def _build_sync_cadence(recent_syncs, now):
+    sync_cadence_map = {}
+    for d in range(30):
+        day_str = (now - timedelta(days=d)).strftime('%Y-%m-%d')
+        sync_cadence_map[day_str] = 0
+        
+    for dt in recent_syncs:
+        if dt:
+            day_str = dt.strftime('%Y-%m-%d')
+            if day_str in sync_cadence_map:
+                sync_cadence_map[day_str] += 1
+    
+    return [{"date": k, "count": v} for k, v in sorted(sync_cadence_map.items())]
+
+def _calculate_store_sync_ages(store_syncs, now):
+    store_age_map = {}
+    for name, dt in store_syncs:
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        age = (now - dt).days
+        if name not in store_age_map:
+            store_age_map[name] = []
+        store_age_map[name].append(age)
+        
+    avg_sync_age_by_store = []
+    for name, ages in store_age_map.items():
+        avg_age = sum(ages) / len(ages) if ages else 0
+        avg_sync_age_by_store.append({"name": name, "avg_age_days": round(avg_age, 1)})
+        
+    avg_sync_age_by_store.sort(key=lambda x: x["avg_age_days"], reverse=True)
+    return avg_sync_age_by_store
+
+def _build_price_staleness_grid(staleness_query, stale_date):
+    staleness_map = {}
+    for store_name, synced_at in staleness_query:
+        if store_name not in staleness_map:
+            staleness_map[store_name] = {"fresh": 0, "stale": 0}
+            
+        if synced_at:
+            if synced_at.tzinfo is None:
+                synced_at = synced_at.replace(tzinfo=timezone.utc)
+            if synced_at >= stale_date:
+                staleness_map[store_name]["fresh"] += 1
+            else:
+                staleness_map[store_name]["stale"] += 1
+        else:
+            staleness_map[store_name]["stale"] += 1
+            
+    staleness_list = [
+        {"name": k, "fresh": v["fresh"], "stale": v["stale"], "total": v["fresh"] + v["stale"]} 
+        for k, v in staleness_map.items()
+    ]
+    staleness_list.sort(key=lambda x: x["total"], reverse=True)
+    return staleness_list[:10]
+
 def get_admin_stores_page(page, per_page, search, network, country, sync_staleness):
     stmt = select(Store)
     if search:
@@ -232,18 +287,7 @@ def get_admin_store_health_stats():
         .where(ItemStoreLink.last_synced_at >= month_start)
     ).all()
     
-    sync_cadence_map = {}
-    for d in range(30):
-        day_str = (now - timedelta(days=d)).strftime('%Y-%m-%d')
-        sync_cadence_map[day_str] = 0
-        
-    for dt in recent_syncs:
-        if dt:
-            day_str = dt.strftime('%Y-%m-%d')
-            if day_str in sync_cadence_map:
-                sync_cadence_map[day_str] += 1
-    
-    sync_cadence = [{"date": k, "count": v} for k, v in sorted(sync_cadence_map.items())]
+    sync_cadence = _build_sync_cadence(recent_syncs, now)
 
     store_syncs = db.session.execute(
         select(Store.name, ItemStoreLink.last_synced_at)
@@ -251,21 +295,7 @@ def get_admin_store_health_stats():
         .where(ItemStoreLink.last_synced_at != None)
     ).all()
     
-    store_age_map = {}
-    for name, dt in store_syncs:
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        age = (now - dt).days
-        if name not in store_age_map:
-            store_age_map[name] = []
-        store_age_map[name].append(age)
-        
-    avg_sync_age_by_store = []
-    for name, ages in store_age_map.items():
-        avg_age = sum(ages) / len(ages) if ages else 0
-        avg_sync_age_by_store.append({"name": name, "avg_age_days": round(avg_age, 1)})
-        
-    avg_sync_age_by_store.sort(key=lambda x: x["avg_age_days"], reverse=True)
+    avg_sync_age_by_store = _calculate_store_sync_ages(store_syncs, now)
     top_stale_stores = avg_sync_age_by_store[:10]
     
     return {
@@ -417,27 +447,7 @@ def get_admin_store_pricing_stats():
         .join(ItemStoreLink, ItemStoreLink.store_id == Store.id)
     ).all()
     
-    staleness_map = {}
-    for store_name, synced_at in staleness_query:
-        if store_name not in staleness_map:
-            staleness_map[store_name] = {"fresh": 0, "stale": 0}
-            
-        if synced_at:
-            if synced_at.tzinfo is None:
-                synced_at = synced_at.replace(tzinfo=timezone.utc)
-            if synced_at >= stale_date:
-                staleness_map[store_name]["fresh"] += 1
-            else:
-                staleness_map[store_name]["stale"] += 1
-        else:
-            staleness_map[store_name]["stale"] += 1
-            
-    staleness_list = [
-        {"name": k, "fresh": v["fresh"], "stale": v["stale"], "total": v["fresh"] + v["stale"]} 
-        for k, v in staleness_map.items()
-    ]
-    staleness_list.sort(key=lambda x: x["total"], reverse=True)
-    price_staleness_grid = staleness_list[:10]
+    price_staleness_grid = _build_price_staleness_grid(staleness_query, stale_date)
 
     item_avail_query = db.session.execute(
         select(ItemVariant.item_id, ItemStoreLink.availability)

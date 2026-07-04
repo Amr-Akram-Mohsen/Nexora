@@ -11,11 +11,6 @@ def serialize_taxonomy(t, counts=None, health=None):
         data["hierarchy level"] = "Leaf" if t.is_leaf else "Parent"
     if isinstance(t, Section):
         data['description'] = t.description
-        data['is_configured'] = bool(t.allowed_filters)
-    if isinstance(t, Brand):
-        data['industry'] = t.industry or "—"
-    if isinstance(t, (Brand, Topic)):
-        data['is_featured'] = getattr(t, 'is_featured', False)
         
     if counts:
         for k, v in counts.items():
@@ -27,50 +22,28 @@ def serialize_taxonomy(t, counts=None, health=None):
     return data
 
 
-def serialize_category(c):
-    return {
-        "id": c.id,
-        "name": c.name,
-        "slug": c.slug,
-        "is_active": c.is_active,
-        "is_leaf": c.is_leaf,
-        "sort_order": c.sort_order,
-        "parent_id": c.parent_id,
+def _serialize_taxonomy_base(obj, **kwargs):
+    data = {
+        "id": obj.id,
+        "name": obj.name,
+        "slug": obj.slug,
+        "is_active": obj.is_active,
+        "sort_order": obj.sort_order,
     }
+    data.update(kwargs)
+    return data
 
+def serialize_category(c):
+    return _serialize_taxonomy_base(c, is_leaf=c.is_leaf, parent_id=c.parent_id)
 
 def serialize_brand(b):
-    return {
-        "id": b.id,
-        "name": b.name,
-        "slug": b.slug,
-        "industry": b.industry,
-        "is_active": b.is_active,
-        "is_featured": b.is_featured,
-        "sort_order": b.sort_order,
-    }
-
+    return _serialize_taxonomy_base(b, industry=b.industry, is_featured=b.is_featured)
 
 def serialize_topic(t):
-    return {
-        "id": t.id,
-        "name": t.name,
-        "slug": t.slug,
-        "is_active": t.is_active,
-        "is_featured": t.is_featured,
-        "sort_order": t.sort_order,
-    }
-
+    return _serialize_taxonomy_base(t, is_featured=t.is_featured)
 
 def serialize_section(s):
-    return {
-        "id": s.id,
-        "name": s.name,
-        "slug": s.slug,
-        "description": s.description,
-        "is_active": s.is_active,
-        "sort_order": s.sort_order,
-    }
+    return _serialize_taxonomy_base(s, description=s.description)
 
 
 def serialize_attribute(a):

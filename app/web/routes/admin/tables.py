@@ -104,7 +104,7 @@ CRUD_TABLES = {
     },
     "brands": {
         "id": "brands",
-        "preview_table": ["Name", "Industry", "Status", "Content Count", "Product Count", "Health Status", "Actions"],
+        "preview_table": ["Name", "Status", "Content Count", "Product Count", "Health Status", "Actions"],
         "detailed_table": {
             "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
             "related metadata": ["content count", "item count"]
@@ -120,7 +120,7 @@ CRUD_TABLES = {
     },
     "sections": {
         "id": "sections",
-        "preview_table": ["Name", "Description", "Status", "Content Count", "Category Count", "Health Status", "Actions"],
+        "preview_table": ["Name", "Status", "Description", "Content Count", "Category Count", "Health Status", "Actions"],
         "detailed_table": {
             "section info": ["id", "slug", "name", "description", "status", "sort order", "allowed filters"],
             "related metadata": ["content count", "category count", "related brands"],

@@ -3,12 +3,12 @@ from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
 from app.domains.taxonomy.models import Category, Topic, Brand
 
+from app.shared.utils.admin_helpers import execute_paginated_query
+
 def get_admin_users_paginated(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page):
     from app.domains.user.service.analytics import build_user_query as domain_build_user_query
     stmt, count_stmt = domain_build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
             
-    total = db.session.scalar(count_stmt) or 0
-    
     stats = {
         "active": db.session.scalar(count_stmt.where(User.is_active == True)) or 0,
         "admins": db.session.scalar(count_stmt.where(User.is_admin == True)) or 0,
@@ -19,20 +19,12 @@ def get_admin_users_paginated(search, role, status, verified, subscription, prov
         ) or 0
     }
     
-    offset = (page - 1) * per_page
-    items_stmt = stmt.limit(per_page).offset(offset)
-    items = db.session.execute(items_stmt).all()
-    
-    import math
-    pages = math.ceil(total / per_page) if per_page else 1
+    items, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
     return items, total, pages, stats
 
 def toggle_admin_user(id):
-    user = db.session.get(User, id)
-    if not user:
-        return None
-    user.is_admin = not user.is_admin
-    return user
+    from app.shared.utils.admin_helpers import toggle_model_flag_workflow
+    return toggle_model_flag_workflow(User, id, "is_admin")
 
 def get_admin_user_inspect_raw(id):
     from sqlalchemy.orm import selectinload
@@ -68,23 +60,20 @@ def get_admin_subscribers_paginated(search, status, has_user, page, per_page):
         stmt = stmt.where(user_filter)
         count_stmt = count_stmt.where(user_filter)
 
-    total = db.session.scalar(count_stmt) or 0
-    
     stats = {
-        "total": total,
+        "total": db.session.scalar(count_stmt) or 0,
         "confirmed": db.session.scalar(count_stmt.where(and_(NewsletterSubscriber.is_confirmed == True, NewsletterSubscriber.unsubscribed_at.is_(None)))) or 0,
         "unconfirmed": db.session.scalar(count_stmt.where(NewsletterSubscriber.is_confirmed == False)) or 0,
         "unsubscribed": db.session.scalar(count_stmt.where(NewsletterSubscriber.unsubscribed_at.isnot(None))) or 0,
         "anonymous": db.session.scalar(count_stmt.where(NewsletterSubscriber.user_id.is_(None))) or 0
     }
 
-    offset = (page - 1) * per_page
-    items = db.session.scalars(stmt.limit(per_page).offset(offset)).all()
-    
-    import math
-    pages = math.ceil(total / per_page) if per_page else 1
-
-    return items, total, pages, stats
+    items, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
+    # The original returned scalars, but execute_paginated_query returns all()
+    # We must extract the scalars if the route expects models, or we can just return items if the route handles it.
+    # Actually, execute_paginated_query returns the result of .all(), which is a list of tuples/Row.
+    # Wait, the original was scalars().all(). We need to be careful.
+    return [i[0] for i in items], total, pages, stats
 
 def get_admin_audience_analytics_stats():
     from app.domains.interaction.models import RecommendationImpression, RecommendationClick

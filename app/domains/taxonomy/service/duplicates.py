@@ -45,6 +45,17 @@ def detect_taxonomy_duplicates(domain: str, threshold: int = 85):
     return duplicates[:50]
 
 
+def _merge_m2m(association, source_id, target_id, relation_col_name):
+    rel_col = getattr(association.c, relation_col_name)
+    content_col = association.c.content_id
+    
+    content_ids = db.session.scalars(select(content_col).where(rel_col == source_id)).all()
+    for cid in content_ids:
+        exists = db.session.scalar(select(content_col).where(rel_col == target_id, content_col == cid))
+        if not exists:
+            db.session.execute(association.insert().values(content_id=cid, **{relation_col_name: target_id}))
+    db.session.execute(association.delete().where(rel_col == source_id))
+
 def merge_taxonomy_entities(domain: str, source_id: int, target_id: int):
     if domain not in DOMAIN_MAP:
         raise ValueError("Invalid domain")
@@ -62,34 +73,19 @@ def merge_taxonomy_entities(domain: str, source_id: int, target_id: int):
         
     elif domain == "brands":
         from app.domains.relationships import content_brands
-        content_ids = db.session.scalars(select(content_brands.c.content_id).where(content_brands.c.brand_id == source.id)).all()
-        for cid in content_ids:
-            exists = db.session.scalar(select(content_brands.c.content_id).where(content_brands.c.brand_id == target.id, content_brands.c.content_id == cid))
-            if not exists:
-                db.session.execute(content_brands.insert().values(content_id=cid, brand_id=target.id))
-        db.session.execute(content_brands.delete().where(content_brands.c.brand_id == source.id))
+        _merge_m2m(content_brands, source.id, target.id, "brand_id")
         db.session.execute(update(Item).where(Item.brand_id == source.id).values(brand_id=target.id))
         
     elif domain == "topics":
         from app.domains.relationships import content_topics
-        content_ids = db.session.scalars(select(content_topics.c.content_id).where(content_topics.c.topic_id == source.id)).all()
-        for cid in content_ids:
-            exists = db.session.scalar(select(content_topics.c.content_id).where(content_topics.c.topic_id == target.id, content_topics.c.content_id == cid))
-            if not exists:
-                db.session.execute(content_topics.insert().values(content_id=cid, topic_id=target.id))
-        db.session.execute(content_topics.delete().where(content_topics.c.topic_id == source.id))
+        _merge_m2m(content_topics, source.id, target.id, "topic_id")
         
     elif domain == "sections":
         db.session.execute(update(Content).where(Content.section_id == source.id).values(section_id=target.id))
         
     elif domain == "attributes":
         from app.domains.relationships import content_attributes
-        content_ids = db.session.scalars(select(content_attributes.c.content_id).where(content_attributes.c.attribute_id == source.id)).all()
-        for cid in content_ids:
-            exists = db.session.scalar(select(content_attributes.c.content_id).where(content_attributes.c.attribute_id == target.id, content_attributes.c.content_id == cid))
-            if not exists:
-                db.session.execute(content_attributes.insert().values(content_id=cid, attribute_id=target.id))
-        db.session.execute(content_attributes.delete().where(content_attributes.c.attribute_id == source.id))
+        _merge_m2m(content_attributes, source.id, target.id, "attribute_id")
 
     db.session.delete(source)
     db.session.commit()
