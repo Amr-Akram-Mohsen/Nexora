@@ -1,7 +1,6 @@
 {% extends "components/cards/base-card.html" %}
 {% from "commercial/features/item-image.html" import render_image_url %}
-{% from "components/ui/button.html" import button %}
-{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/core.html" import badge, button %}
 {% from "commercial/features/rating.html" import render_stars %}
 
 {% set best_link = item.store_links[0] if item.store_links else None %}

@@ -1,14 +1,9 @@
 {# app/web/templates/admin/distribution/_health_alerts.html #}
 {% if alerts %}
 <div class="distribution-health-alerts flex flex-col gap-2" id="distribution-health-alerts-container">
-    {% for alert in alerts %}
-    <div class="distribution-alert-card alert-{{ alert.type }} flex gap-3 items-start">
-        <span class="distribution-alert-icon">{{ alert.icon }}</span>
-        <div>
-            <h5 class="distribution-alert-title">{{ alert.title }}</h5>
-            <p class="distribution-alert-message">{{ alert.message }}</p>
-        </div>
-    </div>
+    {% from "components/ui/core.html" import alert %}
+    {% for alert_item in alerts %}
+    {{ alert(message=alert_item.message, title=alert_item.title, type=alert_item.type, icon=alert_item.icon, class="distribution-alert-card") }}
     {% endfor %}
 </div>
 {% endif %}

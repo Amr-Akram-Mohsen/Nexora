@@ -24,7 +24,7 @@
     <div class="admin-card">
         <div class="card-header flex justify-between items-center">
             <h3>Recent Ingestion Events</h3>
-            {% from "components/ui/button.html" import button %}
+            {% from "components/ui/core.html" import button %}
             {{ button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) }}
         </div>
         <div>

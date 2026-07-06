@@ -15,7 +15,7 @@ Refactoring applied:
 from flask import Blueprint, jsonify, request, render_template
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
-from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from app.domains.content.models import Content
 from app.domains.content.service.admin import (
     build_admin_contents_query,
@@ -162,12 +162,9 @@ def contents_rows():
         for c in page_items
     ]
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="content")
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, "content",
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 

@@ -15,7 +15,7 @@ from app.domains.user.service.admin import get_admin_users_paginated
 from app.application.user.admin import deactivate_user_workflow, activate_user_workflow, toggle_admin_user_workflow
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
-from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, or_, and_, func
 from app.domains.taxonomy.models import Category, Topic, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
@@ -106,16 +106,9 @@ def users_rows():
     for u, score in items:
         users.append(serialize_user_row(u, score))
 
-    html = render_template(
-        "admin/components/_rows.html",
-        items=users,
-        domain_type="user"
-    )
-    resp = make_rows_response(
-        html,
-        total=total,
-        pages=pages,
-        page=page,
+    resp = render_admin_rows_response(
+        users, "user",
+        total=total, pages=pages, page=page
     )
     resp.headers["X-Active-Count"] = stats["active"]
     resp.headers["X-Admin-Count"] = stats["admins"]

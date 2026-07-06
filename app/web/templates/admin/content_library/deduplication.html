@@ -21,7 +21,7 @@
           <h3 class="dup-group-title">{{ group.title }}</h3>
           <p class="dup-group-meta">{{ group.count }} identical titles found</p>
         </div>
-        {% from "components/ui/button.html" import button %}
+        {% from "components/ui/core.html" import button %}
         {{ button(class="user-action-btn user-action-delete", attrs={"data-action": "keep-oldest", "data-group": loop.index, "data-items": group.content_list|tojson|e}, icon="fas fa-trash-alt", text="Keep Oldest Only", unstyled=True) }}
       </div>
       <div class="dup-group-body">

@@ -6,7 +6,7 @@
       <span class="nav-brand-name">Nexora</span>
       <span class="nav-brand-badge">Admin</span>
     </div>
-    {% from "components/ui/button.html" import button %}
+    {% from "components/ui/core.html" import button %}
     {% call button(id="sidebar-toggle", class="sidebar-toggle-btn justify-center items-center", attrs={"aria-label": "Toggle Sidebar"}, unstyled=True) %}
       <span class="toggle-arrow">◀</span>
     {% endcall %}

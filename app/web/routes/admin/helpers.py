@@ -132,6 +132,30 @@ def make_rows_response(html: str, *, total: int, pages: int, page: int):
     return resp
 
 
+def render_admin_rows_response(items: list, domain_type: str, *, total: int, pages: int, page: int, hide_action_column: bool = False, **kwargs):
+    """
+    Renders the standard _rows.html partial and wraps it in a paginated Response.
+    
+    Args:
+        items: List of serialized dictionaries ready for the template.
+        domain_type: The string representing the domain (e.g. 'user', 'comment').
+        total: Total number of records matching the query.
+        pages: Total number of pages available.
+        page: Current page number.
+        hide_action_column: Optional boolean to hide the action column in the table.
+        kwargs: Additional arguments to pass to render_template.
+    """
+    from flask import render_template
+    html = render_template(
+        "admin/components/_rows.html", 
+        items=items, 
+        domain_type=domain_type, 
+        hide_action_column=hide_action_column,
+        **kwargs
+    )
+    return make_rows_response(html, total=total, pages=pages, page=page)
+
+
 # ──────────────────────────────────────────────
 # FIELD FORMATTERS
 # ──────────────────────────────────────────────

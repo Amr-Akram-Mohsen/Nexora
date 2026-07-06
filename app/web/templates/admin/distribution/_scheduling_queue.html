@@ -1,5 +1,5 @@
 {# app/web/templates/admin/distribution/_scheduling_queue.html #}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import button %}
 <div class="suggestions-list-scroll flex flex-col gap-3">
     {% for item in items %}
     <div class="rec-action-card {% if item.is_overdue %}overdue-alert-card{% endif %}">

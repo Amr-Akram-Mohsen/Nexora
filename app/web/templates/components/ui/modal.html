@@ -1,5 +1,5 @@
 {% macro modal(id, title, icon="", class="", attrs={}) %}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import button %}
 <div id="{{ id }}" class="dashboard-modal-overlay flex-center" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
   <div class="dashboard-modal-content {{ class }}" role="dialog" aria-modal="true" aria-labelledby="{{ id }}-title">
     {% call button(class="dashboard-modal-close-x", attrs={"aria-label": "Close modal", "data-dismiss": "modal"}, unstyled=True) %}×{% endcall %}

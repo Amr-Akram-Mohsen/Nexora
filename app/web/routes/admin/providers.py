@@ -19,7 +19,7 @@ from app.domains.content.models import Content
 from app.domains.item.models import Store, Item, ItemVariant, ItemStoreLink
 from app.domains.external.models import LastAPIFetch
 from app.domains.interaction.models import View, ItemClick
-from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, or_, case
 
 bp = Blueprint("api_provider", __name__, url_prefix="/admin/providers")
@@ -129,12 +129,10 @@ def sources_rows():
     search = request.args.get("search", "").strip()
     from app.domains.taxonomy.service.admin_providers_source import get_admin_sources_page
     pagination, serialized = get_admin_sources_page(page, per_page, search)
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="source", domain_target_type="contents")
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, "source",
+        total=pagination.total, pages=pagination.pages, page=pagination.page,
+        domain_target_type="contents"
     )
 
 
@@ -149,12 +147,10 @@ def stores_rows():
     
     from app.domains.item.service.admin_providers_store import get_admin_stores_page
     pagination, serialized = get_admin_stores_page(page, per_page, search, network, country, sync_staleness)
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="store", domain_target_type="items")
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, "store",
+        total=pagination.total, pages=pagination.pages, page=pagination.page,
+        domain_target_type="items"
     )
 
 

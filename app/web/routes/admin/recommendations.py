@@ -13,7 +13,7 @@ from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.relationships import content_items
-from app.web.routes.admin.helpers import paginate_manual, make_rows_response
+from app.web.routes.admin.helpers import paginate_manual, render_admin_rows_response
 from app.domains.recommendation.service.admin import (
     get_recommendation_stats,
     fetch_admin_matches_page,
@@ -73,8 +73,10 @@ def matches_rows():
             "linked_items_list": [i['id'] for i in r["items"]]
         })
 
-    html = render_template("admin/components/_rows.html", items=display_items, domain_type="rec")
-    return make_rows_response(html, total=total, pages=pages, page=page)
+    return render_admin_rows_response(
+        display_items, "rec",
+        total=total, pages=pages, page=page
+    )
 
 
 @bp.route("/matches/<int:content_id>/inspect", methods=["GET"])

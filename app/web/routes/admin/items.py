@@ -15,7 +15,7 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.item.models import Item, ItemVariant, ItemStoreLink, Store, ItemImage
 from app.domains.taxonomy.models import Category, Brand, Source
-from app.web.routes.admin.helpers import parse_pagination_params, parse_sort_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, parse_sort_params, render_admin_rows_response
 from sqlalchemy import select, func, or_
 from sqlalchemy.orm import joinedload
 from app.domains.item.models import ItemSpecification
@@ -190,12 +190,9 @@ def items_rows():
         has_specs = spec_info_map.get(item.id, False)
         serialized.append(serialize_item_row(item, price_info, store_info, has_image, has_specs))
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='item')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'item',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 

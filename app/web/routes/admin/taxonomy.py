@@ -5,7 +5,7 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.taxonomy.models import Category, Brand, Topic, Section, Source, AttributeFacet, GenderFacet, IntentFacet, PriceTierFacet
 from app.shared.utils.slug import generate_slug
-from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, update
 import difflib
 from app.domains.content.models import Content
@@ -253,12 +253,9 @@ def categories_rows():
         }
         serialized.append(serialize_taxonomy(c, counts=counts, health=health))
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='category')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'category',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 
@@ -294,12 +291,9 @@ def brands_rows():
         }
         serialized.append(serialize_taxonomy(b, counts=counts, health=health))
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='brand')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'brand',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 
@@ -335,12 +329,9 @@ def topics_rows():
         }
         serialized.append(serialize_taxonomy(t, counts=counts, health=health))
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='topic')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'topic',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 
@@ -375,12 +366,9 @@ def sections_rows():
         }
         serialized.append(serialize_taxonomy(s, counts=counts, health=health))
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='section')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'section',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 # ─────────────────────────────────────────────
@@ -457,12 +445,9 @@ def attributes_rows():
         }
         serialized.append(data)
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type='attribute')
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, 'attribute',
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 # ─────────────────────────────────────────────
@@ -589,12 +574,9 @@ def _get_facet_rows(model, domain_type, field_id_name):
         }
         serialized.append(data)
 
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type=domain_type)
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
+    return render_admin_rows_response(
+        serialized, domain_type,
+        total=pagination.total, pages=pagination.pages, page=pagination.page
     )
 
 

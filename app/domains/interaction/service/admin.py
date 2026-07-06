@@ -390,3 +390,68 @@ def get_admin_shares_page(page, per_page, target, user_search):
     serialized = [_serialize_share(s, users, content_titles, item_names) for s in pagination.items]
 
     return pagination, serialized
+
+
+def map_comment_for_rows(c):
+    return {
+        "id": c["id"],
+        "title": c["target_title"],
+        "target_type": c["target_type"],
+        "preview": c["preview"],
+        "sentiment": c["sentiment"],
+        "like_count": c['like_count'],
+        "dislike_count": c['dislike_count'],
+        "replies_count": c["replies_count"],
+        "is_reply": bool(c["parent_id"]),
+        "created_at": c["created_at"][:10] if c["created_at"] else "—",
+        "username": c["user_name"],
+    }
+
+def map_reaction_for_rows(r):
+    return {
+        "id": r["id"],
+        "target": r["target_title"],
+        "target_type": r["target_icon"],
+        "reaction_type": r["type"],
+        "date": r["created_at"][:10] if r["created_at"] else "—",
+        "username": r["username"],
+    }
+
+def map_view_for_rows(v):
+    return {
+        "id": f"{v['target_type']}-{v['target_id']}",
+        "target": v["target_title"],
+        "target_type": v["target_type"],
+        "view_count": v["view_count"] or 0,
+        "auth_views": v["auth_views"] or 0,
+        "anon_views": v["anon_views"] or 0,
+        "latest_view": v["latest_view"]
+    }
+
+def map_click_for_rows(r):
+    return {
+        "id": r["link_id"],
+        "name": r["item_name"],
+        "store_name": r["store_name"],
+        "store_url": r["affiliate_url"],
+        "click_count": r["click_count"] or 0,
+        "latest_click": r["latest_click"],
+    }
+
+def map_save_for_rows(s):
+    return {
+        "id": s["id"],
+        "target": s["target_title"],
+        "target_type": s["target_type"],
+        "username": s["user_name"],
+        "date": s["created_at"][:10] if s["created_at"] else "—",
+    }
+
+def map_share_for_rows(s):
+    return {
+        "id": s["id"],
+        "user": s["user_name"],
+        "target": f"{s['target_type'].title()}: {s['target_title']}",
+        "channel": s["channel"],
+        "date": s["created_at"][:10] if s["created_at"] else "—"
+    }

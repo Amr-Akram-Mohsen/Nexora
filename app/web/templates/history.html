@@ -2,7 +2,7 @@
 
 {% from "components/listing/listing-page.html" import listing_page %}
 {% from "components/ui/grid.html" import grid %}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import button %}
 
 {% block title %}Nexora | Reading History{% endblock %}
 
@@ -51,17 +51,8 @@
 
 {% if slot == 'results' %}
 {% if not history_items %}
-<div class="empty-state flex flex-col items-center gap-4">
-  <div class="empty-state__icon-wrapper flex-center">
-    <i class="fas fa-history"></i>
-    <div class="empty-state__pulse"></div>
-  </div>
-  <h3 class="empty-state__title">No history yet</h3>
-  <p class="empty-state__message">Explore articles and products. They will appear here.</p>
-  <a href="{{ url_for('system.home') }}">
-    {{ button(text="Explore Now", class="empty-state__btn", variant="primary") }}
-  </a>
-</div>
+{% from "components/ui/empty-state.html" import empty_state %}
+{{ empty_state(title="No history yet", message="Explore articles and products. They will appear here.", icon="fa-history", action_text="Explore Now", action_url=url_for('system.home')) }}
 {% else %}
 
 <div class="saved-collections flex flex-col gap-12">

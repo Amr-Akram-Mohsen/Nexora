@@ -1,3 +1,58 @@
+{% macro alert(message, title=None, type="info", icon=None, class="", dismissible=False) %}
+<div class="alert flex flex-col alert-{{ type }} {{ class }}">
+  <div class="alert-header flex items-start justify-between">
+    <div class="alert-title-group flex items-center gap-2">
+      {% if icon %}<span class="alert-icon">{{ icon|safe }}</span>{% endif %}
+      {% if title %}<h4 class="alert-title m-0">{{ title }}</h4>{% endif %}
+    </div>
+    {% if dismissible %}
+    {% from "components/ui/core.html" import button %}
+    {{ button(class="alert-close", unstyled=True, attrs={"onclick": "this.closest('.alert').remove()"}, text="&times;") }}
+    {% endif %}
+  </div>
+  {% if message %}
+  <div class="alert-message mt-1">
+    {{ message|safe }}
+  </div>
+  {% endif %}
+  {% if caller is defined %}
+  <div class="alert-body mt-2">
+    {{ caller() }}
+  </div>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro breadcrumbs(paths=[], current_page="", class="") %}
+<nav class="breadcrumbs flex items-center {{ class }}" aria-label="Breadcrumb">
+  <ul class="flex items-center">
+    <li>
+      <a href="/" class="breadcrumb-link inline-flex items-center">
+        <i class="fas fa-home"></i>
+      </a>
+    </li>
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+    {% for path in paths %}
+    <li>
+      <a href="{{ path.url }}" class="breadcrumb-link inline-flex items-center">
+        {{ path.label }}
+      </a>
+    </li>
+    <li class="separator">
+      <i class="fas fa-chevron-right"></i>
+    </li>
+    {% endfor %}
+    <li>
+      <span class="breadcrumb-current">
+        {{ current_page }}
+      </span>
+    </li>
+  </ul>
+</nav>
+{% endmacro %}
+
 {% macro badge(text="", class="", variant="primary", icon=None, attrs={}) %}
 
 <span

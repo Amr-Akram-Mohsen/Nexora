@@ -145,7 +145,7 @@
         </div>
     </td>
     <td>
-        {% from "components/ui/button.html" import button %}
+        {% from "components/ui/core.html" import button %}
         {{ button(type="button", class="btn btn-sm btn-outline-secondary", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, icon="bi bi-eye", text="View", unstyled=True) }}
     </td>
 </tr>

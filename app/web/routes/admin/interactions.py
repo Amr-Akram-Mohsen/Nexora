@@ -32,75 +32,15 @@ from app.domains.interaction.service.admin import (
     get_admin_shares_page
 )
 from app.domains.user.models import User
-from app.web.routes.admin.helpers import parse_pagination_params, make_rows_response
+from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, or_
 from datetime import datetime
+from app.domains.interaction.service.admin import (
+    map_comment_for_rows, map_reaction_for_rows, map_view_for_rows,
+    map_click_for_rows, map_save_for_rows, map_share_for_rows
+)
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
-
-def _map_comment_for_rows(c):
-    return {
-        "id": c["id"],
-        "title": c["target_title"],
-        "target_type": c["target_type"],
-        "preview": c["preview"],
-        "sentiment": c["sentiment"],
-        "like_count": c['like_count'],
-        "dislike_count": c['dislike_count'],
-        "replies_count": c["replies_count"],
-        "is_reply": bool(c["parent_id"]),
-        "created_at": c["created_at"],
-        "username": c["user_name"],
-    }
-
-def _map_reaction_for_rows(r):
-    return {
-        "id": r["id"],
-        "target": r["target_title"],
-        "target_type": r["target_icon"],
-        "reaction_type": r["type"],
-        "date": r["created_at"][:10] if r["created_at"] else "—",
-        "username": r["username"],
-    }
-
-def _map_view_for_rows(v):
-    return {
-        "id": f"{v['target_type']}-{v['target_id']}",
-        "target": v["target_title"],
-        "target_type": v["target_type"],
-        "view_count": v["view_count"] or 0,
-        "auth_views": v["auth_views"] or 0,
-        "anon_views": v["anon_views"] or 0,
-        "latest_view": v["latest_view"]
-    }
-
-def _map_click_for_rows(r):
-    return {
-        "id": r["link_id"],
-        "name": r["item_name"],
-        "store_name": r["store_name"],
-        "store_url": r["affiliate_url"],
-        "click_count": r["click_count"] or 0,
-        "latest_click": r["latest_click"],
-    }
-
-def _map_save_for_rows(s):
-    return {
-        "id": s["id"],
-        "target": s["target_title"],
-        "target_type": s["target_type"],
-        "username": s["user_name"],
-        "date": s["created_at"][:10] if s["created_at"] else "—",
-    }
-
-def _map_share_for_rows(s):
-    return {
-        "id": s["id"],
-        "user": s["user_name"],
-        "target": f"{s['target_type'].title()}: {s['target_title']}",
-        "channel": s["channel"],
-        "date": s["created_at"][:10] if s["created_at"] else "—"
-    }
 
 
 apply_admin_guard(bp)
@@ -240,32 +180,7 @@ def list_shares():
 # HTML PARTIAL ROWS + INSPECT ENDPOINTS
 # ─────────────────────────────────────────────
 
-def _serialize_comment(c, users, content_titles, item_names):
-    """Shared comment serializer for both JSON and HTML endpoints."""
-    user = users.get(c.user_id)
-    target_title = (
-        content_titles.get(c.target_id)
-        if c.target_type == "content"
-        else item_names.get(c.target_id)
-    )
-    return {
-        "id":           c.id,
-        "content":      c.content,
-        "preview":      c.content[:120] + ("…" if len(c.content) > 120 else ""),
-        "user_id":      c.user_id,
-        "user_name":    user["name"] if user else f"User #{c.user_id}",
-        "user_email":   user["email"] if user else None,
-        "parent_id":    c.parent_id,
-        "sentiment":    c.sentiment or "neutral",
-        "target_type":  c.target_type,
-        "target_id":    c.target_id,
-        "like_count":   c.like_count,
-        "dislike_count": c.dislike_count,
-        "replies_count": c.replies_count,
-        "replies":      c.replies,
-        "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
-        "created_at":   c.created_at.strftime("%Y-%m-%d") if c.created_at else None,
-    }
+
 
 
 
@@ -286,14 +201,12 @@ def comments_rows():
         page, per_page, sentiment, target_type, search, user_search, start_date, end_date
     )
 
-    display_items = [_map_comment_for_rows(c) for c in serialized]
-
-    html = render_template("admin/components/_rows.html", items=display_items, domain_type="comment")
-    return make_rows_response(
-        html,
+    display_items = [map_comment_for_rows(c) for c in serialized]
+    return render_admin_rows_response(
+        display_items, "comment",
         total=pagination.total,
         pages=pagination.pages,
-        page=pagination.page,
+        page=pagination.page
     )
 
 
@@ -342,14 +255,13 @@ def reactions_rows():
         page, per_page, reaction_type, search, user_search
     )
 
-    display_items = [_map_reaction_for_rows(r) for r in serialized]
-
-    html = render_template("admin/components/_rows.html", items=display_items, domain_type="reaction", hide_action_column=True)
-    return make_rows_response(
-        html,
+    display_items = [map_reaction_for_rows(r) for r in serialized]
+    return render_admin_rows_response(
+        display_items, "reaction",
         total=pagination.total,
         pages=pagination.pages,
         page=pagination.page,
+        hide_action_column=True
     )
 
 
@@ -363,10 +275,12 @@ def views_rows():
 
     data = get_admin_views_page(page, per_page, search, start_date, end_date)
 
-    serialized = [_map_view_for_rows(v) for v in data["items"]]
-
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="view", hide_action_column=True)
-    return make_rows_response(html, total=data["total"], pages=data["pages"], page=data["page"])
+    serialized = [map_view_for_rows(v) for v in data["items"]]
+    return render_admin_rows_response(
+        serialized, "view",
+        total=data["total"], pages=data["pages"], page=data["page"],
+        hide_action_column=True
+    )
 
 
 @bp.route("/clicks/rows", methods=["GET"])
@@ -378,10 +292,12 @@ def clicks_rows():
 
     data = get_admin_clicks_page(page, per_page, search, destination)
 
-    serialized = [_map_click_for_rows(r) for r in data["items"]]
-
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type="click", hide_action_column=False)
-    return make_rows_response(html, total=data["total"], pages=data["pages"], page=data["page"])
+    serialized = [map_click_for_rows(r) for r in data["items"]]
+    return render_admin_rows_response(
+        serialized, "click",
+        total=data["total"], pages=data["pages"], page=data["page"],
+        hide_action_column=False
+    )
 
 
 @bp.route("/saves/rows", methods=["GET"])
@@ -395,14 +311,13 @@ def saves_rows():
         page, per_page, search, user_search
     )
 
-    display_items = [_map_save_for_rows(s) for s in serialized]
-
-    html = render_template("admin/components/_rows.html", items=display_items, domain_type="save", hide_action_column=True)
-    return make_rows_response(
-        html,
+    display_items = [map_save_for_rows(s) for s in serialized]
+    return render_admin_rows_response(
+        display_items, "save",
         total=pagination.total,
         pages=pagination.pages,
         page=pagination.page,
+        hide_action_column=True
     )
 
 @bp.route("/shares/rows", methods=["GET"])
@@ -416,10 +331,14 @@ def shares_rows():
         page, per_page, search, user_search
     )
 
-    display_items = [_map_share_for_rows(s) for s in serialized]
-
-    html = render_template("admin/components/_rows.html", items=display_items, domain_type="share", hide_action_column=True)
-    return make_rows_response(html, total=pagination.total, pages=pagination.pages, page=pagination.page)
+    display_items = [map_share_for_rows(s) for s in serialized]
+    return render_admin_rows_response(
+        display_items, "share",
+        total=pagination.total,
+        pages=pagination.pages,
+        page=pagination.page,
+        hide_action_column=True
+    )
 
 
 # ─────────────────────────────────────────────

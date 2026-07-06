@@ -1,33 +1,6 @@
-<nav class="breadcrumbs flex items-center" aria-label="Breadcrumb">
-  <ul class="flex items-center">
-
-    <li>
-      <a href="/" class="breadcrumb-link inline-flex items-center">
-        <i class="fas fa-home"></i>
-      </a>
-    </li>
-
-    <li class="separator">
-      <i class="fas fa-chevron-right"></i>
-    </li>
-
-    {% if content.section %}
-    <li>
-      <a href="{{ url_for('content.sections', section_slug=content.section.slug) }}" class="breadcrumb-link inline-flex items-center">
-        {{ content.section.name }}
-      </a>
-    </li>
-
-    <li class="separator">
-      <i class="fas fa-chevron-right"></i>
-    </li>
-    {% endif %}
-
-    <li>
-      <span class="breadcrumb-current">
-        {{ content.target.title | truncate(35) }}
-      </span>
-    </li>
-
-  </ul>
-</nav>
+{% from "components/ui/core.html" import breadcrumbs %}
+{% set paths = [] %}
+{% if content.section %}
+  {% set _ = paths.append({"label": content.section.name, "url": url_for('content.sections', section_slug=content.section.slug)}) %}
+{% endif %}
+{{ breadcrumbs(paths=paths, current_page=content.target.title | truncate(35)) }}

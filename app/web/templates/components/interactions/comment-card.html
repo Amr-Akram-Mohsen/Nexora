@@ -1,7 +1,5 @@
 {% set btn_class = "interaction-btn comment-action-btn" %}
-{% from "components/ui/form.html" import form %}
-{% from "components/ui/button.html" import button %}
-{% from "components/ui/textarea.html" import textarea %}
+{% from "components/ui/core.html" import button, form, textarea %}
 
 <div class="comment{% if comment.parent_id %} comment--reply{% endif %}" data-type="{{ comment.target_type }}"
   data-id="{{ comment.target_id }}" data-comment-id="{{ comment.id }}">

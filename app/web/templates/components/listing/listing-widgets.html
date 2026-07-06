@@ -3,7 +3,7 @@
 {% macro listing_header(title, count, label, active_filters, get_sort_url) %}
 {# Mobile filter toggle button #}
 <div class="listing-mobile-bar flex items-center justify-between">
-  {% from "components/ui/button.html" import button %}
+  {% from "components/ui/core.html" import button %}
   {% call button(id="filterToggleBtn", class="filter-toggle-btn gap-2", attrs={"aria-label": "Open filters"}, icon="fas fa-sliders-h", unstyled=True) %}
     <span>Filters</span>
     {% set active_count = namespace(n=0) %}

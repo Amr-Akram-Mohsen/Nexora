@@ -1,43 +1,6 @@
-<nav class="breadcrumbs flex items-center" aria-label="Breadcrumb">
-  <ul class="flex items-center">
-
-    <li>
-      <a href="/" class="breadcrumb-link inline-flex items-center">
-        <i class="fas fa-home"></i>
-      </a>
-    </li>
-
-    <li class="separator">
-      <i class="fas fa-chevron-right"></i>
-    </li>
-
-    <li>
-      <a href="{{ url_for('item.deals') }}" class="breadcrumb-link inline-flex items-center">
-        Deals
-      </a>
-    </li>
-
-    <li class="separator">
-      <i class="fas fa-chevron-right"></i>
-    </li>
-
-    {% if item.category %}
-    <li>
-      <a href="{{ url_for('item.deals', category=item.category.slug) }}" class="breadcrumb-link inline-flex items-center">
-        {{ item.category.name }}
-      </a>
-    </li>
-
-    <li class="separator">
-      <i class="fas fa-chevron-right"></i>
-    </li>
-    {% endif %}
-
-    <li>
-      <span class="breadcrumb-current">
-        {{ item.name | truncate(35) }}
-      </span>
-    </li>
-
-  </ul>
-</nav>
+{% from "components/ui/core.html" import breadcrumbs %}
+{% set paths = [{"label": "Deals", "url": url_for('item.deals')}] %}
+{% if item.category %}
+  {% set _ = paths.append({"label": item.category.name, "url": url_for('item.deals', category=item.category.slug)}) %}
+{% endif %}
+{{ breadcrumbs(paths=paths, current_page=item.name | truncate(35)) }}

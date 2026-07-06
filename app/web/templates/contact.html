@@ -4,11 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/contact.css') }}" />
 {% endblock %}
 {% block content %}
-{% from "components/ui/form.html" import form %}
-{% from "components/ui/button.html" import button %}
-{% from "components/ui/input.html" import input %}
-{% from "components/ui/field.html" import field %}
-{% from "components/ui/textarea.html" import textarea %}
+{% from "components/ui/core.html" import button, field, form, input, textarea %}
 
 <section class="content-page contact-page">
 

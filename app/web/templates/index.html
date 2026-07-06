@@ -8,7 +8,7 @@
 {% block content %}
 {% from"components/ui/section.html" import section %}
 {% from"components/ui/grid.html" import grid %}
-{% from"components/ui/badge.html" import badge %}
+{% from"components/ui/core.html" import badge %}
 {% include "components/hero-sliders.html" %}
 <div class="container">
 
@@ -89,7 +89,7 @@
         </p>
       </div>
       <a href="{{ url_for('item.deals') }}" class="cross-domain-bridge__cta">
-        {% from "components/ui/button.html" import button %}
+        {% from "components/ui/core.html" import button %}
         {{ button(text="Browse All Deals", variant="primary", icon="fas fa-arrow-right") }}
       </a>
     </div>

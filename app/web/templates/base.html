@@ -63,15 +63,14 @@
 </head>
 
 <body class="light-mode">
-  {% from "components/ui/button.html" import button %}
+  {% from "components/ui/core.html" import button %}
   {% block flash_messages %}
   {% with messages = get_flashed_messages(with_categories=true) %} {% if
   messages %}
   <div class="flash-messages flex flex-col">
     {% for category, message in messages %}
-    <div class="alert flex items-center justify-between alert-{{ category }}">
-      {{ message }} {% call button(class="alert-close", unstyled=True) %}&times;{% endcall %}
-    </div>
+    {% from "components/ui/core.html" import alert %}
+    {{ alert(message=message, type=category, dismissible=True, class="justify-between") }}
     {% endfor %}
   </div>
   {% endif %}

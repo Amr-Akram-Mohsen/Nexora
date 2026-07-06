@@ -2,8 +2,7 @@
 
 {% from "components/listing/listing-page.html" import listing_page %}
 {% from "components/ui/grid.html" import grid %}
-{% from "components/ui/button.html" import button %}
-{% from "components/ui/link.html" import link %}
+{% from "components/ui/core.html" import button, link %}
 
 {% block title %}Nexora | Saved Items{% endblock %}
 
@@ -62,15 +61,8 @@
 
 {% if slot == 'results' %}
 {% if not saved_articles and not saved_items %}
-<div class="empty-state flex flex-col items-center gap-4">
-  <div class="empty-state__icon-wrapper flex-center">
-    <i class="far fa-bookmark"></i>
-    <div class="empty-state__pulse"></div>
-  </div>
-  <h3 class="empty-state__title">Nothing saved yet</h3>
-  <p class="empty-state__message">Start exploring and save items you want to read or buy later.</p>
-  {{ button(text="Explore Now", href=url_for('system.home'), class="empty-state__btn", variant="primary") }}
-</div>
+{% from "components/ui/empty-state.html" import empty_state %}
+{{ empty_state(title="Nothing saved yet", message="Start exploring and save items you want to read or buy later.", icon="fa-bookmark", action_text="Explore Now", action_url=url_for('system.home')) }}
 {% else %}
 
 <div class="saved-collections flex flex-col gap-12">

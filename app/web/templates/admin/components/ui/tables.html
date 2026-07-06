@@ -1,4 +1,4 @@
-{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/core.html" import badge %}
 {% macro admin_crud_table(table, loading_text="Loading...", height_class="loading-height-lg") %}
 <div class="admin-table-wrapper">
   <table class="admin-table" id="{{ table.id }}-table">
@@ -50,9 +50,24 @@
 {% elif item.link %}
 <a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
 {% elif item.badge %}
-{{ badge(item.value, class=item.badge_class, variant=none) }}
+  {% set badge_class = "badge-danger" %}
+  {% if item.value|lower == "power user" %}
+    {% set badge_class = "badge-origin" %}
+  {% elif item.value|lower == "high" %}
+    {% set badge_class = "badge-success" %}
+  {% elif item.value|lower == "medium" %}
+    {% set badge_class = "badge-warning" %}
+  {% endif %}
+  {{ badge(item.value, class=badge_class, variant=none) }}
 {% elif item.is_boolean %}
-<span>{{ item.true_label if item.value else item.false_label }}</span>
+  {% set lbl_lower = item.label|lower %}
+  {% if lbl_lower == "status" %}
+    <span>{{ "Live Index" if item.value else "Draft" }}</span>
+  {% elif lbl_lower == "rendering status" %}
+    <span>{{ "Active" if item.value else "Inactive" }}</span>
+  {% else %}
+    <span>{{ "Yes" if item.value else "No" }}</span>
+  {% endif %}
 {% elif item.is_number %}
 <span>{{ item.value|intcomma }}{% if item.detail %} ({{ item.detail }}){% endif %}</span>
 {% elif item.is_datetime %}

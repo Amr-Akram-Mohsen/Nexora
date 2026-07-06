@@ -1,7 +1,7 @@
 {# admin/content_library/_pipeline_stats_partial.html
    Rendered server-side and returned as an HTML partial via fetch.
    Variables: stats (list of pipeline stat objects) #}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import button %}
 {% if stats %}
 <div class="admin-table-wrapper">
   <table class="admin-table" id="pipeline-stats-table">

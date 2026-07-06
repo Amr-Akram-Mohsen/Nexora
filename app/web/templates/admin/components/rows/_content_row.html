@@ -1,5 +1,4 @@
-{% from "components/ui/badge.html" import badge %}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import badge, button %}
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">
   <div class="content-cell-title flex flex-col gap-1">
@@ -79,16 +78,16 @@
 </td>
 {% if not hide_action_column %}
 {% call action_cell('contents', row.id) %}
-  <div class="actions-cell-group flex flex-col gap-1 mt-1">
-    {% set is_pub = row.is_published %}
-    {% set btn_status = 'unpublish' if is_pub else 'publish' %}
-    {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
-    {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else
-    'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
-    {% set btn_icon = 'fas fa-eye-slash' if is_pub else 'fas fa-upload' %}
+<div class="actions-cell-group flex flex-col gap-1 mt-1">
+  {% set is_pub = row.is_published %}
+  {% set btn_status = 'unpublish' if is_pub else 'publish' %}
+  {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
+  {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else
+  'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
+  {% set btn_icon = 'fas fa-eye-slash' if is_pub else 'fas fa-upload' %}
 
-    {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id,
-    "data-status": btn_status, "title": btn_label}, variant=none) }}
-  </div>
+  {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id,
+  "data-status": btn_status, "title": btn_label}, variant=none) }}
+</div>
 {% endcall %}
 {% endif %}

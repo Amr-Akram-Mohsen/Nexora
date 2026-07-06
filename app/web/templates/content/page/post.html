@@ -2,9 +2,8 @@
 {% set post = content.target %}
 {% set page_css = "css/content/page/post.css" %}
 
-{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/core.html" import badge, button %}
 {% from "content/features/content-utils.html" import content_snippet %}
-{% from "components/ui/button.html" import button %}
 
 {% block title %}{{ post.title }} | Nexora{% endblock %}
 

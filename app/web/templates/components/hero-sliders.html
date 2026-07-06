@@ -1,5 +1,4 @@
-{% from"components/ui/button.html" import button %}
-{% from"components/ui/badge.html" import badge %}
+{% from"components/ui/core.html" import button, badge %}
 <section class="hero-slider">
   <div class="container">
     <div class="hero-slider__wrapper">
@@ -32,7 +31,8 @@
       <!-- Dots -->
       <div class="hero-slider__dots flex gap-2">
         {% for i in range(hero_sliders|length) %}
-        {% call button(class="hero-slider__dot" ~ (" active" if loop.first else ""), attrs={"data-slide": i, "aria-label": "Go to slide " ~ (i + 1)}, unstyled=True) %}{% endcall %}
+        {% call button(class="hero-slider__dot" ~ (" active" if loop.first else ""), attrs={"data-slide": i,
+        "aria-label": "Go to slide " ~ (i + 1)}, unstyled=True) %}{% endcall %}
         {% endfor %}
       </div>
     </div>

@@ -1,9 +1,5 @@
 <!-- _distribution_modal_inner.html -->
-{% from "components/ui/form.html" import form %}
-{% from "components/ui/label.html" import label %}
-{% from "components/ui/input.html" import input %}
-{% from "components/ui/textarea.html" import textarea %}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import button, form, input, label, textarea %}
 
 {% call form(attrs={"id": "distribution-draft-form"}, include_csrf=false) %}
     

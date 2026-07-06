@@ -1,7 +1,6 @@
 {% from "admin/components/ui/actions.html" import action_group, action_button, action_cell, inspect_btn_cell %}
 {% from "admin/components/crud.html" import admin_crud_rows %}
-{% from "components/ui/badge.html" import badge %}
-{% from "components/ui/button.html" import button %}
+{% from "components/ui/core.html" import badge, button %}
 
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">

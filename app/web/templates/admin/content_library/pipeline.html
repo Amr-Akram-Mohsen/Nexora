@@ -17,7 +17,7 @@
       <h3 class="overview-panel-title">Enrichment Queue Status</h3>
       <p class="overview-panel-sub">Processing health across all ingestion origins</p>
     </div>
-    {% from "components/ui/button.html" import button %}
+    {% from "components/ui/core.html" import button %}
     {{ button(id="refresh-pipeline-btn", class="user-action-btn gap-1", icon="fas fa-sync-alt", text="Refresh", unstyled=True) }}
   </div>
 

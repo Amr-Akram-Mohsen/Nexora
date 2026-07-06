@@ -1,4 +1,4 @@
-{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/core.html" import badge, button %}
 
 {% macro filter_section(filter_name, options, active_filters, get_filter_url) %}
 {# Determine if ANY option in this group is active #}
@@ -56,8 +56,7 @@
     {# Clickable "Show more" toggle if list is long (>8) #}
     {% if options | length > 8 %}
       <li class="filter-item filter-item--more-toggle">
-        {% from "components/ui/button.html" import button %}
-        {{ button(class="filter-item__more-link", attrs={"data-action": "toggle-more-filters", "aria-expanded": "false"}, icon="fas fa-plus", text="Show more (+" ~ (options | length - 8) ~ ")", unstyled=True) }}
+                {{ button(class="filter-item__more-link", attrs={"data-action": "toggle-more-filters", "aria-expanded": "false"}, icon="fas fa-plus", text="Show more (+" ~ (options | length - 8) ~ ")", unstyled=True) }}
       </li>
     {% endif %}
   </ul>

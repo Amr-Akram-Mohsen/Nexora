@@ -201,12 +201,10 @@ status" %}
 
 <!-- Commission Gap Alert -->
 <div id="commission-gap-alert-container">
-  <div class="admin-alert admin-alert-warning flex items-center gap-3">
-    <i class="fa-solid fa-triangle-exclamation"></i>
-    <div>
-      <strong>Commission Gap Detected:</strong> <span id="commission-gap-alert-text"></span>
-    </div>
-  </div>
+  {% from "components/ui/core.html" import alert %}
+  {% call alert(type="warning", icon='<i class="fa-solid fa-triangle-exclamation"></i>', class="admin-alert admin-alert-warning items-center") %}
+    <strong>Commission Gap Detected:</strong> <span id="commission-gap-alert-text"></span>
+  {% endcall %}
 </div>
 
 <div class="dashboard-stats-grid" id="affiliate-health-dashboard">
@@ -339,8 +337,10 @@ status" %}
 
 <!-- Pricing Alerts Banner -->
 <div id="pricing-alerts-container">
-  <div class="admin-alert admin-alert-danger flex flex-col gap-2" id="pricing-alerts-list">
-  </div>
+  {% from "components/ui/core.html" import alert %}
+  {% call alert(type="danger", class="admin-alert admin-alert-danger") %}
+    <div id="pricing-alerts-list" class="flex flex-col gap-2"></div>
+  {% endcall %}
 </div>
 
 <div class="dashboard-stats-grid" id="pricing-health-dashboard">

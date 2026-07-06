@@ -282,30 +282,12 @@ def get_inspect_table(table_name, data):
                 }
                 if isinstance(field_data, bool):
                     entry["is_boolean"] = True
-                    if field.lower() == "status":
-                        entry["true_label"] = "Live Index"
-                        entry["false_label"] = "Draft"
-                    elif field.lower() == "rendering status":
-                        entry["true_label"] = "Active"
-                        entry["false_label"] = "Inactive"
-                    else:
-                        entry["true_label"] = "Yes"
-                        entry["false_label"] = "No"
                 elif isinstance(field_data, (int, float)):
                     entry["is_number"] = True
                 elif isinstance(field_data, str) and (" at" in field.lower() or " date" in field.lower() or field.lower() in ("joined", "added")):
                     entry["is_datetime"] = True
                 elif field.lower() == "engagement tier":
                     entry["badge"] = True
-                    val_lower = str(field_data).lower()
-                    if val_lower == "power user":
-                        entry["badge_class"] = "badge-origin"
-                    elif val_lower == "high":
-                        entry["badge_class"] = "badge-success"
-                    elif val_lower == "medium":
-                        entry["badge_class"] = "badge-warning"
-                    else:
-                        entry["badge_class"] = "badge-danger"
                     
                 mapped_table[section_name.title()].append(entry)
         # Remove empty sections

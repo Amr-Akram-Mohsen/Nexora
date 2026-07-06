@@ -14,13 +14,8 @@
       <p class="auth-text">{{ auth_text or "Please enter your details to continue" }}</p>
     </div>
 
-    {% from "components/ui/form.html" import form %}
-    {% from "components/ui/input.html" import input %}
-    {% from "components/ui/button.html" import button %}
-    {% from "components/ui/field.html" import field %}
-    {% from "components/ui/label.html" import label %}
-    {% from "components/ui/link.html" import link %}
-
+    {% from "components/ui/core.html" import button, field, form, input, label, link %}
+                    
     <div class="auth-methods">
 
       {# ── Google OAuth ── #}

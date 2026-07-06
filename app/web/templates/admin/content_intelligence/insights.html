@@ -21,7 +21,7 @@
     ("30_days", "Last 30 Days"),
     ("all_time", "All Time")
   ], default_val="7_days", default_text=None, extra_class="insights-timeframe-select") }}
-  {% from "components/ui/button.html" import button %}
+  {% from "components/ui/core.html" import button %}
   {{ button(id="refresh-insights-btn", class="admin-btn-secondary", text="↺ Refresh", unstyled=True) }}
 </div>
 {% endset %}
