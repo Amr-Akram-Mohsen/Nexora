@@ -1,5 +1,11 @@
 <!-- _distribution_modal_inner.html -->
-<form id="distribution-draft-form">
+{% from "components/ui/form.html" import form %}
+{% from "components/ui/label.html" import label %}
+{% from "components/ui/input.html" import input %}
+{% from "components/ui/textarea.html" import textarea %}
+{% from "components/ui/button.html" import button %}
+
+{% call form(attrs={"id": "distribution-draft-form"}, include_csrf=false) %}
     
     <div class="distribution-modal-section">
         <h6 class="distribution-modal-section-title">Source Entity Context</h6>
@@ -10,11 +16,11 @@
         <h6 class="distribution-modal-section-title">Platform Details</h6>
         <div class="flex gap-4">
             <div>
-                <label class="distribution-modal-label">Platform</label>
+                {{ label("Platform", class="distribution-modal-label") }}
                 <div class="distribution-modal-readonly-value platform-name">{{ platform }}</div>
             </div>
             <div>
-                <label class="distribution-modal-label">Post Type</label>
+                {{ label("Post Type", class="distribution-modal-label") }}
                 <div class="distribution-modal-readonly-value platform-name">{{ post_type }}</div>
             </div>
         </div>
@@ -22,16 +28,18 @@
     
     <div class="distribution-modal-section">
         <h6 class="distribution-modal-section-title">Platform-Specific Content</h6>
-        <textarea class="distribution-post-textarea" id="distribution-post-text" rows="6" {% if status == 'published' %}readonly{% endif %}>{{ text }}</textarea>
+        {% set ta_attrs = {"rows": "6"} %}
+        {% if status == 'published' %}{% set _ = ta_attrs.update({"readonly": "readonly"}) %}{% endif %}
+        {{ textarea(id="distribution-post-text", value=text, class="distribution-post-textarea", attrs=ta_attrs, required=False) }}
     </div>
     
     <div class="distribution-modal-section">
         <h6 class="distribution-modal-section-title">Publishing Details</h6>
         {% if status != 'published' %}
-        <label class="distribution-modal-label">Live URL (Optional)</label>
-        <input type="url" class="distribution-external-url-input" id="distribution-external-url" placeholder="https://...">
+        {{ label("Live URL (Optional)", class="distribution-modal-label") }}
+        {{ input(type="url", id="distribution-external-url", placeholder="https://...", class="distribution-external-url-input", required=False) }}
         {% else %}
-        <label class="distribution-modal-label">Live URL</label>
+        {{ label("Live URL", class="distribution-modal-label") }}
         <div class="distribution-modal-readonly-value">
             {% if post.external_url %}
             <a href="{{ post.external_url }}" target="_blank">{{ post.external_url }}</a>
@@ -56,11 +64,11 @@
     {% endif %}
     
     <div class="distribution-modal-actions flex justify-end gap-3 items-center">
-        <button type="button" class="admin-btn-secondary" data-bs-dismiss="modal">Close</button>
+        {{ button(text="Close", type="button", class="admin-btn-secondary", attrs={"data-bs-dismiss": "modal"}, variant=none) }}
         {% if status != 'published' %}
-        <button type="button" class="admin-btn-primary" data-action="publish-distribution-post" data-id="{{ post_id }}">Publish Post</button>
+        {{ button(text="Publish Post", type="button", class="admin-btn-primary", attrs={"data-action": "publish-distribution-post", "data-id": post_id}, variant=none) }}
         {% else %}
-        <button type="button" class="admin-btn-success" disabled>Published</button>
+        {{ button(text="Published", type="button", class="admin-btn-success", attrs={"disabled": "disabled"}, variant=none) }}
         {% endif %}
     </div>
-</form>
+{% endcall %}

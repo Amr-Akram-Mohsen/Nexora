@@ -1,4 +1,6 @@
 {# app/web/templates/admin/components/_inspect_primitives.html #}
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/input.html" import input %}
 
 {% macro inspect_card(title, icon="", body_class="") %}
 <div class="profile-section-card flex gap-3">
@@ -57,12 +59,10 @@
   <div class="inspect-store-card-header flex justify-between items-center flex-wrap gap-2">
     <div>
       <strong class="inspect-store-card-name">{{ lnk.store_name }}</strong>
-      <span class="status-badge">{{ lnk.affiliate_network }}</span>
+      {{ badge(lnk.affiliate_network, class="status-badge", variant=none) }}
     </div>
     <div>
-      <span class="inspect-store-availability status-badge {{ 'active' if lnk.availability == 'in_stock' else 'inactive' }}">
-        {{ "In Stock" if lnk.availability == 'in_stock' else (lnk.availability or "Out of Stock") }}
-      </span>
+      {{ badge("In Stock" if lnk.availability == 'in_stock' else (lnk.availability or "Out of Stock"), class="inspect-store-availability status-badge " ~ ('active' if lnk.availability == 'in_stock' else 'inactive'), variant=none) }}
     </div>
   </div>
   <div class="inspect-store-card-grid">
@@ -79,7 +79,7 @@
     <div class="inspect-url-group">
       <span class="inspect-url-label">Original URL</span>
       <div class="inspect-url-container">
-        <input class="inspect-url-input" type="text" readonly value="{{ lnk.original_url or '' }}" data-action="select-text">
+        {{ input(type="text", value=(lnk.original_url or ''), class="inspect-url-input", attrs={"readonly": "readonly", "data-action": "select-text"}, required=False) }}
         {% if lnk.original_url %}
         <a target="_blank" href="{{ lnk.original_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
         {% endif %}
@@ -88,7 +88,7 @@
     <div class="inspect-url-group">
       <span class="inspect-url-label">Affiliate URL</span>
       <div class="inspect-url-container">
-        <input class="inspect-url-input" type="text" readonly value="{{ lnk.affiliate_url or '' }}" data-action="select-text">
+        {{ input(type="text", value=(lnk.affiliate_url or ''), class="inspect-url-input", attrs={"readonly": "readonly", "data-action": "select-text"}, required=False) }}
         {% if lnk.affiliate_url %}
         <a target="_blank" href="{{ lnk.affiliate_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
         {% endif %}
@@ -117,17 +117,17 @@
       <strong class="inspect-store-card-name">{{ post.platform | title }}</strong>
     </div>
     <div>
-      <span class="status-badge {{ '' if post.status == 'published' else '' }}">
-        {{ post.status | title }}
-      </span>
+      {{ badge(post.status | title, class="status-badge", variant=none) }}
     </div>
   </div>
   <div class="inspect-store-card-grid">
-    <div><strong>Published At:</strong> <span>{{ post.publish_date }}</span></div>
-    <div class="flex gap-md">
-      <span><i class="bi bi-eye"></i> {{ post.views }}</span>
-      <span><i class="bi bi-heart"></i> {{ post.likes }}</span>
-      <span><i class="bi bi-cursor"></i> {{ post.clicks }}</span>
+    <div class="inspect-store-card-item"><strong>Published At</strong> <span>{{ post.publish_date }}</span></div>
+    <div class="inspect-store-card-item"><strong>Engagement</strong> 
+      <span class="flex gap-2">
+        <span><i class="bi bi-eye"></i> {{ post.views }}</span>
+        <span><i class="bi bi-heart"></i> {{ post.likes }}</span>
+        <span><i class="bi bi-cursor"></i> {{ post.clicks }}</span>
+      </span>
     </div>
   </div>
 </div>
@@ -139,10 +139,10 @@
   <div class="flex flex-wrap gap-1">
     {% if tags %}
       {% for tag in tags %}
-      <span class="status-badge">{{ tag[0] if tag is iterable and not tag is string else tag }}</span>
+      {{ badge(tag[0] if tag is iterable and not tag is string else tag, class="status-badge", variant=none) }}
       {% endfor %}
     {% else %}
-      <span >No {{ label | lower }} data available</span>
+      <span class="text-muted">No {{ label | lower }} data available</span>
     {% endif %}
   </div>
 </div>
@@ -212,7 +212,7 @@
   <div class="inspect-image-card">
     <img src="{{ img.url }}" alt="Item Image" class="inspect-image-card-img">
     {% if img.is_primary %}
-      <span class="badge badge-success inspect-image-card-badge">Primary</span>
+      {{ badge("Primary", class="badge-success inspect-image-card-badge", variant=none) }}
     {% endif %}
     <div class="inspect-image-card-label">
       {% if img.variant_id %}Variant #{{ img.variant_id }}{% else %}Shared{% endif %}
@@ -259,7 +259,7 @@
     <div class="inspect-spec-section-title">Searchable Attributes</div>
     <div class="flex flex-wrap gap-2">
       {% for k, v in specs.searchable_attributes.items() %}
-      <span class="badge badge-primary">{{ k }}: {{ v }}</span>
+      {{ badge(k ~ ": " ~ v, class="badge-primary", variant=none) }}
       {% endfor %}
     </div>
   </div>
@@ -320,4 +320,51 @@
   </div>
   {% endif %}
 </div>
+{% endmacro %}
+
+{% macro render_distribution_section(history) %}
+{% from "admin/components/ui/inspect.html" import inspect_section %}
+{% call inspect_section('Social Distribution History') %}
+<div class='inspect-links-container'>
+  {% if history %}
+  {% for post in history %}
+  {{ inspect_distribution_card(post) }}
+  {% endfor %}
+  {% else %}
+  <div>No distribution history found.</div>
+  {% endif %}
+</div>
+{% endcall %}
+{% endmacro %}
+
+{% macro render_top_articles_section(articles, section_title="Top Articles", with_view_link=false) %}
+{% from "admin/components/ui/inspect.html" import inspect_section %}
+{% call inspect_section(section_title) %}
+<div class="flex flex-col gap-2">
+  {% if articles %}
+  {% for article in articles %}
+    {% if with_view_link %}
+    <div class="admin-card p-3 flex justify-between items-center">
+      <div>
+        <strong>{{ article.title }}</strong>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-muted"><i class="fas fa-eye"></i> {{ article.views|default(0) }}</span>
+        <a href="/admin/contents/{{ article.id }}" target="_blank" class="admin-btn-secondary py-1 px-2 text-xs">View</a>
+      </div>
+    </div>
+    {% else %}
+    <div class='inspect-article-row flex justify-between items-center'>
+      <a href='/admin/contents/{{ article.id }}' target='_blank' class='inspect-article-title'>
+        {{ article.title }}
+      </a>
+      {{ badge('{:,}'.format(article.views|default(0)) ~ ' views', class='badge-secondary inspect-article-views', variant=none) }}
+    </div>
+    {% endif %}
+  {% endfor %}
+  {% else %}
+  <div class="text-muted">No articles found.</div>
+  {% endif %}
+</div>
+{% endcall %}
 {% endmacro %}

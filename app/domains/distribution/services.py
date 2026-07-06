@@ -173,7 +173,7 @@ def get_admin_scheduling_queue():
     from sqlalchemy import select
     from app.domains.distribution.models import DistributionPost, DistributionPlatform
     from datetime import datetime, timezone
-    from app.web.routes.admin.helpers import get_platform_icon, get_source_title
+    from app.domains.shared_lookups import get_platform_icon, get_source_title
     
     query = (
         select(DistributionPost, DistributionPlatform.name.label("platform_name"))
@@ -209,7 +209,7 @@ def generate_admin_distribution_draft(source_type, source_id, platform_name):
     from app.domains.distribution.models import DistributionPost, DistributionPlatform
     from app.domains.content.models import Content
     from app.domains.item.models import Item
-    from app.web.routes.admin.helpers import get_source_title
+    from app.domains.shared_lookups import get_source_title
 
     platform = db.session.execute(select(DistributionPlatform).filter_by(name=platform_name)).scalar_one_or_none()
     if not platform:

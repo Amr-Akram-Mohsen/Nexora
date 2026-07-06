@@ -158,8 +158,11 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app.shared.filters import format_date
+    from app.shared.filters import format_date, format_datetime, intcomma, duration_min
     app.jinja_env.filters['format_date'] = format_date
+    app.jinja_env.filters['format_datetime'] = format_datetime
+    app.jinja_env.filters['intcomma'] = intcomma
+    app.jinja_env.filters['duration_min'] = duration_min
 
     from app import domains
 

@@ -51,18 +51,10 @@ def list_users():
 
     items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
+    from app.domains.user.service.admin import serialize_user_row
     serialized = []
     for u, score in items:
-        serialized.append({
-            "id":         u.id,
-            "name":       u.name,
-            "email":      u.email,
-            "is_admin":   u.is_admin,
-            "is_active":  u.is_active,
-            "created_at": str(u.created_at),
-            "last_login_at": str(u.last_login_at) if u.last_login_at else None,
-            "engagement_score": score or 0,
-        })
+        serialized.append(serialize_user_row(u, score))
 
     return jsonify({
         "items":    serialized,
@@ -109,24 +101,10 @@ def users_rows():
 
     items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
+    from app.domains.user.service.admin import serialize_user_row
     users = []
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
     for u, score in items:
-        recency_days = (now - u.last_login_at).days if u.last_login_at else None
-        users.append({
-            "id": u.id,
-            "name": u.name,
-            "email": u.email,
-            "is_verified": u.is_verified,
-            "is_admin": u.is_admin,
-            "is_subscribed": bool(u.newsletter_subscription and u.newsletter_subscription.is_active),
-            "is_active": u.is_active,
-            "created_at": u.created_at.strftime("%Y-%m-%d") if u.created_at else None,
-            "last_login_at": u.last_login_at.strftime("%Y-%m-%d %H:%M") if u.last_login_at else None,
-            "recency_days": recency_days,
-            "engagement_score": float(score) if score else 0.0,
-        })
+        users.append(serialize_user_row(u, score))
 
     html = render_template(
         "admin/components/_rows.html",

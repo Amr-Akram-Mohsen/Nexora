@@ -1,3 +1,6 @@
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">{{ row.title }}</td>
 <td data-field="type">{{ badge(row.target_type|title, variant="secondary") }}</td>
 <td data-field="preview"><span class="max-w-xs truncate block" title="{{ row.preview }}">{{ row.preview }}</span></td>
@@ -20,12 +23,5 @@
 <td data-field="date">{{ row.created_at if row.created_at else '' }}</td>
 <td data-field="user">{{ row.username }}</td>
 {% if not hide_action_column %}
-<td data-field="actions">
-  <div class="actions-cell-group flex flex-col gap-1">
-    <button class="inspect-action flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect"
-      data-domain="comments" data-id="{{ row.id }}" data-title="{{ row.title }}">
-      <i class="fas fa-eye"></i> Inspect
-    </button>
-  </div>
-</td>
+{{ inspect_btn_cell(domain_type|default('comments'), row.id, title=row.title) }}
 {% endif %}

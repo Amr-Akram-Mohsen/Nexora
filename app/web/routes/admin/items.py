@@ -34,55 +34,7 @@ from app.application.item.admin import delete_item_workflow
 
 bp = Blueprint("api_item", __name__, url_prefix="/admin/items")
 
-def _serialize_item_row(item, price_info, store_info, has_image, has_specs, now):
-    price_min = price_info.get("price")
-    price_max = price_info.get("max_price")
-    currency = price_info.get("currency")
 
-    sync_age_days = None
-    last_synced_at = store_info.get("last_synced_at")
-    if last_synced_at:
-        if last_synced_at.tzinfo is None:
-            from datetime import timezone
-            last_synced_at = last_synced_at.replace(tzinfo=timezone.utc)
-        sync_age_days = (now - last_synced_at).days
-
-    completeness_points = 0
-    total_criteria = 8
-    if has_image: completeness_points += 1
-    if item.brand_id: completeness_points += 1
-    if item.description and len(item.description) > 10: completeness_points += 1
-    if store_info.get("active_links", 0) > 0: completeness_points += 1
-    if price_info.get("price") is not None: completeness_points += 1
-    if has_specs: completeness_points += 1
-    if item.searchable_attributes and len(item.searchable_attributes) > 0: completeness_points += 1
-    if item.structured_details and len(item.structured_details) > 0: completeness_points += 1
-    
-    completeness_score = int((completeness_points / total_criteria) * 100)
-
-    return {
-        "id":          item.id,
-        "name":        item.name,
-        "slug":        item.slug,
-        "image_url":   item.image_url if has_image else None,
-        "brand":       item.brand.name if item.brand else "—",
-        "brand_slug":  item.brand.slug if item.brand else None,
-        "category":    item.category.name if item.category else "—",
-        "category_slug": item.category.slug if item.category else None,
-        "category_name": item.category.name if item.category else None,
-        "brand_name":  item.brand.name if item.brand else None,
-        "min_price":   price_min,
-        "max_price":   price_max,
-        "currency":    currency,
-        "store_count": store_info.get("active_links", 0),
-        "last_synced_at": store_info.get("last_synced_at").isoformat() if store_info.get("last_synced_at") else None,
-        "sync_age":    sync_age_days,
-        "has_discount": store_info.get("has_discount", False),
-        "health":      completeness_score,
-        "click_count": item.click_count or 0,
-        "view_count":  item.view_count or 0,
-        "created_at":  item.created_at.strftime("%Y-%m-%d") if item.created_at else None,
-    }
 
 
 apply_admin_guard(bp)
@@ -134,9 +86,8 @@ def list_items():
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
+    from app.domains.item.service.admin import serialize_item_row
     serialized = []
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
     
     for item in pagination.items:
         price_info  = min_price_map.get(item.id, {})
@@ -144,7 +95,7 @@ def list_items():
         has_image   = image_info_map.get(item.id, False)
         has_specs   = spec_info_map.get(item.id, False)
 
-        serialized.append(_serialize_item_row(item, price_info, store_info, has_image, has_specs, now))
+        serialized.append(serialize_item_row(item, price_info, store_info, has_image, has_specs))
 
     return jsonify({
         "items":    serialized,
@@ -229,16 +180,15 @@ def items_rows():
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
+    from app.domains.item.service.admin import serialize_item_row
     serialized = []
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
     
     for item in pagination.items:
         price_info = min_price_map.get(item.id, {})
         store_info = store_info_map.get(item.id, {})
         has_image = image_info_map.get(item.id, False)
         has_specs = spec_info_map.get(item.id, False)
-        serialized.append(_serialize_item_row(item, price_info, store_info, has_image, has_specs, now))
+        serialized.append(serialize_item_row(item, price_info, store_info, has_image, has_specs))
 
     html = render_template("admin/components/_rows.html", items=serialized, domain_type='item')
     return make_rows_response(

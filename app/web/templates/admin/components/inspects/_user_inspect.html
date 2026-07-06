@@ -1,28 +1,14 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/inspect.html" import inspect_section %}
 {% from "admin/components/ui/actions.html" import action_group, action_button %}
-{% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/panels.html" import admin_page_header, inspect_page_shell %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
 
 {% block title %}User Details — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-{% set header_actions %}
-<a href="{{ url_for('admin.dashboard_users') }}" class="admin-btn-secondary">
-  ← Back to Users
-</a>
-{% endset %}
-
-{{ admin_page_header(
-  "User Details",
-  title,
-  actions=header_actions
-) }}
-
-<div class="admin-detail-page">
-  <div class="admin-card">
-    <div class="inspect-details-group flex">
+{% call inspect_page_shell("User Details", url_for('admin.dashboard_users'), "Back to Users", title) %}
       
       {% if inspect_header is defined and inspect_header %}
       <div class="inspect-header-block">
@@ -49,13 +35,9 @@
       {% endif %}
 
       {% if inspect_table and inspect_table is mapping %}
-      {% for section_name, fields in inspect_table.items() %}
+      {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
-      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
-      {{ admin_inspect_section_table(fields, layout='horizontal') }}
-      {% else %}
-      {{ admin_inspect_section_table(fields, layout='vertical') }}
-      {% endif %}
+      {{ admin_inspect_section_table(section_name, section_data) }}
       {% endcall %}
       {% endfor %}
       {% endif %}
@@ -75,17 +57,41 @@
       {% endcall %}
       {% endif %}
 
-      {% if actions is defined and actions %}
       {% call inspect_section('Management Actions', divider=false) %}
       {% call action_group(extra_class='flex-wrap') %}
-      {% for act in actions %}
-      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''), extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
-      {% endfor %}
+      
+      {{ action_button(
+          "Demote to User" if is_admin else "Promote to Admin",
+          action_type="toggle-admin",
+          extra_class="user-action-toggle-admin",
+          attrs={"data-action": "toggle-admin", "data-id": inspect_id, "data-name": user_name}
+      ) }}
+      
+      {{ action_button(
+          "Deactivate Account" if is_active else "Activate Account",
+          action_type="toggle-active",
+          extra_class="user-action-toggle-active",
+          attrs={"data-action": "toggle-active", "data-id": inspect_id, "data-is-active": is_active|string|lower, "data-name": user_name}
+      ) }}
+      
+      {{ action_button(
+          "Debug Personalization",
+          action_type="view",
+          icon="🧠",
+          extra_class="inspect-action-debug-recs",
+          attrs={"data-action": "inspect", "data-domain": "recommendations/user_interests", "data-id": inspect_id}
+      ) }}
+      
+      {{ action_button(
+          "Delete User",
+          action_type="delete",
+          icon="🗑",
+          extra_class="user-action-delete",
+          attrs={"data-action": "delete-user", "data-id": inspect_id, "data-name": user_name}
+      ) }}
+      
       {% endcall %}
       {% endcall %}
-      {% endif %}
 
-    </div>
-  </div>
-</div>
+{% endcall %}
 {% endblock %}

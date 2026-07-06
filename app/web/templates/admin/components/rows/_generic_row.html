@@ -1,52 +1,50 @@
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 {% for key, value in row.items() %}
-{% if key not in ["slug", "id", "is_published", "image_url", "has-discount", "is_verified", "recency_days", "logo-url"]
-%}
+{% if key not in ["slug", "id", "is_published", "image_url", "has-discount", "is_verified", "recency_days", "logo-url"] %}
 <td class="cell-{{ key|replace(' ', '-') }}" data-field="{{ key }}">
   {% if key == "user_link" %}
-  {% if value %}
-  <a href="/admin/users?search={{ value }}" class="admin-link">User #{{ value }}</a>
-  {% else %}
-  <span class="text-muted">Anonymous</span>
-  {% endif %}
+    {% if value %}
+      <a href="/admin/users?search={{ value }}" class="admin-link">User #{{ value }}</a>
+    {% else %}
+      <span class="text-muted">Anonymous</span>
+    {% endif %}
   {% elif key == "health" %}
-  {% set tooltip, text, variant = ('Entity is orphaned (0 linked items/content)', 'Unused', 'danger') if value ==
-  'unused' else
-  ('Entity is inactive but has linked items/content', 'Inactive (Linked)', 'warning') if value == 'inactive-linked' else
-  (None, 'OK', 'success') if value == 'ok' else
-  (None, value|title, 'secondary') %}
-  {% if tooltip %}<span title="{{ tooltip }}">{% endif %}
+    {% set tooltip, text, variant = 
+      ('Entity is orphaned (0 linked items/content)', 'Unused', 'danger') if value == 'unused' else
+      ('Entity is inactive but has linked items/content', 'Inactive (Linked)', 'warning') if value == 'inactive-linked' else
+      (None, 'OK', 'success') if value == 'ok' else
+      (None, value|title, 'secondary') %}
+    {% if tooltip %}<span title="{{ tooltip }}">{% endif %}
     {{ badge(text, variant=variant) }}
     {% if tooltip %}</span>{% endif %}
-  {% elif key == "is_configured" or key == "filter config" %}
-  {% set is_conf = (value == "Configured" or value == True) %}
-  {{ badge("Configured" if is_conf else "Not Configured", variant="success" if is_conf else "warning") }}
-  {% elif key == "is_active" or key == "status" %}
-  {% set is_act = (value == "active" or value == True) %}
-  {{ badge("Active" if is_act else "Inactive", variant="success" if is_act else "secondary") }}
-  {% elif key == "is_featured" or key == "featured" %}
-  {% if value == "Featured" or value == True %}
-  {{ badge("Featured", variant="primary") }}
+  {% elif key in ["is_configured", "filter config"] %}
+    {% set is_conf = (value in ["Configured", True]) %}
+    {{ badge("Configured" if is_conf else "Not Configured", variant="success" if is_conf else "warning") }}
+  {% elif key in ["is_active", "status"] %}
+    {% set is_act = (value in ["active", True]) %}
+    {{ badge("Active" if is_act else "Inactive", variant="success" if is_act else "secondary") }}
+  {% elif key in ["is_featured", "featured"] %}
+    {% if value in ["Featured", True] %}
+      {{ badge("Featured", variant="primary") }}
+    {% else %}
+      <span class="text-muted">—</span>
+    {% endif %}
   {% else %}
-  <span class="text-muted">—</span>
-  {% endif %}
-  {% else %}
-  <span>{{ value }}</span>
+    <span>{{ value }}</span>
   {% endif %}
 </td>
 {% endif %}
 {% endfor %}
+
 {% if not hide_action_column %}
-<td data-field="actions" class="flex flex-col gap-1">
-  <button class="inspect-action flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect"
-    data-domain="{{ domain_type|default('') }}" data-id="{{ row.id }}"
-    data-title="{{ row.name|default(row.title|default('')) }}">
-    <i class="fas fa-eye"></i> Inspect
-  </button>
+{% call inspect_btn_cell(domain_type|default(''), row.id, title=row.name|default(row.title|default(''))) %}
   {% if domain_target_type %}
   <a class="inspect-action user-action-inspect inspect-btn"
     href="/admin/{{ domain_target_type }}?source={{ row.get('slug', '') }}">
     <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title}}
   </a>
   {% endif %}
-</td>
+{% endcall %}
 {% endif %}

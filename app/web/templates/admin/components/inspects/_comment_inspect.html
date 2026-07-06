@@ -1,52 +1,44 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/inspect.html" import inspect_section %}
 {% from "admin/components/ui/actions.html" import action_group, action_button %}
-{% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/panels.html" import admin_page_header, inspect_page_shell %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
 
 {% block title %}Comment Details — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-{% set header_actions %}
-<a href="{{ url_for('admin.dashboard_audience') }}" class="admin-btn-secondary">
-  ← Back to Audience
-</a>
-{% endset %}
-
-{{ admin_page_header(
-  "Comment Details",
-  title,
-  actions=header_actions
-) }}
-
-<div class="admin-detail-page">
-  <div class="admin-card">
-    <div class="inspect-details-group flex">
+{% call inspect_page_shell("Comment Details", url_for('admin.dashboard_audience'), "Back to Audience", title) %}
       
       {% if inspect_table and inspect_table is mapping %}
-      {% for section_name, fields in inspect_table.items() %}
+      {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
-      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
-      {{ admin_inspect_section_table(fields, layout='horizontal') }}
-      {% else %}
-      {{ admin_inspect_section_table(fields, layout='vertical') }}
-      {% endif %}
+      {{ admin_inspect_section_table(section_name, section_data) }}
       {% endcall %}
       {% endfor %}
       {% endif %}
 
-      {% if actions is defined and actions %}
       {% call inspect_section('Management Actions', divider=false) %}
       {% call action_group(extra_class='flex-wrap') %}
-      {% for act in actions %}
-      {{ action_button(act.label, action_type=act.action_type, icon=act.icon|default(''), extra_class=act.extra_class|default(''), attrs=act.attrs|default({})) }}
-      {% endfor %}
+      
+      {{ action_button(
+          "Already Flagged" if sentiment == 'spam' else "Flag as Spam",
+          action_type="toggle-active",
+          icon="🚩",
+          disabled=(sentiment == 'spam'),
+          attrs={"data-action": "flag-comment", "data-id": inspect_id}
+      ) }}
+      
+      {{ action_button(
+          "Delete Comment",
+          action_type="delete",
+          icon="🗑",
+          extra_class="inspect-delete-btn",
+          attrs={"data-action": "delete-comment", "data-id": inspect_id}
+      ) }}
+      
       {% endcall %}
       {% endcall %}
-      {% endif %}
 
-    </div>
-  </div>
-</div>
+{% endcall %}
 {% endblock %}

@@ -1,5 +1,5 @@
-{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100],
-current_per_page=20) %}
+{% from "components/ui/button.html" import button %}
+{% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
 <div class="pagination-container">
   <div id="{{ info_id }}" class="pagination-info-text">
     Showing 0 to 0 of 0 items
@@ -10,9 +10,9 @@ current_per_page=20) %}
       <option value="{{ opt }}" {% if opt==current_per_page %}selected{% endif %}>{{ opt }} per page</option>
       {% endfor %}
     </select>
-    <button id="{{ prev_id }}" class="user-action-btn" disabled>← Previous</button>
+    {{ button(text="← Previous", attrs={"id": prev_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
     <span id="{{ indicator_id }}" class="pagination-page-indicator">Page 1 of 1</span>
-    <button id="{{ next_id }}" class="user-action-btn" disabled>Next →</button>
+    {{ button(text="Next →", attrs={"id": next_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
   </div>
 </div>
 {% endmacro %}

@@ -1,3 +1,4 @@
+{% from "components/ui/badge.html" import badge %}
 {% macro admin_crud_table(table, loading_text="Loading...", height_class="loading-height-lg") %}
 <div class="admin-table-wrapper">
   <table class="admin-table" id="{{ table.id }}-table">
@@ -25,6 +26,42 @@
 </div>
 {% endmacro %}
 
+{% macro render_cell(item) %}
+{% if item.is_list %}
+<ul class="inspect-inline-list">
+  {% for entry in item.value %}
+  <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
+    entry.count }}{% endif %}</li>
+  {% endfor %}
+</ul>
+{% elif item.is_labeled %}
+<span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
+{% elif item.is_link %}
+<a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit" {% if
+  item.value.external %} target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
+    class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
+{% elif item.is_breadcrumb %}
+<div class="flex items-center gap-2 flex-wrap">
+  {% for crumb in item.value %}
+  <a href="{{ crumb.link }}">{{ crumb.label }}</a>
+  {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}
+  {% endfor %}
+</div>
+{% elif item.link %}
+<a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
+{% elif item.badge %}
+{{ badge(item.value, class=item.badge_class, variant=none) }}
+{% elif item.is_boolean %}
+<span>{{ item.true_label if item.value else item.false_label }}</span>
+{% elif item.is_number %}
+<span>{{ item.value|intcomma }}{% if item.detail %} ({{ item.detail }}){% endif %}</span>
+{% elif item.is_datetime %}
+<span>{{ item.value|format_datetime }}</span>
+{% else %}
+<span>{{ item.value }}</span>
+{% endif %}
+{% endmacro %}
+
 {% macro admin_inspect_attributes_table(fields) %}
 <div class="admin-table-wrapper">
   <table class="admin-table vertical-table">
@@ -33,33 +70,7 @@
       <tr>
         <th class="cell-label">{{ item.label }}</th>
         <td class="cell-value">
-          {% if item.is_list %}
-          <ul class="inspect-inline-list">
-            {% for entry in item.value %}
-            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
-              entry.count }}{% endif %}</li>
-            {% endfor %}
-          </ul>
-          {% elif item.is_labeled %}
-          <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
-          {% elif item.is_link %}
-          <a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit" {% if
-            item.value.external %} target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
-              class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
-          {% elif item.is_breadcrumb %}
-          <div class="flex items-center gap-2 flex-wrap">
-            {% for crumb in item.value %}
-            <a href="{{ crumb.link }}">{{ crumb.label }}</a>
-            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}
-            {% endfor %}
-          </div>
-          {% elif item.link %}
-          <a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
-          {% elif item.badge %}
-          <span class="badge {{ item.badge_class }}">{{ item.value }}</span>
-          {% else %}
-          <span>{{ item.value }}</span>
-          {% endif %}
+          {{ render_cell(item) }}
         </td>
       </tr>
       {% endfor %}
@@ -83,33 +94,7 @@
       <tr>
         {% for item in fields %}
         <td>
-          {% if item.is_list %}
-          <ul class="inspect-inline-list">
-            {% for entry in item.value %}
-            <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
-              entry.count }}{% endif %}</li>
-            {% endfor %}
-          </ul>
-          {% elif item.is_labeled %}
-          <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
-          {% elif item.is_link %}
-          <a href="{{ item.value.link }}" class="activity-target inspect-link" {% if item.value.external %}
-            target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
-              class="fas fa-external-link-alt"></i>{% endif %}</a>
-          {% elif item.is_breadcrumb %}
-          <div class="flex items-center gap-2">
-            {% for crumb in item.value %}
-            <a href="{{ crumb.link }}">{{ crumb.label }}</a>
-            {% if not loop.last %}<i class="fas fa-chevron-right fa-xs"></i>{% endif %}
-            {% endfor %}
-          </div>
-          {% elif item.link %}
-          <a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
-          {% elif item.badge %}
-          <span class="badge {{ item.badge_class }}">{{ item.value }}</span>
-          {% else %}
-          <span>{{ item.value }}</span>
-          {% endif %}
+          {{ render_cell(item) }}
         </td>
         {% endfor %}
       </tr>
@@ -119,8 +104,9 @@
 {% endmacro %}
 
 
-{% macro admin_inspect_section_table(fields, layout='vertical') %}
-{% if layout == 'horizontal' or layout == 'metrics' %}
+{% macro admin_inspect_section_table(section_name, fields) %}
+{% set lower_name = section_name|lower %}
+{% if lower_name.endswith('metrics') or lower_name.endswith('breakdown') or lower_name.endswith('scoring') or lower_name.endswith('summary') or lower_name.endswith('pipeline') %}
 {{ admin_inspect_metrics_table(fields) }}
 {% else %}
 {{ admin_inspect_attributes_table(fields) }}

@@ -44,27 +44,10 @@ def build_comment_inspect_view_model(aggregated_data: dict) -> dict:
     
     inspect_table = get_inspect_table("comments", data_for_table)
     
-    actions = [
-        {
-            "label": "Already Flagged" if dto["sentiment"] == 'spam' else "Flag as Spam",
-            "action_type": "toggle-active",
-            "icon": "🚩",
-            "disabled": True if dto["sentiment"] == 'spam' else False,
-            "attrs": {"data-action": "flag-comment", "data-id": dto["id"]}
-        },
-        {
-            "label": "Delete Comment",
-            "action_type": "delete",
-            "icon": "🗑",
-            "extra_class": "inspect-delete-btn",
-            "attrs": {"data-action": "delete-comment", "data-id": dto["id"]}
-        }
-    ]
-
     return {
         "inspect_table": inspect_table,
-        "actions": actions,
-        "inspect_id": dto["id"]
+        "inspect_id": dto["id"],
+        "sentiment": dto["sentiment"]
     }
 
 def build_link_clicks_view_model(aggregated_data: dict) -> dict:

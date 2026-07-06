@@ -1,3 +1,4 @@
+{% from "components/ui/badge.html" import badge %}
 <div class="user-interests-container flex flex-col gap-4">
   {% if affinities.Brands or affinities.Categories or affinities.Topics %}
   <div class="affinities-section gap-4">
@@ -9,7 +10,7 @@
         {% for item in items_list %}
         <div class="affinity-item flex items-center justify-between">
           <span title="{{ item.name }}">{{ item.name }}</span>
-          <span class="badge badge-primary badge-sm">{{ item.score }} pts</span>
+          {{ badge(item.score ~ " pts", class="badge-primary badge-sm", variant=none) }}
         </div>
         {% endfor %}
       </div>
@@ -29,7 +30,7 @@
           <div class="flex flex-col gap-1">
             <strong title="{{ item.target_name }}">{{ item.target_name }}</strong>
             <div class="flex items-center gap-2">
-              <span class="badge badge-secondary" id="interest-badge-sm">{{ item.target_type|title }}</span>
+              {{ badge(item.target_type|title, class="badge-secondary", attrs={"id": "interest-badge-sm"}, variant=none) }}
               <span>{{ item.score }} pts</span>
             </div>
           </div>

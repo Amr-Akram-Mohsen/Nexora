@@ -107,16 +107,6 @@ def delete_category(id):
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
 
-def _serialize_category(c):
-    return {
-        "id": c.id,
-        "name": c.name,
-        "slug": c.slug,
-        "is_active": c.is_active,
-        "is_leaf": c.is_leaf,
-        "sort_order": c.sort_order,
-        "parent_id": c.parent_id,
-    }
 
 
 # ─────────────────────────────────────────────
@@ -479,40 +469,6 @@ def attributes_rows():
 # CONTENT FACETS (READ-ONLY)
 # ─────────────────────────────────────────────
 
-def _get_facet_rows(model_class, domain_type, field_name):
-    page, per_page = parse_pagination_params(default_per_page=50)
-    search = request.args.get("search", "").strip()
-    health = request.args.get("health")
-
-    pagination = get_admin_facet_paginated(model_class, field_name, page, per_page, search, health)
-    item_ids = [f.id for f in pagination.items]
-    from app.domains.taxonomy.service.metrics import get_facet_metrics
-    metrics = get_facet_metrics(item_ids, field_name)
-        
-    serialized = []
-    for f in pagination.items:
-        m = metrics.get(f.id, {})
-        c_count = m.get("content_count", 0)
-        
-        health = "ok"
-        if c_count == 0:
-            health = "unused"
-            
-        data = {
-            "id": f.id,
-            "name": f.name,
-            "content count": str(c_count),
-            "health": health
-        }
-        serialized.append(data)
-
-    html = render_template("admin/components/_rows.html", items=serialized, domain_type=domain_type)
-    return make_rows_response(
-        html,
-        total=pagination.total,
-        pages=pagination.pages,
-        page=pagination.page,
-    )
 
 # ─────────────────────────────────────────────
 # DUPLICATES DETECTION & MERGING
@@ -664,133 +620,53 @@ def _get_entity_or_404(model, id, entity_name):
         return None, f"{entity_name} not found."
     return entity, None
 
-def _get_taxonomy_inspect_table(entity, entity_type, metadata):
-    from app.web.routes.admin.helpers import format_status, format_featured
-    from app.web.routes.admin.tables import get_inspect_table
-    
-    data = {
-        "id": f"#{entity.id}",
-        "name": entity.name,
-        "status": format_status(getattr(entity, "is_active", True)),
-        "sort order": str(entity.sort_order) if hasattr(entity, "sort_order") else "0",
-    }
-    data.update(metadata)
-    
-    if entity_type == "category":
-        data["slug"] = entity.slug
-        data["hierarchy level"] = "Leaf" if entity.is_leaf else "Parent"
-        if entity.is_leaf and entity.parent:
-            data["parent name"] = entity.parent.name
-        return get_inspect_table("categories", data)
-    elif entity_type == "brand":
-        data["slug"] = entity.slug
-        data["industry"] = entity.industry or "—"
-        data["featured"] = format_featured(entity.is_featured)
-        return get_inspect_table("brands", data)
-    elif entity_type == "topic":
-        data["slug"] = entity.slug
-        data["featured"] = format_featured(entity.is_featured)
-        return get_inspect_table("topics", data)
-    elif entity_type == "section":
-        import json
-        data["slug"] = entity.slug
-        data["description"] = entity.description or "—"
-        data["allowed filters"] = json.dumps(entity.allowed_filters) if entity.allowed_filters else "—"
-        return get_inspect_table("sections", data)
-    elif entity_type == "attribute":
-        data["slug"] = entity.slug
-        data["category"] = entity.category.name if entity.category else "Global"
-        return get_inspect_table("attributes", data)
-    elif entity_type == "gender_facet":
-        data["slug"] = entity.slug
-        return get_inspect_table("gender_facets", data)
-    elif entity_type == "intent_facet":
-        data["slug"] = entity.slug
-        return get_inspect_table("intent_facets", data)
-    elif entity_type == "price_tier_facet":
-        data["slug"] = entity.slug
-        return get_inspect_table("price_tier_facets", data)
+def _render_taxonomy_inspect(model, id, entity_name, entity_type):
+    from app.web.routes.admin.builders.taxonomy_builder import build_taxonomy_inspect_view_model
+    entity, err = _get_entity_or_404(model, id, entity_name)
+    if err: return err, 404
+    metadata = get_admin_taxonomy_related_metadata(entity, entity_type)
+    data = build_taxonomy_inspect_view_model(entity, entity_type, metadata)
+    return render_template("admin/components/_inspect.html", **data)
 
 @bp.route("/categories/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_category(id):
-    cat, err = _get_entity_or_404(Category, id, "Category")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(cat, "category")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(cat, "category", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(Category, id, "Category", "category")
 
 @bp.route("/brands/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_brand(id):
-    brand, err = _get_entity_or_404(Brand, id, "Brand")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(brand, "brand")
-    top_contents = metadata.pop("_top_contents", None)
-    top_items = metadata.pop("_top_items", None)
-    inspect_table = _get_taxonomy_inspect_table(brand, "brand", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents, top_items=top_items)
+    return _render_taxonomy_inspect(Brand, id, "Brand", "brand")
 
 @bp.route("/topics/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_topic(id):
-    topic, err = _get_entity_or_404(Topic, id, "Topic")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(topic, "topic")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(topic, "topic", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(Topic, id, "Topic", "topic")
 
 @bp.route("/sections/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_section(id):
-    section, err = _get_entity_or_404(Section, id, "Section")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(section, "section")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(section, "section", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(Section, id, "Section", "section")
 
 @bp.route("/attributes/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_attribute(id):
-    attr, err = _get_entity_or_404(AttributeFacet, id, "Attribute")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(attr, "attribute")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(attr, "attribute", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(AttributeFacet, id, "Attribute", "attribute")
 
 @bp.route("/gender_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_gender_facet(id):
-    facet, err = _get_entity_or_404(GenderFacet, id, "Gender Facet")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(facet, "gender_facet")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(facet, "gender_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(GenderFacet, id, "Gender Facet", "gender_facet")
 
 @bp.route("/intent_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_intent_facet(id):
-    facet, err = _get_entity_or_404(IntentFacet, id, "Intent Facet")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(facet, "intent_facet")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(facet, "intent_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(IntentFacet, id, "Intent Facet", "intent_facet")
 
 @bp.route("/price_tier_facets/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_price_tier_facet(id):
-    facet, err = _get_entity_or_404(PriceTierFacet, id, "Price Tier Facet")
-    if err: return err, 404
-    metadata = get_admin_taxonomy_related_metadata(facet, "price_tier_facet")
-    top_contents = metadata.pop("_top_contents", None)
-    inspect_table = _get_taxonomy_inspect_table(facet, "price_tier_facet", metadata)
-    return render_template("admin/components/_inspect.html", inspect_table=inspect_table, top_contents=top_contents)
+    return _render_taxonomy_inspect(PriceTierFacet, id, "Price Tier Facet", "price_tier_facet")
 
 @bp.route("/sources/<int:id>/inspect", methods=["GET"])
 @admin_required

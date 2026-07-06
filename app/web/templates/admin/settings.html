@@ -2,6 +2,7 @@
 {% from "components/ui/modal.html" import modal %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_settings_card %}
+{% from "components/ui/button.html" import button %}
 
 {% block title %}Settings — Nexora Admin{% endblock %}
 
@@ -20,9 +21,7 @@
 
   <!-- Cache Controls -->
   {% call admin_settings_card("Cache", "Invalidate server-side cache", '<i class="fa-solid fa-server"></i>') %}
-    <button id="clear-cache-btn" class="admin-btn-primary settings-action-btn gap-2 items-center">
-      Clear Cache
-    </button>
+    {{ button(text="Clear Cache", class="admin-btn-primary settings-action-btn gap-2 items-center", attrs={"id": "clear-cache-btn"}, variant=none) }}
     <p class="hint">Clears server cache. First request after clearing may be slower.</p>
   {% endcall %}
 
@@ -53,9 +52,9 @@
   {% set log_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' %}
   {% call admin_settings_card("Ingestion Log", "Recent API fetch events", log_icon, id="ingestion-log-card") %}
     <div class="settings-tabs-wrapper flex gap-1">
-      <button class="settings-tab active" id="filter-all-logs">All Events</button>
-      <button class="settings-tab" id="filter-article-logs">Articles</button>
-      <button class="settings-tab" id="filter-item-logs">Items</button>
+      {{ button(text="All Events", class="settings-tab active", attrs={"id": "filter-all-logs"}, variant=none) }}
+      {{ button(text="Articles", class="settings-tab", attrs={"id": "filter-article-logs"}, variant=none) }}
+      {{ button(text="Items", class="settings-tab", attrs={"id": "filter-item-logs"}, variant=none) }}
     </div>
     <div id="ingestion-log-container" class="settings-log-container">
       {{ spinner("Loading logs...") }}
@@ -71,17 +70,7 @@
         <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action
           cannot be undone.</p>
       </div>
-      <button id="reset-system-btn" class="admin-btn-danger settings-action-btn gap-2 items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 6h18" />
-          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-          <line x1="10" x2="10" y1="11" y2="17" />
-          <line x1="14" x2="14" y1="11" y2="17" />
-        </svg>
-        Reset System
-      </button>
+      {{ button(text='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg> Reset System'|safe, class="admin-btn-danger settings-action-btn gap-2 items-center", attrs={"id": "reset-system-btn"}, variant=none) }}
     </div>
   {% endcall %}
 

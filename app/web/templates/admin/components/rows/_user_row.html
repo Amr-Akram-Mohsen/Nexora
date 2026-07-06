@@ -1,3 +1,6 @@
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="name">
   <div class="flex flex-col">
     <span data-field="full-name">{{ row.name }}</span>
@@ -28,21 +31,18 @@
   </div>
 </td>
 <td data-field="joined">
-  {{ row.created_at|truncate(10, True, '') if row.created_at else '—' }}
+  {{ row.created_at|format_date if row.created_at else '—' }}
 </td>
 <td data-field="last-active">
   {% set days = row.recency_days %}
-  {% set value = row.last_login_at if row.last_login_at else 'Never' %}
+  {% set value = row.last_login_at|format_date if row.last_login_at else 'Never' %}
   {% set text, variant = ('Never', 'danger') if days is none else
   ('Active Today', 'success') if days <= 1 else ('Active this week', 'warning' ) if days <=7 else (value, 'danger' ) %}
     {{ badge(text, variant=variant) }} </td>
 <td data-field="engagement-score">{{ "%.1f"|format(row.engagement_score) if row.engagement_score else 0 }}</td>
 <td data-field="engagement-tier">
-  {% set score = row.engagement_score %}
-  {% set text, variant = ('Power User', 'origin') if score >= 200 else
-  ('High', 'success') if score >= 50 else
-  ('Medium', 'warning') if score >= 10 else
-  ('Low', 'danger') %}
+  {% set text = row.engagement_tier %}
+  {% set variant = 'origin' if text == 'Power User' else 'success' if text == 'High' else 'warning' if text == 'Medium' else 'danger' %}
   {{ badge(text, variant=variant) }}
 </td>
 {% if not hide_action_column %}

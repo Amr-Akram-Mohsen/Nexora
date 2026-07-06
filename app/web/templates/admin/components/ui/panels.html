@@ -92,3 +92,25 @@ scroll_class="admin-table-scrollable") %}
   {{ caller() }}
 </div>
 {% endmacro %}
+
+{% macro inspect_page_shell(page_title, back_url, back_label, header_title=None) %}
+{% set header_actions %}
+<a href="{{ back_url }}" class="admin-btn-secondary">
+  ← {{ back_label }}
+</a>
+{% endset %}
+
+{{ admin_page_header(
+  header_title if header_title else page_title,
+  title,
+  actions=header_actions
+) }}
+
+<div class="admin-detail-page">
+  <div class="admin-card">
+    <div class="inspect-details-group flex">
+      {{ caller() }}
+    </div>
+  </div>
+</div>
+{% endmacro %}

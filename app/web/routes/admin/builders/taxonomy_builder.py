@@ -1,4 +1,61 @@
 from app.web.routes.admin.tables import get_inspect_table
+from app.web.routes.admin.helpers import format_status, format_featured
+
+def build_taxonomy_inspect_view_model(entity, entity_type, metadata) -> dict:
+    top_contents = metadata.pop("_top_contents", None)
+    top_items = metadata.pop("_top_items", None)
+    
+    data = {
+        "id": f"#{entity.id}",
+        "name": entity.name,
+        "status": format_status(getattr(entity, "is_active", True)),
+        "sort order": str(entity.sort_order) if hasattr(entity, "sort_order") else "0",
+    }
+    data.update(metadata)
+    
+    if entity_type == "category":
+        data["slug"] = entity.slug
+        data["hierarchy level"] = "Leaf" if entity.is_leaf else "Parent"
+        if entity.is_leaf and entity.parent:
+            data["parent name"] = entity.parent.name
+        inspect_table = get_inspect_table("categories", data)
+    elif entity_type == "brand":
+        data["slug"] = entity.slug
+        data["industry"] = entity.industry or "—"
+        data["featured"] = format_featured(entity.is_featured)
+        inspect_table = get_inspect_table("brands", data)
+    elif entity_type == "topic":
+        data["slug"] = entity.slug
+        data["featured"] = format_featured(entity.is_featured)
+        inspect_table = get_inspect_table("topics", data)
+    elif entity_type == "section":
+        import json
+        data["slug"] = entity.slug
+        data["description"] = entity.description or "—"
+        data["allowed filters"] = json.dumps(entity.allowed_filters) if entity.allowed_filters else "—"
+        inspect_table = get_inspect_table("sections", data)
+    elif entity_type == "attribute":
+        data["slug"] = entity.slug
+        data["category"] = entity.category.name if entity.category else "Global"
+        inspect_table = get_inspect_table("attributes", data)
+    elif entity_type == "gender_facet":
+        data["slug"] = entity.slug
+        inspect_table = get_inspect_table("gender_facets", data)
+    elif entity_type == "intent_facet":
+        data["slug"] = entity.slug
+        inspect_table = get_inspect_table("intent_facets", data)
+    elif entity_type == "price_tier_facet":
+        data["slug"] = entity.slug
+        inspect_table = get_inspect_table("price_tier_facets", data)
+    else:
+        inspect_table = {}
+
+    return {
+        "inspect_table": inspect_table,
+        "top_contents": top_contents,
+        "top_items": top_items,
+        "domain": f"{entity_type}s"
+    }
 
 def build_source_inspect_view_model(aggregated_data: dict) -> dict:
     """Takes aggregated source workflow data and formats it for the UI."""

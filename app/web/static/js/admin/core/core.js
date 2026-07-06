@@ -221,7 +221,7 @@ document.addEventListener("click", e => {
     } else if (domain === "rec") {
       const parts = id.split('-');
       url = `/admin/recommendations/matches/${parts[0]}/${parts[1]}/inspect`;
-    } else if (["category", "brand", "topic", "section"].includes(domain)) {
+    } else if (["category", "brand", "topic", "section", "attribute", "gender_facet", "intent_facet", "price_tier_facet"].includes(domain)) {
       const plural = domain === "category" ? "categories" : `${domain}s`;
       url = `/admin/taxonomy/${plural}/${id}/inspect`;
     } else if (domain === "comment") {

@@ -1,3 +1,4 @@
+{% from "components/ui/button.html" import button %}
 {% macro action_button(
 text,
 action_type="inspect",
@@ -8,16 +9,18 @@ extra_class="",
 button_id="",
 button_type="button"
 ) %}
-<button type="{{ button_type }}" {% if button_id %} data-id="{{ button_id }}" {% endif %} {% if data_action %}
-  data-action="{{ data_action }}" {% endif %} {% if title %} title="{{ title }}" {% endif %}
-  class="user-action-btn user-action-{{ action_type }} {{ extra_class }}" {% for key, val in kwargs.items() %} {% if
-  key=="attrs" and val is mapping %} {% for k, v in val.items() %} {{ k }}="{{ v }}" {% endfor %} {% else %} {{
-  key.replace('_', '-' ) }}="{{ val }}" {% endif %} {% endfor %}>
-  {% if icon %}
-  {{ icon }}
+{% set final_attrs = {} %}
+{% if button_id %}{% set _ = final_attrs.update({'data-id': button_id}) %}{% endif %}
+{% if data_action %}{% set _ = final_attrs.update({'data-action': data_action}) %}{% endif %}
+{% if title %}{% set _ = final_attrs.update({'title': title}) %}{% endif %}
+{% for key, val in kwargs.items() %}
+  {% if key == "attrs" and val is mapping %}
+    {% for k, v in val.items() %}{% set _ = final_attrs.update({k: v}) %}{% endfor %}
+  {% else %}
+    {% set _ = final_attrs.update({key.replace('_', '-'): val}) %}
   {% endif %}
-  {{ text }}
-</button>
+{% endfor %}
+{{ button(text=(icon|safe ~ " " ~ text)|safe if icon else text, type=button_type, class="user-action-btn user-action-" ~ action_type ~ " " ~ extra_class, attrs=final_attrs, variant=none) }}
 {% endmacro %}
 
 {% macro action_group(
@@ -35,9 +38,7 @@ wrapper_class="dashboard-modal-actions flex justify-center gap-3",
 button_class="dashboard-btn dashboard-btn-secondary"
 ) %}
 <div class="{{ wrapper_class }}">
-  <button {% if button_id %} id="{{ button_id }}" {% endif %} class="{{ button_class }}" data-dismiss="modal">
-    {{ text }}
-  </button>
+  {{ button(text=text, class=button_class, attrs={"data-dismiss": "modal", "id": button_id} if button_id else {"data-dismiss": "modal"}, variant=none) }}
 </div>
 {% endmacro %}
 
@@ -47,6 +48,17 @@ button_class="dashboard-btn dashboard-btn-secondary"
   <a class="inspect-action flex-center gap-1" href="/admin/{{ domain }}/{{ id }}" target="_blank">
     <i class="fas fa-eye"></i> Inspect
   </a>
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
 </td>
+{% endmacro %}
 
+{% macro inspect_btn_cell(domain, id, title="") %}
+<td data-field="actions" class="flex flex-col gap-1">
+  {{ button(text="Inspect", icon="fas fa-eye", class="inspect-action inspect-btn", attrs={"data-action": "global-inspect", "data-domain": domain, "data-id": id, "data-title": title}, variant=none) }}
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</td>
 {% endmacro %}

@@ -1,5 +1,6 @@
 {% from "components/ui/empty-state.html" import empty_state %}
 {% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
 {% if not data %}
   {{ empty_state("No suggestions found. You're fully tagged!") }}
 {% else %}
@@ -17,7 +18,7 @@
         <tr>
           <td>{{ item.content_title }}</td>
           <td>{{ badge(item.type ~ ": " ~ item.suggested_name, "blue") }}</td>
-          <td><button class="admin-btn-secondary admin-btn-sm" data-action="apply-insight" data-id="{{ item.content_id }}" data-insight-type="{{ item.type }}" data-suggested-id="{{ item.suggested_id }}">Apply</button></td>
+          <td>{{ button(text="Apply", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "apply-insight", "data-id": item.content_id, "data-insight-type": item.type, "data-suggested-id": item.suggested_id}, variant=none) }}</td>
         </tr>
         {% endfor %}
       </tbody>

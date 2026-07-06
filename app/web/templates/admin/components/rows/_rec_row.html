@@ -1,3 +1,6 @@
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="content-title">
   <div class="flex flex-col gap-1">
     <strong class="cell-primary-text">{{ row.content_title }}</strong>
@@ -28,12 +31,5 @@
   {% endif %}
 </td>
 {% if not hide_action_column %}
-<td data-field="actions">
-  <div class="actions-cell-group flex flex-col gap-1">
-    <button class="inspect-action flex items-center justify-center gap-1 inspect-btn" data-action="global-inspect"
-      data-domain="recommendations" data-id="{{ row.id }}" data-title="{{ row.content_title }}">
-      <i class="fas fa-eye"></i> Inspect
-    </button>
-  </div>
-</td>
+{{ inspect_btn_cell(domain_type|default('recommendations'), row.id, title=row.content_title) }}
 {% endif %}

@@ -52,11 +52,19 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
     sub_is_active = False
     sub_created_at = None
     sub_unsubscribed_at = None
+    sub_status_label = "Not Subscribed"
     
     if user.newsletter_subscription:
         sub_is_active = user.newsletter_subscription.is_active
         sub_created_at = user.newsletter_subscription.created_at.isoformat() if user.newsletter_subscription.created_at else None
         sub_unsubscribed_at = user.newsletter_subscription.unsubscribed_at.isoformat() if user.newsletter_subscription.unsubscribed_at else None
+        
+        if sub_is_active:
+            sub_status_label = "Active"
+        elif sub_unsubscribed_at:
+            sub_status_label = "Unsubscribed"
+        else:
+            sub_status_label = "Unconfirmed"
 
     # For recent activity, serialize the latest interaction models
     def serialize_activity(obj):
@@ -93,7 +101,8 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
             "exists": user.newsletter_subscription is not None,
             "is_active": sub_is_active,
             "created_at": sub_created_at,
-            "unsubscribed_at": sub_unsubscribed_at
+            "unsubscribed_at": sub_unsubscribed_at,
+            "status_label": sub_status_label
         },
         
         "interests": interests_data,
@@ -109,6 +118,9 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
             "recs_seen": metrics["recs_seen"],
             "recs_clicked": metrics["recs_clicked"],
             "engagement_score": metrics["engagement_score"],
+            "engagement_tier": metrics["engagement_tier"],
+            "engagement_profile": metrics["engagement_profile"],
+            "recent_activity_summary": metrics["recent_activity_summary"],
             "likes": metrics["likes"],
             "dislikes": metrics["dislikes"],
             "pos": metrics["pos"],

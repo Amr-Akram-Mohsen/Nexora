@@ -1,27 +1,14 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/inspect.html" import inspect_section %}
-{% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/panels.html" import admin_page_header, inspect_page_shell %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
+{% from "admin/components/_inspect_primitives.html" import render_top_articles_section %}
 
 {% block title %}Source Details — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-{% set header_actions %}
-<a href="{{ url_for('admin.dashboard_sources') }}" class="admin-btn-secondary">
-  ← Back to Providers
-</a>
-{% endset %}
-
-{{ admin_page_header(
-  "Source Details",
-  title,
-  actions=header_actions
-) }}
-
-<div class="admin-detail-page">
-  <div class="admin-card">
-    <div class="inspect-details-group flex">
+{% call inspect_page_shell("Source Details", url_for('admin.dashboard_sources'), "Back to Providers", title) %}
       
       {% if source_header is defined and source_header %}
       <div class="inspect-header-block flex justify-between items-start">
@@ -44,36 +31,16 @@
       {% endif %}
 
       {% if inspect_table and inspect_table is mapping %}
-      {% for section_name, fields in inspect_table.items() %}
+      {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
-      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
-      {{ admin_inspect_section_table(fields, layout='horizontal') }}
-      {% else %}
-      {{ admin_inspect_section_table(fields, layout='vertical') }}
-      {% endif %}
+      {{ admin_inspect_section_table(section_name, section_data) }}
       {% endcall %}
       {% endfor %}
       {% endif %}
 
       {% if top_articles is defined and top_articles %}
-      {% call inspect_section('Top Indexed Articles') %}
-      <div class="flex flex-col gap-2">
-        {% for article in top_articles %}
-        <div class="admin-card p-3 flex justify-between items-center">
-          <div>
-            <strong>{{ article.title }}</strong>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="text-muted"><i class="fas fa-eye"></i> {{ article.views|default(0) }}</span>
-            <a href="/admin/contents/{{ article.id }}" target="_blank" class="admin-btn-secondary py-1 px-2 text-xs">View</a>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% endcall %}
+      {{ render_top_articles_section(top_articles, "Top Indexed Articles", with_view_link=true) }}
       {% endif %}
 
-    </div>
-  </div>
-</div>
+{% endcall %}
 {% endblock %}

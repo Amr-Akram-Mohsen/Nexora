@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from 'components/ui/modal.html' import modal %}
 {% from 'components/ui/spinner.html' import spinner, table_spinner %}
+{% from 'components/ui/button.html' import button %}
 
 {% block title %}Admin{% endblock %}
 
@@ -42,8 +43,8 @@
     <h3 id='modal-title' class='dashboard-modal-title'>Confirm</h3>
     <p id='modal-body' class='dashboard-modal-body'></p>
     <div class='dashboard-modal-actions flex justify-center gap-3'>
-      <button id='modal-cancel' class='dashboard-btn dashboard-btn-secondary'>Cancel</button>
-      <button id='modal-confirm' class='dashboard-btn dashboard-btn-danger'>Confirm</button>
+      {{ button(text="Cancel", class="dashboard-btn dashboard-btn-secondary", attrs={"id": "modal-cancel"}, variant=none) }}
+      {{ button(text="Confirm", class="dashboard-btn dashboard-btn-danger", attrs={"id": "modal-confirm"}, variant=none) }}
     </div>
   </div>
 </div>

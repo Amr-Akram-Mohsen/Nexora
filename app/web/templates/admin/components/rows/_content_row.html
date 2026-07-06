@@ -1,3 +1,6 @@
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">
   <div class="content-cell-title flex flex-col gap-1">
     <strong class="cell-primary-text">{{ row.title }}</strong>
@@ -71,17 +74,12 @@
     {% set is_pub = row.is_published %}
     {% set status_text = 'Live' if is_pub else 'Draft' %}
     {% set status_class = 'status-badge active w-fit' if is_pub else 'status-badge inactive w-fit' %}
-    <span class="{{ status_class }}">{{ status_text }}</span>
+    {{ badge(status_text, class=status_class, variant=none) }}
   </div>
 </td>
 {% if not hide_action_column %}
-<td data-field="actions">
-  <div class="actions-cell-group flex flex-col gap-1">
-    <a class="inspect-action flex items-center justify-center gap-1" href="/admin/contents/{{ row.id }}" target="_blank"
-      title="Inspect full detail page">
-      <i class="fas fa-eye"></i> Inspect
-    </a>
-
+{% call action_cell('contents', row.id) %}
+  <div class="actions-cell-group flex flex-col gap-1 mt-1">
     {% set is_pub = row.is_published %}
     {% set btn_status = 'unpublish' if is_pub else 'publish' %}
     {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
@@ -92,5 +90,5 @@
     {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id,
     "data-status": btn_status, "title": btn_label}, variant=none) }}
   </div>
-</td>
+{% endcall %}
 {% endif %}

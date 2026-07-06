@@ -1,5 +1,5 @@
 from app.web.routes.admin.tables import get_inspect_table
-from app.web.routes.admin.helpers import format_date
+
 
 def build_item_inspect_view_model(aggregated_data: dict) -> dict:
     """Takes aggregated item workflow data and formats it for the UI."""
@@ -14,8 +14,8 @@ def build_item_inspect_view_model(aggregated_data: dict) -> dict:
         "category": dto["category_name"],
         "brand": dto["brand_name"],
         "source": dto["source_name"],
-        "added": format_date(dto["created_at"]) if dto.get("created_at") else None,
-        "last synced": format_date(max(dto["last_synced_dates"])) if dto.get("last_synced_dates") else None,
+        "added": dto.get("created_at"),
+        "last synced": max(dto["last_synced_dates"]) if dto.get("last_synced_dates") else None,
         
         "variants count": dto["variants_count"],
         "store count": dto["store_count"],
@@ -86,7 +86,7 @@ def build_store_inspect_view_model(aggregated_data: dict) -> dict:
         "stale links (7d)": dto["stale_links"],
         "out of stock": dto["out_of_stock"],
         "avg sync age (days)": dto["avg_sync_age"],
-        "last synced at": format_date(dto["last_synced_at"]) if dto.get("last_synced_at") else None,
+        "last synced at": dto.get("last_synced_at"),
         "feed enabled": dto["feed_enabled"],
         "network slug": dto["network_slug"],
         "program count": dto["program_count"],

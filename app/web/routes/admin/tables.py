@@ -3,7 +3,7 @@
 CRUD_TABLES = {
     "users": {
         "id": "users",
-        "preview_table": ["User", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score", "Tier", "Actions"],
+        "preview_table": ["Name/Email", "Role", "Subscription", "Status", "Joined", "Last Active", "Engagement Score", "Tier", "Actions"],
         "detailed_table": {
             "account info": ["id", "name", "email", "role", "status", "provider"],
             "security & auth": ["verified", "verified at", "verification sent", "password changed", "joined", "last active"],
@@ -37,7 +37,7 @@ CRUD_TABLES = {
             "quality & scoring": ["base score", "review score", "article quality score"],
             "taxonomy & targeting": ["intent", "gender", "price tier", "attributes"],
             "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "acquired via"],
-            "status & lifecycle": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "rendering status"]
+            "status & lifecycle pipeline": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "rendering status"]
         }
     },
     "items": {
@@ -47,7 +47,7 @@ CRUD_TABLES = {
             "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
             "variants & availability": ["variants count", "store count", "price", "price spread", "variant groups"],
             "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves", "click count"],
-            "content & quality": ["linked contents", "description", "rating", "review count", "images count", "specs count"]
+            "content & quality summary": ["linked contents", "description", "rating", "review count", "images count", "specs count"]
         }
     },
     "sources": {
@@ -60,7 +60,7 @@ CRUD_TABLES = {
             "content distribution": ["article count", "video count", "post count", "categories covered"],
             "article pipeline": ["pending", "enriching", "complete", "failed"],
             "engagement breakdown": ["total views", "total likes", "total saves", "total comments"],
-            "multi-source attribution": ["primary attribution count", "secondary attribution count"]
+            "multi-source attribution metrics": ["primary attribution count", "secondary attribution count"]
         }
     },
     "stores": {
@@ -81,8 +81,8 @@ CRUD_TABLES = {
         "detailed_table": {
             "store info": ["id", "name", "slug", "website", "status", "affiliate network"],
             "commercial & localization": ["country", "currency", "api enabled", "product count"],
-            "link health": ["total links", "active links", "inactive links", "never synced", "stale links (7d)", "out of stock", "avg sync age (days)", "last synced at"],
-            "affiliate & commission": ["feed enabled", "network slug", "program count", "avg commission rate", "max commission rate", "links with commission", "links without commission", "links with tracking code"],
+            "link health metrics": ["total links", "active links", "inactive links", "never synced", "stale links (7d)", "out of stock", "avg sync age (days)", "last synced at"],
+            "affiliate & commission metrics": ["feed enabled", "network slug", "program count", "avg commission rate", "max commission rate", "links with commission", "links without commission", "links with tracking code"],
             "pricing summary": ["min price", "avg price", "max price", "links with discount", "avg discount %", "links with null price", "currency mix"]
         }
     },
@@ -276,10 +276,38 @@ def get_inspect_table(table_name, data):
                     "is_list": True
                 })
             else:
-                mapped_table[section_name.title()].append({
+                entry = {
                     "label": field.title(),
-                    "value": str(field_data)
-                })
+                    "value": field_data
+                }
+                if isinstance(field_data, bool):
+                    entry["is_boolean"] = True
+                    if field.lower() == "status":
+                        entry["true_label"] = "Live Index"
+                        entry["false_label"] = "Draft"
+                    elif field.lower() == "rendering status":
+                        entry["true_label"] = "Active"
+                        entry["false_label"] = "Inactive"
+                    else:
+                        entry["true_label"] = "Yes"
+                        entry["false_label"] = "No"
+                elif isinstance(field_data, (int, float)):
+                    entry["is_number"] = True
+                elif isinstance(field_data, str) and (" at" in field.lower() or " date" in field.lower() or field.lower() in ("joined", "added")):
+                    entry["is_datetime"] = True
+                elif field.lower() == "engagement tier":
+                    entry["badge"] = True
+                    val_lower = str(field_data).lower()
+                    if val_lower == "power user":
+                        entry["badge_class"] = "badge-origin"
+                    elif val_lower == "high":
+                        entry["badge_class"] = "badge-success"
+                    elif val_lower == "medium":
+                        entry["badge_class"] = "badge-warning"
+                    else:
+                        entry["badge_class"] = "badge-danger"
+                    
+                mapped_table[section_name.title()].append(entry)
         # Remove empty sections
         if not mapped_table[section_name.title()]:
             del mapped_table[section_name.title()]

@@ -1,4 +1,5 @@
 from sqlalchemy import select, or_, and_, func
+from datetime import datetime
 from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
@@ -55,11 +56,12 @@ def get_user_dashboard_stats():
         
     scores = db.session.execute(stmt).scalars().all()
     
+    from app.domains.user.service.tiers import TIER_THRESHOLDS
     tiers = {
-        "Power User (200+)": sum(1 for s in scores if s >= 200),
-        "High (50+)": sum(1 for s in scores if 50 <= s < 200),
-        "Medium (10+)": sum(1 for s in scores if 10 <= s < 50),
-        "Low (1-9)": sum(1 for s in scores if 0 < s < 10),
+        f"{TIER_THRESHOLDS[0][1]} ({TIER_THRESHOLDS[0][0]}+)": sum(1 for s in scores if s >= TIER_THRESHOLDS[0][0]),
+        f"{TIER_THRESHOLDS[1][1]} ({TIER_THRESHOLDS[1][0]}+)": sum(1 for s in scores if TIER_THRESHOLDS[1][0] <= s < TIER_THRESHOLDS[0][0]),
+        f"{TIER_THRESHOLDS[2][1]} ({TIER_THRESHOLDS[2][0]}+)": sum(1 for s in scores if TIER_THRESHOLDS[2][0] <= s < TIER_THRESHOLDS[1][0]),
+        f"{TIER_THRESHOLDS[3][1]} (1-{TIER_THRESHOLDS[2][0]-1})": sum(1 for s in scores if 0 < s < TIER_THRESHOLDS[2][0]),
         "Inactive (0)": sum(1 for s in scores if s == 0)
     }
 
@@ -201,6 +203,42 @@ def get_user_analytics_metrics(id: int):
     latest_share = db.session.scalar(select(Share).where(Share.user_id == id).order_by(Share.created_at.desc()).limit(1))
     latest_click = db.session.scalar(select(ItemClick).where(ItemClick.user_id == id).order_by(ItemClick.created_at.desc()).limit(1))
 
+    from app.domains.user.service.tiers import score_to_tier
+    engagement_tier = score_to_tier(engagement_score)
+    
+    counts_dict = {
+        "Commenter": comments_count,
+        "Saver": saves_count,
+        "Sharer": shares_count,
+        "Clicker": clicks_count,
+        "Viewer": views_count
+    }
+    max_count = max(counts_dict.values()) if any(counts_dict.values()) else 0
+    engagement_profile = "Inactive"
+    if max_count > 0:
+        for profile, count in counts_dict.items():
+            if count == max_count:
+                engagement_profile = profile
+                break
+
+    recent_activity_summary = "—"
+    activities = []
+    
+    def get_title(obj):
+        target = getattr(obj, "target", None)
+        return getattr(target, "title", getattr(target, "name", "Unknown Item"))
+
+    if latest_comment: activities.append((latest_comment.created_at, f"Commented: {latest_comment.content[:50]}..."))
+    if latest_save: activities.append((latest_save.created_at, f"Saved: {get_title(latest_save)}"))
+    if latest_view: activities.append((latest_view.created_at, f"Viewed: {get_title(latest_view)}"))
+    if latest_reaction: activities.append((latest_reaction.created_at, f"Reacted ({latest_reaction.type}): {get_title(latest_reaction)}"))
+    if latest_share: activities.append((latest_share.created_at, f"Shared: {get_title(latest_share)}"))
+    if latest_click: activities.append((latest_click.created_at, "Clicked Item Link"))
+
+    if activities:
+        activities.sort(key=lambda x: x[0] or datetime.min, reverse=True)
+        recent_activity_summary = activities[0][1]
+
     return {
         "views_count": views_count,
         "clicks_count": clicks_count,
@@ -222,5 +260,8 @@ def get_user_analytics_metrics(id: int):
         "latest_view": latest_view,
         "latest_reaction": latest_reaction,
         "latest_share": latest_share,
-        "latest_click": latest_click
+        "latest_click": latest_click,
+        "engagement_tier": engagement_tier,
+        "engagement_profile": engagement_profile,
+        "recent_activity_summary": recent_activity_summary
     }

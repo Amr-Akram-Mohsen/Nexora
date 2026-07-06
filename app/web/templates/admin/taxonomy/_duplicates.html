@@ -1,5 +1,6 @@
 {% from "components/ui/empty-state.html" import empty_state %}
 {% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
 {% if error %}
   {{ empty_state(error, "color: var(--brand-red);") }}
 {% elif not data %}
@@ -23,8 +24,8 @@
           <td>{{ badge(pair.similarity ~ "%", "blue") }}</td>
           <td>
             <div class="flex gap-2">
-              <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="{{ domain }}" data-source-id="{{ pair.source.id }}" data-target-id="{{ pair.target.id }}">Merge S &rarr; T</button>
-              <button class="admin-btn-secondary admin-btn-sm" data-action="merge-duplicate" data-domain="{{ domain }}" data-source-id="{{ pair.target.id }}" data-target-id="{{ pair.source.id }}">Merge T &rarr; S</button>
+              {{ button(text="Merge S &rarr; T"|safe, class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "merge-duplicate", "data-domain": domain, "data-source-id": pair.source.id, "data-target-id": pair.target.id}, variant=none) }}
+              {{ button(text="Merge T &rarr; S"|safe, class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "merge-duplicate", "data-domain": domain, "data-source-id": pair.target.id, "data-target-id": pair.source.id}, variant=none) }}
             </div>
           </td>
         </tr>

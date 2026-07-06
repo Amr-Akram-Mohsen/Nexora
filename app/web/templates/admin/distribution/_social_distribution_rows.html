@@ -1,4 +1,5 @@
 <!-- _social_distribution_rows.html -->
+{% from "components/ui/button.html" import button %}
 {% if summary_stats %}
 <div class="distribution-summary-bar flex gap-4">
   <div class="flex items-center gap-2"><span class="status-badge badge-secondary">DRAFT: {{ summary_stats.draft }}</span></div>
@@ -84,7 +85,7 @@
     </div>
   </td>
   <td>
-    <button class="admin-btn-secondary admin-btn-sm" data-action="view-distribution-draft" data-id="{{ item.id }}" data-source-type="{{ item.source_type }}" data-source-id="{{ item.source_id }}" data-platform="{{ item.platform }}">View</button>
+    {{ button(text="View", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, variant=none) }}
   </td>
 </tr>
 {% else %}
@@ -102,17 +103,17 @@
       </div>
       <div class="flex items-center gap-2">
         {% if pagination.has_prev %}
-        <button class="admin-btn-secondary admin-btn-sm" data-action="fetch-and-inject-html" data-url="/admin/distribution/widget/social-distribution?page={{ pagination.prev_num }}" data-target="social-distribution-table-body" data-loading-msg="Loading distribution history..." data-colspan="7">Previous</button>
+        {{ button(text="Previous", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "fetch-and-inject-html", "data-url": "/admin/distribution/widget/social-distribution?page=" ~ pagination.prev_num, "data-target": "social-distribution-table-body", "data-loading-msg": "Loading distribution history...", "data-colspan": "7"}, variant=none) }}
         {% else %}
-        <button class="admin-btn-secondary admin-btn-sm btn-disabled" disabled>Previous</button>
+        {{ button(text="Previous", class="admin-btn-secondary admin-btn-sm btn-disabled", attrs={"disabled": "disabled"}, variant=none) }}
         {% endif %}
         
         <span class="pagination-page-indicator">Page {{ pagination.page }} of {{ pagination.pages }}</span>
         
         {% if pagination.has_next %}
-        <button class="admin-btn-secondary admin-btn-sm" data-action="fetch-and-inject-html" data-url="/admin/distribution/widget/social-distribution?page={{ pagination.next_num }}" data-target="social-distribution-table-body" data-loading-msg="Loading distribution history..." data-colspan="7">Next</button>
+        {{ button(text="Next", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "fetch-and-inject-html", "data-url": "/admin/distribution/widget/social-distribution?page=" ~ pagination.next_num, "data-target": "social-distribution-table-body", "data-loading-msg": "Loading distribution history...", "data-colspan": "7"}, variant=none) }}
         {% else %}
-        <button class="admin-btn-secondary admin-btn-sm btn-disabled" disabled>Next</button>
+        {{ button(text="Next", class="admin-btn-secondary admin-btn-sm btn-disabled", attrs={"disabled": "disabled"}, variant=none) }}
         {% endif %}
       </div>
     </div>

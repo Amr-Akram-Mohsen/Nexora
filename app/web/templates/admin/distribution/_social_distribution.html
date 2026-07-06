@@ -2,31 +2,15 @@
 {% from "admin/components/ui/panels.html" import admin_panel, admin_table_panel %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
 <div class="flex justify-between items-center">
   <h2 class="insight-group-title flex gap-3 items-center">
     <i class="fa-solid fa-mobile-screen"></i> Social Distribution Tracking
   </h2>
   <div class="flex gap-2">
-    <select id="dist-filter-platform" class="dashboard-filter-select">
-      <option value="">All Platforms</option>
-      <option value="youtube">YouTube</option>
-      <option value="pinterest">Pinterest</option>
-      <option value="facebook">Facebook</option>
-      <option value="instagram">Instagram</option>
-      <option value="twitter">Twitter</option>
-      <option value="linkedin">LinkedIn</option>
-    </select>
-    <select id="dist-filter-status" class="dashboard-filter-select">
-      <option value="">All Statuses</option>
-      <option value="published">Published</option>
-      <option value="scheduled">Scheduled</option>
-      <option value="draft">Draft</option>
-    </select>
-    <select id="dist-filter-type" class="dashboard-filter-select">
-      <option value="">All Types</option>
-      <option value="content">Content</option>
-      <option value="item">Item</option>
-    </select>
+    {{ admin_filter_select("dist-filter-platform", name=none, options=[("youtube", "YouTube"), ("pinterest", "Pinterest"), ("facebook", "Facebook"), ("instagram", "Instagram"), ("twitter", "Twitter"), ("linkedin", "LinkedIn")], default_val="", default_text="All Platforms") }}
+    {{ admin_filter_select("dist-filter-status", name=none, options=[("published", "Published"), ("scheduled", "Scheduled"), ("draft", "Draft")], default_val="", default_text="All Statuses") }}
+    {{ admin_filter_select("dist-filter-type", name=none, options=[("content", "Content"), ("item", "Item")], default_val="", default_text="All Types") }}
   </div>
 </div>
 
@@ -36,7 +20,7 @@ platforms.", actions='') %}
 {% endcall %}
 
 <!-- Social Distribution Modal -->
-{% call modal("distributionDraftModal", "Distribution Post", "lg") %}
+{% call modal("distributionDraftModal", "Distribution Post", class="modal-content-lg") %}
 <div id="distribution-draft-content">
   <div>
     <div class="spinner-border" role="status">

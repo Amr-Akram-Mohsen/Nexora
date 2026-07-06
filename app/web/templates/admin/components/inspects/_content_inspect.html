@@ -1,37 +1,19 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/inspect.html" import inspect_section %}
-{% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/panels.html" import admin_page_header, inspect_page_shell %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
-{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, render_distribution_section %}
 
 {% block title %}Content Details — Nexora Admin{% endblock %}
 
 {% block admin_content %}
 
-{% set header_actions %}
-<a href="{{ url_for('admin.dashboard_contents') }}" class="admin-btn-secondary">
-  ← Back to Contents
-</a>
-{% endset %}
-
-{{ admin_page_header(
-"Content Details",
-title,
-actions=header_actions
-) }}
-
-<div class="admin-detail-page">
-  <div class="admin-card">
-    <div class="inspect-details-group flex">
+{% call inspect_page_shell("Content Details", url_for('admin.dashboard_contents'), "Back to Contents", title) %}
 
       {% if inspect_table and inspect_table is mapping %}
-      {% for section_name, fields in inspect_table.items() %}
+      {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
-      {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
-      {{ admin_inspect_section_table(fields, layout='horizontal') }}
-      {% else %}
-      {{ admin_inspect_section_table(fields, layout='vertical') }}
-      {% endif %}
+      {{ admin_inspect_section_table(section_name, section_data) }}
       {% endcall %}
       {% endfor %}
       {% endif %}
@@ -44,17 +26,7 @@ actions=header_actions
       {% endif %}
 
       {% if distribution_history is defined %}
-      {% call inspect_section('Social Distribution History') %}
-      <div class='inspect-links-container'>
-        {% if distribution_history %}
-        {% for post in distribution_history %}
-        {{ inspect_distribution_card(post) }}
-        {% endfor %}
-        {% else %}
-        <div>No distribution history found.</div>
-        {% endif %}
-      </div>
-      {% endcall %}
+      {{ render_distribution_section(distribution_history) }}
       {% endif %}
 
       {% call inspect_section('Management Actions', divider=false) %}
@@ -65,7 +37,5 @@ actions=header_actions
       </div>
       {% endcall %}
 
-    </div>
-  </div>
-</div>
+{% endcall %}
 {% endblock %}

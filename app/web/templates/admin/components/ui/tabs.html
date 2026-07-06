@@ -1,8 +1,8 @@
+{% from "components/ui/button.html" import button %}
 {% macro admin_tab_navigation(id_prefix, tabs) %}
 <div class="admin-tabs flex gap-1" id="{{ id_prefix }}-tabs">
   {% for tab in tabs %}
-  <button class="admin-tab-btn {% if tab.active %}active{% endif %}" data-tab="{{ tab.id }}">{{ tab.label|safe
-    }}</button>
+  {{ button(text=tab.label|safe, class="admin-tab-btn " ~ ('active' if tab.active else ''), attrs={"data-tab": tab.id}, variant=none) }}
   {% endfor %}
 </div>
 {% endmacro %}

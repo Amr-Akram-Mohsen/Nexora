@@ -1,7 +1,7 @@
 {% from "admin/components/ui/inspect.html" import inspect_section %}
 {% from "admin/components/ui/actions.html" import action_group, action_button %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table, admin_crud_table %}
-{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel %}
+{% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, inspect_store_card, inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel, render_distribution_section, render_top_articles_section %}
 
 {% set linked_items_table = {
     "id": "linked-items",
@@ -32,13 +32,9 @@
   {% endif %}
 
   {% if inspect_table and inspect_table is mapping %}
-  {% for section_name, fields in inspect_table.items() %}
+  {% for section_name, section_data in inspect_table.items() %}
   {% call inspect_section(section_name|title) %}
-  {% if 'metrics' in section_name|lower or 'scoring' in section_name|lower or 'traffic' in section_name|lower %}
-  {{ admin_inspect_section_table(fields, layout='horizontal') }}
-  {% else %}
-  {{ admin_inspect_section_table(fields, layout='vertical') }}
-  {% endif %}
+  {{ admin_inspect_section_table(section_name, section_data) }}
   {% endcall %}
   {% endfor %}
   {% endif %}
@@ -138,32 +134,11 @@
   {% endif %}
 
   {% if distribution_history is defined %}
-  {% call inspect_section('Social Distribution History') %}
-  <div class='inspect-links-container'>
-    {% if distribution_history %}
-    {% for post in distribution_history %}
-    {{ inspect_distribution_card(post) }}
-    {% endfor %}
-    {% else %}
-    <div>No distribution history found.</div>
-    {% endif %}
-  </div>
-  {% endcall %}
+  {{ render_distribution_section(distribution_history) }}
   {% endif %}
 
   {% if top_articles is defined and top_articles %}
-  {% call inspect_section('Top Articles (by Views)') %}
-    <div class='flex flex-col'>
-      {% for article in top_articles %}
-        <div class='inspect-article-row flex justify-between items-center'>
-          <a href='/admin/contents/{{ article.id }}' target='_blank' class='inspect-article-title'>
-            {{ article.title }}
-          </a>
-          <span class='badge badge-secondary inspect-article-views'>{{ '{:,}'.format(article.views) }} views</span>
-        </div>
-      {% endfor %}
-    </div>
-  {% endcall %}
+  {{ render_top_articles_section(top_articles, "Top Articles (by Views)", with_view_link=false) }}
   {% endif %}
 
   {% if actions is defined and actions %}

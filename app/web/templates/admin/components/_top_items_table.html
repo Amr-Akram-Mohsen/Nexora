@@ -1,3 +1,4 @@
+{% from "components/ui/badge.html" import badge %}
 <div class="top-content-mini-table">
   {% if items %}
   <table class="dashboard-table">
@@ -15,7 +16,7 @@
                 {% if item.image_url %}
                     <img src="{{ item.image_url }}" alt="Thumbnail" class="item-thumbnail-small">
                 {% else %}
-                    <span class="badge badge-secondary" title="No Image"><i class="fa-regular fa-image"></i></span>
+                    {{ badge("", icon="fa-regular fa-image", class="badge-secondary", attrs={"title": "No Image"}, variant=none) }}
                 {% endif %}
                 <a href="/admin/items?search={{ item.id }}" class="activity-target inspect-link">{{ item.name }}</a>
             </div>

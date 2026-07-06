@@ -34,25 +34,25 @@ def build_content_inspect_view_model(aggregated_data: dict) -> dict:
         "acquired via": dto['ingestion_origin'],
         
         # Formatting dates for UI
-        "published at": format_datetime(dto.get('published_at')) if dto.get('published_at') else None,
-        "ingested at": format_datetime(dto.get('ingested_at')) if dto.get('ingested_at') else None,
+        "published at": dto.get('published_at'),
+        "ingested at": dto.get('ingested_at'),
         
         "enrichment status": dto['enrichment_status'],
-        "status": "Live Index" if dto['is_published'] else "Draft",
-        "rendering status": "Active" if dto['is_active'] else "Inactive",
+        "status": dto['is_published'],
+        "rendering status": dto['is_active'],
         
-        "views": "{:,}".format(dto['view_count'] or 0),
-        "likes": "{:,}".format(dto['like_count'] or 0),
-        "dislikes": "{:,}".format(dto['dislike_count'] or 0),
-        "comments": "{:,}".format(dto['comment_count'] or 0),
-        "shares": "{:,}".format(dto['share_count'] or 0),
-        "saves": "{:,}".format(dto['save_count'] or 0),
+        "views": dto['view_count'] or 0,
+        "likes": dto['like_count'] or 0,
+        "dislikes": dto['dislike_count'] or 0,
+        "comments": dto['comment_count'] or 0,
+        "shares": dto['share_count'] or 0,
+        "saves": dto['save_count'] or 0,
         
         "intent": dto['intent'],
         "gender": dto['gender'],
         "price tier": dto['price_tier'],
-        "base score": str(dto['score'] or 0),
-        "review score": str(dto['review_score'] or 0),
+        "base score": dto['score'] or 0,
+        "review score": dto['review_score'] or 0,
     }
 
     if dto['object_type'] == "video":
@@ -62,14 +62,14 @@ def build_content_inspect_view_model(aggregated_data: dict) -> dict:
         data_for_table["platform"] = dto.get('platform')
         data_for_table["author"] = dto.get('author')
         data_for_table["subreddit"] = dto.get('subreddit')
-        data_for_table["platform upvotes"] = str(dto.get('upvotes') or 0)
-        data_for_table["platform comments"] = str(dto.get('platform_comments_count') or 0)
+        data_for_table["platform upvotes"] = dto.get('upvotes') or 0
+        data_for_table["platform comments"] = dto.get('platform_comments_count') or 0
     elif dto['object_type'] == "article":
-        data_for_table["is scraped"] = "Yes" if dto.get('is_content_scraped') else "No"
-        data_for_table["word count"] = "{:,}".format(dto.get('word_count') or 0)
+        data_for_table["is scraped"] = dto.get('is_content_scraped', False)
+        data_for_table["word count"] = dto.get('word_count') or 0
         data_for_table["read time"] = f"{dto.get('read_time_minutes')} min" if dto.get('read_time_minutes') else None
-        data_for_table["article quality score"] = str(dto.get('article_quality_score') or 0)
-        data_for_table["last enrichment attempt"] = format_datetime(dto.get('last_enrichment_attempt')) if dto.get('last_enrichment_attempt') else None
+        data_for_table["article quality score"] = dto.get('article_quality_score') or 0
+        data_for_table["last enrichment attempt"] = dto.get('last_enrichment_attempt')
 
     inspect_table = get_inspect_table("contents", data_for_table)
 

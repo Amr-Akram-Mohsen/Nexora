@@ -3,6 +3,8 @@
 {% from "components/ui/spinner.html" import spinner %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_panel, admin_table_panel %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
+{% from "components/ui/button.html" import button %}
 
 {% block title %}Distribution & Publishing — Nexora Admin{% endblock %}
 
@@ -14,13 +16,8 @@
 
 {% set header_actions %}
 <div class="flex items-center gap-sm">
-  <select id="timeframe-select" class="dashboard-filter-select insights-timeframe-select">
-    <option value="today">Today (24h)</option>
-    <option value="7_days" selected>Last 7 Days</option>
-    <option value="30_days">Last 30 Days</option>
-    <option value="all_time">All Time</option>
-  </select>
-  <button id="refresh-distribution-btn" class="admin-btn-secondary">↺ Refresh</button>
+  {{ admin_filter_select("timeframe-select", name=none, options=[("today", "Today (24h)"), ("30_days", "Last 30 Days"), ("all_time", "All Time")], default_val="7_days", default_text="Last 7 Days", extra_class="insights-timeframe-select") }}
+  {{ button(text="↺ Refresh", attrs={"id": "refresh-distribution-btn"}, class="admin-btn-secondary", variant=none) }}
 </div>
 {% endset %}
 

@@ -6,6 +6,7 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from sqlalchemy import select, desc
 from app.web.routes.admin.insights import get_cached, set_cached, invalidate_cache
+from app.domains.shared_lookups import get_platform_icon, get_source_title
 from app.domains.analytics import (
     get_decision_intelligence_data,
     get_intent_opportunity_data,
@@ -377,7 +378,7 @@ def widget_platform_performance():
     platforms_data = get_platform_performance()
     
     # Attach icons which are view-specific
-    from app.web.routes.admin.helpers import get_platform_icon
+    from app.domains.shared_lookups import get_platform_icon
     for p in platforms_data:
         p["icon"] = get_platform_icon(p["name"])
         

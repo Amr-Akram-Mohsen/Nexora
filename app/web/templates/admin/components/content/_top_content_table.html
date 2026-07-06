@@ -1,3 +1,4 @@
+{% from "components/ui/badge.html" import badge %}
 <div class="top-content-mini-table">
   {% if contents %}
   <table class="dashboard-table">
@@ -12,7 +13,7 @@
       {% for c in contents %}
       <tr>
         <td><a href="/admin/contents?search={{ c.title | urlencode }}" class="activity-target inspect-link">{{ c.title }}</a></td>
-        <td><span class="badge badge-type badge-compact">{{ c.object_type }}</span></td>
+        <td>{{ badge(c.object_type, class="badge-type badge-compact", variant=none) }}</td>
         <td>{{ c.view_count }}</td>
       </tr>
       {% endfor %}
