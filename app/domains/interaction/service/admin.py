@@ -4,129 +4,21 @@ from app.domains.interaction.models import Comment, Reaction, View, Save, Share,
 from app.domains.user.models import User
 from app.domains.content.models import Content
 from app.domains.item.models import Item, ItemStoreLink, ItemVariant, Store
+from app.domains.interaction.serializers import (
+    _serialize_comment, _serialize_reaction, _serialize_save, _serialize_share
+)
 import math
 from datetime import date, datetime
 
+from app.shared.utils.orm_helpers import resolve_polymorphic_titles, resolve_users
+
 def _load_interaction_context(items):
-    user_ids     = {c.user_id for c in items if getattr(c, 'user_id', None)}
-    content_ids  = {c.target_id for c in items if getattr(c, 'target_type', None) == "content"}
-    item_ids     = {c.target_id for c in items if getattr(c, 'target_type', None) == "item"}
-    users, content_titles, item_names = {}, {}, {}
-    if user_ids:
-        rows = db.session.execute(select(User.id, User.name, User.email).where(User.id.in_(user_ids))).mappings().all()
-        users = {r["id"]: r for r in rows}
-    if content_ids:
-        rows = db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-    if item_ids:
-        rows = db.session.execute(select(Item.id, Item.name).where(Item.id.in_(item_ids))).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
-    return users, content_titles, item_names
+    users = resolve_users(items)
+    titles_map = resolve_polymorphic_titles(items)
+    return users, titles_map
 
 def _load_target_titles(items, type_attr="target_type", id_attr="target_id"):
-    content_ids = {getattr(obj, id_attr) for obj in items if getattr(obj, type_attr) == "content"}
-    item_ids    = {getattr(obj, id_attr) for obj in items if getattr(obj, type_attr) == "item"}
-    content_titles, item_names = {}, {}
-    if content_ids:
-        rows = db.session.execute(
-            select(Content.id, Content.title).where(Content.id.in_(content_ids))
-        ).mappings().all()
-        content_titles = {r["id"]: r["title"] for r in rows}
-    if item_ids:
-        rows = db.session.execute(
-            select(Item.id, Item.name).where(Item.id.in_(item_ids))
-        ).mappings().all()
-        item_names = {r["id"]: r["name"] for r in rows}
-    return content_titles, item_names
-
-def _serialize_comment(c, users, content_titles, item_names):
-    user = users.get(c.user_id)
-    target_title = (
-        content_titles.get(c.target_id)
-        if c.target_type == "content"
-        else item_names.get(c.target_id)
-    )
-    return {
-        "id":           c.id,
-        "content":      c.content,
-        "preview":      c.content[:120] + ("…" if len(c.content) > 120 else ""),
-        "user_id":      c.user_id,
-        "user_name":    user["name"] if user else f"User #{c.user_id}",
-        "user_email":   user["email"] if user else None,
-        "parent_id":    c.parent_id,
-        "sentiment":    c.sentiment or "neutral",
-        "confidence":   c.confidence,
-        "target_type":  c.target_type,
-        "target_id":    c.target_id,
-        "like_count":   c.like_count,
-        "dislike_count": c.dislike_count,
-        "replies_count": c.replies_count,
-        "replies":      c.replies,
-        "target_title": target_title or f"{c.target_type.capitalize()} #{c.target_id}",
-        "created_at":   c.created_at.isoformat() if c.created_at else None,
-    }
-
-def _serialize_reaction(r, users, content_titles, item_names, comment_previews):
-    user = users.get(r.user_id)
-    if r.target_type == "content":
-        target_title = content_titles.get(r.target_id)
-        icon = "📄 Content"
-    elif r.target_type == "item":
-        target_title = item_names.get(r.target_id)
-        icon = "📦 Item"
-    else:
-        target_title = comment_previews.get(r.target_id)
-        icon = "💬 Comment"
-
-    return {
-        "id":          r.id,
-        "type":        r.type,
-        "user_id":     r.user_id,
-        "username":   user["name"] if user else f"User #{r.user_id}",
-        "user_email":  user["email"] if user else None,
-        "target_type": r.target_type,
-        "target_icon": icon,
-        "target_id":   r.target_id,
-        "target_title": target_title or f"{r.target_type.capitalize()} #{r.target_id}",
-        "created_at":  r.created_at.isoformat() if r.created_at else None,
-    }
-
-def _serialize_save(s, users, content_titles, item_names):
-    user = users.get(s.user_id)
-    target_title = (
-        content_titles.get(s.target_id)
-        if s.target_type == "content"
-        else item_names.get(s.target_id)
-    )
-    return {
-        "id": s.id,
-        "user_id": s.user_id,
-        "user_name": user["name"] if user else f"User #{s.user_id}",
-        "user_email": user["email"] if user else None,
-        "target_type": s.target_type,
-        "target_id": s.target_id,
-        "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
-        "created_at": s.created_at.isoformat() if s.created_at else None
-    }
-
-def _serialize_share(s, users, content_titles, item_names):
-    user = users.get(s.user_id)
-    target_title = (
-        content_titles.get(s.target_id)
-        if s.target_type == "content"
-        else item_names.get(s.target_id)
-    )
-    return {
-        "id": s.id,
-        "user_id": s.user_id,
-        "user_name": user["name"] if user else f"User #{s.user_id}",
-        "user_email": user["email"] if user else None,
-        "target_type": s.target_type,
-        "target_id": s.target_id,
-        "target_title": target_title or f"{s.target_type.capitalize()} #{s.target_id}",
-        "channel": s.channel or "—",
-        "created_at": s.created_at.isoformat() if s.created_at else None
-    }
+    return resolve_polymorphic_titles(items, type_attr, id_attr)
 
 def get_admin_comments_page(page, per_page, sentiment, target_type, search, user_search, start_date, end_date):
     stmt = select(Comment).order_by(Comment.id.desc())
@@ -154,9 +46,9 @@ def get_admin_comments_page(page, per_page, sentiment, target_type, search, user
             pass
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, content_titles, item_names = _load_interaction_context(pagination.items)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_comment(c, users, content_titles, item_names) for c in pagination.items]
+    serialized = [_serialize_comment(c, users, titles_map) for c in pagination.items]
     return pagination, serialized
 
 def delete_admin_comment(id):
@@ -201,17 +93,9 @@ def get_admin_reactions_page(page, per_page, reaction_type, target, user_search)
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, content_titles, item_names = _load_interaction_context(pagination.items)
-    
-    comment_ids = {r.target_id for r in pagination.items if r.target_type == "comment"}
-    comment_previews = {}
-    if comment_ids:
-        rows = db.session.execute(
-            select(Comment.id, Comment.content).where(Comment.id.in_(comment_ids))
-        ).mappings().all()
-        comment_previews = {r["id"]: r["content"][:60] + ("…" if len(r["content"]) > 60 else "") for r in rows}
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_reaction(r, users, content_titles, item_names, comment_previews) for r in pagination.items]
+    serialized = [_serialize_reaction(r, users, titles_map) for r in pagination.items]
     return pagination, serialized
 
 def get_admin_views_page(page, per_page, target, start_date, end_date):
@@ -255,28 +139,18 @@ def get_admin_views_page(page, per_page, target, start_date, end_date):
     paginated_stmt = stmt.limit(per_page).offset((page - 1) * per_page)
     items = db.session.execute(paginated_stmt).all()
 
-    content_titles, item_names = _load_target_titles(items)
+    titles_map = _load_target_titles(items)
+    
+    # map_view_for_rows expects dicts. We will inject the title into the dictionary directly.
+    result_items = []
+    for row in items:
+        row_dict = dict(row._mapping) if hasattr(row, '_mapping') else dict(row)
+        row_dict["target_title"] = titles_map.get((row_dict["target_type"], row_dict["target_id"]))
+        result_items.append(row_dict)
+
     pages = math.ceil(total / per_page) if per_page > 0 else 1
 
-    serialized = []
-    for v in items:
-        target_title = (
-            content_titles.get(v.target_id)
-            if v.target_type == "content"
-            else item_names.get(v.target_id)
-        )
-        serialized.append({
-            "id": f"{v.target_type}-{v.target_id}",
-            "target_type": v.target_type,
-            "target_id": v.target_id,
-            "target_title": target_title or f"{v.target_type.capitalize()} #{v.target_id}",
-            "view_count": v.view_count,
-            "auth_views": v.auth_views or 0,
-            "anon_views": v.anon_views or 0,
-            "latest_view": v.latest_view.isoformat() if v.latest_view else None,
-            "created_at": v.latest_view.isoformat() if v.latest_view else None
-        })
-    return {"items": serialized, "page": page, "pages": pages, "total": total, "per_page": per_page}
+    return {"items": result_items, "page": page, "pages": pages, "total": total, "per_page": per_page}
 
 def get_admin_clicks_page(page, per_page, target, destination):
     stmt = (
@@ -318,20 +192,7 @@ def get_admin_clicks_page(page, per_page, target, destination):
 
     pages = math.ceil(total / per_page) if per_page > 0 else 1
 
-    serialized = []
-    for row in items:
-        serialized.append({
-            "link_id": row.link_id,
-            "affiliate_url": row.affiliate_url,
-            "store_name": row.store_name,
-            "item_id": row.item_id,
-            "item_name": row.item_name,
-            "click_count": row.click_count,
-            "latest_click": row.latest_click.isoformat() if row.latest_click else None,
-            "created_at": row.latest_click.isoformat() if row.latest_click else None
-        })
-
-    return {"items": serialized, "page": page, "pages": pages, "total": total, "per_page": per_page}
+    return {"items": items, "page": page, "pages": pages, "total": total, "per_page": per_page}
 
 def get_admin_saves_page(page, per_page, target, user_search):
     stmt = select(Save).order_by(Save.id.desc())
@@ -356,9 +217,9 @@ def get_admin_saves_page(page, per_page, target, user_search):
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, content_titles, item_names = _load_interaction_context(pagination.items)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_save(s, users, content_titles, item_names) for s in pagination.items]
+    serialized = [_serialize_save(s, users, titles_map) for s in pagination.items]
 
     return pagination, serialized
 
@@ -385,73 +246,8 @@ def get_admin_shares_page(page, per_page, target, user_search):
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, content_titles, item_names = _load_interaction_context(pagination.items)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_share(s, users, content_titles, item_names) for s in pagination.items]
+    serialized = [_serialize_share(s, users, titles_map) for s in pagination.items]
 
     return pagination, serialized
-
-
-def map_comment_for_rows(c):
-    return {
-        "id": c["id"],
-        "title": c["target_title"],
-        "target_type": c["target_type"],
-        "preview": c["preview"],
-        "sentiment": c["sentiment"],
-        "like_count": c['like_count'],
-        "dislike_count": c['dislike_count'],
-        "replies_count": c["replies_count"],
-        "is_reply": bool(c["parent_id"]),
-        "created_at": c["created_at"][:10] if c["created_at"] else "—",
-        "username": c["user_name"],
-    }
-
-def map_reaction_for_rows(r):
-    return {
-        "id": r["id"],
-        "target": r["target_title"],
-        "target_type": r["target_icon"],
-        "reaction_type": r["type"],
-        "date": r["created_at"][:10] if r["created_at"] else "—",
-        "username": r["username"],
-    }
-
-def map_view_for_rows(v):
-    return {
-        "id": f"{v['target_type']}-{v['target_id']}",
-        "target": v["target_title"],
-        "target_type": v["target_type"],
-        "view_count": v["view_count"] or 0,
-        "auth_views": v["auth_views"] or 0,
-        "anon_views": v["anon_views"] or 0,
-        "latest_view": v["latest_view"]
-    }
-
-def map_click_for_rows(r):
-    return {
-        "id": r["link_id"],
-        "name": r["item_name"],
-        "store_name": r["store_name"],
-        "store_url": r["affiliate_url"],
-        "click_count": r["click_count"] or 0,
-        "latest_click": r["latest_click"],
-    }
-
-def map_save_for_rows(s):
-    return {
-        "id": s["id"],
-        "target": s["target_title"],
-        "target_type": s["target_type"],
-        "username": s["user_name"],
-        "date": s["created_at"][:10] if s["created_at"] else "—",
-    }
-
-def map_share_for_rows(s):
-    return {
-        "id": s["id"],
-        "user": s["user_name"],
-        "target": f"{s['target_type'].title()}: {s['target_title']}",
-        "channel": s["channel"],
-        "date": s["created_at"][:10] if s["created_at"] else "—"
-    }

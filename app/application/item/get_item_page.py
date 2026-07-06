@@ -1,5 +1,5 @@
 from app.domains.item.service import get_item_by_id, get_related_items, serialize_item
-from app.domains.item.service.serializers import serialize_item_detail
+from app.domains.item.serializers import serialize_item_detail
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
 from app.infrastructure.cache import cache

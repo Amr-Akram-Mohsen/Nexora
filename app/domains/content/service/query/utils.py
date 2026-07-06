@@ -108,3 +108,125 @@ def fetch_serialized_contents(stmt, session=None, include_linked_items=False):
     contents = fetch_contents(stmt, session)
     from ..content_access import assign_target_to_contents
     return assign_target_to_contents(contents, include_linked_items=include_linked_items, session=session)
+
+
+def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
+    """
+    Applies unified content filters across public and admin interfaces.
+    """
+    from sqlalchemy import select, or_
+    from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet, PriceTierFacet, AttributeFacet, Section, Source, GenderFacet
+    from app.domains.content.models import Content
+    
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+
+    def _is_allowed(key):
+        return allowed_filters is None or key in allowed_filters
+
+    def _normalize(val):
+        if not val: return []
+        if isinstance(val, str):
+            if val.lower() == "none": return ["none"]
+            return [val]
+        return [f for f in val if f]
+
+    cats = _normalize(filters.get("category"))
+    if cats and _is_allowed("category"):
+        if "uncategorized" in cats:
+             stmt = stmt.where(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
+        else:
+            from sqlalchemy.orm import selectinload
+            category_objs = session.execute(
+                select(Category).options(selectinload(Category.children)).where(Category.slug.in_(cats))
+            ).scalars().all()
+            
+            cat_ids = set()
+            for cat in category_objs:
+                cat_ids.add(cat.id)
+                if cat.children:
+                    for child in cat.children:
+                        cat_ids.add(child.id)
+            if cat_ids:
+                stmt = stmt.where(Content.category_id.in_(list(cat_ids)))
+
+    topics = _normalize(filters.get("topic"))
+    if topics and _is_allowed("topic"):
+        if "none" in topics:
+            stmt = stmt.where(~Content.topics.any())
+        else:
+            stmt = stmt.where(Content.topics.any(Topic.slug.in_(topics)))
+
+    brands = _normalize(filters.get("brand"))
+    if brands and _is_allowed("brand"):
+        if "none" in brands:
+            stmt = stmt.where(~Content.brands.any())
+        else:
+            stmt = stmt.where(Content.brands.any(Brand.slug.in_(brands)))
+
+    intents = _normalize(filters.get("intent"))
+    if intents and _is_allowed("intent"):
+        stmt = stmt.where(Content.intent.has(IntentFacet.slug.in_(intents)))
+
+    genders = _normalize(filters.get("gender"))
+    if genders and _is_allowed("gender"):
+        stmt = stmt.where(Content.gender.has(GenderFacet.slug.in_(genders)))
+
+    price_tiers = _normalize(filters.get("price_tier"))
+    if price_tiers and _is_allowed("price_tier"):
+        stmt = stmt.where(Content.price_tier.has(PriceTierFacet.slug.in_(price_tiers)))
+
+    attributes = _normalize(filters.get("attributes"))
+    if attributes and _is_allowed("attributes"):
+        stmt = stmt.where(Content.attributes.any(AttributeFacet.slug.in_(attributes)))
+
+    types = _normalize(filters.get("type"))
+    if types and _is_allowed("type"):
+        stmt = stmt.where(Content.object_type.in_(types))
+
+    sections = _normalize(filters.get("section"))
+    if sections and _is_allowed("section"):
+        stmt = stmt.where(Content.section.has(Section.slug.in_(sections)))
+
+    sources = _normalize(filters.get("source"))
+    if sources and _is_allowed("source"):
+        stmt = stmt.where(Content.source.has(Source.slug.in_(sources)))
+
+    search = filters.get("search")
+    if search and search.strip() and _is_allowed("search"):
+        term = f"%{search.strip()}%"
+        if search.strip().isdigit():
+            stmt = stmt.where(or_(Content.id == int(search.strip()), Content.title.ilike(term)))
+        else:
+            stmt = stmt.where(or_(Content.title.ilike(term), Content.preview_text.ilike(term)))
+
+    start_date = filters.get("start_date")
+    end_date = filters.get("end_date")
+    date_type = filters.get("date_type", "published_at")
+    if (start_date or end_date) and _is_allowed("date"):
+        from datetime import datetime
+        date_col = Content.published_at if date_type == "published_at" else Content.ingested_at
+        if start_date:
+            try:
+                stmt = stmt.where(date_col >= datetime.strptime(start_date, "%Y-%m-%d"))
+            except ValueError:
+                pass
+        if end_date:
+            try:
+                end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
+                stmt = stmt.where(date_col <= end_dt)
+            except ValueError:
+                pass
+
+    status = filters.get("status")
+    if status and _is_allowed("status"):
+        from app.domains.content.models import Article
+        stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == status)))
+        
+    origin = filters.get("ingestion_origin")
+    if origin and _is_allowed("ingestion_origin"):
+        stmt = stmt.where(Content.ingestion_origin == origin)
+        
+    return stmt
+

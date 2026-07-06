@@ -7,7 +7,7 @@ from app.shared.parsing import safe_float
 from app.infrastructure import cache
 
 from .options import get_item_load_options, get_item_card_load_options
-from .serializers import serialize_item, serialize_item_detail
+from app.domains.item.serializers import serialize_item, serialize_item_detail
 
 
 def filter_items_by_country(query):
@@ -25,7 +25,7 @@ def filter_items_by_country(query):
     )
 
 
-def _apply_catalog_sort(stmt, sort_type, needs_variant_join):
+def _apply_catalog_sort(stmt, sort_type):
     if sort_type == "price_low":
         order = ItemVariant.price.asc()
     elif sort_type == "price_high":
@@ -35,9 +35,7 @@ def _apply_catalog_sort(stmt, sort_type, needs_variant_join):
     else:
         return stmt.order_by(Item.created_at.desc(), Item.id.desc())
 
-    if needs_variant_join:
-        return stmt.order_by(order, Item.id.desc())
-    return stmt.order_by(order)
+    return stmt.order_by(order, Item.id.desc())
 
 
 @cache.memoize(timeout=300)
@@ -46,6 +44,7 @@ def get_filtered_items(active_filters, page=1, per_page=24):
     Handles complex filtering, joining, and sorting for the items catalog.
     """
     from .utils import build_item_stmt
+    from sqlalchemy import and_
     
     stmt = build_item_stmt(eager_load="card")
 
@@ -62,32 +61,35 @@ def get_filtered_items(active_filters, page=1, per_page=24):
     min_p = safe_float(active_filters.get("min_price"))
     max_p = safe_float(active_filters.get("max_price"))
     has_price_filter = min_p is not None or max_p is not None
-
     sort_type = active_filters.get("sort", "newest")
-    needs_variant_join = (
-        has_store_filter or has_price_filter or sort_type in ["price_low", "price_high"]
-    )
+    is_price_sort = sort_type in ["price_low", "price_high"]
 
-    if needs_variant_join:
-        stmt = stmt.join(Item.variants)
-        if has_store_filter:
-            stmt = (
-                stmt.join(ItemVariant.store_links)
-                .join(ItemStoreLink.store)
-                .where(Store.slug.in_(active_filters["store"]))
-            )
+    if has_store_filter or has_price_filter or is_price_sort:
+        if is_price_sort:
+            stmt = stmt.join(ItemVariant, and_(ItemVariant.item_id == Item.id, ItemVariant.is_default == True))
+            if has_store_filter:
+                stmt = stmt.where(ItemVariant.store_links.any(
+                    ItemStoreLink.store.has(Store.slug.in_(active_filters["store"]))
+                ))
+            if min_p is not None:
+                stmt = stmt.where(ItemVariant.price >= min_p)
+            if max_p is not None:
+                stmt = stmt.where(ItemVariant.price <= max_p)
+        else:
+            variant_conds = []
+            if has_store_filter:
+                variant_conds.append(ItemVariant.store_links.any(
+                    ItemStoreLink.store.has(Store.slug.in_(active_filters["store"]))
+                ))
+            if min_p is not None:
+                variant_conds.append(ItemVariant.price >= min_p)
+            if max_p is not None:
+                variant_conds.append(ItemVariant.price <= max_p)
+                
+            if variant_conds:
+                stmt = stmt.where(Item.variants.any(and_(*variant_conds)))
 
-        if min_p is not None:
-            stmt = stmt.where(ItemVariant.price >= min_p)
-        if max_p is not None:
-            stmt = stmt.where(ItemVariant.price <= max_p)
-
-        if sort_type in ["price_low", "price_high"]:
-            stmt = stmt.where(ItemVariant.is_default.is_(True))
-
-        stmt = stmt.distinct(Item.id)
-
-    stmt = _apply_catalog_sort(stmt, sort_type, needs_variant_join)
+    stmt = _apply_catalog_sort(stmt, sort_type)
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     return {
@@ -434,7 +436,7 @@ def get_popular_items(
     from app.domains.item.models import Item
     from app.domains.taxonomy.models import Category, Brand
     from app.domains.item.service.utils import build_item_stmt, fetch_items
-    from app.domains.item.service.serializers import serialize_item
+    from app.domains.item.serializers import serialize_item
     
     if session is None:
         from app.core.extensions import db

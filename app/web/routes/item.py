@@ -96,5 +96,5 @@ def compare():
         return redirect(url_for("item.deals"))
 
     return render_template(
-        "commercial/catalog/compare-page.html", target_type="item", **data
+        "commercial/catalog/compare-page.html", target_type="commercial", **data
     )

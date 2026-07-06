@@ -1,5 +1,6 @@
 from typing import Optional, Dict, Any
-
+from app.domains.serializers import serialize_model, serialize_target
+from app.domains.item.serializers import serialize_item
 def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     if not target:
         return {}
@@ -91,3 +92,112 @@ def serialize_content_inspect_dto(content, target) -> Optional[Dict[str, Any]]:
     dto.update(_serialize_inspect_target(target, content.object_type))
 
     return dto
+
+def _calculate_content_health_score(c, target, duplicate):
+    score = 0
+    if c.title: score += 10
+    if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
+    if c.category and c.category.slug != 'uncategorized': score += 10
+    if c.topics: score += 15
+    if c.brands: score += 15
+    if c.source_id: score += 10
+    if not duplicate: score += 5
+    
+    if c.object_type == "article" and target:
+        if getattr(target, 'is_content_scraped', False): score += 10
+        if getattr(target, 'status', '') == 'complete': score += 10
+        if getattr(target, 'quality_score', 0) > 0: score += 5
+    elif c.object_type in ("video", "post"):
+        score += 25
+        
+    return min(score, 100)
+
+def serialize_content_row(c, target, duplicate_titles: set) -> dict:
+    """
+    Serialize a single Content row for the admin listing.
+
+    Args:
+        c: The Content ORM instance.
+        target: The polymorphic target (Article / Video / Post) or None.
+        duplicate_titles: Set of titles known to be duplicated on the current page.
+
+    Returns:
+        A dict suitable for JSON serialization.
+    """
+    source_name  = c.source.name if c.source else "Unknown"
+    source_slug  = c.source.slug if c.source else "unknown"
+    status_val   = "complete"
+    canonical_url = None
+
+    if c.object_type == "article" and target:
+        status_val    = target.status
+        canonical_url = target.canonical_url
+        sources = [s.source.name for s in target.article_sources if s.source]
+    else:
+        if target:
+            canonical_url = target.url
+        sources = [c.source.name] if c.source else []
+
+    # Quality flags
+    duplicate = c.title and c.title in duplicate_titles
+    
+    score = _calculate_content_health_score(c, target, duplicate)
+
+    cat_name = c.category.name if c.category else "None"
+    sec_name = c.section.name if c.section else "None"
+    sources_text = ", ".join(sources)
+
+    return {
+        "id": c.id,
+        "is_published": c.is_published,
+        "title": c.title or "",
+        "object_type": c.object_type,
+        "category": cat_name,
+        "section": sec_name,
+        "has_topics": bool(c.topics),
+        "has_brands": bool(c.brands),
+        "has_source": bool(c.source_id),
+        "is_duplicate": bool(duplicate),
+        "enrichment_status": status_val,
+        "health_score": score,
+        "engagement": {
+            "views": c.view_count, 
+            "likes": c.like_count, 
+            "comments": c.comment_count, 
+            "shares": c.share_count, 
+            "saves": c.save_count
+        },
+        "published_at": c.published_at.isoformat() if c.published_at else None,
+        "sources_text": sources_text,
+        "ingestion_origin": c.ingestion_origin,
+    }
+
+def serialize_content(content_obj, target_obj=None, session=None, include_linked_items=False):
+    """
+    Serializes a Content model into a predictable dictionary.
+    """
+    if not content_obj:
+        return None
+
+    data = {
+        "id": content_obj.id,
+        "object_type": content_obj.object_type,
+        "type": content_obj.object_type,
+        "section_id": content_obj.section_id,
+        "category_id": content_obj.category_id,
+        "published_at": content_obj.published_at.isoformat() if content_obj.published_at else None,
+        "is_published": getattr(content_obj, "is_published", True),
+        "is_active": getattr(content_obj, "is_active", True),
+        "view_count": getattr(content_obj, "view_count", 0),
+        "comment_count": getattr(content_obj, "comment_count", 0),
+        "category": serialize_model(content_obj.category)
+        if getattr(content_obj, "category", None) and content_obj.category.slug != "uncategorized"
+        else None,
+        "section": serialize_model(content_obj.section),
+        "target": serialize_target(target_obj, session) if target_obj else None,
+        "topics": [serialize_model(t) for t in (content_obj.topics or [])],
+        "brands": [serialize_model(b) for b in (content_obj.brands or [])],
+        "linked_items": [serialize_item(i) for i in (content_obj.linked_items or [])] if include_linked_items else None,
+    }
+
+    return data

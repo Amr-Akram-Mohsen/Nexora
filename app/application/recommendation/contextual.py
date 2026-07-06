@@ -77,7 +77,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if cat_products:
                     blocks.append({
                         "title": f"Popular {cat_name} Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": cat_products
                     })
 
@@ -90,7 +90,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if brand_products:
                     blocks.append({
                         "title": f"Popular {brand_name} Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": brand_products
                     })
 
@@ -136,7 +136,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if brand_products:
                     blocks.append({
                         "title": f"Popular {brand_name} Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": brand_products
                     })
 
@@ -182,7 +182,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if trending_products:
                     blocks.append({
                         "title": "Trending Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": trending_products
                     })
 
@@ -219,7 +219,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if cat_products:
                     blocks.append({
                         "title": f"Popular Products in {cat_name}",
-                        "type": "item",
+                        "type": "commercial",
                         "items": cat_products
                     })
             else:
@@ -230,7 +230,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if cat_alternatives:
                     blocks.append({
                         "title": f"Popular Alternatives in {cat_name}",
-                        "type": "item",
+                        "type": "commercial",
                         "items": cat_alternatives
                     })
 
@@ -253,7 +253,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
             if brand_products:
                 blocks.append({
                     "title": f"Popular {brand_name} Products",
-                    "type": "item",
+                    "type": "commercial",
                     "items": brand_products
                 })
 
@@ -288,7 +288,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if popular_products:
                     blocks.append({
                         "title": "Popular Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": popular_products
                     })
             else:
@@ -296,7 +296,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 if trending_products:
                     blocks.append({
                         "title": "Trending Products",
-                        "type": "item",
+                        "type": "commercial",
                         "items": trending_products
                     })
 

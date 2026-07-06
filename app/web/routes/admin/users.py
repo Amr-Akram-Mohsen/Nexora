@@ -51,7 +51,7 @@ def list_users():
 
     items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
-    from app.domains.user.service.admin import serialize_user_row
+    from app.domains.user.serializers import serialize_user_row
     serialized = []
     for u, score in items:
         serialized.append(serialize_user_row(u, score))
@@ -101,7 +101,7 @@ def users_rows():
 
     items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
-    from app.domains.user.service.admin import serialize_user_row
+    from app.domains.user.serializers import serialize_user_row
     users = []
     for u, score in items:
         users.append(serialize_user_row(u, score))

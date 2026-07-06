@@ -19,7 +19,7 @@ def get_catalog_data(active_filters, page=1):
     has_results = len(pagination.get("items", [])) > 0
     from app.application.recommendation.contextual import get_contextual_recommendations
     recommendation_blocks = get_contextual_recommendations(
-        active_filters, has_results, target_type="item"
+        active_filters, has_results, target_type="commercial"
     )
 
     return {

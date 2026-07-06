@@ -86,7 +86,7 @@ def list_items():
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
-    from app.domains.item.service.admin import serialize_item_row
+    from app.domains.item.serializers import serialize_item_row
     serialized = []
     
     for item in pagination.items:
@@ -180,7 +180,7 @@ def items_rows():
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
-    from app.domains.item.service.admin import serialize_item_row
+    from app.domains.item.serializers import serialize_item_row
     serialized = []
     
     for item in pagination.items:

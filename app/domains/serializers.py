@@ -78,7 +78,7 @@ def serialize_target(obj, session=None):
         )
 
     elif type_name == "item":
-        from app.domains.item.service.serializers import serialize_item
+        from app.domains.item.serializers import serialize_item
         
         item_data = serialize_item(obj)
         if item_data:

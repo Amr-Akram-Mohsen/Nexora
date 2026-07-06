@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any
+from app.domains.serializers import serialize_model
 
 def serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, avg_sync_age) -> Optional[Dict[str, Any]]:
     """Serializes a Store ORM model and its aggregated stats into a DTO."""
@@ -169,3 +170,270 @@ def serialize_item_inspect_dto(item) -> Optional[Dict[str, Any]]:
         "specifications": specifications,
         "comments": recent_comments
     }
+
+def serialize_asset_url(url):
+    if not url:
+        return None
+
+    if url.startswith(("http://", "https://", "//", "/")):
+        return url
+
+    if url.startswith("static/"):
+        return f"/{url}"
+
+    return f"/static/{url}"
+
+
+def serialize_store_link(link):
+    """Serialize a single active store link.
+
+    Exposes both ``store`` (nested object for Jinja templates) and flat
+    ``name``/``logo``/``url`` keys that purchase-options.js expects so a
+    single serializer satisfies every consumer.
+    """
+    if not link or not link.is_active:
+        return None
+
+    store = link.store
+    store_logo = store.logo_url if store else None
+    store_data = (
+        {"name": store.name, "logo_url": store_logo, "slug": store.slug}
+        if store
+        else None
+    )
+
+    return {
+        "id": link.id,
+        # Template key
+        "affiliate_url": link.affiliate_url,
+        # JS key (purchase-options.js reads `link.url`)
+        "url": link.affiliate_url,
+        "price": float(link.price) if link.price is not None else None,
+        "old_price": float(link.old_price) if link.old_price is not None else None,
+        "currency": link.currency,
+        # Nested store object (Jinja templates)
+        "store": store_data,
+        # Flat keys (purchase-options.js reads `link.name` / `link.logo`)
+        "name": store.name if store else "",
+        "logo": serialize_asset_url(store_logo),
+    }
+
+
+def serialize_store_links(links):
+    """Serialize a list of store links, skipping inactive ones."""
+    return [row for row in (serialize_store_link(link) for link in links) if row]
+
+
+def serialize_item_variant(variant, item=None, include_variant_images=True):
+    """Serialize an item variant.
+
+    Images are merged (variant-specific first, then item-level) so that
+    both the gallery and the variant-selector receive a unified flat URL list.
+    ``images_detailed`` retains the full object list for templates that need
+    position/id metadata.
+    """
+    if not variant:
+        return None
+
+    item_images = item.images if item else []
+    variant_images = list(variant.images or []) if include_variant_images else []
+
+    seen: set = set()
+    merged_images: list[str] = []
+    for img in variant_images + list(item_images):
+        url = img.image_url
+        if url and url not in seen:
+            seen.add(url)
+            merged_images.append(url)
+
+    return {
+        "id": variant.id,
+        "title": variant.title,
+        "sku": variant.sku,
+        "attributes": variant.attributes or {},
+        "is_default": variant.is_default,
+        "price": float(variant.price) if variant.price is not None else 0.0,
+        "old_price": float(variant.old_price) if variant.old_price is not None else 0.0,
+        "currency": variant.currency,
+        "display_name": variant.display_name(),
+        # Primary image URL (gallery main image on variant switch)
+        "image": merged_images[0] if merged_images else None,
+        # Flat URL list — variant-selector.js / gallery.js
+        "images": merged_images,
+        # Detailed list — templates that need position / id
+        "images_detailed": [
+            {"id": img.id, "image_url": img.image_url, "position": img.position}
+            for img in variant_images
+        ],
+        "store_links": serialize_store_links(variant.store_links),
+    }
+
+
+def serialize_item(item, include_variant_images=False):
+    """Serialize basic item info for catalog cards and related-items lists.
+
+    Kept intentionally lean: only what cards and listing pages need.
+    Full detail (specs, structured data, all variants) lives in
+    ``serialize_item_detail``.
+    """
+    if not item:
+        return None
+
+    default_variant = item.default_variant
+    store_links = (
+        serialize_store_links(default_variant.store_links) if default_variant else []
+    )
+
+    variant_data = [
+        serialize_item_variant(
+            v, item=item, include_variant_images=include_variant_images
+        )
+        for v in item.variants
+    ]
+
+    return {
+        "id": item.id,
+        "name": item.name,
+        "slug": item.slug,
+        # Single canonical key — templates use item.item_type
+        "item_type": item.item_type,
+        "type": item.item_type,
+        "card_type": item.card_type,
+        "brand": serialize_model(item.brand),
+        "category": serialize_model(item.category),
+        "view_count": getattr(item, "view_count", 0),
+        "comment_count": getattr(item, "comment_count", 0),
+        # Single canonical image key
+        "image_url": item.image_url,
+        "price": float(item.price) if item.price is not None else None,
+        "min_price": float(item.min_price) if item.min_price is not None else None,
+        "has_variants": item.has_variants,
+        "default_variant": (
+            {
+                "id": default_variant.id,
+                "sku": getattr(default_variant, "sku", None),
+                "currency": getattr(default_variant, "currency", None),
+                "price": (
+                    float(default_variant.price)
+                    if default_variant.price is not None
+                    else None
+                ),
+            }
+            if default_variant
+            else None
+        ),
+        "variant_data": variant_data,
+        "variant_groups": item.variant_groups,
+        "store_links": store_links,
+        # Convenience flat list for templates that iterate stores
+        "stores": [
+            {
+                "name": link["store"]["name"] if link["store"] else "",
+                "slug": link["store"]["slug"] if link["store"] else "",
+                "price": link["price"],
+                "currency": link["currency"],
+            }
+            for link in store_links
+        ],
+        "rating": item.rating,
+        "review_count": item.review_count,
+        "created_at": item.created_at.isoformat() if item.created_at else None,
+        "badges": (
+            item.pick_keys(item.searchable_attributes, ["badge", "tag"])
+            if item.searchable_attributes
+            else None
+        ),
+    }
+
+
+def serialize_item_detail(item):
+    """Serialize full item details including specs, all variants, and all images.
+
+    Calls ``serialize_item`` for the base payload, then extends it with
+    detail-only fields.  Each variant is serialized exactly once (O(N)).
+    """
+    if not item:
+        return None
+
+    data = serialize_item(item, include_variant_images=True)
+
+    structured = item.structured_details
+    groups = structured.get("groups") if structured else None
+
+    detailed_images = [
+        {"id": img.id, "image_url": img.image_url, "position": img.position}
+        for img in item.images
+    ]
+
+    # Keep the explicit detail key for templates that read item.variants.
+    variants_detailed = [
+        serialize_item_variant(v, item=item, include_variant_images=True)
+        for v in item.variants
+    ]
+
+    data.update(
+        {
+            "images": detailed_images,
+            "variants": variants_detailed,
+            "structured_details": structured,
+            "quick_details": item.quick_details,
+            "full_details": groups if isinstance(groups, dict) else item.full_details,
+        }
+    )
+    return data
+
+def _calculate_item_completeness_score(item, price_info, store_info, has_image, has_specs):
+    completeness_points = 0
+    total_criteria = 8
+    if has_image: completeness_points += 1
+    if item.brand_id: completeness_points += 1
+    if item.description and len(item.description) > 10: completeness_points += 1
+    if store_info.get("active_links", 0) > 0: completeness_points += 1
+    if price_info.get("price") is not None: completeness_points += 1
+    if has_specs: completeness_points += 1
+    if item.searchable_attributes and len(item.searchable_attributes) > 0: completeness_points += 1
+    if item.structured_details and len(item.structured_details) > 0: completeness_points += 1
+    
+    return int((completeness_points / total_criteria) * 100)
+
+def serialize_item_row(item, price_info, store_info, has_image, has_specs):
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    
+    price_min = price_info.get("price")
+    price_max = price_info.get("max_price")
+    currency = price_info.get("currency")
+
+    sync_age_days = None
+    last_synced_at = store_info.get("last_synced_at")
+    if last_synced_at:
+        if last_synced_at.tzinfo is None:
+            last_synced_at = last_synced_at.replace(tzinfo=timezone.utc)
+        sync_age_days = (now - last_synced_at).days
+
+    completeness_score = _calculate_item_completeness_score(item, price_info, store_info, has_image, has_specs)
+
+    return {
+        "id":          item.id,
+        "name":        item.name,
+        "slug":        item.slug,
+        "image_url":   item.image_url if has_image else None,
+        "brand":       item.brand.name if item.brand else "—",
+        "brand_slug":  item.brand.slug if item.brand else None,
+        "category":    item.category.name if item.category else "—",
+        "category_slug": item.category.slug if item.category else None,
+        "category_name": item.category.name if item.category else None,
+        "brand_name":  item.brand.name if item.brand else None,
+        "min_price":   price_min,
+        "max_price":   price_max,
+        "currency":    currency,
+        "store_count": store_info.get("active_links", 0),
+        "last_synced_at": store_info.get("last_synced_at").isoformat() if store_info.get("last_synced_at") else None,
+        "sync_age":    sync_age_days,
+        "has_discount": store_info.get("has_discount", False),
+        "health":      completeness_score,
+        "click_count": item.click_count or 0,
+        "view_count":  item.view_count or 0,
+        "created_at":  item.created_at.isoformat() if item.created_at else None,
+    }
+

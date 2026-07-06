@@ -11,10 +11,8 @@ import difflib
 from app.domains.content.models import Content
 from app.domains.item.models import Item
 from app.domains.analytics.taxonomy_intelligence import get_taxonomy_intelligence
+from app.domains.taxonomy.service.query import paginate_taxonomy_entity
 from app.domains.taxonomy.service.admin import (
-    get_admin_categories_paginated, get_admin_brands_paginated,
-    get_admin_topics_paginated, get_admin_sections_paginated,
-    get_admin_attributes_paginated, get_admin_facet_paginated,
     get_admin_categories,
     get_admin_brands,
     get_admin_topics,
@@ -230,7 +228,7 @@ def categories_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    pagination = get_admin_categories_paginated(page, per_page, search, status, health)
+    pagination = paginate_taxonomy_entity(Category, page, per_page, search, status, health)
     item_ids = [c.id for c in pagination.items]
     from app.domains.taxonomy.service.metrics import get_category_metrics
     metrics = get_category_metrics(item_ids)
@@ -268,7 +266,7 @@ def brands_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    pagination = get_admin_brands_paginated(page, per_page, search, status, health)
+    pagination = paginate_taxonomy_entity(Brand, page, per_page, search, status, health)
     item_ids = [b.id for b in pagination.items]
     from app.domains.taxonomy.service.metrics import get_brand_metrics
     metrics = get_brand_metrics(item_ids)
@@ -306,7 +304,7 @@ def topics_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    pagination = get_admin_topics_paginated(page, per_page, search, status, health)
+    pagination = paginate_taxonomy_entity(Topic, page, per_page, search, status, health)
     item_ids = [t.id for t in pagination.items]
     from app.domains.taxonomy.service.metrics import get_topic_metrics
     metrics = get_topic_metrics(item_ids)
@@ -343,7 +341,7 @@ def sections_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    pagination = get_admin_sections_paginated(page, per_page, search, status, health)
+    pagination = paginate_taxonomy_entity(Section, page, per_page, search, status, health)
     item_ids = [s.id for s in pagination.items]
     from app.domains.taxonomy.service.metrics import get_section_metrics
     metrics = get_section_metrics(item_ids)
@@ -422,7 +420,7 @@ def attributes_rows():
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    pagination = get_admin_attributes_paginated(page, per_page, search, health)
+    pagination = paginate_taxonomy_entity(AttributeFacet, page, per_page, search, health=health)
     item_ids = [a.id for a in pagination.items]
     from app.domains.taxonomy.service.metrics import get_attribute_metrics
     metrics = get_attribute_metrics(item_ids)
@@ -551,7 +549,7 @@ def _get_facet_rows(model, domain_type, field_id_name):
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    pagination = get_admin_facet_paginated(model, field_id_name, page, per_page, search, health)
+    pagination = paginate_taxonomy_entity(model, page, per_page, search, health=health, field_name=field_id_name)
     item_ids = [a.id for a in pagination.items]
     
     from app.domains.taxonomy.service.metrics import get_facet_metrics

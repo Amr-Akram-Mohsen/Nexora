@@ -36,36 +36,12 @@ def assign_target_to_contents(contents, include_linked_items=False, session=None
     if session is None:
         session = db.session
 
-    # Group IDs by object type
-    ids_by_type = {}
-    for c in contents:
-        ids_by_type.setdefault(c.object_type, set()).add(c.object_id)
+    from app.shared.utils.orm_helpers import resolve_polymorphic_targets
+    targets_map = resolve_polymorphic_targets(
+        contents, type_attr="object_type", id_attr="object_id", session=session
+    )
 
-    # Fetch all targets in 3 queries
-    targets_map = {}
-    model_map = get_model_map()
-    for obj_type, ids in ids_by_type.items():
-        model = model_map.get(obj_type)
-        if not model:
-            continue
-
-        # Batch fetch for this type
-        stmt = select(model).where(model.id.in_(list(ids)))
-        if obj_type == "article":
-            from app.domains.relationships import ArticleSource
-
-            stmt = stmt.options(
-                db.joinedload(model.primary_source).joinedload(ArticleSource.source),
-                db.selectinload(model.article_sources).selectinload(
-                    ArticleSource.source
-                ),
-            )
-
-        objs = session.execute(stmt).scalars().all()
-        for obj in objs:
-            targets_map[(obj_type, obj.id)] = obj
-
-    from .serializers import serialize_content
+    from app.domains.content.serializers import serialize_content
 
     result = []
     # Assign targets back to content objects

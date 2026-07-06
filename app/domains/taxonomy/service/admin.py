@@ -7,118 +7,7 @@ from app.domains.item.models import Item
 from app.domains.relationships import content_brands, content_topics, content_attributes, ArticleSource
 from app.domains.external.models import LastAPIFetch
 
-def get_admin_categories_paginated(page, per_page, search="", status=None, health=None):
-    stmt = select(Category).order_by(Category.name.asc())
-    if search:
-        stmt = stmt.where(Category.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Category.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Category.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Category.is_active == False).where(
-            db.session.query(Content.id).filter(Content.category_id == Category.id).exists() |
-            db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
-        )
-        
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-def get_admin_brands_paginated(page, per_page, search="", status=None, health=None):
-    stmt = select(Brand).order_by(Brand.name.asc())
-    if search:
-        stmt = stmt.where(Brand.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Brand.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Brand.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists()
-        ).where(
-            ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Brand.is_active == False).where(
-            db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists() |
-            db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        )
-        
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-def get_admin_topics_paginated(page, per_page, search="", status=None, health=None):
-    stmt = select(Topic).order_by(Topic.name.asc())
-    if search:
-        stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Topic.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Topic.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Topic.is_active == False).where(
-            db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
-        )
-        
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-def get_admin_sections_paginated(page, per_page, search="", status=None, health=None):
-    stmt = select(Section).order_by(Section.name.asc())
-    if search:
-        stmt = stmt.where(Section.name.ilike(f"%{search}%"))
-        
-    if status == "1":
-        stmt = stmt.where(Section.is_active == True)
-    elif status == "0":
-        stmt = stmt.where(Section.is_active == False)
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-    elif health == "inactive-linked":
-        stmt = stmt.where(Section.is_active == False).where(
-            db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
-        )
-        
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-def get_admin_attributes_paginated(page, per_page, search="", health=None):
-    stmt = select(AttributeFacet).order_by(AttributeFacet.name.asc())
-    if search:
-        stmt = stmt.where(AttributeFacet.name.ilike(f"%{search}%"))
-        
-    if health == "unused":
-        stmt = stmt.where(
-            ~db.session.query(content_attributes.c.content_id).filter(content_attributes.c.attribute_id == AttributeFacet.id).exists()
-        )
-        
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-def get_admin_facet_paginated(model_class, field_name, page, per_page, search="", health=None):
-    stmt = select(model_class).order_by(model_class.name.asc())
-    if search:
-        stmt = stmt.where(model_class.name.ilike(f"%{search}%"))
-    
-    if health == "unused":
-        field = getattr(Content, field_name)
-        stmt = stmt.where(~db.session.query(Content.id).filter(field == model_class.id).exists())
-
-    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
 
 def get_admin_categories(search=""):
@@ -334,11 +223,10 @@ def get_admin_entity_or_404(model, entity_id):
     return db.session.get(model, entity_id)
 
 def get_admin_taxonomy_related_metadata(entity, entity_type):
-    from app.domains.relationships import content_brands, content_topics, content_items
+    from app.domains.relationships import content_brands, content_topics, content_items, content_attributes
     from app.domains.item.models import ItemVariant, ItemImage
+    from app.domains.taxonomy.service.query import get_taxonomy_content_stats
     data = {}
-    
-    top_contents_query = select(Content).order_by(Content.view_count.desc()).limit(5)
     
     def _format_breakdown_and_engagement(type_breakdown, engagement):
         type_strs = [f"{count} {type_.capitalize()}{'s' if count != 1 else ''}" for type_, count in type_breakdown]
@@ -350,8 +238,7 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
     if entity_type == "category":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.category_id == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(Content.category_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(Content.category_id == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, field=Content.category_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
         total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0
@@ -374,13 +261,10 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         ) or 0
         data["items without content"] = str(total_items - items_with_content)
         
-        top_contents = db.session.execute(top_contents_query.where(Content.category_id == entity.id)).scalars().all()
-        
     elif entity_type == "brand":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=content_brands, foreign_key_col=content_brands.c.brand_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
         total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0
@@ -401,13 +285,10 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         ).scalars().all()
         data["_top_items"] = top_items
         
-        top_contents = db.session.execute(top_contents_query.join(content_brands, content_brands.c.content_id == Content.id).where(content_brands.c.brand_id == entity.id)).scalars().all()
-        
     elif entity_type == "topic":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_topics).where(content_topics.c.topic_id == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=content_topics, foreign_key_col=content_topics.c.topic_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
         rel_cats = db.session.scalar(
@@ -423,13 +304,11 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
             .filter(content_topics.c.topic_id == entity.id)
         ) or 0
         data["related brands"] = str(rel_brands)
-        top_contents = db.session.execute(top_contents_query.join(content_topics, content_topics.c.content_id == Content.id).where(content_topics.c.topic_id == entity.id)).scalars().all()
         
     elif entity_type == "section":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(Content.section_id == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(Content.section_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(Content.section_id == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, field=Content.section_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
         cat_count = db.session.scalar(
@@ -444,17 +323,13 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
             .filter(Content.section_id == entity.id)
         ) or 0
         data["related brands"] = str(rel_brands)
-        top_contents = db.session.execute(top_contents_query.where(Content.section_id == entity.id)).scalars().all()
         
     elif entity_type == "attribute":
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_attributes).where(content_attributes.c.attribute_id == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=content_attributes, foreign_key_col=content_attributes.c.attribute_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
-        top_contents = db.session.execute(top_contents_query.join(content_attributes, content_attributes.c.content_id == Content.id).where(content_attributes.c.attribute_id == entity.id)).scalars().all()
-
     elif entity_type in ["gender_facet", "intent_facet", "price_tier_facet"]:
         field_mapping = {
             "gender_facet": Content.gender_id,
@@ -465,12 +340,9 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         
         data["content count"] = str(db.session.scalar(select(func.count()).select_from(Content).where(field == entity.id)) or 0)
         
-        type_breakdown = db.session.execute(select(Content.object_type, func.count(Content.id)).where(field == entity.id).group_by(Content.object_type)).all()
-        engagement = db.session.execute(select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count)).where(field == entity.id)).first()
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, field=field)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
-        top_contents = db.session.execute(top_contents_query.where(field == entity.id)).scalars().all()
-
     data["_top_contents"] = top_contents
     return data
 

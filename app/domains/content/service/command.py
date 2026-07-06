@@ -173,3 +173,66 @@ def apply_relationships(content, data, session=None) -> dict:
         updated_relationships["sources"] = [slug]
 
     return updated_relationships
+
+def delete_content_and_relations(content: Content, session=None) -> None:
+    from app.domains.interaction.models import Comment, Reaction, View
+    if session is None:
+        session = db.session
+    cid = content.id
+    session.execute(
+        Comment.__table__.delete().where(
+            (Comment.target_type == "content") & (Comment.target_id == cid)
+        )
+    )
+    session.execute(
+        Reaction.__table__.delete().where(
+            (Reaction.target_type == "content") & (Reaction.target_id == cid)
+        )
+    )
+    session.execute(
+        View.__table__.delete().where(
+            (View.target_type == "content") & (View.target_id == cid)
+        )
+    )
+
+    if content.object_type == "article":
+        session.execute(Article.__table__.delete().where(Article.id == content.object_id))
+    elif content.object_type == "video":
+        session.execute(Video.__table__.delete().where(Video.id == content.object_id))
+    elif content.object_type == "post":
+        session.execute(Post.__table__.delete().where(Post.id == content.object_id))
+
+    session.delete(content)
+
+def execute_bulk_content_actions(action, contents, category_id=None, session=None):
+    if session is None:
+        session = db.session
+    if action == "activate":
+        for c in contents:
+            c.is_active = True
+    elif action == "deactivate":
+        for c in contents:
+            c.is_active = False
+    elif action == "publish":
+        for c in contents:
+            c.is_published = True
+    elif action == "unpublish":
+        for c in contents:
+            c.is_published = False
+    elif action == "review":
+        for c in contents:
+            c.is_published = False
+    elif action == "recategorize":
+        from ...taxonomy.models import Category
+        if category_id is None:
+            raise ValueError("Category ID is required for recategorize action")
+        category = session.get(Category, int(category_id))
+        if not category:
+            raise ValueError("Target category not found")
+        for c in contents:
+            c.category_id = category.id
+    elif action == "delete":
+        for c in contents:
+            delete_content_and_relations(c, session)
+    else:
+        raise ValueError("Unsupported bulk action")

@@ -59,6 +59,51 @@ def execute_mapped_query(stmt, session=None):
     rows = session.execute(stmt).mappings().all()
     return [dict(row) for row in rows]
 
+def get_taxonomy_mappings(model_class, used_in_model=None, used_in_column=None, session=None):
+    """
+    Fetches basic mappings (id, name, slug) for any taxonomy model.
+    Optionally filters only those used in a specific model/column.
+    """
+    if session is None:
+        session = db.session
+    stmt = select(model_class.id, model_class.name, model_class.slug)
+    
+    if used_in_model is not None and used_in_column is not None:
+        stmt = stmt.where(model_class.id.in_(select(used_in_column).distinct()))
+        
+    rows = session.execute(stmt.order_by(model_class.name)).mappings().all()
+    return [dict(r) for r in rows]
+
+def get_taxonomy_content_stats(entity_id, field=None, relationship_table=None, foreign_key_col=None, session=None):
+    """
+    Dynamically calculates content breakdown, engagement stats, and top contents for a given taxonomy entity.
+    """
+    if session is None:
+        session = db.session
+    
+    from app.domains.content.models import Content
+    
+    breakdown_stmt = select(Content.object_type, func.count(Content.id))
+    eng_stmt = select(func.sum(Content.view_count), func.sum(Content.like_count), func.sum(Content.share_count))
+    top_stmt = select(Content).order_by(Content.view_count.desc()).limit(5)
+    
+    if relationship_table is not None and foreign_key_col is not None:
+        breakdown_stmt = breakdown_stmt.join(relationship_table, relationship_table.c.content_id == Content.id).where(foreign_key_col == entity_id).group_by(Content.object_type)
+        eng_stmt = eng_stmt.join(relationship_table, relationship_table.c.content_id == Content.id).where(foreign_key_col == entity_id)
+        top_stmt = top_stmt.join(relationship_table, relationship_table.c.content_id == Content.id).where(foreign_key_col == entity_id)
+    elif field is not None:
+        breakdown_stmt = breakdown_stmt.where(field == entity_id).group_by(Content.object_type)
+        eng_stmt = eng_stmt.where(field == entity_id)
+        top_stmt = top_stmt.where(field == entity_id)
+    else:
+        raise ValueError("Must provide either a field or a relationship_table/foreign_key_col pair.")
+        
+    type_breakdown = session.execute(breakdown_stmt).all()
+    engagement = session.execute(eng_stmt).first()
+    top_contents = session.execute(top_stmt).scalars().all()
+    
+    return type_breakdown, engagement, top_contents
+
 
 @cache.memoize(timeout=3600)
 def get_relationships_for_section(section_slug, rel_name, limit=20, session=None):
@@ -254,3 +299,53 @@ def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit, se
 
     return execute_mapped_query(stmt, session)
 
+def paginate_taxonomy_entity(model, page, per_page, search="", status=None, health=None, field_name=None):
+    """Generic pagination utility for taxonomy entities supporting search, status, and health checks."""
+    from app.domains.content.models import Content
+    from app.domains.item.models import Item
+    from app.domains.relationships import content_brands, content_topics, content_attributes
+    from app.domains.taxonomy.models import Category, Brand, Topic, Section, AttributeFacet
+    
+    stmt = select(model).order_by(model.name.asc())
+    if search:
+        stmt = stmt.where(model.name.ilike(f"%{search}%"))
+        
+    if hasattr(model, 'is_active'):
+        if status == "1":
+            stmt = stmt.where(model.is_active == True)
+        elif status == "0":
+            stmt = stmt.where(model.is_active == False)
+        
+    if health:
+        cond_content = None
+        cond_item = None
+        
+        if model == Category:
+            cond_content = db.session.query(Content.id).filter(Content.category_id == Category.id).exists()
+            cond_item = db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
+        elif model == Brand:
+            cond_content = db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists()
+            cond_item = db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
+        elif model == Topic:
+            cond_content = db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
+        elif model == Section:
+            cond_content = db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
+        elif model == AttributeFacet:
+            cond_content = db.session.query(content_attributes.c.content_id).filter(content_attributes.c.attribute_id == AttributeFacet.id).exists()
+        elif field_name:
+            field = getattr(Content, field_name)
+            cond_content = db.session.query(Content.id).filter(field == model.id).exists()
+
+        if health == "unused":
+            if cond_content is not None:
+                stmt = stmt.where(~cond_content)
+            if cond_item is not None:
+                stmt = stmt.where(~cond_item)
+        elif health == "inactive-linked" and hasattr(model, 'is_active'):
+            stmt = stmt.where(model.is_active == False)
+            if cond_content is not None and cond_item is not None:
+                stmt = stmt.where(cond_content | cond_item)
+            elif cond_content is not None:
+                stmt = stmt.where(cond_content)
+                
+    return db.paginate(stmt, page=page, per_page=per_page, error_out=False)

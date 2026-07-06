@@ -38,7 +38,7 @@ apply_admin_guard(bp)
 @bp.route("/stats", methods=["GET"])
 def dashboard_stats():
     """Enhanced dashboard metrics, aggregates, distributions, and trends."""
-    from app.domains.analytics.service.admin import get_admin_dashboard_stats_data
+    from app.application.analytics.admin import get_admin_dashboard_stats_data
     return jsonify(get_admin_dashboard_stats_data())
 
 
@@ -49,12 +49,12 @@ def dashboard_stats():
 @bp.route("/top-contents", methods=["GET"])
 def top_contents():
     """Top 5 content items by view count for the overview panel."""
-    from app.domains.analytics.service.admin import get_admin_top_contents
+    from app.application.analytics.admin import get_admin_top_contents
     return jsonify(get_admin_top_contents())
 
 
 @bp.route("/top-items", methods=["GET"])
 def top_items():
     """Top 5 items by click count for the overview panel."""
-    from app.domains.analytics.service.admin import get_admin_top_items
+    from app.application.analytics.admin import get_admin_top_items
     return jsonify(get_admin_top_items())

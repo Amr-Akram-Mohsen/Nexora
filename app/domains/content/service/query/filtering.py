@@ -50,48 +50,8 @@ def get_filtered_contents(
     stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
     stmt = stmt.where(Content.section_id == section_id)
 
-    cats = [f for f in active_filters.get("category", []) if f]
-    if cats and "category" in allowed_filters:
-        category_objs = session.execute(
-            select(Category)
-            .options(selectinload(Category.children))
-            .where(Category.slug.in_(cats))
-        ).scalars().all()
-        
-        cat_ids = set()
-        for cat in category_objs:
-            cat_ids.add(cat.id)
-            if cat.children:
-                for child in cat.children:
-                    cat_ids.add(child.id)
-        stmt = stmt.where(Content.category_id.in_(list(cat_ids)))
-
-    topics = [f for f in active_filters.get("topic", []) if f]
-    if topics and "topic" in allowed_filters:
-        stmt = stmt.where(Content.topics.any(Topic.slug.in_(topics)))
-
-    brands = [f for f in active_filters.get("brand", []) if f]
-    if brands and "brand" in allowed_filters:
-        stmt = stmt.where(Content.brands.any(Brand.slug.in_(brands)))
-
-    intents = [f for f in active_filters.get("intent", []) if f]
-    if intents and "intent" in allowed_filters:
-        from app.domains.taxonomy.models import IntentFacet
-        stmt = stmt.where(Content.intent.has(IntentFacet.slug.in_(intents)))
-
-    price_tiers = [f for f in active_filters.get("price_tier", []) if f]
-    if price_tiers and "price_tier" in allowed_filters:
-        from app.domains.taxonomy.models import PriceTierFacet
-        stmt = stmt.where(Content.price_tier.has(PriceTierFacet.slug.in_(price_tiers)))
-
-    types = [f for f in active_filters.get("type", []) if f]
-    if types and "type" in allowed_filters:
-        stmt = stmt.where(Content.object_type.in_(types))
-
-    attributes = [f for f in active_filters.get("attributes", []) if f]
-    if attributes and "attributes" in allowed_filters:
-        from app.domains.taxonomy.models import AttributeFacet
-        stmt = stmt.where(Content.attributes.any(AttributeFacet.slug.in_(attributes)))
+    from .utils import apply_content_filters
+    stmt = apply_content_filters(stmt, active_filters, allowed_filters, session=session)
 
     if active_filters.get("sort") == "oldest":
         stmt = stmt.order_by(Content.published_at.asc())
@@ -258,3 +218,68 @@ def get_markdown_only_articles(limit, session=None):
     )
     return session.execute(stmt).scalars().all()
 
+
+def get_content_paginated(filters, sort_by=None, sort_dir=None, page=1, per_page=20, session=None):
+    from sqlalchemy import select, or_, func
+    from ...models import Content, Article
+    from app.domains.taxonomy.models import Category
+    from .utils import build_content_stmt, apply_content_filters
+    
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+
+    _CONTENT_SORT_MAP = {
+        "id": Content.id,
+        "published_at": Content.published_at,
+        "ingested_at": Content.ingested_at,
+        "view_count": Content.view_count,
+        "like_count": Content.like_count,
+        "comment_count": Content.comment_count,
+        "share_count": Content.share_count,
+        "save_count": Content.save_count,
+        "score": Content.score,
+        "title": Content.title,
+    }
+    
+    sort_col = _CONTENT_SORT_MAP.get(sort_by, Content.published_at)
+    sort_dir = sort_dir.lower() if sort_dir and sort_dir.lower() in ("asc", "desc") else "desc"
+
+    stmt = build_content_stmt(active_only=False, published_only=False, eager_load="list")
+    
+    stmt = apply_content_filters(stmt, filters, session=session)
+
+    quality = filters.get("quality")
+    if quality:
+        if quality == "missing_category":
+            stmt = stmt.where(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
+        elif quality == "missing_metadata":
+            stmt = stmt.where(or_(Content.title.is_(None), Content.title == "", Content.preview_text.is_(None), Content.preview_text == ""))
+        elif quality == "duplicate":
+            dup_sub = (
+                select(Content.title)
+                .group_by(Content.title)
+                .having(func.count(Content.id) > 1)
+            ).subquery()
+            stmt = stmt.where(Content.title.in_(dup_sub))
+        elif quality == "missing_topics":
+            stmt = stmt.where(~Content.topics.any())
+        elif quality == "missing_brands":
+            stmt = stmt.where(~Content.brands.any())
+        elif quality == "missing_source":
+            stmt = stmt.where(Content.source_id.is_(None))
+        elif quality == "enrichment_failed":
+            stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == "failed")))
+            
+    active = filters.get("active")
+    if active:
+        stmt = stmt.where(Content.is_active == (active.lower() == "true"))
+    published = filters.get("published")
+    if published:
+        stmt = stmt.where(Content.is_published == (published.lower() == "true"))
+        
+    stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+    
+    from app.core.extensions import db
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    return pagination, quality

@@ -17,18 +17,21 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from app.domains.content.models import Content
+from app.domains.content.service.query.filtering import get_content_paginated
 from app.domains.content.service.admin import (
-    build_admin_contents_query,
     load_admin_content_relations,
     delete_admin_content_and_relations,
     get_admin_content_metadata,
     get_admin_content_stats,
-    get_admin_content_dashboard_stats,
-    get_admin_pipeline_stats,
     get_admin_deduplication_groups,
     get_admin_content_inspect_raw,
-    serialize_content_row,
 )
+from app.application.analytics.admin import (
+    get_admin_content_dashboard_stats,
+    get_admin_pipeline_stats,
+)
+from app.domains.content.serializers import serialize_content_row
+
 from app.application.content.admin import (
     delete_content_workflow,
     toggle_publish_workflow,
@@ -57,7 +60,14 @@ def _build_contents_query(args):
     """
     Build a filtered, sorted ORM query for content listing.
     """
-    return build_admin_contents_query(args, args.get("sort_by", "").strip(), args.get("sort_dir", "desc").strip())
+    filters = args.to_dict() if hasattr(args, "to_dict") else dict(args)
+    return get_content_paginated(
+        filters=filters,
+        sort_by=filters.get("sort_by", "").strip(),
+        sort_dir=filters.get("sort_dir", "desc").strip(),
+        page=filters.get("page", 1, type=int),
+        per_page=filters.get("per_page", 20, type=int)
+    )
 
 def _load_content_relations(page_items, quality):
     """Batch-load polymorphic targets and duplicate titles for a page of contents."""
@@ -99,8 +109,13 @@ def list_contents():
     """Advanced content listing with filtering, search, pagination, and sorting."""
     page, per_page = parse_pagination_params(default_per_page=20)
 
-    query, quality = _build_contents_query(request.args)
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination, quality = get_content_paginated(
+        filters=request.args,
+        sort_by=request.args.get("sort_by", "").strip(),
+        sort_dir=request.args.get("sort_dir", "desc").strip(),
+        page=page,
+        per_page=per_page
+    )
     page_items = pagination.items
 
     # Batch-load polymorphic targets and duplicate titles
@@ -151,8 +166,13 @@ def contents_rows():
     """Return server-rendered HTML rows partial for AJAX injection."""
     page, per_page = parse_pagination_params(default_per_page=20)
 
-    query, quality = _build_contents_query(request.args)
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination, quality = get_content_paginated(
+        filters=request.args,
+        sort_by=request.args.get("sort_by", "").strip(),
+        sort_dir=request.args.get("sort_dir", "desc").strip(),
+        page=page,
+        per_page=per_page
+    )
     page_items = pagination.items
 
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)

@@ -32,7 +32,7 @@ def get_items_for_content(
     """
     from app.domains.content.models import Content
     from app.domains.item.service.utils import build_item_stmt, fetch_items
-    from app.domains.item.service.serializers import serialize_item
+    from app.domains.item.serializers import serialize_item
     from app.domains.recommendation.ranking import (
         ItemScoreWeights,
         score_item_relevance,
@@ -109,7 +109,7 @@ def get_trending_items(
     ``Item`` for efficiency (no join on the views table needed).
     """
     from app.domains.item.service.utils import build_item_stmt, fetch_items
-    from app.domains.item.service.serializers import serialize_item
+    from app.domains.item.serializers import serialize_item
 
     if session is None:
         session = db.session
@@ -141,7 +141,7 @@ def get_popular_items_by_brand(
     Return the most popular items for a specific brand, by view count.
     """
     from app.domains.item.service.utils import build_item_stmt, fetch_items
-    from app.domains.item.service.serializers import serialize_item
+    from app.domains.item.serializers import serialize_item
 
     if session is None:
         session = db.session

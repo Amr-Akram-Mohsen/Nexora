@@ -1,10 +1,11 @@
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category
-from app.domains.content.service.admin import delete_admin_content_and_relations, retry_admin_pipeline, get_admin_content_inspect_raw
+from app.domains.content.service.admin import retry_admin_pipeline, get_admin_content_inspect_raw
 from app.domains.interaction.service.scoring import get_content_engagement_score
 from app.domains.distribution.services import get_distribution_history
 from app.domains.content.serializers import serialize_content_inspect_dto
+from app.domains.content.service.command import execute_bulk_content_actions, delete_content_and_relations
 
 def get_content_inspect_workflow(content_id: int) -> dict:
     raw_data = get_admin_content_inspect_raw(content_id)
@@ -36,7 +37,7 @@ def delete_content_workflow(content_id):
     content = db.session.get(Content, content_id)
     if not content:
         return False
-    execute_admin_workflow(delete_admin_content_and_relations, content)
+    execute_admin_workflow(delete_content_and_relations, content)
     return True
 
 def toggle_publish_workflow(content_id, action):
@@ -50,35 +51,7 @@ def bulk_actions_workflow(action, ids, category_id=None):
     if not contents:
         return 0
 
-    if action == "activate":
-        for c in contents:
-            c.is_active = True
-    elif action == "deactivate":
-        for c in contents:
-            c.is_active = False
-    elif action == "publish":
-        for c in contents:
-            c.is_published = True
-    elif action == "unpublish":
-        for c in contents:
-            c.is_published = False
-    elif action == "review":
-        for c in contents:
-            c.is_published = False
-    elif action == "recategorize":
-        if category_id is None:
-            raise ValueError("Category ID is required for recategorize action")
-        category = db.session.get(Category, int(category_id))
-        if not category:
-            raise ValueError("Target category not found")
-        for c in contents:
-            c.category_id = category.id
-    elif action == "delete":
-        for c in contents:
-            delete_admin_content_and_relations(c)
-    else:
-        raise ValueError("Unsupported bulk action")
-
+    execute_bulk_content_actions(action, contents, category_id=category_id, session=db.session)
     db.session.commit()
     return len(contents)
 

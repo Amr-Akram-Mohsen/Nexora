@@ -6,57 +6,54 @@ from app.domains.item.models import Item, ItemVariant, ItemStoreLink, ItemImage,
 from app.domains.taxonomy.models import Category, Brand, Source
 from app.domains.interaction.models import Comment
 
-def get_admin_item_meta():
-    categories = db.session.execute(
-        select(Category.id, Category.name, Category.slug)
-        .where(Category.id.in_(select(Item.category_id).distinct()))
-        .order_by(Category.name)
-    ).mappings().all()
+from app.domains.taxonomy.service.query import get_taxonomy_mappings
 
-    brands = db.session.execute(
-        select(Brand.id, Brand.name, Brand.slug)
-        .where(Brand.id.in_(select(Item.brand_id).distinct()))
-        .order_by(Brand.name)
-    ).mappings().all()
+def get_admin_item_meta():
+    categories = get_taxonomy_mappings(Category, used_in_model=Item, used_in_column=Item.category_id)
+    brands = get_taxonomy_mappings(Brand, used_in_model=Item, used_in_column=Item.brand_id)
+    sources = get_taxonomy_mappings(Source, used_in_model=Item, used_in_column=Item.source_id)
 
     item_types = db.session.execute(
         select(Item.item_type).distinct().order_by(Item.item_type)
     ).scalars().all()
 
-    sources = db.session.execute(
-        select(Source.id, Source.name, Source.slug)
-        .where(Source.id.in_(select(Item.source_id).distinct()))
-        .order_by(Source.name)
-    ).mappings().all()
-
     return {
-        "categories": [dict(r) for r in categories],
-        "brands":     [dict(r) for r in brands],
+        "categories": categories,
+        "brands":     brands,
         "item_types": [t for t in item_types if t],
-        "sources":    [dict(r) for r in sources],
+        "sources":    sources,
     }
 
 def get_admin_item_health_stats():
-    total_items = db.session.scalar(select(func.count(Item.id))) or 0
-    branded_items = db.session.scalar(select(func.count(Item.id)).where(Item.brand_id.isnot(None))) or 0
-    
-    items_with_images = db.session.scalar(
-        select(func.count(func.distinct(ItemImage.item_id)))
-    ) or 0
-    
-    items_with_links = db.session.scalar(
-        select(func.count(func.distinct(ItemVariant.item_id)))
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .where(ItemStoreLink.is_active.is_(True))
-    ) or 0
-    
+    from sqlalchemy import case
+    stats = db.session.execute(
+        select(
+            func.count(func.distinct(Item.id)).label("total_items"),
+            func.count(func.distinct(case((Item.brand_id.isnot(None), Item.id), else_=None))).label("branded_items"),
+            func.count(func.distinct(ItemImage.item_id)).label("items_with_images")
+        )
+        .select_from(Item)
+        .outerjoin(ItemImage, ItemImage.item_id == Item.id)
+    ).first()
+
+    total_items = stats.total_items or 0
+    branded_items = stats.branded_items or 0
+    items_with_images = stats.items_with_images or 0
+
     seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
     
-    items_with_recent_sync = db.session.scalar(
-        select(func.count(func.distinct(ItemVariant.item_id)))
+    link_stats = db.session.execute(
+        select(
+            func.count(func.distinct(ItemVariant.item_id)).label("items_with_links"),
+            func.count(func.distinct(case((ItemStoreLink.last_synced_at >= seven_days_ago, ItemVariant.item_id), else_=None))).label("recent_sync")
+        )
+        .select_from(ItemVariant)
         .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .where(ItemStoreLink.is_active.is_(True), ItemStoreLink.last_synced_at >= seven_days_ago)
-    ) or 0
+        .where(ItemStoreLink.is_active.is_(True))
+    ).first()
+    
+    items_with_links = link_stats.items_with_links or 0
+    items_with_recent_sync = link_stats.recent_sync or 0
     stale_sync_items = max(0, items_with_links - items_with_recent_sync)
 
     type_dist_rows = db.session.execute(
@@ -237,60 +234,6 @@ def get_admin_items_page(args, sort_col, sort_dir, page, per_page):
 def get_admin_item(id):
     return db.session.get(Item, id)
 
-def _calculate_item_completeness_score(item, price_info, store_info, has_image, has_specs):
-    completeness_points = 0
-    total_criteria = 8
-    if has_image: completeness_points += 1
-    if item.brand_id: completeness_points += 1
-    if item.description and len(item.description) > 10: completeness_points += 1
-    if store_info.get("active_links", 0) > 0: completeness_points += 1
-    if price_info.get("price") is not None: completeness_points += 1
-    if has_specs: completeness_points += 1
-    if item.searchable_attributes and len(item.searchable_attributes) > 0: completeness_points += 1
-    if item.structured_details and len(item.structured_details) > 0: completeness_points += 1
-    
-    return int((completeness_points / total_criteria) * 100)
-
-def serialize_item_row(item, price_info, store_info, has_image, has_specs):
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc)
-    
-    price_min = price_info.get("price")
-    price_max = price_info.get("max_price")
-    currency = price_info.get("currency")
-
-    sync_age_days = None
-    last_synced_at = store_info.get("last_synced_at")
-    if last_synced_at:
-        if last_synced_at.tzinfo is None:
-            last_synced_at = last_synced_at.replace(tzinfo=timezone.utc)
-        sync_age_days = (now - last_synced_at).days
-
-    completeness_score = _calculate_item_completeness_score(item, price_info, store_info, has_image, has_specs)
-
-    return {
-        "id":          item.id,
-        "name":        item.name,
-        "slug":        item.slug,
-        "image_url":   item.image_url if has_image else None,
-        "brand":       item.brand.name if item.brand else "—",
-        "brand_slug":  item.brand.slug if item.brand else None,
-        "category":    item.category.name if item.category else "—",
-        "category_slug": item.category.slug if item.category else None,
-        "category_name": item.category.name if item.category else None,
-        "brand_name":  item.brand.name if item.brand else None,
-        "min_price":   price_min,
-        "max_price":   price_max,
-        "currency":    currency,
-        "store_count": store_info.get("active_links", 0),
-        "last_synced_at": store_info.get("last_synced_at").isoformat() if store_info.get("last_synced_at") else None,
-        "sync_age":    sync_age_days,
-        "has_discount": store_info.get("has_discount", False),
-        "health":      completeness_score,
-        "click_count": item.click_count or 0,
-        "view_count":  item.view_count or 0,
-        "created_at":  item.created_at.isoformat() if item.created_at else None,
-    }
 
 def get_admin_item_inspect_raw(id):
     item = db.session.scalar(

@@ -395,9 +395,20 @@
     const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
     const activeTab = params.tab || 'comments';
     const tabBtn = document.querySelector(`#interactions-tabs .admin-tab-btn[data-tab="${activeTab}"]`);
-    if (tabBtn) tabBtn.click();
-
-
+    if (tabBtn) {
+      if (tabBtn.classList.contains("active")) {
+        // Tab is already active visually, just load the data
+        if (activeTab === 'reactions') window.reactionsController.load(1);
+        else if (activeTab === 'comments') window.commentsController.load(1);
+        else if (activeTab === 'views') window.viewsController.load(1);
+        else if (activeTab === 'clicks') window.clicksController.load(1);
+        else if (activeTab === 'saves') window.savesController.load(1);
+        else if (activeTab === 'shares') window.sharesController.load(1);
+      } else {
+        // Tab is not active, simulate click to switch visuals and trigger load
+        tabBtn.click();
+      }
+    }
     // Comment inspect modal: action delegation (rendered by _inspect.html)
     const commentModal = document.getElementById("inspect-comment-modal");
     if (commentModal) {

@@ -138,3 +138,34 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
             "latest_click": serialize_activity(metrics["latest_click"])
         }
     }
+
+def serialize_user_row(u, score):
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    # Be careful to handle naive datetimes if necessary, or assume they are timezone-aware.
+    # Usually in Flask-SQLAlchemy, datetimes are naive UTC if not configured otherwise.
+    # Let's ensure we can subtract them:
+    if u.last_login_at:
+        login_time = u.last_login_at.replace(tzinfo=timezone.utc) if u.last_login_at.tzinfo is None else u.last_login_at
+        recency_days = (now - login_time).days
+    else:
+        recency_days = None
+
+    from app.domains.user.service.tiers import score_to_tier
+    score_val = float(score) if score else 0.0
+    engagement_tier = score_to_tier(score_val)
+
+    return {
+        "id": u.id,
+        "name": u.name,
+        "email": u.email,
+        "is_verified": u.is_verified,
+        "is_admin": u.is_admin,
+        "is_subscribed": bool(u.newsletter_subscription and u.newsletter_subscription.is_active),
+        "is_active": u.is_active,
+        "created_at": u.created_at.isoformat() if u.created_at else None,
+        "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
+        "recency_days": recency_days,
+        "engagement_score": score_val,
+        "engagement_tier": engagement_tier,
+    }
