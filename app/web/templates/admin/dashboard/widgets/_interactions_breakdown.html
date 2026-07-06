@@ -3,14 +3,14 @@
   {% set total = interactions.total or 1 %}
 
   {% set items = [
-  { 'label': 'Views', 'val': interactions.views or 0, 'icon': '<i class="fa-solid fa-eye"></i>' },
-  { 'label': 'Comments', 'val': interactions.comments or 0, 'icon': '<i class="fa-solid fa-comments"></i>' },
-  { 'label': 'Likes', 'val': interactions.likes or 0, 'icon': '<i class="fa-solid fa-thumbs-up"></i>' },
-  { 'label': 'Dislikes', 'val': interactions.dislikes or 0, 'icon': '<i class="fa-solid fa-thumbs-down"></i>' },
-  { 'label': 'Saves', 'val': interactions.saves or 0, 'icon': '<i class="fa-solid fa-bookmark"></i>' },
-  { 'label': 'Shares', 'val': interactions.shares or 0, 'icon': '<i class="fa-solid fa-link"></i>' },
+  { 'label': 'Views', 'val': interactions.views or 0, 'icon': 'fa-solid fa-eye' },
+  { 'label': 'Comments', 'val': interactions.comments or 0, 'icon': 'fa-solid fa-comments' },
+  { 'label': 'Likes', 'val': interactions.likes or 0, 'icon': 'fa-solid fa-thumbs-up' },
+  { 'label': 'Dislikes', 'val': interactions.dislikes or 0, 'icon': 'fa-solid fa-thumbs-down' },
+  { 'label': 'Saves', 'val': interactions.saves or 0, 'icon': 'fa-solid fa-bookmark' },
+  { 'label': 'Shares', 'val': interactions.shares or 0, 'icon': 'fa-solid fa-link' },
   { 'label': 'Item Clicks', 'val': (interactions.clicks if interactions.clicks is defined else (interactions.item_clicks
-  if interactions.item_clicks is defined else 0)), 'icon': '<i class="fa-solid fa-cart-shopping"></i>' }
+  if interactions.item_clicks is defined else 0)), 'icon': 'fa-solid fa-cart-shopping' }
   ] %}
 
   {% from "admin/components/ui/dashboard.html" import breakdown_progress_bar %}

@@ -1,3 +1,4 @@
+{% from "components/ui/core.html" import badge %}
 {% if not data or data | length == 0 %}
 <p class="hint">No integration activity yet. Run a fetch job to populate data.</p>
 {% else %}
@@ -13,7 +14,7 @@
 {% endif %}
 <div class="integration-row flex items-center gap-3">
   <span class="integration-name">{{ intg.name | upper }}</span>
-  <span class="integration-status {{ status_class }}">{{ status_text }}</span>
+  {{ badge(text=status_text, class="integration-status " ~ status_class) }}
   <span class="integration-meta">
     <span class="meta-requests">Reqs Today: {{ intg.requests_today }}</span>
     <span class="integration-separator">|</span>

@@ -1,13 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="article-sources-mini-table">
-  <table class="dashboard-table">
-    <thead>
-      <tr>
-        <th>Source</th>
-        <th>URL</th>
-        <th>Published At</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Source", "URL", "Published At"], class="dashboard-table") %}
       {% for src in sources %}
       <tr>
         <td>{{ src.source.name if src.source else "Unknown" }}</td>
@@ -29,6 +22,5 @@
         </td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

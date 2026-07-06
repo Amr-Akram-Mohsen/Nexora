@@ -1,5 +1,7 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header %}
+{% from "admin/components/ui/tables.html" import standard_table %}
+{% from "components/ui/core.html" import badge %}
 
 {% block title %}Content Analytics Dashboard — Nexora Admin{% endblock %}
 {% block content_class %}admin-content-fluid{% endblock %}
@@ -193,20 +195,10 @@
     <p class="overview-panel-sub">Detailed performance and quality metrics by ingestion source</p>
   </div>
   <div class="panel-body-list">
-    <table class="dashboard-table">
-      <thead>
-        <tr>
-          <th>Ingestion Origin</th>
-          <th>Content Count</th>
-          <th>Avg Quality Score</th>
-          <th>Avg Word Count</th>
-          <th>Avg Views</th>
-        </tr>
-      </thead>
-      <tbody>
+    {% call standard_table(["Ingestion Origin", "Content Count", "Avg Quality Score", "Avg Word Count", "Avg Views"], class="dashboard-table") %}
         {% for row in stats.origin_table %}
         <tr>
-          <td><span class="badge badge-origin badge-compact">{{ row.origin }}</span></td>
+          <td>{{ badge(text=row.origin, class="badge badge-origin badge-compact") }}</td>
           <td>{{ row.count }}</td>
           <td>{{ row.avg_quality }}</td>
           <td>{{ row.avg_words }}</td>
@@ -217,8 +209,7 @@
           <td colspan="5" class="text-center">No origin data available.</td>
         </tr>
         {% endfor %}
-      </tbody>
-    </table>
+    {% endcall %}
   </div>
 </div>
 

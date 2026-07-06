@@ -2,7 +2,7 @@
 {% macro admin_tab_navigation(id_prefix, tabs) %}
 <div class="admin-tabs flex gap-1" id="{{ id_prefix }}-tabs">
   {% for tab in tabs %}
-  {{ button(text=tab.label|safe, class="admin-tab-btn " ~ ('active' if tab.active else ''), attrs={"data-tab": tab.id}, variant=none) }}
+  {{ button(text=tab.label, icon=tab.icon, class="admin-tab-btn " ~ ('active' if tab.active else ''), attrs={"data-tab": tab.id}, variant=none) }}
   {% endfor %}
 </div>
 {% endmacro %}

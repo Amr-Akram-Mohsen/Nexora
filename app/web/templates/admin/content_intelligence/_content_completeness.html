@@ -1,3 +1,4 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="summary-cards gap-4">
   <div class="summary-card flex-col gap-2">
     <div class="summary-title">System-Wide Completeness</div>
@@ -9,16 +10,7 @@
 </div>
 
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Category</th>
-        <th>Content Count</th>
-        <th>Completeness %</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Category", "Content Count", "Completeness %", "Status"]) %}
       {% for cat in data.category_scores %}
       <tr>
         <td><strong>{{ cat.category_name }}</strong></td>
@@ -39,6 +31,5 @@
         <td colspan="4">No data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

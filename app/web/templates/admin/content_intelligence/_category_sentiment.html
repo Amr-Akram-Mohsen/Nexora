@@ -1,16 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Category Name</th>
-        <th>Total Comments</th>
-        <th>Positive</th>
-        <th>Neutral</th>
-        <th>Negative</th>
-        <th>Health Status</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Category Name", "Total Comments", "Positive", "Neutral", "Negative", "Health Status"]) %}
       {% for item in data %}
       <tr>
         <td><strong>{{ item.category_name }}</strong></td>
@@ -25,6 +15,5 @@
         <td colspan="6">No sentiment data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

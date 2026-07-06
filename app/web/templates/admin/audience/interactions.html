@@ -59,12 +59,12 @@
 
 {# Tab Navigation #}
 {{ admin_tab_navigation("interactions", [
-{"id": "comments", "label": '<i class="fa-solid fa-comments"></i> Comments', "active": true},
-{"id": "reactions", "label": '<i class="fa-solid fa-thumbs-up"></i> Reactions'},
-{"id": "views", "label": '<i class="fa-solid fa-eye"></i> Views'},
-{"id": "clicks", "label": '<i class="fa-solid fa-cart-shopping"></i> Clicks'},
-{"id": "saves", "label": '<i class="fa-solid fa-bookmark"></i> Saves'},
-{"id": "shares", "label": '<i class="fa-solid fa-link"></i> Shares'}
+{"id": "comments", "label": 'Comments', "icon": "fa-solid fa-comments", "active": true},
+{"id": "reactions", "label": 'Reactions', "icon": "fa-solid fa-thumbs-up"},
+{"id": "views", "label": 'Views', "icon": "fa-solid fa-eye"},
+{"id": "clicks", "label": 'Clicks', "icon": "fa-solid fa-cart-shopping"},
+{"id": "saves", "label": 'Saves', "icon": "fa-solid fa-bookmark"},
+{"id": "shares", "label": 'Shares', "icon": "fa-solid fa-link"}
 ]) }}
 
 {# ── Comments Tab ─────────────────────────────────────────── #}
@@ -118,8 +118,7 @@
     {{ admin_search_input("reactions-search", "Search target title…") }}
     {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
     default_val="", default_text="All Reaction Types", extra_class="filter-select-item") }}
-    {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon='<i class="fa-solid fa-user"></i>')
-    }}
+    {{ admin_search_input("filter-reactions-user", "Search user name/email…", icon='fa-solid fa-user') }}
     {{ admin_reset_button("clear-reactions-filters-btn", "Reset") }}
   </div>
   {% endcall %}
@@ -157,8 +156,7 @@
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("clicks-search", "Search item name…") }}
-  {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon='<i
-    class="fa-solid fa-store"></i>') }}
+  {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon='fa-solid fa-store') }}
   {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
 </div>
 {% endcall %}
@@ -173,8 +171,7 @@
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("saves-search", "Search target title…") }}
-  {{ admin_search_input("filter-saves-user", "Search user name/email…", icon='<i class="fa-solid fa-user"></i>')
-  }}
+  {{ admin_search_input("filter-saves-user", "Search user name/email…", icon='fa-solid fa-user') }}
   {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
 </div>
 {% endcall %}
@@ -189,8 +186,7 @@
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("shares-search", "Search target title…") }}
-  {{ admin_search_input("filter-shares-user", "Search user name/email…", icon='<i class="fa-solid fa-user"></i>')
-  }}
+  {{ admin_search_input("filter-shares-user", "Search user name/email…", icon='fa-solid fa-user') }}
   {{ admin_reset_button("clear-shares-filters-btn", "Reset") }}
 </div>
 {% endcall %}

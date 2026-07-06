@@ -22,7 +22,7 @@
     ("all_time", "All Time")
   ], default_val="7_days", default_text=None, extra_class="insights-timeframe-select") }}
   {% from "components/ui/core.html" import button %}
-  {{ button(id="refresh-insights-btn", class="admin-btn-secondary", text="↺ Refresh", unstyled=True) }}
+  {{ button(id="refresh-insights-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) }}
 </div>
 {% endset %}
 
@@ -45,7 +45,7 @@
     {{ button(id="clear-filter-btn", class="admin-btn-secondary", text="Clear Filter", unstyled=True) }}
   </div>
   {% endset %}
-  {% call admin_table_panel('<i class="fa-solid fa-trophy"></i> Top Opportunities', "Unified priority list of categories and brands with the highest growth potential.", actions=opps_actions) %}
+  {% call admin_table_panel('Top Opportunities', "Unified priority list of categories and brands with the highest growth potential.", icon="fa-solid fa-trophy", actions=opps_actions) %}
     {{ admin_crud_table(tables['top_opportunities'], loading_text="Compiling top opportunities...") }}
   {% endcall %}
 </div>
@@ -70,7 +70,7 @@
   {% endcall %}
 
   <!-- Brand Opportunity Analysis -->
-  {% call admin_table_panel('<i class="fa-solid fa-star"></i> Brand Opportunity Analysis', "User engagement vs content volume to identify brand expansion opportunities.") %}
+  {% call admin_table_panel('Brand Opportunity Analysis', "User engagement vs content volume to identify brand expansion opportunities.", icon="fa-solid fa-star") %}
     {{ admin_crud_table(tables['brand_opportunities'], loading_text="Calculating brand expansion opportunities...") }}
   {% endcall %}
 </div>

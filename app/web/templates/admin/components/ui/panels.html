@@ -70,12 +70,9 @@ scroll_class="admin-table-scrollable") %}
 {% macro admin_settings_card(title, desc, icon, id=None, is_danger=False) %}
 <div class="settings-card {% if is_danger %}danger-zone-card{% endif %}" {% if id %}id="{{ id }}" {% endif %}>
   <div class="settings-card-header flex">
-    {% if '<svg' in icon or '<i' in icon %} <div class="settings-card-icon-wrapper flex-center">
-      {{ icon|safe }}
-  </div>
-  {% else %}
-  <span class="settings-card-icon">{{ icon }}</span>
-  {% endif %}
+    <div class="settings-card-icon-wrapper flex-center">
+      <i class="{{ icon }}"></i>
+    </div>
   <div>
     <h3 {% if is_danger %}class="danger-title" {% endif %}>{{ title }}</h3>
     <p class="settings-card-desc">{{ desc }}</p>
@@ -96,7 +93,7 @@ scroll_class="admin-table-scrollable") %}
 {% macro inspect_page_shell(page_title, back_url, back_label, header_title=None) %}
 {% set header_actions %}
 <a href="{{ back_url }}" class="admin-btn-secondary">
-  ← {{ back_label }}
+  <i class="fa-solid fa-arrow-left"></i> {{ back_label }}
 </a>
 {% endset %}
 

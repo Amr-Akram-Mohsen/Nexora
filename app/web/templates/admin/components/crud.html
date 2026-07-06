@@ -11,11 +11,8 @@ Renders a <tbody> with all items passed through the row macro.
   {% else %}
   <tr>
     <td colspan="{{ colspan or 3 }}" class="table-loading-cell">
-      <div class="dashboard-empty loading-height-sm">
-        <span ><i class="fa-regular fa-envelope-open"></i></span>
-        <p>{{ empty_text }}</p>
-        <p >Adjust your search or filters.</p>
-      </div>
+      {% from "admin/components/ui/dashboard.html" import dashboard_empty %}
+      {{ dashboard_empty(empty_text, icon="fa-regular fa-envelope-open", height_class="loading-height-sm", subtext="Adjust your search or filters.") }}
     </td>
   </tr>
   {% endfor %}

@@ -1,37 +1,17 @@
-<a href="/admin/contents" class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-newspaper"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.contents_count or 0) }}</h3>
-  <p class="dashboard-stat-label">Total Contents</p>
-</a>
-<a href="/admin/items" class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-bag-shopping"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.items_count or 0) }}</h3>
-  <p class="dashboard-stat-label">Total Items</p>
-</a>
-<a href="/admin/users" class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-users"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.users_count or 0) }}</h3>
-  <p class="dashboard-stat-label">Total Users</p>
-</a>
-<a href="/admin/moderation" class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-chart-pie"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.total or 0) }}</h3>
-  <p class="dashboard-stat-label">Interactions</p>
-  {% if stats.interactions %}
-  <p class="dashboard-stat-meta">
-    {{ "{:,}".format(stats.interactions.reactions or 0) }} reactions · {{ "{:,}".format(stats.interactions.saves or 0)
-    }} saves
-  </p>
-  {% endif %}
-</a>
-<a href="/admin/contents?sort_by=view_count&sort_dir=desc"
-  class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-eye"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.views or 0) }}</h3>
-  <p class="dashboard-stat-label">Total Views</p>
-</a>
-<a href="/admin/moderation?tab=comments" class="dashboard-stat-card clickable-card flex flex-col items-center">
-  <i class="fa-solid fa-comments"></i>
-  <h3 class="dashboard-stat-value">{{ "{:,}".format(stats.interactions.comments or 0) }}</h3>
-  <p class="dashboard-stat-label">Total Comments</p>
-</a>
+{% from "components/ui/core.html" import stat_card %}
+{{ stat_card("Total Contents", value_text="{:,}".format(stats.contents_count or 0), icon="fa-solid fa-newspaper", href="/admin/contents", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+
+{{ stat_card("Total Items", value_text="{:,}".format(stats.items_count or 0), icon="fa-solid fa-bag-shopping", href="/admin/items", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+
+{{ stat_card("Total Users", value_text="{:,}".format(stats.users_count or 0), icon="fa-solid fa-users", href="/admin/users", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+
+{% if stats.interactions %}
+  {% set interactions_meta = "{:,} reactions &middot; {:,} saves".format(stats.interactions.reactions or 0, stats.interactions.saves or 0) %}
+  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/moderation", meta_text=interactions_meta, class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+{% else %}
+  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/moderation", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+{% endif %}
+
+{{ stat_card("Total Views", value_text="{:,}".format(stats.interactions.views or 0), icon="fa-solid fa-eye", href="/admin/contents?sort_by=view_count&sort_dir=desc", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+
+{{ stat_card("Total Comments", value_text="{:,}".format(stats.interactions.comments or 0), icon="fa-solid fa-comments", href="/admin/moderation?tab=comments", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}

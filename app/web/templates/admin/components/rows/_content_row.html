@@ -38,9 +38,9 @@
 </td>
 <td data-field="classification">
   <div class="flex flex-col gap-1">
-    {{ badge(row.object_type, class="badge-type badge-compact", variant=none) }}
-    <span class="content-date-row">{{ row.category }}</span>
-    <span class="content-date-row">{{ row.section }}</span>
+    <span>Type: <strong><i>{{ row.object_type|title }}</i></strong></span>
+    <span>Category: <strong><i>{{ row.category }}</i></strong></span>
+    <span>Section: <strong><i>{{ row.section }}</i></strong></span>
   </div>
 </td>
 <td data-field="engagement">

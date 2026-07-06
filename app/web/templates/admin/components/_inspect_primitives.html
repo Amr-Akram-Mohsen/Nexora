@@ -1,5 +1,5 @@
 {# app/web/templates/admin/components/_inspect_primitives.html #}
-{% from "components/ui/core.html" import badge, input %}
+{% from "components/ui/core.html" import badge, input, link %}
 
 {% macro inspect_card(title, icon="", body_class="") %}
 <div class="profile-section-card flex gap-3">
@@ -80,7 +80,7 @@
       <div class="inspect-url-container">
         {{ input(type="text", value=(lnk.original_url or ''), class="inspect-url-input", attrs={"readonly": "readonly", "data-action": "select-text"}, required=False) }}
         {% if lnk.original_url %}
-        <a target="_blank" href="{{ lnk.original_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
+        {{ link(href=lnk.original_url, class="inspect-url-link", icon="fa-solid fa-external-link-alt", attrs={"target": "_blank", "title": "Open in new tab"}, unstyled=True) }}
         {% endif %}
       </div>
     </div>
@@ -89,7 +89,7 @@
       <div class="inspect-url-container">
         {{ input(type="text", value=(lnk.affiliate_url or ''), class="inspect-url-input", attrs={"readonly": "readonly", "data-action": "select-text"}, required=False) }}
         {% if lnk.affiliate_url %}
-        <a target="_blank" href="{{ lnk.affiliate_url }}" class="inspect-url-link" title="Open in new tab"><i class="fa-solid fa-external-link-alt"></i></a>
+        {{ link(href=lnk.affiliate_url, class="inspect-url-link", icon="fa-solid fa-external-link-alt", attrs={"target": "_blank", "title": "Open in new tab"}, unstyled=True) }}
         {% endif %}
       </div>
     </div>
@@ -349,14 +349,12 @@
       </div>
       <div class="flex items-center gap-3">
         <span class="text-muted"><i class="fas fa-eye"></i> {{ article.views|default(0) }}</span>
-        <a href="/admin/contents/{{ article.id }}" target="_blank" class="admin-btn-secondary py-1 px-2 text-xs">View</a>
+        {{ link(text="View", href="/admin/contents/" ~ article.id, class="admin-btn-secondary py-1 px-2 text-xs", attrs={"target": "_blank"}, unstyled=True) }}
       </div>
     </div>
     {% else %}
     <div class='inspect-article-row flex justify-between items-center'>
-      <a href='/admin/contents/{{ article.id }}' target='_blank' class='inspect-article-title'>
-        {{ article.title }}
-      </a>
+      {{ link(text=article.title, href="/admin/contents/" ~ article.id, class="inspect-article-title", attrs={"target": "_blank"}, unstyled=True) }}
       {{ badge('{:,}'.format(article.views|default(0)) ~ ' views', class='badge-secondary inspect-article-views', variant=none) }}
     </div>
     {% endif %}

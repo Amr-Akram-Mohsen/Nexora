@@ -1,34 +1,35 @@
+{% from "components/ui/core.html" import link, badge %}
 <!-- Summary Metrics Bar -->
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-plan-summary">
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-robot"></i> Auto-Execute Queue: <span class="status-badge">{{ auto_execute|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-circle-question"></i> Needs Review Queue: <span class="status-badge">{{ needs_review|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Queue: <span class="status-badge">{{ blocked|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-robot"></i> Auto-Execute Queue: {{ badge(text=auto_execute|length, class="status-badge") }}</div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-circle-question"></i> Needs Review Queue: {{ badge(text=needs_review|length, class="status-badge") }}</div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Queue: {{ badge(text=blocked|length, class="status-badge") }}</div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-plan-grid-container">
   {% set queues = [
-    { 'name': 'AUTO EXECUTE', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge">AUTO APPROVED</span>'|safe, 'list': auto_execute },
-    { 'name': 'NEEDS REVIEW', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge">PENDING REVIEW</span>'|safe, 'list': needs_review },
-    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge">SAFETY BLOCKED</span>'|safe, 'list': blocked }
+    { 'name': 'AUTO EXECUTE', 'headerClass': 'auto-execute', 'statusLabel': 'AUTO APPROVED', 'list': auto_execute },
+    { 'name': 'NEEDS REVIEW', 'headerClass': 'needs-review', 'statusLabel': 'PENDING REVIEW', 'list': needs_review },
+    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': 'SAFETY BLOCKED', 'list': blocked }
   ] %}
 
   {% for q in queues %}
     <div class="kanban-column flex">
       <div class="publishing-column-header {{ q.headerClass }} flex justify-between items-center">
         <div >{{ q.name }}</div>
-        <div>{{ q.statusLabel }}</div>
+        <div>{{ badge(text=q.statusLabel, class="status-badge") }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not q.list %}
           <div  >No items in this queue.</div>
         {% else %}
           {% for task in q.list %}
-            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if task.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if task.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
+            {% set platformIcon = 'fa-solid fa-tv' if task.platform == 'youtube' else 'fa-solid fa-thumbtack' if task.platform == 'pinterest' else 'fa-solid fa-pen-to-square' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
               <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
-                <span class="kanban-task-platform flex gap-1 items-center">{{ platformIcon }} {{ task.platform|upper }}</span>
-                <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
+                <span class="kanban-task-platform flex gap-1 items-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
+                {{ badge(text=task.action, class="status-badge " ~ actionBadgeClass) }}
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>
               <p class="kanban-task-meta">Confidence Score: <strong >{{ (task.confidence_score * 100)|round|int }}%</strong></p>
@@ -48,7 +49,7 @@
                 <div class="kanban-task-log">
                   <strong>Status:</strong> {{ log_status }}<br/>
                   {% if log_url %}
-                    <strong>Sim Published:</strong> <a href="{{ log_url }}" target="_blank">{{ log_url }}</a><br/>
+                    <strong>Sim Published:</strong> {{ link(text=log_url, href=log_url, attrs={"target": "_blank"}, unstyled=True) }}<br/>
                   {% endif %}
                   <strong>Timestamp:</strong> {{ task.execution_log.timestamp or '' }}
                 </div>

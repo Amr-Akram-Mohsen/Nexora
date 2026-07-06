@@ -4,9 +4,7 @@
 {% else %}
 <ol class="overview-top-list">
   {% for item in items %}
-    {% set value_html = "{:,} views".format(item.view_count or 0) %}
-    {% set link_html = '<a class="overview-top-link-title" href="/admin/contents?search=' ~ item.id ~ '" title="' ~ item.title ~ '">' ~ item.title ~ '</a>' %}
-    {{ ranked_list_item(loop.index, link_html, value_html, extra_class="") }}
+    {{ ranked_list_item(loop.index, item.title, title_href="/admin/contents?search=" ~ item.id, value_text="{:,} views".format(item.view_count or 0)) }}
   {% endfor %}
 </ol>
 {% endif %}

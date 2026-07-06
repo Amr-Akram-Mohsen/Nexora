@@ -4,7 +4,7 @@
   <div class="dashboard-modal-content {{ class }}" role="dialog" aria-modal="true" aria-labelledby="{{ id }}-title">
     {% call button(class="dashboard-modal-close-x", attrs={"aria-label": "Close modal", "data-dismiss": "modal"}, unstyled=True) %}×{% endcall %}
     {% if icon %}
-    <div class="dashboard-modal-icon">{{ icon|safe }}</div>
+    <div class="dashboard-modal-icon"><i class="{{ icon }}"></i></div>
     {% endif %}
     <h3 class="dashboard-modal-title" id="{{ id }}-title">{{ title }}</h3>
     <div class="dashboard-modal-body" id="{{ id }}-body">

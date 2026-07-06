@@ -1,18 +1,7 @@
 {# app/web/templates/admin/distribution/_platform_performance.html #}
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="distribution-platform-performance">
-    <table class="distribution-table">
-        <thead>
-            <tr>
-                <th>Platform</th>
-                <th>Published Posts</th>
-                <th>Views</th>
-                <th>Engagement</th>
-                <th>Likes</th>
-                <th>Clicks</th>
-                <th>Shares</th>
-            </tr>
-        </thead>
-        <tbody>
+    {% call standard_table(["Platform", "Published Posts", "Views", "Engagement", "Likes", "Clicks", "Shares"], class="distribution-table") %}
             {% for p in platforms %}
             <tr class="distribution-table-row">
                 <td class="flex items-center gap-2">
@@ -33,6 +22,5 @@
                 </td>
             </tr>
             {% endfor %}
-        </tbody>
-    </table>
+    {% endcall %}
 </div>

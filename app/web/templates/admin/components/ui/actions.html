@@ -20,7 +20,7 @@ button_type="button"
     {% set _ = final_attrs.update({key.replace('_', '-'): val}) %}
   {% endif %}
 {% endfor %}
-{{ button(text=(icon|safe ~ " " ~ text)|safe if icon else text, type=button_type, class="user-action-btn user-action-" ~ action_type ~ " " ~ extra_class, attrs=final_attrs, variant=none) }}
+{{ button(text=text, icon=icon, type=button_type, class="user-action-btn user-action-" ~ action_type ~ " " ~ extra_class, attrs=final_attrs, variant=none) }}
 {% endmacro %}
 
 {% macro action_group(

@@ -1,6 +1,7 @@
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
 {% from "admin/components/ui/panels.html" import admin_panel %}
 {% from "admin/distribution/_components.html" import metric_card %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 
 <!-- Section 1: Recommendation CTR Dashboard -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-link"></i> Recommendation Widget Performance</h2>
@@ -22,7 +23,7 @@
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-brain"></i> Recommendation Intelligence Summary</h2>
 <div class="insights-double-grid" id="recommendation-intelligence-panel" >
   <!-- Left Side: Quality Scores & Benchmark -->
-  {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Quality Scores & Benchmarks', "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.") %}
+  {% call admin_panel('Quality Scores & Benchmarks', "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.", icon="fa-solid fa-chart-pie") %}
     <div class="benchmark-list flex gap-3">
       <!-- Cross Category Benchmarking Widget -->
       <div class="benchmark-card">
@@ -63,16 +64,7 @@
           <i class="fas fa-star"></i> Quality Score Breakdown
         </h4>
         <div class="insights-table-scroll">
-          <table class="admin-table" id="quality-scores-table">
-            <thead>
-              <tr>
-                <th>Segment</th>
-                <th>Type / Name</th>
-                <th>CTR</th>
-                <th>Quality Score</th>
-              </tr>
-            </thead>
-            <tbody id="quality-scores-table-body">
+          {% call standard_table(["Segment", "Type / Name", "CTR", "Quality Score"], id="quality-scores-table", body_id="quality-scores-table-body") %}
               {% if metrics and metrics.quality_scores %}
                 {% set qScores = metrics.quality_scores %}
                 <!-- A. Render Recommendation Types -->
@@ -105,15 +97,14 @@
               {% else %}
                 <tr><td colspan="4" >No quality score details.</td></tr>
               {% endif %}
-            </tbody>
-          </table>
+          {% endcall %}
         </div>
       </div>
     </div>
   {% endcall %}
 
   <!-- Right Side: Action Suggestions List -->
-  {% call admin_panel('<i class="fa-solid fa-lightbulb"></i> Action Suggestions Engine', "Behavior-driven diagnoses and recommended actions per recommendation module.") %}
+  {% call admin_panel('Action Suggestions Engine', "Behavior-driven diagnoses and recommended actions per recommendation module.", icon="fa-solid fa-lightbulb") %}
     <div id="rec-action-suggestions-list" class="suggestions-list-scroll flex gap-3">
       {% if metrics and metrics.diagnoses_list %}
         {% for ddata in metrics.diagnoses_list %}

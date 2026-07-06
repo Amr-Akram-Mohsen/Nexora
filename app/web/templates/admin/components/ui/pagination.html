@@ -11,9 +11,11 @@
       {% set _ = pagination_opts.append((opt, opt ~ " per page")) %}
     {% endfor %}
     {{ admin_filter_select(per_page_id, None, pagination_opts, default_val=current_per_page, default_text=None, extra_class="pagination-per-page-select") }}
-    {{ button(text="← Previous", attrs={"id": prev_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
+    {{ button(text="Previous", icon="fa-solid fa-arrow-left", attrs={"id": prev_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
     <span id="{{ indicator_id }}" class="pagination-page-indicator">Page 1 of 1</span>
-    {{ button(text="Next →", attrs={"id": next_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
+    {% call button(attrs={"id": next_id, "disabled": "disabled"}, class="user-action-btn", variant=none) %}
+      Next <i class="fa-solid fa-arrow-right"></i>
+    {% endcall %}
   </div>
 </div>
 {% endmacro %}

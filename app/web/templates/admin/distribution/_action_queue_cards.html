@@ -1,4 +1,5 @@
 {% from "admin/distribution/_components.html" import opportunity_card %}
+{% from "components/ui/core.html" import badge %}
 {% if items %}
 {% for item in items %}
 {% set priorityBadgeClass = "badge-danger" if item.priority == "High" else "badge-warning" if item.priority == "Medium"
@@ -10,8 +11,7 @@ else "badge-secondary" %}
 <div class="opp-metrics gap-2">
   <div class="opp-metric-item flex gap-1 items-center">Target <strong>{{ item.target }}</strong></div>
   <div class="opp-metric-item flex gap-1 items-center">Type <strong>{{ item.type }}</strong></div>
-  <div class="opp-metric-item flex gap-1 items-center">Priority <strong class="status-badge {{ priorityBadgeClass }}">{{
-      item.priority }}</strong></div>
+  <div class="opp-metric-item flex gap-1 items-center">Priority {{ badge(text=item.priority, class="status-badge " ~ priorityBadgeClass) }}</div>
   <div class="opp-metric-item flex gap-1 items-center">Confidence <strong>{{ (item.confidence * 100)|round|int
       }}%</strong></div>
 </div>

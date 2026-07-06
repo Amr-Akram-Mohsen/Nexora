@@ -21,14 +21,14 @@
           <h3 class="dup-group-title">{{ group.title }}</h3>
           <p class="dup-group-meta">{{ group.count }} identical titles found</p>
         </div>
-        {% from "components/ui/core.html" import button %}
+        {% from "components/ui/core.html" import button, badge %}
         {{ button(class="user-action-btn user-action-delete", attrs={"data-action": "keep-oldest", "data-group": loop.index, "data-items": group.content_list|tojson|e}, icon="fas fa-trash-alt", text="Keep Oldest Only", unstyled=True) }}
       </div>
       <div class="dup-group-body">
         {% for item in group.content_list %}
         <div class="dup-item-card" id="dup-item-{{ item.id }}" data-id="{{ item.id }}">
           <div class="flex justify-between items-center">
-            <span class="badge badge-type badge-compact">{{ item.type }}</span>
+            {{ badge(text=item.type, class="badge badge-type badge-compact") }}
             <span class="dup-item-meta">ID: {{ item.id }}</span>
           </div>
           <div class="dup-item-meta">

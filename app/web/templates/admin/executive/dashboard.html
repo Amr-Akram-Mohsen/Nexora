@@ -1,4 +1,6 @@
 {% extends "admin/base.html" %}
+{% from "admin/components/ui/tables.html" import standard_table %}
+{% from "components/ui/core.html" import badge %}
 
 {% block title %}Executive Intelligence Dashboard{% endblock %}
 
@@ -21,8 +23,7 @@
                 <canvas id="healthChart"></canvas>
             </div>
             <div class="flex-grow-1">
-                <table class="admin-table vertical-table">
-                    <tbody>
+            {% call standard_table(none, class="admin-table vertical-table") %}
                         <tr>
                             <td class="cell-label">Overall Score</td>
                             <td class="cell-value"><h2>{{ summary.system_health.score }}%</h2></td>
@@ -39,8 +40,7 @@
                             <td class="cell-label">Distribution sync</td>
                             <td class="cell-value">{{ summary.system_health.distribution_coverage }}%</td>
                         </tr>
-                    </tbody>
-                </table>
+            {% endcall %}
             </div>
         </div>
     </div>
@@ -53,15 +53,7 @@
         <div class="card-body">
             <canvas id="velocityChart" height="80"></canvas>
             <div class="insights-table-scroll">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Growth Velocity</th>
-                            <th>Current Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {% call standard_table(["Category", "Growth Velocity", "Current Volume"]) %}
                         {% for v in summary.engagement_velocity %}
                         <tr>
                             <td><strong>{{ v.category }}</strong></td>
@@ -69,8 +61,7 @@
                             <td>{{ v.volume }} interactions</td>
                         </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
+            {% endcall %}
             </div>
         </div>
     </div>
@@ -87,7 +78,7 @@
                 {% for opp in summary.top_opportunities %}
                 <div class="dashboard-card">
                     <div class="card-body">
-                        <span class="status-badge badge-blue">{{ opp.type }}</span>
+                        {{ badge(text=opp.type, class="status-badge badge-blue") }}
                         <h4>{{ opp.entity }}</h4>
                         <p>{{ opp.reason }}</p>
                         <strong>Score: {{ opp.score }}</strong>

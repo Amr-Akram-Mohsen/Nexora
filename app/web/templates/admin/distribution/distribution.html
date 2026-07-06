@@ -17,7 +17,7 @@
 {% set header_actions %}
 <div class="flex items-center gap-sm">
   {{ admin_filter_select("timeframe-select", name=none, options=[("today", "Today (24h)"), ("30_days", "Last 30 Days"), ("all_time", "All Time")], default_val="7_days", default_text="Last 7 Days", extra_class="insights-timeframe-select") }}
-  {{ button(text="↺ Refresh", attrs={"id": "refresh-distribution-btn"}, class="admin-btn-secondary", variant=none) }}
+  {{ button(text="Refresh", icon="fa-solid fa-rotate-right", attrs={"id": "refresh-distribution-btn"}, class="admin-btn-secondary", variant=none) }}
 </div>
 {% endset %}
 
@@ -38,15 +38,15 @@ actions=header_actions
 
 <!-- Action Queue Section -->
 <div class="overview-top-grid insights-section">
-  {% call admin_table_panel('<i class="fa-solid fa-bolt"></i> Tactical Action Queue', "Immediate tactical actions
-  including content recycles, updates, and creation drafts.") %}
+  {% call admin_table_panel('Tactical Action Queue', "Immediate tactical actions
+  including content recycles, updates, and creation drafts.", icon="fa-solid fa-bolt") %}
   <div id="action-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
     {{ spinner("Compiling tactical actions...") }}
   </div>
   {% endcall %}
 
-  {% call admin_table_panel('<i class="fa-solid fa-calendar"></i> Scheduling Queue', "Upcoming distribution events ready
-  to be published.") %}
+  {% call admin_table_panel('Scheduling Queue', "Upcoming distribution events ready
+  to be published.", icon="fa-solid fa-calendar") %}
   <div id="scheduling-queue-list" class="suggestions-list-scroll flex flex-col gap-3">
     {{ spinner("Loading scheduled posts...") }}
   </div>

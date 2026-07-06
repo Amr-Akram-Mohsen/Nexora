@@ -1,13 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Content Piece (Article)</th>
-        <th>Commerce Transition Volume</th>
-        <th>Funnel Rank</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Content Piece (Article)", "Commerce Transition Volume", "Funnel Rank"]) %}
       {% for item in data %}
       <tr>
         <td><strong>{{ item.title }}</strong><br><small>Content ID: {{ item.content_id }}</small></td>
@@ -19,6 +12,5 @@
         <td colspan="3">No commerce chain data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

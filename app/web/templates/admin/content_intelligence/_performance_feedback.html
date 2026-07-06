@@ -1,10 +1,11 @@
 {% from "admin/components/ui/panels.html" import admin_panel, admin_table_panel %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 <!-- Section 1.98: Content Performance Feedback -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-line fa-flip-vertical"></i> Content Performance Feedback</h2>
 <div class="flex gap-6" id="content-feedback-panel" >
     <!-- Left Side: Strategy Accuracy & Failures -->
-    {% call admin_panel('<i class="fa-solid fa-brain"></i> Strategy Accuracy & Failures', "Platform-weighted accuracy index and root-cause diagnoses of
-    underperforming assets.") %}
+    {% call admin_panel('Strategy Accuracy & Failures', "Platform-weighted accuracy index and root-cause diagnoses of
+    underperforming assets.", icon="fa-solid fa-brain") %}
     <div class="accuracy-panel-body flex gap-6">
         <!-- Strategy Accuracy Widget -->
         <div class="insights-accuracy-card gap-5 flex justify-between items-center">
@@ -31,20 +32,16 @@
     {% endcall %}
 
     <!-- Right Side: Evaluations list -->
-    {% call admin_table_panel('<i class="fa-solid fa-clipboard-list"></i> Content Evaluations Inventory', "Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.") %}
-        <table class="admin-table" id="feedback-evaluations-table">
-            <thead>
-                <tr>
-                    <th>Platform / Title</th>
-                    <th class="col-metric">Expected CTR</th>
-                    <th class="col-metric">Actual CTR</th>
-                    <th>Evaluation Status</th>
-                    <th>Reason</th>
-                </tr>
-            </thead>
-            <tbody id="feedback-evaluations-body">
-                <!-- Populated by JS -->
-            </tbody>
-        </table>
+    {% call admin_table_panel('Content Evaluations Inventory', "Comparing actual CTR, engagement rate, and conversion rate with baseline expectations.", icon="fa-solid fa-clipboard-list") %}
+        {% set fb_headers = [
+            "Platform / Title",
+            {"label": "Expected CTR", "class": "col-metric"},
+            {"label": "Actual CTR", "class": "col-metric"},
+            "Evaluation Status",
+            "Reason"
+        ] %}
+        {% call standard_table(fb_headers, id="feedback-evaluations-table", body_id="feedback-evaluations-body") %}
+            <!-- Populated by JS -->
+        {% endcall %}
     {% endcall %}
 </div>

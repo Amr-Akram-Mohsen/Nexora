@@ -24,7 +24,7 @@
       {{ action_button(
           "Already Flagged" if sentiment == 'spam' else "Flag as Spam",
           action_type="toggle-active",
-          icon="🚩",
+          icon="fa-solid fa-flag",
           disabled=(sentiment == 'spam'),
           attrs={"data-action": "flag-comment", "data-id": inspect_id}
       ) }}
@@ -32,7 +32,7 @@
       {{ action_button(
           "Delete Comment",
           action_type="delete",
-          icon="🗑",
+          icon="fa-solid fa-trash",
           extra_class="inspect-delete-btn",
           attrs={"data-action": "delete-comment", "data-id": inspect_id}
       ) }}

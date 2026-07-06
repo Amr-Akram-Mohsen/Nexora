@@ -10,7 +10,7 @@
   {% elif sentiment == "spam" %}{{ badge(sentiment|title, variant="warning") }}
   {% else %}{{ badge(sentiment|title, variant="secondary") }}{% endif %}
 </td>
-<td data-field="likes">{{ "👍 " ~ row.like_count ~ " 👎 " ~ row.dislike_count }}</td>
+<td data-field="likes"><i class="fa-solid fa-thumbs-up"></i> {{ row.like_count }} <i class="fa-solid fa-thumbs-down"></i> {{ row.dislike_count }}</td>
 <td data-field="replies">{{ row.replies_count }}</td>
 <td data-field="thread">
   {% if row.is_reply %}

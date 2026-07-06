@@ -1,8 +1,6 @@
+{% from "admin/components/ui/dashboard.html" import dashboard_empty %}
 {% if not by_source or by_source | length == 0 %}
-<div class="dashboard-empty loading-height-sm">
-  <span class="dashboard-state-icon"><i class="fa-regular fa-envelope-open"></i></span>
-  <p class="empty-message">No source statistics.</p>
-</div>
+{{ dashboard_empty("No source statistics.", icon="fa-regular fa-envelope-open", height_class="loading-height-sm") }}
 {% else %}
 {% set max_val = namespace(val=1) %}
 {% for s in by_source %}

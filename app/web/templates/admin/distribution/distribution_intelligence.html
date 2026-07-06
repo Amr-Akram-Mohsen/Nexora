@@ -1,5 +1,7 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_panel %}
+{% from "admin/components/ui/tables.html" import standard_table %}
+{% from "components/ui/core.html" import badge %}
 
 {% block title %}Distribution Intelligence Dashboard — Nexora Admin{% endblock %}
 
@@ -37,22 +39,13 @@ external platforms") }}
 </div>
 
 <div>
-  {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Platform Engagement Index', "Platform performance ranked by
-  multi-metric engagement score") %}
+  {% call admin_panel('Platform Engagement Index', "Platform performance ranked by
+  multi-metric engagement score", icon="fa-solid fa-chart-pie") %}
   <div class="insights-table-scroll">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Platform</th>
-          <th>Post Count</th>
-          <th>Engagement Index</th>
-          <th>Avg Engagement / Post</th>
-        </tr>
-      </thead>
-      <tbody>
+    {% call standard_table(["Platform", "Post Count", "Engagement Index", "Avg Engagement / Post"]) %}
         {% for platform in data.platforms %}
         <tr>
-          <td><span class="status-badge">{{ platform.platform | title }}</span></td>
+          <td>{{ badge(text=platform.platform | title, class="status-badge") }}</td>
           <td>{{ "{:,}".format(platform.post_count) }}</td>
           <td class="col-metric">{{ "{:,}".format(platform.engagement_index) }}</td>
           <td class="col-metric">{{ "{:,}".format(platform.avg_engagement_per_post) }}</td>
@@ -62,8 +55,7 @@ external platforms") }}
           <td colspan="4">No distribution platforms found.</td>
         </tr>
         {% endfor %}
-      </tbody>
-    </table>
+    {% endcall %}
   </div>
   {% endcall %}
 </div>

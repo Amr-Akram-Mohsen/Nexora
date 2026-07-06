@@ -286,7 +286,7 @@
         <span class="trend-badge neutral items-center">{{ item.engagement_level }} ({{ "{:,}".format(item.engagement) }})</span>
       </td>
       <td>
-        <span class="status-badge {{ badgeClass }}">{{ badgeText }}</span>
+        <span class="status-badge {{ badgeClass }}">{{ badgeText|safe }}</span>
       </td>
     </tr>
   {% endfor %}
@@ -309,7 +309,7 @@ item.evaluation == 'underperforming' else 'badge-secondary' %}
 %}
 <tr>
     <td>
-        <div >{{ platformIcon }} {{ item.title }}</div>
+        <div >{{ platformIcon|safe }} {{ item.title }}</div>
     </td>
     <td>
         <div >{{ item.entity }}</div>

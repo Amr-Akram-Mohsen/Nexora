@@ -1,15 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Source Name</th>
-        <th>Authority Score</th>
-        <th>Avg Engagement / Content</th>
-        <th>Validation Ratio</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Source Name", "Authority Score", "Avg Engagement / Content", "Validation Ratio", "Status"]) %}
       {% for item in data %}
       <tr>
         <td><strong>{{ item.source_name }}</strong><br><small>{{ item.content_count }} pieces published</small></td>
@@ -23,6 +14,5 @@
         <td colspan="5">No source validation data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

@@ -1,16 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Entity Name</th>
-        <th>Type</th>
-        <th>Interest Rank</th>
-        <th>Volume Rank</th>
-        <th>Gap Score</th>
-        <th>Content Volume</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Entity Name", "Type", "Interest Rank", "Volume Rank", "Gap Score", "Content Volume"]) %}
       {% for item in data %}
       <tr>
         <td><strong>{{ item.name }}</strong></td>
@@ -29,6 +19,5 @@
         <td colspan="6">No user interest gap data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

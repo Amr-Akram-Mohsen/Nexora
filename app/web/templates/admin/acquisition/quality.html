@@ -1,5 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_panel %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 
 {% block title %}Quality & Freshness — Nexora Admin{% endblock %}
 
@@ -16,36 +17,18 @@
         <!-- Quality Tier Leaderboard -->
         {% call admin_panel("Quality Tier Leaderboard", "Ranked source list by average quality score.") %}
         <div>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Avg Quality</th>
-                        <th>Tier</th>
-                    </tr>
-                </thead>
-                <tbody id="quality-leaderboard-tbody">
-                    <tr><td colspan="3"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
-                </tbody>
-            </table>
+            {% call standard_table(["Source", "Avg Quality", "Tier"], class="dashboard-table", body_id="quality-leaderboard-tbody") %}
+                <tr><td colspan="3"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
+            {% endcall %}
         </div>
         {% endcall %}
 
         <!-- Scrape Coverage Leaderboard -->
         {% call admin_panel("Scrape Coverage Leaderboard", "Sources ordered by successful full-text extraction percentage.") %}
         <div>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Scrape %</th>
-                        <th>Health</th>
-                    </tr>
-                </thead>
-                <tbody id="scrape-leaderboard-tbody">
-                    <tr><td colspan="3"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
-                </tbody>
-            </table>
+            {% call standard_table(["Source", "Scrape %", "Health"], class="dashboard-table", body_id="scrape-leaderboard-tbody") %}
+                <tr><td colspan="3"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
+            {% endcall %}
         </div>
         {% endcall %}
     </div>
@@ -76,19 +59,9 @@
         <!-- Content Freshness Index -->
         {% call admin_panel("Content Freshness Index", "Sources ranked by the staleness of their most recent content.") %}
         <div>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Source</th>
-                        <th>Last Ingested</th>
-                        <th>Days Stale</th>
-                        <th>Severity</th>
-                    </tr>
-                </thead>
-                <tbody id="freshness-index-tbody">
-                    <tr><td colspan="4"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
-                </tbody>
-            </table>
+            {% call standard_table(["Source", "Last Ingested", "Days Stale", "Severity"], class="dashboard-table", body_id="freshness-index-tbody") %}
+                <tr><td colspan="4"><i class="fa-solid fa-circle-notch fa-spin"></i><p>Loading...</p></td></tr>
+            {% endcall %}
         </div>
         {% endcall %}
     </div>

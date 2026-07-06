@@ -1,10 +1,10 @@
-{% from "components/ui/core.html" import badge, button %}
+{% from "components/ui/core.html" import badge, button, link %}
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="name">
   <div class="flex items-center gap-2">
     <strong class="cell-primary-text">{{ row.name }}</strong>
     {% if row.website %}
-    <a href="{{ row.website }}" target="_blank" title="Visit Website"><i class="fas fa-external-link-alt fa-xs"></i></a>
+    {{ link(href=row.website, icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank", "title": "Visit Website"}, unstyled=True) }}
     {% endif %}
   </div>
 </td>

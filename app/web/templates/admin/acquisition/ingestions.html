@@ -1,6 +1,7 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_panel, admin_table_panel %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 
 {% block title %}Ingestion Channels — Nexora Admin{% endblock %}
 
@@ -28,22 +29,10 @@
             {{ button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) }}
         </div>
         <div>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Channel</th>
-                        <th>Type</th>
-                        <th>Target / Query</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="ingestions-logs-tbody">
-                    <!-- Populated by JS -->
-                    {{ table_spinner(colspan=6, text="Loading recent events...") }}
-                </tbody>
-            </table>
+            {% call standard_table(["Time", "Channel", "Type", "Target / Query", "Category", "Status"], class="dashboard-table", body_id="ingestions-logs-tbody") %}
+                <!-- Populated by JS -->
+                {{ table_spinner(colspan=6, text="Loading recent events...") }}
+            {% endcall %}
         </div>
     </div>
 </div>

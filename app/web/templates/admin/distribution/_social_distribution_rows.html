@@ -1,12 +1,12 @@
 <!-- _social_distribution_rows.html -->
-{% from "components/ui/core.html" import button %}
+{% from "components/ui/core.html" import button, badge %}
 {% if summary_stats %}
 <div class="distribution-summary-bar flex gap-4">
-  <div class="flex items-center gap-2"><span class="status-badge badge-secondary">DRAFT: {{ summary_stats.draft }}</span></div>
-  <div class="flex items-center gap-2"><span class="status-badge badge-warning">SCHEDULED: {{ summary_stats.scheduled }}</span></div>
-  <div class="flex items-center gap-2"><span class="status-badge badge-success">PUBLISHED: {{ summary_stats.published }}</span></div>
+  <div class="flex items-center gap-2">{{ badge(text="DRAFT: " ~ summary_stats.draft, class="status-badge badge-secondary") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="SCHEDULED: " ~ summary_stats.scheduled, class="status-badge badge-warning") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="PUBLISHED: " ~ summary_stats.published, class="status-badge badge-success") }}</div>
   {% if summary_stats.overdue > 0 %}
-  <div class="flex items-center gap-2"><span class="status-badge badge-danger">OVERDUE: {{ summary_stats.overdue }}</span></div>
+  <div class="flex items-center gap-2">{{ badge(text="OVERDUE: " ~ summary_stats.overdue, class="status-badge badge-danger") }}</div>
   {% endif %}
 </div>
 {% endif %}
@@ -23,9 +23,9 @@
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-2">
         {% if item.source_type == 'content' %}
-        <span class="status-badge badge-info" title="Content"><i class="fa-solid fa-pen-to-square"></i> CONTENT</span>
+        {{ badge(text="CONTENT", class="status-badge badge-info", icon="fa-solid fa-pen-to-square", attrs={"title": "Content"}) }}
         {% else %}
-        <span class="status-badge badge-secondary" title="Item"><i class="fa-solid fa-box"></i> ITEM</span>
+        {{ badge(text="ITEM", class="status-badge badge-secondary", icon="fa-solid fa-box", attrs={"title": "Item"}) }}
         {% endif %}
       </div>
       <div class="source-title-truncate" title="{{ item.source_title }}">{{ item.source_title }}</div>
@@ -33,11 +33,11 @@
   </td>
   <td>
     {% if item.status == 'published' %}
-      <span class="status-badge badge-success">PUBLISHED</span>
+      {{ badge(text="PUBLISHED", class="status-badge badge-success") }}
     {% elif item.status == 'scheduled' %}
-      <span class="status-badge badge-warning">SCHEDULED</span>
+      {{ badge(text="SCHEDULED", class="status-badge badge-warning") }}
     {% else %}
-      <span class="status-badge badge-secondary">DRAFT</span>
+      {{ badge(text="DRAFT", class="status-badge badge-secondary") }}
     {% endif %}
   </td>
   <td>
@@ -52,7 +52,7 @@
         {% if item.publish_date %}
           <span class="publish-date-value {% if item.is_overdue %}is-overdue{% endif %}" title="{{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}">
             {{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}
-            {% if item.is_overdue %}<br><span class="overdue-badge-wrap"><span class="status-badge badge-danger">OVERDUE</span></span>{% endif %}
+            {% if item.is_overdue %}<br><span class="overdue-badge-wrap">{{ badge(text="OVERDUE", class="status-badge badge-danger") }}</span>{% endif %}
           </span>
         {% else %}
           <span class="stale-indicator">-</span>
@@ -64,8 +64,8 @@
     <div class="flex flex-col gap-1 performance-metrics-container">
       <div class="flex gap-2 performance-stats">
         <span title="Views"><i class="fa-solid fa-eye"></i> {{ item.views }}</span>
-        <span title="Likes"><i class="fa-solid fa-heart"></i>️ {{ item.likes }}</span>
-        <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i>️ {{ item.clicks }}</span>
+        <span title="Likes"><i class="fa-solid fa-heart"></i> {{ item.likes }}</span>
+        <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i> {{ item.clicks }}</span>
         <span title="Shares"><i class="fa-solid fa-rotate"></i> {{ item.shares }}</span>
       </div>
       <div class="engagement-score" title="Engagement Score"><i class="fa-solid fa-fire"></i> Score: {{ item.engagement }}</div>
@@ -74,12 +74,12 @@
   <td>
     <div class="flex items-center gap-2">
       {% if item.has_url %}
-        <span class="url-present" title="URL Present">✓</span>
+        <span class="url-present" title="URL Present"><i class="fa-solid fa-check"></i></span>
       {% else %}
         {% if item.status == 'published' %}
         <span class="url-warning" title="No URL"><i class="fa-solid fa-triangle-exclamation"></i></span>
         {% else %}
-        <span class="url-missing" title="No URL">✗</span>
+        <span class="url-missing" title="No URL"><i class="fa-solid fa-xmark"></i></span>
         {% endif %}
       {% endif %}
     </div>

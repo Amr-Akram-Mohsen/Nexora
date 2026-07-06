@@ -2,7 +2,7 @@
 {% macro admin_search_input(
 id,
 placeholder,
-icon='<i class="fa-solid fa-magnifying-glass"></i>',
+icon='fa-solid fa-magnifying-glass',
 wrapper_class="",
 input_class="",
 icon_class="admin-toolbar-search-icon-inside",
@@ -10,7 +10,7 @@ value=""
 ) %}
 <div class="admin-toolbar-search admin-search-grow flex items-center {{ wrapper_class }}">
   <span class="{{ icon_class }}">
-    {{ icon|safe }}
+    {% if icon %}<i class="{{ icon }}"></i>{% endif %}
   </span>
 
   {% set final_attrs = {} %}
@@ -29,10 +29,10 @@ extra_class=""
 {{ button(text=text, class="dashboard-filter-clear " ~ extra_class, attrs=final_attrs, variant=none) }}
 {% endmacro %}
 
-{% macro admin_refresh_btn(id, text="↺ Refresh", extra_class="") %}
+{% macro admin_refresh_btn(id, text="Refresh", extra_class="", icon="fa-solid fa-rotate-right") %}
 {% set final_attrs = {"id": id} %}
 {% for key, val in kwargs.items() %}{% set _ = final_attrs.update({key.replace('_', '-'): val}) %}{% endfor %}
-{{ button(text=text, class="admin-btn-secondary " ~ extra_class, attrs=final_attrs, variant=none) }}
+{{ button(text=text, icon=icon, class="admin-btn-secondary " ~ extra_class, attrs=final_attrs, variant=none) }}
 {% endmacro %}
 
 {% macro admin_toolbar_section(extra_class="", extra_style="") %}

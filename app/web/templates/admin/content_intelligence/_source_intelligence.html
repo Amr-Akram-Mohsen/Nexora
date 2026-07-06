@@ -1,17 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Store Name</th>
-        <th>Active Links</th>
-        <th>Stale Links %</th>
-        <th>Total Clicks</th>
-        <th>Conversion Potential</th>
-        <th>Health Score</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Store Name", "Active Links", "Stale Links %", "Total Clicks", "Conversion Potential", "Health Score", "Status"]) %}
       {% for src in data %}
       <tr>
         <td><strong>{{ src.store_name }}</strong></td>
@@ -37,6 +26,5 @@
         <td colspan="7">No source intelligence data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

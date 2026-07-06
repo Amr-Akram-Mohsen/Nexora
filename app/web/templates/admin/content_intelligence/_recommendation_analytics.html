@@ -1,41 +1,22 @@
 {% from "admin/components/ui/panels.html" import admin_panel %}
 {% from "components/ui/spinner.html" import table_spinner %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 
 <div class="insights-section">
   <div class="insights-double-grid">
-    {% call admin_panel('<i class="fa-solid fa-trophy"></i> Top Contexts (by Impressions)', "The articles/pages generating the most recommendation widgets.") %}
+    {% call admin_panel('Top Contexts (by Impressions)', "The articles/pages generating the most recommendation widgets.", icon="fa-solid fa-trophy") %}
       <div class="insights-table-scroll">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Context ID</th>
-              <th>Type</th>
-              <th>Impressions</th>
-              <th>Clicks</th>
-              <th>CTR</th>
-            </tr>
-          </thead>
-          <tbody id="context-performance-tbody">
+        {% call standard_table(["Context ID", "Type", "Impressions", "Clicks", "CTR"], body_id="context-performance-tbody") %}
             {{ table_spinner(colspan=5, text="Loading top contexts...") }}
-          </tbody>
-        </table>
+        {% endcall %}
       </div>
     {% endcall %}
 
-    {% call admin_panel('<i class="fa-solid fa-star"></i> Top Entities (by Clicks)', "The recommended items/articles getting clicked the most.") %}
+    {% call admin_panel('Top Entities (by Clicks)', "The recommended items/articles getting clicked the most.", icon="fa-solid fa-star") %}
       <div class="insights-table-scroll">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Entity</th>
-              <th>Type</th>
-              <th>Clicks</th>
-            </tr>
-          </thead>
-          <tbody id="entity-performance-tbody">
+        {% call standard_table(["Entity", "Type", "Clicks"], body_id="entity-performance-tbody") %}
             {{ table_spinner(colspan=3, text="Loading top entities...") }}
-          </tbody>
-        </table>
+        {% endcall %}
       </div>
     {% endcall %}
   </div>
@@ -43,7 +24,7 @@
 
 <div class="insights-double-grid">
   <div class="insights-section">
-    {% call admin_panel('<i class="fa-solid fa-chart-line"></i> Time-Series Trends', "Daily impressions vs clicks over the last 30 days.") %}
+    {% call admin_panel('Time-Series Trends', "Daily impressions vs clicks over the last 30 days.", icon="fa-solid fa-chart-line") %}
       <div class="dashboard-chart-wrapper">
         <canvas id="recTrendChart"></canvas>
       </div>
@@ -51,7 +32,7 @@
   </div>
 
   <div class="insights-section">
-    {% call admin_panel('<i class="fa-solid fa-chart-pie"></i> Slot Position Performance', "Which recommendation slots get the most clicks.") %}
+    {% call admin_panel('Slot Position Performance', "Which recommendation slots get the most clicks.", icon="fa-solid fa-chart-pie") %}
       <div class="dashboard-chart-wrapper">
         <canvas id="recSlotChart"></canvas>
       </div>

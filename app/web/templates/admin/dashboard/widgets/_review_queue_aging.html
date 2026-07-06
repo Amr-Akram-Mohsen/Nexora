@@ -1,25 +1,27 @@
 {% from "admin/components/ui/dashboard.html" import activity_list_item, dashboard_empty %}
+{% from "components/ui/core.html" import link, badge %}
 {% if not stats.review_queue_aging or stats.review_queue_aging | length == 0 %}
 {{ dashboard_empty("No pending reviews.") }}
 {% else %}
 <ul class="activity-feed">
   {% for r in stats.review_queue_aging %}
   {% set badge_class = "user" %}
-  {% set badge_icon = '<i class="fa-solid fa-newspaper"></i>' %}
+  {% set badge_icon = "fa-solid fa-newspaper" %}
   {% if r.type == "video" %}
   {% set badge_class = "active" %}
-  {% set badge_icon = '<i class="fa-solid fa-video"></i>' %}
+  {% set badge_icon = "fa-solid fa-video" %}
   {% elif r.type == "post" %}
   {% set badge_class = "admin" %}
-  {% set badge_icon = '<i class="fa-solid fa-comments"></i>' %}
+  {% set badge_icon = "fa-solid fa-comments" %}
   {% endif %}
-  {% call activity_list_item(icon_html=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-item") %}
-    <div class="activity-text ingest-log-text flex items-center gap-2">
-      <span class="status-badge {{ badge_class }} badge-type-compact">{{ r.type }}</span>
-      <a class="activity-target text-deco-none" href="/admin/contents?search={{ r.id }}">#{{ r.id }}</a>
-      <span class="status-badge badge-danger" title="Time in queue">Waiting: {{ r.age }}</span>
-    </div>
-    <p class="activity-meta ingest-log-title">{{ r.title }}</p>
+  {% call activity_list_item(icon=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-item") %}
+  <div class="activity-text ingest-log-text flex items-center gap-2">
+    {{ badge(text=r.type, class="status-badge badge-type-compact " ~ badge_class) }}
+    {{ link(text="#" ~ r.id, href="/admin/contents?search=" ~ r.id, class="activity-target text-deco-none",
+    unstyled=True) }}
+    {{ badge(text="Waiting: " ~ r.age, class="status-badge badge-danger", attrs={"title": "Time in queue"}) }}
+  </div>
+  <p class="activity-meta ingest-log-title">{{ r.title }}</p>
   {% endcall %}
   {% endfor %}
 </ul>

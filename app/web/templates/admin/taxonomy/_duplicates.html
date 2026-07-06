@@ -1,21 +1,13 @@
 {% from "components/ui/empty-state.html" import empty_state %}
 {% from "components/ui/core.html" import badge, button %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 {% if error %}
   {{ empty_state(error, "color: var(--brand-red);") }}
 {% elif not data %}
   {{ empty_state("No duplicates found!") }}
 {% else %}
   <div class="admin-table-wrapper">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>Source (Will be merged &amp; deleted)</th>
-          <th>Target (Will be kept)</th>
-          <th>Similarity</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
+    {% call standard_table(["Source (Will be merged &amp; deleted)", "Target (Will be kept)", "Similarity", "Actions"]) %}
         {% for pair in data %}
         <tr>
           <td><strong>{{ pair.source.name }}</strong> <span class="content-date-row">(ID: {{ pair.source.id }})</span></td>
@@ -29,7 +21,6 @@
           </td>
         </tr>
         {% endfor %}
-      </tbody>
-    </table>
+    {% endcall %}
   </div>
 {% endif %}

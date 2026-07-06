@@ -27,7 +27,7 @@ summary_class="admin-summary-bar"
 {% macro breakdown_progress_bar(label, value, percentage, color="var(--brand-purple)", icon="", extra_class="") %}
 <div class="flex items-center w-full gap-3 {{ extra_class }}">
   {% if icon %}
-  <div class="overview-breakdown-icon" style="--icon-color: {{ color }};">{{ icon|safe }}</div>
+  <div class="overview-breakdown-icon" style="--icon-color: {{ color }};"><i class="{{ icon }}"></i></div>
   {% endif %}
   <div class="overview-breakdown-label truncate" title="{{ label }}">{{ label }}</div>
   <div class="overview-breakdown-bar-track">
@@ -37,29 +37,37 @@ summary_class="admin-summary-bar"
 </div>
 {% endmacro %}
 
-{% macro ranked_list_item(rank, name, value_html, extra_class="") %}
-<li
-  class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
+{% macro ranked_list_item(rank, title_text, title_href=none, value_text=none, extra_class="") %}
+<li class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
   <div class="flex items-center gap-3">
     <div class="overview-top-rank text-muted font-mono text-sm">#{{ rank }}</div>
-    <div class="overview-top-name truncate font-medium" title="{{ name }}">{{ name }}</div>
+    {% if title_href %}
+      <a class="overview-top-link-title truncate font-medium" href="{{ title_href }}" title="{{ title_text }}">{{ title_text }}</a>
+    {% else %}
+      <div class="overview-top-name truncate font-medium" title="{{ title_text }}">{{ title_text }}</div>
+    {% endif %}
   </div>
   <div class="overview-top-value text-right whitespace-nowrap">
-    {{ value_html|safe }}
+    {% if value_text %}
+      {{ value_text }}
+    {% elif caller %}
+      {{ caller() }}
+    {% endif %}
   </div>
 </li>
 {% endmacro %}
 
-{% macro activity_list_item(icon_html="", icon_class="icon-save", extra_class="") %}
+{% macro activity_list_item(icon="", icon_class="icon-save", extra_class="") %}
 <li class="activity-item {{ extra_class }} flex">
-  <div class="activity-icon {{ icon_class }} flex-center">{{ icon_html|safe }}</div>
+  <div class="activity-icon {{ icon_class }} flex-center"><i class="{{ icon }}"></i></div>
   <div class="activity-content">
     {{ caller() }}
   </div>
 </li>
 {% endmacro %}
 
-{% macro dashboard_empty(message="No data yet.", icon="fa-regular fa-envelope-open", height_class="loading-height-sm") %}
+{% macro dashboard_empty(message="No data yet.", icon="fa-regular fa-envelope-open", height_class="loading-height-sm")
+%}
 <div class="dashboard-empty {{ height_class }}">
   {{ empty_state(title="", message=message, icon=icon) }}
 </div>

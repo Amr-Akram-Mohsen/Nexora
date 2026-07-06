@@ -5,66 +5,22 @@
 {% set summary_label = "products" %}
 
 {% block crud_stats %}
+{% from "components/ui/core.html" import stat_card %}
 <div class="dashboard-stats-grid" id="catalog-health-dashboard">
   <!-- Total Items -->
-  <a class="card clickable-card filter-link" data-filter="" data-val="">
-    <div class="dashboard-stat-card flex flex-col items-center">
-      <div class="dashboard-stat-icon"><i class="fa-solid fa-box-open"></i></div>
-      <p class="dashboard-stat-label">Total Items</p>
-      <h3 class="dashboard-stat-value" id="stats-total-items"><i
-          class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta" id="stats-meta-items">in catalog</p>
-    </div>
-  </a>
+  {{ stat_card("Total Items", value_id="stats-total-items", icon="fa-solid fa-box-open", meta_text="in catalog", meta_id="stats-meta-items", attrs={"data-filter": "", "data-val": ""}, class="card clickable-card filter-link") }}
 
   <!-- Image Coverage -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-has-images" data-val="false"
-    title="Click to view items without images">
-    <div class="dashboard-stat-card flex flex-col items-center">
-      <div class="dashboard-stat-icon"><i class="fa-regular fa-image"></i></div>
-      <p class="dashboard-stat-label">Image Coverage</p>
-      <h3 class="dashboard-stat-value" id="stats-image-coverage"><i
-          class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta" id="stats-meta-images">with images</p>
-    </div>
-  </a>
+  {{ stat_card("Image Coverage", value_id="stats-image-coverage", icon="fa-regular fa-image", meta_text="with images", meta_id="stats-meta-images", attrs={"data-filter": "filter-item-has-images", "data-val": "false", "title": "Click to view items without images"}, class="card clickable-card filter-link") }}
 
   <!-- Brand Assignment -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-has-brand" data-val="false"
-    title="Click to view unbranded items">
-    <div class="dashboard-stat-card flex flex-col items-center">
-      <div class="dashboard-stat-icon"><i class="fa-solid fa-tag"></i></div>
-      <p class="dashboard-stat-label">Brand Assigned</p>
-      <h3 class="dashboard-stat-value" id="stats-brand-coverage"><i
-          class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta" id="stats-meta-brands">have brand</p>
-    </div>
-  </a>
+  {{ stat_card("Brand Assigned", value_id="stats-brand-coverage", icon="fa-solid fa-tag", meta_text="have brand", meta_id="stats-meta-brands", attrs={"data-filter": "filter-item-has-brand", "data-val": "false", "title": "Click to view unbranded items"}, class="card clickable-card filter-link") }}
 
   <!-- Active Link Coverage -->
-  <a class="card clickable-card filter-link" data-filter="filter-item-availability" data-val="OutOfStock"
-    title="Click to view items with no active links">
-    <div class="dashboard-stat-card flex flex-col items-center">
-      <div class="dashboard-stat-icon"><i class="fa-solid fa-link"></i></div>
-      <p class="dashboard-stat-label">Active Links</p>
-      <h3 class="dashboard-stat-value" id="stats-link-coverage"><i
-          class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta" id="stats-meta-links">have store link</p>
-    </div>
-  </a>
+  {{ stat_card("Active Links", value_id="stats-link-coverage", icon="fa-solid fa-link", meta_text="have store link", meta_id="stats-meta-links", attrs={"data-filter": "filter-item-availability", "data-val": "OutOfStock", "title": "Click to view items with no active links"}, class="card clickable-card filter-link") }}
 
   <!-- Stale Syncs -->
-  <a class="card clickable-card filter-link" data-filter="item-sort-by" data-val="last_synced_at"
-    title="Click to sort by stalest sync">
-    <div class="dashboard-stat-card flex flex-col items-center">
-      <div class="dashboard-stat-icon"><i class="fa-solid fa-clock-rotate-left"></i>
-      </div>
-      <p class="dashboard-stat-label">Stale Syncs</p>
-      <h3 class="dashboard-stat-value" id="stats-stale-syncs"><i
-          class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta">> 7 days old</p>
-    </div>
-  </a>
+  {{ stat_card("Stale Syncs", value_id="stats-stale-syncs", icon="fa-solid fa-clock-rotate-left", meta_text="> 7 days old", attrs={"data-filter": "item-sort-by", "data-val": "last_synced_at", "title": "Click to sort by stalest sync"}, class="card clickable-card filter-link") }}
 </div>
 
 <!-- Item Type Distribution Panel -->

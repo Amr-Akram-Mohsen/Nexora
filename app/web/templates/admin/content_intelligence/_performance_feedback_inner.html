@@ -67,7 +67,7 @@ baseline expectations.") %}
             <tr>
                 <td>
                     <div class="flex gap-2 items-center">
-                        <div>{{ platformIcon }} {{ item.title }}</div>
+                        <div>{{ platformIcon|safe }} {{ item.title }}</div>
                         {% if item.is_simulated %}
                         <span class="status-badge badge-warning" title="CTR metrics are simulated due to insufficient impression data">Simulated</span>
                         {% endif %}
@@ -83,7 +83,7 @@ baseline expectations.") %}
                 <td><span class="status-badge {{ evalBadgeClass }}">{{ item.evaluation }}</span></td>
                 <td class="col-metric">
                     {% if item.actual_performance.decay_rate > 0 %}
-                    <span class="status-badge badge-danger badge-type-compact" title="30-day traffic drop">▼ {{ "%.1f"|format(item.actual_performance.decay_rate) }}%</span>
+                    <span class="status-badge badge-danger badge-type-compact" title="30-day traffic drop"><i class="fa-solid fa-caret-down"></i> {{ "%.1f"|format(item.actual_performance.decay_rate) }}%</span>
                     {% else %}
                     <span class="status-badge badge-secondary badge-type-compact">—</span>
                     {% endif %}

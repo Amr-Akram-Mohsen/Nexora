@@ -1,5 +1,5 @@
 <!-- _distribution_modal_inner.html -->
-{% from "components/ui/core.html" import button, form, input, label, textarea %}
+{% from "components/ui/core.html" import button, form, input, label, textarea, link %}
 
 {% call form(attrs={"id": "distribution-draft-form"}, include_csrf=false) %}
     
@@ -38,7 +38,7 @@
         {{ label("Live URL", class="distribution-modal-label") }}
         <div class="distribution-modal-readonly-value">
             {% if post.external_url %}
-            <a href="{{ post.external_url }}" target="_blank">{{ post.external_url }}</a>
+            {{ link(text=post.external_url, href=post.external_url, attrs={"target": "_blank"}, unstyled=True) }}
             {% else %}
             <span>No URL provided</span>
             {% endif %}
@@ -51,8 +51,8 @@
         <h6 class="performance-summary-title">Performance Summary</h6>
         <div class="flex gap-4 items-center">
             <span title="Views"><i class="fa-solid fa-eye"></i> {{ post.views_count }}</span>
-            <span title="Likes"><i class="fa-solid fa-heart"></i>️ {{ post.likes_count }}</span>
-            <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i>️ {{ post.clicks_count }}</span>
+            <span title="Likes"><i class="fa-solid fa-heart"></i> {{ post.likes_count }}</span>
+            <span title="Clicks"><i class="fa-solid fa-computer-mouse"></i> {{ post.clicks_count }}</span>
             <span title="Shares"><i class="fa-solid fa-rotate"></i> {{ post.shares_count }}</span>
             <span class="engagement-score-badge" title="Engagement Score"><i class="fa-solid fa-fire"></i> Score: {{ engagement|int }}</span>
         </div>

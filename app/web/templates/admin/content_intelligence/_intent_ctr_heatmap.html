@@ -1,14 +1,7 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Category</th>
-        {% for intent in data.intent_names %}
-        <th>{{ intent | title }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
+  {% set headers = ["Category"] + (data.intent_names | map("title") | list) %}
+  {% call standard_table(headers) %}
       {% for row in data.heatmap %}
       <tr>
         <td><strong>{{ row.category_name }}</strong></td>
@@ -28,6 +21,5 @@
         <td colspan="{{ data.intent_names|length + 1 }}">No CTR data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

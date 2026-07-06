@@ -1,6 +1,6 @@
 {% extends "admin/layout/_crud_page_base.html" %}
 {% from "components/ui/modal.html" import modal %}
-{% from "components/ui/core.html" import button, input %}
+{% from "components/ui/core.html" import button, input, badge %}
 {% set header_title = "Content Moderation & Management" %}
 {% set page_description = "Clean up, categorize, inspect quality, and perform bulk operations on aggregated content" %}
 {% set summary_label = "items" %}
@@ -122,11 +122,11 @@
       <div id="stat-bar-drafts" class="overview-breakdown-bar" style="--bar-color: var(--brand-purple); --seg-width: 0%;"></div>
       <div id="stat-bar-failed" class="overview-breakdown-bar bar-inactive" style="--seg-width: 0%;"></div>
     </div>
-    <span class="status-badge active">Live: <span id="stat-published">0</span></span>
-    <span class="status-badge user">Drafts: <span id="stat-drafts">0</span></span>
-    <span class="status-badge inactive">Failed: <span id="stat-failed">0</span></span>
-    <span class="badge badge-orange badge-compact">No Topics: <span id="stat-no-topics">0</span></span>
-    <span class="badge badge-orange badge-compact">No Brands: <span id="stat-no-brands">0</span></span>
+    {% call badge(class="status-badge active") %}Live: <span id="stat-published">0</span>{% endcall %}
+    {% call badge(class="status-badge user") %}Drafts: <span id="stat-drafts">0</span>{% endcall %}
+    {% call badge(class="status-badge inactive") %}Failed: <span id="stat-failed">0</span>{% endcall %}
+    {% call badge(class="badge-orange badge-compact") %}No Topics: <span id="stat-no-topics">0</span>{% endcall %}
+    {% call badge(class="badge-orange badge-compact") %}No Brands: <span id="stat-no-brands">0</span>{% endcall %}
   </div>
 </div>
 <div class="tip-text">
@@ -136,7 +136,7 @@
 {% endblock %}
 
 {% block crud_modals %}
-{% call modal("quick-category-modal", "Quick Recategorize", '<i class="fa-solid fa-tag"></i>', "modal-content-sm") %}
+{% call modal("quick-category-modal", "Quick Recategorize", 'fa-solid fa-tag', "modal-content-sm") %}
 <p class="dashboard-modal-body">Move this item to a different content category:</p>
 {{ input(type="hidden", id="quick-cat-content-id", required=False) }}
 {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None,

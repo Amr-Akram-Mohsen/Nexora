@@ -1,3 +1,4 @@
+{% from "components/ui/core.html" import badge %}
 {% if not data %}
 <tr><td colspan="4" class="p-8 text-center text-muted">No data available</td></tr>
 {% else %}
@@ -11,7 +12,7 @@
         <td class="p-4 font-medium">{{ row.source }}</td>
         <td class="p-4 text-sm text-gray-500">{{ row.latest_ingested }}</td>
         <td class="p-4 font-bold text-gray-700">{{ row.days_stale }}</td>
-        <td class="p-4"><span class="status-badge {{ severityClass }}">{{ row.severity }}</span></td>
+        <td class="p-4">{{ badge(text=row.severity, class="status-badge " ~ severityClass) }}</td>
     </tr>
   {% endfor %}
 {% endif %}

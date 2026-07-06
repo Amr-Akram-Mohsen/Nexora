@@ -1,4 +1,6 @@
 {% extends "admin/base.html" %}
+{% from "admin/components/ui/tables.html" import standard_table %}
+{% from "components/ui/core.html" import badge %}
 
 {% block title %}Taxonomy Intelligence Dashboard{% endblock %}
 
@@ -19,24 +21,16 @@
         <div class="card-body">
             <canvas id="topicChart" height="120"></canvas>
             <div class="insights-table-scroll">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Topic Tag</th>
-                            <th>Content Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {% call standard_table(["Topic Tag", "Content Volume"]) %}
                         {% for t in data.topic_concentration %}
                         <tr>
-                            <td><span class="status-badge badge-blue">#{{ t.topic }}</span></td>
+                            <td>{{ badge(text='#' ~ t.topic, class="status-badge badge-blue") }}</td>
                             <td><strong>{{ t.volume }}</strong> articles</td>
                         </tr>
                         {% else %}
                         <tr><td colspan="2">No topic data available.</td></tr>
                         {% endfor %}
-                    </tbody>
-                </table>
+            {% endcall %}
             </div>
         </div>
     </div>
@@ -48,15 +42,7 @@
         </div>
         <div class="card-body">
             <div class="insights-table-scroll">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Category Name</th>
-                            <th>Volume</th>
-                            <th>Avg Engagement</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            {% call standard_table(["Category Name", "Volume", "Avg Engagement"]) %}
                         {% for c in data.category_health %}
                         <tr>
                             <td><strong>{{ c.category }}</strong></td>
@@ -66,8 +52,7 @@
                         {% else %}
                         <tr><td colspan="3">No category data available.</td></tr>
                         {% endfor %}
-                    </tbody>
-                </table>
+            {% endcall %}
             </div>
         </div>
     </div>

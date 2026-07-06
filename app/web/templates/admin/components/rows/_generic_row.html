@@ -1,4 +1,4 @@
-{% from "components/ui/core.html" import badge %}
+{% from "components/ui/core.html" import badge, link %}
 {% from "admin/components/ui/actions.html" import inspect_btn_cell %}
 
 {% set ignored_keys = [
@@ -8,7 +8,7 @@
 
 {% macro render_user_link(value) %}
     {% if value %}
-        <a href="{{ url_for('admin.dashboard_users', search=value) }}" class="admin-link">User #{{ value }}</a>
+        {{ link(text="User #" ~ value, href=url_for('admin.dashboard_users', search=value), class="admin-link", unstyled=True) }}
     {% else %}
         <span class="text-muted">Anonymous</span>
     {% endif %}
@@ -62,10 +62,7 @@
     {% set title = row.name|default(row.title|default('')) %}
     {% call inspect_btn_cell(domain_type|default(''), row.id, title=title) %}
         {% if domain_target_type %}
-            <a class="inspect-action user-action-inspect inspect-btn"
-               href="/admin/{{ domain_target_type }}?source={{ row.get('slug', '') }}">
-                <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title }}
-            </a>
+            {{ link(text="View " ~ (domain_target_type|title), href="/admin/" ~ domain_target_type ~ "?source=" ~ row.get('slug', ''), icon="fa-solid fa-eye", class="inspect-action user-action-inspect inspect-btn", unstyled=True) }}
         {% endif %}
     {% endcall %}
 {% endif %}

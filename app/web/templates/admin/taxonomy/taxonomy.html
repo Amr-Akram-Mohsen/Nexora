@@ -5,7 +5,7 @@
 {% from "admin/components/ui/tabs.html" import admin_tab_navigation %}
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
 {% from "admin/components/ui/inspect.html" import admin_inspect_modal %}
-{% from "components/ui/core.html" import button, input %}
+{% from "components/ui/core.html" import button, input, badge %}
 {% from "admin/components/ui/forms.html" import admin_filter_select %}
 {% from "components/ui/modal.html" import modal %}
 {% set header_title = "Taxonomy Management" %}
@@ -25,24 +25,24 @@
 </div>
 
 <div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden mb-4">
-  <span class="status-badge active">Total Entities: <span id="stat-total-entities">0</span></span>
-  <span class="status-badge inactive">Orphans: <span id="stat-orphan-entities">0</span> (<span id="stat-orphan-pct">0</span>%)</span>
-  <span class="badge badge-orange badge-compact">Missing Category: <span id="stat-missing-category">0</span></span>
-  <span class="badge badge-orange badge-compact">Missing Section: <span id="stat-missing-section">0</span></span>
-  <span class="badge badge-orange badge-compact">Missing Brand: <span id="stat-missing-brand">0</span></span>
+  {% call badge(class="status-badge active") %}Total Entities: <span id="stat-total-entities">0</span>{% endcall %}
+  {% call badge(class="status-badge inactive") %}Orphans: <span id="stat-orphan-entities">0</span> (<span id="stat-orphan-pct">0</span>%){% endcall %}
+  {% call badge(class="badge-orange badge-compact") %}Missing Category: <span id="stat-missing-category">0</span>{% endcall %}
+  {% call badge(class="badge-orange badge-compact") %}Missing Section: <span id="stat-missing-section">0</span>{% endcall %}
+  {% call badge(class="badge-orange badge-compact") %}Missing Brand: <span id="stat-missing-brand">0</span>{% endcall %}
 </div>
 
 {# Tab Navigation #}
 {{ admin_tab_navigation("taxonomy", [
-{"id": "insights", "label": '<i class="fa-solid fa-lightbulb"></i> Insights', "active": true},
-{"id": "categories", "label": '<i class="fa-solid fa-folder"></i> Categories'},
-{"id": "brands", "label": '<i class="fa-solid fa-industry"></i> Brands'},
-{"id": "topics", "label": '<i class="fa-solid fa-tag"></i> Topics'},
-{"id": "sections", "label": '<i class="fa-solid fa-clipboard-list"></i> Sections'},
-{"id": "attributes", "label": '<i class="fa-solid fa-wand-magic-sparkles"></i> Attributes'},
-{"id": "gender_facets", "label": '<i class="fa-solid fa-user"></i> Gender'},
-{"id": "intent_facets", "label": '<i class="fa-solid fa-bullseye"></i> Intent'},
-{"id": "price_tier_facets", "label": '<i class="fa-solid fa-sack-dollar"></i> Price Tier'}
+{"id": "insights", "label": 'Insights', "icon": "fa-solid fa-lightbulb", "active": true},
+{"id": "categories", "label": 'Categories', "icon": "fa-solid fa-folder"},
+{"id": "brands", "label": 'Brands', "icon": "fa-solid fa-industry"},
+{"id": "topics", "label": 'Topics', "icon": "fa-solid fa-tag"},
+{"id": "sections", "label": 'Sections', "icon": "fa-solid fa-clipboard-list"},
+{"id": "attributes", "label": 'Attributes', "icon": "fa-solid fa-wand-magic-sparkles"},
+{"id": "gender_facets", "label": 'Gender', "icon": "fa-solid fa-user"},
+{"id": "intent_facets", "label": 'Intent', "icon": "fa-solid fa-bullseye"},
+{"id": "price_tier_facets", "label": 'Price Tier', "icon": "fa-solid fa-sack-dollar"}
 ]) }}
 
 {# Restrict width so it doesn't stretch 100% on large monitors #}
@@ -215,17 +215,17 @@
 </div>{# End max-width wrapper #}
 
 {# Inspect Modals #}
-{{ admin_inspect_modal("category", "Category Details", '<i class="fa-solid fa-folder"></i>') }}
-{{ admin_inspect_modal("brand", "Brand Details", '<i class="fa-solid fa-industry"></i>') }}
-{{ admin_inspect_modal("topic", "Topic Details", '<i class="fa-solid fa-tag"></i>') }}
-{{ admin_inspect_modal("section", "Section Details", '<i class="fa-solid fa-clipboard-list"></i>') }}
-{{ admin_inspect_modal("attribute", "Attribute Details", '<i class="fa-solid fa-wand-magic-sparkles"></i>') }}
-{{ admin_inspect_modal("gender_facet", "Gender Facet Details", '<i class="fa-solid fa-user"></i>') }}
-{{ admin_inspect_modal("intent_facet", "Intent Facet Details", '<i class="fa-solid fa-bullseye"></i>') }}
-{{ admin_inspect_modal("price_tier_facet", "Price Tier Facet Details", '<i class="fa-solid fa-sack-dollar"></i>') }}
+{{ admin_inspect_modal("category", "Category Details", 'fa-solid fa-folder') }}
+{{ admin_inspect_modal("brand", "Brand Details", 'fa-solid fa-industry') }}
+{{ admin_inspect_modal("topic", "Topic Details", 'fa-solid fa-tag') }}
+{{ admin_inspect_modal("section", "Section Details", 'fa-solid fa-clipboard-list') }}
+{{ admin_inspect_modal("attribute", "Attribute Details", 'fa-solid fa-wand-magic-sparkles') }}
+{{ admin_inspect_modal("gender_facet", "Gender Facet Details", 'fa-solid fa-user') }}
+{{ admin_inspect_modal("intent_facet", "Intent Facet Details", 'fa-solid fa-bullseye') }}
+{{ admin_inspect_modal("price_tier_facet", "Price Tier Facet Details", 'fa-solid fa-sack-dollar') }}
 
 {# Duplicates Modal #}
-{% call modal(id="admin-duplicates-modal", title="Duplicate Candidate Detection", icon='<i class="fa-solid fa-magnifying-glass"></i>', class="admin-duplicates-modal") %}
+{% call modal(id="admin-duplicates-modal", title="Duplicate Candidate Detection", icon='fa-solid fa-magnifying-glass', class="admin-duplicates-modal") %}
 <div id="admin-duplicates-body">
   <div>Scanning for duplicates...</div>
 </div>

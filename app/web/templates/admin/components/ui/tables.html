@@ -1,4 +1,4 @@
-{% from "components/ui/core.html" import badge %}
+{% from "components/ui/core.html" import badge, link %}
 {% macro admin_crud_table(table, loading_text="Loading...", height_class="loading-height-lg") %}
 <div class="admin-table-wrapper">
   <table class="admin-table" id="{{ table.id }}-table">
@@ -26,6 +26,29 @@
 </div>
 {% endmacro %}
 
+{% macro standard_table(headers, class="admin-table", id=None, body_id=None) %}
+<div class="admin-table-wrapper">
+  <table class="{{ class }}"{% if id %} id="{{ id }}"{% endif %}>
+    {% if headers %}
+    <thead>
+      <tr>
+        {% for column in headers %}
+        <th{% if column is mapping and column.class %} class="{{ column.class }}"{% endif %}>
+          {{ column.label if column is mapping else column }}
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    {% endif %}
+    <tbody{% if body_id %} id="{{ body_id }}"{% endif %}>
+      {% if caller is defined %}
+      {{ caller() }}
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
 {% macro render_cell(item) %}
 {% if item.is_list %}
 <ul class="inspect-inline-list">
@@ -37,18 +60,20 @@
 {% elif item.is_labeled %}
 <span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
 {% elif item.is_link %}
-<a href="{{ item.value.link }}" class="activity-target inspect-link flex items-center gap-1 w-fit" {% if
-  item.value.external %} target="_blank" {% endif %}>{{ item.value.label }} {% if item.value.external %}<i
-    class="fas fa-external-link-alt fa-xs"></i>{% endif %}</a>
+{% if item.value.external %}
+{{ link(text=item.value.label, href=item.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank"}, unstyled=True) }}
+{% else %}
+{{ link(text=item.value.label, href=item.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", unstyled=True) }}
+{% endif %}
 {% elif item.is_breadcrumb %}
 <div class="flex items-center gap-2 flex-wrap">
   {% for crumb in item.value %}
-  <a href="{{ crumb.link }}">{{ crumb.label }}</a>
+  {{ link(text=crumb.label, href=crumb.link, unstyled=True) }}
   {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}
   {% endfor %}
 </div>
 {% elif item.link %}
-<a href="{{ item.link }}" class="admin-link">{{ item.value }}</a>
+{{ link(text=item.value, href=item.link, class="admin-link", unstyled=True) }}
 {% elif item.badge %}
   {% set badge_class = "badge-danger" %}
   {% if item.value|lower == "power user" %}
@@ -79,8 +104,7 @@
 
 {% macro admin_inspect_attributes_table(fields) %}
 <div class="admin-table-wrapper">
-  <table class="admin-table vertical-table">
-    <tbody>
+  {% call standard_table(none, class="admin-table vertical-table") %}
       {% for item in fields %}
       <tr>
         <th class="cell-label">{{ item.label }}</th>
@@ -89,32 +113,23 @@
         </td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>
 {% endmacro %}
 
 
 {% macro admin_inspect_metrics_table(fields) %}
 <div class="admin-table-wrapper">
-  <table class="admin-table">
-    <thead>
+  {% set metric_headers = fields | map(attribute="label") | list %}
+  {% call standard_table(metric_headers) %}
       <tr>
         {% for item in fields %}
-        <th>{{ item.label }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        {% for item in fields %}
-        <td>
+        <td class="cell-value">
           {{ render_cell(item) }}
         </td>
         {% endfor %}
       </tr>
-    </tbody>
-  </table>
+  {% endcall %}
 </div>
 {% endmacro %}
 

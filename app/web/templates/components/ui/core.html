@@ -58,7 +58,8 @@
 <span
   class="badge{% if variant is not none %} variant--{{ variant }} badge--{{ variant }}{% endif %} {{ class }} inline-flex-center"
   {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
-  {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}{{ text|safe }}
+  {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}
+  {%- if text -%}{{ text|safe }}{%- elif caller -%}{{ caller() }}{%- endif -%}
 </span>
 {% endmacro %}
 
@@ -171,4 +172,33 @@ if type == 'checkbox' else 'input flex'
 {% macro textarea(name="", id=None, rows=4, placeholder="", class="", required=True) %}
 <textarea name="{{ name }}" id="{{ id or name }}" rows="{{ rows }}" placeholder="{{ placeholder }}" {% if required
   %}required{% endif %} class="textarea flex {{ class }}"></textarea>
+{% endmacro %}
+
+{% macro stat_card(label, value_id=None, icon=None, meta_text=None, meta_id=None, value_text=None, href=None, class="card clickable-card", inner_class="dashboard-stat-card flex flex-col items-center", attrs={}, label_first=True) %}
+<a{% if href %} href="{{ href }}"{% endif %} class="{{ class }}"{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>
+  <div class="{{ inner_class }}">
+    {% if icon %}
+    <div class="dashboard-stat-icon"><i class="{{ icon }}"></i></div>
+    {% endif %}
+    
+    {% if label_first %}
+    <p class="dashboard-stat-label">{{ label }}</p>
+    <h3 class="dashboard-stat-value"{% if value_id %} id="{{ value_id }}"{% endif %}>
+      {% if value_text is not none %}{{ value_text }}{% else %}<i class="fa-solid fa-circle-notch fa-spin"></i>{% endif %}
+    </h3>
+    {% else %}
+    <h3 class="dashboard-stat-value"{% if value_id %} id="{{ value_id }}"{% endif %}>
+      {% if value_text is not none %}{{ value_text }}{% else %}<i class="fa-solid fa-circle-notch fa-spin"></i>{% endif %}
+    </h3>
+    <p class="dashboard-stat-label">{{ label }}</p>
+    {% endif %}
+    
+    {% if meta_text or meta_id or caller is defined %}
+    <p class="dashboard-stat-meta"{% if meta_id %} id="{{ meta_id }}"{% endif %}>
+      {% if meta_text %}{{ meta_text|safe }}{% endif %}
+      {% if caller is defined %}{{ caller() }}{% endif %}
+    </p>
+    {% endif %}
+  </div>
+</a>
 {% endmacro %}

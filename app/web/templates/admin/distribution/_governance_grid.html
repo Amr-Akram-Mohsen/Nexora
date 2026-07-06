@@ -1,41 +1,42 @@
+{% from "components/ui/core.html" import link, badge %}
 <!-- Summary / Config Mode Bar -->
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-governance-summary">
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-shield-halved"></i> Governance Mode: <span class="status-badge">{{ mode }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-check"></i> Safe / Executed: <span class="status-badge">{{ approved_tasks|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-hourglass-half"></i> Needs Approval: <span class="status-badge">{{ queued_tasks|length }}</span></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Tasks: <span class="status-badge">{{ blocked_tasks|length }}</span></div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-shield-halved"></i> Governance Mode: {{ badge(text=mode, class="status-badge") }}</div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-check"></i> Safe / Executed: {{ badge(text=approved_tasks|length, class="status-badge") }}</div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-hourglass-half"></i> Needs Approval: {{ badge(text=queued_tasks|length, class="status-badge") }}</div>
+  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Tasks: {{ badge(text=blocked_tasks|length, class="status-badge") }}</div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-governance-grid-container">
   {% set queues = [
-    { 'name': 'SAFE / EXECUTED', 'headerClass': 'auto-execute', 'statusLabel': '<span class="status-badge">SAFE FOR PRODUCTION</span>'|safe, 'list': approved_tasks },
-    { 'name': 'NEEDS APPROVAL', 'headerClass': 'needs-review', 'statusLabel': '<span class="status-badge">APPROVAL GATED</span>'|safe, 'list': queued_tasks },
-    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': '<span class="status-badge">SAFETY RESTRICTED</span>'|safe, 'list': blocked_tasks }
+    { 'name': 'SAFE / EXECUTED', 'headerClass': 'auto-execute', 'statusLabel': 'SAFE FOR PRODUCTION', 'list': approved_tasks },
+    { 'name': 'NEEDS APPROVAL', 'headerClass': 'needs-review', 'statusLabel': 'APPROVAL GATED', 'list': queued_tasks },
+    { 'name': 'BLOCKED', 'headerClass': 'blocked', 'statusLabel': 'SAFETY RESTRICTED', 'list': blocked_tasks }
   ] %}
 
   {% for q in queues %}
     <div class="kanban-column flex">
       <div class="publishing-column-header {{ q.headerClass }} flex justify-between items-center">
         <div >{{ q.name }}</div>
-        <div>{{ q.statusLabel }}</div>
+        <div>{{ badge(text=q.statusLabel, class="status-badge") }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not q.list %}
           <div  >No items in this queue.</div>
         {% else %}
           {% for task in q.list %}
-            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if task.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if task.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
+            {% set platformIcon = 'fa-solid fa-tv' if task.platform == 'youtube' else 'fa-solid fa-thumbtack' if task.platform == 'pinterest' else 'fa-solid fa-pen-to-square' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             {% set riskBadgeClass = 'badge-danger' if task.risk_level == 'HIGH' else 'badge-warning' if task.risk_level == 'MEDIUM' else 'badge-success' %}
             <div class="kanban-task-card">
               <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
-                <span class="kanban-task-platform flex gap-1 items-center">{{ platformIcon }} {{ task.platform|upper }}</span>
-                <span class="status-badge {{ actionBadgeClass }}">{{ task.action }}</span>
+                <span class="kanban-task-platform flex gap-1 items-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
+                {{ badge(text=task.action, class="status-badge " ~ actionBadgeClass) }}
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>
               <div >
                 <span class="kanban-task-meta">Decision Score: <strong >{{ (task.decision_score * 100)|round|int }}%</strong></span>
-                <span class="status-badge {{ riskBadgeClass }}">{{ task.risk_level }} RISK</span>
+                {{ badge(text=task.risk_level ~ " RISK", class="status-badge " ~ riskBadgeClass) }}
               </div>
               <div class="kanban-task-meta" >
                 <span>Timeline: <strong>{{ task.scheduled_time }}</strong></span>
@@ -56,7 +57,7 @@
                 <div class="kanban-task-log">
                   <strong>Status:</strong> {{ log_status }}
                   {% if log_url %}
-                    <br/><strong>Sim Published:</strong> <a href="{{ log_url }}" target="_blank">{{ log_url }}</a>
+                    <br/><strong>Sim Published:</strong> {{ link(text=log_url, href=log_url, attrs={"target": "_blank"}, unstyled=True) }}
                   {% endif %}
                 </div>
               {% endif %}

@@ -25,7 +25,7 @@
 </div>
 
 <div class="overview-top-grid">
-  {% call admin_panel('<i class="fa-solid fa-camera"></i> Missing Images', "Items with 0 images") %}
+  {% call admin_panel('Missing Images', "Items with 0 images", icon="fa-solid fa-camera") %}
   <div class="panel-body-padded flex-col gap-2">
     <h2>
       {{ data.metrics.without_images }}
@@ -34,7 +34,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel('<i class="fa-solid fa-link"></i> Missing Affiliate Links', "Items with 0 active store links") %}
+  {% call admin_panel('Missing Affiliate Links', "Items with 0 active store links", icon="fa-solid fa-link") %}
   <div class="panel-body-padded flex-col gap-2">
     <h2>
       {{ data.metrics.without_links }}
@@ -43,7 +43,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel('<i class="fa-solid fa-hourglass-half"></i> Pricing Staleness', "Items with pricing older than 30 days") %}
+  {% call admin_panel('Pricing Staleness', "Items with pricing older than 30 days", icon="fa-solid fa-hourglass-half") %}
   <div class="panel-body-padded flex-col gap-2">
     <h2>
       {{ data.metrics.stale_pricing }}
@@ -52,7 +52,7 @@
   </div>
   {% endcall %}
 
-  {% call admin_panel('<i class="fa-solid fa-pen-to-square"></i> No Editorial Coverage', "Items with no linked articles") %}
+  {% call admin_panel('No Editorial Coverage', "Items with no linked articles", icon="fa-solid fa-pen-to-square") %}
   <div class="panel-body-padded flex-col gap-2">
     <h2>
       {{ data.metrics.without_content }}

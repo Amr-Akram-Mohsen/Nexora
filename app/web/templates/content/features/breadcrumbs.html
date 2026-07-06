@@ -1,6 +1,7 @@
 {% from "components/ui/core.html" import breadcrumbs %}
 {% set paths = [] %}
 {% if content.section %}
-  {% set _ = paths.append({"label": content.section.name, "url": url_for('content.sections', section_slug=content.section.slug)}) %}
+{% set _ = paths.append({"label": content.section.name, "url": url_for('content.sections',
+section_slug=content.section.slug)}) %}
 {% endif %}
 {{ breadcrumbs(paths=paths, current_page=content.target.title | truncate(35)) }}

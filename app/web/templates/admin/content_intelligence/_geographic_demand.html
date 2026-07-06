@@ -1,13 +1,6 @@
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Category Name</th>
-        <th>Total Clicks</th>
-        <th>Top Countries (Click Volume)</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Category Name", "Total Clicks", "Top Countries (Click Volume)"]) %}
       {% for item in data %}
       <tr>
         <td><strong>{{ item.category_name }}</strong></td>
@@ -32,6 +25,5 @@
         <td colspan="3">No geographic demand data available.</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
 </div>

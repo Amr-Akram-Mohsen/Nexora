@@ -1,24 +1,16 @@
-{% from "components/ui/core.html" import badge %}
+{% from "components/ui/core.html" import badge, link %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 <div class="top-content-mini-table">
   {% if contents %}
-  <table class="dashboard-table">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Type</th>
-        <th>Views</th>
-      </tr>
-    </thead>
-    <tbody>
+  {% call standard_table(["Title", "Type", "Views"], class="dashboard-table") %}
       {% for c in contents %}
       <tr>
-        <td><a href="/admin/contents?search={{ c.title | urlencode }}" class="activity-target inspect-link">{{ c.title }}</a></td>
+        <td>{{ link(text=c.title, href="/admin/contents?search=" ~ (c.title | urlencode), class="activity-target inspect-link", unstyled=True) }}</td>
         <td>{{ badge(c.object_type, class="badge-type badge-compact", variant=none) }}</td>
         <td>{{ c.view_count }}</td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+  {% endcall %}
   {% else %}
   <div>No associated content found.</div>
   {% endif %}

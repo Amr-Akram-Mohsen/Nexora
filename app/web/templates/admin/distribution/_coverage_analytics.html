@@ -1,10 +1,11 @@
 {# app/web/templates/admin/distribution/_coverage_analytics.html #}
+{% from "components/ui/core.html" import badge %}
 <div class="distribution-double-grid insights-double-grid">
   <!-- Content Coverage -->
   <div class="distribution-coverage-card rec-stat-card">
     <div class="flex justify-between items-center">
       <h5 class="coverage-title">Content Distribution Coverage</h5>
-      <span class="status-badge badge-info"><i class="fa-solid fa-pen-to-square"></i> CONTENT</span>
+      {{ badge(text="CONTENT", class="status-badge badge-info", icon="fa-solid fa-pen-to-square") }}
     </div>
 
     <div class="coverage-stats flex items-center justify-between">
@@ -37,7 +38,7 @@
   <div class="distribution-coverage-card rec-stat-card">
     <div class="flex justify-between items-center">
       <h5 class="coverage-title">Item Distribution Coverage</h5>
-      <span class="status-badge badge-secondary"><i class="fa-solid fa-box"></i> ITEM</span>
+      {{ badge(text="ITEM", class="status-badge badge-secondary", icon="fa-solid fa-box") }}
     </div>
 
     <div class="coverage-stats flex items-center justify-between">

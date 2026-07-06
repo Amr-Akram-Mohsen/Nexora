@@ -1,29 +1,19 @@
 {# admin/content_library/_pipeline_stats_partial.html
    Rendered server-side and returned as an HTML partial via fetch.
    Variables: stats (list of pipeline stat objects) #}
-{% from "components/ui/core.html" import button %}
+{% from "components/ui/core.html" import button, badge %}
+{% from "admin/components/ui/tables.html" import standard_table %}
 {% if stats %}
 <div class="admin-table-wrapper">
-  <table class="admin-table" id="pipeline-stats-table">
-    <thead>
-      <tr>
-        <th>Ingestion Origin</th>
-        <th>Pending</th>
-        <th>Enriching</th>
-        <th>Failed</th>
-        <th>Complete</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
+    {% call standard_table(["Ingestion Origin", "Pending", "Enriching", "Failed", "Complete", "Actions"], id="pipeline-stats-table") %}
       {% for s in stats %}
       <tr>
         <td>
-          <span class="badge badge-origin badge-compact">{{ s.origin }}</span>
+          {{ badge(text=s.origin, class="badge badge-origin badge-compact") }}
         </td>
         <td>
           {% if s.pending > 0 %}
-          <span class="badge badge-health-medium badge-compact">{{ s.pending }}</span>
+          {{ badge(text=s.pending, class="badge badge-health-medium badge-compact") }}
           {% else %}
           <span class="content-date-row">0</span>
           {% endif %}
@@ -33,25 +23,24 @@
         </td>
         <td>
           {% if s.failed > 0 %}
-          <span class="badge badge-health-low badge-compact">{{ s.failed }}</span>
+          {{ badge(text=s.failed, class="badge badge-health-low badge-compact") }}
           {% else %}
           <span class="content-date-row">0</span>
           {% endif %}
         </td>
         <td>
-          <span class="badge badge-health-high badge-compact">{{ s.complete }}</span>
+          {{ badge(text=s.complete, class="badge badge-health-high badge-compact") }}
         </td>
         <td>
           {% if s.failed > 0 %}
           {{ button(class="user-action-btn user-action-toggle-active gap-1", attrs={"data-action": "retry-failed", "data-origin": s.origin}, icon="fas fa-redo", text="Retry Failed", unstyled=True) }}
           {% else %}
-          <span class="badge badge-health-high badge-compact">Healthy</span>
+          {{ badge(text="Healthy", class="badge badge-health-high badge-compact") }}
           {% endif %}
         </td>
       </tr>
       {% endfor %}
-    </tbody>
-  </table>
+    {% endcall %}
 </div>
 {% else %}
 <div class="table-empty-state">
