@@ -1,0 +1,119 @@
+{% macro badge(text="", class="", variant="primary", icon=None, attrs={}) %}
+
+<span
+  class="badge{% if variant is not none %} variant--{{ variant }} badge--{{ variant }}{% endif %} {{ class }} inline-flex-center"
+  {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
+  {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}{{ text|safe }}
+</span>
+{% endmacro %}
+
+{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,
+unstyled=False, id=None) %}
+{% set tag = "a" if href else "button" %}
+{% set base_class = "" if unstyled else "btn" %}
+{% set variant_class = "" if unstyled or variant is none else (" variant--" ~ variant ~ " btn--" ~ variant) %}
+{% set flex_class = "" if unstyled else " inline-flex-center" %}
+<{{ tag }} {% if href %}href="{{ href }}" {% else %}type="{{ type }}" {% endif %} {% if id %}id="{{ id }}" {% endif %}
+  class="{{ base_class }}{{ variant_class }} {{ class }}{{ flex_class }}" {% for key, value in attrs.items() %} {{ key
+  }}="{{ value }}" {% endfor %}>
+  {% if icon %}
+  <i class="{{ icon }}"></i>
+  {% endif %}
+
+  {% if text %}
+  <span class="btn-text {{ btn_span_class }}">
+    {{ text }}
+  </span>
+  {% endif %}
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</{{ tag }}>
+{% endmacro %}
+
+{% macro card(title=None, desc=None, class="", body_class="", header_class="", icon=None) %}
+<div class="card glass {{ class }}">
+  {% if title or desc or icon %}
+  <div class="card-header {{ header_class }}">
+    {% if icon %}
+    <div class="card-icon">
+      <i class="{{ icon }}"></i>
+    </div>
+    {% endif %}
+    <div>
+      {% if title %}
+      <h3 class="card-section-title">{{ title }}</h3>
+      {% endif %}
+      {% if desc %}
+      <p class="card-section-desc">{{ desc }}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <div class="card-body {{ body_class }}">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro label(text, for_id, class="") %}
+<label for="{{ for_id }}" class="label flex items-center {{ class }} gap-2">
+  {{ text }}
+
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</label>
+{% endmacro %}
+
+
+{% macro field(label_text="", for_id="", class="", label_class="", variant="vertical") %}
+<div
+  class="field-wrapper flex {{ 'flex-col' if variant == 'vertical' else 'flex-row items-center gap-2' }} {{ class }}">
+  {{ label(label_text, for_id, label_class) }}
+  {{ caller() }}
+</div>
+{% endmacro %}
+
+
+{% macro form(class="", variant="default", form_action=None, attrs={}, method="POST", include_csrf=True) %}
+{% set default_classes = 'form flex flex-col '
+if variant == 'default'
+else ''
+%}
+<form method="{{ method }}" {% if form_action %} action="{{ form_action }}" {% endif %}
+  class="{{ default_classes }}{{ class }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+  {% if include_csrf %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endif %}
+  {{ caller() }}
+</form>
+{% endmacro %}
+
+{% macro input(name="", type="text", id=None, value="", placeholder="", class="", required=True, attrs={}) %}
+{% set type_variant_class =
+'checkbox inline-flex-center'
+if type == 'checkbox' else 'input flex'
+%}
+<input type="{{ type }}" name="{{ name }}" id="{{ id or name }}" value="{{ value }}" placeholder="{{ placeholder }}" {%
+  if required %}required{% endif %} {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}
+  class="{{ type_variant_class }} {{ class }}">
+{% endmacro %}
+
+{% macro link(text="", href="#", class="", icon=None, attrs={}, variant="primary", unstyled=False) %}
+<a href="{{ href }}"
+  class="{{ class if unstyled else ('link link--' ~ variant ~ ' ' ~ class ~ ' inline-flex items-center gap-2') }}" {%
+  for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+  {% if icon %}
+  <i class="{{ icon }}"></i>
+  {% endif %}
+  {{ text }}
+  {% if caller is defined %}
+  {{ caller() }}
+  {% endif %}
+</a>
+{% endmacro %}
+
+
+{% macro textarea(name="", id=None, rows=4, placeholder="", class="", required=True) %}
+<textarea name="{{ name }}" id="{{ id or name }}" rows="{{ rows }}" placeholder="{{ placeholder }}" {% if required
+  %}required{% endif %} class="textarea flex {{ class }}"></textarea>
+{% endmacro %}

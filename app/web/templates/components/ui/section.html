@@ -19,10 +19,10 @@
   {{ caller() }}
 
   {% if more_url is not false %}
-  <button type="button" class="section-toggle" data-section-toggle hidden>
+  {% call button(type="button", class="section-toggle", attrs={"data-section-toggle": "", "hidden": ""}, unstyled=True) %}
     <span>Show More</span>
     <i class="fas fa-arrow-down"></i>
-  </button>
+  {% endcall %}
   {% endif %}
 
 </section>

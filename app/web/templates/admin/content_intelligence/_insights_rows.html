@@ -145,10 +145,8 @@
         </div>
     </td>
     <td>
-        <button type="button" class="btn btn-sm btn-outline-secondary" 
-                data-action="view-distribution-draft" data-id="{{ item.id }}" data-source-type="{{ item.source_type }}" data-source-id="{{ item.source_id }}" data-platform="{{ item.platform }}">
-            <i class="bi bi-eye"></i> View
-        </button>
+        {% from "components/ui/button.html" import button %}
+        {{ button(type="button", class="btn btn-sm btn-outline-secondary", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, icon="bi bi-eye", text="View", unstyled=True) }}
     </td>
 </tr>
 {% endfor %}
@@ -168,9 +166,7 @@
     <td class="col-gap-count">{{ (item.missing_assets or [])|length }} Gaps</td>
     <td>
         <div class="asset-mapping-actions">
-            <button type="button" class="btn btn-outline btn-sm asset-mapping-details-toggle gap-2" aria-expanded="false">
-                <i class="fa fa-chevron-right" aria-hidden="true"></i> View
-            </button>
+            {{ button(type="button", class="btn btn-outline btn-sm asset-mapping-details-toggle gap-2", attrs={"aria-expanded": "false"}, icon="fa fa-chevron-right", text="View", unstyled=True) }}
         </div>
     </td>
 </tr>

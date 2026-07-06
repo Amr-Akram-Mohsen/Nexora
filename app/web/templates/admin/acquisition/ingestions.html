@@ -1,5 +1,6 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header, admin_panel, admin_table_panel %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
 
 {% block title %}Ingestion Channels — Nexora Admin{% endblock %}
 
@@ -15,10 +16,7 @@
         <h3>Channel Status Grid</h3>
         <div class="dashboard-stats-grid" id="ingestions-status-grid">
             <!-- Populated by JS -->
-            <div>
-                <i class="fa-solid fa-circle-notch fa-spin"></i>
-                <p>Loading channel status...</p>
-            </div>
+            {{ spinner("Loading channel status...") }}
         </div>
     </div>
 
@@ -26,7 +24,8 @@
     <div class="admin-card">
         <div class="card-header flex justify-between items-center">
             <h3>Recent Ingestion Events</h3>
-            <button id="refresh-logs-btn" class="admin-btn-secondary"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+            {% from "components/ui/button.html" import button %}
+            {{ button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) }}
         </div>
         <div>
             <table class="dashboard-table">
@@ -42,12 +41,7 @@
                 </thead>
                 <tbody id="ingestions-logs-tbody">
                     <!-- Populated by JS -->
-                    <tr>
-                        <td colspan="6">
-                            <i class="fa-solid fa-circle-notch fa-spin"></i>
-                            <p>Loading recent events...</p>
-                        </td>
-                    </tr>
+                    {{ table_spinner(colspan=6, text="Loading recent events...") }}
                 </tbody>
             </table>
         </div>

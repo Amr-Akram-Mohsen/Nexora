@@ -13,9 +13,8 @@
         {# Sidebar header (mobile close) #}
         <div class="sidebar-header flex items-center justify-between">
           <span class="sidebar-header__title">Filters</span>
-          <button class="sidebar-close-btn btn--icon" id="sidebarClose" aria-label="Close filters">
-            <i class="fas fa-times"></i>
-          </button>
+          {% from "components/ui/button.html" import button %}
+          {{ button(id="sidebarClose", class="sidebar-close-btn btn--icon", attrs={"aria-label": "Close filters"}, icon="fas fa-times", unstyled=True) }}
         </div>
         {{ caller('sidebar') }}
       </div>

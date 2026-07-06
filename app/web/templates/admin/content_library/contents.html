@@ -1,6 +1,7 @@
 {% extends "admin/layout/_crud_page_base.html" %}
 {% from "components/ui/modal.html" import modal %}
 {% from "components/ui/button.html" import button %}
+{% from "components/ui/input.html" import input %}
 {% set header_title = "Content Moderation & Management" %}
 {% set page_description = "Clean up, categorize, inspect quality, and perform bulk operations on aggregated content" %}
 {% set summary_label = "items" %}
@@ -60,9 +61,9 @@
   {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")],
   default_val="published_at", default_text=None, extra_class="filter-input-auto") }}
 
-  <input type="date" id="filter-start-date" class="dashboard-filter-input filter-input-auto" />
+  {{ input(type="date", id="filter-start-date", class="dashboard-filter-input filter-input-auto", required=False) }}
   <span class="filter-text-divider">to</span>
-  <input type="date" id="filter-end-date" class="dashboard-filter-input filter-input-auto" />
+  {{ input(type="date", id="filter-end-date", class="dashboard-filter-input filter-input-auto", required=False) }}
 
   <div class="filter-sort-group flex items-center gap-2">
     <span class="filter-label-xs">Sort:</span>
@@ -106,10 +107,7 @@
     ], default_val="", default_text="Choose Bulk Action...") }}
 
     {# Bulk Category Dropdown (shown only when recategorize is selected) #}
-    <select id="bulk-category-select" class="dashboard-filter-select is-hidden">
-      <option value="">Select Category...</option>
-      {# Populated dynamically #}
-    </select>
+    {{ admin_filter_select("bulk-category-select", None, [], default_val="", default_text="Select Category...", extra_class="is-hidden") }}
 
     {{ button(text="Apply Action", class="admin-btn-primary", attrs={"id": "bulk-apply-btn", "disabled": "disabled"}, variant=none) }}
   </div>
@@ -141,7 +139,7 @@
 {% block crud_modals %}
 {% call modal("quick-category-modal", "Quick Recategorize", '<i class="fa-solid fa-tag"></i>', "modal-content-sm") %}
 <p class="dashboard-modal-body">Move this item to a different content category:</p>
-<input type="hidden" id="quick-cat-content-id" />
+{{ input(type="hidden", id="quick-cat-content-id", required=False) }}
 {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None,
 extra_class="modal-select-full")
 }}

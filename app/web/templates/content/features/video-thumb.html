@@ -1,4 +1,5 @@
 {% from "content/features/content-image.html" import render_image_url %}
+{% from "components/ui/button.html" import button %}
 
 {% macro render_video_thumbnail(thumbnail_url, title, video_url_or_id, duration=None, platform='youtube',
 wrapper_class='card__img-wrapper', priority='low') %}
@@ -9,12 +10,11 @@ wrapper_class='card__img-wrapper', priority='low') %}
         {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img', priority=priority) }}
 
         <div class="video-preview__overlay flex justify-center items-center">
-            <button class="video-preview__play-btn flex justify-center items-center" aria-label="Play {{ title }}"
-                data-action="lazy-play">
+            {% call button(class="video-preview__play-btn justify-center items-center", attrs={"aria-label": "Play " ~ title, "data-action": "lazy-play"}, unstyled=True) %}
                 <div class="play-icon-wrapper">
                     <i class="fas fa-play"></i>
                 </div>
-            </button>
+            {% endcall %}
 
             {% if duration %}
             <span class="video-preview__duration">{{ duration }}</span>
@@ -55,9 +55,7 @@ wrapper_class='card__img-wrapper', priority='low') %}
 
             if (embedUrl) {
                 container.innerHTML = `
-                    <button class="video-sticky-close" aria-label="Close sticky video">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    {{ button(class="video-sticky-close", attrs={"aria-label": "Close sticky video"}, icon="fas fa-times", unstyled=True) }}
                     <div class="video-resize-handle">
                         <i class="fas fa-arrows-alt-v"></i>
                     </div>

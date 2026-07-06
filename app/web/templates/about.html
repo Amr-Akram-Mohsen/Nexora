@@ -1,4 +1,5 @@
 {% extends"base.html" %} {% block title %}Nexora | About{% endblock %}
+{% from "components/ui/button.html" import button %}
 {%
 block content %} {% from"components/page.html" import page %}
 {% call page("About <span>Nexora</span>","about-page") %}
@@ -49,9 +50,7 @@ block content %} {% from"components/page.html" import page %}
 <div class="about-cta">
   <h3 class="about-cta__title">Want to learn more?</h3>
   <p class="about-cta__text">We are always open to feedback, partnerships, and questions.</p>
-  <a href="{{ url_for('system.contact') }}" class="btn btn--primary about-cta__btn">
-    <i class="far fa-envelope"></i> Get in Touch
-  </a>
+  {{ button(text="Get in Touch", href=url_for('system.contact'), variant="primary", class="about-cta__btn", icon="far fa-envelope") }}
 </div>
 
 {% endcall %}

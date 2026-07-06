@@ -19,6 +19,7 @@
     {% from "components/ui/button.html" import button %}
     {% from "components/ui/field.html" import field %}
     {% from "components/ui/label.html" import label %}
+    {% from "components/ui/link.html" import link %}
 
     <div class="auth-methods">
 
@@ -62,9 +63,7 @@
         attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
         required=True
         ) }}
-        <button type="button" class="password-toggle flex justify-center items-center" aria-label="Show password">
-          <i class="fa-regular fa-eye"></i>
-        </button>
+        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
       {# Strength meter — register only #}
       {% if is_new_user %}
@@ -91,9 +90,7 @@
         attrs={"autocomplete": "new-password"},
         required=True
         ) }}
-        <button type="button" class="password-toggle flex justify-center items-center" aria-label="Show password">
-          <i class="fa-regular fa-eye"></i>
-        </button>
+        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
       <span class="confirm-match"></span>
       {% endcall %}
@@ -111,7 +108,7 @@
           #}
         </div>
         {% if not is_new_user %}
-        <a href="{{ url_for('user.forgot_password') }}" class="redirect-link">Forgot password?</a>
+        {{ link(text="Forgot password?", href=url_for('user.forgot_password'), class="redirect-link") }}
         {% endif %}
       </div>
 
@@ -119,11 +116,10 @@
       {% if show_resend and email %}
       <div class="resend-alert">
         <p class="field-hint resend-alert__hint">Haven't received the verification email?</p>
-        <form action="{{ url_for('user.resend_verification') }}" method="POST">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% call form("user.resend_verification") %}
           <input type="hidden" name="email" value="{{ email }}">
-          <button type="submit" class="btn variant--outline resend-alert__btn gap-2">Resend Verification Email</button>
-        </form>
+          {{ button(text="Resend Verification Email", type="submit", variant="outline", class="resend-alert__btn gap-2") }}
+        {% endcall %}
       </div>
       {% endif %}
 
@@ -136,10 +132,9 @@
       <span class="auth-status-text">
         {{ "Already have an account?" if is_new_user else "New to Nexora?" }}
       </span>
-      <a href="{{ url_for('user.login') if is_new_user else url_for('user.register') }}"
-        class="redirect-link redirect-link--bold">
-        {{ "Login" if is_new_user else "Join now" }}
-      </a>
+      {% set redirect_url = url_for('user.login') if is_new_user else url_for('user.register') %}
+      {% set redirect_text = "Login" if is_new_user else "Join now" %}
+      {{ link(text=redirect_text, href=redirect_url, class="redirect-link redirect-link--bold") }}
     </div>
 
   </div>

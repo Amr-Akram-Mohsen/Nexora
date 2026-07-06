@@ -1,4 +1,6 @@
 <footer class="site-footer">
+  {% from "components/ui/button.html" import button %}
+  {% from "components/ui/link.html" import link %}
   <div class="container">
 
     <!-- Main Footer -->
@@ -6,9 +8,9 @@
 
       <!-- Column 1: Brand -->
       <div class="footer-column footer-brand flex flex-col items-start gap-3">
-        <a href="/" class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex">
+        {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
           {% include "logos/nexora-logo.html" %}
-        </a>
+        {% endcall %}
         {# <p class="footer-slogan">
           The #1 Tech Guide in the Middle East
         </p> #}
@@ -17,10 +19,7 @@
         </p>
         <div class="footer-socials flex">
           {% for name, url in social_links %}
-          <a href="{{ url }}" target="_blank" rel="noopener" class="footer-social flex-center {{ name }}"
-            aria-label="{{ name }}">
-            <i class="fab fa-{{ name }}{% if name == 'facebook' %}-f{% endif %}"></i>
-          </a>
+          {{ link(href=url, class="footer-social flex-center " ~ name, unstyled=True, attrs={"target": "_blank", "rel": "noopener", "aria-label": name}, icon="fab fa-" ~ name ~ ('-f' if name == 'facebook' else '')) }}
           {% endfor %}
         </div>
       </div>
@@ -31,17 +30,12 @@
         <ul class="footer-items flex flex-col gap-3">
           {% for item in main_sections %}
           <li class="footer-item">
-            <a href="{{ url_for('content.sections', section_slug=item.slug) }}" class="footer-link">
-              {{ item.name }}
-            </a>
+            {{ link(text=item.name, href=url_for('content.sections', section_slug=item.slug), class="footer-link", unstyled=True) }}
           </li>
           {% endfor %}
           {% for item in footer_topics %}
           <li class="footer-item">
-            <a href="{{ url_for('content.sections', section_slug='reviews', topic_slug=item.slug) }}"
-              class="footer-link">
-              {{ item.name }}
-            </a>
+            {{ link(text=item.name, href=url_for('content.sections', section_slug='reviews', topic_slug=item.slug), class="footer-link", unstyled=True) }}
           </li>
           {% endfor %}
         </ul>
@@ -59,9 +53,7 @@
         <ul class="footer-items flex flex-col gap-3">
           {% for item in footer_pages %}
           <li class="footer-item">
-            <a href="{{ url_for('system.' ~ item.slug) }}" class="footer-link">
-              {{ item.name }}
-            </a>
+            {{ link(text=item.name, href=url_for('system.' ~ item.slug), class="footer-link", unstyled=True) }}
           </li>
           {% endfor %}
         </ul>
@@ -73,9 +65,7 @@
         <p class="footer-text">
           Get the latest tech news and exclusive deals delivered to your inbox.
         </p>
-        <a href="{{ url_for('system.newsletter') }}" class="btn btn--primary footer-newsletter__btn">
-          Subscribe to Newsletter
-        </a>
+        {{ button(text="Subscribe to Newsletter", href=url_for('system.newsletter'), variant="primary", class="footer-newsletter__btn") }}
       </div>
 
     </div>
@@ -89,7 +79,7 @@
       <div class="footer-bottom__row flex flex-wrap items-center justify-between gap-4">
         <p class="footer-copy">
           © {{ current_year }}
-          <a href="/" class="footer-brand-link">Nexora</a>. All rights reserved.
+          {{ link(text="Nexora", href="/", class="footer-brand-link", unstyled=True) }}. All rights reserved.
         </p>
 
         <div class="footer-trust flex items-center gap-4">

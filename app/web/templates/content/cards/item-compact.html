@@ -1,4 +1,5 @@
 {% from "components/ui/badge.html" import badge %}
+{% from "components/ui/button.html" import button %}
 {% macro render_item_compact_card(item) %}
 <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="inline-product-card gap-2 flex" data-domain-type="commercial">
   <div class="inline-product__image">
@@ -20,7 +21,7 @@
   </div>
 
   <div class="inline-product__action">
-    <button class="btn btn--primary btn--sm gap-2" tabindex="-1">View Deal</button>
+    {{ button(text="View Deal", variant="primary", class="btn--sm gap-2", attrs={"tabindex": "-1"}) }}
   </div>
 </a>
 {% endmacro %}

@@ -1,4 +1,5 @@
 {% if item.has_variants and item.variant_groups %}
+{% from "components/ui/button.html" import button %}
 
 <div class="item-variants">
 
@@ -38,23 +39,13 @@
 
                 {% if attr in ['color', 'finish'] %}
 
-                <button type="button"
-                    class="variant-option variant-option--color-pill flex items-center gap-2 inline-flex"
-                    data-attribute="{{ attr }}" data-value="{{ value }}"
-                    title="{{ value }}"
-                    aria-label="Select {{ attr }}: {{ value }}">
+                {% call button(type="button", class="variant-option variant-option--color-pill gap-2", attrs={"data-attribute": attr, "data-value": value, "title": value, "aria-label": "Select " ~ attr ~ ": " ~ value}, unstyled=True) %}
                     <span class="variant-option__color-label">{{ value }}</span>
-                </button>
+                {% endcall %}
 
                 {% else %}
 
-                <button type="button"
-                    class="variant-option"
-                    data-attribute="{{ attr }}"
-                    data-value="{{ value }}"
-                    aria-label="Select {{ attr }}: {{ value }}">
-                    {{ value }}
-                </button>
+                {{ button(text=value, type="button", class="variant-option", attrs={"data-attribute": attr, "data-value": value, "aria-label": "Select " ~ attr ~ ": " ~ value}, unstyled=True) }}
 
                 {% endif %}
 

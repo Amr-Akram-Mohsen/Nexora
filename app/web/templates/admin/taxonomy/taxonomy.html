@@ -6,6 +6,7 @@
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
 {% from "admin/components/ui/inspect.html" import admin_inspect_modal %}
 {% from "components/ui/button.html" import button %}
+{% from "components/ui/input.html" import input %}
 {% from "admin/components/ui/forms.html" import admin_filter_select %}
 {% from "components/ui/modal.html" import modal %}
 {% set header_title = "Taxonomy Management" %}
@@ -71,8 +72,7 @@
   <div class="admin-inline-form" id="category-create-form">
     <h3 class="admin-inline-form-title">Add New Category</h3>
     <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-category-name" placeholder="Category name…"
-        class="dashboard-filter-input admin-inline-input" />
+      {{ input(type="text", id="new-category-name", placeholder="Category name…", class="dashboard-filter-input admin-inline-input", required=False) }}
       <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-category-slug-preview">—</code>
       </div>
@@ -97,10 +97,8 @@
   <div class="admin-inline-form" id="brand-create-form">
     <h3 class="admin-inline-form-title">Add New Brand</h3>
     <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-brand-name" placeholder="Brand name…"
-        class="dashboard-filter-input admin-inline-input" />
-      <input type="text" id="new-brand-industry" placeholder="Industry (optional)…"
-        class="dashboard-filter-input admin-inline-input admin-inline-input-sm" />
+      {{ input(type="text", id="new-brand-name", placeholder="Brand name…", class="dashboard-filter-input admin-inline-input", required=False) }}
+      {{ input(type="text", id="new-brand-industry", placeholder="Industry (optional)…", class="dashboard-filter-input admin-inline-input admin-inline-input-sm", required=False) }}
       <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-brand-slug-preview">—</code>
       </div>
@@ -125,8 +123,7 @@
   <div class="admin-inline-form" id="topic-create-form">
     <h3 class="admin-inline-form-title">Add New Topic</h3>
     <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-topic-name" placeholder="Topic name…"
-        class="dashboard-filter-input admin-inline-input" />
+      {{ input(type="text", id="new-topic-name", placeholder="Topic name…", class="dashboard-filter-input admin-inline-input", required=False) }}
       <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-topic-slug-preview">—</code>
       </div>
@@ -164,8 +161,7 @@
   <div class="admin-inline-form" id="attribute-create-form">
     <h3 class="admin-inline-form-title">Add New Attribute</h3>
     <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      <input type="text" id="new-attribute-name" placeholder="Attribute name…"
-        class="dashboard-filter-input admin-inline-input" />
+      {{ input(type="text", id="new-attribute-name", placeholder="Attribute name…", class="dashboard-filter-input admin-inline-input", required=False) }}
       <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-attribute-slug-preview">—</code>
       </div>

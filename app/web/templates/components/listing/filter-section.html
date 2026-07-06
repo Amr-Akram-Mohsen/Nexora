@@ -56,9 +56,8 @@
     {# Clickable "Show more" toggle if list is long (>8) #}
     {% if options | length > 8 %}
       <li class="filter-item filter-item--more-toggle">
-        <button type="button" class="filter-item__more-link" data-action="toggle-more-filters" aria-expanded="false">
-          <i class="fas fa-plus"></i> Show more (+{{ options | length - 8 }})
-        </button>
+        {% from "components/ui/button.html" import button %}
+        {{ button(class="filter-item__more-link", attrs={"data-action": "toggle-more-filters", "aria-expanded": "false"}, icon="fas fa-plus", text="Show more (+" ~ (options | length - 8) ~ ")", unstyled=True) }}
       </li>
     {% endif %}
   </ul>

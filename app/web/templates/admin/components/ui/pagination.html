@@ -1,15 +1,16 @@
 {% from "components/ui/button.html" import button %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
 {% macro admin_pagination(info_id, per_page_id, prev_id, indicator_id, next_id, per_page_options=[10, 20, 50, 100], current_per_page=20) %}
 <div class="pagination-container">
   <div id="{{ info_id }}" class="pagination-info-text">
     Showing 0 to 0 of 0 items
   </div>
   <div class="pagination-controls-group gap-2">
-    <select id="{{ per_page_id }}" class="dashboard-filter-select pagination-per-page-select">
-      {% for opt in per_page_options %}
-      <option value="{{ opt }}" {% if opt==current_per_page %}selected{% endif %}>{{ opt }} per page</option>
-      {% endfor %}
-    </select>
+    {% set pagination_opts = [] %}
+    {% for opt in per_page_options %}
+      {% set _ = pagination_opts.append((opt, opt ~ " per page")) %}
+    {% endfor %}
+    {{ admin_filter_select(per_page_id, None, pagination_opts, default_val=current_per_page, default_text=None, extra_class="pagination-per-page-select") }}
     {{ button(text="← Previous", attrs={"id": prev_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}
     <span id="{{ indicator_id }}" class="pagination-page-indicator">Page 1 of 1</span>
     {{ button(text="Next →", attrs={"id": next_id, "disabled": "disabled"}, class="user-action-btn", variant=none) }}

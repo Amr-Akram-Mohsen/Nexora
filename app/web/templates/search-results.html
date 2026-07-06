@@ -5,6 +5,7 @@
 {% from "components/ui/form.html" import form %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/input.html" import input %}
+{% from "components/ui/link.html" import link %}
 
 {% set tab_labels = {
 "all": "All",
@@ -30,12 +31,10 @@
   <h3 class="filter-section__title flex items-center gap-2">Result Types</h3>
   <div class="search-type-list flex flex-col gap-2">
     {% for search_type in search_types %}
-    <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}"
-      class="search-type-link {{ 'justify-between gap-2 inline-flex items-center is-active' if active_type == search_type else '' }}">
+    {% call link(href=url_for('recommendation.search', query=query, type=search_type), class="search-type-link " ~ ('justify-between gap-2 inline-flex items-center is-active' if active_type == search_type else ''), unstyled=True) %}
       <span>{{ tab_labels[search_type] }}</span>
-      <span class="search-type-count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0)
-        }}</span>
-    </a>
+      <span class="search-type-count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
+    {% endcall %}
     {% endfor %}
   </div>
 </div>
@@ -63,13 +62,10 @@
       class="input-search",
       attrs={"autocomplete": "off", "aria-label": "Search query input"}
       ) }}
-      <button type="button" class="search-page-form__clear justify-center inline-flex items-center"
-        aria-label="Clear search" tabindex="-1">
-        <i class="fas fa-times"></i>
-      </button>
+      {{ button(type="button", class="search-page-form__clear justify-center inline-flex items-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
     </div>
     {% if active_type and active_type != 'all' %}
-    <input type="hidden" name="type" value="{{ active_type }}">
+    {{ input(type="hidden", name="type", value=active_type, required=False) }}
     {% endif %}
     {{ button(type="submit", icon="fas fa-search", attrs={"aria-label": "Submit search"}) }}
   </div>
@@ -78,12 +74,10 @@
 
 <nav class="search-tabs gap-2" aria-label="Search result filters">
   {% for search_type in search_types %}
-  <a href="{{ url_for('recommendation.search', query=query, type=search_type) }}" class="search-tab {{ 'justify-between gap-2 inline-flex items-center is-active' if active_type==search_type else ''
-    }}">
+  {% call link(href=url_for('recommendation.search', query=query, type=search_type), class="search-tab " ~ ('justify-between gap-2 inline-flex items-center is-active' if active_type==search_type else ''), unstyled=True) %}
     <span>{{ tab_labels[search_type] }}</span>
-    <span class="search-tab__count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0)
-      }}</span>
-  </a>
+    <span class="search-tab__count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
+  {% endcall %}
   {% endfor %}
 </nav>
 {% endif %}
@@ -92,8 +86,7 @@
 {% if active_type != 'all' %}
 <span class="filter-tag gap-2 inline-flex items-center">
   <span>{{ tab_labels[active_type] }}</span>
-  <a href="{{ url_for('recommendation.search', query=query, type='all') }}"
-    class="remove-tag justify-center inline-flex items-center" aria-label="Clear result type">&times;</a>
+  {{ link("&times;"|safe, href=url_for('recommendation.search', query=query, type='all'), class="remove-tag justify-center inline-flex items-center", unstyled=True, attrs={"aria-label": "Clear result type"}) }}
 </span>
 {% endif %}
 {% endif %}

@@ -7,6 +7,7 @@
 {% from "admin/components/ui/tabs.html" import admin_tab_navigation %}
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_reset_button, admin_toolbar_section %}
 {% from "admin/components/ui/dashboard.html" import admin_summary_bar %}
+{% from "components/ui/input.html" import input %}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
 
@@ -94,11 +95,11 @@
   default_text="All Targets", extra_class="filter-select-item") }}
   <div class="flex items-center gap-2">
     <span class="filter-label-xs">From:</span>
-    <input type="date" id="filter-comments-start-date" class="dashboard-filter-select filter-select-item" />
+    {{ input(type="date", id="filter-comments-start-date", class="dashboard-filter-select filter-select-item", required=False) }}
   </div>
   <div class="flex items-center gap-2">
     <span class="filter-label-xs">To:</span>
-    <input type="date" id="filter-comments-end-date" class="dashboard-filter-select filter-select-item" />
+    {{ input(type="date", id="filter-comments-end-date", class="dashboard-filter-select filter-select-item", required=False) }}
   </div>
   {{ admin_reset_button("clear-comment-filters-btn", "Reset") }}
 </div>
@@ -136,11 +137,11 @@
   {{ admin_search_input("views-search", "Search target title…") }}
   <div class="flex items-center gap-2">
     <span class="filter-label-xs">From:</span>
-    <input type="date" id="filter-views-start-date" class="dashboard-filter-select filter-select-item" />
+    {{ input(type="date", id="filter-views-start-date", class="dashboard-filter-select filter-select-item", required=False) }}
   </div>
   <div class="flex items-center gap-2">
     <span class="filter-label-xs">To:</span>
-    <input type="date" id="filter-views-end-date" class="dashboard-filter-select filter-select-item" />
+    {{ input(type="date", id="filter-views-end-date", class="dashboard-filter-select filter-select-item", required=False) }}
   </div>
   {{ admin_reset_button("clear-views-filters-btn", "Reset") }}
 </div>

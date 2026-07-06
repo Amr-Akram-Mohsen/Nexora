@@ -3,8 +3,8 @@
 {% macro listing_header(title, count, label, active_filters, get_sort_url) %}
 {# Mobile filter toggle button #}
 <div class="listing-mobile-bar flex items-center justify-between">
-  <button type="button" class="filter-toggle-btn flex items-center gap-2" id="filterToggleBtn" aria-label="Open filters">
-    <i class="fas fa-sliders-h"></i>
+  {% from "components/ui/button.html" import button %}
+  {% call button(id="filterToggleBtn", class="filter-toggle-btn gap-2", attrs={"aria-label": "Open filters"}, icon="fas fa-sliders-h", unstyled=True) %}
     <span>Filters</span>
     {% set active_count = namespace(n=0) %}
     {% for k, v in active_filters.items() if k not in ['sort'] %}
@@ -13,7 +13,7 @@
     {% if active_count.n > 0 %}
       <span class="filter-toggle-badge justify-center inline-flex items-center">{{ active_count.n }}</span>
     {% endif %}
-  </button>
+  {% endcall %}
 
   {# Inline sort (mobile) #}
   <div class="listing-sort-compact flex items-center gap-2">

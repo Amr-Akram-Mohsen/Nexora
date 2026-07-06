@@ -23,10 +23,7 @@
 {% block image_overlays %}
   {{ badge('Product', 'badge--card-type') }}
   {# Compare toggle #}
-  <button class="compare-toggle-btn flex-center" data-id="{{ item.id }}" data-name="{{ item.name }}"
-    title="Add to compare" aria-label="Add {{ item.name }} to compare">
-    <i class="fas fa-balance-scale"></i>
-  </button>
+  {{ button(class="compare-toggle-btn", attrs={"data-id": item.id, "data-name": item.name, "title": "Add to compare", "aria-label": "Add " ~ item.name ~ " to compare"}, icon="fas fa-balance-scale", unstyled=True) }}
   {# Discount badge #}
   {% if best_link and best_link.old_price and best_link.price %}
   {% set discount = ((best_link.old_price - best_link.price) / best_link.old_price * 100) | int %}

@@ -21,13 +21,8 @@
           <h3 class="dup-group-title">{{ group.title }}</h3>
           <p class="dup-group-meta">{{ group.count }} identical titles found</p>
         </div>
-        <button
-          class="user-action-btn user-action-delete"
-          data-action="keep-oldest"
-          data-group="{{ loop.index }}"
-          data-items="{{ group.content_list|tojson|e }}">
-          <i class="fas fa-trash-alt"></i> Keep Oldest Only
-        </button>
+        {% from "components/ui/button.html" import button %}
+        {{ button(class="user-action-btn user-action-delete", attrs={"data-action": "keep-oldest", "data-group": loop.index, "data-items": group.content_list|tojson|e}, icon="fas fa-trash-alt", text="Keep Oldest Only", unstyled=True) }}
       </div>
       <div class="dup-group-body">
         {% for item in group.content_list %}
@@ -49,10 +44,7 @@
                class="user-action-btn flex items-center justify-center gap-1">
               <i class="fas fa-eye"></i> Inspect
             </a>
-            <button class="user-action-btn user-action-delete flex items-center justify-center gap-1"
-              data-action="delete-dup" data-id="{{ item.id }}">
-              <i class="fas fa-trash"></i> Delete
-            </button>
+            {{ button(class="user-action-btn user-action-delete justify-center gap-1", attrs={"data-action": "delete-dup", "data-id": item.id}, icon="fas fa-trash", text="Delete", unstyled=True) }}
           </div>
         </div>
         {% endfor %}

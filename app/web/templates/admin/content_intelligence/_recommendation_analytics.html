@@ -1,4 +1,5 @@
 {% from "admin/components/ui/panels.html" import admin_panel %}
+{% from "components/ui/spinner.html" import table_spinner %}
 
 <div class="insights-section">
   <div class="insights-double-grid">
@@ -15,7 +16,7 @@
             </tr>
           </thead>
           <tbody id="context-performance-tbody">
-            <tr><td colspan="5">Loading top contexts...</td></tr>
+            {{ table_spinner(colspan=5, text="Loading top contexts...") }}
           </tbody>
         </table>
       </div>
@@ -32,7 +33,7 @@
             </tr>
           </thead>
           <tbody id="entity-performance-tbody">
-            <tr><td colspan="3">Loading top entities...</td></tr>
+            {{ table_spinner(colspan=3, text="Loading top entities...") }}
           </tbody>
         </table>
       </div>

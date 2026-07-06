@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% from "components/ui/form.html" import form %}
+{% from "components/ui/input.html" import input %}
+{% from "components/ui/button.html" import button %}
+{% from "components/ui/field.html" import field %}
+{% from "components/ui/card.html" import card %}
+{% from "components/ui/badge.html" import badge %}
+{% from "components/ui/modal.html" import modal %}
 {% block title %}My Profile | Nexora{% endblock %}
 
 {% block page_css %}
@@ -18,47 +25,45 @@
     <div class="profile-grid">
       <!-- Sidebar: User Summary -->
       <aside class="profile-sidebar">
-        <div class="profile-card profile-user-card glass">
-          <div class="profile-user-info flex flex-col items-center">
-            <div class="profile-avatar flex-center flex justify-center items-center">
-              {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
-            </div>
-            <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
-            <p class="profile-email">{{ current_user.email }}</p>
-
-            <div class="profile-verification-status flex justify-center">
-              {% if current_user.is_verified %}
-              <span class="badge badge--verified"><i class="fas fa-check-circle"></i> Verified Account</span>
-              {% else %}
-              <span class="badge badge--unverified"><i class="fas fa-exclamation-circle"></i> Unverified Account</span>
-              {% endif %}
-            </div>
+        {% call card(class="profile-user-card") %}
+        <div class="profile-user-info flex flex-col items-center">
+          <div class="profile-avatar flex-center flex justify-center items-center">
+            {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
           </div>
+          <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
+          <p class="profile-email">{{ current_user.email }}</p>
 
-          <div class="profile-meta-list">
-            <div class="meta-item flex items-center justify-between">
-              <span class="meta-label">Provider</span>
-              <span class="meta-value capitalize">{{ current_user.provider or 'Local' }}</span>
-            </div>
-
-            <div class="meta-item flex items-center justify-between">
-              <span class="meta-label">Member Since</span>
-              <span class="meta-value">{{ current_user.created_at | format_date('%Y-%m-%d') }}</span>
-            </div>
+          <div class="profile-verification-status flex justify-center">
+            {% if current_user.is_verified %}
+            {{ badge("Verified Account", variant="success", icon="fas fa-check-circle", class="badge--verified") }}
+            {% else %}
+            {{ badge("Unverified Account", variant="danger", icon="fas fa-exclamation-circle",
+            class="badge--unverified") }}
+            {% endif %}
           </div>
         </div>
+
+        <div class="profile-meta-list">
+          <div class="meta-item flex items-center justify-between">
+            <span class="meta-label">Provider</span>
+            <span class="meta-value capitalize">{{ current_user.provider or 'Local' }}</span>
+          </div>
+
+          <div class="meta-item flex items-center justify-between">
+            <span class="meta-label">Member Since</span>
+            <span class="meta-value">{{ current_user.created_at | format_date('%Y-%m-%d') }}</span>
+          </div>
+        </div>
+        {% endcall %}
 
         {% if not current_user.is_verified and current_user.provider != 'google' %}
-        <div class="profile-card verification-alert-card glass">
-          <h3 class="alert-card-title">Verify Your Email</h3>
-          <p class="alert-card-desc">Please verify your account to access all features. We've sent a verification link
-            to your email.</p>
-          <form action="{{ url_for('user.resend_verification') }}" method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="email" value="{{ current_user.email }}">
-            <button type="submit" class="btn variant--primary w-full text-center gap-2">Resend Link</button>
-          </form>
-        </div>
+        {% call card(title="Verify Your Email", desc="Please verify your account to access all features. We've sent a
+        verification link to your email.", class="verification-alert-card") %}
+        {% call form("user.resend_verification") %}
+        {{ input(type="hidden", name="email", value=current_user.email, required=False) }}
+        {{ button(text="Resend Link", type="submit", variant="primary", class="w-full text-center gap-2") }}
+        {% endcall %}
+        {% endcall %}
         {% endif %}
       </aside>
 
@@ -66,145 +71,126 @@
       <main class="profile-main">
 
         <!-- Card: Personal Information -->
-        <div class="profile-card glass settings-card">
-          <h3 class="card-section-title">Personal Details</h3>
-          <p class="card-section-desc">Update your display name for public interactions.</p>
+        {% call card(title="Personal Details", desc="Update your display name for public interactions.",
+        class="settings-card") %}
+        {% call form(form_action=url_for('user.update_profile'), class="profile-form") %}
+        {{ input(type="hidden", name="action", value="name", required=False) }}
 
-          <form action="{{ url_for('user.update_profile') }}" method="POST" class="profile-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="action" value="name">
-
-            <div class="profile-form-grid">
-              <div class="form-field gap-2 flex">
-                <label class="label gap-2" for="name">Display Name</label>
-                <input type="text" id="name" name="name" class="input" value="{{ current_user.name or '' }}"
-                  placeholder="Enter your name">
-                <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="btn variant--primary gap-2">Save Changes</button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- Card: Newsletters -->
-        <div class="profile-card glass settings-card">
-          <h3 class="card-section-title">Email Preferences</h3>
-          <p class="card-section-desc">Manage your email communications and digest updates.</p>
-
-          <div class="newsletter-settings-box" data-newsletter data-newsletter-placement="profile">
-            {% if subscriber and subscriber.is_active %}
-            <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <p class="newsletter-status-title">Weekly Digest Ingestion</p>
-                <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals,
-                  and tech updates.</p>
-              </div>
-              <form action="{{ url_for('interaction.unsubscribe_auth') }}" method="POST" data-newsletter-form
-                data-newsletter-placement="profile">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="newsletter_placement" value="profile">
-                <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
-                <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
-                <button type="submit" class="btn variant--outline text-xs gap-2">Unsubscribe</button>
-              </form>
-            </div>
-            {% else %}
-            <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <p class="newsletter-status-title">Weekly Digest Ingestion</p>
-                <p class="newsletter-status-subtitle text-muted-foreground">
-                  {% if subscriber and subscriber.unsubscribed_at is none %}
-                  Check your email to confirm your subscription.
-                  {% else %}
-                  Stay updated with Saudi Arabia & UAE tech
-                  reviews, deals, and insights.
-                  {% endif %}
-                </p>
-              </div>
-              <form action="{{ url_for('interaction.subscribe') }}" method="POST" data-newsletter-form
-                data-newsletter-placement="profile">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="newsletter_placement" value="profile">
-                <input type="hidden" name="newsletter_title" value="Weekly Digest Ingestion">
-                <input type="hidden" name="newsletter_description" value="Manage your Nexora newsletter subscription.">
-                <button type="submit" class="btn variant--primary text-xs gap-2">
-                  {% if subscriber and subscriber.unsubscribed_at is none %}Resend confirmation{% else %}Subscribe{%
-                  endif %}
-                </button>
-              </form>
-            </div>
-            {% endif %}
+        <div class="profile-form-grid">
+          {% call field(label_text="Display Name", for_id="name", class="gap-2 flex") %}
+          {{ input(name="name", id="name", value=current_user.name or '', placeholder="Enter your name") }}
+          <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
+          {% endcall %}
+          <div class="form-actions">
+            {{ button(text="Save Changes", type="submit", variant="primary", class="gap-2") }}
           </div>
         </div>
+        {% endcall %}
+        {% endcall %}
+
+        <!-- Card: Newsletters -->
+        {% call card(title="Email Preferences", desc="Manage your email communications and digest updates.",
+        class="settings-card") %}
+        <div class="newsletter-settings-box" data-newsletter data-newsletter-placement="profile">
+          {% if subscriber and subscriber.is_active %}
+          <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+              <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals,
+                and tech updates.</p>
+            </div>
+            {% call form("interaction.unsubscribe_auth", attrs={"data-newsletter-form": "", "data-newsletter-placement":
+            "profile"}) %}
+            {{ input(type="hidden", name="newsletter_placement", value="profile", required=False) }}
+            {{ input(type="hidden", name="newsletter_title", value="Weekly Digest Ingestion", required=False) }}
+            {{ input(type="hidden", name="newsletter_description", value="Manage your Nexora newsletter subscription.", required=False) }}
+            {{ button(text="Unsubscribe", type="submit", variant="outline", class="text-xs gap-2") }}
+            {% endcall %}
+          </div>
+          {% else %}
+          <div class="newsletter-status-item flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+              <p class="newsletter-status-subtitle text-muted-foreground">
+                {% if subscriber and subscriber.unsubscribed_at is none %}
+                Check your email to confirm your subscription.
+                {% else %}
+                Stay updated with Saudi Arabia & UAE tech reviews, deals, and insights.
+                {% endif %}
+              </p>
+            </div>
+            {% call form("interaction.subscribe", attrs={"data-newsletter-form": "", "data-newsletter-placement":
+            "profile"}) %}
+            {{ input(type="hidden", name="newsletter_placement", value="profile", required=False) }}
+            {{ input(type="hidden", name="newsletter_title", value="Weekly Digest Ingestion", required=False) }}
+            {{ input(type="hidden", name="newsletter_description", value="Manage your Nexora newsletter subscription.", required=False) }}
+            {% set btn_text = "Resend confirmation" if subscriber and subscriber.unsubscribed_at is none else
+            "Subscribe" %}
+            {{ button(text=btn_text, type="submit", variant="primary", class="text-xs gap-2") }}
+            {% endcall %}
+          </div>
+          {% endif %}
+        </div>
+        {% endcall %}
 
         <!-- Card: Security & Password -->
         {% if current_user.provider != 'google' %}
-        <div class="profile-card glass settings-card">
-          <div class="settings-card-header flex items-center justify-between" data-action="toggle-password-form"
+        <div class="card glass settings-card">
+          <div class="card-header flex items-center justify-between" data-action="toggle-password-form"
             style="cursor: pointer;">
             <div>
               <h3 class="card-section-title" style="margin-bottom: 0;">Security & Password</h3>
               <p class="card-section-desc" style="margin-top: 0.25rem;">Change your password to ensure your account
                 security.</p>
             </div>
-            <button type="button" class="btn variant--ghost btn--icon gap-2" id="password-toggle-btn"
-              aria-label="Toggle Password Form">
-              <i class="fas fa-chevron-down transition-transform duration-300" id="accordion-arrow"></i>
-            </button>
+            {{ button(variant="ghost", class="btn--icon gap-2", attrs={"id": "password-toggle-btn", "aria-label":
+            "Toggle Password Form"}, icon="fas fa-chevron-down transition-transform duration-300",
+            btn_span_class="hidden") }}
           </div>
+          <div class="card-body password-form-collapsible collapsed" id="password-collapsible">
+            {% call form("user.update_profile", attrs={"id": "password-form"}, class="profile-form border-t-separator")
+            %}
+            {{ input(type="hidden", name="action", value="password", required=False) }}
 
-          <div class="password-form-collapsible collapsed" id="password-collapsible">
-            <form id="password-form" action="{{ url_for('user.update_profile') }}" method="POST"
-              class="profile-form border-t-separator">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <input type="hidden" name="action" value="password">
+            <div class="form-row-grid">
+              {% call field(label_text="Current Password", for_id="current_password", class="full-width gap-2 flex") %}
+              {{ input(type="password", id="current_password", name="current_password", required=True,
+              placeholder="Enter your current password") }}
+              {% endcall %}
 
-              <div class="form-row-grid">
-                <div class="form-field full-width gap-2 flex">
-                  <label class="label gap-2" for="current_password">Current Password</label>
-                  <input type="password" id="current_password" name="current_password" class="input" required
-                    placeholder="Enter your current password">
-                </div>
+              {% call field(label_text="New Password", for_id="new_password", class="gap-2 flex") %}
+              {{ input(type="password", id="new_password", name="new_password", required=True, placeholder="Enter new
+              password (min. 8 chars)", attrs={"minlength": "8"}) }}
+              {% endcall %}
 
-                <div class="form-field gap-2 flex">
-                  <label class="label gap-2" for="new_password">New Password</label>
-                  <input type="password" id="new_password" name="new_password" class="input" minlength="8" required
-                    placeholder="Enter new password (min. 8 chars)">
-                </div>
+              {% call field(label_text="Confirm New Password", for_id="confirm_new_password", class="gap-2 flex") %}
+              {{ input(type="password", id="confirm_new_password", name="confirm_new_password", required=True,
+              placeholder="Confirm your new password", attrs={"minlength": "8"}) }}
+              {% endcall %}
+            </div>
 
-                <div class="form-field gap-2 flex">
-                  <label class="label gap-2" for="confirm_new_password">Confirm New Password</label>
-                  <input type="password" id="confirm_new_password" name="confirm_new_password" class="input"
-                    minlength="8" required placeholder="Confirm your new password">
-                </div>
-              </div>
-
-              <div class="form-actions flex justify-end">
-                <button type="submit" class="btn variant--primary gap-2">Update Password</button>
-              </div>
-            </form>
+            <div class="form-actions flex justify-end">
+              {{ button(text="Update Password", type="submit", variant="primary", class="gap-2") }}
+            </div>
+            {% endcall %}
           </div>
         </div>
         {% endif %}
     </div>
 
     <!-- Card: Collections Management -->
-    <div class="profile-card glass settings-card">
-      <div class="settings-card-header flex items-center justify-between">
+    <div class="card glass settings-card">
+      <div class="card-header flex items-center justify-between">
         <div>
           <h3 class="card-section-title" style="margin-bottom: 0;">Saved Collections</h3>
           <p class="card-section-desc" style="margin-top: 0.25rem;">Manage your saved collections across the platform.
           </p>
         </div>
-        <a href="{{ url_for('interaction.saved_items') }}" class="btn variant--outline btn--icon gap-2"
-          aria-label="View All Saved Items" title="View Saved Items">
-          <i class="fas fa-external-link-alt"></i>
-        </a>
+        {{ button(href=url_for('interaction.saved_items'), variant="outline", class="btn--icon gap-2", icon="fas
+        fa-external-link-alt", attrs={"aria-label": "View All Saved Items", "title": "View Saved Items"}) }}
       </div>
 
-      <div class="collections-list flex flex-col gap-4 mt-6">
+      <div class="card-body collections-list flex flex-col gap-4 mt-6">
         {% if collections %}
         {% for collection in collections %}
         <div class="collection-manage-item flex items-center justify-between p-4 border rounded-md">
@@ -214,14 +200,10 @@
           </div>
 
           <div class="collection-actions flex items-center gap-2">
-            <button type="button" class="btn variant--ghost text-sm btn-rename-collection"
-              data-collection="{{ collection.name }}">
-              <i class="fas fa-edit"></i> Rename
-            </button>
-            <button type="button" class="btn variant--ghost text-sm text-red-500 hover:bg-red-50 btn-delete-collection"
-              data-collection="{{ collection.name }}">
-              <i class="fas fa-trash"></i> Delete
-            </button>
+            {{ button(text="Rename", type="button", variant="ghost", class="text-sm btn-rename-collection", icon="fas
+            fa-edit", attrs={"data-collection": collection.name}) }}
+            {{ button(text="Delete", type="button", variant="ghost", class="text-sm text-red-500 hover:bg-red-50
+            btn-delete-collection", icon="fas fa-trash", attrs={"data-collection": collection.name}) }}
           </div>
         </div>
         {% endfor %}
@@ -235,48 +217,39 @@
     </div>
 
     <!-- Card: Danger Zone -->
-    <div class="profile-card settings-card danger-zone-card">
-      <h3 class="card-section-title danger-zone-title">Danger Zone</h3>
-      <p class="card-section-desc danger-zone-desc">Permanently delete your account and all
-        associated data. This action cannot be undone.</p>
-
-      <button type="button" class="btn mt-4 text-sm gap-2 btn-danger"
-        onclick="document.getElementById('delete-account-modal').classList.add('active');">
-        <i class="fas fa-exclamation-triangle"></i> Delete Account
-      </button>
-    </div>
+    {% call card(title="Danger Zone", desc="Permanently delete your account and all associated data. This action cannot
+    be undone.", class="settings-card danger-zone-card") %}
+    {{ button(text="Delete Account", type="button", variant="danger", class="mt-4 text-sm gap-2 btn-danger", icon="fas
+    fa-exclamation-triangle", attrs={"onclick":
+    "document.getElementById('delete-account-modal').classList.add('active');"}) }}
+    {% endcall %}
     </main>
   </div>
   </div>
 </section>
 
 <!-- Delete Account Modal -->
-<div class="modal-overlay" id="delete-account-modal">
-  <div class="modal-content glass p-6 rounded-lg max-w-md w-full">
-    <h3 class="text-xl font-bold mb-2 text-red-500">Delete Account</h3>
-    <p class="text-sm text-muted-foreground mb-6">Are you sure you want to delete your account? This will erase all your
-      reviews, saved items, and settings. This cannot be undone.</p>
+{% call modal("delete-account-modal", title="Delete Account", icon="fas fa-exclamation-triangle",
+class="border-red-500") %}
+<p class="text-sm text-muted-foreground mb-6">Are you sure you want to delete your account? This will erase all your
+  reviews, saved items, and settings. This cannot be undone.</p>
 
-    <form action="{{ url_for('user.delete_account') }}" method="POST">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% call form("user.delete_account") %}
+{% if current_user.provider != 'google' %}
+{% call field(label_text="Confirm Password", for_id="delete_password", class="flex flex-col gap-2 mb-6") %}
+{{ input(type="password", name="password", id="delete_password", required=True, placeholder="Enter your password to
+confirm") }}
+{% endcall %}
+{% endif %}
 
-      {% if current_user.provider != 'google' %}
-      <div class="form-field flex flex-col gap-2 mb-6">
-        <label for="delete_password" class="label">Confirm Password</label>
-        <input type="password" name="password" id="delete_password" class="input" required
-          placeholder="Enter your password to confirm">
-      </div>
-      {% endif %}
-
-      <div class="flex justify-end gap-3 mt-4">
-        <button type="button" class="btn variant--outline"
-          onclick="document.getElementById('delete-account-modal').classList.remove('active');">Cancel</button>
-        <button type="submit" class="btn" style="background-color: rgb(239, 68, 68); color: white;">Permanently
-          Delete</button>
-      </div>
-    </form>
-  </div>
+<div class="flex justify-end gap-3 mt-4">
+  {{ button(text="Cancel", type="button", variant="outline", attrs={"onclick":
+  "document.getElementById('delete-account-modal').classList.remove('active');"}) }}
+  {{ button(text="Permanently Delete", type="submit", variant="danger", attrs={"style": "background-color: rgb(239, 68,
+  68); color: white;"}) }}
 </div>
+{% endcall %}
+{% endcall %}
 
 {% block page_scripts %}
 <script src="{{ url_for('static', filename='js/features/profile.js') }}"></script>

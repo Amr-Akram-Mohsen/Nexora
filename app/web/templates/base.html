@@ -63,13 +63,14 @@
 </head>
 
 <body class="light-mode">
+  {% from "components/ui/button.html" import button %}
   {% block flash_messages %}
   {% with messages = get_flashed_messages(with_categories=true) %} {% if
   messages %}
   <div class="flash-messages flex flex-col">
     {% for category, message in messages %}
     <div class="alert flex items-center justify-between alert-{{ category }}">
-      {{ message }} <button class="alert-close">&times;</button>
+      {{ message }} {% call button(class="alert-close", unstyled=True) %}&times;{% endcall %}
     </div>
     {% endfor %}
   </div>
@@ -137,9 +138,7 @@
   {% block additional_content %}
   <!-- Back to Top Button -->
   <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
-  <button id="back-to-top" class="back-to-top is-hidden" aria-label="Go to top">
-    <i class="fas fa-chevron-up"></i>
-  </button>
+  {{ button(id="back-to-top", class="back-to-top is-hidden", attrs={"aria-label": "Go to top"}, icon="fas fa-chevron-up", unstyled=True) }}
   
   <!-- Floating Compare Bar (hidden by default) -->
   <div id="compare-floating-bar" class="compare-bar flex items-center justify-between" style="display: none;">
@@ -148,8 +147,8 @@
           <span class="compare-bar__text">Items selected for comparison</span>
       </div>
       <div class="compare-bar__actions flex items-center">
-          <button class="compare-bar__clear btn btn--link">Clear All</button>
-          <a href="/compare" class="compare-bar__link btn btn--primary">Compare Now</a>
+          {{ button(text="Clear All", class="compare-bar__clear", variant="link") }}
+          {{ button(text="Compare Now", href="/compare", class="compare-bar__link", variant="primary") }}
       </div>
   </div>
   {% endblock %}

@@ -1,6 +1,7 @@
 {# admin/content_library/_pipeline_stats_partial.html
    Rendered server-side and returned as an HTML partial via fetch.
    Variables: stats (list of pipeline stat objects) #}
+{% from "components/ui/button.html" import button %}
 {% if stats %}
 <div class="admin-table-wrapper">
   <table class="admin-table" id="pipeline-stats-table">
@@ -42,11 +43,7 @@
         </td>
         <td>
           {% if s.failed > 0 %}
-          <button class="user-action-btn user-action-toggle-active flex items-center gap-1"
-            data-action="retry-failed"
-            data-origin="{{ s.origin }}">
-            <i class="fas fa-redo"></i> Retry Failed
-          </button>
+          {{ button(class="user-action-btn user-action-toggle-active gap-1", attrs={"data-action": "retry-failed", "data-origin": s.origin}, icon="fas fa-redo", text="Retry Failed", unstyled=True) }}
           {% else %}
           <span class="badge badge-health-high badge-compact">Healthy</span>
           {% endif %}

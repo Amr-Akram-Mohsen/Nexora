@@ -7,10 +7,7 @@
 
         <div class="admin-header__left flex items-center">
 
-            <button id="sidebar-toggle" class="btn btn--ghost btn--icon admin-sidebar-toggle gap-2" type="button"
-                aria-label="Toggle Sidebar">
-                <i class="fas fa-bars"></i>
-            </button>
+            {{ button(id="sidebar-toggle", type="button", class="admin-sidebar-toggle btn--icon gap-2", variant="ghost", attrs={"aria-label": "Toggle Sidebar"}, icon="fas fa-bars") }}
 
             <a href="{{ url_for('admin.home') }}" class="site-logo admin-header__logo">
                 {% include "logos/nexora-logo.html" %}
@@ -39,9 +36,7 @@
             icon="far fa-sun"
             ) }}
 
-            <button type="button" class="btn btn--ghost btn--icon gap-2" aria-label="Notifications">
-                <i class="far fa-bell"></i>
-            </button>
+            {{ button(type="button", variant="ghost", class="btn--icon gap-2", attrs={"aria-label": "Notifications"}, icon="far fa-bell") }}
 
             <div class="nav-user">
 

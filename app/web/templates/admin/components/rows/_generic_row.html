@@ -1,50 +1,71 @@
 {% from "components/ui/badge.html" import badge %}
-{% from "components/ui/button.html" import button %}
-{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
-{% for key, value in row.items() %}
-{% if key not in ["slug", "id", "is_published", "image_url", "has-discount", "is_verified", "recency_days", "logo-url"] %}
-<td class="cell-{{ key|replace(' ', '-') }}" data-field="{{ key }}">
-  {% if key == "user_link" %}
+{% from "admin/components/ui/actions.html" import inspect_btn_cell %}
+
+{% set ignored_keys = [
+    "slug", "id", "is_published", "image_url", 
+    "has-discount", "is_verified", "recency_days", "logo-url"
+] %}
+
+{% macro render_user_link(value) %}
     {% if value %}
-      <a href="/admin/users?search={{ value }}" class="admin-link">User #{{ value }}</a>
+        <a href="{{ url_for('admin.dashboard_users', search=value) }}" class="admin-link">User #{{ value }}</a>
     {% else %}
-      <span class="text-muted">Anonymous</span>
+        <span class="text-muted">Anonymous</span>
     {% endif %}
-  {% elif key == "health" %}
-    {% set tooltip, text, variant = 
-      ('Entity is orphaned (0 linked items/content)', 'Unused', 'danger') if value == 'unused' else
-      ('Entity is inactive but has linked items/content', 'Inactive (Linked)', 'warning') if value == 'inactive-linked' else
-      (None, 'OK', 'success') if value == 'ok' else
-      (None, value|title, 'secondary') %}
-    {% if tooltip %}<span title="{{ tooltip }}">{% endif %}
-    {{ badge(text, variant=variant) }}
-    {% if tooltip %}</span>{% endif %}
-  {% elif key in ["is_configured", "filter config"] %}
-    {% set is_conf = (value in ["Configured", True]) %}
-    {{ badge("Configured" if is_conf else "Not Configured", variant="success" if is_conf else "warning") }}
-  {% elif key in ["is_active", "status"] %}
-    {% set is_act = (value in ["active", True]) %}
-    {{ badge("Active" if is_act else "Inactive", variant="success" if is_act else "secondary") }}
-  {% elif key in ["is_featured", "featured"] %}
-    {% if value in ["Featured", True] %}
-      {{ badge("Featured", variant="primary") }}
+{% endmacro %}
+
+{% macro render_health_badge(value) %}
+    {% set health_config = {
+        'unused': {'tooltip': 'Entity is orphaned (0 linked items/content)', 'text': 'Unused', 'variant': 'danger'},
+        'inactive-linked': {'tooltip': 'Entity is inactive but has linked items/content', 'text': 'Inactive (Linked)', 'variant': 'warning'},
+        'ok': {'tooltip': None, 'text': 'OK', 'variant': 'success'}
+    } %}
+    {% set config = health_config.get(value, {'tooltip': None, 'text': value|title, 'variant': 'secondary'}) %}
+    
+    {% if config.tooltip %}<span title="{{ config.tooltip }}">{% endif %}
+    {{ badge(config.text, variant=config.variant) }}
+    {% if config.tooltip %}</span>{% endif %}
+{% endmacro %}
+
+{% macro render_boolean_badge(value, true_label, false_label, true_variant="success", false_variant="secondary", true_values=["active", "Configured", "Featured", True]) %}
+    {% set is_true = (value in true_values) %}
+    {% if is_true %}
+        {{ badge(true_label, variant=true_variant) }}
+    {% elif false_label %}
+        {{ badge(false_label, variant=false_variant) }}
     {% else %}
-      <span class="text-muted">—</span>
+        <span class="text-muted">—</span>
     {% endif %}
-  {% else %}
-    <span>{{ value }}</span>
-  {% endif %}
-</td>
-{% endif %}
+{% endmacro %}
+
+{% for key, value in row.items() %}
+    {% if key not in ignored_keys %}
+        <td class="cell-{{ key|replace(' ', '-') }}" data-field="{{ key }}">
+            {% if key == "user_link" %}
+                {{ render_user_link(value) }}
+            {% elif key == "health" %}
+                {{ render_health_badge(value) }}
+            {% elif key in ["is_configured", "filter config"] %}
+                {{ render_boolean_badge(value, "Configured", "Not Configured", false_variant="warning") }}
+            {% elif key in ["is_active", "status"] %}
+                {{ render_boolean_badge(value, "Active", "Inactive") }}
+            {% elif key in ["is_featured", "featured"] %}
+                {{ render_boolean_badge(value, "Featured", None, true_variant="primary") }}
+            {% else %}
+                <span>{{ value }}</span>
+            {% endif %}
+        </td>
+    {% endif %}
 {% endfor %}
 
 {% if not hide_action_column %}
-{% call inspect_btn_cell(domain_type|default(''), row.id, title=row.name|default(row.title|default(''))) %}
-  {% if domain_target_type %}
-  <a class="inspect-action user-action-inspect inspect-btn"
-    href="/admin/{{ domain_target_type }}?source={{ row.get('slug', '') }}">
-    <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title}}
-  </a>
-  {% endif %}
-{% endcall %}
+    {% set title = row.name|default(row.title|default('')) %}
+    {% call inspect_btn_cell(domain_type|default(''), row.id, title=title) %}
+        {% if domain_target_type %}
+            <a class="inspect-action user-action-inspect inspect-btn"
+               href="/admin/{{ domain_target_type }}?source={{ row.get('slug', '') }}">
+                <i class="fa-solid fa-eye"></i> View {{ domain_target_type|title }}
+            </a>
+        {% endif %}
+    {% endcall %}
 {% endif %}

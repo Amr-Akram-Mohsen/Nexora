@@ -58,11 +58,11 @@
   {% set action_label = 'Unsubscribe' if is_subscribed else ('Resend confirmation' if is_pending else 'Subscribe') %}
 
   {% call form("newsletter-form", form_action=action, attrs={"data-newsletter-form": "", "data-newsletter-placement": newsletter_placement}) %}
-  <input type="hidden" name="newsletter_placement" value="{{ newsletter_placement }}">
-  <input type="hidden" name="newsletter_title" value="{{ newsletter_title }}">
-  <input type="hidden" name="newsletter_description" value="{{ newsletter_description }}">
+  {{ input(type="hidden", name="newsletter_placement", value=newsletter_placement, required=False) }}
+  {{ input(type="hidden", name="newsletter_title", value=newsletter_title, required=False) }}
+  {{ input(type="hidden", name="newsletter_description", value=newsletter_description, required=False) }}
   {% if newsletter_email and not is_authenticated %}
-  <input type="hidden" name="email" value="{{ newsletter_email }}">
+  {{ input(type="hidden", name="email", value=newsletter_email, required=False) }}
   {% endif %}
 
   {% if not is_authenticated and not is_subscribed and not is_pending %}

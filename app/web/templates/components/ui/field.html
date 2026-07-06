@@ -1,7 +1,0 @@
-{% from "components/ui/label.html" import label %}
-{% macro field(label_text="", for_id="", class="", label_class="", variant="vertical") %}
-<div class="field-wrapper flex {{ 'flex-col' if variant == 'vertical' else 'flex-row items-center gap-2' }} {{ class }}">
-  {{ label(label_text, for_id, label_class) }}
-  {{ caller() }}
-</div>
-{% endmacro %}

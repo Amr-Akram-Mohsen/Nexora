@@ -1,27 +1,23 @@
 {% from "components/ui/form.html" import form %}
 {% from "components/ui/button.html" import button %}
 {% from "components/ui/input.html" import input %}
+{% from "components/ui/link.html" import link %}
 
 <header class="site-header">
 
   <div class="container">
     <div class="header flex items-center justify-between">
       <!-- Logo -->
-      <a href="/" class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex">
+      {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
         {% include "logos/nexora-logo.html" %}
-      </a>
+      {% endcall %}
 
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for section in main_sections %}
-        <a href="{{ url_for('content.sections', section_slug=section.slug) }}"
-          class="main-nav__link gap-2 inline-flex items-center">
-          {{ section.name }}
-        </a>
+        {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link gap-2 inline-flex items-center", unstyled=True) }}
         {% endfor %}
-        <a href="{{ url_for('item.deals') }}" class="main-nav__link gap-2 inline-flex items-center">
-          <i class="fas fa-tag"></i> Deals
-        </a>
+        {{ link(text="Deals", href=url_for('item.deals'), class="main-nav__link gap-2 inline-flex items-center", icon="fas fa-tag", unstyled=True) }}
       </nav>
 
       <!-- Actions -->
@@ -62,9 +58,7 @@
 
         {% if is_authenticated %}
         <!-- Saved (Shortcut) -->
-        <a href="{{ url_for('interaction.saved_items') }}" class="btn btn--icon flex-center gap-2" title="Saved Items">
-          <i class="far fa-bookmark"></i>
-        </a>
+        {{ button(href=url_for('interaction.saved_items'), variant="", class="btn--icon gap-2", icon="far fa-bookmark", attrs={"title": "Saved Items"}) }}
         {% endif %}
 
         <!-- User -->
@@ -95,21 +89,12 @@
               <span class="user-email">{{ user_name or user_email }}</span>
             </div>
 
-            <a href="{{ url_for('user.profile') }}" class="{{ item_class }}">
-              <i class="fas fa-id-card"></i>
-              Profile
-            </a>
+            {{ link(text="Profile", href=url_for('user.profile'), class=item_class, icon="fas fa-id-card", unstyled=True) }}
 
-            <a href="{{ url_for('interaction.saved_items') }}" class="{{ item_class }}">
-              <i class="far fa-bookmark"></i>
-              Saved Items
-            </a>
+            {{ link(text="Saved Items", href=url_for('interaction.saved_items'), class=item_class, icon="far fa-bookmark", unstyled=True) }}
 
             {% if is_admin %}
-            <a href="{{ url_for('admin.home') }}" class="{{ item_class }}">
-              <i class="fas fa-shield-alt"></i>
-              Admin Panel
-            </a>
+            {{ link(text="Admin Panel", href=url_for('admin.home'), class=item_class, icon="fas fa-shield-alt", unstyled=True) }}
             {% endif %}
 
             <div class="dropdown-divider"></div>
@@ -121,23 +106,20 @@
               {% if not acc.is_active %}
               {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form")
               %}
-              <button type="submit" class="{{ item_class }} switch-btn flex items-center">
+              {% call button(type="submit", class=item_class ~ " switch-btn", unstyled=True) %}
                 <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
                 <div class="switch-details flex">
                   <span class="switch-name">{{ acc.name }}</span>
                   <span class="switch-email">{{ acc.email }}</span>
                 </div>
-              </button>
+              {% endcall %}
               {% endcall %}
               {% endif %}
               {% endfor %}
             </div>
             {% endif %}
 
-            <a href="{{ url_for('user.login', add_account=1) }}" class="{{ item_class }}">
-              <i class="fas fa-plus-circle"></i>
-              Add Another Account
-            </a>
+            {{ link(text="Add Another Account", href=url_for('user.login', add_account=1), class=item_class, icon="fas fa-plus-circle", unstyled=True) }}
 
             <div class="dropdown-divider"></div>
 
@@ -158,14 +140,8 @@
             {% endif %}
 
             {% else %}
-            <a href="{{ url_for('user.login') }}" class="{{ item_class }}">
-              <i class="fas fa-sign-in-alt"></i>
-              Login
-            </a>
-            <a href="{{ url_for('user.register') }}" class="{{ item_class }}">
-              <i class="fas fa-user-plus"></i>
-              Sign Up
-            </a>
+            {{ link(text="Login", href=url_for('user.login'), class=item_class, icon="fas fa-sign-in-alt", unstyled=True) }}
+            {{ link(text="Sign Up", href=url_for('user.register'), class=item_class, icon="fas fa-user-plus", unstyled=True) }}
             {% endif %}
           </div>
         </div>
@@ -191,10 +167,7 @@
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        <button type="button" class="header-search__clear justify-center inline-flex items-center"
-          aria-label="Clear search" tabindex="-1">
-          <i class="fas fa-times"></i>
-        </button>
+        {{ button(type="button", class="header-search__clear justify-center inline-flex items-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
         {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
         attrs={"aria-label": "Submit search"}) }}
       </div>
@@ -204,14 +177,9 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
-      <a href="{{ url_for('content.sections', section_slug=section.slug) }}"
-        class="mobile-nav__link flex gap-3 items-center">
-        {{ section.name }}
-      </a>
+      {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link flex gap-3 items-center", unstyled=True) }}
       {% endfor %}
-      <a href="{{ url_for('item.deals') }}" class="mobile-nav__link flex gap-3 items-center">
-        <i class="fas fa-tag"></i>Deals
-      </a>
+      {{ link(text="Deals", href=url_for('item.deals'), class="mobile-nav__link flex gap-3 items-center", icon="fas fa-tag", unstyled=True) }}
     </nav>
 
   </div>

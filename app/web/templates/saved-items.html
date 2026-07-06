@@ -3,6 +3,7 @@
 {% from "components/listing/listing-page.html" import listing_page %}
 {% from "components/ui/grid.html" import grid %}
 {% from "components/ui/button.html" import button %}
+{% from "components/ui/link.html" import link %}
 
 {% block title %}Nexora | Saved Items{% endblock %}
 
@@ -30,16 +31,16 @@
     </h3>
     <ul class="filter-list flex flex-col">
       <li class="filter-item is-active" id="filter-all">
-        <a href="#all" class="filter-item__link flex items-center justify-between">
+        {% call link(href="#all", class="filter-item__link flex items-center justify-between", unstyled=True) %}
           <span>All Saved</span>
           <span class="filter-section__badge">{{ saved_items|length + saved_articles|length }}</span>
-        </a>
+        {% endcall %}
       </li>
       {% for collection in collections %}
       <li class="filter-item">
-        <a href="#collection-{{ loop.index }}" class="filter-item__link flex items-center justify-between">
+        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex items-center justify-between", unstyled=True) %}
           <span>{{ collection }}</span>
-        </a>
+        {% endcall %}
       </li>
       {% endfor %}
     </ul>
@@ -68,9 +69,7 @@
   </div>
   <h3 class="empty-state__title">Nothing saved yet</h3>
   <p class="empty-state__message">Start exploring and save items you want to read or buy later.</p>
-  <a href="{{ url_for('system.home') }}">
-    {{ button(text="Explore Now", class="empty-state__btn", variant="primary") }}
-  </a>
+  {{ button(text="Explore Now", href=url_for('system.home'), class="empty-state__btn", variant="primary") }}
 </div>
 {% else %}
 
