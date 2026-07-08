@@ -1,0 +1,121 @@
+{% extends "layout/base.html" %}
+{% block title %}Nexora | Product Comparison{% endblock %}
+
+{% block content %}
+{% from "components/media/item-image.html" import render_image_url %}
+{% from "components/ui/core.html" import button %}
+
+<section class="compare-page content-page" data-domain-type="items">
+    <div class="container container--wide">
+        <header class="page-header flex flex-col">
+            <h1 class="page-title">Product Comparison</h1>
+            <p class="page-description">Compare technical specifications and prices side-by-side.</p>
+        </header>
+
+        {% if items|length < 2 %} <div class="compare-empty flex-center flex-col">
+            <i class="fas fa-balance-scale empty-icon"></i>
+            <p>Not enough items to compare. Add at least two items.</p>
+            <a href="{{ url_for('item.deals') }}" class="btn btn--primary gap-2">Browse Products</a>
+    </div>
+    {% else %}
+    <div class="compare-table-wrapper">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th class="sticky-col">Features</th>
+                    {% for item in items %}
+                    <th class="compare-col">
+                        <div class="compare-item-header flex flex-col items-center gap-2">
+                            <div class="compare-img-wrapper flex-center">
+                                {{ render_image_url(item.image_url, item.name) }}
+                            </div>
+                            <h3 class="compare-item-name">{{ item.name }}</h3>
+                            <p class="compare-item-brand">{{ item.brand.name if item.brand else 'Unknown' }}</p>
+
+                            {% set best_link = (item.variants[0].store_links[0] if item.variants[0].store_links else
+                            None) if item.variants else None %}
+                            <div class="compare-item-price">
+                                {% if best_link %}
+                                <span class="price-val">{{ best_link.currency }} {{ best_link.price }}</span>
+                                {% else %}
+                                <span class="price-none">Price unavailable</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="compare-actions flex flex-col gap-2">
+                                <a href="{{ url_for('item.item_page', item_id=item.id) }}"
+                                    class="btn btn--outline btn--sm gap-2">View Full Details</a>
+                                {% if best_link %}
+                                <a href="{{ best_link.affiliate_url }}" target="_blank" rel="noopener nofollow"
+                                    class="btn btn--primary btn--sm gap-2">Get Deal</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {# Basic Info #}
+                <tr class="table-row-group">
+                    <td colspan="{{ items|length + 1 }}">General Information</td>
+                </tr>
+                <tr>
+                    <td class="feature-label">Category</td>
+                    {% for item in items %}
+                    <td>{{ item.category.name }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="feature-label">Brand</td>
+                    {% for item in items %}
+                    <td>{{ item.brand.name if item.brand else 'Unknown' }}</td>
+                    {% endfor %}
+                </tr>
+
+                {# Dynamic Specs from full_details #}
+                {% for cat in all_categories %}
+                <tr class="table-row-group">
+                    <td colspan="{{ items|length + 1 }}">{{ cat|capitalize }}</td>
+                </tr>
+
+                {# We need to find all unique keys for this category across all items #}
+                {% set cat_keys = [] %}
+                {% for item in items %}
+                {% set item_cat_specs = item.full_details.get(cat, {}) %}
+                {% for key in item_cat_specs.keys() %}
+                {% if key not in cat_keys %}
+                {% set _ = cat_keys.append(key) %}
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+
+                {% for key in cat_keys %}
+                <tr>
+                    <td class="feature-label">{{ key|replace('_', ' ')|title }}</td>
+                    {% for item in items %}
+                    <td>
+                        {% set val = item.full_details.get(cat, {}).get(key) %}
+                        {% if val %}
+                        {{ val }}
+                        {% else %}
+                        <span class="spec-missing">—</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/commercial/page/compare.js') }}" defer></script>
+{% endblock %}

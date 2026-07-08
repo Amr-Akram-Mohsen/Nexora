@@ -1,0 +1,45 @@
+{% extends "layout/base.html" %}
+{% block title %}Nexora | Terms of Service{% endblock %}
+{% block content %}
+{% from"components/page.html" import page %}
+{% call page("Terms of Service", "terms-page") %}
+<div class="content-block flex flex-col">
+    <p class="page__text">
+        Welcome to Nexora. By accessing or using our website, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the service.
+    </p>
+
+    <h2 class="page__subtitle">1. Acceptance of Terms</h2>
+    <p class="page__text">
+        By using Nexora, you confirm that you are at least the age of majority in your jurisdiction of residence and that you agree to comply with our terms and all applicable local, national, and international laws.
+    </p>
+
+    <h2 class="page__subtitle">2. Content & Intellectual Property</h2>
+    <p class="page__text">
+        All content published on Nexora, including original articles, reviews, logos, and site design, is the property of Nexora or its content suppliers. Some product images and descriptions are sourced via official APIs (e.g., Amazon, GNews) and remain the property of their respective owners. You may not reproduce, distribute, or create derivative works from our content without explicit permission.
+    </p>
+
+    <h2 class="page__subtitle">3. Affiliate Disclosure & External Links</h2>
+    <p class="page__text">
+        Nexora acts as a platform displaying articles and affiliate products. Our Service contains links to third-party web sites or services that are not owned or controlled by Nexora. We strongly advise you to read the terms and conditions and privacy policies of any third-party web sites or services that you visit. Nexora assumes no responsibility for the content, privacy policies, or practices of any third-party sites or services.
+    </p>
+
+    <h2 class="page__subtitle">4. User Accounts & Interactions</h2>
+    <p class="page__text">
+        If you create an account, you are responsible for maintaining the security of your account and password. We reserve the right to terminate or suspend accounts that engage in spamming, abusive comments, or any activities that violate our terms or community guidelines.
+    </p>
+
+    <h2 class="page__subtitle">5. Limitation of Liability</h2>
+    <p class="page__text">
+        Nexora makes no warranties regarding the accuracy or reliability of product specifications, prices, or availability displayed on our platform, as this data is fetched from external sources. You agree that Nexora shall not be liable for any direct, indirect, incidental, or consequential damages resulting from your use of the site or any products purchased via our affiliate links.
+    </p>
+
+    <h2 class="page__subtitle">6. Modifications</h2>
+    <p class="page__text">
+        We reserve the right to modify these Terms at any time. We will notify users of any significant changes by posting the new terms on this site.
+    </p>
+    <p class="page__text page__last-updated">
+        <em>Last Updated: {{ current_year }}</em>
+    </p>
+</div>
+{% endcall %}
+{% endblock %}

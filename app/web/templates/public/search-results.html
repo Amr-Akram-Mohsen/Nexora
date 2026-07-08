@@ -1,0 +1,112 @@
+{% extends "layout/base.html" %}
+
+{% from "components/listing/listing-page.html" import listing_page %}
+{% from "components/ui/grid.html" import grid %}
+{% from "components/ui/core.html" import button, form, input, link %}
+
+{% set tab_labels = {
+"all": "All",
+"articles": "Articles",
+"posts": "Posts",
+"videos": "Videos",
+"products": "Products"
+} %}
+
+{% block title %}Search Results | Nexora{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/catalog-page.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/catalog/search.css') }}" />
+{% endblock %}
+
+{% block content %}
+
+{% call(slot) listing_page("search-results-page", domain_type="search", include_sidebar=False) %}
+
+{% if slot == 'sidebar' %}
+<div class="search-sidebar">
+  <h3 class="filter-section__title flex items-center gap-2">Result Types</h3>
+  <div class="search-type-list flex flex-col gap-2">
+    {% for search_type in search_types %}
+    {% call link(href=url_for('recommendation.search', query=query, type=search_type), class="search-type-link " ~ ('justify-between gap-2 inline-flex items-center is-active' if active_type == search_type else ''), unstyled=True) %}
+      <span>{{ tab_labels[search_type] }}</span>
+      <span class="search-type-count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
+    {% endcall %}
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if slot == 'header' %}
+<div class="listing-header__inner flex items-center justify-between flex-wrap gap-4">
+  <div class="listing-summary flex">
+    <h1 class="listing-title">Search Results</h1>
+    <p class="listing-count">
+      <span class="listing-count__num">{{ search_results|length }}</span>
+      {% if query %}results for "{{ query }}"{% else %}results{% endif %}
+    </p>
+  </div>
+
+  {% call form("search-form", variant="", form_action=url_for('recommendation.search'), method="GET",
+  include_csrf=False, attrs={"role": "search", "aria-label": "Search results page"}) %}
+  <div class="listing-search-wrapper search-page-form flex gap-2 items-center">
+    <div class="search-page-form__wrapper flex items-center">
+      {{ input(
+      name="query",
+      type="search",
+      placeholder="Search articles, videos, posts, and products...",
+      value=query,
+      class="input-search",
+      attrs={"autocomplete": "off", "aria-label": "Search query input"}
+      ) }}
+      {{ button(type="button", class="search-page-form__clear justify-center inline-flex items-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
+    </div>
+    {% if active_type and active_type != 'all' %}
+    {{ input(type="hidden", name="type", value=active_type, required=False) }}
+    {% endif %}
+    {{ button(type="submit", icon="fas fa-search", attrs={"aria-label": "Submit search"}) }}
+  </div>
+  {% endcall %}
+</div>
+
+<nav class="search-tabs gap-2" aria-label="Search result filters">
+  {% for search_type in search_types %}
+  {% call link(href=url_for('recommendation.search', query=query, type=search_type), class="search-tab " ~ ('justify-between gap-2 inline-flex items-center is-active' if active_type==search_type else ''), unstyled=True) %}
+    <span>{{ tab_labels[search_type] }}</span>
+    <span class="search-tab__count justify-center inline-flex items-center">{{ result_counts.get(search_type, 0) }}</span>
+  {% endcall %}
+  {% endfor %}
+</nav>
+{% endif %}
+
+{% if slot == 'active_filters' %}
+{% if active_type != 'all' %}
+<span class="filter-tag gap-2 inline-flex items-center">
+  <span>{{ tab_labels[active_type] }}</span>
+  {{ link("&times;"|safe, href=url_for('recommendation.search', query=query, type='all'), class="remove-tag justify-center inline-flex items-center", unstyled=True, attrs={"aria-label": "Clear result type"}) }}
+</span>
+{% endif %}
+{% endif %}
+
+{% if slot == 'results' %}
+{% if search_results %}
+{{ grid(search_results) }}
+{% else %}
+{% from "components/ui/empty-state.html" import empty_state %}
+{{ empty_state(
+title="No results found",
+message="Try different keywords or browse the latest deals and guides.",
+icon="fa-search-minus"
+) }}
+{% endif %}
+{% endif %}
+
+{% endcall %}
+
+{% if query %}
+<script>
+  window.SEARCH_QUERY = {{ query | tojson | safe }};
+</script>
+{% endif %}
+
+{% endblock %}

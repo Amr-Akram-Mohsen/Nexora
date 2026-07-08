@@ -1,0 +1,286 @@
+{% extends "layout/base.html" %}
+
+{% set content = {
+'object_type': 'item',
+'target': item,
+'section': None,
+'linked_items': []
+} %}
+
+{% set page_css = "css/commercial/page/item.css" %}
+
+{% from "commercial/features/item-gallery.html" import item_gallery %}
+{% from "components/ui/core.html" import badge, button %}
+{% from "commercial/features/rating.html" import render_stars %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename=page_css) }}" />
+{% endblock %}
+
+{% block title %}
+Nexora | {{ item.name }}
+{% endblock %}
+
+{% block description %}
+{{ (item.description or '') | truncate(160) }}
+{% endblock %}
+
+{% block og_type %}
+product
+{% endblock %}
+
+{% block og_image %}
+{{ item.images[0].image_url if item.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}
+{% endblock %}
+
+{% block structured_data %}
+{% from "components/seo/jsonld-product.html" import render_product_jsonld %}
+{{ render_product_jsonld(item) }}
+{% endblock %}
+
+{% block content %}
+<section class="detail-page" data-id="{{ item.id }}" data-type="{{ item.item_type }}" data-domain-type="commercial">
+
+    <div class="container">
+
+        {# ══ Breadcrumbs — full width top row ══ #}
+        <div class="detail-page__top flex items-center justify-between gap-6">
+            <div class="detail-page__breadcrumbs-wrapper flex items-center">
+                {% include "commercial/features/breadcrumbs.html" %}
+            </div>
+        </div>
+
+        {# ══ Main (display:contents on desktop — children participate directly in grid) ══
+        Source / mobile order: header → gallery → content → specs
+        Desktop visual order is controlled by grid-template-areas in item.css #}
+        <div class="detail-page__main">
+
+            {# ── Right column: title, badges, rating, price, quick-details ── #}
+            <div class="detail-page__header">
+
+                <div class="detail-page__badges flex flex-wrap items-center gap-3">
+                    {{ badge(item.category.name, 'badge--category') if item.category else '' }}
+                    {{ badge(item.brand.name, 'badge--brand') if item.brand else '' }}
+                </div>
+
+                <h1 class="detail-page__title">{{ item.name }}</h1>
+
+                <div class="detail-page__meta flex items-center flex-wrap">
+
+                    <div class="meta-item flex items-center">
+                        {{ render_stars(item.rating or 0) }}
+                    </div>
+
+                    <span class="item-rating">({{ item.rating or 0 }})</span>
+
+                    <span class="item-reviews-count">
+                        {{ item.review_count or 0 }} reviews
+                    </span>
+
+                </div>
+
+                {# Price — immediately below rating for clear hierarchy #}
+                {% if item.default_variant %}
+                <div class="item-price-summary flex flex-wrap">
+                    <span class="current-price">
+                        {{ item.default_variant.price }}
+                        {{ item.default_variant.currency }}
+                    </span>
+                    {% if item.default_variant.old_price %}
+                    <span class="old-price">{{ item.default_variant.old_price }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {# Quick details — key specs at a glance #}
+                {% if item.quick_details %}
+                <div class="item-quick-details">
+                    {% for detail in item.quick_details[:6] %}
+                    <div class="quick-detail flex">
+                        <span class="quick-detail__label">{{ detail.label }}</span>
+                        <span class="quick-detail__value">{{ detail.value }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+
+            {# Variants + purchase options — below header in right column #}
+            <div class="detail-page__variants flex flex-wrap items-start gap-4">
+                {% if item.has_variants %}
+                {% include "commercial/features/variant-selector.html" %}
+                {% endif %}
+
+                {% if item.store_links %}
+                {% set store_links = item.store_links %}
+                <div class="purchase-sidebar">
+                    {% include "commercial/features/purchase-options.html" %}
+                </div>
+                {% endif %}
+            </div>
+
+            {# ── Left-column top: gallery (always left, always above specs) ── #}
+            <div class="detail-page__image">
+                {{ item_gallery(item) }}
+            </div>
+
+
+
+            {# ── Left-column bottom: specifications (always below gallery) ── #}
+            {% if item.quick_details and item.quick_details|length > 0 %}
+            <div class="detail-page__specs">
+
+                <div class="item-details-card">
+
+                    <h3 class="item-details-card__title flex items-center">
+                        <span class="item-details-card__bar"></span>
+                        {% block details_title %}
+                        Product Details
+                        {% endblock %}
+                    </h3>
+
+                    {% set full_details = item.structured_details.get('groups')
+                    if item.structured_details else None %}
+
+                    {% if full_details %}
+                    <div class="item-details-card__items flex flex-col gap-3">
+                        {% from "commercial/features/render-details.html" import render_details %}
+                        {{ render_details(full_details) }}
+                    </div>
+
+                    {% call button(type="button", id="toggle-specs-btn", class="item-details-inline-toggle flex-center gap-2 justify-center items-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
+                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        Show More
+                    {% endcall %}
+                    {% endif %}
+
+                </div>
+
+            </div>
+            {% endif %}
+
+
+            {# ── Left-column body: description + category blocks ── #}
+            <div class="detail-page__content">
+                <div class="item-content">
+
+                    {# Highlights card — key features above the description #}
+                    {% if item.structured_details and item.structured_details.highlights %}
+                    <div class="item-highlights item-details-card">
+                        <h3 class="item-details-card__title flex items-center">
+                            <span class="item-details-card__bar"></span>
+                            Highlights
+                        </h3>
+                        <ul class="item-highlights__list gap-2 flex">
+                            {% for key, value in item.structured_details.highlights.items() %}
+                            <li class="item-highlight-row flex gap-3">
+                                <strong class="item-highlight-row__key">{{ key|replace('_',' ')|title }}</strong>
+                                <span class="item-highlight-row__val">{{ value }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {{ item.description or '' }}
+
+                    {% block category_content %}
+                    {% endblock %}
+
+                    {% if item.store_links %}
+                    {% include "partials/affiliate-disclosure.html" %}
+                    {% endif %}
+
+                </div>
+            </div>
+
+            {# ── Interactions + comments — full-width row below content ── #}
+            <div class="detail-page__extra">
+                {% include "components/interactions/interactions.html" %}
+                {% include "components/interactions/comments.html" %}
+            </div>
+
+        </div>
+        {# end .detail-page__main #}
+
+        {# ── Related Items ── #}
+        {% if related_items %}
+        {% from "components/ui/grid.html" import grid %}
+        <section class="section recommendation-section recommendation-section--products" id="related-products"
+            data-recommendation-container="related_product"
+            data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
+            <div class="section__header flex justify-between gap-6 items-center">
+                <h2 class="title">You May Also Like</h2>
+            </div>
+            {{ grid(related_items[:4], target_type='commercial') }}
+        </section>
+        {% endif %}
+
+        {# ── Related Content — Articles, Videos, and Buying Guides ── #}
+        {% if related_articles or related_videos or buying_guides %}
+        {% from "components/ui/grid.html" import grid %}
+        <section class="section recommendation-section recommendation-section--content" id="related-content">
+
+            {# ── Related Articles ── #}
+            {% if related_articles %}
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
+                <div class="section__header flex justify-between gap-6 items-center">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-newspaper" aria-hidden="true"></i> Articles & Reviews
+                        </h2>
+                        <p class="section__subtitle">Deep dives, news, and insights featuring this product</p>
+                    </div>
+                </div>
+                {{ grid(related_articles[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+            {# ── Related Videos ── #}
+            {% if related_videos %}
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
+                <div class="section__header flex justify-between gap-6 items-center">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-video" aria-hidden="true"></i> Related Videos
+                        </h2>
+                        <p class="section__subtitle">Video reviews, hands-on, and tutorials</p>
+                    </div>
+                </div>
+                {{ grid(related_videos[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+            {# ── Buying Guides ── #}
+            {% if buying_guides %}
+            <div class="recommendation-group" data-recommendation-container="related_content"
+                data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
+                <div class="section__header flex justify-between gap-6 items-center">
+                    <div class="flex flex-col">
+                        <h2 class="title">
+                            <i class="fas fa-book-open" aria-hidden="true"></i> Buying Guides & Tutorials
+                        </h2>
+                        <p class="section__subtitle">Guides to help you choose and make the most of this product</p>
+                    </div>
+                </div>
+                {{ grid(buying_guides[:3], target_type='content') }}
+            </div>
+            {% endif %}
+
+        </section>
+        {% endif %}
+
+    </div>
+
+</section>
+
+<script type="application/json" id="variant-data">
+
+{{ item.variant_data|tojson }}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "layout/base.html" %}
+{% block title %}Nexora | Contact{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/contact.css') }}" />
+{% endblock %}
+{% block content %}
+{% from "components/ui/core.html" import button, field, form, input, textarea %}
+
+<section class="content-page contact-page">
+
+  <div class="container">
+
+    <div class="contact-wrapper">
+
+      <header class="contact-header">
+        <h1>Contact Us</h1>
+        <p class="contact-subtitle">
+          Have a question or feedback? We'd love to hear from you. We aim to respond to all inquiries within 24-48 hours.
+        </p>
+        <p class="contact-fallback">
+          Prefer email? Reach out directly at <a href="mailto:hello@nexora.com">hello@nexora.com</a>.
+        </p>
+      </header>
+
+      <div class="contact-grid">
+
+        <!-- Contact Info -->
+        <aside class="contact-info flex flex-col">
+          {% for card in contact_cards %}
+          <div class="contact-item flex items-start gap-4">
+            <div class="contact-icon flex justify-center items-center">
+              <i class="{{ card.icon }}"></i>
+            </div>
+            <div>
+              <h3>{{ card.title }}</h3>
+              <p>{{ card.text }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </aside>
+
+        <!-- Contact Form -->
+        <div class="contact-form-card">
+          {% call form("contact-form") %}
+          <div class="form-row">
+            {% call field(label_text="Name", for_id="name") %}
+            {{ input(name="name", placeholder="Your name i.e. John Doe") }}
+            {% endcall %}
+
+            {% call field(label_text="Email", for_id="email") %}
+            {{ input(name="email", type="email", placeholder="you@example.com") }}
+            {% endcall %}
+          </div>
+
+          {% call field(label_text="Subject", for_id="subject") %}
+          {{ input(name="subject", placeholder="How can we help?") }}
+          {% endcall %}
+
+          {% call field(label_text="Message", for_id="message") %}
+          {{ textarea(name="message", rows=6, placeholder="Tell us more...") }}
+          {% endcall %}
+
+          {{ button(text="Send Message", class="contact-submit") }}
+
+          {% endcall %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

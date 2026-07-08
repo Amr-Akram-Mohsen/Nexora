@@ -1,0 +1,72 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Nexora Newsletter{% endblock %}
+{% block description %}Subscribe to the Nexora newsletter for technology news, product reviews, platform updates, and curated discoveries.{% endblock %}
+
+{% block content %}
+<section class="newsletter-page">
+  <div class="container">
+    <header class="newsletter-page-hero">
+      <p class="newsletter-page-kicker">Nexora Newsletter</p>
+      <h1>Useful tech updates without inbox clutter</h1>
+      <p class="newsletter-page-lead">
+        Join readers who receive technology news, product reviews, platform updates,
+        and curated insights delivered directly to their inbox.
+      </p>
+    </header>
+
+    <div class="newsletter-page-content">
+      <section class="newsletter-page-panel newsletter-page-subscribe">
+        {% with
+        newsletter_placement='landing',
+        newsletter_title='Subscribe to Our Newsletter',
+        newsletter_description='A focused digest of technology news, reviews, product highlights, and platform updates.'
+        %}
+        <div class="newsletter newsletter--landing" data-newsletter data-newsletter-placement="landing">
+          {% include "partials/newsletter.html" %}
+        </div>
+        {% endwith %}
+      </section>
+
+      <section class="newsletter-page-panel newsletter-page-benefits">
+        <h2>What You'll Receive</h2>
+        <ul class="newsletter-benefits-list">
+          <li>Weekly technology news and noteworthy industry developments.</li>
+          <li>Product reviews, comparisons, and recommendations.</li>
+          <li>Highlights from newly published articles and content.</li>
+          <li>Important platform updates and feature announcements.</li>
+          <li>Curated resources and discoveries worth exploring.</li>
+        </ul>
+      </section>
+
+      <section class="newsletter-page-panel newsletter-page-expectations">
+        <h2>What to Expect</h2>
+        <p>
+          We focus on quality rather than volume. The goal is to provide useful,
+          relevant updates instead of filling your inbox with unnecessary messages.
+        </p>
+        <ul>
+          <li>Clear and concise updates.</li>
+          <li>No daily spam.</li>
+          <li>Easy unsubscribe at any time.</li>
+          <li>Confirmation-based subscription process.</li>
+        </ul>
+      </section>
+
+      <section class="newsletter-page-panel newsletter-page-privacy">
+        <h2>Your Privacy Matters</h2>
+        <p>
+          We only use the information required to manage your newsletter subscription
+          and deliver emails you've requested.
+        </p>
+        <ul>
+          <li>Your email address is used solely for newsletter-related communication.</li>
+          <li>We do not ask for unnecessary personal information.</li>
+          <li>You can unsubscribe whenever you choose.</li>
+          <li>Your subscription preferences remain under your control.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "layout/base.html" %}
+
+{% from "components/listing/listing-page.html" import listing_page %}
+{% from "components/listing/listing-widgets.html" import listing_header, active_filter_chips, listing_pagination,
+listing_sort_script %}
+{% from "components/ui/grid.html" import grid %}
+{% from "components/ui/core.html" import button %}
+{% from "components/ui/empty-state.html" import empty_state %}
+
+{% set page_title = page_title or 'Deals' %}
+{% set results = items %}
+
+{% block title %}Deals | Nexora{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/commercial/catalog/catalog-page.css') }}" />
+{% endblock %}
+
+{% block content %}
+
+{% call(slot) listing_page(class_name="catalog-page " ~ target_type ~ "-listing", domain_type=target_type) %}
+
+{# ═══════════════════════════════════════
+SLOT: sidebar
+═══════════════════════════════════════ #}
+{% if slot == 'sidebar' %}
+{% include "commercial/features/item-sidebar.html" %}
+{% endif %}
+
+{# ═══════════════════════════════════════
+SLOT: header
+═══════════════════════════════════════ #}
+{% if slot == 'header' %}
+{{ listing_header(page_title, results|length, target_type, active_filters, get_sort_url) }}
+{% endif %}{# end slot == 'header' #}
+
+{# ═══════════════════════════════════════
+SLOT: active_filters
+═══════════════════════════════════════ #}
+{% if slot == 'active_filters' %}
+{{ active_filter_chips(active_filters, get_filter_url, url_for(request.endpoint, **request.view_args)) }}
+{% endif %}{# end slot == 'active_filters' #}
+
+
+{# ═══════════════════════════════════════
+SLOT: results
+═══════════════════════════════════════ #}
+{% if results %}
+{% if slot == 'results' %}
+{{ grid(results, target_type='commercial') }}
+
+{% if recommendations %}
+<div class="catalog-recommendations"
+  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+  {% for block in recommendations %}
+  {% from "components/ui/section.html" import section %}
+  {% call section(block['title'], more_url=false) %}
+  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
+  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+
+{# ═══════════════════════════════════════
+SLOT: footer (pagination)
+═══════════════════════════════════════ #}
+{% if slot == 'footer' %}
+{{ listing_pagination(pagination, get_page_url) }}
+{% endif %}
+
+{% else %}
+{# Empty state (show in results slot) #}
+{% if slot == 'results' %}
+{{ empty_state(
+title="No " ~ target_type | title ~ " Found",
+message="We couldn't find any match for your current filters or search query. Try clearing filters to see more.",
+action_text="Reset All Filters",
+action_url=url_for(request.endpoint, **request.view_args)
+) }}
+
+{% if recommendations %}
+<div class="catalog-recommendations"
+  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+  {% for block in recommendations %}
+  {% from "components/ui/section.html" import section %}
+  {% call section(block['title'], more_url=false) %}
+  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% endcall %}
+
+{{ listing_sort_script() }}
+
+{% endblock %}

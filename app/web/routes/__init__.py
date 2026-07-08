@@ -17,10 +17,10 @@ from .admin import (
     api_admin_bp
 )
 
-from .user import bp as user_bp
-from .content import bp as content_bp
-from .item import bp as item_bp
-from .interaction import bp as interaction_bp
-from .recommendation import bp as recommendation_bp
-from .system import bp as system_bp
+from .auth import user_bp
+from .public import content_bp
+from .public import item_bp
+from .public import interaction_bp
+from .public import recommendation_bp
+from .public import system_bp
 
