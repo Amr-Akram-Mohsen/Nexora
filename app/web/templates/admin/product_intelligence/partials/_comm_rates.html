@@ -6,5 +6,5 @@
     {{ breakdown_progress_bar(item.name, item.avg_rate|round(1) ~ '%', pct, "var(--brand-teal)") }}
   {% endfor %}
 {% else %}
-  <div class="text-muted text-sm py-2">No commission rate data available.</div>
+  <div class="table-empty-state">No commission rate data available.</div>
 {% endif %}

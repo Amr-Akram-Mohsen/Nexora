@@ -67,7 +67,20 @@ def get_item_meta():
 @bp.route("/health_stats", methods=["GET"])
 def get_item_health_stats():
     """Return fast KPI stats for the item catalog health dashboard."""
-    return jsonify(get_admin_item_health_stats())
+    stats = get_admin_item_health_stats()
+    
+    stats["item_type_distribution_html"] = render_template(
+        "admin/items/partials/_type_distribution.html",
+        data=stats.get("item_type_distribution", []),
+        total=stats.get("total_items", 0)
+    )
+    
+    stats["top_engagement_items_html"] = render_template(
+        "admin/items/partials/_top_engagement.html",
+        data=stats.get("top_engagement_items", [])
+    )
+    
+    return jsonify(stats)
 
 @bp.route("/catalog-health", methods=["GET"])
 def catalog_health():

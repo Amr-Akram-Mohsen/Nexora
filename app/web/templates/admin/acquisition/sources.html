@@ -4,56 +4,22 @@
 {% set page_description = "Monitor content sources, imported volumes, authority rankings, and latest activities" %}
 
 {% block crud_stats %}
+{% from "components/ui/core.html" import stat_card %}
 <div class="dashboard-stats-grid" id="sources-health-dashboard">
   <!-- Total Sources -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-tower-broadcast"></i></div>
-      <p class="dashboard-stat-label">Total Sources</p>
-      <h3 class="dashboard-stat-value" id="stats-total-sources"><i class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta" id="stats-active-sources">active providers</p>
-    </div>
-  </a>
+  {{ stat_card("Total Sources", value_id="stats-total-sources", icon="fa-solid fa-tower-broadcast", meta_text="active providers", meta_id="stats-active-sources", class="card clickable-card") }}
 
   <!-- Healthy Sources -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-check-circle"></i></div>
-      <p class="dashboard-stat-label">Healthy</p>
-      <h3 class="dashboard-stat-value" id="stats-healthy"><i class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta">active content</p>
-    </div>
-  </a>
+  {{ stat_card("Healthy", value_id="stats-healthy", icon="fa-solid fa-check-circle", meta_text="active content", class="card clickable-card") }}
 
   <!-- Warning Sources -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <p class="dashboard-stat-label">Warning</p>
-      <h3 class="dashboard-stat-value" id="stats-warning"><i class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta">stale or empty</p>
-    </div>
-  </a>
+  {{ stat_card("Warning", value_id="stats-warning", icon="fa-solid fa-triangle-exclamation", meta_text="stale or empty", class="card clickable-card") }}
 
   <!-- Failed/Inactive -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-circle-xmark"></i></div>
-      <p class="dashboard-stat-label">Failed / Inactive</p>
-      <h3 class="dashboard-stat-value" id="stats-failed"><i class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta">disabled configs</p>
-    </div>
-  </a>
+  {{ stat_card("Failed / Inactive", value_id="stats-failed", icon="fa-solid fa-circle-xmark", meta_text="disabled configs", class="card clickable-card") }}
 
   <!-- Silent Sources -->
-  <a class="card clickable-card">
-    <div class="dashboard-stat-card">
-      <div class="dashboard-stat-icon flex items-center justify-center"><i class="fa-solid fa-moon"></i></div>
-      <p class="dashboard-stat-label">Silent (>7d)</p>
-      <h3 class="dashboard-stat-value" id="stats-silent"><i class="fa-solid fa-circle-notch fa-spin"></i></h3>
-      <p class="dashboard-stat-meta">no recent content</p>
-    </div>
-  </a>
+  {{ stat_card("Silent (>7d)", value_id="stats-silent", icon="fa-solid fa-moon", meta_text="no recent content", class="card clickable-card") }}
 </div>
 {% endblock %}
 

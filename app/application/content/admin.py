@@ -6,6 +6,7 @@ from app.domains.interaction.service.scoring import get_content_engagement_score
 from app.domains.distribution.services import get_distribution_history
 from app.domains.content.serializers import serialize_content_inspect_dto
 from app.domains.content.service.command import execute_bulk_content_actions, delete_content_and_relations
+from app.application.content.editorial import assess_publishing_readiness
 
 def get_content_inspect_workflow(content_id: int) -> dict:
     raw_data = get_admin_content_inspect_raw(content_id)
@@ -24,11 +25,18 @@ def get_content_inspect_workflow(content_id: int) -> dict:
     if content.object_type == "article" and target and hasattr(target, "article_sources"):
         article_sources_data = target.article_sources
         
+    extraction_assessment = None
+    if dto["object_type"] == "article":
+        extraction_assessment = dto.get("extraction_assessment")
+
+    readiness = assess_publishing_readiness(dto, extraction_assessment)
+        
     return {
         "content_dto": dto,
         "engagement_score": engagement_score,
         "distribution_history": distribution_history,
-        "article_sources": article_sources_data
+        "article_sources": article_sources_data,
+        "publishing_readiness": readiness
     }
 
 from app.shared.utils.admin_helpers import execute_admin_workflow, toggle_model_flag_workflow

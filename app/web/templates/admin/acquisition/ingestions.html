@@ -22,19 +22,15 @@
     </div>
 
     <!-- Recent Ingestion Events List -->
-    <div class="admin-card">
-        <div class="card-header flex justify-between items-center">
-            <h3>Recent Ingestion Events</h3>
-            {% from "components/ui/core.html" import button %}
-            {{ button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) }}
-        </div>
-        <div>
-            {% call standard_table(["Time", "Channel", "Type", "Target / Query", "Category", "Status"], class="dashboard-table", body_id="ingestions-logs-tbody") %}
-                <!-- Populated by JS -->
-                {{ table_spinner(colspan=6, text="Loading recent events...") }}
-            {% endcall %}
-        </div>
-    </div>
+    {% from "components/ui/core.html" import button %}
+    {% set refresh_btn = button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) %}
+    
+    {% call admin_table_panel("Recent Ingestion Events", actions=refresh_btn) %}
+        {% call standard_table(["Time", "Channel", "Type", "Target / Query", "Category", "Status"], class="dashboard-table", body_id="ingestions-logs-tbody") %}
+            <!-- Populated by JS -->
+            {{ table_spinner(colspan=6, text="Loading recent events...") }}
+        {% endcall %}
+    {% endcall %}
 </div>
 
 {% endblock %}

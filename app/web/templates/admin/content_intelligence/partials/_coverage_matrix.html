@@ -1,33 +1,30 @@
 {% if not data.sources %}
-    <div class='text-muted p-4 text-center'>No data available</div>
+    <div class='table-empty-state'>No data available</div>
 {% else %}
-    <table class="dashboard-table w-full text-left border-collapse whitespace-nowrap">
+    <table class="admin-table coverage-matrix-table">
         <thead>
-            <tr class="bg-gray-50 border-b border-border text-sm text-muted uppercase tracking-wider">
-                <th class="p-3 font-bold sticky left-0 bg-gray-50 z-10 border-r border-border">Category</th>
+            <tr>
+                <th class="col-sticky">Category</th>
                 {% for src in data.sources %}
-                <th class="p-3 font-bold text-center">{{ src }}</th>
+                <th class="col-center">{{ src }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for row in data.rows %}
-            <tr class="border-b border-border hover:bg-gray-50">
-                <td class="p-3 font-medium sticky left-0 bg-white z-10 border-r border-border hover:bg-gray-50">{{ row.category }}</td>
+            <tr>
+                <td class="col-sticky cell-primary-text">{{ row.category }}</td>
                 {% for src in data.sources %}
                     {% set count = row.counts.get(src, 0) %}
-                    {% set bgClass = "" %}
-                    {% set textClass = "text-muted" %}
+                    {% set coverageClass = "coverage-none" %}
                     {% if count > 50 %}
-                        {% set bgClass = "bg-blue-100" %}
-                        {% set textClass = "text-blue-800 font-bold" %}
+                        {% set coverageClass = "coverage-high" %}
                     {% elif count > 10 %}
-                        {% set bgClass = "bg-blue-50" %}
-                        {% set textClass = "text-blue-700 font-medium" %}
+                        {% set coverageClass = "coverage-medium" %}
                     {% elif count > 0 %}
-                        {% set textClass = "text-gray-700" %}
+                        {% set coverageClass = "coverage-low" %}
                     {% endif %}
-                    <td class="p-3 text-center text-sm {{ bgClass }} {{ textClass }}">{{ count }}</td>
+                    <td class="col-center {{ coverageClass }}">{{ count }}</td>
                 {% endfor %}
             </tr>
             {% endfor %}

@@ -1,0 +1,115 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% set page_description = "Track CTR heatmaps, geographic demand, user interest gaps, and retention." %}
+
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_panel %}
+
+{% block admin_content %}
+{{ admin_page_header(
+    "Audience Receptivity Hub",
+    page_description
+) }}
+<div class="insights-section">
+    <div class="user-analytics-dashboard grid grid-cols-3 gap-4">
+        
+        {% call admin_panel("Recommendation Receptivity", "System-wide CTR for algorithmic recommendations") %}
+        <div>
+            <div id="receptivity-ctr" class="text-4xl font-bold text-[var(--brand-purple)]">—%</div>
+            <div class="text-muted small mt-2">
+                <span id="receptivity-clicks">—</span> Clicks / <span id="receptivity-impressions">—</span> Impressions
+            </div>
+        </div>
+        {% endcall %}
+
+        {% call admin_panel("Churn Risk", "Inactive accounts registered > 30 days ago") %}
+        <div>
+            <div id="churn-risk-count" class="text-4xl font-bold text-[var(--brand-red)]">—</div>
+            <div class="text-muted small mt-2">Users at risk of churn</div>
+        </div>
+        {% endcall %}
+
+        {% call admin_panel("Power User Segmentation", "Active vs Inactive Account Distribution") %}
+        <div>
+            <canvas id="powerUserChart" data-chart="doughnut" data-chart-payload="power-user-data"></canvas>
+        </div>
+        <!-- Mock payload until we connect it to backend routes properly -->
+        <script type="application/json" id="power-user-data">
+        {
+            "labels": ["Active", "Inactive"],
+            "datasets": [{
+                "data": [75, 25],
+                "backgroundColor": ["#10b981", "#ef4444"]
+            }]
+        }
+        </script>
+        {% endcall %}
+    </div>
+</div>
+
+<h2 class="insight-group-title flex items-center gap-3">
+    <i class="fa-solid fa-users-viewfinder"></i> Engagement Insights
+</h2>
+<div class="insights-section">
+    <div class="insights-double-grid">
+        {% call admin_panel("Country Distribution", "Audience Traffic Demographics") %}
+        <div>
+            <canvas id="countryDistChart" data-chart="bar" data-chart-payload="country-data"></canvas>
+        </div>
+        <script type="application/json" id="country-data">
+        {
+            "labels": ["USA", "UK", "Germany", "France", "Canada"],
+            "datasets": [{
+                "label": "Traffic Volume",
+                "data": [450, 320, 280, 150, 120],
+                "backgroundColor": "#3b82f6"
+            }]
+        }
+        </script>
+        {% endcall %}
+
+        {% call admin_panel("Hourly Heatmap", "Activity by Time of Day") %}
+        <div>
+            <canvas id="hourlyHeatmapChart" data-chart="line" data-chart-payload="heatmap-data"></canvas>
+        </div>
+        <script type="application/json" id="heatmap-data">
+        {
+            "labels": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
+            "datasets": [{
+                "label": "Engagement",
+                "data": [10, 5, 45, 80, 60, 95],
+                "borderColor": "#f59e0b",
+                "tension": 0.3
+            }]
+        }
+        </script>
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block custom_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/core/chartHelper.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Hydrate the receptivity stats
+        window.api.get('/admin/analytics/stats')
+        .then(data => {
+            const receptivityCtr = document.getElementById('receptivity-ctr');
+            if (receptivityCtr) receptivityCtr.textContent = data.receptivity_ctr + '%';
+            
+            const receptivityClicks = document.getElementById('receptivity-clicks');
+            if (receptivityClicks) receptivityClicks.textContent = parseInt(data.recommendation_clicks).toLocaleString();
+            
+            const receptivityImpressions = document.getElementById('receptivity-impressions');
+            if (receptivityImpressions) receptivityImpressions.textContent = parseInt(data.recommendation_impressions).toLocaleString();
+            
+            const churnRiskCount = document.getElementById('churn-risk-count');
+            if (churnRiskCount) churnRiskCount.textContent = parseInt(data.churn_risk_count).toLocaleString();
+        }).catch(err => console.log('Mocking data until hooked up', err));
+    });
+</script>
+{% endblock %}

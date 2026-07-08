@@ -1,0 +1,162 @@
+{% from "components/ui/core.html" import badge %}
+{% from "admin/components/_inspect_primitives.html" import inspect_metric_grid, inspect_metric_item %}
+
+{% macro render_video_editorial_panel(description, quality) %}
+<div class="profile-section-card flex gap-3">
+  <div class="editorial-panel-body">
+    <div class="flex justify-between items-center editorial-section">
+      <div>
+        <strong>Recommendation: </strong>
+        {% set variant = 'success' %}
+        {% if quality.editorial_recommendation == 'review' or quality.editorial_recommendation == 'flag' %}
+          {% set variant = 'warning' %}
+        {% elif quality.editorial_recommendation == 'hide' %}
+          {% set variant = 'danger' %}
+        {% endif %}
+        {{ badge(quality.editorial_recommendation | title, class="status-badge", variant=variant) }}
+      </div>
+      <div>
+        <strong>Confidence Score: </strong> {{ (quality.confidence_score * 100)|int }}% promotional
+      </div>
+    </div>
+    
+    <div class="editorial-section">
+      <strong class="editorial-subtitle">Detection Signals:</strong>
+      <ul class="editorial-signal-list">
+        {% if quality.signals %}
+          {% for signal in quality.signals %}
+            {% set severity_class = 'badge-danger' if signal.severity == 'high' else ('badge-warning' if signal.severity == 'medium' else 'badge-secondary') %}
+            {% set icon_color_class = 'editorial-signal-high' if signal.severity == 'high' else ('editorial-signal-medium' if signal.severity == 'medium' else 'editorial-signal-low') %}
+            <li class="editorial-signal-item">
+              <i class="fas fa-exclamation-triangle {{ icon_color_class }}"></i>
+              <span>{{ signal.label }}</span>
+              {{ badge(signal.severity | upper, class=severity_class ~ " badge-compact", variant=none) }}
+            </li>
+          {% endfor %}
+        {% else %}
+          <li class="editorial-signal-item editorial-signal-low">
+            <i class="fas fa-check editorial-signal-success"></i> No promotional signals detected
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    
+    <details class="inspect-accordion">
+      <summary>
+        <div class="flex items-center gap-2"><i class="fas fa-align-left"></i> Description Preview</div>
+      </summary>
+      <div class="inspect-accordion-content editorial-description-preview">
+        {{ description if description else "No description available." }}
+      </div>
+    </details>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_article_extraction_panel(assessment) %}
+<div class="profile-section-card flex gap-3">
+  <div class="editorial-panel-body">
+    <div class="editorial-section">
+      <strong>Extraction Health: </strong>
+      {% set health_variant = 'success' %}
+      {% if assessment.extraction_health == 'partial' %}
+        {% set health_variant = 'warning' %}
+      {% elif assessment.extraction_health in ['thin', 'empty'] %}
+        {% set health_variant = 'danger' %}
+      {% endif %}
+      {{ badge(assessment.extraction_health | title, class="status-badge", variant=health_variant) }}
+    </div>
+    
+    <div class="editorial-section">
+      <strong class="editorial-subtitle">Content Statistics</strong>
+      {% call inspect_metric_grid() %}
+        {{ inspect_metric_item(assessment.word_count, "Words") }}
+        {{ inspect_metric_item((assessment.read_time_minutes ~ " min") if assessment.read_time_minutes else "—", "Read time") }}
+        {{ inspect_metric_item(assessment.block_summary.total_blocks, "Blocks") }}
+      {% endcall %}
+    </div>
+    
+    <div class="editorial-section">
+      <strong class="editorial-subtitle">Document Structure</strong>
+      <div class="editorial-metrics-grid flex gap-4">
+        <div><strong>Headings:</strong> {{ assessment.block_summary.heading_count }}</div>
+        <div><strong>Paragraphs:</strong> {{ assessment.block_summary.paragraph_count }}</div>
+        <div><strong>Images:</strong> {{ assessment.block_summary.image_count }}</div>
+        <div><strong>Embeds:</strong> {{ assessment.block_summary.embed_count }}</div>
+        <div><strong>Quotes:</strong> {{ assessment.block_summary.quote_count }}</div>
+        <div><strong>Tables:</strong> {{ assessment.block_summary.table_count }}</div>
+      </div>
+    </div>
+    
+    {% if assessment.warnings %}
+    <div class="editorial-section">
+      <strong class="editorial-subtitle">⚠ Editorial Warnings ({{ assessment.warnings | length }})</strong>
+      <ul class="editorial-signal-list">
+        {% for warning in assessment.warnings %}
+          {% set severity_class = 'badge-danger' if warning.severity == 'high' else ('badge-warning' if warning.severity == 'medium' else 'badge-secondary') %}
+          {% set icon_color_class = 'editorial-signal-high' if warning.severity == 'high' else ('editorial-signal-medium' if warning.severity == 'medium' else 'editorial-signal-low') %}
+          {% set icon_name = 'fa-exclamation-circle' if warning.severity == 'high' else ('fa-exclamation-triangle' if warning.severity == 'medium' else 'fa-info-circle') %}
+          <li class="editorial-signal-item">
+            <i class="fas {{ icon_name }} {{ icon_color_class }}"></i>
+            {{ badge(warning.severity | upper, class=severity_class ~ " badge-compact", variant=none) }}
+            <span>{{ warning.label }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_publishing_readiness_panel(readiness) %}
+<div class="profile-section-card flex gap-3">
+  <div class="editorial-panel-body">
+    <div class="flex justify-between items-center editorial-section">
+      <div>
+        <strong>Publishing Readiness: </strong>
+        {% set variant = 'success' %}
+        {% if readiness.readiness_level == 'almost_ready' %}
+          {% set variant = 'warning' %}
+        {% elif readiness.readiness_level in ['needs_work', 'not_ready'] %}
+          {% set variant = 'danger' %}
+        {% endif %}
+        {{ badge(readiness.readiness_level.replace('_', ' ') | title, class="status-badge", variant=variant) }}
+      </div>
+      <div>
+        <strong>Score: </strong> {{ readiness.readiness_score }} / 100
+      </div>
+    </div>
+    
+    <div class="editorial-section">
+      <strong class="editorial-subtitle">Checklist:</strong>
+      <ul class="editorial-signal-list">
+        {% for check in readiness.checklist %}
+          <li class="editorial-signal-item {{ 'editorial-missing-item' if not check.passed else '' }}">
+            {% if check.passed %}
+              <i class="fas fa-check editorial-signal-success"></i>
+            {% else %}
+              <i class="fas fa-times editorial-signal-high"></i>
+            {% endif %}
+            <span>{{ check.label }}</span>
+            {% if not check.passed %}
+              {{ badge("MISSING", class="badge-danger badge-compact", variant=none) }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    
+    {% if readiness.blocking_issues %}
+    <div class="editorial-blocking-issues">
+      <strong class="editorial-blocking-title"><i class="fas fa-minus-circle"></i> Blocking Issues:</strong>
+      <ul class="editorial-blocking-list">
+        {% for issue in readiness.blocking_issues %}
+          <li>{{ issue }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

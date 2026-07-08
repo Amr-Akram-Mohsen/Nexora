@@ -1,0 +1,29 @@
+{% if data %}
+  {% set colors = ['var(--brand-blue)', 'var(--brand-purple)', 'var(--brand-orange)', 'var(--brand-teal)', 'var(--brand-green)'] %}
+  {% for item in data %}
+    {% set pct = ((item.count / total) * 100) | round(1) if total > 0 else 0 %}
+    {% set color = colors[loop.index0 % colors | length] %}
+    {% set typeName = item.type | capitalize %}
+    
+    <div class="flex items-center w-full gap-3 py-1 {% if item.type != 'Uncategorized' %}dist-row-link hover-bg-subtle rounded-md px-2 transition-colors cursor-pointer{% endif %}"
+         {% if item.type != 'Uncategorized' %}onclick="window.location.href='/admin/items?item_type={{ item.type | urlencode }}'"{% endif %}>
+      <div class="overview-breakdown-icon" style="color: {{ color }};">
+        <i class="fa-solid fa-cube"></i>
+      </div>
+      <div class="overview-breakdown-label truncate flex-1 font-medium" title="{{ typeName }}">
+        {{ typeName }}
+      </div>
+      <div class="overview-breakdown-bar-track flex-1 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
+        <div class="overview-breakdown-bar h-full rounded-full" style="width: {{ pct }}%; background-color: {{ color }};"></div>
+      </div>
+      <div class="overview-breakdown-val w-12 text-right font-semibold">
+        {{ "{:,}".format(item.count) }}
+      </div>
+      <div class="overview-breakdown-pct w-12 text-right text-muted text-xs">
+        {{ pct }}%
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="text-muted text-sm py-2">No type distribution data available.</div>
+{% endif %}

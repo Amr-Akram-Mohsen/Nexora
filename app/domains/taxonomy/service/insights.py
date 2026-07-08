@@ -27,11 +27,11 @@ def get_taxonomy_insights_suggestions(limit: int = 50):
     unmapped_brand = db.session.execute(
         select(Content).where(
             ~db.session.query(content_brands.c.brand_id).filter(content_brands.c.content_id == Content.id).exists()
-        ).order_by(Content.id.desc()).limit(1000)
+        ).order_by(Content.id.desc()).limit(200)
     ).scalars().all()
     
     unmapped_cat = db.session.execute(
-        select(Content).where(Content.category_id == None).order_by(Content.id.desc()).limit(1000)
+        select(Content).where(Content.category_id == None).order_by(Content.id.desc()).limit(200)
     ).scalars().all()
 
     brands = db.session.execute(select(Brand)).scalars().all()
@@ -47,18 +47,26 @@ def get_taxonomy_insights_suggestions(limit: int = 50):
 def get_taxonomy_insights_coherence(limit: int = 50):
     from app.domains.relationships import content_items
     
+    from sqlalchemy.orm import selectinload
     contents = db.session.execute(
-        select(Content).where(
+        select(Content)
+        .options(selectinload(Content.brands))
+        .where(
             db.session.query(content_items.c.item_id).filter(content_items.c.content_id == Content.id).exists()
-        ).order_by(Content.id.desc()).limit(500)
+        ).order_by(Content.id.desc()).limit(100)
     ).scalars().all()
     
     conflicts = []
     for c in contents:
-        item_ids = db.session.scalars(select(content_items.c.item_id).where(content_items.c.content_id == c.id)).all()
-        if not item_ids: continue
+        items = db.session.execute(
+            select(Item)
+            .options(selectinload(Item.brand))
+            .join(content_items, content_items.c.item_id == Item.id)
+            .where(content_items.c.content_id == c.id)
+        ).scalars().all()
         
-        items = db.session.execute(select(Item).where(Item.id.in_(item_ids))).scalars().all()
+        if not items: continue
+        
         content_brand_ids = {b.id for b in c.brands}
         
         for item in items:

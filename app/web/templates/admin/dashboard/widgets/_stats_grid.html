@@ -7,11 +7,11 @@
 
 {% if stats.interactions %}
   {% set interactions_meta = "{:,} reactions &middot; {:,} saves".format(stats.interactions.reactions or 0, stats.interactions.saves or 0) %}
-  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/moderation", meta_text=interactions_meta, class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/interactions", meta_text=interactions_meta, class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
 {% else %}
-  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/moderation", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+  {{ stat_card("Interactions", value_text="{:,}".format(stats.interactions.total or 0), icon="fa-solid fa-chart-pie", href="/admin/interactions", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
 {% endif %}
 
-{{ stat_card("Total Views", value_text="{:,}".format(stats.interactions.views or 0), icon="fa-solid fa-eye", href="/admin/contents?sort_by=view_count&sort_dir=desc", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+{{ stat_card("Total Views", value_text="{:,}".format(stats.interactions.views or 0), icon="fa-solid fa-eye", href="/admin/interactions?tab=views", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
 
-{{ stat_card("Total Comments", value_text="{:,}".format(stats.interactions.comments or 0), icon="fa-solid fa-comments", href="/admin/moderation?tab=comments", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}
+{{ stat_card("Total Comments", value_text="{:,}".format(stats.interactions.comments or 0), icon="fa-solid fa-comments", href="/admin/interactions?tab=comments", class="dashboard-stat-card clickable-card", inner_class="flex flex-col items-center", label_first=false) }}

@@ -343,13 +343,13 @@
   {% if articles %}
   {% for article in articles %}
     {% if with_view_link %}
-    <div class="admin-card p-3 flex justify-between items-center">
+    <div class="admin-card inspect-article-card flex justify-between items-center">
       <div>
         <strong>{{ article.title }}</strong>
       </div>
       <div class="flex items-center gap-3">
         <span class="text-muted"><i class="fas fa-eye"></i> {{ article.views|default(0) }}</span>
-        {{ link(text="View", href="/admin/contents/" ~ article.id, class="admin-btn-secondary py-1 px-2 text-xs", attrs={"target": "_blank"}, unstyled=True) }}
+        {{ link(text="View", href="/admin/contents/" ~ article.id, class="admin-btn-secondary admin-btn-sm", attrs={"target": "_blank"}, unstyled=True) }}
       </div>
     </div>
     {% else %}

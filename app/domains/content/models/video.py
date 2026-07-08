@@ -8,6 +8,7 @@ class Video(db.Model):
 
     title = db.Column(db.String(300), nullable=False)
     description = db.Column(db.Text)
+    description_display_rule = db.Column(db.String(20), default='review')
 
     external_id = db.Column(
         db.String(100),

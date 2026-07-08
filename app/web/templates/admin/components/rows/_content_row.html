@@ -2,7 +2,11 @@
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">
   <div class="content-cell-title flex flex-col gap-1">
-    <strong class="cell-primary-text">{{ row.title }}</strong>
+    <strong class="cell-primary-text flex items-center gap-1">
+      {% set type_icon = 'fas fa-newspaper' if row.object_type == 'article' else ('fas fa-play-circle' if row.object_type == 'video' else 'fab fa-reddit') %}
+      <i class="{{ type_icon }} content-type-icon" title="{{ row.object_type | title }}"></i>
+      {{ row.title }}
+    </strong>
 
     <div class="flex flex-wrap gap-1 content-status-group">
       {% set health_variant = 'success' if row.health_score >= 80 else ('warning' if row.health_score >= 50 else
@@ -78,7 +82,7 @@
 </td>
 {% if not hide_action_column %}
 {% call action_cell('contents', row.id) %}
-<div class="actions-cell-group flex flex-col gap-1 mt-1">
+<div class="actions-cell-group flex flex-col gap-1">
   {% set is_pub = row.is_published %}
   {% set btn_status = 'unpublish' if is_pub else 'publish' %}
   {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}

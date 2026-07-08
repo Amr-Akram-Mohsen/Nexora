@@ -1,0 +1,20 @@
+{% if items %}
+{% for item in items %}
+{% set type_badge_class = "badge-blue" if item.type == "Category" else "badge-purple" %}
+<tr class="clickable-row cursor-pointer" data-entity="{{ item.entity }}">
+    <td><strong>{{ loop.index }}</strong></td>
+    <td>
+      <div class="flex items-center gap-2">
+        <strong class="clickable-entity-name">{{ item.entity }}</strong>
+        <span class="status-badge {{ type_badge_class }}">{{ item.type }}</span>
+      </div>
+    </td>
+    <td class="col-metric">{{ "%.2f"|format(item.score) }}</td>
+    <td >{{ item.reason }}</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <td colspan="4" >No opportunities ranked yet.</td>
+</tr>
+{% endif %}

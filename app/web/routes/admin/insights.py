@@ -49,6 +49,18 @@ def get_insights_data():
     # Placeholder or deprecated route, keeping for signature safety
     return jsonify({"status": "deprecated"})
 
+@bp.route("/content-quality", methods=["GET"])
+def content_quality_hub():
+    return render_template("admin/insights/content_quality.html", active_nav="content_quality")
+
+@bp.route("/commercial-opportunities", methods=["GET"])
+def commercial_opportunities_hub():
+    return render_template("admin/insights/commercial_opportunities.html", active_nav="commercial_opportunities")
+
+@bp.route("/audience-receptivity", methods=["GET"])
+def audience_receptivity_hub():
+    return render_template("admin/insights/audience_receptivity.html", active_nav="audience_receptivity")
+
 
 def _compute_strategy(time_frame):
     cached = get_cached("strategy", time_frame)
@@ -205,7 +217,7 @@ def widget_top_opportunities():
         time_frame = "7_days"
         
     dec_data = get_decision_intelligence_data(lightweight=True)
-    return render_template("admin/content_intelligence/_insights_rows.html", widget_type="top_opportunities", items=dec_data.get("top_opportunities", []))
+    return render_template("admin/content_intelligence/components/_top_opportunities_row.html", items=dec_data.get("top_opportunities", []))
 
 
 @bp.route("/widget/coverage-matrix", methods=["GET"])
@@ -295,7 +307,7 @@ def widget_brand_opportunities():
         time_frame = "7_days"
         
     brand_opportunities = get_brand_opportunity_data()
-    return render_template("admin/content_intelligence/_insights_rows.html", widget_type="brand_opportunities", items=brand_opportunities)
+    return render_template("admin/content_intelligence/components/_brand_opportunities_row.html", items=brand_opportunities)
 
 
 @bp.route("/widget/content-completeness", methods=["GET"])
@@ -356,7 +368,7 @@ def widget_content_strategy():
         items = [item for item in items if lower_filter in str(item.get("entity", "")).lower()]
         
     headers = {"X-Empty": "true"} if not items else {}
-    return render_template("admin/content_intelligence/_insights_rows.html", widget_type="content_strategy", items=items), 200, headers
+    return render_template("admin/content_intelligence/components/_content_strategy_row.html", items=items), 200, headers
 
 
 @bp.route("/widget/asset-mapping", methods=["GET"])
@@ -391,7 +403,7 @@ def widget_asset_mapping():
         items = [item for item in items if lower_filter in str(item.get("entity", "")).lower()]
         
     headers = {"X-Empty": "true"} if not items else {}
-    return render_template("admin/content_intelligence/_insights_rows.html", widget_type="asset_mapping", items=items), 200, headers
+    return render_template("admin/content_intelligence/components/_asset_mapping_row.html", items=items), 200, headers
 
 
 @bp.route("/widget/performance-feedback", methods=["GET"])

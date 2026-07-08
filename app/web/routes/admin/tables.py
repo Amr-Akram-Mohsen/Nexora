@@ -31,9 +31,12 @@ CRUD_TABLES = {
             "Actions",
         ],
         "detailed_table": {
-            "content info": ["id", "title", "type", "taxonomy path"],
-            "performance metrics": ["engagement score", "views", "likes", "dislikes", "comments", "shares", "saves"],
-            "target specifics": ["platform", "channel", "author", "subreddit", "is scraped", "word count", "read time", "platform upvotes", "platform comments"],
+            "content info": ["id", "title", "description", "type", "taxonomy path"],
+            "target specifics": [
+                "platform", "channel", "creator", "duration", 
+                "author", "subreddit", "is scraped", "word count",
+                "read time", "platform upvotes", "platform comments"
+            ],
             "quality & scoring": ["base score", "review score", "article quality score"],
             "taxonomy & targeting": ["intent", "gender", "price tier", "attributes"],
             "related metadata": ["related brands", "related topics", "mentioned products", "available sources", "primary source", "acquired via"],

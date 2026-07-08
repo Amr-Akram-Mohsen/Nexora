@@ -3,13 +3,14 @@
    Templates and scripts remain unchanged while imports resolve sequentially.
 --- */
 
-@import "./admin/layout.css";
-@import "./admin/header.css";
-@import "./admin/navigation.css";
-@import "./admin/dashboard.css";
-@import "./admin/tables.css";
-@import "./admin/forms.css";
-@import "./admin/modals.css";
-@import "./admin/settings.css";
-@import "./admin/components.css";
-@import "./admin/inspect.css";
+@import "./admin/layout/layout.css";
+@import "./admin/layout/header.css";
+@import "./admin/layout/navigation.css";
+@import "./admin/pages/dashboard.css";
+@import "./admin/pages/taxonomy.css";
+@import "./admin/components/tables.css";
+@import "./admin/components/forms.css";
+@import "./admin/components/modals.css";
+@import "./admin/pages/settings.css";
+@import "./admin/components/components.css";
+@import "./admin/components/inspect.css";

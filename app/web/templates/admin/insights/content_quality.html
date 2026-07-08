@@ -1,0 +1,74 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% set page_description = "Monitor Markdown health, semantic density, missing content blocks, and strategy accuracy." %}
+
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_panel %}
+{% from "components/ui/core.html" import badge %}
+
+{% block admin_content %}
+{{ admin_page_header(
+    "Content Quality & Structure Hub",
+    page_description
+) }}
+<div class="insights-section">
+    <div class="insights-double-grid">
+        {% call admin_panel("Markdown & Structure Health (Mocked)", "Overall syntactical and block health of content") %}
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <canvas id="markdownHealthChart" data-chart="doughnut" data-chart-payload="markdown-health-data"></canvas>
+            </div>
+            <div class="flex flex-col justify-center gap-2 text-sm text-muted">
+                <div>{{ badge(text="85%", class="status-badge badge-success", variant=none) }} Valid Markdown</div>
+                <div>{{ badge(text="12%", class="status-badge badge-warning", variant=none) }} Missing H2/H3 Tags</div>
+                <div>{{ badge(text="3%", class="status-badge badge-danger", variant=none) }} Broken Image Links</div>
+            </div>
+        </div>
+        <script type="application/json" id="markdown-health-data">
+        {
+            "labels": ["Valid", "Missing Tags", "Broken Links"],
+            "datasets": [{
+                "data": [85, 12, 3],
+                "backgroundColor": ["#10b981", "#f59e0b", "#ef4444"]
+            }]
+        }
+        </script>
+        {% endcall %}
+
+        {% call admin_panel("Content Block Utilization (Mocked)", "Frequency of specific content components") %}
+        <div>
+            <canvas id="contentBlocksChart" data-chart="bar" data-chart-payload="content-blocks-data"></canvas>
+        </div>
+        <script type="application/json" id="content-blocks-data">
+        {
+            "labels": ["Intro", "Pros/Cons", "Price Table", "FAQ", "Conclusion"],
+            "datasets": [{
+                "label": "Block Coverage (%)",
+                "data": [95, 60, 45, 80, 90],
+                "backgroundColor": "#3b82f6"
+            }]
+        }
+        </script>
+        {% endcall %}
+    </div>
+</div>
+
+<h2 class="insight-group-title flex items-center gap-3">
+    <i class="fa-solid fa-bullseye"></i> Strategy Accuracy & Feedback
+</h2>
+<div class="insights-section">
+    <!-- Loaded dynamically from insights.py -->
+    <div class="card bg-card border border-border radius-md mb-4 p-4">
+        <div hx-get="{{ url_for('api_insights.widget_performance_feedback') }}" hx-trigger="load">
+            <div class="text-center text-muted p-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading Strategy Performance...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block custom_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/core/chartHelper.js') }}"></script>
+{% endblock %}

@@ -37,11 +37,12 @@ from app.web.routes import (
     api_system_bp,
     api_taxonomy_bp,
     api_recommendation_bp,
-    api_provider_bp,
+    api_source_bp,
+    api_store_bp,
     api_insights_bp,
     api_distribution_bp,
     api_subscribers_bp,
-    api_audience_analytics_bp,
+    api_analytics_bp,
     api_admin_bp
 )
 
@@ -213,11 +214,12 @@ def create_app():
     app.register_blueprint(api_system_bp)
     app.register_blueprint(api_taxonomy_bp)
     app.register_blueprint(api_recommendation_bp)
-    app.register_blueprint(api_provider_bp)
+    app.register_blueprint(api_source_bp)
+    app.register_blueprint(api_store_bp)
     app.register_blueprint(api_insights_bp)
     app.register_blueprint(api_distribution_bp)
     app.register_blueprint(api_subscribers_bp)
-    app.register_blueprint(api_audience_analytics_bp)
+    app.register_blueprint(api_analytics_bp)
     app.register_blueprint(api_admin_bp)
 
     @app.before_request

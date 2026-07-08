@@ -6,5 +6,5 @@
     {{ breakdown_progress_bar(item.name, item.count, pct, "var(--brand-purple)") }}
   {% endfor %}
 {% else %}
-  <div class="text-muted text-sm py-2">No category coverage data available.</div>
+  <div class="table-empty-state">No category coverage data available.</div>
 {% endif %}

@@ -58,6 +58,8 @@ def build_content_inspect_view_model(aggregated_data: dict) -> dict:
     if dto['object_type'] == "video":
         data_for_table["platform"] = dto.get('platform')
         data_for_table["channel"] = dto.get('channel_name')
+        data_for_table["creator"] = dto.get("creator")
+        data_for_table["duration"] = f"{dto.get('duration_seconds') // 60} min" if dto.get("duration_seconds") else None
     elif dto['object_type'] == "post":
         data_for_table["platform"] = dto.get('platform')
         data_for_table["author"] = dto.get('author')
@@ -65,6 +67,7 @@ def build_content_inspect_view_model(aggregated_data: dict) -> dict:
         data_for_table["platform upvotes"] = dto.get('upvotes') or 0
         data_for_table["platform comments"] = dto.get('platform_comments_count') or 0
     elif dto['object_type'] == "article":
+        data_for_table["description"] = dto.get("description")
         data_for_table["is scraped"] = dto.get('is_content_scraped', False)
         data_for_table["word count"] = dto.get('word_count') or 0
         data_for_table["read time"] = f"{dto.get('read_time_minutes')} min" if dto.get('read_time_minutes') else None
@@ -93,7 +96,15 @@ def build_content_inspect_view_model(aggregated_data: dict) -> dict:
 
     return {
         "inspect_table": inspect_table,
-        "article_sources": aggregated_data["article_sources"],
-        "distribution_history": aggregated_data["distribution_history"],
+        "article_sources": aggregated_data.get("article_sources", []),
+        "distribution_history": aggregated_data.get("distribution_history", []),
         "inspect_id": dto["id"],
+        "content_title": dto["title"],
+        "content_type": dto["object_type"],
+        # Video-specific
+        "video_description": dto.get("description"),
+        "video_description_quality": dto.get("description_quality"),
+        # Article-specific
+        "article_extraction_assessment": dto.get("extraction_assessment"),
+        "publishing_readiness": aggregated_data.get("publishing_readiness"),
     }

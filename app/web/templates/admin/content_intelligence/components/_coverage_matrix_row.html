@@ -1,0 +1,15 @@
+{% if items %}
+  {% for item in items %}
+    <tr>
+      <td >{{ item.name }}</td>
+      <td class="col-metric"><span class="status-badge">{{ item.demand }}</span></td>
+      <td class="col-metric"><span class="status-badge">{{ item.coverage }}</span></td>
+      <td>
+        {% set gap_class = 'badge-danger' if item.gap_score == 'High Gap' else ('badge-warning' if item.gap_score == 'Medium Gap' else 'badge-success') %}
+        <span class="status-badge {{ gap_class }}">{{ item.gap_score }}</span>
+      </td>
+    </tr>
+  {% endfor %}
+{% else %}
+  <tr><td colspan="4" >No matrix data available.</td></tr>
+{% endif %}

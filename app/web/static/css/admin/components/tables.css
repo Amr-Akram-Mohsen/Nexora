@@ -258,6 +258,22 @@
     text-align: right;
 }
 
+.col-center {
+    text-align: center;
+}
+
+.col-sticky {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+}
+
+.admin-table tbody tr:hover .col-sticky {
+    background: rgba(var(--brand-blue-rgb), 0.04);
+}
+
 .expand-arrow {
     color: var(--muted-foreground);
     font-size: var(--text-xs);

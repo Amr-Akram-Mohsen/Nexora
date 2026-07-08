@@ -1,13 +1,13 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "components/ui/spinner.html" import spinner %}
-{% from "admin/components/ui/panels.html" import admin_page_header, admin_tab_panel %}
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_tab_panel, admin_padded_panel %}
 {% from "admin/components/ui/pagination.html" import admin_paginator %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 {% from "admin/components/ui/forms.html" import admin_filter_select %}
 {% from "admin/components/ui/tabs.html" import admin_tab_navigation %}
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_reset_button, admin_toolbar_section %}
 {% from "admin/components/ui/dashboard.html" import admin_summary_bar %}
-{% from "components/ui/core.html" import input %}
+{% from "components/ui/core.html" import input, stat_card %}
 
 {% block title %}Interactions & Moderation — Nexora Admin{% endblock %}
 
@@ -24,38 +24,23 @@
 </div>
 
 {# Analytics Overview Section #}
-<div id="analytics-overview" class="overview-panel">
-  <div class="overview-panel-header flex items-center justify-between">
-    <h3 class="overview-panel-title"><i class="fa-solid fa-chart-line"></i> Analytics Overview (30 Days)</h3>
-    <span class="overview-panel-sub" id="recs-ctr-badge"></span>
-  </div>
-  <div class="panel-body-padded">
-    <div class="gap-4">
-      <div class="chart-container card">
-        <canvas id="engagementTrendChart"></canvas>
-      </div>
-      <div class="chart-container card">
-        <canvas id="sentimentSpamChart"></canvas>
-      </div>
-      <div class="chart-container card">
-        <canvas id="countryDistChart"></canvas>
-      </div>
-      <div class="chart-container card">
-        <canvas id="reactionTargetChart"></canvas>
-      </div>
-      <div class="chart-container card">
-        <canvas id="hourlyHeatmapChart"></canvas>
-      </div>
+{% call admin_padded_panel("Analytics Overview (30 Days)", id="analytics-overview", icon="fa-solid fa-chart-line", actions='<span class="overview-panel-sub" id="recs-ctr-badge"></span>') %}
+  <div class="gap-4">
+    <div class="chart-container card">
+      <canvas id="sentimentSpamChart"></canvas>
     </div>
+    <div class="chart-container card">
+      <canvas id="reactionTargetChart"></canvas>
+    </div>
+  </div>
 
-    <div class="card">
-      <h4><i class="fa-solid fa-bookmark"></i> Top Saved Content/Items</h4>
-      <div id="top-saves-container">
-        {{ spinner("Loading top saves…") }}
-      </div>
+  <div class="card">
+    <h4><i class="fa-solid fa-bookmark"></i> Top Saved Content/Items</h4>
+    <div id="top-saves-container">
+      {{ spinner("Loading top saves…") }}
     </div>
   </div>
-</div>
+{% endcall %}
 
 {# Tab Navigation #}
 {{ admin_tab_navigation("interactions", [
@@ -70,19 +55,10 @@
 {# ── Comments Tab ─────────────────────────────────────────── #}
 {% call admin_tab_panel("comments", is_active=true) %}
 
-<div class="gap-4" id="moderation-stats-panel">
-  <div class="card">
-    <div>New Comments (24h)</div>
-    <div id="mod-daily-new">-</div>
-  </div>
-  <div class="card">
-    <div>Flagged/Spam (24h)</div>
-    <div id="mod-daily-flagged">-</div>
-  </div>
-  <div class="card">
-    <div>Pending Triage</div>
-    <div id="mod-pending-triage">-</div>
-  </div>
+<div class="dashboard-stats-grid" id="moderation-stats-panel">
+  {{ stat_card("New Comments (24h)", value_id="mod-daily-new", icon="fa-solid fa-comments", class="card") }}
+  {{ stat_card("Flagged/Spam (24h)", value_id="mod-daily-flagged", icon="fa-solid fa-flag", class="card") }}
+  {{ stat_card("Pending Triage", value_id="mod-pending-triage", icon="fa-solid fa-inbox", class="card") }}
 </div>
 
 {% call admin_toolbar_section() %}

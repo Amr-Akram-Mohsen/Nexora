@@ -1,0 +1,50 @@
+{% if not items %}
+<tr>
+    <td colspan="6" >
+        No social distribution data available for this time frame.
+    </td>
+</tr>
+{% else %}
+{% for item in items %}
+<tr >
+    <td>
+        {% if item.platform == "youtube" %}
+            <span class="status-badge">YouTube</span>
+        {% elif item.platform == "pinterest" %}
+            <span class="status-badge">Pinterest</span>
+        {% elif item.platform == "instagram" %}
+            <span class="status-badge">Instagram</span>
+        {% elif item.platform == "facebook" %}
+            <span class="status-badge">Facebook</span>
+        {% else %}
+            <span class="status-badge">{{ item.platform | title }}</span>
+        {% endif %}
+    </td>
+    <td>
+        <strong>{{ item.source_title }}</strong>
+        <div class="small">{{ item.source_type | title }}</div>
+    </td>
+    <td>
+        {% if item.status == 'published' %}
+            <span class="badge">Published</span>
+        {% elif item.status == 'scheduled' %}
+            <span class="badge">Scheduled</span>
+        {% else %}
+            <span class="badge">Draft</span>
+        {% endif %}
+    </td>
+    <td>{{ item.publish_date }}</td>
+    <td>
+        <div class="d-flex align-items-center gap-3 small">
+            <span title="Views"><i class="bi bi-eye"></i> {{ item.views }}</span>
+            <span title="Likes"><i class="bi bi-heart"></i> {{ item.likes }}</span>
+            <span title="Clicks"><i class="bi bi-cursor"></i> {{ item.clicks }}</span>
+        </div>
+    </td>
+    <td>
+        {% from "components/ui/core.html" import button %}
+        {{ button(type="button", class="btn btn-sm btn-outline-secondary", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, icon="bi bi-eye", text="View", unstyled=True) }}
+    </td>
+</tr>
+{% endfor %}
+{% endif %}

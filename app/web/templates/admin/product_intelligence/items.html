@@ -23,41 +23,7 @@
   {{ stat_card("Stale Syncs", value_id="stats-stale-syncs", icon="fa-solid fa-clock-rotate-left", meta_text="> 7 days old", attrs={"data-filter": "item-sort-by", "data-val": "last_synced_at", "title": "Click to sort by stalest sync"}, class="card clickable-card filter-link") }}
 </div>
 
-<!-- Item Type Distribution Panel -->
-<div class="overview-top-grid">
-  <div class="overview-panel card">
-    <div class="overview-panel-header flex items-center justify-between">
-      <div>
-        <h3 class="overview-panel-title">Catalog Breakdown by Item Type</h3>
-        <p class="overview-panel-sub">Distribution of items across different categories</p>
-      </div>
-      <i class="fa-solid fa-chart-pie"></i>
-    </div>
-    <div class="panel-body-padded">
-      <div id="stats-type-distribution" class="overview-breakdown-grid flex gap-2">
-        <!-- JS will inject progress bars here -->
-        <div><i class="fa-solid fa-circle-notch fa-spin"></i> Loading
-          distribution...</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="overview-panel card">
-    <div class="overview-panel-header flex items-center justify-between">
-      <div>
-        <h3 class="overview-panel-title">Top Items by Engagement</h3>
-        <p class="overview-panel-sub">Highest performing products (Clickthrough Rate)</p>
-      </div>
-      <i class="fa-solid fa-fire"></i>
-    </div>
-    <div class="panel-body-list">
-      <ul id="stats-engagement-items" class="overview-top-list">
-        <li><i class="fa-solid fa-circle-notch fa-spin"></i> Loading top
-          items...</li>
-      </ul>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block crud_filters %}

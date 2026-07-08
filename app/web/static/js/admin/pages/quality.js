@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let charts = {};
 
 function fetchQualityData() {
-    fetch("/admin/providers/sources/quality-data")
+    fetch("/admin/sources/quality-data")
         .then(res => res.json())
         .then(data => {
             const qBody = document.getElementById("quality-leaderboard-tbody");
@@ -27,7 +27,7 @@ function fetchQualityData() {
             const tbodies = ['quality-leaderboard-tbody', 'scrape-leaderboard-tbody', 'freshness-index-tbody'];
             tbodies.forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load data</td></tr>`;
+                if (el) renderTableErrorState(el, 4, "Failed to load data");
             });
         });
 }

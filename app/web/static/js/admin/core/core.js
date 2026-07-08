@@ -63,7 +63,7 @@ class AdminListController {
     const tbody = document.getElementById(this.tbodyId);
     if (!tbody) return;
 
-    tbody.innerHTML = getTableSpinnerHtml(this.colspan, `Loading ${this.domain}...`, "loading-height-sm");
+    renderTableSpinner(tbody, this.colspan, `Loading ${this.domain}...`);
 
     const filters = this.getFilters();
     const params = new URLSearchParams({
@@ -74,7 +74,7 @@ class AdminListController {
 
     if (!this.rowsEndpoint) {
       console.error(`rowsEndpoint is required for ${this.domain} controller.`);
-      tbody.innerHTML = getTableErrorStateHtml(this.colspan, `Configuration error.`);
+      renderTableErrorState(tbody, this.colspan, `Configuration error.`);
       return;
     }
 
@@ -96,7 +96,7 @@ class AdminListController {
       })
       .catch(err => {
         console.error(err);
-        tbody.innerHTML = getTableErrorStateHtml(this.colspan, `Failed to load ${this.domain}.`);
+        renderTableErrorState(tbody, this.colspan, `Failed to load ${this.domain}.`);
       });
   }
 
@@ -216,9 +216,7 @@ document.addEventListener("click", e => {
   let url = btn.dataset.url;
   
   if (!url) {
-    if (domain === "source" || domain === "store") {
-      url = `/admin/providers/${domain}s/${id}/inspect`;
-    } else if (domain === "rec") {
+    if (domain === "rec") {
       const parts = id.split('-');
       url = `/admin/recommendations/matches/${parts[0]}/${parts[1]}/inspect`;
     } else if (["category", "brand", "topic", "section", "attribute", "gender_facet", "intent_facet", "price_tier_facet"].includes(domain)) {
@@ -357,3 +355,82 @@ function initSidebar() {
 
 document.addEventListener("DOMContentLoaded", initSidebar);
 
+/**
+ * Standardized template rendering functions
+ */
+function renderSpinner(container, text = "Loading…") {
+  if (!container) return;
+  const tpl = document.getElementById('global-spinner-template');
+  if (!tpl) {
+      container.innerHTML = `<div class='dashboard-loading'><div class='spinner'></div><p class='spinner-text'>${text}</p></div>`;
+      return;
+  }
+  const clone = tpl.content.cloneNode(true);
+  if (text) {
+      const textEl = clone.querySelector('.spinner-text');
+      if (textEl) textEl.textContent = text;
+  }
+  container.innerHTML = '';
+  container.appendChild(clone);
+}
+
+function renderEmptyState(container, message = "No items found.", submessage = "", iconClass = "") {
+  if (!container) return;
+  const tpl = document.getElementById('global-empty-template');
+  if (!tpl) return;
+  const clone = tpl.content.cloneNode(true);
+  
+  if (message) {
+      const msgEl = clone.querySelector('.empty-message');
+      if (msgEl) msgEl.textContent = message;
+  }
+  if (submessage) {
+      const subEl = clone.querySelector('.empty-submessage');
+      if (subEl) subEl.textContent = submessage;
+  }
+  if (iconClass) {
+      const iconEl = clone.querySelector('.dashboard-state-icon i');
+      if (iconEl) {
+          iconEl.className = iconClass;
+      }
+  }
+  container.innerHTML = '';
+  container.appendChild(clone);
+}
+
+function renderErrorState(container, message = "Failed to load data. Please try again.") {
+  if (!container) return;
+  const tpl = document.getElementById('global-error-template');
+  if (!tpl) return;
+  const clone = tpl.content.cloneNode(true);
+  if (message) {
+      const msgEl = clone.querySelector('.error-message');
+      if (msgEl) msgEl.textContent = message;
+  }
+  container.innerHTML = '';
+  container.appendChild(clone);
+}
+
+function renderTableSpinner(tbody, colspan, text) {
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  const td = document.createElement('td');
+  td.colSpan = colspan || 1;
+  td.className = 'table-loading-cell';
+  renderSpinner(td, text);
+  tr.appendChild(td);
+  tbody.innerHTML = '';
+  tbody.appendChild(tr);
+}
+
+function renderTableErrorState(tbody, colspan, text) {
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  const td = document.createElement('td');
+  td.colSpan = colspan || 1;
+  td.className = 'table-error-cell';
+  renderErrorState(td, text);
+  tr.appendChild(td);
+  tbody.innerHTML = '';
+  tbody.appendChild(tr);
+}

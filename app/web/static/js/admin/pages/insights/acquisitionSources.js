@@ -22,7 +22,7 @@ function renderVelocityChart(data) {
   if (!container) return;
   
   if (data.labels.length === 0) {
-    container.innerHTML = "<div class='text-muted p-4 text-center'>No data available</div>";
+    renderEmptyState(container, "No data available");
     return;
   }
   
@@ -66,7 +66,7 @@ function renderContributionChart(data) {
   if (!container) return;
   
   if (data.labels.length === 0) {
-    container.innerHTML = "<div class='text-muted p-4 text-center'>No data available</div>";
+    renderEmptyState(container, "No data available");
     return;
   }
   
@@ -105,7 +105,7 @@ function renderAuthorityChart(data) {
   if (!container) return;
   
   if (data.labels.length === 0) {
-    container.innerHTML = "<div class='text-muted p-4 text-center'>No data available</div>";
+    renderEmptyState(container, "No data available");
     return;
   }
   

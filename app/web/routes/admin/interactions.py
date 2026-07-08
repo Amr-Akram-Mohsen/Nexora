@@ -392,4 +392,6 @@ def clicks_stats():
 @bp.route("/analytics", methods=["GET"])
 def analytics_dashboard():
     from app.domains.interaction.service.analytics import get_analytics_dashboard_data
-    return jsonify(get_analytics_dashboard_data())
+    data = get_analytics_dashboard_data()
+    data["top_saves_html"] = render_template("admin/interactions/partials/_top_saves.html", data=data.get("top_saves", []))
+    return jsonify(data)

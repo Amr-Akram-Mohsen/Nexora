@@ -1,4 +1,5 @@
 {% from "admin/components/ui/dashboard.html" import activity_list_item, dashboard_empty %}
+{% from "components/ui/core.html" import badge %}
 {% if not stats.provider_activities or stats.provider_activities | length == 0 %}
 {{ dashboard_empty("No active providers.") }}
 {% else %}
@@ -8,7 +9,7 @@
   extra_class="ingest-log-item") %}
   <p class="activity-text ingest-log-text">
     <strong class="provider-name">{{ s.name }}</strong>
-    <span class="status-badge active badge-type-compact badge-indigo provider-slug">slug: {{ s.slug }}</span>
+    {{ badge(text="slug: " ~ s.slug, class="status-badge active badge-type-compact badge-indigo provider-slug", variant=none) }}
   </p>
   <p class="activity-meta ingest-log-text">
     Volume: <strong class="provider-content-count">{{ "{:,}".format(s.content_count or 0) }}</strong> content items
@@ -17,7 +18,7 @@
   <p class="activity-meta ingest-log-meta flex items-center gap-2">
     Last Ingest Activity: <strong class="provider-activity-time">{{ s.latest_activity_formatted }}</strong>
     {% if s.days_since_last_ingestion is not none and s.days_since_last_ingestion > 7 %}
-    <span class="status-badge badge-danger badge-type-compact" title="No new content in >7 days">Stale Source</span>
+    {{ badge(text="Stale Source", class="status-badge badge-danger badge-type-compact", attrs={"title": "No new content in >7 days"}, variant=none) }}
     {% endif %}
   </p>
   {% endcall %}

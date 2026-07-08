@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function fetchSourceStats() {
-    fetch("/admin/providers/sources/health_stats")
+    fetch("/admin/sources/health_stats")
         .then(response => response.json())
         .then(data => {
             const elTotal = document.getElementById("stats-total-sources");

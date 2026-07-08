@@ -5,7 +5,7 @@ export function renderSocialDistribution() {
   const container = document.getElementById("social-distribution-table-body");
   if (!container) return;
 
-  container.innerHTML = getSpinnerHtml(7, "Loading distribution history...");
+  renderSpinner(container, "Loading distribution history...");
 
   const status = document.getElementById("dist-filter-status")?.value || "";
   const type = document.getElementById("dist-filter-type")?.value || "";
@@ -46,7 +46,7 @@ function viewDistributionDraft(postId, sourceType, sourceId, platform) {
     modalContent.replaceChildren();
     const loadDiv = document.createElement('div');
     loadDiv.className = 'py-5 text-center';
-    loadDiv.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2 text-muted"></i><p>Loading post details...</p>';
+    renderSpinner(loadDiv, "Loading post details...");
     modalContent.appendChild(loadDiv);
     
     // Open modal using Nexora architecture
@@ -73,7 +73,7 @@ function viewDistributionDraft(postId, sourceType, sourceId, platform) {
             const errDiv = document.createElement('div');
             errDiv.className = 'text-center py-5';
             errDiv.style.color = 'var(--brand-red)';
-            errDiv.innerHTML = `<div class="mt-2">Failed to load draft: ${err.message}</div>`;
+            renderErrorState(errDiv, `Failed to load draft: ${err.message}`);
             modalContent.appendChild(errDiv);
         }
     });

@@ -1,14 +1,22 @@
 from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model, serialize_target
 from app.domains.item.serializers import serialize_item
+from app.domains.content.service.editorial import assess_video_description, assess_article_extraction
 def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     if not target:
         return {}
     
     if object_type == "video":
+        description = getattr(target, "description", None)
         return {
             "platform": getattr(target, "platform", None),
-            "channel_name": getattr(target, "channel_name", None)
+            "channel_name": getattr(target, "channel_name", None),
+            "creator": getattr(target, "creator", None),
+            "duration_seconds": getattr(target, "duration_seconds", None),
+            "external_id": getattr(target, "external_id", None),
+            "description": description,
+            "description_display_rule": getattr(target, "description_display_rule", "review"),
+            "description_quality": assess_video_description(description)
         }
     elif object_type == "post":
         return {
@@ -25,7 +33,9 @@ def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
             "read_time_minutes": getattr(target, "read_time_minutes", None),
             "article_quality_score": getattr(target, "quality_score", 0),
             "last_enrichment_attempt": target.last_enrichment_attempt.isoformat() if getattr(target, "last_enrichment_attempt", None) else None,
-            "original_url": getattr(target, "url", None)
+            "original_url": getattr(target, "url", None),
+            "description": getattr(target, "description", None),
+            "extraction_assessment": assess_article_extraction(target)
         }
     return {}
 

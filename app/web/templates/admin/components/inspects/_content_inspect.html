@@ -3,6 +3,7 @@
 {% from "admin/components/ui/panels.html" import admin_page_header, inspect_page_shell %}
 {% from "admin/components/ui/tables.html" import admin_inspect_section_table %}
 {% from "admin/components/_inspect_primitives.html" import inspect_distribution_card, render_distribution_section %}
+{% from "admin/components/_editorial_primitives.html" import render_video_editorial_panel, render_article_extraction_panel, render_publishing_readiness_panel %}
 
 {% block title %}Content Details — Nexora Admin{% endblock %}
 
@@ -16,6 +17,24 @@
       {{ admin_inspect_section_table(section_name, section_data) }}
       {% endcall %}
       {% endfor %}
+      {% endif %}
+
+      {% if publishing_readiness is defined %}
+      {% call inspect_section('Publishing Readiness') %}
+        {{ render_publishing_readiness_panel(publishing_readiness) }}
+      {% endcall %}
+      {% endif %}
+
+      {% if content_type == "video" and video_description_quality is defined %}
+      {% call inspect_section('Video Description Review') %}
+        {{ render_video_editorial_panel(video_description, video_description_quality) }}
+      {% endcall %}
+      {% endif %}
+
+      {% if content_type == "article" and article_extraction_assessment is defined %}
+      {% call inspect_section('Extraction Health & Document Structure') %}
+        {{ render_article_extraction_panel(article_extraction_assessment) }}
+      {% endcall %}
       {% endif %}
 
       {% if article_sources is defined and article_sources %}

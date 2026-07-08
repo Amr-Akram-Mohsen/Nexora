@@ -26,6 +26,9 @@ class Config:
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "support@yoursite.com")
     MAIL_ENABLED = os.environ.get("MAIL_ENABLED", "False").lower() == "true"
 
+    HF_API_URL = os.environ.get("HF_API_URL")
+    HF_TOKEN = os.environ.get("HF_TOKEN")
+
     # ── Article / News APIs ───────────────────────────────────────
     NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
     GNEWS_API_KEY = os.environ.get("GNEWS_API_KEY")

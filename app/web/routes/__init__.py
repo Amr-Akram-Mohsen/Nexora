@@ -8,11 +8,12 @@ from .admin import (
     api_system_bp,
     api_taxonomy_bp,
     api_recommendation_bp,
-    api_provider_bp,
+    api_source_bp,
+    api_store_bp,
     api_insights_bp,
     api_distribution_bp,
     api_subscribers_bp,
-    api_audience_analytics_bp,
+    api_analytics_bp,
     api_admin_bp
 )
 

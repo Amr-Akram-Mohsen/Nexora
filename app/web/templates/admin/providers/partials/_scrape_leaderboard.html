@@ -1,6 +1,6 @@
 {% from "components/ui/core.html" import badge %}
 {% if not data %}
-<tr><td colspan="3" class="p-8 text-center text-muted">No data available</td></tr>
+<tr class="table-empty-state"><td colspan="3">No data available</td></tr>
 {% else %}
   {% for row in data %}
     {% set healthClass = "badge-gray" %}
@@ -8,10 +8,10 @@
     {% elif row.health == "Warning" %} {% set healthClass = "badge-warning" %}
     {% elif row.health == "Critical" %} {% set healthClass = "badge-danger" %}
     {% endif %}
-    <tr class="border-b border-border hover:bg-gray-50">
-        <td class="p-4 font-medium">{{ row.source }}</td>
-        <td class="p-4 text-center font-bold">{{ row.scrape_pct }}%</td>
-        <td class="p-4">{{ badge(text=row.health, class="status-badge " ~ healthClass) }}</td>
+    <tr>
+        <td class="cell-primary-text">{{ row.source }}</td>
+        <td class="col-center cell-primary-text">{{ row.scrape_pct }}%</td>
+        <td>{{ badge(text=row.health, class="status-badge " ~ healthClass) }}</td>
     </tr>
   {% endfor %}
 {% endif %}

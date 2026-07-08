@@ -22,9 +22,7 @@ def home():
         stats=stats_data
     )
 
-@bp.route("/insights")
-def dashboard_insights():
-    return render_template("admin/content_intelligence/insights.html", title="Insights & Opportunities", domain="insights", tables=INSIGHTS_TABLES)
+
 
 
 @bp.route("/distribution")
@@ -55,6 +53,14 @@ def dashboard_items():
         title="Product Management",
         domain="items",
         table=CRUD_TABLES["items"],
+    )
+
+@bp.route("/items/dashboard")
+def dashboard_items_analytics():
+    return render_template(
+        "admin/product_intelligence/items_dashboard.html",
+        title="Products Intelligence Dashboard",
+        domain="items_dashboard"
     )
 
 
@@ -93,6 +99,14 @@ def dashboard_stores():
         table=CRUD_TABLES["stores"]        
     )
 
+@bp.route("/stores/dashboard")
+def dashboard_stores_analytics():
+    return render_template(
+        "admin/product_intelligence/stores_dashboard.html",
+        title="Stores & Commercial Intelligence",
+        domain="stores_dashboard"
+    )
+
 
 @bp.route("/taxonomy")
 def dashboard_taxonomy():
@@ -122,21 +136,15 @@ def dashboard_subscribers():
         table=CRUD_TABLES.get("subscribers", {}),
     )
 
-@bp.route("/analytics")
-def dashboard_audience_analytics():
-    return render_template(
-        "admin/audience/analytics.html",
-        title="Audience Analytics",
-        domain="analytics"
-    )
 
 
-@bp.route("/moderation")
-def dashboard_moderation():
+
+@bp.route("/interactions")
+def dashboard_interactions():
     return render_template(
         "admin/audience/interactions.html",
         title="Moderation & Interactions",
-        domain="moderation",
+        domain="interactions",
         tables=CRUD_TABLES,
     )
 

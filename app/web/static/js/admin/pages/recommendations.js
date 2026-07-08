@@ -187,7 +187,7 @@
         });
       })
       .catch(() => {
-        ctx.parentElement.innerHTML = '<div class="text-center text-muted">Failed to load chart data.</div>';
+        renderErrorState(ctx.parentElement, "Failed to load chart data.");
       });
   }
 
@@ -227,7 +227,7 @@
         });
       })
       .catch(() => {
-        ctx.parentElement.innerHTML = '<div class="text-center text-muted">Failed to load slot data.</div>';
+        renderErrorState(ctx.parentElement, "Failed to load slot data.");
       });
   }
 

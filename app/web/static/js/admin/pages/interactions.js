@@ -81,7 +81,7 @@
   function loadAnalyticsOverview() {
     window.api.get('/admin/interactions/analytics')
       .then(data => {
-        renderTopSaves(data.top_saves);
+        renderTopSaves(data.top_saves_html);
         const ctrBadge = document.getElementById('recs-ctr-badge');
         if(ctrBadge) {
             ctrBadge.replaceChildren();
@@ -101,11 +101,8 @@
             document.getElementById('mod-pending-triage').textContent = data.moderation_workload.pending_triage;
         }
 
-        drawEngagementChart(data.trends, data.spam_trend);
         drawSentimentChart(data.sentiment_dist);
-        drawCountryChart(data.country_dist);
         drawReactionChart(data.reaction_targets);
-        drawHeatmapChart(data.heatmap);
       })
       .catch(err => console.error("Failed to load analytics", err));
   }
@@ -140,65 +137,13 @@
     });
   }
 
-  function renderTopSaves(saves) {
+  function renderTopSaves(html) {
     const container = document.getElementById('top-saves-container');
     if (!container) return;
-    container.replaceChildren();
-    
-    if (!saves || !saves.length) {
-      const p = document.createElement('p');
-      p.className = 'text-muted';
-      p.textContent = 'No saves recorded.';
-      container.appendChild(p);
-      return;
-    }
-    
-    const ul = document.createElement('ul');
-    ul.className = 'divide-y';
-    
-    saves.forEach(s => {
-      const icon = s.target_type === 'content' ? '📄' : '📦';
-      const li = document.createElement('li');
-      li.className = 'py-2 flex justify-between';
-      li.style.borderBottom = '1px solid var(--border)';
-      
-      const spanName = document.createElement('span');
-      spanName.className = 'truncate pr-4';
-      spanName.textContent = `${icon} ${s.name}`;
-      
-      const spanCount = document.createElement('span');
-      spanCount.className = 'font-semibold';
-      spanCount.style.color = 'var(--brand-blue)';
-      spanCount.textContent = s.count;
-      
-      li.appendChild(spanName);
-      li.appendChild(spanCount);
-      ul.appendChild(li);
-    });
-    
-    container.appendChild(ul);
+    container.innerHTML = html;
   }
 
-  function getSortedDates(trendsObj) {
-    const allDates = new Set();
-    Object.values(trendsObj).forEach(typeData => Object.keys(typeData).forEach(d => allDates.add(d)));
-    return Array.from(allDates).sort();
-  }
 
-  function drawEngagementChart(trends, spamTrend) {
-    const dates = getSortedDates(trends);
-    const datasets = [
-      { label: 'Comments', data: dates.map(d => trends.comments[d] || 0), borderColor: '#4CAF50', tension: 0.4 },
-      { label: 'Reactions', data: dates.map(d => trends.reactions[d] || 0), borderColor: '#2196F3', tension: 0.4 },
-      { label: 'Views', data: dates.map(d => trends.views[d] || 0), borderColor: '#9C27B0', tension: 0.4 },
-      { label: 'Spam', data: dates.map(d => spamTrend[d] || 0), borderColor: '#F44336', borderDash: [5, 5], tension: 0.4 },
-    ];
-    
-    window.nexoraCharts.render('engagementTrendChart', 'line', 
-      { labels: dates, datasets },
-      { plugins: { title: { display: true, text: '30-Day Engagement & Spam', color: '#ccc' } } }
-    );
-  }
 
   function drawSentimentChart(sentimentDist) {
     const labels = Object.keys(sentimentDist);
@@ -211,15 +156,7 @@
     );
   }
 
-  function drawCountryChart(countryDist) {
-    const labels = Object.keys(countryDist);
-    const data = Object.values(countryDist);
 
-    window.nexoraCharts.render('countryDistChart', 'bar', 
-      { labels, datasets: [{ label: 'Clicks', data, backgroundColor: '#3F51B5' }] },
-      { plugins: { title: { display: true, text: 'Top Click Countries', color: '#ccc' } } }
-    );
-  }
 
   function drawReactionChart(reactionTargets) {
     const labels = Object.keys(reactionTargets);
@@ -231,20 +168,7 @@
     );
   }
 
-  function drawHeatmapChart(heatmapData) {
-    const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
 
-    window.nexoraCharts.render('hourlyHeatmapChart', 'bar', 
-      { labels, datasets: [{
-          label: 'Total Engagement',
-          data: heatmapData,
-          backgroundColor: 'rgba(255, 152, 0, 0.6)',
-          borderColor: '#FF9800',
-          borderWidth: 1
-      }] },
-      { plugins: { title: { display: true, text: 'Most Engaged Hour of Day (Last 30 Days)', color: '#ccc' } } }
-    );
-  }
 
   // ── Comment Moderation Actions ───────────
   function deleteComment(id, btn, modal) {

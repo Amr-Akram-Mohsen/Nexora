@@ -19,12 +19,11 @@
 ) }}
 
 {# Analytics Dashboard Container #}
-<div id="taxonomy-analytics-dashboard" class="dashboard-widgets-grid"
-  style="display: none;">
+<div id="taxonomy-analytics-dashboard" class="dashboard-widgets-grid is-hidden">
   <!-- Filled dynamically by JS -->
 </div>
 
-<div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden mb-4">
+<div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden taxonomy-stats-bar">
   {% call badge(class="status-badge active") %}Total Entities: <span id="stat-total-entities">0</span>{% endcall %}
   {% call badge(class="status-badge inactive") %}Orphans: <span id="stat-orphan-entities">0</span> (<span id="stat-orphan-pct">0</span>%){% endcall %}
   {% call badge(class="badge-orange badge-compact") %}Missing Category: <span id="stat-missing-category">0</span>{% endcall %}

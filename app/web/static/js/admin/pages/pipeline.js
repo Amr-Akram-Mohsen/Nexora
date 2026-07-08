@@ -20,7 +20,7 @@
 
   function loadStats() {
     setLoading(true);
-    container.innerHTML = getSpinnerHtml('Loading pipeline statistics…');
+    renderSpinner(container, 'Loading pipeline statistics…');
 
     fetchAndInjectHtml('/admin/contents/pipeline/stats/partial', 'pipeline-stats-container')
       .then(function () {

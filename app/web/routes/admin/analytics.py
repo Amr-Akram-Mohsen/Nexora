@@ -5,7 +5,7 @@ from app.domains.user.models import User
 from app.domains.interaction.models import RecommendationImpression, RecommendationClick
 from sqlalchemy import select, func, text
 
-bp = Blueprint("api_audience_analytics", __name__, url_prefix="/admin/audience-analytics")
+bp = Blueprint("api_analytics", __name__, url_prefix="/admin/analytics")
 
 apply_admin_guard(bp)
 

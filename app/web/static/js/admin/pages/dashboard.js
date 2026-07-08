@@ -60,11 +60,7 @@
         }
       );
     } else {
-      typeCanvas.closest('.content-chart-canvas-wrap').innerHTML = getEmptyStateHtml(
-        'No content type data available.',
-        '',
-        'loading-height-sm'
-      );
+      renderEmptyState(typeCanvas.closest('.content-chart-canvas-wrap'), "No content type data available");
     }
   }
 
@@ -130,11 +126,7 @@
         }
       );
     } else {
-      enrichCanvas.closest('.content-chart-canvas-wrap').innerHTML = getEmptyStateHtml(
-        'No enrichment data available.',
-        '',
-        'loading-height-sm'
-      );
+      renderEmptyState(enrichCanvas.closest('.content-chart-canvas-wrap'), "No enrichment data available");
     }
   }
 

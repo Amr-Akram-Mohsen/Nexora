@@ -1,0 +1,13 @@
+{% if data %}
+  <ul class="divide-y">
+    {% for s in data %}
+      {% set icon = '📄' if s.target_type == 'content' else '📦' %}
+      <li class="py-2 flex justify-between" style="border-bottom: 1px solid var(--border);">
+        <span class="truncate pr-4">{{ icon }} {{ s.name }}</span>
+        <span class="font-semibold" style="color: var(--brand-blue);">{{ s.count }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No saves recorded.</p>
+{% endif %}

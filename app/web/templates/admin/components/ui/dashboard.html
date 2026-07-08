@@ -38,7 +38,7 @@ summary_class="admin-summary-bar"
 {% endmacro %}
 
 {% macro ranked_list_item(rank, title_text, title_href=none, value_text=none, extra_class="") %}
-<li class="overview-top-item flex items-center justify-between py-2 border-b border-border last:border-0 {{ extra_class }}">
+<li class="overview-top-item flex items-center justify-between {{ extra_class }}">
   <div class="flex items-center gap-3">
     <div class="overview-top-rank text-muted font-mono text-sm">#{{ rank }}</div>
     {% if title_href %}
