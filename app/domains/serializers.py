@@ -45,6 +45,8 @@ def serialize_target(obj, session=None):
                 "extended_metadata": getattr(obj, "extended_metadata", None),
                 "author": getattr(obj, "author", None),
                 "content_text": getattr(obj, "content_text", None),
+                "content_html": getattr(obj, "content_html", None),
+                "summary": getattr(obj, "summary", None),
                 "formatted_paragraphs": getattr(obj, "formatted_paragraphs", []),
                 "body": getattr(obj, "body", None),
                 "description": getattr(obj, "description", None),

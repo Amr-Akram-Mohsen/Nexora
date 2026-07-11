@@ -70,7 +70,8 @@ def log_scrape_error(logger: logging.Logger, url: str, reason: str) -> None:
 def log_item_ingested(
     logger: logging.Logger,
     source: str,
-    title: str,
+    content_id: int | str,
+    object_id: int | str,
     status: str,
     published: bool = None,
     **kwargs,
@@ -79,7 +80,7 @@ def log_item_ingested(
     pub_str = f"  published={published}" if published is not None else ""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.info(
-        '[INGEST][%s] %-8s  title="%s"%s  %s', source, status, title, pub_str, extras
+        '[INGEST][%s] %-8s  content_id=%s  object_id=%s%s  %s', source, status, content_id, object_id, pub_str, extras
     )
 
 

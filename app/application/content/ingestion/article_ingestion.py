@@ -15,9 +15,11 @@ def create_article_model(data):
         ingestion_method=data.get("ingestion_method"),
         status=data.get("status", "pending"),
         image_url=data.get("image_url"),
-        authors=[data.get("author")] if data.get("author") else None,
+        authors=data.get("authors") or ([data.get("author")] if data.get("author") else None),
         extended_metadata=data.get("extended_metadata"),
         images=data.get("images"),
+        videos=data.get("videos"),
+        summary=data.get("summary"),
     )
 
 
@@ -38,16 +40,11 @@ def ingest_article(session, raw_data):
     # Fallback to dict for generic_ingest compatibility
     cleaned_dict = cleaned_dto.model_dump()
 
-    # Automatically mark newsapi_ai articles as published and scraped
-    if cleaned_dict.get("ingestion_method") == "newsapi_ai" or raw_data.get("ingestion_method") == "newsapi_ai":
-        cleaned_dict["is_published"] = True
-        cleaned_dict["is_content_scraped"] = True
-        cleaned_dict["status"] = "complete"
+
 
     return generic_ingest(
         session,
         object_type="article",
         raw_data=cleaned_dict,
-        model_class=Article,
         factory_func=create_article_model,
     )

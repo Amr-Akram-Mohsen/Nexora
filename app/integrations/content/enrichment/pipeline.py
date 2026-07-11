@@ -200,7 +200,7 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot"
                 "extended_metadata": metadata, # raw tags/categories preserved here for the inserter
                 "images":           res["images"],
                 "videos":           metadata.get("videos"),
-                "summary":          metadata.get("naturalLanguage", {}).get("summary"),
+                "summary":          metadata.get("summary"),
                 "language":         metadata.get("humanLanguage"),
                 "sentiment_score":  metadata.get("sentiment"),
                 "external_uri":     metadata.get("diffbotUri"),

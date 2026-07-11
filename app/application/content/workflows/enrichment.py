@@ -83,14 +83,20 @@ def reprocess_unscraped_articles(limit: int = 50, extractor_service: str = "diff
             # Quality gate: enough content AND has an image
             is_good_quality = (article.word_count or 0) > 250 and article.image_url
 
+            # Sync with Content record
+            content_rec = get_content_by_object("article", article.id)
+
             if is_good_quality:
                 article.status = "complete"
                 success_count += 1
-                log_item_ingested(
-                    logger, _NAME, article.title[:60],
-                    status="published",
-                    words=article.word_count,
-                )
+                if content_rec:
+                    log_item_ingested(
+                        logger, _NAME,
+                        content_id=content_rec.id,
+                        object_id=article.id,
+                        status="published",
+                        words=article.word_count,
+                    )
             else:
                 article.status = "partial" if (article.word_count or 0) > 100 else "failed"
                 log_item_skipped(
@@ -99,8 +105,6 @@ def reprocess_unscraped_articles(limit: int = 50, extractor_service: str = "diff
                     words=article.word_count,
                 )
 
-            # Sync with Content record
-            content_rec = get_content_by_object("article", article.id)
             if content_rec:
                 content_rec.is_published = article.status == "complete"
                 

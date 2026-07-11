@@ -106,9 +106,7 @@ def normalize_article_data(enriched: EnrichedItemDTO) -> ArticleCreateDTO | None
     if any(d in url for d in BLOCKED_DOMAINS): return None
     if "[Removed]" in title or len(title) < 10: return None
 
-    description = data.get("description") or data.get("summary") or ""
-    if "… [+" in description: 
-        description = description.split("… [+")[0].strip()
+    description = data.get("description") or ""
 
     data.update({
         "title":          title,
@@ -121,9 +119,6 @@ def normalize_article_data(enriched: EnrichedItemDTO) -> ArticleCreateDTO | None
         "content_text":   sanitize_text(data.get("content_text") or ""),
         "canonical_url":  normalize_url(data.get("canonical_url"))
     })
-    
-    # Backwards compatibility
-    data["content"] = data["content_html"]
     
     return ArticleCreateDTO(**data)
 

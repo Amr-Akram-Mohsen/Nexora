@@ -167,8 +167,6 @@ class YouTubeQuotaService(QuotaPort):
         # First check the shared global quota tracker, then the run budget.
         if not can_call_youtube(units=YouTubeQuota.UNITS_PER_SEARCH):
             return False
-        # remaining = YouTubeQuota.RUN_BUDGET - self._units_used
-        # return remaining >= YouTubeQuota.UNITS_PER_SEARCH
 
         if self._units_used + YouTubeQuota.UNITS_PER_SEARCH > YouTubeQuota.RUN_BUDGET:
             return False

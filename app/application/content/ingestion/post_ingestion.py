@@ -25,6 +25,5 @@ def ingest_post(session, raw_data):
         session,
         object_type="post",
         raw_data=cleaned,
-        model_class=Post,
         factory_func=create_post_model,
     )

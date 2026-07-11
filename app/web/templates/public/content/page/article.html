@@ -99,12 +99,6 @@
     <div class="article-html">
       {{ article.content_html | safe }}
     </div>
-    {% elif article.content_text and article.content_text|trim|length > 0 %}
-    <div class="article-blocks flex flex-col gap-4">
-      {% for paragraph in article.formatted_paragraphs %}
-      <p>{{ paragraph }}</p>
-      {% endfor %}
-    </div>
     {% endif %}
   </div>
 
@@ -134,6 +128,13 @@
       {% endfor %}
     </div>
   </div>
+  {% endif %}
+
+  {% if article.images %}
+  <div class="article-images-count">{{ article.images | length }} Images</div>
+  {% endif %}
+  {% if article.videos %}
+  <div class="article-videos-count">{{ article.videos | length }} videos</div>
   {% endif %}
 
   <div class="article-cta-box flex items-center justify-between">

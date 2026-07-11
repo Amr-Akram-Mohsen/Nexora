@@ -36,25 +36,28 @@ def link_article_sources(article, data, session=None) -> bool:
         if domain.startswith("www."):
             domain = domain[4:]
             
-        # Default score
-        authority_score = 50
+        source = session.query(Source).filter_by(domain=domain).first()
         
-        # Check for trusted domain match
-        for s_trusted in TRUSTED_SOURCES:
-            t_domain = s_trusted["domain"].lower()
-            if domain == t_domain or domain.endswith("." + t_domain):
-                authority_score = s_trusted.get("score", 70)
-                break
-        
-        source = Source(
-            name=source_name,
-            slug=slug,
-            domain=domain,
-            authority_score=authority_score,
-            is_active=True
-        )
-        session.add(source)
-        session.flush() # Ensure ID is available
+        if not source:
+            # Default score
+            authority_score = 50
+            
+            # Check for trusted domain match
+            for s_trusted in TRUSTED_SOURCES:
+                t_domain = s_trusted["domain"].lower()
+                if domain == t_domain or domain.endswith("." + t_domain):
+                    authority_score = s_trusted.get("score", 70)
+                    break
+            
+            source = Source(
+                name=source_name,
+                slug=slug,
+                domain=domain,
+                authority_score=authority_score,
+                is_active=True
+            )
+            session.add(source)
+            session.flush() # Ensure ID is available
 
     from ...relationships import ArticleSource
     

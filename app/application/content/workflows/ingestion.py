@@ -569,7 +569,8 @@ class IngestionWorkflow:
                         log_item_ingested(
                             logger,
                             self.source_name,
-                            item_title,
+                            content_id=content_obj.id,
+                            object_id=content_obj.object_id,
                             status="stored",
                             published=content_obj.is_published if hasattr(content_obj, "is_published") else enriched_dict.get("is_published"),
                         )
@@ -583,7 +584,7 @@ class IngestionWorkflow:
                     else:
                         query_updated += 1
                         log_item_ingested(
-                            logger, self.source_name, item_title, status="updated", updated_relationships=status
+                            logger, self.source_name, content_id=content_obj.id, object_id=content_obj.object_id, status="updated", updated_relationships=status
                         )
                 else:
                     log_item_skipped(

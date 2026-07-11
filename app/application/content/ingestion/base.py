@@ -9,7 +9,7 @@ from app.domains.content.service import populate_content_search_fields
 
 logger = logging.getLogger(__name__)
 
-def generic_ingest(session, object_type, raw_data, model_class, factory_func):
+def generic_ingest(session, object_type, raw_data, factory_func):
     """
     Standardized ingestion flow for any content type.
     """

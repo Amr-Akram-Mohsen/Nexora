@@ -26,6 +26,5 @@ def ingest_video(session, raw_data):
         session,
         object_type="video",
         raw_data=cleaned,
-        model_class=Video,
         factory_func=create_video_model,
     )

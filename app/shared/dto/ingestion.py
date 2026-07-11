@@ -40,8 +40,7 @@ class EnrichedItemDTO(ClassifiedItemDTO):
 
     content_html: Optional[str] = None
     content_text: Optional[str] = None
-    content_markdown: Optional[str] = None
-    content_blocks: Optional[list] = None  # canonical structured representation
+    summary: Optional[str] = None
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0
     is_content_scraped: Optional[bool] = False
@@ -74,8 +73,7 @@ class ArticleCreateDTO(BaseModel):
     source_name: Optional[str] = None
     content_html: Optional[str] = None
     content_text: Optional[str] = None
-    content_markdown: Optional[str] = None
-    content_blocks: Optional[list] = None  # canonical structured representation
+    summary: Optional[str] = None
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0
     is_content_scraped: Optional[bool] = False

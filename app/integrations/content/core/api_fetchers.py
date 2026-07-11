@@ -1,4 +1,6 @@
 import logging
+import time
+import re
 from flask import current_app
 from app.shared.utils.logging import (
     log_integration_start,
@@ -8,13 +10,9 @@ from app.shared.utils.logging import (
 )
 from .http import _get_session
 from .fetch_engine import safe_get_json, safe_post_json
-from .fetchers_mappers import map_newsapi, map_newsapi_ai, map_youtube, map_reddit
+from .fetchers_mappers import map_newsapi, map_newsapi_ai, map_gnews, map_youtube, map_reddit
 
 logger = logging.getLogger(__name__)
-
-
-import time
-import re
 
 
 def fetch_newsapi_query(q_obj, **kwargs):
@@ -62,8 +60,48 @@ def fetch_newsapi_query(q_obj, **kwargs):
 
     return items
 
+
+def fetch_gnews_query(q_obj, **kwargs):
+    api_key = current_app.config.get("GNEWS_API_KEY")
+    if not api_key:
+        log_integration_warning(logger, "gnews", reason="no_api_key")
+        return []
+
+    q_text = q_obj.get("query", "")
+    region = q_obj.get("region", "en").lower()
+
+    log_integration_start(logger, "gnews", query=q_text)
+    time.sleep(2.5)
+    session = _get_session()
+
+    params = {
+        "q": q_text,
+        "lang": "en",
+        "country": region if len(region) == 2 else "us",
+        "max": 10,
+        "apikey": api_key,
+    }
+
+    data = safe_get_json(
+        session,
+        "https://gnews.io/api/v4/search",
+        params=params,
+        timeout=(5, 15),
+        logger=logger,
+        source_name="gnews",
+    )
+
+    items = map_gnews(data, region=region)
+    if isinstance(items, list):
+        log_integration_success(logger, "gnews", items=len(items), query=q_text)
+    else:
+        log_integration_warning(
+            logger, "gnews", reason="unexpected_response_shape", query=q_text
+        )
+
+    return items
+
 def _parse_to_er_query(query_str: str) -> dict:
-    import re
     blocks = []
     
     def replacer(match):
@@ -109,7 +147,6 @@ def fetch_newsapi_ai_query(q_obj, **kwargs):
     q_text = q_obj.get("query", "")
 
     log_integration_start(logger, "newsapi_ai", query=q_text)
-    import time
     time.sleep(2.5)
     session = _get_session()
 
