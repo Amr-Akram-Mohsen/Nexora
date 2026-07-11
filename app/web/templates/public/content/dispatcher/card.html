@@ -1,4 +1,4 @@
-{% set content = item %}
+{% set content = product %}
 {% if content.object_type == "article" %}
 {% include "content/cards/article.html" %}
 {% elif content.object_type == "video" %}
@@ -6,5 +6,5 @@
 {% elif content.object_type == "post" %}
 {% include "content/cards/post.html" %}
 {% else %}
-{% include "commercial/cards/item.html" %}
+{% include "commercial/cards/product.html" %}
 {% endif %}

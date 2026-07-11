@@ -1,9 +1,9 @@
 {% from "components/ui/core.html" import badge, button %}
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="name">
-  <div class="flex items-center gap-2">
+  <div class="flex products-center gap-2">
     {% if row.logo_url %}
-    <img src="{{ row.logo_url }}" alt="Logo" class="item-thumbnail-small">
+    <img src="{{ row.logo_url }}" alt="Logo" class="product-thumbnail-small">
     {% else %}
     {{ badge(icon="fa-solid fa-tower-broadcast", class="badge-secondary", variant=none) }}
     {% endif %}

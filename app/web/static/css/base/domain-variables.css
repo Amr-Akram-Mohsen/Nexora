@@ -7,7 +7,7 @@
   --domain-primary-rgb: var(--brand-green-rgb);
   --domain-secondary-rgb: var(--brand-teal-rgb);
 
-  /* Type specific mappings for item domain */
+  /* Type specific mappings for product domain */
   --type-electronics-rgb: var(--brand-blue-rgb);
   --type-perfume-rgb: var(--brand-purple-rgb);
   --type-accessories-rgb: var(--brand-green-rgb);

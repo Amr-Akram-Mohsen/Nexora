@@ -1,9 +1,9 @@
 {% from "admin/components/ui/dashboard.html" import breakdown_progress_bar %}
 {% if data %}
   {% set max_count = data | map(attribute='count') | max %}
-  {% for item in data[:10] %}
-    {% set pct = (item.count / max_count * 100)|round(1) if max_count > 0 else 0 %}
-    {{ breakdown_progress_bar(item.name, item.count, pct, "var(--brand-purple)") }}
+  {% for product in data[:10] %}
+    {% set pct = (product.count / max_count * 100)|round(1) if max_count > 0 else 0 %}
+    {{ breakdown_progress_bar(product.name, product.count, pct, "var(--brand-purple)") }}
   {% endfor %}
 {% else %}
   <div class="table-empty-state">No category coverage data available.</div>

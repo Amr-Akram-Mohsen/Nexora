@@ -9,7 +9,7 @@
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
   {{ admin_search_input("subscribers-search", "Search by email…", icon_class="admin-toolbar-search-icon") }}
   {{ admin_filter_select("subscriber-status-filter", None, [("confirmed", "Confirmed"), ("unconfirmed", "Pending"), ("unsubscribed", "Unsubscribed")], default_val="", default_text="All Statuses") }}
   {{ admin_filter_select("subscriber-user-filter", None, [("true", "Has Linked User"), ("false", "Anonymous Only")], default_val="", default_text="All Types") }}
@@ -47,7 +47,7 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar(domain ~ "-count", "Subscribers", summary_id=domain ~ "-summary") %}
-  <div class="flex items-center gap-4 text-sm text-muted">
+  <div class="flex products-center gap-4 text-sm text-muted">
     <span id="summary-confirmed-count">Confirmed: —</span>
     <span id="summary-anonymous-count">Anonymous: —</span>
   </div>

@@ -13,11 +13,11 @@ def log_integration_start(logger: logging.Logger, name: str, **kwargs) -> None:
 
 
 def log_integration_success(
-    logger: logging.Logger, name: str, items: int, **kwargs
+    logger: logging.Logger, name: str, products: int, **kwargs
 ) -> None:
     """Log a successful integration fetch."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
-    logger.debug("[INTEGRATION][%s] success  items=%d  %s", name, items, extras)
+    logger.debug("[INTEGRATION][%s] success  products=%d  %s", name, products, extras)
 
 
 def log_integration_error(
@@ -76,7 +76,7 @@ def log_item_ingested(
     published: bool = None,
     **kwargs,
 ) -> None:
-    """Log an item being stored or updated in the DB."""
+    """Log an product being stored or updated in the DB."""
     pub_str = f"  published={published}" if published is not None else ""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.info(
@@ -87,7 +87,7 @@ def log_item_ingested(
 def log_item_skipped(
     logger: logging.Logger, source: str, title: str, reason: str, **kwargs
 ) -> None:
-    """Log an item being skipped during ingestion."""
+    """Log an product being skipped during ingestion."""
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.debug(
         '[INGEST][%s] skipped  reason=%-20s  title="%s"  %s',
@@ -121,14 +121,14 @@ def log_route_success(
     logger: logging.Logger,
     route: str,
     *,
-    items: int | None = None,
+    products: int | None = None,
     template: str | None = None,
     status: int = 200,
 ) -> None:
     """Log a successful route response."""
     parts = [f"status={status}"]
-    if items is not None:
-        parts.append(f"items={items}")
+    if products is not None:
+        parts.append(f"products={products}")
     if template:
         parts.append(f'template="{template}"')
     logger.info("[ROUTE][%s] success  %s", route, "  ".join(parts))

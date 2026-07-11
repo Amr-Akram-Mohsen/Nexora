@@ -19,7 +19,7 @@ from main import app
 from app.core.extensions import db
 
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 
 from app.domains.content.service.content_access import (
     resolve_content_object
@@ -29,7 +29,7 @@ from app.domains.content.service import (
     populate_content_search_fields
 )
 
-from app.domains.item.service import (
+from app.domains.product.service import (
     populate_item_search_fields
 )
 
@@ -121,35 +121,35 @@ def backfill_contents():
 def backfill_items():
 
     print(
-        "\n--- Backfilling Item Search Fields ---"
+        "\n--- Backfilling Product Search Fields ---"
     )
 
     offset = 0
 
     while True:
 
-        items = (
-            Item.query
+        products = (
+            Product.query
             .offset(offset)
             .limit(BATCH_SIZE)
             .all()
         )
 
-        if not items:
+        if not products:
             break
 
 
-        for item in items:
+        for product in products:
 
             populate_item_search_fields(
-                item
+                product
             )
 
 
         db.session.commit()
 
         print(
-            f"Processed items: {offset + len(items)}"
+            f"Processed products: {offset + len(products)}"
         )
 
         offset += BATCH_SIZE

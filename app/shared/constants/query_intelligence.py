@@ -93,10 +93,10 @@ CATEGORY_TOPIC_MAP = {
 # ==========================================================
 
 DEFAULT_SOURCE_ALIGNMENT = {
-    "news": ["gnews", "newsapi", "newsapi_ai"],
+    "news": ["gnews", "newsapi", "event_registry"],
     "reviews": ["youtube", "rss", "reddit"],
     "tutorials": ["youtube", "rss"],
-    "trends": ["newsapi", "newsapi_ai", "reddit"],
+    "trends": ["newsapi", "event_registry", "reddit"],
     "community": ["reddit"],
 }
 
@@ -107,8 +107,8 @@ DEFAULT_SOURCE_ALIGNMENT = {
 
 CATEGORY_SOURCE_OVERRIDES = {
     "electronics": {
-        "news": ["gnews", "newsapi", "newsapi_ai", "rss"],
-        "trends": ["newsapi", "newsapi_ai", "reddit", "rss"],
+        "news": ["gnews", "newsapi", "event_registry", "rss"],
+        "trends": ["newsapi", "event_registry", "reddit", "rss"],
     },
     "perfumes": {
         "news": ["youtube", "reddit", "gnews"],
@@ -117,7 +117,7 @@ CATEGORY_SOURCE_OVERRIDES = {
         "trends": ["reddit", "youtube"],
     },
     "accessories": {
-        "news": ["rss", "newsapi", "newsapi_ai", "gnews"],
+        "news": ["rss", "newsapi", "event_registry", "gnews"],
         "reviews": ["youtube", "reddit", "rss"],
         "community": ["reddit"],
     },
@@ -144,7 +144,7 @@ INTENT_KEYWORDS = {
 }
 
 # Sources that support (OR / AND / Parentheses)
-BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "newsapi_ai", "reddit", "gnews"]
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "event_registry", "reddit", "gnews"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS
@@ -717,7 +717,7 @@ SOURCE_DIALECTS = {
             "unveiled",
         ]
     },
-    "newsapi_ai": {
+    "event_registry": {
         "news": [
             "launch",
             "announced",

@@ -7,7 +7,7 @@ async function handleAffiliateClick(li) {
     const linkId = li.dataset.linkId;
 
     try {
-        const res = await fetch(`/item-click/${linkId}`, {
+        const res = await fetch(`/product-click/${linkId}`, {
             method: "POST",
             headers: { "X-Requested-With": "XMLHttpRequest" }
         });
@@ -28,7 +28,7 @@ async function handleAffiliateClick(li) {
 }
 
 function handleAffiliateClickEvent(e) {
-    const itemBuyBtn = e.target.closest(".item-buy-link");
+    const itemBuyBtn = e.target.closest(".product-buy-link");
     if (!itemBuyBtn) return false;
     e.preventDefault();
     handleAffiliateClick(itemBuyBtn);

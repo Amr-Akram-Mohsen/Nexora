@@ -59,7 +59,7 @@ inspect_variant_summary_table, inspect_image_strip, inspect_specifications_panel
 
       {% call inspect_section('Management Actions', divider=false) %}
       <div class="flex flex-wrap gap-2">
-      {{ button(text="Delete Product", type="button", variant="danger", icon="fas fa-trash", class="user-action-delete", attrs={"data-action": "delete-item", "data-id": inspect_id, "data-name": item_name}) }}
+      {{ button(text="Delete Product", type="button", variant="danger", icon="fas fa-trash", class="user-action-delete", attrs={"data-action": "delete-product", "data-id": inspect_id, "data-name": item_name}) }}
       </div>
       {% endcall %}
 

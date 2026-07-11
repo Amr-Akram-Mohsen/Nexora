@@ -3,9 +3,9 @@ async function initAllSaves() {
     const targets = [];
 
     buttons.forEach(btn => {
-        const item = btn.closest("[data-id]");
-        if (!item) return;
-        targets.push({ 'type': item.dataset.type, 'id': item.dataset.id });
+        const product = btn.closest("[data-id]");
+        if (!product) return;
+        targets.push({ 'type': product.dataset.type, 'id': product.dataset.id });
     });
 
     // Deduplicate targets
@@ -34,9 +34,9 @@ async function initAllSaves() {
         const data = await res.json();
 
         buttons.forEach(btn => {
-            const item = btn.closest("[data-id]");
-            if (!item) return;
-            const key = `${item.dataset.type}:${item.dataset.id}`;
+            const product = btn.closest("[data-id]");
+            if (!product) return;
+            const key = `${product.dataset.type}:${product.dataset.id}`;
 
             btn.classList.toggle('active', key in data);
         });
@@ -45,7 +45,7 @@ async function initAllSaves() {
     }
 }
 
-// Global state for saved items page
+// Global state for saved products page
 let currentSavedView = 'all';
 
 function updateSavedHeaderCount() {
@@ -59,13 +59,13 @@ function updateSavedHeaderCount() {
     const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card').length;
 
     totalCountEl.textContent = numProducts + numArticles;
-    if (totalCountLabel) totalCountLabel.textContent = (numProducts + numArticles) === 1 ? 'item' : 'items';
+    if (totalCountLabel) totalCountLabel.textContent = (numProducts + numArticles) === 1 ? 'product' : 'products';
 }
 
 function setSavedActiveFilter(activeId) {
-    const filters = document.querySelectorAll('.filter-item');
+    const filters = document.querySelectorAll('.filter-product');
     filters.forEach(el => el.classList.remove('is-active'));
-    const activeEl = document.getElementById(activeId) || document.querySelector(`a[href="${activeId}"]`)?.closest('.filter-item');
+    const activeEl = document.getElementById(activeId) || document.querySelector(`a[href="${activeId}"]`)?.closest('.filter-product');
     if (activeEl) activeEl.classList.add('is-active');
 }
 
@@ -95,7 +95,7 @@ function handleSavedItemsFilterClick(e) {
     const filterLink = e.target.closest('.filter-item__link');
     if (!filterLink || !filterLink.closest('.filter-sidebar')) return false;
     
-    const filterItem = filterLink.closest('.filter-item');
+    const filterItem = filterLink.closest('.filter-product');
     if (!filterItem) return false;
 
     const href = filterLink.getAttribute('href');
@@ -117,7 +117,7 @@ function handleSavedItemsFilterClick(e) {
 
 function initSavedItemsPage() {
     const collectionsContainer = document.querySelector('.saved-collections');
-    if (!collectionsContainer) return; // Not on the saved items page
+    if (!collectionsContainer) return; // Not on the saved products page
     
     // Check hash on load
     const hash = window.location.hash;
@@ -156,7 +156,7 @@ function initMoveToCollection() {
     const collectionsContainer = document.querySelector('.saved-collections');
     if (!collectionsContainer) return;
     
-    const collectionElements = document.querySelectorAll('.filter-item:not(#filter-all) .filter-item__link span:first-child');
+    const collectionElements = document.querySelectorAll('.filter-product:not(#filter-all) .filter-item__link span:first-child');
     const collections = Array.from(collectionElements).map(el => el.textContent.trim());
     
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="csrf_token"]')?.value;
@@ -183,15 +183,15 @@ function initMoveToCollection() {
         
         const selectHtml = `
             <div class="move-collection-wrapper">
-                <select class="move-item-select" aria-label="Move to collection">
+                <select class="move-product-select" aria-label="Move to collection">
                     ${optionsHtml}
                 </select>
-                <i class="fas fa-chevron-down move-item-select-icon"></i>
+                <i class="fas fa-chevron-down move-product-select-icon"></i>
             </div>
         `;
         actions.insertAdjacentHTML('afterbegin', selectHtml);
         
-        actions.querySelector('.move-item-select').addEventListener('change', async (e) => {
+        actions.querySelector('.move-product-select').addEventListener('change', async (e) => {
             const newCollection = e.target.value;
             if (!newCollection) return;
             
@@ -213,14 +213,14 @@ function initMoveToCollection() {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     if (typeof showToast === 'function') {
-                        showToast('Item moved successfully', 'success');
+                        showToast('Product moved successfully', 'success');
                     }
                     setTimeout(() => window.location.reload(), 800);
                 } else {
                     if (typeof showToast === 'function') {
-                        showToast(data.error || 'Failed to move item.', 'error');
+                        showToast(data.error || 'Failed to move product.', 'error');
                     } else {
-                        alert(data.error || 'Failed to move item.');
+                        alert(data.error || 'Failed to move product.');
                     }
                     e.target.value = ""; // Reset
                 }

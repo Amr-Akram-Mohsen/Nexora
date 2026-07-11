@@ -4,7 +4,7 @@ from sqlalchemy import select
 def get_model_registry():
     """Returns a map of entity_type strings to their corresponding SQLAlchemy models."""
     from app.domains.content.models import Article, Video, Post, Content
-    from app.domains.item.models import Item
+    from app.domains.product.models import Product
     from app.domains.user.models import User
     from app.domains.interaction.models import Comment
     
@@ -13,12 +13,12 @@ def get_model_registry():
         "video": Video,
         "post": Post,
         "content": Content,
-        "item": Item,
+        "product": Product,
         "user": User,
         "comment": Comment,
     }
 
-def resolve_polymorphic_targets(items, type_attr="target_type", id_attr="target_id", session=None):
+def resolve_polymorphic_targets(products, type_attr="target_type", id_attr="target_id", session=None):
     """
     Batch loads polymorphic target objects.
     Returns a dictionary mapping (type, id) -> ORM object.
@@ -27,9 +27,9 @@ def resolve_polymorphic_targets(items, type_attr="target_type", id_attr="target_
         session = db.session
 
     ids_by_type = {}
-    for item in items:
-        obj_type = getattr(item, type_attr, None)
-        obj_id = getattr(item, id_attr, None)
+    for product in products:
+        obj_type = getattr(product, type_attr, None)
+        obj_id = getattr(product, id_attr, None)
         if obj_type and obj_id:
             ids_by_type.setdefault(obj_type, set()).add(obj_id)
 
@@ -56,7 +56,7 @@ def resolve_polymorphic_targets(items, type_attr="target_type", id_attr="target_
 
     return targets_map
 
-def resolve_polymorphic_titles(items, type_attr="target_type", id_attr="target_id", session=None):
+def resolve_polymorphic_titles(products, type_attr="target_type", id_attr="target_id", session=None):
     """
     Batch loads title/name representation of polymorphic targets.
     Returns a dictionary mapping (type, id) -> String.
@@ -65,10 +65,10 @@ def resolve_polymorphic_titles(items, type_attr="target_type", id_attr="target_i
         session = db.session
 
     ids_by_type = {}
-    for item in items:
+    for product in products:
         # Handling for dictionaries as well as objects
-        obj_type = item.get(type_attr) if isinstance(item, dict) else getattr(item, type_attr, None)
-        obj_id = item.get(id_attr) if isinstance(item, dict) else getattr(item, id_attr, None)
+        obj_type = product.get(type_attr) if isinstance(product, dict) else getattr(product, type_attr, None)
+        obj_id = product.get(id_attr) if isinstance(product, dict) else getattr(product, id_attr, None)
         if obj_type and obj_id:
             ids_by_type.setdefault(obj_type, set()).add(obj_id)
 
@@ -101,7 +101,7 @@ def resolve_polymorphic_titles(items, type_attr="target_type", id_attr="target_i
 
     return titles_map
 
-def resolve_users(items, user_id_attr="user_id", session=None):
+def resolve_users(products, user_id_attr="user_id", session=None):
     """
     Batch loads basic user information.
     Returns a dictionary mapping user_id -> dict of user data.
@@ -111,8 +111,8 @@ def resolve_users(items, user_id_attr="user_id", session=None):
         session = db.session
         
     user_ids = set()
-    for item in items:
-        uid = item.get(user_id_attr) if isinstance(item, dict) else getattr(item, user_id_attr, None)
+    for product in products:
+        uid = product.get(user_id_attr) if isinstance(product, dict) else getattr(product, user_id_attr, None)
         if uid:
             user_ids.add(uid)
             

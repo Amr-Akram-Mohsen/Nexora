@@ -28,8 +28,8 @@
 
   <h1 class="article-header__title">{{ article.title }}</h1>
 
-  <div class="article-header__meta flex flex-wrap items-center gap-4">
-    <div class="meta-pill gap-2 flex items-center">
+  <div class="article-header__meta flex flex-wrap products-center gap-4">
+    <div class="meta-pill gap-2 flex products-center">
       <i class="far fa-newspaper"></i>
       <span class="meta-pill__text">{{ article.source_name }}</span>
     </div>
@@ -47,25 +47,25 @@
     {% endif %}
 
     {% if author_name %}
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill gap-2 flex products-center">
       <i class="far fa-user"></i>
       <span class="meta-pill__text">{{ author_name }}</span>
     </div>
     {% endif %}
     {% endif %}
 
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill gap-2 flex products-center">
       <i class="far fa-clock"></i>
       <span class="meta-pill__text">{{ article.read_time_minutes }} min read</span>
     </div>
 
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill gap-2 flex products-center">
       <i class="far fa-calendar"></i>
       <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
     </div>
 
     {% if article.is_content_scraped %}
-    <div class="meta-pill meta-pill--success gap-2 flex items-center" title="Full Article Extracted">
+    <div class="meta-pill meta-pill--success gap-2 flex products-center" title="Full Article Extracted">
       <i class="fas fa-check-circle"></i>
       <span class="meta-pill__text">Verified Content</span>
     </div>
@@ -137,7 +137,7 @@
   <div class="article-videos-count">{{ article.videos | length }} videos</div>
   {% endif %}
 
-  <div class="article-cta-box flex items-center justify-between">
+  <div class="article-cta-box flex products-center justify-between">
     <div class="cta-content">
       <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
       <h4 class="cta-title">Want to read more?</h4>

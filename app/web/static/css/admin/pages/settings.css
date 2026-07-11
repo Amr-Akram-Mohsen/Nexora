@@ -301,12 +301,12 @@
 
   .settings-danger-row {
     flex-direction: column;
-    align-items: flex-start;
+    align-products: flex-start;
   }
 }
 
 /* --- Utilities (Migrated) --- */
 
 .settings-card-header {
-    align-items: flex-start;
+    align-products: flex-start;
 }

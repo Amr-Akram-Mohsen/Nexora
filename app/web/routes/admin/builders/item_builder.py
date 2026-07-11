@@ -2,7 +2,7 @@ from app.web.routes.admin.tables import get_inspect_table
 
 
 def build_item_inspect_view_model(aggregated_data: dict) -> dict:
-    """Takes aggregated item workflow data and formats it for the UI."""
+    """Takes aggregated product workflow data and formats it for the UI."""
     dto = aggregated_data["item_dto"]
     engagement_score = aggregated_data["engagement_score"]
     
@@ -40,7 +40,7 @@ def build_item_inspect_view_model(aggregated_data: dict) -> dict:
         "specs count": dto["specs_count"],
     }
     
-    inspect_table = get_inspect_table("items", data_for_table)
+    inspect_table = get_inspect_table("products", data_for_table)
 
     recent_comments = dto.get("comments", [])
     if recent_comments:

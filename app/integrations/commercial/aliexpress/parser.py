@@ -4,7 +4,7 @@ AliExpressParser — converts raw AliExpress HTML into a ParsedProduct.
 Input format (one element of the batch JSON):
     {
         "store":               "aliexpress",
-        "product_url":         "https://www.aliexpress.com/item/1005010507405338.html",
+        "product_url":         "https://www.aliexpress.com/product/1005010507405338.html",
         "affiliate_url":       "https://...",
         "product_info_html":   "<div class='pdp-info'>...</div>",
         "specifications_html": "<ul class='specification--list...'>...</ul>"
@@ -40,8 +40,8 @@ SOURCE_SLUG = "aliexpress"
 _PRICE_WITH_CUR_RE = re.compile(r"([A-Z]{2,3})\s*([\d,]+\.?\d*)")
 # Matches a bare number "941.13" or "1,000"
 _BARE_NUM_RE = re.compile(r"([\d,]+\.?\d*)")
-# Extracts AliExpress item ID from URL
-_ITEM_ID_RE = re.compile(r"/item/(\d+)\.html")
+# Extracts AliExpress product ID from URL
+_ITEM_ID_RE = re.compile(r"/product/(\d+)\.html")
 
 
 class AliExpressParser(BaseParser):
@@ -104,13 +104,13 @@ class AliExpressParser(BaseParser):
         images = self._parse_images(info)
         variants = self._parse_variants(info, price, old_price, currency)
         specs, brand_name, category_name = self._parse_specifications(spec)
-        external_item_id = self._extract_item_id(product_url, info)
+        external_product_id = self._extract_product_id(product_url, info)
 
         store_link = ParsedStoreLink(
             store_slug=SOURCE_SLUG,
             affiliate_url=affiliate_url,
             original_url=product_url,
-            external_item_id=external_item_id,
+            external_product_id=external_product_id,
             price=price,
             old_price=old_price,
             currency=currency,
@@ -122,7 +122,7 @@ class AliExpressParser(BaseParser):
             description=None,
             brand_name=brand_name,
             category_name=category_name,
-            item_type=None,
+            product_type=None,
             source_type=SOURCE_SLUG,
             rating=rating,
             review_count=review_count,
@@ -222,10 +222,10 @@ class AliExpressParser(BaseParser):
         seen: set[str] = set()
         images: list[ParsedImage] = []
 
-        for item in soup.find_all(class_=re.compile(r"slider--item")):
-            if item.find(class_=re.compile(r"videoIcon|video--")):
+        for product in soup.find_all(class_=re.compile(r"slider--product")):
+            if product.find(class_=re.compile(r"videoIcon|video--")):
                 continue
-            img_wrap = item.find(class_=re.compile(r"slider--img"))
+            img_wrap = product.find(class_=re.compile(r"slider--img"))
             if not img_wrap:
                 continue
             img = img_wrap.find("img")
@@ -268,8 +268,8 @@ class AliExpressParser(BaseParser):
 
         variants: list[ParsedVariant] = []
 
-        for item_wrap in sku_wrap.find_all(class_=re.compile(r"sku-item--wrap")):
-            title_tag = item_wrap.find(class_=re.compile(r"sku-item--title"))
+        for item_wrap in sku_wrap.find_all(class_=re.compile(r"sku-product--wrap")):
+            title_tag = item_wrap.find(class_=re.compile(r"sku-product--title"))
             dimension_text = sanitize_text(title_tag.get_text()) if title_tag else ""
             # "Color: Black" → dim_key = "color"
             dim_key = (
@@ -291,7 +291,7 @@ class AliExpressParser(BaseParser):
                     else None
                 )
                 is_selected = bool(
-                    re.search(r"sku-item--selected", " ".join(sku_item.get("class", [])))
+                    re.search(r"sku-product--selected", " ".join(sku_item.get("class", [])))
                 )
                 variants.append(
                     ParsedVariant(
@@ -363,8 +363,8 @@ class AliExpressParser(BaseParser):
 
         return specs, brand_name, category_name
 
-    def _extract_item_id(self, url: str, soup: BeautifulSoup) -> Optional[str]:
-        """Extract AliExpress item ID from URL, falling back to HTML data attrs."""
+    def _extract_product_id(self, url: str, soup: BeautifulSoup) -> Optional[str]:
+        """Extract AliExpress product ID from URL, falling back to HTML data attrs."""
         m = _ITEM_ID_RE.search(url)
         if m:
             return m.group(1)

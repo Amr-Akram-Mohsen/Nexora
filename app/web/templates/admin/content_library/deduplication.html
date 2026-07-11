@@ -16,35 +16,35 @@
     {% for group in duplicate_groups %}
     <div class="overview-panel bg-card border border-border radius-md dup-group-panel"
          id="dup-group-{{ loop.index }}">
-      <div class="dup-group-header flex justify-between items-center">
+      <div class="dup-group-header flex justify-between products-center">
         <div>
           <h3 class="dup-group-title">{{ group.title }}</h3>
           <p class="dup-group-meta">{{ group.count }} identical titles found</p>
         </div>
         {% from "components/ui/core.html" import button, badge %}
-        {{ button(class="user-action-btn user-action-delete", attrs={"data-action": "keep-oldest", "data-group": loop.index, "data-items": group.content_list|tojson|e}, icon="fas fa-trash-alt", text="Keep Oldest Only", unstyled=True) }}
+        {{ button(class="user-action-btn user-action-delete", attrs={"data-action": "keep-oldest", "data-group": loop.index, "data-products": group.content_list|tojson|e}, icon="fas fa-trash-alt", text="Keep Oldest Only", unstyled=True) }}
       </div>
       <div class="dup-group-body">
-        {% for item in group.content_list %}
-        <div class="dup-item-card" id="dup-item-{{ item.id }}" data-id="{{ item.id }}">
-          <div class="flex justify-between items-center">
-            {{ badge(text=item.type, class="badge badge-type badge-compact") }}
-            <span class="dup-item-meta">ID: {{ item.id }}</span>
+        {% for product in group.content_list %}
+        <div class="dup-product-card" id="dup-product-{{ product.id }}" data-id="{{ product.id }}">
+          <div class="flex justify-between products-center">
+            {{ badge(text=product.type, class="badge badge-type badge-compact") }}
+            <span class="dup-product-meta">ID: {{ product.id }}</span>
           </div>
-          <div class="dup-item-meta">
+          <div class="dup-product-meta">
             <i class="fas fa-building fa-fw"></i>
-            {{ item.source }}
+            {{ product.source }}
           </div>
-          <div class="dup-item-meta">
+          <div class="dup-product-meta">
             <i class="fas fa-calendar fa-fw"></i>
-            {{ item.published_at[:10] if item.published_at else 'Unknown' }}
+            {{ product.published_at[:10] if product.published_at else 'Unknown' }}
           </div>
-          <div class="dup-item-actions">
-            <a href="/admin/contents/{{ item.id }}" target="_blank"
-               class="user-action-btn flex items-center justify-center gap-1">
+          <div class="dup-product-actions">
+            <a href="/admin/contents/{{ product.id }}" target="_blank"
+               class="user-action-btn flex products-center justify-center gap-1">
               <i class="fas fa-eye"></i> Inspect
             </a>
-            {{ button(class="user-action-btn user-action-delete justify-center gap-1", attrs={"data-action": "delete-dup", "data-id": item.id}, icon="fas fa-trash", text="Delete", unstyled=True) }}
+            {{ button(class="user-action-btn user-action-delete justify-center gap-1", attrs={"data-action": "delete-dup", "data-id": product.id}, icon="fas fa-trash", text="Delete", unstyled=True) }}
           </div>
         </div>
         {% endfor %}
@@ -56,7 +56,7 @@
     <div class="dup-empty-state">
       <i class="fas fa-check-circle dup-empty-icon"></i>
       <h3 class="dup-empty-title">No Duplicates Found</h3>
-      <p class="dup-empty-sub">Your content library is clean. No items share identical titles.</p>
+      <p class="dup-empty-sub">Your content library is clean. No products share identical titles.</p>
     </div>
   </div>
   {% endif %}

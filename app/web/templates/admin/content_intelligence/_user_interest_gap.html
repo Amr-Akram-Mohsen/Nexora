@@ -1,18 +1,18 @@
 {% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
   {% call standard_table(["Entity Name", "Type", "Interest Rank", "Volume Rank", "Gap Score", "Content Volume"]) %}
-      {% for item in data %}
+      {% for product in data %}
       <tr>
-        <td><strong>{{ item.name }}</strong></td>
-        <td><span class="status-badge {% if item.type == 'category' %}badge-blue{% else %}badge-purple{% endif %}">{{ item.type | title }}</span></td>
-        <td>#{{ item.interest_rank }}</td>
-        <td>#{{ item.volume_rank }}</td>
+        <td><strong>{{ product.name }}</strong></td>
+        <td><span class="status-badge {% if product.type == 'category' %}badge-blue{% else %}badge-purple{% endif %}">{{ product.type | title }}</span></td>
+        <td>#{{ product.interest_rank }}</td>
+        <td>#{{ product.volume_rank }}</td>
         <td>
-          <span class="status-badge {% if item.gap_score > 5 %}badge-danger{% elif item.gap_score > 0 %}badge-warning{% else %}badge-success{% endif %}">
-            {% if item.gap_score > 0 %}+{% endif %}{{ item.gap_score }}
+          <span class="status-badge {% if product.gap_score > 5 %}badge-danger{% elif product.gap_score > 0 %}badge-warning{% else %}badge-success{% endif %}">
+            {% if product.gap_score > 0 %}+{% endif %}{{ product.gap_score }}
           </span>
         </td>
-        <td>{{ "{:,}".format(item.content_count) }}</td>
+        <td>{{ "{:,}".format(product.content_count) }}</td>
       </tr>
       {% else %}
       <tr>

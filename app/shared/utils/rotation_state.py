@@ -41,32 +41,32 @@ class RotationState:
         with open(self.file_path, "w", encoding="utf-8") as f:
             json.dump(self.state, f, indent=2)
 
-    def get_next(self, key: str, items: list):
+    def get_next(self, key: str, products: list):
         """
-        Returns the next item from the list in a round-robin fashion.
+        Returns the next product from the list in a round-robin fashion.
         """
-        if not items:
+        if not products:
             return None
 
         current_idx = self.state.get(key, 0)
 
         # Ensure index is within bounds
-        if current_idx >= len(items):
+        if current_idx >= len(products):
             current_idx = 0
 
-        selected_item = items[current_idx]
+        selected_item = products[current_idx]
 
         # Advance index for next time
-        self.state[key] = (current_idx + 1) % len(items)
+        self.state[key] = (current_idx + 1) % len(products)
         self._save()
 
         return selected_item
 
-    def peek(self, key: str, items: list):
-        """Returns the current item without advancing."""
-        if not items:
+    def peek(self, key: str, products: list):
+        """Returns the current product without advancing."""
+        if not products:
             return None
         current_idx = self.state.get(key, 0)
-        if current_idx >= len(items):
+        if current_idx >= len(products):
             current_idx = 0
-        return items[current_idx]
+        return products[current_idx]

@@ -6,11 +6,11 @@
 {% else %}
   <div class="admin-table-wrapper insights-table-scroll">
     {% call standard_table(["Content", "Suggested Tag", "Action"]) %}
-        {% for item in data %}
+        {% for product in data %}
         <tr>
-          <td>{{ item.content_title }}</td>
-          <td>{{ badge(item.type ~ ": " ~ item.suggested_name, "blue") }}</td>
-          <td>{{ button(text="Apply", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "apply-insight", "data-id": item.content_id, "data-insight-type": item.type, "data-suggested-id": item.suggested_id}, variant=none) }}</td>
+          <td>{{ product.content_title }}</td>
+          <td>{{ badge(product.type ~ ": " ~ product.suggested_name, "blue") }}</td>
+          <td>{{ button(text="Apply", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "apply-insight", "data-id": product.content_id, "data-insight-type": product.type, "data-suggested-id": product.suggested_id}, variant=none) }}</td>
         </tr>
         {% endfor %}
     {% endcall %}

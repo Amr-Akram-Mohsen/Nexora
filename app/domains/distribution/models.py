@@ -18,8 +18,8 @@ class DistributionPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     platform_id = db.Column(db.Integer, db.ForeignKey("distribution_platforms.id", ondelete="CASCADE"), nullable=False)
     
-    # Generic target to point to a Nexora Asset (Content or Item)
-    source_target_type = db.Column(db.String(50), nullable=False) # 'content' or 'item'
+    # Generic target to point to a Nexora Asset (Content or Product)
+    source_target_type = db.Column(db.String(50), nullable=False) # 'content' or 'product'
     source_target_id = db.Column(db.Integer, nullable=False)
     
     status = db.Column(db.String(20), default="draft", index=True) # "draft", "scheduled", "published"
@@ -47,8 +47,8 @@ class DistributionPost(db.Model):
         lazy="selectin"
     )
     item_target = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(DistributionPost.source_target_id) == Item.id, DistributionPost.source_target_type == 'item')",
+        "Product",
+        primaryjoin="and_(foreign(DistributionPost.source_target_id) == Product.id, DistributionPost.source_target_type == 'product')",
         viewonly=True,
         lazy="selectin"
     )
@@ -59,7 +59,7 @@ class DistributionPost(db.Model):
 
     __table_args__ = (
         db.Index("ix_distribution_post_target", "source_target_type", "source_target_id"),
-        db.CheckConstraint("source_target_type IN ('content', 'item')", name="ck_distribution_post_target_type"),
+        db.CheckConstraint("source_target_type IN ('content', 'product')", name="ck_distribution_post_target_type"),
     )
 
     def __repr__(self):

@@ -34,13 +34,10 @@ Category Re-assignment
     CATEGORY_CONFIDENCE_THRESHOLD points to trigger re-assignment.
 
 Topic Enrichment
-  - Each topic has an associated keyword list (TOPIC_KEYWORD_MAP).
-  - Matches accumulate a score; topics above TOPIC_MIN_SCORE are added.
+  - Removed
 
 Brand Enrichment
-  - Runs the existing detect_brands() logic against all taxonomy brands.
-  - Already applied in the classification step; here we extend with
-    source-category-driven brand hints.
+  - Removed
 
 Attribute Enrichment
   - Extends facets["attributes"] using the existing facet_detector logic,
@@ -72,9 +69,6 @@ _NAME = "taxonomy_enrichment"
 # A candidate category must exceed the discovery-assigned score by at least
 # this many points before we override the assignment.
 CATEGORY_CONFIDENCE_THRESHOLD = 4
-
-# Minimum cumulative score for a topic to be included.
-TOPIC_MIN_SCORE = 2
 
 # Minimum cumulative score for an attribute to be appended.
 ATTRIBUTE_MIN_SCORE = 1
@@ -155,42 +149,6 @@ CATEGORY_DISAMBIGUATION_KEYWORDS: dict[str, list[str]] = {
     "jewelry": [
         "jewelry", "jewellery", "necklace", "bracelet", "ring", "earring",
         "fine jewelry", "gold jewelry",
-    ],
-}
-
-# Maps topic slug → signal keywords
-TOPIC_KEYWORD_MAP: dict[str, list[str]] = {
-    "gaming": [
-        "gaming", "game", "fps", "battle royale", "esport",
-        "refresh rate", "gpu", "gaming laptop", "gaming phone",
-    ],
-    "photography": [
-        "photography", "photo", "camera", "lens", "mirrorless",
-        "dslr", "lightroom", "aperture", "shutter speed",
-    ],
-    "fitness": [
-        "fitness", "workout", "health tracking", "gym", "sport",
-        "running", "heart rate", "calories", "step count",
-    ],
-    "home-office": [
-        "home office", "work from home", "remote work", "desk setup",
-        "productivity", "monitor", "ergonomic",
-    ],
-    "travel-gear": [
-        "travel", "carry-on", "airport", "backpacking", "luggage",
-        "adventure", "outdoor",
-    ],
-    "luxury": [
-        "luxury", "high-end", "premium brand", "investment piece",
-        "haute", "exclusive", "limited edition",
-    ],
-    "fashion": [
-        "fashion", "style", "outfit", "trendy", "aesthetic",
-        "streetwear", "minimalist", "wardrobe",
-    ],
-    "productivity": [
-        "productivity", "workflow", "task management", "focus",
-        "gtd", "efficiency", "app",
     ],
 }
 
@@ -352,7 +310,7 @@ def _score_category_against_signals(
 # ---------------------------------------------------------------------------
 
 
-def enrich_taxonomy(item: EnrichedItemDTO | dict) -> EnrichedItemDTO:
+def enrich_taxonomy(product: EnrichedItemDTO | dict) -> EnrichedItemDTO:
     """
     Taxonomy Enrichment step.
 
@@ -366,26 +324,24 @@ def enrich_taxonomy(item: EnrichedItemDTO | dict) -> EnrichedItemDTO:
 
     Parameters
     ----------
-    item:
-        The normalized+classified content item.
+    product:
+        The normalized+classified content product.
 
     Returns
     -------
     EnrichedItemDTO
         A new DTO with potentially updated:
         * ``category_slug``
-        * ``topic_slugs``
-        * ``brand_slugs``
         * ``facets``  (intent, gender, attributes)
     """
-    data: dict = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+    data: dict = product.model_dump() if hasattr(product, "model_dump") else dict(product)
 
     title_raw: str = data.get("title") or ""
     description_raw: str = data.get("description") or ""
     title = _text_lower(title_raw)
     description = _text_lower(description_raw)
 
-    # --- Source metadata from the raw item (may be None) ---
+    # --- Source metadata from the raw product (may be None) ---
     source_tags: list[str] = data.get("source_tags") or []
     source_categories: list[str] = data.get("source_categories") or []
 
@@ -417,17 +373,7 @@ def enrich_taxonomy(item: EnrichedItemDTO | dict) -> EnrichedItemDTO:
         )
         data["category_slug"] = enriched_category
 
-    # ── 2. Topic Enrichment ───────────────────────────────────────────────
-    existing_topics: list[str] = list(data.get("topic_slugs") or [])
-    enriched_topics = _enrich_topics(title, description, existing=existing_topics)
-    data["topic_slugs"] = enriched_topics
-
-    # ── 3. Brand Enrichment ───────────────────────────────────────────────
-    existing_brands: list[str] = list(data.get("brand_slugs") or [])
-    enriched_brands = _enrich_brands(title, description, existing=existing_brands)
-    data["brand_slugs"] = enriched_brands
-
-    # ── 4. Attribute / Facet Enrichment ──────────────────────────────────
+    # ── 2. Attribute / Facet Enrichment ──────────────────────────────────
     facets: dict = dict(data.get("facets") or {})
     facets = _enrich_facets(
         facets=facets,
@@ -438,11 +384,9 @@ def enrich_taxonomy(item: EnrichedItemDTO | dict) -> EnrichedItemDTO:
     data["facets"] = facets
 
     logger.debug(
-        "[%s] done  category=%s  topics=%d  brands=%d  attributes=%d",
+        "[%s] done  category=%s  attributes=%d",
         _NAME,
         data["category_slug"],
-        len(data["topic_slugs"]),
-        len(data["brand_slugs"]),
         len(data["facets"].get("attributes", [])),
     )
 
@@ -504,71 +448,6 @@ def _enrich_category(
             return discovery_category
 
     return best_slug
-
-
-# ---------------------------------------------------------------------------
-# Topic enrichment
-# ---------------------------------------------------------------------------
-
-
-def _enrich_topics(
-    title: str,
-    description: str,
-    existing: list[str],
-) -> list[str]:
-    """
-    Add topics whose keyword score meets TOPIC_MIN_SCORE.
-    Existing topics from the discovery step are always preserved.
-    Returns a deduplicated, order-stable list.
-    """
-    seen: set[str] = set(existing)
-    result: list[str] = list(existing)
-
-    text = f"{title} {description}"
-
-    for topic_slug, keywords in TOPIC_KEYWORD_MAP.items():
-        if topic_slug in seen:
-            continue
-        score = _keyword_score(text, keywords)
-        if score >= TOPIC_MIN_SCORE:
-            result.append(topic_slug)
-            seen.add(topic_slug)
-            logger.debug(
-                "[%s] topic_added  slug=%s  score=%d", _NAME, topic_slug, score
-            )
-
-    return result
-
-
-# ---------------------------------------------------------------------------
-# Brand enrichment
-# ---------------------------------------------------------------------------
-
-
-def _enrich_brands(
-    title: str,
-    description: str,
-    existing: list[str],
-) -> list[str]:
-    """
-    Re-run brand detection against the full TAXONOMY brand list and
-    merge with the existing discovery-assigned brands.
-    Uses word-boundary matching (same strategy as detect_brands()).
-    """
-    from .brand_detector import detect_brands
-
-    text = f"{title} {description}"
-    detected = detect_brands(text, TAXONOMY.get("brands", []))
-
-    seen: set[str] = set(b.lower() for b in existing)
-    result: list[str] = list(existing)
-
-    for brand in detected:
-        if brand.lower() not in seen:
-            result.append(brand)
-            seen.add(brand.lower())
-
-    return result
 
 
 # ---------------------------------------------------------------------------

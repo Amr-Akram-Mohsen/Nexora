@@ -37,7 +37,7 @@
   letter-spacing: -0.02em;
   text-transform: capitalize;
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   gap: 0.75rem;
 }
 
@@ -72,7 +72,7 @@
   display: grid;
   gap: var(--card-gap, 1.5rem);
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  align-items: start;
+  align-products: start;
 }
 
 .contents-listing .grid-auto {
@@ -130,7 +130,7 @@
   /* Hide default scrollbars on Chrome/Safari for scrollbarless organic touch */
 }
 
-.grid-item-hidden {
+.grid-product-hidden {
   display: none !important;
 }
 

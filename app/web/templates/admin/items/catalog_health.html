@@ -5,7 +5,7 @@
 
 {% block admin_content %}
 
-{{ admin_page_header("Catalog Health Dashboard", "System-wide item completeness and operational integrity") }}
+{{ admin_page_header("Catalog Health Dashboard", "System-wide product completeness and operational integrity") }}
 
 <div class="summary-cards flex gap-4">
   <div class="summary-card flex-col gap-2">
@@ -13,7 +13,7 @@
     <div class="summary-value">
       {{ data.completeness_score }}%
     </div>
-    <div class="summary-meta">System-wide average item completeness based on images, links, and pricing.</div>
+    <div class="summary-meta">System-wide average product completeness based on images, links, and pricing.</div>
   </div>
   <div class="summary-card flex-col gap-2">
     <div class="summary-title">Total Items Managed</div>

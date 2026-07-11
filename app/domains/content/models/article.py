@@ -17,21 +17,27 @@ class Article(db.Model):
     word_count = db.Column(db.Integer)
 
     quality_score = db.Column(db.Float, default=0.0)
-    is_content_scraped = db.Column(db.Boolean, default=False)
     
-    ingestion_method = db.Column(db.String(50)) # 'diffbot', 'newsapi', 'scraper'
+    ingestion_method = db.Column(db.String(50)) # 'diffbot', 'event_registry', 'scraper'
     language = db.Column(db.String(10), index=True)
     sentiment_score = db.Column(db.Float, index=True)
     
     authors = db.Column(db.JSON)
-    extended_metadata = db.Column(db.JSON)
+    extended_metadata = db.Column(
+        db.JSON,
+        comment=(
+            "Raw provider-specific payload for debugging/auditing only. "
+            "Do NOT use for routing or queries. "
+            "Structured data (entities, categories, events) belongs in proper relational tables."
+        )
+    )
     images = db.Column(db.JSON) # Formerly extracted_images
     videos = db.Column(db.JSON)
 
     # Staged ingestion fields
     status = db.Column(
-        db.String(20), default="pending", index=True
-    )  # pending, enriching, complete, failed
+        db.String(20), default="discovered", index=True
+    )  # discovered, enriching, ready, published, failed, archived
     last_enrichment_attempt = db.Column(db.DateTime)
 
     image_url = db.Column(db.Text)
@@ -143,33 +149,12 @@ class Article(db.Model):
             else None
         )
 
-    @property
-    def formatted_paragraphs(self):
-        if not self.content_text:
-            return []
-        
-        # If the text naturally has newlines, use them
-        if '\n' in self.content_text:
-            return [p.strip() for p in self.content_text.split('\n') if p.strip()]
-        
-        # If no newlines exist (e.g. NewsAPI AI), split artificially by sentences
-        import re
-        # Split by punctuation followed by space and a capital letter
-        sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9])', self.content_text)
-        
-        chunks = []
-        current_chunk = []
-        for s in sentences:
-            current_chunk.append(s)
-            # Group 4 sentences per paragraph
-            if len(current_chunk) >= 4:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-            
-        return chunks
+    __table_args__ = (
+        db.CheckConstraint(
+            "status IN ('discovered', 'enriching', 'ready', 'published', 'failed', 'archived')",
+            name="ck_articles_status_valid"
+        ),
+    )
 
     def __repr__(self):
         return f"<Article {self.id} '{self.title[:30]}'>"

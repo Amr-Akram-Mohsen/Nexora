@@ -5,14 +5,14 @@ class Reaction(db.Model):
     __tablename__ = "reactions"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item' or 'comment'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'product' or 'comment'
     target_id = db.Column(db.Integer, nullable=False)
     type = db.Column(db.String(20), nullable=False)         # 'like', 'dislike', etc.
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     @property
     def target(self):
-        return self.content or self.item or self.comment
+        return self.content or self.product or self.comment
     
     user = db.relationship("User", back_populates="reactions")
     
@@ -23,9 +23,9 @@ class Reaction(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    item = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(Reaction.target_id) == Item.id, Reaction.target_type == 'item')",
+    product = db.relationship(
+        "Product",
+        primaryjoin="and_(foreign(Reaction.target_id) == Product.id, Reaction.target_type == 'product')",
         back_populates="reactions",
         viewonly=True,
         lazy="selectin"
@@ -42,7 +42,7 @@ class Reaction(db.Model):
         db.Index("ix_reactions_target", "target_type", "target_id"),
         db.UniqueConstraint('user_id', 'target_type', 'target_id', name='unique_user_reaction'),
         db.CheckConstraint(
-            "target_type IN ('content', 'item', 'comment')",
+            "target_type IN ('content', 'product', 'comment')",
             name="ck_reaction_target_type"
         ),
     )
@@ -59,7 +59,7 @@ class Comment(db.Model):
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'product'
     target_id = db.Column(db.Integer, nullable=False)
     content = db.Column(db.Text, nullable=False, default="")
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -75,7 +75,7 @@ class Comment(db.Model):
 
     @property
     def target(self):
-        return self.content_target or self.item
+        return self.content_target or self.product
 
     user = db.relationship("User", back_populates="comments")
     parent = db.relationship("Comment", remote_side=[id], back_populates="replies")
@@ -88,9 +88,9 @@ class Comment(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    item = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(Comment.target_id) == Item.id, Comment.target_type == 'item')",
+    product = db.relationship(
+        "Product",
+        primaryjoin="and_(foreign(Comment.target_id) == Product.id, Comment.target_type == 'product')",
         back_populates="comments",
         viewonly=True,
         lazy="selectin"
@@ -105,7 +105,7 @@ class Comment(db.Model):
 
     __table_args__ = (
         db.Index("ix_comments_target", "target_type", "target_id"),
-        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_comment_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'product')", name="ck_comment_target_type"),
     )
 
     def __repr__(self):
@@ -120,14 +120,14 @@ class View(db.Model):
     __tablename__ = "views"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
-    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'item'
+    target_type = db.Column(db.String(50), nullable=False)  # 'content' or 'product'
     target_id = db.Column(db.Integer, nullable=False)
     ip_address = db.Column(db.String(45), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     @property
     def target(self):
-        return self.content or self.item
+        return self.content or self.product
 
     user = db.relationship("User", back_populates="views")
     content = db.relationship(
@@ -137,9 +137,9 @@ class View(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    item = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(View.target_id) == Item.id, View.target_type == 'item')",
+    product = db.relationship(
+        "Product",
+        primaryjoin="and_(foreign(View.target_id) == Product.id, View.target_type == 'product')",
         back_populates="views",
         viewonly=True,
         lazy="selectin"
@@ -149,7 +149,7 @@ class View(db.Model):
         db.Index("ix_views_target", "target_type", "target_id"),
         db.CheckConstraint("(user_id IS NOT NULL AND ip_address IS NULL) OR (user_id IS NULL AND ip_address IS NOT NULL)", name="ck_view_one_identity"),
         db.UniqueConstraint("user_id", "ip_address", "target_type", "target_id", name="unique_view"),
-        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_view_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'product')", name="ck_view_target_type"),
     )
 
     def __repr__(self):
@@ -171,23 +171,23 @@ class Save(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    item = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(Save.target_id) == Item.id, Save.target_type == 'item')",
+    product = db.relationship(
+        "Product",
+        primaryjoin="and_(foreign(Save.target_id) == Product.id, Save.target_type == 'product')",
         viewonly=True,
         lazy="selectin"
     )
 
     @property
     def target(self):
-        return self.content or self.item
+        return self.content or self.product
 
     user = db.relationship("User", back_populates="saves")
 
     __table_args__ = (
         db.UniqueConstraint("user_id", "target_type", "target_id", "collection_name", name="uq_user_save_collection"),
         db.Index("ix_save_target", "target_type", "target_id"),
-        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_save_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'product')", name="ck_save_target_type"),
     )
 
     def __repr__(self):
@@ -209,30 +209,30 @@ class Share(db.Model):
         viewonly=True,
         lazy="selectin"
     )
-    item = db.relationship(
-        "Item",
-        primaryjoin="and_(foreign(Share.target_id) == Item.id, Share.target_type == 'item')",
+    product = db.relationship(
+        "Product",
+        primaryjoin="and_(foreign(Share.target_id) == Product.id, Share.target_type == 'product')",
         viewonly=True,
         lazy="selectin"
     )
 
     @property
     def target(self):
-        return self.content or self.item
+        return self.content or self.product
 
     __table_args__ = (
         db.Index("ix_share_target", "target_type", "target_id"),
         db.Index("ix_share_user_created", "user_id", "created_at"),
-        db.CheckConstraint("target_type IN ('content', 'item')", name="ck_share_target_type"),
+        db.CheckConstraint("target_type IN ('content', 'product')", name="ck_share_target_type"),
     )
 
     def __repr__(self):
         return f"<Share user={self.user_id} {self.target_type}:{self.target_id}>"
 
-class ItemClick(db.Model):
-    __tablename__ = "item_clicks"
+class ProductClick(db.Model):
+    __tablename__ = "product_clicks"
     id = db.Column(db.Integer, primary_key=True)
-    item_store_link_id = db.Column(db.Integer, db.ForeignKey("item_store_links.id", ondelete="CASCADE"), nullable=False)
+    product_store_link_id = db.Column(db.Integer, db.ForeignKey("product_store_links.id", ondelete="CASCADE"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.Text)
@@ -240,16 +240,16 @@ class ItemClick(db.Model):
     country = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, server_default=db.func.now(), index=True)
 
-    user = db.relationship("User", back_populates="item_clicks")
-    item_store_link = db.relationship("ItemStoreLink")
+    user = db.relationship("User", back_populates="product_clicks")
+    product_store_link = db.relationship("ProductStoreLink")
 
     __table_args__ = (
-        db.Index("ix_item_click_link", "item_store_link_id"),
-        db.Index("ix_item_click_user", "user_id"),
+        db.Index("ix_product_click_link", "product_store_link_id"),
+        db.Index("ix_product_click_user", "user_id"),
     )
 
     def __repr__(self):
-        return f"<ItemClick id={self.id} link={self.item_store_link_id} user={self.user_id} ip={self.ip_address}>"
+        return f"<ProductClick id={self.id} link={self.product_store_link_id} user={self.user_id} ip={self.ip_address}>"
 
 class RecommendationImpression(db.Model):
     __tablename__ = "recommendation_impressions"
@@ -267,7 +267,7 @@ class RecommendationClick(db.Model):
     __tablename__ = "recommendation_clicks"
     id = db.Column(db.Integer, primary_key=True)
     entity_type = db.Column(db.String(50), nullable=False) # 'related_content', 'related_product', 'shop_product'
-    entity_id = db.Column(db.String(100), nullable=False)   # the specific clicked item/content id
+    entity_id = db.Column(db.String(100), nullable=False)   # the specific clicked product/content id
     context_id = db.Column(db.String(100), nullable=True)  # article or page id context
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), server_default=db.func.now(), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

@@ -14,7 +14,7 @@
   {% set badge_class = "admin" %}
   {% set badge_icon = "fa-solid fa-comments" %}
   {% endif %}
-  {% call activity_list_item(icon=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-item") %}
+  {% call activity_list_item(icon=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-product") %}
   <p class="activity-text ingest-log-text">
     Successfully ingested {{ badge(text=r.type, class="status-badge " ~ badge_class ~ " badge-type-compact", variant=none) }}
     {{ link(text="#" ~ r.id, href="/admin/contents?search=" ~ r.id, class="activity-target text-deco-none",

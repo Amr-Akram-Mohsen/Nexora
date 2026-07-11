@@ -3,12 +3,12 @@
 </div>
 
 {% set matrix_data = [] %}
-{% for item in items %}
+{% for product in products %}
   {% set _ = matrix_data.append({
-    "x": item.content_count,
-    "y": item.demand_score,
-    "name": item.name,
-    "gapScore": item.gap_score
+    "x": product.content_count,
+    "y": product.demand_score,
+    "name": product.name,
+    "gapScore": product.gap_score
   }) %}
 {% endfor %}
 

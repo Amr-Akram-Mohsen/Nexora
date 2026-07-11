@@ -36,7 +36,7 @@ def get_admin_integrations_status_data():
 
     result = []
     for source_name in all_source_names:
-        source_type = "item" if source_name in _ITEM_SOURCE_NAMES else "article"
+        source_type = "product" if source_name in _ITEM_SOURCE_NAMES else "article"
 
         fetch_info = fetch_map.get(source_name, {})
         result.append({
@@ -59,7 +59,7 @@ def get_admin_integrations_logs_data():
     result = []
     for log in logs:
         source_name = (log.source or "Unknown").lower()
-        log_type    = "item" if source_name in _ITEM_SOURCE_NAMES else "article"
+        log_type    = "product" if source_name in _ITEM_SOURCE_NAMES else "article"
         status      = "error" if log.failure_count > 0 else "success"
         result.append({
             "source":   source_name.upper(),

@@ -15,7 +15,7 @@
 {% block admin_content %}
 
 {% set header_actions %}
-<div class="flex items-center gap-sm">
+<div class="flex products-center gap-sm">
   {{ admin_filter_select("timeframe-select", name=none, options=[("today", "Today (24h)"), ("30_days", "Last 30 Days"), ("all_time", "All Time")], default_val="7_days", default_text="Last 7 Days", extra_class="insights-timeframe-select") }}
   {{ button(text="Refresh", icon="fa-solid fa-rotate-right", attrs={"id": "refresh-distribution-btn"}, class="admin-btn-secondary", variant=none) }}
 </div>
@@ -64,21 +64,21 @@ actions=header_actions
 </div>
 
 <!-- Section 1.99: Autonomous Execution Panel -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel
 </h2>
 <div class="insights-section">
   {% include "admin/distribution/_autonomous_execution.html" %}
 </div>
 
 <!-- Section 1.995: Execution Governance Panel -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance
   Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_governance.html" %}
 </div>
 
 <!-- Phase 3: Distribution Analytics -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics
 </h2>
 
 <!-- Platform Performance -->

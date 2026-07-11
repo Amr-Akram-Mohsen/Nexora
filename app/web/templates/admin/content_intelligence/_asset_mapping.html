@@ -2,7 +2,7 @@
 {% from "admin/components/ui/panels.html" import admin_panel, admin_table_panel %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 <!-- Section 1.9: Content Asset Mapping -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-link"></i> Content Asset Mapping</h2>
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-link"></i> Content Asset Mapping</h2>
 {% call admin_table_panel("Asset Inventory & Gaps", "Analyzing existing database articles, videos, and product pages against the recommended content strategy.", id="content-asset-mapping-panel", display_style="none") %}
     {{ admin_crud_table(tables['asset_mapping'], loading_text="Mapping strategy to assets...") }}
 {% endcall %}

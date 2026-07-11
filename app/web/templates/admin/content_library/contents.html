@@ -3,46 +3,46 @@
 {% from "components/ui/core.html" import button, input, badge %}
 {% set header_title = "Content Moderation & Management" %}
 {% set page_description = "Clean up, categorize, inspect quality, and perform bulk operations on aggregated content" %}
-{% set summary_label = "items" %}
+{% set summary_label = "products" %}
 {% set per_page_options = [10, 20, 50, 100] %}
 {% set current_per_page = 20 %}
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
 {# Row 1: Search & Basic Filters #}
-<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
   {{ admin_search_input("content-search", "Search title or ID…") }}
   {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")],
-  default_val="", default_text="All Content Types", extra_class="filter-select-item") }}
+  default_val="", default_text="All Content Types", extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-section", None, [], default_val="", default_text="All Sections",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-category", None, [("uncategorized", "Uncategorized")], default_val="",
-  default_text="All Categories", extra_class="filter-select-item") }}
+  default_text="All Categories", extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-topic", None, [("none", "None (No Topic)")], default_val="", default_text="All Topics",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-brand", None, [("none", "None (No Brand)")], default_val="", default_text="All Brands",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-intent", None, [], default_val="", default_text="All Intents",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-gender", None, [], default_val="", default_text="All Genders",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-price-tier", None, [], default_val="", default_text="All Price Tiers",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
 </div>
 
 {# Row 2: Ingest Details & Compliance #}
-<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
   {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-ingestion-origin", None, [], default_val="", default_text="All Ingestion Origins",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-status", None, [("pending", "Pending"), ("enriching", "Enriching"), ("complete",
   "Complete"), ("failed", "Failed")], default_val="", default_text="All Processing States",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-active", None, [("true", "Active Only"), ("false", "Inactive Only")], default_val="",
-  default_text="Active & Inactive", extra_class="filter-select-item") }}
+  default_text="Active & Inactive", extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-published", None, [("true", "Published Only"), ("false", "Draft / Review Only")],
-  default_val="", default_text="All Visibility", extra_class="filter-select-item") }}
+  default_val="", default_text="All Visibility", extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-quality", None, [
   ("missing_category", "⚠ Missing Category"),
   ("missing_metadata", "✎ Missing Metadata"),
@@ -55,7 +55,7 @@
 </div>
 
 {# Row 3: Date Filters & Sorting #}
-<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
   <span class="filter-label-xs">Date Range:</span>
   {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")],
   default_val="published_at", default_text=None, extra_class="filter-input-auto") }}
@@ -64,7 +64,7 @@
   <span class="filter-text-divider">to</span>
   {{ input(type="date", id="filter-end-date", class="dashboard-filter-input filter-input-auto", required=False) }}
 
-  <div class="filter-sort-group flex items-center gap-2">
+  <div class="filter-sort-group flex products-center gap-2">
     <span class="filter-label-xs">Sort:</span>
     {{ admin_filter_select("sort-by", None, [
     ("id", "ID / Newest"),
@@ -88,13 +88,13 @@
 
 {% block crud_actions %}
 {# Bulk Actions Toolbar (hidden by default) #}
-<div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
-  <div class="flex items-center gap-2">
+<div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between products-center is-hidden">
+  <div class="flex products-center gap-2">
     <span><i class="fa-solid fa-bolt"></i></span>
-    <span id="bulk-selection-count" class="bulk-selection-count">0 items selected</span>
+    <span id="bulk-selection-count" class="bulk-selection-count">0 products selected</span>
   </div>
 
-  <div class="bulk-controls-group flex items-center gap-sm gap-2">
+  <div class="bulk-controls-group flex products-center gap-sm gap-2">
     {{ admin_filter_select("bulk-action-select", None, [
     ("activate", "Activate Selected"),
     ("deactivate", "Deactivate Selected"),
@@ -114,9 +114,9 @@
 {% endblock %}
 
 {% block crud_summary %}
-{% call admin_summary_bar("contents-count", "items", summary_id="contents-summary") %}
+{% call admin_summary_bar("contents-count", "products", summary_id="contents-summary") %}
 <div class="flex flex-col gap-2">
-  <div id="contents-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden">
+  <div id="contents-stats-bar" class="flex products-center flex-wrap gap-2 is-hidden">
     <div class="overview-breakdown-bar-track flex" style="width: 250px;">
       <div id="stat-bar-published" class="overview-breakdown-bar bar-active" style="--seg-width: 0%;"></div>
       <div id="stat-bar-drafts" class="overview-breakdown-bar" style="--bar-color: var(--brand-purple); --seg-width: 0%;"></div>
@@ -137,7 +137,7 @@
 
 {% block crud_modals %}
 {% call modal("quick-category-modal", "Quick Recategorize", 'fa-solid fa-tag', "modal-content-sm") %}
-<p class="dashboard-modal-body">Move this item to a different content category:</p>
+<p class="dashboard-modal-body">Move this product to a different content category:</p>
 {{ input(type="hidden", id="quick-cat-content-id", required=False) }}
 {{ admin_filter_select("quick-cat-select", None, [], default_val="", default_text=None,
 extra_class="modal-select-full")

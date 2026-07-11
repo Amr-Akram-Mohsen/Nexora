@@ -4,7 +4,7 @@ Admin user management endpoints.
 
 Refactoring applied:
 - Global @admin_required guard via before_request (R-01).
-- Listing now returns a proper paginated envelope {items, page, pages, total, per_page}
+- Listing now returns a proper paginated envelope {products, page, pages, total, per_page}
   instead of a flat array limited to 10 results (R-09).
 - Normalized to LF line endings (R-24).
 - Added /rows HTML partial endpoint and /<id>/inspect HTML endpoint for Jinja AJAX architecture.
@@ -18,7 +18,7 @@ from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, or_, and_, func
 from app.domains.taxonomy.models import Category, Topic, Brand
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.recommendation.models import UserInterest, UserEntityInterest
 
 bp = Blueprint("api_user", __name__, url_prefix="/admin/users")
@@ -49,15 +49,15 @@ def list_users():
     sort_by = request.args.get("sort_by", "").strip()
     sort_dir = request.args.get("sort_dir", "desc").strip()
 
-    items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
+    products, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
     from app.domains.user.serializers import serialize_user_row
     serialized = []
-    for u, score in items:
+    for u, score in products:
         serialized.append(serialize_user_row(u, score))
 
     return jsonify({
-        "items":    serialized,
+        "products":    serialized,
         "page":     page,
         "pages":    pages,
         "total":    total,
@@ -99,11 +99,11 @@ def users_rows():
     sort_by = request.args.get("sort_by", "").strip()
     sort_dir = request.args.get("sort_dir", "desc").strip()
 
-    items, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
+    products, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
     from app.domains.user.serializers import serialize_user_row
     users = []
-    for u, score in items:
+    for u, score in products:
         users.append(serialize_user_row(u, score))
 
     resp = render_admin_rows_response(

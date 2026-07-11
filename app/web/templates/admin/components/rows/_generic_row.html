@@ -16,8 +16,8 @@
 
 {% macro render_health_badge(value) %}
     {% set health_config = {
-        'unused': {'tooltip': 'Entity is orphaned (0 linked items/content)', 'text': 'Unused', 'variant': 'danger'},
-        'inactive-linked': {'tooltip': 'Entity is inactive but has linked items/content', 'text': 'Inactive (Linked)', 'variant': 'warning'},
+        'unused': {'tooltip': 'Entity is orphaned (0 linked products/content)', 'text': 'Unused', 'variant': 'danger'},
+        'inactive-linked': {'tooltip': 'Entity is inactive but has linked products/content', 'text': 'Inactive (Linked)', 'variant': 'warning'},
         'ok': {'tooltip': None, 'text': 'OK', 'variant': 'success'}
     } %}
     {% set config = health_config.get(value, {'tooltip': None, 'text': value|title, 'variant': 'secondary'}) %}

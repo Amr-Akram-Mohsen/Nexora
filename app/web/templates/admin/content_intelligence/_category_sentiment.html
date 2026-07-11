@@ -1,14 +1,14 @@
 {% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
   {% call standard_table(["Category Name", "Total Comments", "Positive", "Neutral", "Negative", "Health Status"]) %}
-      {% for item in data %}
+      {% for product in data %}
       <tr>
-        <td><strong>{{ item.category_name }}</strong></td>
-        <td>{{ item.total }}</td>
-        <td>{{ item.positive_pct }}%</td>
-        <td>{{ item.neutral_pct }}%</td>
-        <td>{{ item.negative_pct }}%</td>
-        <td><span class="status-badge {{ item.status_class }}">{{ item.status }}</span></td>
+        <td><strong>{{ product.category_name }}</strong></td>
+        <td>{{ product.total }}</td>
+        <td>{{ product.positive_pct }}%</td>
+        <td>{{ product.neutral_pct }}%</td>
+        <td>{{ product.negative_pct }}%</td>
+        <td><span class="status-badge {{ product.status_class }}">{{ product.status }}</span></td>
       </tr>
       {% else %}
       <tr>

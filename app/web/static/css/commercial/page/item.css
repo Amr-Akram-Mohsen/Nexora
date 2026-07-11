@@ -1,4 +1,4 @@
-@import "../features/item-gallery.css";
+@import "../features/product-gallery.css";
 @import "../features/variant-selector.css";
 @import "../features/full-details.css";
 @import "../features/category-details.css";
@@ -16,9 +16,9 @@
   hyphens: auto;
 }
 
-/* ─── Item Details Card ──────────────────────────────────────────────── */
+/* ─── Product Details Card ──────────────────────────────────────────────── */
 
-.item-details-card {
+.product-details-card {
   background: var(--card);
   margin-bottom: 0;
   border-radius: var(--radius-xl);
@@ -28,11 +28,11 @@
   transition: box-shadow 0.25s ease;
 }
 
-.item-details-card:hover {
+.product-details-card:hover {
   box-shadow: var(--shadow-md);
 }
 
-.item-details-card__title {
+.product-details-card__title {
   gap: 0.625rem;
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
@@ -41,7 +41,7 @@
   letter-spacing: -0.01em;
 }
 
-.item-details-card__bar {
+.product-details-card__bar {
   width: 3px;
   height: 16px;
   border-radius: var(--radius-full);
@@ -50,9 +50,9 @@
 }
 
 
-/* ─── Item Content (description) ─────────────────────────────────────── */
+/* ─── Product Content (description) ─────────────────────────────────────── */
 
-.item-content {
+.product-content {
   line-height: 1.8;
   color: var(--muted-foreground);
   font-size: var(--text-base);
@@ -85,7 +85,7 @@
 
 .detail-page[data-domain-type="commercial"]>.container {
   display: grid;
-  align-items: start;
+  align-products: start;
 }
 
 /* display:contents — children of main participate directly in the container grid */
@@ -191,7 +191,7 @@
 }
 
 /* Mobile gallery: main above, thumbs below */
-.detail-page__image .item-gallery {
+.detail-page__image .product-gallery {
   grid-template-columns: 1fr;
   grid-template-areas:
     "main"
@@ -236,7 +236,7 @@
   }
 
   /* Desktop gallery: 90px thumb col left, main image right */
-  .detail-page__image .item-gallery {
+  .detail-page__image .product-gallery {
     grid-template-columns: 90px 1fr;
     grid-template-areas: "thumbs main";
     grid-template-rows: 1fr;
@@ -295,7 +295,7 @@
 
 /* ─── Quick Details grid ──────────────────────────────────────────────── */
 
-.item-quick-details {
+.product-quick-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
@@ -303,7 +303,7 @@
 }
 
 @media (min-width: 640px) {
-  .item-quick-details {
+  .product-quick-details {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -341,7 +341,7 @@
 
 /* ─── Price summary ───────────────────────────────────────────────────── */
 
-.item-price-summary {align-items: baseline;
+.product-price-summary {align-products: baseline;
   gap: 0.625rem;
   margin: 0.5rem 0 1rem;
 }

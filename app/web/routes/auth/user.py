@@ -461,8 +461,8 @@ def profile():
         saved_items = get_saved_products_workflow(current_user.id)
         
         collections_map = {}
-        for item in saved_articles + saved_items:
-            c_name = item.get("collection_name", "General")
+        for product in saved_articles + saved_items:
+            c_name = product.get("collection_name", "General")
             collections_map[c_name] = collections_map.get(c_name, 0) + 1
             
         collections = [{"name": k, "count": v} for k, v in collections_map.items()]

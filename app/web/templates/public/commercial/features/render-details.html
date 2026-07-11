@@ -7,8 +7,8 @@
 {% if value is mapping %}
 
 {# Nested mapping → render as a titled group #}
-<div class="item-details-group">
-  <div class="item-details-group__items">
+<div class="product-details-group">
+  <div class="product-details-group__items">
     {{ render_details(value, counter) }}
   </div>
 </div>
@@ -16,13 +16,13 @@
 {% elif value is sequence and value is not string %}
 
 {# Sequence value → bulleted list inside a group #}
-<div class="item-details-group">
-  <h4 class="item-details-group__title">
+<div class="product-details-group">
+  <h4 class="product-details-group__title">
     {{ key.replace('_',' ') | title }}
   </h4>
-  <ul class="item-details-group__list flex flex-col gap-1">
-    {% for item in value %}
-    <li>{{ render_details(item, counter) }}</li>
+  <ul class="product-details-group__list flex flex-col gap-1">
+    {% for product in value %}
+    <li>{{ render_details(product, counter) }}</li>
     {% endfor %}
   </ul>
 </div>
@@ -31,13 +31,13 @@
 
 {# Scalar key→value pair: two-tone row #}
 {% set counter.value = counter.value + 1 %}
-{% set hidden_class = " item-detail-item--hidden" if counter.value > 6 else "" %}
+{% set hidden_class = " product-detail-product--hidden" if counter.value > 6 else "" %}
 
-<div class="item-detail-item flex items-start {{ hidden_class }}">
-  <span class="item-detail-item__label">
+<div class="product-detail-product flex products-start {{ hidden_class }}">
+  <span class="product-detail-item__label">
     {{ key.replace('_',' ') | title }}
   </span>
-  <span class="item-detail-item__value u-break-words">
+  <span class="product-detail-item__value u-break-words">
     {{ value }}
   </span>
 </div>
@@ -49,7 +49,7 @@
 {% elif details is not mapping and details is not sequence %}
 
 {# Plain scalar — just print the value #}
-<span class="item-detail-scalar">{{ details }}</span>
+<span class="product-detail-scalar">{{ details }}</span>
 
 {% endif %}
 

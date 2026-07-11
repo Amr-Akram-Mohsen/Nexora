@@ -49,7 +49,7 @@ class User(db.Model, UserMixin):
         back_populates="user",
         cascade="all, delete-orphan"
     )
-    item_clicks = db.relationship("ItemClick", back_populates="user")
+    product_clicks = db.relationship("ProductClick", back_populates="user")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

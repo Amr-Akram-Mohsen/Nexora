@@ -1,9 +1,9 @@
 {% from "admin/components/ui/dashboard.html" import ranked_list_item %}
 {% from "components/ui/core.html" import badge %}
 {% if data %}
-  {% for item in data[:5] %}
-    {% call ranked_list_item(loop.index, item.name) %}
-      {{ badge(text=item.avg_discount|round(1) ~ '% off', attrs={'style': 'background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);'}) }}
+  {% for product in data[:5] %}
+    {% call ranked_list_item(loop.index, product.name) %}
+      {{ badge(text=product.avg_discount|round(1) ~ '% off', attrs={'style': 'background: rgba(var(--brand-green-rgb), 0.1); color: var(--brand-green);'}) }}
     {% endcall %}
   {% endfor %}
 {% else %}

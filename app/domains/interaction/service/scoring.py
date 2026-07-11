@@ -1,7 +1,7 @@
 from flask import current_app
 from sqlalchemy import select, func
 from app.core.extensions import db
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick
 
 def _get_weights():
     return {
@@ -31,21 +31,21 @@ def get_content_engagement_score(content_id: int) -> float:
     )
     return round(score, 1)
 
-def get_item_engagement_score(item_id: int) -> float:
+def get_item_engagement_score(product_id: int) -> float:
     weights = _get_weights()
     
-    views = db.session.scalar(select(func.count()).select_from(View).where(View.target_type == 'item', View.target_id == item_id)) or 0
-    likes = db.session.scalar(select(func.count()).select_from(Reaction).where(Reaction.target_type == 'item', Reaction.target_id == item_id, Reaction.type == 'like')) or 0
-    comments = db.session.scalar(select(func.count()).select_from(Comment).where(Comment.target_type == 'item', Comment.target_id == item_id)) or 0
-    saves = db.session.scalar(select(func.count()).select_from(Save).where(Save.target_type == 'item', Save.target_id == item_id)) or 0
-    shares = db.session.scalar(select(func.count()).select_from(Share).where(Share.target_type == 'item', Share.target_id == item_id)) or 0
+    views = db.session.scalar(select(func.count()).select_from(View).where(View.target_type == 'product', View.target_id == product_id)) or 0
+    likes = db.session.scalar(select(func.count()).select_from(Reaction).where(Reaction.target_type == 'product', Reaction.target_id == product_id, Reaction.type == 'like')) or 0
+    comments = db.session.scalar(select(func.count()).select_from(Comment).where(Comment.target_type == 'product', Comment.target_id == product_id)) or 0
+    saves = db.session.scalar(select(func.count()).select_from(Save).where(Save.target_type == 'product', Save.target_id == product_id)) or 0
+    shares = db.session.scalar(select(func.count()).select_from(Share).where(Share.target_type == 'product', Share.target_id == product_id)) or 0
     
-    from app.domains.item.models import ItemVariant, ItemStoreLink
+    from app.domains.product.models import ProductVariant, ProductStoreLink
     clicks = db.session.scalar(
-        select(func.count(ItemClick.id))
-        .join(ItemStoreLink, ItemStoreLink.id == ItemClick.item_store_link_id)
-        .join(ItemVariant, ItemVariant.id == ItemStoreLink.variant_id)
-        .where(ItemVariant.item_id == item_id)
+        select(func.count(ProductClick.id))
+        .join(ProductStoreLink, ProductStoreLink.id == ProductClick.product_store_link_id)
+        .join(ProductVariant, ProductVariant.id == ProductStoreLink.variant_id)
+        .where(ProductVariant.product_id == product_id)
     ) or 0
     
     score = (

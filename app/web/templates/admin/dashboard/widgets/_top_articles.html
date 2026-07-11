@@ -1,10 +1,10 @@
 {% from "admin/components/ui/dashboard.html" import dashboard_empty, ranked_list_item %}
-{% if not items or items | length == 0 %}
+{% if not products or products | length == 0 %}
 {{ dashboard_empty("No data yet.") }}
 {% else %}
 <ol class="overview-top-list">
-  {% for item in items %}
-    {{ ranked_list_item(loop.index, item.title, title_href="/admin/contents?search=" ~ item.id, value_text="{:,} views".format(item.view_count or 0)) }}
+  {% for product in products %}
+    {{ ranked_list_item(loop.index, product.title, title_href="/admin/contents?search=" ~ product.id, value_text="{:,} views".format(product.view_count or 0)) }}
   {% endfor %}
 </ol>
 {% endif %}

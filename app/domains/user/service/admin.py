@@ -1,7 +1,7 @@
 from sqlalchemy import select, or_, and_, func
 from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
-from app.domains.taxonomy.models import Category, Topic, Brand
+
 
 from app.shared.utils.admin_helpers import execute_paginated_query
 
@@ -19,8 +19,8 @@ def get_admin_users_paginated(search, role, status, verified, subscription, prov
         ) or 0
     }
     
-    items, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
-    return items, total, pages, stats
+    products, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
+    return products, total, pages, stats
 
 def toggle_admin_user(id):
     from app.shared.utils.admin_helpers import toggle_model_flag_workflow
@@ -68,12 +68,12 @@ def get_admin_subscribers_paginated(search, status, has_user, page, per_page):
         "anonymous": db.session.scalar(count_stmt.where(NewsletterSubscriber.user_id.is_(None))) or 0
     }
 
-    items, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
+    products, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
     # The original returned scalars, but execute_paginated_query returns all()
-    # We must extract the scalars if the route expects models, or we can just return items if the route handles it.
+    # We must extract the scalars if the route expects models, or we can just return products if the route handles it.
     # Actually, execute_paginated_query returns the result of .all(), which is a list of tuples/Row.
     # Wait, the original was scalars().all(). We need to be careful.
-    return [i[0] for i in items], total, pages, stats
+    return [i[0] for i in products], total, pages, stats
 
 def get_admin_audience_analytics_stats():
     from app.domains.interaction.models import RecommendationImpression, RecommendationClick

@@ -1,13 +1,13 @@
 <nav class="dashboard-nav flex">
 
-  <div class="nav-brand flex items-center justify-between">
-    <div class="brand-wrapper flex items-center">
+  <div class="nav-brand flex products-center justify-between">
+    <div class="brand-wrapper flex products-center">
       <span class="nav-brand-icon"><i class="fa-solid fa-bolt"></i></span>
       <span class="nav-brand-name">Nexora</span>
       <span class="nav-brand-badge">Admin</span>
     </div>
     {% from "components/ui/core.html" import button %}
-    {% call button(id="sidebar-toggle", class="sidebar-toggle-btn justify-center items-center", attrs={"aria-label": "Toggle Sidebar"}, unstyled=True) %}
+    {% call button(id="sidebar-toggle", class="sidebar-toggle-btn justify-center products-center", attrs={"aria-label": "Toggle Sidebar"}, unstyled=True) %}
       <span class="toggle-arrow"><i class="fa-solid fa-chevron-left"></i></span>
     {% endcall %}
   </div>
@@ -15,27 +15,27 @@
   <div class="nav-section">
     <p class="nav-title">Intelligence</p>
     <a href="{{ url_for('admin.home') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'home' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'home' %}active{% endif %}"
       title="Overview">
       <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span> <span class="nav-link-text">Overview</span>
     </a>
     <a href="{{ url_for('api_insights.content_quality_hub') }}"
-      class="nav-link flex items-center gap-2 {% if (active_nav|default('')) == 'content_quality' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (active_nav|default('')) == 'content_quality' %}active{% endif %}"
       title="Content Quality">
       <span class="nav-icon"><i class="fa-solid fa-file-signature"></i></span> <span class="nav-link-text">Content Quality</span>
     </a>
     <a href="{{ url_for('api_insights.commercial_opportunities_hub') }}"
-      class="nav-link flex items-center gap-2 {% if (active_nav|default('')) == 'commercial_opportunities' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (active_nav|default('')) == 'commercial_opportunities' %}active{% endif %}"
       title="Commercial Opps">
       <span class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></span> <span class="nav-link-text">Commercial Opps</span>
     </a>
     <a href="{{ url_for('api_insights.audience_receptivity_hub') }}"
-      class="nav-link flex items-center gap-2 {% if (active_nav|default('')) == 'audience_receptivity' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (active_nav|default('')) == 'audience_receptivity' %}active{% endif %}"
       title="Audience Receptivity">
       <span class="nav-icon"><i class="fa-solid fa-users-viewfinder"></i></span> <span class="nav-link-text">Audience Receptivity</span>
     </a>
     <a href="{{ url_for('admin.dashboard_distribution') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'distribution' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'distribution' %}active{% endif %}"
       title="Distribution">
       <span class="nav-icon"><i class="fa-solid fa-bullhorn"></i></span> <span class="nav-link-text">Distribution</span>
     </a>
@@ -44,37 +44,37 @@
   <div class="nav-section">
     <p class="nav-title">Catalog</p>
     <a href="{{ url_for('admin.dashboard_contents') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'contents' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'contents' %}active{% endif %}"
       title="Content Library">
       <span class="nav-icon"><i class="fa-solid fa-newspaper"></i></span> <span class="nav-link-text">Content Library</span>
     </a>
     <a href="{{ url_for('api_content.content_dashboard') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'content_dashboard' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'content_dashboard' %}active{% endif %}"
       title="Content Analytics">
       <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span> <span class="nav-link-text">Content Analytics</span>
     </a>
     <a href="{{ url_for('api_content.pipeline_view') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'pipeline' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'pipeline' %}active{% endif %}"
       title="Pipeline Audit">
       <span class="nav-icon"><i class="fa-solid fa-gear"></i></span> <span class="nav-link-text">Pipeline Audit</span>
     </a>
     <a href="{{ url_for('api_content.deduplication_view') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'deduplication' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'deduplication' %}active{% endif %}"
       title="Deduplication">
       <span class="nav-icon"><i class="fa-solid fa-user-group"></i></span> <span class="nav-link-text">Deduplication</span>
     </a>
     <a href="{{ url_for('admin.dashboard_items_analytics') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'items_dashboard' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'items_dashboard' %}active{% endif %}"
       title="Products Intelligence">
       <span class="nav-icon"><i class="fa-solid fa-chart-bar"></i></span> <span class="nav-link-text">Products Intelligence</span>
     </a>
     <a href="{{ url_for('admin.dashboard_items') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'items' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'products' %}active{% endif %}"
       title="Products Catalog">
       <span class="nav-icon"><i class="fa-solid fa-bag-shopping"></i></span> <span class="nav-link-text">Products Catalog</span>
     </a>
     <a href="{{ url_for('admin.dashboard_taxonomy') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'taxonomy' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'taxonomy' %}active{% endif %}"
       title="Taxonomy">
       <span class="nav-icon"><i class="fa-solid fa-tag"></i></span> <span class="nav-link-text">Taxonomy</span>
     </a>
@@ -83,16 +83,16 @@
   <div class="nav-section">
     <p class="nav-title">Audience & Moderation</p>
     <a href="{{ url_for('admin.dashboard_users') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'users' %}active{% endif %}" title="Users">
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'users' %}active{% endif %}" title="Users">
       <span class="nav-icon"><i class="fa-solid fa-users"></i></span> <span class="nav-link-text">Audience</span>
     </a>
     <a href="{{ url_for('admin.dashboard_interactions') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'interactions' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'interactions' %}active{% endif %}"
       title="Interactions">
       <span class="nav-icon"><i class="fa-solid fa-shield-halved"></i></span> <span class="nav-link-text">Interactions</span>
     </a>
     <a href="{{ url_for('admin.dashboard_recommendations') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'recommendations' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'recommendations' %}active{% endif %}"
       title="Recommendations">
       <span class="nav-icon"><i class="fa-solid fa-link"></i></span> <span class="nav-link-text">Recommendations</span>
     </a>
@@ -101,27 +101,27 @@
   <div class="nav-section">
     <p class="nav-title">Acquisition & Providers</p>
     <a href="{{ url_for('admin.dashboard_ingestions') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'ingestions' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'ingestions' %}active{% endif %}"
       title="Ingestion Channels">
       <span class="nav-icon"><i class="fa-solid fa-plug"></i></span> <span class="nav-link-text">Ingestion Channels</span>
     </a>
     <a href="{{ url_for('admin.dashboard_sources') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
       title="Sources">
       <span class="nav-icon"><i class="fa-solid fa-satellite-dish"></i></span> <span class="nav-link-text">Sources</span>
     </a>
     <a href="{{ url_for('admin.dashboard_sources_quality') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'sources_quality' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'sources_quality' %}active{% endif %}"
       title="Quality & Freshness">
       <span class="nav-icon"><i class="fa-solid fa-medal"></i></span> <span class="nav-link-text">Quality & Freshness</span>
     </a>
     <a href="{{ url_for('admin.dashboard_stores_analytics') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores_dashboard' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'stores_dashboard' %}active{% endif %}"
       title="Commercial Intelligence">
       <span class="nav-icon"><i class="fa-solid fa-store-slash"></i></span> <span class="nav-link-text">Commercial Intelligence</span>
     </a>
     <a href="{{ url_for('admin.dashboard_stores') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'stores' %}active{% endif %}"
       title="Stores Catalog">
       <span class="nav-icon"><i class="fa-solid fa-store"></i></span> <span class="nav-link-text">Stores Catalog</span>
     </a>
@@ -130,7 +130,7 @@
   <div class="nav-section">
     <p class="nav-title">System</p>
     <a href="{{ url_for('admin.settings') }}"
-      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'settings' %}active{% endif %}"
+      class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'settings' %}active{% endif %}"
       title="Settings">
       <span class="nav-icon"><i class="fa-solid fa-gear"></i></span> <span class="nav-link-text">Settings</span>
     </a>

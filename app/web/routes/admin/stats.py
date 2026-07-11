@@ -15,7 +15,7 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category, Source
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.user.models import User
 from app.domains.interaction.service.query import get_interactions_breakdown, get_reaction_stats
 from app.domains.interaction.models import Share
@@ -43,18 +43,18 @@ def dashboard_stats():
 
 
 # ─────────────────────────────────────────────
-# TOP CONTENT & ITEMS JSON ENDPOINTS (keep for backwards compat if needed)
+# TOP CONTENT & PRODUCTS JSON ENDPOINTS (keep for backwards compat if needed)
 # ─────────────────────────────────────────────
 
 @bp.route("/top-contents", methods=["GET"])
 def top_contents():
-    """Top 5 content items by view count for the overview panel."""
+    """Top 5 content products by view count for the overview panel."""
     from app.application.analytics.admin import get_admin_top_contents
     return jsonify(get_admin_top_contents())
 
 
-@bp.route("/top-items", methods=["GET"])
+@bp.route("/top-products", methods=["GET"])
 def top_items():
-    """Top 5 items by click count for the overview panel."""
+    """Top 5 products by click count for the overview panel."""
     from app.application.analytics.admin import get_admin_top_items
     return jsonify(get_admin_top_items())

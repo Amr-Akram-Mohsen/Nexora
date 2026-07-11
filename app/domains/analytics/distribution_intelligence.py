@@ -2,7 +2,7 @@ from sqlalchemy import func, select, desc
 from app.core.extensions import db
 from app.domains.distribution.models import DistributionPost, DistributionPlatform
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from datetime import datetime, timezone, timedelta
 
 def get_distribution_intelligence_data():
@@ -15,10 +15,10 @@ def get_distribution_intelligence_data():
         .where(Content.is_published == True, DistributionPost.status == 'published')
     ) or 0
     
-    total_items = db.session.scalar(select(func.count(Item.id))) or 0
+    total_items = db.session.scalar(select(func.count(Product.id))) or 0
     distributed_items = db.session.scalar(
-        select(func.count(func.distinct(Item.id)))
-        .join(DistributionPost, (DistributionPost.source_target_type == 'item') & (DistributionPost.source_target_id == Item.id))
+        select(func.count(func.distinct(Product.id)))
+        .join(DistributionPost, (DistributionPost.source_target_type == 'product') & (DistributionPost.source_target_id == Product.id))
         .where(DistributionPost.status == 'published')
     ) or 0
     
@@ -183,13 +183,13 @@ def get_coverage_analytics():
         .where(Content.is_active == True, Content.is_published == True, DistributionPost.status == 'published')
     ) or 0
     
-    total_items = db.session.scalar(select(func.count()).select_from(Item)) or 0
+    total_items = db.session.scalar(select(func.count()).select_from(Product)) or 0
     
     distributed_items = db.session.scalar(
-        select(func.count(func.distinct(Item.id))).select_from(Item)
+        select(func.count(func.distinct(Product.id))).select_from(Product)
         .join(DistributionPost, (
-            (DistributionPost.source_target_type == 'item') &
-            (DistributionPost.source_target_id == Item.id)
+            (DistributionPost.source_target_type == 'product') &
+            (DistributionPost.source_target_id == Product.id)
         ))
         .where(DistributionPost.status == 'published')
     ) or 0
@@ -203,7 +203,7 @@ def get_coverage_analytics():
             "distributed": distributed_content,
             "percentage": round(content_coverage_pct, 1)
         },
-        "item": {
+        "product": {
             "total": total_items,
             "distributed": distributed_items,
             "percentage": round(item_coverage_pct, 1)

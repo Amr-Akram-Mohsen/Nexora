@@ -77,13 +77,13 @@ def _is_similar(text1: str, text2: str) -> bool:
 # ── PHASE 1: DISCOVERY ENRICHMENT (Lightweight / All Content Types) ───────────
 
 
-def normalize_ingested_data(item: Any) -> EnrichedItemDTO:
+def normalize_ingested_data(product: Any) -> EnrichedItemDTO:
     """
     Standardizes and sanitizes raw metadata from discovery APIs.
     Used for ALL content types (Articles, Videos, Posts).
     Performs NO network calls.
     """
-    data = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+    data = product.model_dump() if hasattr(product, "model_dump") else dict(product)
 
     # 1. Basic Sanitization
     content_raw = data.get("content", "") or data.get("description", "")
@@ -108,35 +108,35 @@ def normalize_ingested_data(item: Any) -> EnrichedItemDTO:
     return EnrichedItemDTO(**data)
 
 
-def ingest_enrichment_router(item: ClassifiedItemDTO) -> EnrichedItemDTO:
+def ingest_enrichment_router(product: ClassifiedItemDTO) -> EnrichedItemDTO:
     """
     Entry point for Phase 1 Ingestion.
     Ensures discovery is lightning fast by only performing local normalization.
     """
-    url = (item.url or "").lower()
+    url = (product.url or "").lower()
 
     # Passthrough for non-article types or specific platforms if needed
     if "youtube.com" in url or "reddit.com" in url:
-        return normalize_ingested_data(item)
+        return normalize_ingested_data(product)
 
-    return normalize_ingested_data(item)
+    return normalize_ingested_data(product)
 
 
 # ── PHASE 2: HEAVY ENRICHMENT (Scraping / Articles Only) ──────────────────────
 
 
-def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot") -> EnrichedItemDTO:
+def full_article_scraping_pipeline(product: Any, extractor_service: str = "diffbot") -> EnrichedItemDTO:
     """
     Entry point for Phase 2 Background Worker.
     Performs heavy network-based enrichment (Scraping, Extractor APIs).
     Targets only Articles.
     """
-    data = item.model_dump() if hasattr(item, "model_dump") else dict(item)
+    data = product.model_dump() if hasattr(product, "model_dump") else dict(product)
     url = data.get("url", "")
     description = data.get("description", "")
 
     if not url:
-        return normalize_ingested_data(item)
+        return normalize_ingested_data(product)
 
     log_integration_start(logger, _NAME, mode="phase_2_heavy", url=url[:80])
 
@@ -210,16 +210,13 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot"
             log_scrape_error(logger, url, reason=str(e))
         return None
 
-    best_existing_wc = candidates[0]["word_count"] if candidates else 0
+    res = _fetch_extractor()
+    if res:
+        candidates.append(res)
     
-    if trusted or best_existing_wc < 200:
-        res = _fetch_extractor()
-        if res:
-            candidates.append(res)
-        
-        # Add a delay to respect API rate limits (Diffbot is 1 request/sec on free tier)
-        import time
-        time.sleep(1.5)
+    # Add a delay to respect API rate limits (Diffbot is 1 request/sec on free tier)
+    import time
+    time.sleep(1.5)
 
     # 4. Fallback (Local)
     if not candidates and description:
@@ -240,7 +237,7 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot"
     if candidates:
         best_candidate = max(candidates, key=lambda c: c["quality_score"])
     else:
-        return normalize_ingested_data(item)
+        return normalize_ingested_data(product)
 
     selected_image = data.get("image_url")
     canonical_url = data.get("canonical_url")
@@ -261,7 +258,7 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot"
     log_integration_success(
         logger,
         _NAME,
-        items=1,
+        products=1,
         source=best_candidate["ingestion_method"],
         score=f"{best_candidate['quality_score']:.3f}",
         words=best_candidate["word_count"],

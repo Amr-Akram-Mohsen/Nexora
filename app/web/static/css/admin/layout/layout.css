@@ -9,7 +9,7 @@
 .admin-table-wrapper,
 .pagination-container,
 .settings-card,
-.dashboard-item,
+.dashboard-product,
 .dashboard-analytics-hero {
     background: var(--card);
     border: 1px solid var(--border);
@@ -23,12 +23,12 @@
     overflow-y: auto;
 }
 
-.dashboard-item {
+.dashboard-product {
     padding: 1.25rem 1.5rem;
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.dashboard-item:hover {
+.dashboard-product:hover {
     box-shadow: var(--shadow-md);
     border-color: rgba(var(--brand-blue-rgb), 0.25);
 }

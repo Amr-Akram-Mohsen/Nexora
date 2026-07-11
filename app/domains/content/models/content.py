@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from app.core.extensions import db
-from app.domains.relationships import (content_topics, content_brands, content_items, content_attributes)
+from app.domains.relationships import (content_products, content_attributes)
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
@@ -90,8 +90,7 @@ class Content(db.Model):
     source = db.relationship("Source", backref="contents")
 
 
-    topics = db.relationship("Topic", secondary=content_topics, back_populates="contents")
-    brands = db.relationship("Brand", secondary=content_brands, back_populates="contents")
+
     attributes = db.relationship(
         "AttributeFacet",
         secondary=content_attributes,
@@ -113,9 +112,9 @@ class Content(db.Model):
     )
     
     # Products this content reviews / mentions
-    linked_items = db.relationship(
-        "Item",
-        secondary=content_items,
+    linked_products = db.relationship(
+        "Product",
+        secondary=content_products,
         back_populates="linked_contents"
     )
 
@@ -195,19 +194,10 @@ class Content(db.Model):
     )
 
     # ---------------- Convenience helpers ----------------
-    def add_brand(self, brand_obj) -> bool:
-        if brand_obj not in self.brands:
-            self.brands.append(brand_obj)
-            return True
-        return False
-    def add_topic(self, topic_obj) -> bool:
-        if topic_obj not in self.topics:
-            self.topics.append(topic_obj)
-            return True
-        return False
-    def link_item(self, item_obj) -> bool:
-        if item_obj not in self.linked_items:
-            self.linked_items.append(item_obj)
+
+    def link_product(self, product_obj) -> bool:
+        if product_obj not in self.linked_products:
+            self.linked_products.append(product_obj)
             return True
         return False
 

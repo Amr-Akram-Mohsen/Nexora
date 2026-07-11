@@ -86,7 +86,7 @@ def seed_arabclicks_stores() -> int:
     Returns the number of new stores created.
     """
     from app.core.extensions import db
-    from app.domains.item.models import Store
+    from app.domains.product.models import Store
 
     created = 0
     for store_slug, cfg in ARABCLICKS_STORES.items():
@@ -223,7 +223,7 @@ def refresh_noon_prices() -> int:
     Stub — returns 0 until Noon product API access is available.
 
     When live: fetch current price by NID (Noon product ID stored in
-    ItemStoreLink.external_item_id) and update the record.
+    ProductStoreLink.external_product_id) and update the record.
     """
     publisher_id = current_app.config.get("ARABCLICKS_PUBLISHER_ID")
     if not publisher_id:

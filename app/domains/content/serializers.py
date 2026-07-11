@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model, serialize_target
-from app.domains.item.serializers import serialize_item
+from app.domains.product.serializers import serialize_item
 from app.domains.content.service.editorial import assess_video_description, assess_article_extraction
 def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     if not target:
@@ -73,10 +73,10 @@ def serialize_content_inspect_dto(content, target) -> Optional[Dict[str, Any]]:
         "gender": content.gender.name if content.gender else None,
         "price_tier": content.price_tier.name if content.price_tier else None,
         
-        "brands": [b.name for b in content.brands],
-        "topics": [t.name for t in content.topics],
+        "brands": [ce.entity.name for ce in content.content_entities if ce.entity.entity_type == 'brand'],
+        "topics": [ce.entity.name for ce in content.content_entities if ce.entity.entity_type in ('topic', 'tag', 'concept')],
         "attributes": [a.name for a in content.attributes],
-        "linked_items": [{"id": i.id, "name": i.name} for i in content.linked_items],
+        "linked_items": [{"id": i.id, "name": i.name} for i in content.linked_products],
         "sources": sources,
         
         "enrichment_status": status_val,
@@ -108,8 +108,10 @@ def _calculate_content_health_score(c, target, duplicate):
     if c.title: score += 10
     if c.preview_text or getattr(target, 'description', None) or getattr(target, 'preview_text', None): score += 10
     if c.category and c.category.slug != 'uncategorized': score += 10
-    if c.topics: score += 15
-    if c.brands: score += 15
+    has_topics = any(ce.entity.entity_type in ('topic', 'tag', 'concept') for ce in c.content_entities)
+    has_brands = any(ce.entity.entity_type == 'brand' or ce.entity.origin == 'legacy_brand' for ce in c.content_entities)
+    if has_topics: score += 15
+    if has_brands: score += 15
     if c.source_id: score += 10
     if not duplicate: score += 5
     
@@ -164,8 +166,8 @@ def serialize_content_row(c, target, duplicate_titles: set) -> dict:
         "object_type": c.object_type,
         "category": cat_name,
         "section": sec_name,
-        "has_topics": bool(c.topics),
-        "has_brands": bool(c.brands),
+        "has_topics": any(ce.entity.entity_type in ('topic', 'tag', 'concept') for ce in c.content_entities),
+        "has_brands": any(ce.entity.entity_type == 'brand' or ce.entity.origin == 'legacy_brand' for ce in c.content_entities),
         "has_source": bool(c.source_id),
         "is_duplicate": bool(duplicate),
         "enrichment_status": status_val,
@@ -205,9 +207,9 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         else None,
         "section": serialize_model(content_obj.section),
         "target": serialize_target(target_obj, session) if target_obj else None,
-        "topics": [serialize_model(t) for t in (content_obj.topics or [])],
-        "brands": [serialize_model(b) for b in (content_obj.brands or [])],
-        "linked_items": [serialize_item(i) for i in (content_obj.linked_items or [])] if include_linked_items else None,
+        "topics": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type in ('topic', 'tag', 'concept')],
+        "brands": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type == 'brand'],
+        "linked_items": [serialize_item(i) for i in (content_obj.linked_products or [])] if include_linked_items else None,
         "entities": [serialize_model(e.entity) for e in (content_obj.content_entities or []) if e.entity],
         "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
     }

@@ -1,0 +1,10 @@
+{% from "admin/components/ui/dashboard.html" import dashboard_empty, ranked_list_item %}
+{% if not products or products | length == 0 %}
+{{ dashboard_empty("No data yet.") }}
+{% else %}
+<ol class="overview-top-list">
+  {% for product in products %}
+  {{ ranked_list_item(loop.index, product.name, title_href="/admin/products?search=" ~ product.id, value_text="{:,} clicks".format(product.click_count or 0)) }}
+  {% endfor %}
+</ol>
+{% endif %}

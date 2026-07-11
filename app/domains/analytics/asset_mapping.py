@@ -2,7 +2,7 @@
 from sqlalchemy import select
 from app.core.extensions import db
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.taxonomy.models import Category, Brand
 from app.domains.distribution.models import DistributionPost, DistributionPlatform
 
@@ -18,8 +18,8 @@ def map_content_strategy_to_assets(content_strategy_data):
         select(Content.id, Content.title, Content.object_type, Content.category_id, Content.intent_id)
     ).all()
     
-    item_rows = db.session.execute(
-        select(Item.id, Item.name, Item.category_id, Item.brand_id)
+    product_rows = db.session.execute(
+        select(Product.id, Product.name, Product.category_id, Product.brand_id)
     ).all()
 
     categories = db.session.execute(select(Category.id, Category.name)).all()
@@ -66,9 +66,9 @@ def map_content_strategy_to_assets(content_strategy_data):
             get_words(c_title), has_vs, has_review, has_guide
         ))
 
-    # Pre-tokenize database items and check for metadata flags
+    # Pre-tokenize database products and check for metadata flags
     pretokenized_items = []
-    for i_id, i_name, i_cat_id, i_brand_id in item_rows:
+    for i_id, i_name, i_cat_id, i_brand_id in product_rows:
         name_lower = (i_name or "").lower()
         has_vs = "vs" in name_lower or "comparison" in name_lower
         has_review = "review" in name_lower
@@ -146,14 +146,14 @@ def map_content_strategy_to_assets(content_strategy_data):
 
     mapped_output = []
 
-    for item in content_strategy_data:
-        entity = item["entity"]
-        etype = item["type"]
-        score = item["opportunity_score"]
+    for product in content_strategy_data:
+        entity = product["entity"]
+        etype = product["type"]
+        score = product["opportunity_score"]
         
-        youtube_ideas = item.get("youtube", [])
-        pinterest_ideas = item.get("pinterest", [])
-        blog_ideas = item.get("blog", [])
+        youtube_ideas = product.get("youtube", [])
+        pinterest_ideas = product.get("pinterest", [])
+        blog_ideas = product.get("blog", [])
         
         # Pre-tokenize idea titles and check flags
         def prep_idea(idea_title):
@@ -261,7 +261,7 @@ def map_content_strategy_to_assets(content_strategy_data):
                         "distribution_posts": dist_map.get(("content", c_id), [])
                     })
 
-        # 2. Match against Item product pages
+        # 2. Match against Product product pages
         for i_id, i_name, i_cat_id, i_brand_id, i_words, i_has_vs, i_has_review, i_has_guide in pretokenized_items:
             max_sim = 0.0
             for idea, i_words_idea, i_has_vs_idea, i_has_review_idea, i_has_guide_idea in all_idea_info:
@@ -286,7 +286,7 @@ def map_content_strategy_to_assets(content_strategy_data):
                         "title": i_name,
                         "relevance_score": round(max_sim, 2),
                         "action": action,
-                        "distribution_posts": dist_map.get(("item", i_id), [])
+                        "distribution_posts": dist_map.get(("product", i_id), [])
                     })
 
         # 3. Detect gaps and missing assets with explanatory diagnostics
@@ -343,8 +343,8 @@ def map_content_strategy_to_assets(content_strategy_data):
 
         # 4. Structured downstream Content Engine metadata
         content_planning = {
-            "lifecycle_tag": item.get("lifecycle_tag", "evergreen"),
-            "priority_score": item.get("priority_score", score * 100),
+            "lifecycle_tag": product.get("lifecycle_tag", "evergreen"),
+            "priority_score": product.get("priority_score", score * 100),
             "target_audience": "Informational searchers" if etype == "category" else "Commercial intent buyers"
         }
         publishing_decisions = {
@@ -353,7 +353,7 @@ def map_content_strategy_to_assets(content_strategy_data):
         }
         platform_strategy = {
             "primary_platform": "youtube" if etype == "brand" else "blog",
-            "recommended_angle": item.get("content_angle", "guide")
+            "recommended_angle": product.get("content_angle", "guide")
         }
 
         mapped_output.append({

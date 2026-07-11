@@ -1,15 +1,15 @@
 {% from "admin/distribution/_components.html" import opportunity_card %}
-{% if items %}
-  {% for item in items %}
-    {% call opportunity_card(item.category_name) %}
-      <div class="opp-metrics flex gap-2 flex-wrap items-center">
-        {% for intentName, count in item.distribution.items() %}
+{% if products %}
+  {% for product in products %}
+    {% call opportunity_card(product.category_name) %}
+      <div class="opp-metrics flex gap-2 flex-wrap products-center">
+        {% for intentName, count in product.distribution.items() %}
           <span class="status-badge">{{ intentName }}: <strong >{{ count }}</strong></span>
         {% endfor %}
       </div>
-      <div class="opp-action flex items-center gap-2">
+      <div class="opp-action flex products-center gap-2">
         <span><i class="fa-solid fa-bullseye"></i></span>
-        <span >Opportunity: <strong >{{ item.opportunity }}</strong></span>
+        <span >Opportunity: <strong >{{ product.opportunity }}</strong></span>
       </div>
     {% endcall %}
   {% endfor %}

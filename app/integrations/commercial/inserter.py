@@ -4,10 +4,10 @@ ProductInserter — source-agnostic SQLAlchemy insertion pipeline.
 Accepts any ParsedProduct (produced by any BaseParser subclass) and
 persists it to the database, handling:
     - Store auto-creation for well-known slugs
-    - Duplicate detection via external_item_id → original_url fallback
+    - Duplicate detection via external_product_id → original_url fallback
     - Category and Brand get-or-create
-    - Item slug uniqueness (appends -2, -3, … on collision)
-    - ItemVariant, ItemImage, ItemSpecification, ItemStoreLink creation
+    - Product slug uniqueness (appends -2, -3, … on collision)
+    - ProductVariant, ProductImage, ProductSpecification, ProductStoreLink creation
 
 This class never raises — failures are logged and None is returned.
 """
@@ -19,12 +19,12 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from app.domains.item.models import (
-    Item,
-    ItemImage,
-    ItemSpecification,
-    ItemStoreLink,
-    ItemVariant,
+from app.domains.product.models import (
+    Product,
+    ProductImage,
+    ProductSpecification,
+    ProductStoreLink,
+    ProductVariant,
     Store,
 )
 from app.domains.taxonomy.models import Brand, Category, Source
@@ -60,16 +60,16 @@ class ProductInserter:
 
     Usage:
         inserter = ProductInserter(db.session)
-        item = inserter.insert(parsed_product)
+        product = inserter.insert(parsed_product)
         db.session.commit()
     """
 
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def insert(self, product: ParsedProduct) -> Optional[Item]:
+    def insert(self, product: ParsedProduct) -> Optional[Product]:
         """
-        Insert one ParsedProduct.  Returns the created Item, or None when
+        Insert one ParsedProduct.  Returns the created Product, or None when
         the product is a duplicate or insertion fails.
         """
         try:
@@ -85,7 +85,7 @@ class ProductInserter:
     # Internal orchestration                                               #
     # ------------------------------------------------------------------ #
 
-    def _insert(self, product: ParsedProduct) -> Optional[Item]:
+    def _insert(self, product: ParsedProduct) -> Optional[Product]:
         store = self._resolve_store(product.store_link.store_slug)
         if store is None:
             logger.warning(
@@ -121,36 +121,36 @@ class ProductInserter:
                 self._session.add(source)
                 self._session.flush()
 
-        item = Item(
+        product = Product(
             name=product.name,
             slug=slug,
             description=product.description,
             rating=product.rating,
             review_count=product.review_count,
-            item_type=product.item_type,
+            product_type=product.product_type,
             source_type=product.source_type,
             source_id=source.id if source else None,
             category=category,
             brand=brand,
         )
-        self._session.add(item)
-        self._session.flush()  # item.id is now available
+        self._session.add(product)
+        self._session.flush()  # product.id is now available
 
-        self._add_images(item, product)
-        variants = self._add_variants(item, product)
-        self._add_specifications(item, product)
-        self._add_store_link(item, variants, product, store)
+        self._add_images(product, product)
+        variants = self._add_variants(product, product)
+        self._add_specifications(product, product)
+        self._add_store_link(product, variants, product, store)
 
-        item.set_default_variant()
+        product.set_default_variant()
         self._session.flush()
 
         logger.info(
-            "[ProductInserter] Inserted item id=%s slug='%s' name='%s'",
-            item.id,
-            item.slug,
-            item.name,
+            "[ProductInserter] Inserted product id=%s slug='%s' name='%s'",
+            product.id,
+            product.slug,
+            product.name,
         )
-        return item
+        return product
 
     # ------------------------------------------------------------------ #
     # Duplicate detection                                                  #
@@ -158,15 +158,15 @@ class ProductInserter:
 
     def _is_duplicate(self, product: ParsedProduct, store: Store) -> bool:
         """
-        Check for an existing ItemStoreLink using:
-          1. external_item_id (most reliable)
+        Check for an existing ProductStoreLink using:
+          1. external_product_id (most reliable)
           2. original_url (fallback)
         """
         sl = product.store_link
-        q = self._session.query(ItemStoreLink).filter_by(store_id=store.id)
+        q = self._session.query(ProductStoreLink).filter_by(store_id=store.id)
 
-        if sl.external_item_id:
-            if q.filter_by(external_item_id=sl.external_item_id).first():
+        if sl.external_product_id:
+            if q.filter_by(external_product_id=sl.external_product_id).first():
                 return True
 
         if sl.original_url:
@@ -232,7 +232,7 @@ class ProductInserter:
         base = generate_slug(name)
         slug = base
         counter = 2
-        while self._session.query(Item).filter_by(slug=slug).first():
+        while self._session.query(Product).filter_by(slug=slug).first():
             slug = f"{base}-{counter}"
             counter += 1
         return slug
@@ -241,27 +241,27 @@ class ProductInserter:
     # Child record creation                                                #
     # ------------------------------------------------------------------ #
 
-    def _add_images(self, item: Item, product: ParsedProduct) -> None:
+    def _add_images(self, product: Product, product: ParsedProduct) -> None:
         for img in product.images:
             self._session.add(
-                ItemImage(item_id=item.id, image_url=img.url, position=img.position)
+                ProductImage(product_id=product.id, image_url=img.url, position=img.position)
             )
 
     def _add_variants(
-        self, item: Item, product: ParsedProduct
-    ) -> list[ItemVariant]:
-        created: list[ItemVariant] = []
+        self, product: Product, product: ParsedProduct
+    ) -> list[ProductVariant]:
+        created: list[ProductVariant] = []
         for pv in product.variants:
-            variant = self._create_variant(item, pv)
+            variant = self._create_variant(product, pv)
             self._session.add(variant)
             self._session.flush()  # variant.id available for variant images
             self._add_variant_images(variant, pv)
             created.append(variant)
         return created
 
-    def _create_variant(self, item: Item, pv: ParsedVariant) -> ItemVariant:
-        return ItemVariant(
-            item_id=item.id,
+    def _create_variant(self, product: Product, pv: ParsedVariant) -> ProductVariant:
+        return ProductVariant(
+            product_id=product.id,
             title=pv.title,
             attributes=pv.attributes or None,
             price=pv.price,
@@ -271,23 +271,23 @@ class ProductInserter:
         )
 
     def _add_variant_images(
-        self, variant: ItemVariant, pv: ParsedVariant
+        self, variant: ProductVariant, pv: ParsedVariant
     ) -> None:
         for pos, url in enumerate(pv.image_urls):
             self._session.add(
-                ItemImage(
-                    item_id=variant.item_id,
+                ProductImage(
+                    product_id=variant.product_id,
                     variant_id=variant.id,
                     image_url=url,
                     position=pos,
                 )
             )
 
-    def _add_specifications(self, item: Item, product: ParsedProduct) -> None:
+    def _add_specifications(self, product: Product, product: ParsedProduct) -> None:
         for spec in product.specifications:
             self._session.add(
-                ItemSpecification(
-                    item_id=item.id,
+                ProductSpecification(
+                    product_id=product.id,
                     category=spec.category,
                     spec_json=spec.spec_json,
                 )
@@ -295,8 +295,8 @@ class ProductInserter:
 
     def _add_store_link(
         self,
-        item: Item,
-        variants: list[ItemVariant],
+        product: Product,
+        variants: list[ProductVariant],
         product: ParsedProduct,
         store: Store,
     ) -> None:
@@ -307,16 +307,16 @@ class ProductInserter:
         if default_variant is None:
             logger.warning(
                 "[ProductInserter] No variant available for store link on '%s'",
-                item.name,
+                product.name,
             )
             return
 
         sl = product.store_link
         self._session.add(
-            ItemStoreLink(
+            ProductStoreLink(
                 variant_id=default_variant.id,
                 store_id=store.id,
-                external_item_id=sl.external_item_id,
+                external_product_id=sl.external_product_id,
                 original_url=sl.original_url,
                 affiliate_url=sl.affiliate_url,
                 price=sl.price,

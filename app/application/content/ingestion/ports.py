@@ -12,7 +12,7 @@ class EnrichmentPort(Protocol):
 class TaxonomyEnrichmentPort(Protocol):
     """
     Post-normalization taxonomy enrichment.
-    Accepts a normalized item dict and returns a dict with refined
+    Accepts a normalized product dict and returns a dict with refined
     taxonomy assignments (category, topics, brands, facets).
     Does NOT perform scraping or network calls.
     """

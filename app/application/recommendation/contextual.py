@@ -6,7 +6,7 @@ from app.application.recommendation.query_service import (
 def get_contextual_recommendations(active_filters, has_results, section=None, target_type="content"):
     """
     Generates contextual recommendation blocks based on active filters and result state.
-    Unifies the empty-state and filter-aware recommendations for both Content and Item catalogs.
+    Unifies the empty-state and filter-aware recommendations for both Content and Product catalogs.
     """
     category_slugs = active_filters.get("category", [])
     brand_slugs = active_filters.get("brand", [])
@@ -32,7 +32,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Trending {cat_name} Content",
                         "type": "content",
-                        "items": trending_cat
+                        "products": trending_cat
                     })
 
                 cat_reviews = get_popular_contents_cached(
@@ -44,7 +44,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular {cat_name} Reviews",
                         "type": "content",
-                        "items": cat_reviews
+                        "products": cat_reviews
                     })
 
                 cat_guides = get_popular_contents_cached(
@@ -56,7 +56,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Related Buying Guides",
                         "type": "content",
-                        "items": cat_guides
+                        "products": cat_guides
                     })
             else:
                 cat_contents = get_popular_contents_cached(
@@ -67,7 +67,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Trending {cat_name} Content",
                         "type": "content",
-                        "items": cat_contents
+                        "products": cat_contents
                     })
 
                 cat_products = get_popular_items_cached(
@@ -78,7 +78,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular {cat_name} Products",
                         "type": "commercial",
-                        "items": cat_products
+                        "products": cat_products
                     })
 
         elif brand_slugs:
@@ -91,7 +91,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular {brand_name} Products",
                         "type": "commercial",
-                        "items": brand_products
+                        "products": brand_products
                     })
 
                 brand_reviews = get_popular_contents_cached(
@@ -103,7 +103,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Related {brand_name} Reviews",
                         "type": "content",
-                        "items": brand_reviews
+                        "products": brand_reviews
                     })
 
                 brand_guides = get_popular_contents_cached(
@@ -115,7 +115,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Related Buying Guides",
                         "type": "content",
-                        "items": brand_guides
+                        "products": brand_guides
                     })
             else:
                 brand_contents = get_popular_contents_cached(
@@ -126,7 +126,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Trending {brand_name} Content",
                         "type": "content",
-                        "items": brand_contents
+                        "products": brand_contents
                     })
 
                 brand_products = get_popular_items_cached(
@@ -137,7 +137,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular {brand_name} Products",
                         "type": "commercial",
-                        "items": brand_products
+                        "products": brand_products
                     })
 
         elif intent_slugs and target_type == "content":
@@ -150,7 +150,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 blocks.append({
                     "title": f"Trending {intent_name}s",
                     "type": "content",
-                    "items": trending_intent
+                    "products": trending_intent
                 })
 
             popular_intent = get_popular_contents_cached(
@@ -161,7 +161,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 blocks.append({
                     "title": f"Popular {intent_name}s",
                     "type": "content",
-                    "items": popular_intent
+                    "products": popular_intent
                 })
 
         else:
@@ -175,7 +175,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Trending in {section.name}",
                         "type": "content",
-                        "items": trending_section
+                        "products": trending_section
                     })
             else:
                 trending_products = get_popular_items_cached(limit=6)
@@ -183,7 +183,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Trending Products",
                         "type": "commercial",
-                        "items": trending_products
+                        "products": trending_products
                     })
 
                 trending_reviews = get_popular_contents_cached(
@@ -194,7 +194,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Trending Reviews",
                         "type": "content",
-                        "items": trending_reviews
+                        "products": trending_reviews
                     })
 
     else:
@@ -209,7 +209,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular Alternatives in {cat_name}",
                         "type": "content",
-                        "items": cat_alternatives
+                        "products": cat_alternatives
                     })
 
                 cat_products = get_popular_items_cached(
@@ -220,7 +220,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular Products in {cat_name}",
                         "type": "commercial",
-                        "items": cat_products
+                        "products": cat_products
                     })
             else:
                 cat_alternatives = get_popular_items_cached(
@@ -231,7 +231,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Popular Alternatives in {cat_name}",
                         "type": "commercial",
-                        "items": cat_alternatives
+                        "products": cat_alternatives
                     })
 
                 cat_content = get_popular_contents_cached(
@@ -242,7 +242,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": f"Trending {cat_name} Content",
                         "type": "content",
-                        "items": cat_content
+                        "products": cat_content
                     })
 
         elif brand_slugs:
@@ -254,7 +254,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 blocks.append({
                     "title": f"Popular {brand_name} Products",
                     "type": "commercial",
-                    "items": brand_products
+                    "products": brand_products
                 })
 
             brand_content = get_popular_contents_cached(
@@ -265,7 +265,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                 blocks.append({
                     "title": f"Trending {brand_name} Content",
                     "type": "content",
-                    "items": brand_content
+                    "products": brand_content
                 })
 
         else:
@@ -279,7 +279,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Trending Content",
                         "type": "content",
-                        "items": trending_content
+                        "products": trending_content
                     })
 
                 popular_products = get_popular_items_cached(
@@ -289,7 +289,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Popular Products",
                         "type": "commercial",
-                        "items": popular_products
+                        "products": popular_products
                     })
             else:
                 trending_products = get_popular_items_cached(limit=6)
@@ -297,7 +297,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Trending Products",
                         "type": "commercial",
-                        "items": trending_products
+                        "products": trending_products
                     })
 
                 trending_reviews = get_popular_contents_cached(
@@ -308,7 +308,7 @@ def get_contextual_recommendations(active_filters, has_results, section=None, ta
                     blocks.append({
                         "title": "Trending Reviews",
                         "type": "content",
-                        "items": trending_reviews
+                        "products": trending_reviews
                     })
 
     return blocks

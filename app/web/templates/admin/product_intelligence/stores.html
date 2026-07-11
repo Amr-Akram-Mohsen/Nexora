@@ -26,14 +26,14 @@ status" %}
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
   {{ admin_search_input("stores-search", "Search by name, slug, or website…") }}
   {{ admin_filter_select("filter-network", None, [], default_val="", default_text="All Networks",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-country", None, [], default_val="", default_text="All Countries",
-  extra_class="filter-select-item") }}
+  extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-sync-staleness", None, [("fresh", "Fresh (7d)"), ("stale", "Stale (>7d)"), ("never",
-  "Never Synced")], default_val="", default_text="Sync Staleness: All", extra_class="filter-select-item") }}
+  "Never Synced")], default_val="", default_text="Sync Staleness: All", extra_class="filter-select-product") }}
   {{ admin_reset_button("clear-stores-filters-btn", "Reset") }}
 </div>
 {% endcall %}

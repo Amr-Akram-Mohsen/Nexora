@@ -1,49 +1,49 @@
-{% if not items %}
+{% if not products %}
 <tr>
     <td colspan="6" >
         No social distribution data available for this time frame.
     </td>
 </tr>
 {% else %}
-{% for item in items %}
+{% for product in products %}
 <tr >
     <td>
-        {% if item.platform == "youtube" %}
+        {% if product.platform == "youtube" %}
             <span class="status-badge">YouTube</span>
-        {% elif item.platform == "pinterest" %}
+        {% elif product.platform == "pinterest" %}
             <span class="status-badge">Pinterest</span>
-        {% elif item.platform == "instagram" %}
+        {% elif product.platform == "instagram" %}
             <span class="status-badge">Instagram</span>
-        {% elif item.platform == "facebook" %}
+        {% elif product.platform == "facebook" %}
             <span class="status-badge">Facebook</span>
         {% else %}
-            <span class="status-badge">{{ item.platform | title }}</span>
+            <span class="status-badge">{{ product.platform | title }}</span>
         {% endif %}
     </td>
     <td>
-        <strong>{{ item.source_title }}</strong>
-        <div class="small">{{ item.source_type | title }}</div>
+        <strong>{{ product.source_title }}</strong>
+        <div class="small">{{ product.source_type | title }}</div>
     </td>
     <td>
-        {% if item.status == 'published' %}
+        {% if product.status == 'published' %}
             <span class="badge">Published</span>
-        {% elif item.status == 'scheduled' %}
+        {% elif product.status == 'scheduled' %}
             <span class="badge">Scheduled</span>
         {% else %}
             <span class="badge">Draft</span>
         {% endif %}
     </td>
-    <td>{{ item.publish_date }}</td>
+    <td>{{ product.publish_date }}</td>
     <td>
-        <div class="d-flex align-items-center gap-3 small">
-            <span title="Views"><i class="bi bi-eye"></i> {{ item.views }}</span>
-            <span title="Likes"><i class="bi bi-heart"></i> {{ item.likes }}</span>
-            <span title="Clicks"><i class="bi bi-cursor"></i> {{ item.clicks }}</span>
+        <div class="d-flex align-products-center gap-3 small">
+            <span title="Views"><i class="bi bi-eye"></i> {{ product.views }}</span>
+            <span title="Likes"><i class="bi bi-heart"></i> {{ product.likes }}</span>
+            <span title="Clicks"><i class="bi bi-cursor"></i> {{ product.clicks }}</span>
         </div>
     </td>
     <td>
         {% from "components/ui/core.html" import button %}
-        {{ button(type="button", class="btn btn-sm btn-outline-secondary", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, icon="bi bi-eye", text="View", unstyled=True) }}
+        {{ button(type="button", class="btn btn-sm btn-outline-secondary", attrs={"data-action": "view-distribution-draft", "data-id": product.id, "data-source-type": product.source_type, "data-source-id": product.source_id, "data-platform": product.platform}, icon="bi bi-eye", text="View", unstyled=True) }}
     </td>
 </tr>
 {% endfor %}

@@ -27,7 +27,7 @@ class CompareManager {
             return 'removed';
         } else {
             if (this.compareIds.length >= this.maxItems) {
-                alert(`You can compare up to ${this.maxItems} items at once.`);
+                alert(`You can compare up to ${this.maxItems} products at once.`);
                 return 'full';
             }
             this.compareIds.push(id);

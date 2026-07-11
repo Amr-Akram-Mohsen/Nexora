@@ -9,15 +9,15 @@ def serialize_match_inspect_dto(raw_tuple) -> Optional[Dict[str, Any]]:
     last_active = last_impression.strftime("%Y-%m-%d %H:%M") if last_impression else "Never"
 
     linked_items_data = []
-    for item, context_clicks, widget_clicks in linked_items_stats:
+    for product, context_clicks, widget_clicks in linked_items_stats:
         widget_ctr = f"{(widget_clicks / widget_impressions * 100):.1f}%" if widget_impressions > 0 else "0.0%"
         affiliate_ctr = f"{(context_clicks / content.view_count * 100):.1f}%" if content.view_count and content.view_count > 0 else "0.0%"
         
         linked_items_data.append({
-            "id": item.id,
-            "name": item.name or f"Item #{item.id}",
-            "type": item.item_type,
-            "clicks": f"{widget_clicks} ({widget_ctr} Widget) | {context_clicks} ({affiliate_ctr} Affiliate) | {item.click_count or 0} Total"
+            "id": product.id,
+            "name": product.name or f"Product #{product.id}",
+            "type": product.product_type,
+            "clicks": f"{widget_clicks} ({widget_ctr} Widget) | {context_clicks} ({affiliate_ctr} Affiliate) | {product.click_count or 0} Total"
         })
 
     return {
@@ -38,20 +38,23 @@ def serialize_user_interests_dto(raw_tuple) -> Optional[Dict[str, Any]]:
     user, scores = raw_tuple
     
     from app.core.extensions import db
-    from app.domains.taxonomy.models import Brand, Category, Topic
+    from app.domains.taxonomy.models import Category, Entity
     
     affinities = []
     for row in scores:
         name = "Unknown"
-        if row.brand_id:
-            brand = db.session.get(Brand, row.brand_id)
-            name = f"Brand: {brand.name}" if brand else f"Brand #{row.brand_id}"
-        elif row.category_id:
+        if getattr(row, 'entity_id', None):
+            entity = db.session.get(Entity, row.entity_id)
+            if entity:
+                if entity.entity_type == 'brand' or entity.origin == 'legacy_brand':
+                    name = f"Brand: {entity.name}"
+                else:
+                    name = f"Topic: {entity.name}"
+            else:
+                name = f"Entity #{row.entity_id}"
+        elif getattr(row, 'category_id', None):
             category = db.session.get(Category, row.category_id)
             name = f"Category: {category.name}" if category else f"Category #{row.category_id}"
-        elif row.topic_id:
-            topic = db.session.get(Topic, row.topic_id)
-            name = f"Topic: {topic.name}" if topic else f"Topic #{row.topic_id}"
             
         affinities.append({
             "name": name,

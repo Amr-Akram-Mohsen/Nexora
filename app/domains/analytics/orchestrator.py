@@ -235,9 +235,9 @@ def get_decision_intelligence_data(lightweight=False):
         eval_results = feedback_data["evaluation_results"]
         
         entity_feedback = {}
-        for item in eval_results:
-            ent = item["entity"]
-            eval_val = item["evaluation"]
+        for product in eval_results:
+            ent = product["entity"]
+            eval_val = product["evaluation"]
             if eval_val == "overperforming":
                 f_score = 0.9
             elif eval_val == "underperforming":
@@ -357,7 +357,7 @@ def get_decision_intelligence_data(lightweight=False):
 
     # 4. Insight Actions Queue
     action_queue = []
-    intent_map = {item["category_name"]: item for item in intent_data}
+    intent_map = {product["category_name"]: product for product in intent_data}
     
     # Category actions
     for name, data in category_scores.items():
@@ -404,14 +404,14 @@ def get_decision_intelligence_data(lightweight=False):
             })
             
     action_queue.sort(key=lambda x: x["score"], reverse=True)
-    for item in action_queue:
-        item["content_output"] = _generate_content_ideas(
-            item["target"],
-            item["type"],
-            item["title"],
-            confidence=item["confidence"]
+    for product in action_queue:
+        product["content_output"] = _generate_content_ideas(
+            product["target"],
+            product["type"],
+            product["title"],
+            confidence=product["confidence"]
         )
-        item.pop("score", None)
+        product.pop("score", None)
 
     recommendation_metrics = {
         "impressions": rec_perf["impressions"],

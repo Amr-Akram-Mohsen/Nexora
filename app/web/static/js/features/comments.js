@@ -93,9 +93,9 @@ async function handleCommentPosting(form, formType) {
         return;
     }
 
-    const item = wrapper.closest("[data-id]");
+    const product = wrapper.closest("[data-id]");
 
-    submitUserInteraction(item,
+    submitUserInteraction(product,
         'comment',
         null,
         content,

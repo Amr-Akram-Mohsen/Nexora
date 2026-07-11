@@ -4,13 +4,13 @@ import datetime
 def generate_social_post_template(asset, platform, entity_name=None, category_name=None):
     """
     Generates rule-based and template-based social media content 
-    from an existing Nexora asset (Content or Item).
+    from an existing Nexora asset (Content or Product).
     """
     current_year = datetime.datetime.now().year
     entity = entity_name or getattr(asset, "title", getattr(asset, "name", "Product"))
     category = category_name or "Top Picks"
     
-    # Try to determine if it's an article with linked items
+    # Try to determine if it's an article with linked products
     # (Simplified rule-based check for phase 1)
     linked_items_count = 0
     if hasattr(asset, "linked_items"):
@@ -28,7 +28,7 @@ def generate_social_post_template(asset, platform, entity_name=None, category_na
             generated_text += f"\nSlide 7: Read our full breakdown at the link in bio! #Nexora #{category.replace(' ', '')}"
         else:
             post_type = "Instagram Reel Concept"
-            generated_text = f"Reel Hook: Why everyone is talking about {entity} in {current_year}.\n\n(Show quick b-roll of the item in action)\n\nCaption: Read our full review at the link in bio!"
+            generated_text = f"Reel Hook: Why everyone is talking about {entity} in {current_year}.\n\n(Show quick b-roll of the product in action)\n\nCaption: Read our full review at the link in bio!"
             
     elif platform == "facebook":
         post_type = "Community Discussion"
@@ -131,7 +131,7 @@ def get_admin_social_distribution(status_filter=None, platform_filter=None, sour
     
     summary_stats = get_social_distribution_summary()
     
-    for post, p_name in posts_paginated.items:
+    for post, p_name in posts_paginated.products:
         source_title = "Unknown"
         if post.source:
             source_title = getattr(post.source, "title", getattr(post.source, "name", f"ID: {post.source_target_id}"))
@@ -208,7 +208,7 @@ def generate_admin_distribution_draft(source_type, source_id, platform_name):
     from sqlalchemy import select
     from app.domains.distribution.models import DistributionPost, DistributionPlatform
     from app.domains.content.models import Content
-    from app.domains.item.models import Item
+    from app.domains.product.models import Product
     from app.domains.shared_lookups import get_source_title
 
     platform = db.session.execute(select(DistributionPlatform).filter_by(name=platform_name)).scalar_one_or_none()
@@ -220,8 +220,8 @@ def generate_admin_distribution_draft(source_type, source_id, platform_name):
     asset = None
     if source_type == "content":
         asset = db.session.get(Content, source_id)
-    elif source_type == "item":
-        asset = db.session.get(Item, source_id)
+    elif source_type == "product":
+        asset = db.session.get(Product, source_id)
         
     if not asset:
         return None

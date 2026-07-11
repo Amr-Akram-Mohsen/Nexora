@@ -1,28 +1,28 @@
 {% from"content/features/content-image.html" import render_image_url %}
-{% macro content_snippet(items, snippet_title) %}
+{% macro content_snippet(products, snippet_title) %}
 <div class="snippet-contents__section">
   <h3 class="snippet__header">{{ snippet_title }}</h3>
-  <div class="snippet-contents flex gap-5 flex-wrap items-start">
-    {% for item in items %}
+  <div class="snippet-contents flex gap-5 flex-wrap products-start">
+    {% for product in products %}
     <a href="
-    {{ url_for('content.content_page', content_id=item.id) }}" class="snippet-content flex items-start flex-col gap-4" data-id="{{ item.id }}">
+    {{ url_for('content.content_page', content_id=product.id) }}" class="snippet-content flex products-start flex-col gap-4" data-id="{{ product.id }}">
       {{ render_image_url(
-      item.target.image_url,
-      item.target.title,
+      product.target.image_url,
+      product.target.title,
       ' snippet-content__img')
       }}
       <div class="snippet-content__content flex">
-        <h4 class="snippet-content__title">{{ item.target.title }}</h4>
-        <!-- <div class="snippet-content__meta flex items-center">
-          {% if item.intent %}
-          <span class="snippet-content__badge gap-1 inline-flex items-center">
-            <i class="fas fa-tag"></i> {{ item.intent.name }}
+        <h4 class="snippet-content__title">{{ product.target.title }}</h4>
+        <!-- <div class="snippet-content__meta flex products-center">
+          {% if product.intent %}
+          <span class="snippet-content__badge gap-1 inline-flex products-center">
+            <i class="fas fa-tag"></i> {{ product.intent.name }}
           </span>
           {% else %}
-          <span class="snippet-content__badge gap-1 inline-flex items-center">
+          <span class="snippet-content__badge gap-1 inline-flex products-center">
             <i
-              class="fas {% if item.object_type == 'video' %}fa-video{% elif item.object_type == 'post' %}fa-comment{% else %}fa-file-alt{% endif %}"></i>
-            {{ item.object_type | title }}
+              class="fas {% if product.object_type == 'video' %}fa-video{% elif product.object_type == 'post' %}fa-comment{% else %}fa-file-alt{% endif %}"></i>
+            {{ product.object_type | title }}
           </span>
           {% endif %}
         </div> -->

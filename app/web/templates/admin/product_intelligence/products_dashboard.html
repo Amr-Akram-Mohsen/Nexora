@@ -1,0 +1,32 @@
+{% extends "admin/layout/admin_base.html" %}
+
+{% block title %}Products Intelligence Dashboard — Nexora Admin{% endblock %}
+{% block content_class %}admin-content-fluid{% endblock %}
+
+{% block admin_content %}
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_padded_panel, admin_list_panel %}
+{{ admin_page_header(
+    "Products Intelligence Dashboard",
+    "Monitor catalog breakdown, engagement metrics, and product distribution."
+) }}
+
+<!-- Product Type Distribution Panel -->
+<div class="overview-top-grid">
+  {% call admin_padded_panel("Catalog Breakdown by Product Type", "Distribution of products across different categories", actions='<i class="fa-solid fa-chart-pie"></i>') %}
+    <div id="stats-type-distribution" class="overview-breakdown-grid flex gap-2">
+      <!-- JS will inject progress bars here -->
+      <div><i class="fa-solid fa-circle-notch fa-spin"></i> Loading distribution...</div>
+    </div>
+  {% endcall %}
+
+  {% call admin_list_panel("Top Items by Engagement", "Highest performing products (Clickthrough Rate)", actions='<i class="fa-solid fa-fire"></i>') %}
+    <ul id="stats-engagement-products" class="overview-top-list">
+      <li><i class="fa-solid fa-circle-notch fa-spin"></i> Loading top products...</li>
+    </ul>
+  {% endcall %}
+</div>
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/items_dashboard.js') }}"></script>
+{% endblock %}

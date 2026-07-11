@@ -1,7 +1,7 @@
 from sqlalchemy import select, func
 from app.core.extensions import db
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.taxonomy.models import Category
 
 def _get_metric_counts(fk_col, ids):
@@ -14,7 +14,7 @@ def _get_metric_counts(fk_col, ids):
 def get_category_metrics(category_ids: list[int]) -> dict:
     if not category_ids: return {}
     content_counts = _get_metric_counts(Content.category_id, category_ids)
-    item_counts = _get_metric_counts(Item.category_id, category_ids)
+    item_counts = _get_metric_counts(Product.category_id, category_ids)
     return {cid: {
         "content_count": content_counts.get(cid, 0), 
         "item_count": item_counts.get(cid, 0), 
@@ -22,19 +22,29 @@ def get_category_metrics(category_ids: list[int]) -> dict:
 
 def get_brand_metrics(brand_ids: list[int]) -> dict:
     if not brand_ids: return {}
-    from app.domains.relationships import content_brands
-    content_counts = _get_metric_counts(content_brands.c.brand_id, brand_ids)
-    item_counts = _get_metric_counts(Item.brand_id, brand_ids)
+    from app.domains.relationships import ContentEntity
+    from app.domains.taxonomy.models import Brand, Entity
+    
+    brand_entities = db.session.execute(
+        select(Brand.id, Entity.id)
+        .join(Entity, Entity.slug == Brand.slug)
+        .where(Brand.id.in_(brand_ids))
+    ).all()
+    brand_to_entity = {b_id: e_id for b_id, e_id in brand_entities}
+    entity_ids = list(brand_to_entity.values())
+
+    content_counts = _get_metric_counts(ContentEntity.entity_id, entity_ids) if entity_ids else {}
+    item_counts = _get_metric_counts(Product.brand_id, brand_ids)
     return {bid: {
-        "content_count": content_counts.get(bid, 0), 
+        "content_count": content_counts.get(brand_to_entity.get(bid), 0), 
         "item_count": item_counts.get(bid, 0)
     } for bid in brand_ids}
 
 def get_topic_metrics(topic_ids: list[int]) -> dict:
     if not topic_ids: return {}
-    from app.domains.relationships import content_topics
-    content_counts = _get_metric_counts(content_topics.c.topic_id, topic_ids)
-    cat_spread_query = select(content_topics.c.topic_id, func.count(func.distinct(Content.category_id))).join(Content, Content.id == content_topics.c.content_id).where(content_topics.c.topic_id.in_(topic_ids)).group_by(content_topics.c.topic_id)
+    from app.domains.relationships import ContentEntity
+    content_counts = _get_metric_counts(ContentEntity.entity_id, topic_ids)
+    cat_spread_query = select(ContentEntity.entity_id, func.count(func.distinct(Content.category_id))).join(Content, Content.id == ContentEntity.content_id).where(ContentEntity.entity_id.in_(topic_ids)).group_by(ContentEntity.entity_id)
     category_spread = dict(db.session.execute(cat_spread_query).all())
     return {tid: {
         "content_count": content_counts.get(tid, 0),

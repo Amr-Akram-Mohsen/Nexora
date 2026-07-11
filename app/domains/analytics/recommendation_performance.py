@@ -1,11 +1,10 @@
 from sqlalchemy import func, select, desc, case, cast, Integer
 from functools import lru_cache
 from app.core.extensions import db
-from app.domains.interaction.models import View, Reaction, Comment, Save, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import View, Reaction, Comment, Save, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
-from app.domains.item.models import Item, ItemStoreLink, ItemVariant
-from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet
-from app.domains.relationships import content_brands, content_topics
+from app.domains.product.models import Product, ProductStoreLink, ProductVariant
+from app.domains.taxonomy.models import Category, Brand, Entity, IntentFacet
 from app.domains.analytics.shared import (
     get_start_date,
     finalize_trend_stats,
@@ -50,30 +49,30 @@ def get_recommendation_performance_data():
 
     category_expr = case(
         (RecommendationImpression.entity_type == 'shop_product', Content.category_id),
-        (RecommendationImpression.entity_type == 'related_product', Item.category_id),
+        (RecommendationImpression.entity_type == 'related_product', Product.category_id),
         ((RecommendationImpression.entity_type == 'related_content') & (Content.category_id.isnot(None)), Content.category_id),
-        else_=Item.category_id
+        else_=Product.category_id
     )
 
     click_category_expr = case(
         (RecommendationClick.entity_type == 'shop_product', Content.category_id),
-        (RecommendationClick.entity_type == 'related_product', Item.category_id),
+        (RecommendationClick.entity_type == 'related_product', Product.category_id),
         ((RecommendationClick.entity_type == 'related_content') & (Content.category_id.isnot(None)), Content.category_id),
-        else_=Item.category_id
+        else_=Product.category_id
     )
 
     category_stmt = select(
         category_expr,
         func.count(RecommendationImpression.id)
     ).outerjoin(Content, cast_context_id == Content.id)\
-     .outerjoin(Item, cast_context_id == Item.id)\
+     .outerjoin(Product, cast_context_id == Product.id)\
      .group_by(category_expr)
 
     click_category_stmt = select(
         click_category_expr,
         func.count(RecommendationClick.id)
     ).outerjoin(Content, cast_context_id_click == Content.id)\
-     .outerjoin(Item, cast_context_id_click == Item.id)\
+     .outerjoin(Product, cast_context_id_click == Product.id)\
      .group_by(click_category_expr)
 
     cat_stats = {cat_id: {"impressions": 0, "clicks": 0} for cat_id in cat_id_to_name.keys()}
@@ -115,14 +114,14 @@ def get_recommendation_performance_data():
         page_type_expr,
         func.count(RecommendationImpression.id)
     ).outerjoin(Content, cast_context_id == Content.id)\
-     .outerjoin(Item, cast_context_id == Item.id)\
+     .outerjoin(Product, cast_context_id == Product.id)\
      .group_by(page_type_expr)
 
     click_page_stmt = select(
         click_page_type_expr,
         func.count(RecommendationClick.id)
     ).outerjoin(Content, cast_context_id_click == Content.id)\
-     .outerjoin(Item, cast_context_id_click == Item.id)\
+     .outerjoin(Product, cast_context_id_click == Product.id)\
      .group_by(click_page_type_expr)
 
     page_stats = {
@@ -203,8 +202,8 @@ def get_recommendation_performance_data():
         elif rtype == "related_product":
             if classification == "Low":
                 issue = "Low product suggestion clicks on product pages"
-                diagnosis = "Recommended products do not align well with the main item."
-                recommended_action = "Refine product-to-product similarity weights to favor same-category items."
+                diagnosis = "Recommended products do not align well with the main product."
+                recommended_action = "Refine product-to-product similarity weights to favor same-category products."
                 expected_impact = "Recover lost commercial intent on product detail pages."
                 confidence = 0.85
             elif classification == "Medium":
@@ -223,7 +222,7 @@ def get_recommendation_performance_data():
             if classification == "Low":
                 issue = "Low commercial conversion of article reader base"
                 diagnosis = "Article readers are ignoring the 'Shop Related Products' box."
-                recommended_action = "Align shop recommendations strictly with items directly mentioned in content body."
+                recommended_action = "Align shop recommendations strictly with products directly mentioned in content body."
                 expected_impact = "Increase monetization efficiency of informational traffic."
                 confidence = 0.75
             elif classification == "Medium":

@@ -3,7 +3,7 @@ from sqlalchemy import func, select, cast, Date
 from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Source
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.user.models import User
 from app.domains.interaction.service.query import get_interactions_breakdown
 from app.domains.interaction.models import Share
@@ -23,14 +23,14 @@ def get_admin_top_contents():
 
 def get_admin_top_items():
     rows = db.session.execute(
-        select(Item.id, Item.name, Item.item_type, Item.click_count, Item.rating)
-        .order_by(Item.click_count.desc())
+        select(Product.id, Product.name, Product.product_type, Product.click_count, Product.rating)
+        .order_by(Product.click_count.desc())
         .limit(5)
     ).mappings().all()
     return [{
         "id":          r["id"],
         "name":        r["name"],
-        "item_type":   r["item_type"],
+        "product_type":   r["product_type"],
         "click_count": r["click_count"] or 0,
         "rating":      r["rating"],
     } for r in rows]
@@ -183,7 +183,7 @@ def get_admin_dashboard_stats_data():
 
     # ── Catalog grand totals ──────────────────────────────────────────────
     contents_count = db.session.execute(select(func.count(Content.id))).scalar() or 0
-    items_count    = db.session.execute(select(func.count(Item.id))).scalar() or 0
+    items_count    = db.session.execute(select(func.count(Product.id))).scalar() or 0
     users_count    = db.session.execute(select(func.count(User.id))).scalar() or 0
 
     # ── Active / Inactive distribution ───────────────────────────────────
@@ -247,14 +247,8 @@ def get_admin_dashboard_stats_data():
     ).all()
     content_by_source = [{"name": r.name, "slug": r.slug, "count": r.cnt} for r in content_by_source_rows]
 
-    # ── Product by source ─────────────────────────────────────────────────
-    product_by_source_rows = db.session.execute(
-        select(Source.name, Source.slug, func.count(Item.id).label("cnt"))
-        .join(Item.source)
-        .group_by(Source.name, Source.slug)
-        .order_by(func.count(Item.id).desc())
-    ).all()
-    product_by_source = [{"name": r.name, "slug": r.slug, "count": r.cnt} for r in product_by_source_rows]
+    # Product by source tracking was removed (source_id removed from Product)
+    product_by_source = []
 
     # ── Top performing content providers (by total views) ─────────────────
     top_content_rows = db.session.execute(
@@ -266,38 +260,14 @@ def get_admin_dashboard_stats_data():
     ).all()
     top_performing_content = [{"name": r.name, "slug": r.slug, "views": int(r.total_views or 0)} for r in top_content_rows]
 
-    # ── Top performing product providers (by total clicks) ───────────────
-    top_product_rows = db.session.execute(
-        select(Source.name, Source.slug, func.sum(Item.click_count).label("total_clicks"))
-        .join(Item.source)
-        .group_by(Source.name, Source.slug)
-        .order_by(func.sum(Item.click_count).desc())
-        .limit(6)
-    ).all()
-    top_performing_product = [{"name": r.name, "slug": r.slug, "clicks": int(r.total_clicks or 0)} for r in top_product_rows]
+    # Product by source tracking was removed (source_id removed from Product)
+    top_performing_product = []
 
     # ── Provider activity summary ─────────────────────────────────────────
-    content_agg = db.session.execute(
-        select(
-            Content.source_id,
-            func.count(Content.id).label("c_count"),
-            func.max(Content.ingested_at).label("latest_content"),
-        )
-        .where(Content.source_id != None)
-        .group_by(Content.source_id)
-    ).all()
-
-    item_agg = db.session.execute(
-        select(
-            Item.source_id,
-            func.count(Item.id).label("i_count"),
-            func.max(Item.created_at).label("latest_item"),
-        )
-        .where(Item.source_id != None)
-        .group_by(Item.source_id)
-    ).all()
-
-    all_source_ids = {r.source_id for r in content_agg} | {r.source_id for r in item_agg}
+    # Product source tracking was removed — only track content by source
+    content_by_sid = {r.source_id: r for r in content_agg}
+    item_by_sid    = {}
+    all_source_ids = {r.source_id for r in content_agg}
     source_map = {}
     if all_source_ids:
         source_rows = db.session.execute(
@@ -306,8 +276,6 @@ def get_admin_dashboard_stats_data():
         ).all()
         source_map = {r.id: {"name": r.name, "slug": r.slug} for r in source_rows}
 
-    content_by_sid = {r.source_id: r for r in content_agg}
-    item_by_sid    = {r.source_id: r for r in item_agg}
     provider_activities = _build_provider_activities(all_source_ids, source_map, content_by_sid, item_by_sid, now)
 
     # ── 7-day growth trend ────────────────────────────────────────────────
@@ -423,7 +391,7 @@ def get_admin_content_dashboard_stats():
     total_articles = db.session.query(func.count(Article.id)).scalar() or 1
     scrape_coverage = (scraped / total_articles) * 100
     
-    no_tax = db.session.query(func.count(Content.id)).filter(~Content.topics.any(), ~Content.brands.any()).scalar() or 0
+    no_tax = db.session.query(func.count(Content.id)).filter(~Content.content_entities.any()).scalar() or 0
 
     origin_analytics = db.session.query(
         Content.ingestion_origin,

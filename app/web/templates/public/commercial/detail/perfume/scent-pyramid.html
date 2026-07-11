@@ -1,7 +1,7 @@
-{% set scent = item.structured_details.get('scent') %}
+{% set scent = product.structured_details.get('scent') %}
 
 {% if scent %}
-<div class="scent-pyramid flex flex-col items-center">
+<div class="scent-pyramid flex flex-col products-center">
 
   {% for layer, notes in scent.items() if notes %}
   <div class="pyramid-layer pyramid-layer--{{ layer }}">

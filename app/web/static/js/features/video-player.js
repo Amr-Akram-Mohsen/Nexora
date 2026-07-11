@@ -138,7 +138,7 @@ function initVideoPlayerEnhancements() {
             if (wrapper && iframe) {
                 const videoUrl = iframe.src.replace('embed/', 'watch?v=').split('?')[0];
                 wrapper.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full w-full bg-black text-center p-6 absolute inset-0 z-50">
+                    <div class="flex flex-col products-center justify-center h-full w-full bg-black text-center p-6 absolute inset-0 z-50">
                         <i class="fab fa-youtube text-red-600 mb-4" style="font-size: 3rem;"></i>
                         <h3 class="text-white text-xl font-bold mb-2">Playback Disabled</h3>
                         <p class="text-gray-400 mb-6 max-w-md">The owner of this video has disabled playback on other websites. Don't worry, you can still watch it directly on YouTube!</p>
@@ -171,7 +171,7 @@ function initVideoPlayerEnhancements() {
             seenUrls.add(link.href);
             
             let title = "Related Video";
-            const titleElement = link.querySelector('.card__title, .item-card__title, h4, h3, .content-snippet__title');
+            const titleElement = link.querySelector('.card__title, .product-card__title, h4, h3, .content-snippet__title');
             if (titleElement) title = titleElement.textContent.trim();
             
             let thumb = "";
@@ -198,8 +198,8 @@ function initVideoPlayerEnhancements() {
 
         // Overlay UI with 10 second timeout
         wrapper.insertAdjacentHTML('beforeend', `
-            <div class="up-next-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; padding: 20px; box-sizing: border-box;">
-                <div class="flex justify-between w-full" style="max-width: 800px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="up-next-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-products: center; justify-content: center; z-index: 50; padding: 20px; box-sizing: border-box;">
+                <div class="flex justify-between w-full" style="max-width: 800px; display: flex; justify-content: space-between; align-products: center; margin-bottom: 20px;">
                     <h3 style="color: white; font-size: 1.2rem; margin: 0;">Up Next in <span id="up-next-timer">10</span>s</h3>
                     <button class="cancel-up-next-btn" style="background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem;"><i class="fas fa-times"></i> Cancel</button>
                 </div>

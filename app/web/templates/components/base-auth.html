@@ -51,14 +51,14 @@
 
       {# Password with visibility toggle #}
       {% call field(label_text="Password", for_id="password") %}
-      <div class="password-wrapper flex items-center">
+      <div class="password-wrapper flex products-center">
         {{ input(
         name="password", id="password", type="password",
         placeholder="••••••••",
         attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
         required=True
         ) }}
-        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
+        {{ button(type="button", class="password-toggle justify-center products-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
       {# Strength meter — register only #}
       {% if is_new_user %}
@@ -78,23 +78,23 @@
       {# Confirm Password — register only #}
       {% if is_new_user %}
       {% call field(label_text="Confirm Password", for_id="confirm_password") %}
-      <div class="password-wrapper flex items-center">
+      <div class="password-wrapper flex products-center">
         {{ input(
         name="confirm_password", id="confirm_password", type="password",
         placeholder="••••••••",
         attrs={"autocomplete": "new-password"},
         required=True
         ) }}
-        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
+        {{ button(type="button", class="password-toggle justify-center products-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
       <span class="confirm-match"></span>
       {% endcall %}
       {% endif %}
 
       {# Extras row: remember-me / forgot-password #}
-      <div class="auth-extras flex items-center justify-between">
+      <div class="auth-extras flex products-center justify-between">
         {# Newsletter checkbox (register) or Remember-me (login) — available to re-enable #}
-        <div class="checkbox-group flex items-center gap-2">
+        <div class="checkbox-group flex products-center gap-2">
           {# Uncomment to re-enable:
           {% set check_name = "newsletter" if is_new_user else "remember" %}
           {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}

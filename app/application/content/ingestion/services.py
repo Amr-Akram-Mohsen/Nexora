@@ -47,7 +47,7 @@ class TaxonomyEnrichmentService(TaxonomyEnrichmentPort):
 
     Sits between normalization (EnrichmentService) and persistence so that
     taxonomy assignments are refined using full content signals before the
-    item is written to the database.
+    product is written to the database.
 
     Design contract
     ---------------

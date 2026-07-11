@@ -35,12 +35,12 @@ SLOT: header
 
 {# ── Horizontal Topics Ribbon ── #}
 {% if filter_options.get('topic') %}
-<div class="topics-ribbon gap-2 flex items-center">
+<div class="topics-ribbon gap-2 flex products-center">
   {% for opt in filter_options.get('topic', []) %}
   {% set slug = opt.slug if opt.slug is defined else opt %}
   {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
   {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-  {% set class_name = 'topic-pill' ~ ('inline-flex items-center is-active' if is_active else '') %}
+  {% set class_name = 'topic-pill' ~ ('inline-flex products-center is-active' if is_active else '') %}
   <a href="{{ get_filter_url('topic', slug, multi=True) }}" class="{{ class_name }}">
     {{ name }}
   </a>
@@ -70,8 +70,8 @@ SLOT: results
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
-  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
+  {% set block_target_type = 'commercial' if block['type'] == 'product' else 'content' %}
+  {{ grid(block['products'], target_type=block_target_type, carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>
@@ -101,8 +101,8 @@ action_url=url_for(request.endpoint, **request.view_args)
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
-  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
+  {% set block_target_type = 'commercial' if block['type'] == 'product' else 'content' %}
+  {{ grid(block['products'], target_type=block_target_type, carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>

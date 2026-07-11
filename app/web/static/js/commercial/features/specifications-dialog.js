@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!btn) return;
     const hiddenItems =
         document.querySelectorAll(
-            '.item-detail-item--hidden'
+            '.product-detail-product--hidden'
         );
     let expanded = false;
     btn.addEventListener('click', () => {
         expanded = !expanded;
-        hiddenItems.forEach(item => {
-            item.classList.toggle(
+        hiddenItems.forEach(product => {
+            product.classList.toggle(
                 'is-visible',
                 expanded
             );
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 //                 return;
 //             }
 //             cards.slice(INITIAL_VISIBLE).forEach((card) => {
-//                 card.classList.add("grid-item-hidden");
+//                 card.classList.add("grid-product-hidden");
 //             });
 //             const section = grid.closest(".section");
 //             const button = section?.querySelector("[data-section-toggle]");
@@ -45,14 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
 //                     button.getAttribute("data-expanded") === "true";
 //                 if (!expanded) {
 //                     cards.forEach((card) => {
-//                         card.classList.remove("grid-item-hidden");
+//                         card.classList.remove("grid-product-hidden");
 //                     });
 //                     button.querySelector("span").textContent = "Show Less";
 //                     button.querySelector("i").classList.replace("fa-arrow-down", "fa-arrow-up");
 //                     button.setAttribute("data-expanded", "true");
 //                 } else {
 //                     cards.slice(INITIAL_VISIBLE).forEach((card) => {
-//                         card.classList.add("grid-item-hidden");
+//                         card.classList.add("grid-product-hidden");
 //                     });
 //                     button.querySelector("span").textContent = "Show More";
 //                     button.querySelector("i").classList.replace("fa-arrow-up", "fa-arrow-down");

@@ -1,10 +1,10 @@
 from sqlalchemy import select, func, or_
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section, AttributeFacet
+from app.domains.taxonomy.models import Category, Brand, Entity, Section, AttributeFacet
 from app.shared.utils.slug import generate_slug
 from app.domains.content.models import Content
-from app.domains.item.models import Item
-from app.domains.relationships import content_brands, content_topics, content_attributes, ArticleSource
+from app.domains.product.models import Product
+from app.domains.relationships import ContentEntity, content_attributes, ArticleSource
 from app.domains.external.models import LastAPIFetch
 
 
@@ -81,36 +81,30 @@ def delete_admin_brand(brand_id):
 
 
 def get_admin_topics(search=""):
-    stmt = select(Topic).order_by(Topic.name.asc())
+    stmt = select(Entity).where(Entity.entity_type.in_(["topic", "tag", "concept"])).order_by(Entity.name.asc())
     if search:
-        stmt = stmt.where(Topic.name.ilike(f"%{search}%"))
+        stmt = stmt.where(Entity.name.ilike(f"%{search}%"))
     return db.session.execute(stmt).scalars().all()
 
 def create_admin_topic(name, is_active=True):
     slug = generate_slug(name)
-    if db.session.execute(select(Topic).where(Topic.slug == slug)).scalar_one_or_none():
+    if db.session.execute(select(Entity).where(Entity.slug == slug)).scalar_one_or_none():
         raise ValueError(f"Topic with slug '{slug}' already exists")
-    topic = Topic(name=name, slug=slug, is_active=is_active)
+    topic = Entity(name=name, slug=slug, entity_type="topic")
     db.session.add(topic)
     return topic
 
 def update_admin_topic(topic_id, data):
-    topic = db.session.get(Topic, topic_id)
+    topic = db.session.get(Entity, topic_id)
     if not topic:
         return None
     if "name" in data and data["name"].strip():
         topic.name = data["name"].strip()
         topic.slug = generate_slug(topic.name)
-    if "is_active" in data:
-        topic.is_active = bool(data["is_active"])
-    if "is_featured" in data:
-        topic.is_featured = bool(data["is_featured"])
-    if "sort_order" in data:
-        topic.sort_order = int(data["sort_order"])
     return topic
 
 def delete_admin_topic(topic_id):
-    topic = db.session.get(Topic, topic_id)
+    topic = db.session.get(Entity, topic_id)
     if topic:
         db.session.delete(topic)
     return topic
@@ -182,16 +176,16 @@ def get_admin_taxonomy_analytics():
     missing_category = db.session.scalar(select(func.count(Content.id)).where(Content.category_id == None)) or 0
     missing_section = db.session.scalar(select(func.count(Content.id)).where(Content.section_id == None)) or 0
     
-    content_with_brands = db.session.scalar(select(func.count(func.distinct(content_brands.c.content_id)))) or 0
+    content_with_brands = db.session.scalar(select(func.count(func.distinct(ContentEntity.content_id))).join(Entity).where(Entity.entity_type == 'brand')) or 0
     missing_brand = total_content - content_with_brands
 
     total_entities = 0
     orphans = 0
     
     entities_config = [
-        (Category, ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists(), ~db.session.query(Item.id).filter(Item.category_id == Category.id).exists()),
-        (Brand, ~db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists(), ~db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()),
-        (Topic, ~db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists(), None),
+        (Category, ~db.session.query(Content.id).filter(Content.category_id == Category.id).exists(), ~db.session.query(Product.id).filter(Product.category_id == Category.id).exists()),
+        (Brand, ~db.session.query(Product.id).filter(Product.brand_id == Brand.id).exists(), None),
+        (Entity, ~db.session.query(ContentEntity.content_id).filter(ContentEntity.entity_id == Entity.id).exists(), None),
         (Section, ~db.session.query(Content.id).filter(Content.section_id == Section.id).exists(), None)
     ]
     
@@ -223,8 +217,8 @@ def get_admin_entity_or_404(model, entity_id):
     return db.session.get(model, entity_id)
 
 def get_admin_taxonomy_related_metadata(entity, entity_type):
-    from app.domains.relationships import content_brands, content_topics, content_items, content_attributes
-    from app.domains.item.models import ItemVariant, ItemImage
+    from app.domains.relationships import ContentEntity, content_attributes
+    from app.domains.product.models import ProductVariant, ProductImage
     from app.domains.taxonomy.service.query import get_taxonomy_content_stats
     data = {}
     
@@ -241,67 +235,74 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, field=Content.category_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
-        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.category_id == entity.id)) or 0
-        data["item count"] = str(total_items)
+        total_items = db.session.scalar(select(func.count()).select_from(Product).where(Product.category_id == entity.id)) or 0
+        data["product count"] = str(total_items)
         
         data["child categories"] = str(db.session.scalar(select(func.count()).select_from(Category).where(Category.parent_id == entity.id)) or 0)
         
         variants_count = db.session.scalar(
-            select(func.count(ItemVariant.id)).join(Item, Item.id == ItemVariant.item_id).where(Item.category_id == entity.id)
+            select(func.count(ProductVariant.id)).join(Product, Product.id == ProductVariant.product_id).where(Product.category_id == entity.id)
         ) or 0
-        data["avg variants per item"] = str(round(variants_count / total_items, 1) if total_items > 0 else 0)
+        data["avg variants per product"] = str(round(variants_count / total_items, 1) if total_items > 0 else 0)
         
         items_with_images = db.session.scalar(
-            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.category_id == entity.id)
+            select(func.count(func.distinct(ProductImage.product_id))).join(Product, Product.id == ProductImage.product_id).where(Product.category_id == entity.id)
         ) or 0
         data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
         
         items_with_content = db.session.scalar(
-            select(func.count(func.distinct(content_items.c.item_id))).join(Item, Item.id == content_items.c.item_id).where(Item.category_id == entity.id)
+            select(func.count(func.distinct(content_products.c.product_id))).join(Product, Product.id == content_products.c.product_id).where(Product.category_id == entity.id)
         ) or 0
-        data["items without content"] = str(total_items - items_with_content)
+        data["products without content"] = str(total_items - items_with_content)
         
     elif entity_type == "brand":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_brands).where(content_brands.c.brand_id == entity.id)) or 0)
+        entity_obj = db.session.execute(select(Entity).where(Entity.slug == entity.slug)).scalar()
+        if entity_obj:
+            data["content count"] = str(db.session.scalar(select(func.count()).select_from(ContentEntity).where(ContentEntity.entity_id == entity_obj.id)) or 0)
+            type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity_obj.id, relationship_table=ContentEntity.__table__, foreign_key_col=ContentEntity.entity_id)
+            _format_breakdown_and_engagement(type_breakdown, engagement)
+        else:
+            data["content count"] = "0"
+            _format_breakdown_and_engagement([], None)
         
-        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=content_brands, foreign_key_col=content_brands.c.brand_id)
-        _format_breakdown_and_engagement(type_breakdown, engagement)
-        
-        total_items = db.session.scalar(select(func.count()).select_from(Item).where(Item.brand_id == entity.id)) or 0
-        data["item count"] = str(total_items)
+        total_items = db.session.scalar(select(func.count()).select_from(Product).where(Product.brand_id == entity.id)) or 0
+        data["product count"] = str(total_items)
         
         avg_price = db.session.scalar(
-            select(func.avg(ItemVariant.price)).join(Item, Item.id == ItemVariant.item_id).where(Item.brand_id == entity.id)
+            select(func.avg(ProductVariant.price)).join(Product, Product.id == ProductVariant.product_id).where(Product.brand_id == entity.id)
         )
         data["average price"] = f"${avg_price:.2f}" if avg_price else "—"
         
         items_with_images = db.session.scalar(
-            select(func.count(func.distinct(ItemImage.item_id))).join(Item, Item.id == ItemImage.item_id).where(Item.brand_id == entity.id)
+            select(func.count(func.distinct(ProductImage.product_id))).join(Product, Product.id == ProductImage.product_id).where(Product.brand_id == entity.id)
         ) or 0
         data["image coverage"] = f"{round((items_with_images / total_items) * 100)}%" if total_items > 0 else "0%"
         
         top_items = db.session.execute(
-            select(Item).where(Item.brand_id == entity.id).order_by(Item.click_count.desc()).limit(5)
+            select(Product).where(Product.brand_id == entity.id).order_by(Product.click_count.desc()).limit(5)
         ).scalars().all()
         data["_top_items"] = top_items
         
     elif entity_type == "topic":
-        data["content count"] = str(db.session.scalar(select(func.count()).select_from(content_topics).where(content_topics.c.topic_id == entity.id)) or 0)
+        data["content count"] = str(db.session.scalar(select(func.count()).select_from(ContentEntity).where(ContentEntity.entity_id == entity.id)) or 0)
         
-        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=content_topics, foreign_key_col=content_topics.c.topic_id)
+        type_breakdown, engagement, top_contents = get_taxonomy_content_stats(entity.id, relationship_table=ContentEntity.__table__, foreign_key_col=ContentEntity.entity_id)
         _format_breakdown_and_engagement(type_breakdown, engagement)
         
         rel_cats = db.session.scalar(
             select(func.count(func.distinct(Content.category_id)))
-            .join(content_topics, content_topics.c.content_id == Content.id)
-            .filter(content_topics.c.topic_id == entity.id)
+            .join(ContentEntity, ContentEntity.content_id == Content.id)
+            .filter(ContentEntity.entity_id == entity.id)
         ) or 0
         data["related categories"] = str(rel_cats)
         
         rel_brands = db.session.scalar(
-            select(func.count(func.distinct(content_brands.c.brand_id)))
-            .join(content_topics, content_topics.c.content_id == content_brands.c.content_id)
-            .filter(content_topics.c.topic_id == entity.id)
+            select(func.count(func.distinct(ContentEntity.entity_id)))
+            .join(Entity, Entity.id == ContentEntity.entity_id)
+            .filter(ContentEntity.content_id.in_(
+                select(ContentEntity.content_id).where(ContentEntity.entity_id == entity.id)
+            ))
+            .filter(Entity.entity_type == 'brand')
         ) or 0
         data["related brands"] = str(rel_brands)
         
@@ -318,9 +319,11 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         data["category count"] = str(cat_count)
         
         rel_brands = db.session.scalar(
-            select(func.count(func.distinct(content_brands.c.brand_id)))
-            .join(Content, Content.id == content_brands.c.content_id)
+            select(func.count(func.distinct(ContentEntity.entity_id)))
+            .join(Content, Content.id == ContentEntity.content_id)
+            .join(Entity, Entity.id == ContentEntity.entity_id)
             .filter(Content.section_id == entity.id)
+            .filter(Entity.entity_type == 'brand')
         ) or 0
         data["related brands"] = str(rel_brands)
         

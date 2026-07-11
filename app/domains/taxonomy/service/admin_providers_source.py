@@ -1,11 +1,11 @@
 from sqlalchemy import select, func, or_, case, cast, Date
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section, AttributeFacet, Source
+from app.domains.taxonomy.models import Category, Brand, Section, AttributeFacet, Source
 from app.shared.utils.slug import generate_slug
 from app.domains.content.models import Content, Article
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.external.models import LastAPIFetch, APIUsage
-from app.domains.relationships import content_brands, content_topics, content_attributes, ArticleSource
+from app.domains.relationships import content_attributes, ArticleSource
 
 def _calculate_quality_tier(score):
     if score >= 70: return "High"
@@ -37,7 +37,7 @@ def get_admin_sources_page(page, per_page, search):
         ))
     stmt = stmt.order_by(Source.authority_score.desc(), Source.name.asc())
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    page_source_ids = [s.id for s in pagination.items]
+    page_source_ids = [s.id for s in pagination.products]
 
     if page_source_ids:
         content_agg = db.session.execute(
@@ -71,7 +71,7 @@ def get_admin_sources_page(page, per_page, search):
     now = datetime.now(timezone.utc)
 
     serialized = []
-    for s in pagination.items:
+    for s in pagination.products:
         agg             = content_agg_map.get(s.id)
         content_count   = agg.content_count if agg else 0
         latest_activity = agg.latest_ingested_at.isoformat() if agg and agg.latest_ingested_at else None

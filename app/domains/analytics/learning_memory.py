@@ -102,11 +102,11 @@ def load_memory_layer():
             },
             "records": []
         }
-        for item in raw_data:
-            if isinstance(item, dict):
-                if "version" not in item:
-                    item["version"] = 1
-                migrated_data["records"].append(item)
+        for product in raw_data:
+            if isinstance(product, dict):
+                if "version" not in product:
+                    product["version"] = 1
+                migrated_data["records"].append(product)
         try:
             save_json_file(MEMORY_FILE_PATH, migrated_data)
         except Exception as e:
@@ -117,9 +117,9 @@ def load_memory_layer():
     if isinstance(raw_data, dict):
         records = raw_data.get("records", [])
         # Ensure records are dicts and have versions
-        for item in records:
-            if isinstance(item, dict) and "version" not in item:
-                item["version"] = 1
+        for product in records:
+            if isinstance(product, dict) and "version" not in product:
+                product["version"] = 1
         return records
 
     return []

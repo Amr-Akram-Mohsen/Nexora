@@ -13,7 +13,7 @@ Performance notes
   request window.
 """
 from app.core.extensions import db, cache
-from ..models import View, Reaction, Comment, Save, Share, ItemClick
+from ..models import View, Reaction, Comment, Save, Share, ProductClick
 from sqlalchemy import func, case, select
 
 
@@ -60,8 +60,8 @@ def get_saved_items(user_id, target_type):
             .filter_by(user_id=user_id, target_type="content")\
             .order_by(Save.created_at.desc()).all()
     else:
-        return Save.query.options(selectinload(Save.item))\
-            .filter_by(user_id=user_id, target_type="item")\
+        return Save.query.options(selectinload(Save.product))\
+            .filter_by(user_id=user_id, target_type="product")\
             .order_by(Save.created_at.desc()).all()
 
 
@@ -75,7 +75,7 @@ def get_recent_views(user_id, limit=20):
     # A simple approach is to query views ordered by created_at desc
     return View.query.options(
         selectinload(View.content),
-        selectinload(View.item)
+        selectinload(View.product)
     ).filter_by(user_id=user_id).order_by(View.created_at.desc()).limit(limit).all()
 
 
@@ -114,7 +114,7 @@ def get_interactions_breakdown() -> dict:
     comments = db.session.execute(select(func.count(Comment.id))).scalar() or 0
     saves    = db.session.execute(select(func.count(Save.id))).scalar() or 0
     shares   = db.session.execute(select(func.count(Share.id))).scalar() or 0
-    clicks   = db.session.execute(select(func.count(ItemClick.id))).scalar() or 0
+    clicks   = db.session.execute(select(func.count(ProductClick.id))).scalar() or 0
     likes    = db.session.execute(
         select(func.count(Reaction.id)).where(Reaction.type == "like")
     ).scalar() or 0

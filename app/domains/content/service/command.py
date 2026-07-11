@@ -2,7 +2,7 @@ from collections import defaultdict
 from app.core.extensions import db
 from ..models import Article, Content, Event
 from ...taxonomy.models import (
-    Topic, Brand, AttributeFacet,
+    AttributeFacet,
     GenderFacet, IntentFacet, PriceTierFacet, Source, Category, Entity
 )
 from app.domains.relationships import ContentEntity
@@ -10,6 +10,16 @@ from app.domains.relationships import ContentEntity
 from app.shared.utils.slug import generate_slug
 from .content_access import resolve
 from sqlalchemy import func, insert, select
+
+def sync_content_fields(content, obj, object_type: str) -> None:
+    """
+    Centralised sync: keeps Content wrapper fields in sync with the child model.
+    Call this whenever Article/Video/Post changes publication-relevant state.
+    """
+    content.title = obj.title
+    content.preview_text = getattr(obj, "preview_text", None)
+    if object_type == "article":
+        content.is_published = (obj.status == "published")
 
 def link_article_sources(article, data, session=None) -> bool:
     """Links an article to its specific source URL, ensuring uniqueness."""
@@ -98,19 +108,6 @@ def apply_relationships(content, data, session=None) -> dict:
 
     updated_relationships = defaultdict(list)
 
-    # -------- Topics --------
-    for slug in data.get("topic_slugs", []):
-        topic = Topic.get_or_create(slug, session)
-        if topic:
-            if content.add_topic(topic):
-                updated_relationships["topics"].append(topic.slug)
-
-    # -------- Brands --------
-    for slug in data.get("brand_slugs", []):
-        brand = Brand.get_or_create(slug, session)
-        if brand:
-            if content.add_brand(brand):
-                updated_relationships["brands"].append(brand.slug)
 
     # -------- Attributes --------
     facets_data = data.get("facets", {})
@@ -189,17 +186,22 @@ def apply_relationships(content, data, session=None) -> dict:
                         name=concept_label, 
                         session=session, 
                         external_uri=concept_uri, 
-                        entity_type=entity_type
+                        entity_type=entity_type,
+                        provider="event_registry",
+                        provider_confidence=score
                     )
                     
                     if entity:
-                        # Check if already linked
-                        existing_ce = session.query(ContentEntity).filter_by(content_id=content.id, entity_id=entity.id).first()
-                        if not existing_ce:
-                            ce = ContentEntity(content_id=content.id, entity_id=entity.id, relevance_score=score)
-                            session.add(ce)
-                            updated_relationships.setdefault("entities", []).append(entity.slug)
-                            
+                        origin = "diffbot" if data.get("ingestion_method") == "diffbot" else "event_registry"
+                        ce = ContentEntity.get_or_create(
+                            content_id=content.id,
+                            entity_id=entity.id,
+                            session=session,
+                            origin=origin,
+                            relevance_score=score,
+                            confidence=score / 100.0 if score > 1 else score,
+                        )
+                        updated_relationships.setdefault("entities", []).append(entity.slug)
                     # If this is a location, also populate the Locations model!
                     if entity_type in ("location", "place"):
                         from app.domains.taxonomy.models import Location

@@ -23,19 +23,19 @@ def apply_admin_guard(bp):
 # PAGINATION
 # ──────────────────────────────────────────────
 
-def paginate_response(pagination, items_key: str = "items") -> dict:
+def paginate_response(pagination, items_key: str = "products") -> dict:
     """
     Build a consistent pagination envelope from a SQLAlchemy Pagination object.
 
     Args:
         pagination: A Flask-SQLAlchemy Pagination object.
-        items_key:  The key name to use for the items list in the response.
+        items_key:  The key name to use for the products list in the response.
 
     Returns:
         A dict with {items_key, page, pages, total, per_page}.
     """
     return {
-        items_key: pagination.items,
+        items_key: pagination.products,
         "page": pagination.page,
         "pages": pagination.pages,
         "total": pagination.total,
@@ -43,23 +43,23 @@ def paginate_response(pagination, items_key: str = "items") -> dict:
     }
 
 
-def paginate_manual(items: list, page: int, per_page: int, total: int) -> dict:
+def paginate_manual(products: list, page: int, per_page: int, total: int) -> dict:
     """
     Build a consistent pagination envelope for manually paginated results
     (e.g., raw table queries that don't use SQLAlchemy Pagination).
 
     Args:
-        items:    The current page of serialized items.
+        products:    The current page of serialized products.
         page:     Current page number (1-indexed).
-        per_page: Number of items per page.
+        per_page: Number of products per page.
         total:    Total count of all matching records.
 
     Returns:
-        A dict with {items, page, pages, total, per_page}.
+        A dict with {products, page, pages, total, per_page}.
     """
     pages = max(1, (total + per_page - 1) // per_page)
     return {
-        "items": items,
+        "products": products,
         "page": page,
         "pages": pages,
         "total": total,
@@ -132,12 +132,12 @@ def make_rows_response(html: str, *, total: int, pages: int, page: int):
     return resp
 
 
-def render_admin_rows_response(items: list, domain_type: str, *, total: int, pages: int, page: int, hide_action_column: bool = False, **kwargs):
+def render_admin_rows_response(products: list, domain_type: str, *, total: int, pages: int, page: int, hide_action_column: bool = False, **kwargs):
     """
     Renders the standard _rows.html partial and wraps it in a paginated Response.
     
     Args:
-        items: List of serialized dictionaries ready for the template.
+        products: List of serialized dictionaries ready for the template.
         domain_type: The string representing the domain (e.g. 'user', 'comment').
         total: Total number of records matching the query.
         pages: Total number of pages available.
@@ -148,7 +148,7 @@ def render_admin_rows_response(items: list, domain_type: str, *, total: int, pag
     from flask import render_template
     html = render_template(
         "admin/components/_rows.html", 
-        items=items, 
+        products=products, 
         domain_type=domain_type, 
         hide_action_column=hide_action_column,
         **kwargs

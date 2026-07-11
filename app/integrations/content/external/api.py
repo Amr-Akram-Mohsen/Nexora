@@ -77,7 +77,7 @@ def should_refetch(section: str, query_text: str, hours: int = 24) -> bool:
     Checks if a query is on cooldown or disabled due to health issues.
     Differentiates between success (long) and failure (short) cooldowns.
 
-    A "true success" requires that the API returned at least one item
+    A "true success" requires that the API returned at least one product
     (had_results=True in mark_fetched). Empty-result fetches do NOT count
     as successes and will not block re-fetching after the short cooldown.
     """
@@ -152,7 +152,7 @@ def mark_fetched(
     """
     Updates or creates a record of a fetch attempt.
 
-    ``had_results`` MUST be ``True`` only when the API returned ≥1 item.
+    ``had_results`` MUST be ``True`` only when the API returned ≥1 product.
     When ``False`` (empty-list response), the success_count is NOT
     incremented and last_fetched_at is not updated, so the query stays
     eligible after the normal short cooldown instead of being locked for

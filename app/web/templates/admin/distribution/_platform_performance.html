@@ -4,7 +4,7 @@
     {% call standard_table(["Platform", "Published Posts", "Views", "Engagement", "Likes", "Clicks", "Shares"], class="distribution-table") %}
             {% for p in platforms %}
             <tr class="distribution-table-row">
-                <td class="flex items-center gap-2">
+                <td class="flex products-center gap-2">
                     <span class="platform-icon">{{ p.icon }}</span>
                     <span class="platform-name capitalize">{{ p.name }}</span>
                 </td>

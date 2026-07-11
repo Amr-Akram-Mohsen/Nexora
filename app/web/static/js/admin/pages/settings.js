@@ -153,7 +153,7 @@
   function bindLogFilters() {
     const btnAll = document.getElementById("filter-all-logs");
     const btnArticles = document.getElementById("filter-article-logs");
-    const btnItems = document.getElementById("filter-item-logs");
+    const btnItems = document.getElementById("filter-product-logs");
     if (!btnAll) return;
 
     const btns = [btnAll, btnArticles, btnItems];
@@ -169,7 +169,7 @@
       loadIngestionLogs();
     };
     btnItems.onclick = () => {
-      currentLogFilter = 'item';
+      currentLogFilter = 'product';
       updateActiveTab(btns, btnItems);
       loadIngestionLogs();
     };

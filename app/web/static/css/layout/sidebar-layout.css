@@ -138,23 +138,23 @@ details[open] .filter-section__chevron {
   margin-top: 0.5rem;
 }
 
-.filter-item {
+.filter-product {
   border-radius: var(--radius-md);
   transition: all 0.15s ease-in-out;
   border: 1px solid transparent;
 }
 
 /* Checked/Active Filter Row (Symmetric Pill Highlight) */
-.filter-item.is-active {
+.filter-product.is-active {
   background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.06);
   border-color: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.08);
 }
 
-.filter-item:hover {
+.filter-product:hover {
   background: var(--accent);
 }
 
-.filter-item.is-active:hover {
+.filter-product.is-active:hover {
   background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.09);
 }
 
@@ -165,7 +165,7 @@ details[open] .filter-section__chevron {
   transition: color 0.15s ease;
   text-decoration: none;
   font-size: 0.8125rem;
-  /* 13px clean list item labels */
+  /* 13px clean list product labels */
   font-weight: 500;
 }
 
@@ -173,7 +173,7 @@ details[open] .filter-section__chevron {
   color: var(--foreground);
 }
 
-.filter-item.is-active .filter-item__link {
+.filter-product.is-active .filter-item__link {
   color: var(--domain-primary, var(--primary));
   font-weight: 600;
 }
@@ -189,7 +189,7 @@ details[open] .filter-section__chevron {
   border: 1px solid rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.5);
 }
 
-.filter-item:hover .filter-checkbox {
+.filter-product:hover .filter-checkbox {
   border-color: var(--muted-foreground);
 }
 
@@ -277,7 +277,7 @@ details[open] .filter-section__chevron {
 }
 
 /* --- "Show More" Interactive Toggle --- */
-.filter-item--more-toggle {
+.filter-product--more-toggle {
   margin-top: 0.25rem;
 }
 

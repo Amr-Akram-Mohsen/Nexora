@@ -12,7 +12,7 @@ Refactoring applied:
 from flask import Blueprint, jsonify, request, render_template
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick
 from app.domains.interaction.service.query import (
     get_interactions_breakdown,
     get_reaction_stats,
@@ -66,7 +66,7 @@ def list_comments():
     )
 
     return jsonify({
-        "items":    serialized,
+        "products":    serialized,
         "page":     pagination.page,
         "pages":    pagination.pages,
         "total":    pagination.total,
@@ -106,7 +106,7 @@ def list_reactions():
     )
 
     return jsonify({
-        "items":    serialized,
+        "products":    serialized,
         "page":     pagination.page,
         "pages":    pagination.pages,
         "total":    pagination.total,
@@ -148,7 +148,7 @@ def list_saves():
     )
 
     return jsonify({
-        "items":    serialized,
+        "products":    serialized,
         "page":     pagination.page,
         "pages":    pagination.pages,
         "total":    pagination.total,
@@ -168,7 +168,7 @@ def list_shares():
     )
 
     return jsonify({
-        "items":    serialized,
+        "products":    serialized,
         "page":     pagination.page,
         "pages":    pagination.pages,
         "total":    pagination.total,
@@ -275,7 +275,7 @@ def views_rows():
 
     data = get_admin_views_page(page, per_page, search, start_date, end_date)
 
-    serialized = [map_view_for_rows(v) for v in data["items"]]
+    serialized = [map_view_for_rows(v) for v in data["products"]]
     return render_admin_rows_response(
         serialized, "view",
         total=data["total"], pages=data["pages"], page=data["page"],
@@ -292,7 +292,7 @@ def clicks_rows():
 
     data = get_admin_clicks_page(page, per_page, search, destination)
 
-    serialized = [map_click_for_rows(r) for r in data["items"]]
+    serialized = [map_click_for_rows(r) for r in data["products"]]
     return render_admin_rows_response(
         serialized, "click",
         total=data["total"], pages=data["pages"], page=data["page"],

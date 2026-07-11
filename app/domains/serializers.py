@@ -12,13 +12,13 @@ def serialize_model(m):
 
 def serialize_target(obj, session=None):
     """
-    Serializes a polymorphic target object (Article, Video, Post, or Item).
+    Serializes a polymorphic target object (Article, Video, Post, or Product).
     Ensures all type-specific fields are present for a premium UI.
     """
     if not obj:
         return None
 
-    # Determine type name (e.g., 'article', 'video', 'post', 'item')
+    # Determine type name (e.g., 'article', 'video', 'post', 'product')
     type_name = obj.__class__.__name__.lower()
 
     # Core fields common to most targets
@@ -77,8 +77,8 @@ def serialize_target(obj, session=None):
             }
         )
 
-    elif type_name == "item":
-        from app.domains.item.serializers import serialize_item
+    elif type_name == "product":
+        from app.domains.product.serializers import serialize_item
         
         item_data = serialize_item(obj)
         if item_data:

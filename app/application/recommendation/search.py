@@ -178,7 +178,7 @@ def _attach_score(result, query, intent):
 def get_unified_search_results_cached(normalized_query):
     from app.infrastructure import cache
     from app.domains.content.service import get_search_contents
-    from app.domains.item.service import get_search_items, serialize_item
+    from app.domains.product.service import get_search_items, serialize_item
 
     cache_key = f"search:unified:v1:{normalized_query}"
     cached = cache.get(cache_key)
@@ -189,13 +189,13 @@ def get_unified_search_results_cached(normalized_query):
 
     content_results = []
     for content in get_search_contents(normalized_query, limit=80):
-        item = dict(content)
-        item["search_type"] = item.get("object_type")
-        content_results.append(_attach_score(item, normalized_query, intent))
+        product = dict(content)
+        product["search_type"] = product.get("object_type")
+        content_results.append(_attach_score(product, normalized_query, intent))
 
     product_results = []
-    for item in get_search_items(normalized_query, limit=80):
-        data = serialize_item(item)
+    for product in get_search_items(normalized_query, limit=80):
+        data = serialize_item(product)
         data["search_type"] = "product"
         product_results.append(_attach_score(data, normalized_query, intent))
 

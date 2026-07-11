@@ -1,16 +1,16 @@
-{% if items %}
-{% for item in items %}
-{% set type_badge_class = "badge-blue" if item.type == "Category" else "badge-purple" %}
-<tr class="clickable-row cursor-pointer" data-entity="{{ item.entity }}">
+{% if products %}
+{% for product in products %}
+{% set type_badge_class = "badge-blue" if product.type == "Category" else "badge-purple" %}
+<tr class="clickable-row cursor-pointer" data-entity="{{ product.entity }}">
     <td><strong>{{ loop.index }}</strong></td>
     <td>
-      <div class="flex items-center gap-2">
-        <strong class="clickable-entity-name">{{ item.entity }}</strong>
-        <span class="status-badge {{ type_badge_class }}">{{ item.type }}</span>
+      <div class="flex products-center gap-2">
+        <strong class="clickable-entity-name">{{ product.entity }}</strong>
+        <span class="status-badge {{ type_badge_class }}">{{ product.type }}</span>
       </div>
     </td>
-    <td class="col-metric">{{ "%.2f"|format(item.score) }}</td>
-    <td >{{ item.reason }}</td>
+    <td class="col-metric">{{ "%.2f"|format(product.score) }}</td>
+    <td >{{ product.reason }}</td>
 </tr>
 {% endfor %}
 {% else %}

@@ -1,11 +1,11 @@
 from sqlalchemy import func, select, desc, case, cast, Integer
 from functools import lru_cache
 from app.core.extensions import db
-from app.domains.interaction.models import View, Reaction, Comment, Save, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import View, Reaction, Comment, Save, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
-from app.domains.item.models import Item, ItemStoreLink, ItemVariant
-from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet
-from app.domains.relationships import content_brands, content_topics
+from app.domains.product.models import Product, ProductStoreLink, ProductVariant
+from app.domains.taxonomy.models import Category, Brand, Entity, IntentFacet
+from app.domains.relationships import ContentEntity
 from app.domains.analytics.shared import (
     get_start_date,
     finalize_trend_stats,
@@ -17,7 +17,7 @@ def get_top_products_data(time_frame: str, limit: int = 5):
     start_date = get_start_date(time_frame)
 
     # 1. Most viewed products
-    stmt_views = select(View.target_id, func.count(View.id).label("cnt")).where(View.target_type == "item")
+    stmt_views = select(View.target_id, func.count(View.id).label("cnt")).where(View.target_type == "product")
     if start_date:
         stmt_views = stmt_views.where(View.created_at >= start_date)
     stmt_views = stmt_views.group_by(View.target_id).order_by(desc("cnt")).limit(limit)
@@ -25,40 +25,40 @@ def get_top_products_data(time_frame: str, limit: int = 5):
 
     # 2. Most clicked products
     stmt_clicks = (
-        select(ItemVariant.item_id, func.count(ItemClick.id).label("cnt"))
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)
-        .join(ItemClick, ItemClick.item_store_link_id == ItemStoreLink.id)
+        select(ProductVariant.product_id, func.count(ProductClick.id).label("cnt"))
+        .join(ProductStoreLink, ProductStoreLink.variant_id == ProductVariant.id)
+        .join(ProductClick, ProductClick.product_store_link_id == ProductStoreLink.id)
     )
     if start_date:
-        stmt_clicks = stmt_clicks.where(ItemClick.created_at >= start_date)
-    stmt_clicks = stmt_clicks.group_by(ItemVariant.item_id).order_by(desc("cnt")).limit(limit)
+        stmt_clicks = stmt_clicks.where(ProductClick.created_at >= start_date)
+    stmt_clicks = stmt_clicks.group_by(ProductVariant.product_id).order_by(desc("cnt")).limit(limit)
     clicks_res = db.session.execute(stmt_clicks).all()
 
     # 3. Most saved products
-    stmt_saves = select(Save.target_id, func.count(Save.id).label("cnt")).where(Save.target_type == "item")
+    stmt_saves = select(Save.target_id, func.count(Save.id).label("cnt")).where(Save.target_type == "product")
     if start_date:
         stmt_saves = stmt_saves.where(Save.created_at >= start_date)
     stmt_saves = stmt_saves.group_by(Save.target_id).order_by(desc("cnt")).limit(limit)
     saves_res = db.session.execute(stmt_saves).all()
 
-    # Gather all unique item IDs
-    all_item_ids = set()
+    # Gather all unique product IDs
+    all_product_ids = set()
     for row in views_res + clicks_res + saves_res:
-        all_item_ids.add(row[0])
+        all_product_ids.add(row[0])
 
     item_map = {}
-    if all_item_ids:
-        items = db.session.execute(select(Item).where(Item.id.in_(all_item_ids))).scalars().all()
-        item_map = {item.id: item for item in items}
+    if all_product_ids:
+        products = db.session.execute(select(Product).where(Product.id.in_(all_product_ids))).scalars().all()
+        item_map = {product.id: product for product in products}
 
     def format_list(results):
         formatted = []
         for iid, count in results:
-            item = item_map.get(iid)
-            if item:
+            product = item_map.get(iid)
+            if product:
                 formatted.append({
                     "id": iid,
-                    "name": item.name,
+                    "name": product.name,
                     "count": count
                 })
         return formatted
@@ -70,7 +70,10 @@ def get_top_products_data(time_frame: str, limit: int = 5):
     }
 
 def get_brand_opportunity_data():
-    brands = db.session.execute(select(Brand.id, Brand.name)).all()
+    brands = db.session.execute(
+        select(Entity.id, Entity.name)
+        .where((Entity.entity_type == "brand") | (Entity.entity_type == "organization"))
+    ).all()
     brand_data = {b.id: {
         "name": b.name,
         "article_volume": 0,
@@ -79,36 +82,40 @@ def get_brand_opportunity_data():
     } for b in brands}
 
     art_vol_stmt = select(
-        content_brands.c.brand_id,
-        func.count(content_brands.c.content_id).label("count")
-    ).group_by(content_brands.c.brand_id)
+        ContentEntity.entity_id,
+        func.count(ContentEntity.content_id).label("count")
+    ).group_by(ContentEntity.entity_id)
     for b_id, count in db.session.execute(art_vol_stmt).all():
         if b_id in brand_data:
             brand_data[b_id]["article_volume"] = count
 
     prod_vol_stmt = select(
-        Item.brand_id,
-        func.count(Item.id).label("count")
-    ).group_by(Item.brand_id)
+        Entity.id,
+        func.count(Product.id).label("count")
+    ).join(Brand, Brand.slug == Entity.slug)\
+     .join(Product, Product.brand_id == Brand.id)\
+     .group_by(Entity.id)
     for b_id, count in db.session.execute(prod_vol_stmt).all():
         if b_id in brand_data:
             brand_data[b_id]["product_volume"] = count
 
     brand_content_eng_stmt = select(
-        content_brands.c.brand_id,
+        ContentEntity.entity_id,
         func.sum(
             Content.view_count + Content.like_count + Content.dislike_count + Content.save_count + Content.comment_count
         ).label("eng")
-    ).join(Content, Content.id == content_brands.c.content_id)\
-     .group_by(content_brands.c.brand_id)
+    ).join(Content, Content.id == ContentEntity.content_id)\
+     .group_by(ContentEntity.entity_id)
     for b_id, eng in db.session.execute(brand_content_eng_stmt).all():
         if b_id in brand_data:
             brand_data[b_id]["engagement"] += int(eng or 0)
 
     brand_prod_eng_stmt = select(
-        Item.brand_id,
-        func.sum(Item.view_count + Item.click_count + Item.save_count).label("eng")
-    ).group_by(Item.brand_id)
+        Entity.id,
+        func.sum(Product.view_count + Product.click_count + Product.save_count).label("eng")
+    ).join(Brand, Brand.slug == Entity.slug)\
+     .join(Product, Product.brand_id == Brand.id)\
+     .group_by(Entity.id)
     for b_id, eng in db.session.execute(brand_prod_eng_stmt).all():
         if b_id in brand_data:
             brand_data[b_id]["engagement"] += int(eng or 0)
@@ -134,30 +141,30 @@ def get_brand_opportunity_data():
 
 def get_catalog_health_report():
     from datetime import datetime, timedelta, timezone
-    from app.domains.relationships import content_items
-    from app.domains.item.models import ItemImage
+    from app.domains.relationships import content_products
+    from app.domains.product.models import ProductImage
     
     now = datetime.now(timezone.utc)
     stale_date = now - timedelta(days=30)
     
-    total_items = db.session.execute(select(func.count(Item.id))).scalar() or 0
+    total_items = db.session.execute(select(func.count(Product.id))).scalar() or 0
     
-    items_with_images_stmt = select(func.count(func.distinct(ItemImage.item_id)))
+    items_with_images_stmt = select(func.count(func.distinct(ProductImage.product_id)))
     items_with_images = db.session.execute(items_with_images_stmt).scalar() or 0
     items_without_images = total_items - items_with_images
     
-    items_with_links_stmt = select(func.count(func.distinct(ItemVariant.item_id)))\
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)\
-        .where(ItemStoreLink.is_active == True)
+    items_with_links_stmt = select(func.count(func.distinct(ProductVariant.product_id)))\
+        .join(ProductStoreLink, ProductStoreLink.variant_id == ProductVariant.id)\
+        .where(ProductStoreLink.is_active == True)
     items_with_links = db.session.execute(items_with_links_stmt).scalar() or 0
     items_without_links = total_items - items_with_links
     
-    stale_links_stmt = select(func.count(func.distinct(ItemVariant.item_id)))\
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)\
-        .where((ItemStoreLink.is_active == True) & ((ItemStoreLink.last_checked_at < stale_date) | (ItemStoreLink.last_checked_at == None)))
+    stale_links_stmt = select(func.count(func.distinct(ProductVariant.product_id)))\
+        .join(ProductStoreLink, ProductStoreLink.variant_id == ProductVariant.id)\
+        .where((ProductStoreLink.is_active == True) & ((ProductStoreLink.last_checked_at < stale_date) | (ProductStoreLink.last_checked_at == None)))
     items_with_stale_pricing = db.session.execute(stale_links_stmt).scalar() or 0
     
-    items_with_content_stmt = select(func.count(func.distinct(content_items.c.item_id)))
+    items_with_content_stmt = select(func.count(func.distinct(content_products.c.product_id)))
     items_with_content = db.session.execute(items_with_content_stmt).scalar() or 0
     items_without_content = total_items - items_with_content
     
@@ -184,8 +191,8 @@ def get_catalog_health_report():
     }
 
 def get_source_intelligence():
-    from app.domains.interaction.models import ItemClick
-    from app.domains.item.models import Store
+    from app.domains.interaction.models import ProductClick
+    from app.domains.product.models import Store
     from datetime import datetime, timedelta, timezone
     import random
     
@@ -197,22 +204,22 @@ def get_source_intelligence():
     
     for store in stores:
         active_links = db.session.execute(
-            select(func.count(ItemStoreLink.id))
-            .where((ItemStoreLink.store_id == store.id) & (ItemStoreLink.is_active == True))
+            select(func.count(ProductStoreLink.id))
+            .where((ProductStoreLink.store_id == store.id) & (ProductStoreLink.is_active == True))
         ).scalar() or 0
         
         if active_links == 0:
             continue
             
         stale_links = db.session.execute(
-            select(func.count(ItemStoreLink.id))
-            .where((ItemStoreLink.store_id == store.id) & (ItemStoreLink.is_active == True) & ((ItemStoreLink.last_synced_at < stale_date) | (ItemStoreLink.last_synced_at == None)))
+            select(func.count(ProductStoreLink.id))
+            .where((ProductStoreLink.store_id == store.id) & (ProductStoreLink.is_active == True) & ((ProductStoreLink.last_synced_at < stale_date) | (ProductStoreLink.last_synced_at == None)))
         ).scalar() or 0
         
         clicks = db.session.execute(
-            select(func.count(ItemClick.id))
-            .join(ItemStoreLink, ItemStoreLink.id == ItemClick.item_store_link_id)
-            .where(ItemStoreLink.store_id == store.id)
+            select(func.count(ProductClick.id))
+            .join(ProductStoreLink, ProductStoreLink.id == ProductClick.product_store_link_id)
+            .where(ProductStoreLink.store_id == store.id)
         ).scalar() or 0
         
         random.seed(store.id)
@@ -239,21 +246,21 @@ def get_source_intelligence():
 
 def get_content_commerce_attribution():
     from app.domains.content.models import Content
-    from app.domains.relationships import content_items
-    from app.domains.item.models import Item
+    from app.domains.relationships import content_products
+    from app.domains.product.models import Product
     
     stmt = select(
         Content.id,
         Content.title,
         Content.view_count.label('content_views'),
-        func.sum(Item.click_count).label('total_item_clicks'),
-        func.count(Item.id).label('linked_items_count')
+        func.sum(Product.click_count).label('total_item_clicks'),
+        func.count(Product.id).label('linked_items_count')
     ).select_from(Content)\
-     .join(content_items, content_items.c.content_id == Content.id)\
-     .join(Item, Item.id == content_items.c.item_id)\
+     .join(content_products, content_products.c.content_id == Content.id)\
+     .join(Product, Product.id == content_products.c.product_id)\
      .group_by(Content.id)\
-     .having(func.sum(Item.click_count) > 0)\
-     .order_by(desc(func.sum(Item.click_count)))\
+     .having(func.sum(Product.click_count) > 0)\
+     .order_by(desc(func.sum(Product.click_count)))\
      .limit(10)
      
     rows = db.session.execute(stmt).all()
@@ -327,22 +334,22 @@ def get_source_authority_validation():
     return results
 
 def get_geographic_demand_data():
-    from app.domains.interaction.models import ItemClick
-    from app.domains.item.models import ItemStoreLink, Item
+    from app.domains.interaction.models import ProductClick
+    from app.domains.product.models import ProductStoreLink, Product
     from app.domains.taxonomy.models import Category
     
     stmt = select(
         Category.id.label("category_id"),
         Category.name.label("category_name"),
-        ItemClick.country,
-        func.count(ItemClick.id).label("click_count")
-    ).select_from(ItemClick)\
-     .join(ItemStoreLink, ItemClick.target_id == ItemStoreLink.id)\
-     .join(Item, ItemStoreLink.item_id == Item.id)\
-     .join(Category, Item.category_id == Category.id)\
-     .where(ItemClick.country.isnot(None))\
-     .where(ItemClick.country != "")\
-     .group_by(Category.id, Category.name, ItemClick.country)
+        ProductClick.country,
+        func.count(ProductClick.id).label("click_count")
+    ).select_from(ProductClick)\
+     .join(ProductStoreLink, ProductClick.target_id == ProductStoreLink.id)\
+     .join(Product, ProductStoreLink.product_id == Product.id)\
+     .join(Category, Product.category_id == Category.id)\
+     .where(ProductClick.country.isnot(None))\
+     .where(ProductClick.country != "")\
+     .group_by(Category.id, Category.name, ProductClick.country)
      
     rows = db.session.execute(stmt).all()
     
@@ -371,8 +378,8 @@ def get_geographic_demand_data():
 
 def get_recommendation_commerce_chain():
     from app.domains.interaction.models import RecommendationClick
-    from app.domains.item.models import Item
-    from app.domains.relationships import content_items
+    from app.domains.product.models import Product
+    from app.domains.relationships import content_products
     from app.domains.content.models import Content
     
     cast_entity_id = cast(RecommendationClick.entity_id, Integer)
@@ -382,9 +389,9 @@ def get_recommendation_commerce_chain():
         Content.title,
         func.count(RecommendationClick.id).label('rec_clicks')
     ).select_from(RecommendationClick)\
-     .join(Item, (RecommendationClick.entity_type.in_(['shop_product', 'related_product'])) & (cast_entity_id == Item.id))\
-     .join(content_items, Item.id == content_items.c.item_id)\
-     .join(Content, content_items.c.content_id == Content.id)\
+     .join(Product, (RecommendationClick.entity_type.in_(['shop_product', 'related_product'])) & (cast_entity_id == Product.id))\
+     .join(content_products, Product.id == content_products.c.product_id)\
+     .join(Content, content_products.c.content_id == Content.id)\
      .group_by(Content.id, Content.title)\
      .having(func.count(RecommendationClick.id) > 0)\
      .order_by(desc('rec_clicks'))\

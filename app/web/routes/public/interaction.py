@@ -11,7 +11,7 @@ from app.application.interaction.item_click import record_item_click_workflow
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items
 from app.domains.content.service import get_content_by_id
-from app.domains.item.service import get_item_by_id
+from app.domains.product.service import get_item_by_id
 from app.application.interaction.tracking import track_view_workflow, track_impression_workflow, track_click_workflow
 from app.shared.utils.logging import log_route_start, log_route_success
 import logging
@@ -153,7 +153,7 @@ def get_comments():
     
     return comments_html
 
-@bp.route("/item-click/<int:link_id>", methods=["POST"])
+@bp.route("/product-click/<int:link_id>", methods=["POST"])
 def item_click(link_id):
     user = current_user if current_user.is_authenticated else None
     ip_address = request.remote_addr if not (user and user.is_authenticated) else None
@@ -256,19 +256,19 @@ def saved_items():
     
     # Extract collections
     collections = set()
-    for item in saved_articles + saved_items:
-        if item.get("collection_name"):
-            collections.add(item["collection_name"])
+    for product in saved_articles + saved_items:
+        if product.get("collection_name"):
+            collections.add(product["collection_name"])
     
     collections = sorted(list(collections))
 
     log_route_success(
         logger, "/saved",
-        items=(len(saved_articles) + len(saved_items)),
-        template="saved-items.html",
+        products=(len(saved_articles) + len(saved_items)),
+        template="saved-products.html",
     )
     return render_template(
-        'saved-items.html',
+        'saved-products.html',
         saved_articles=saved_articles,
         saved_items=saved_items,
         collections=collections

@@ -1,7 +1,7 @@
 <div class="engagement-breakdown-container flex flex-col gap-2">
   {% for label, count in data.items() %}
     {% if count > 0 %}
-    <div class="engagement-breakdown-row flex items-center gap-3">
+    <div class="engagement-breakdown-row flex products-center gap-3">
       <div class="engagement-breakdown-label" id="engagement-breakdown-label">{{ label }}</div>
       <div class="engagement-breakdown-bar-wrapper flex-1">
         <div class="engagement-breakdown-bar-fill badge-primary" style="--percent: {{ (count / data.values()|sum * 100)|int }}%;"></div>

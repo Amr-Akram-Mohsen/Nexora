@@ -1,7 +1,7 @@
 from app.shared.dto.ingestion import RawItemDTO
 
 
-def map_newsapi_ai(data: dict, region="en"):
+def map_event_registry(data: dict, region="en"):
     # Event Registry format
     articles_data = data.get("articles", {})
     results = articles_data.get("results", []) if isinstance(articles_data, dict) else []
@@ -9,7 +9,7 @@ def map_newsapi_ai(data: dict, region="en"):
     if not isinstance(results, list):
         return []
 
-    items = []
+    products = []
     for a in results:
         if not isinstance(a, dict):
             continue
@@ -18,29 +18,27 @@ def map_newsapi_ai(data: dict, region="en"):
         # Ensure url is present
         a["url"] = a.get("url")
         a["content_text"] = a.get("body")
-        a["ingestion_method"] = "newsapi_ai"
+        a["ingestion_method"] = "event_registry"
         
         # Explicitly set this to None so it isn't incorrectly populated
         a["content_html"] = None
         
         # Extract rich metadata for ingestion
-        a["extended_metadata"] = a.get("extended_metadata", {})
-        if a.get("concepts"):
-            a["extended_metadata"]["concepts"] = a.get("concepts")
-        if a.get("categories"):
-            a["extended_metadata"]["categories"] = a.get("categories")
-        if a.get("eventUri"):
-            a["extended_metadata"]["eventUri"] = a.get("eventUri")
+        a["er_concepts"] = a.get("concepts")
+        a["er_categories"] = a.get("categories")
+        a["er_event_uri"] = a.get("eventUri")
+        a["er_uri"] = a.get("uri")
+        a["er_source"] = a.get("source")
             
-        items.append(RawItemDTO(**a))
-    return items
+        products.append(RawItemDTO(**a))
+    return products
 
 def map_newsapi(data: dict, region="en"):
     articles = data.get("articles", [])
     if not isinstance(articles, list):
         return []
 
-    items = []
+    products = []
 
     for a in articles:
         if not isinstance(a, dict):
@@ -48,9 +46,9 @@ def map_newsapi(data: dict, region="en"):
         # Map NewsAPI specific fields to standard DTO fields
         a["image_url"] = a.get("urlToImage")
         a["source_name"] = (a.get("source") or {}).get("name")
-        items.append(RawItemDTO(**a))
+        products.append(RawItemDTO(**a))
 
-    return items
+    return products
 
 
 def map_gnews(data: dict, region="en"):
@@ -58,7 +56,7 @@ def map_gnews(data: dict, region="en"):
     if not isinstance(articles, list):
         return []
 
-    items = []
+    products = []
 
     for a in articles:
         if not isinstance(a, dict):
@@ -67,25 +65,25 @@ def map_gnews(data: dict, region="en"):
         a["image_url"] = a.get("image")
         a["region"] = region.upper()
         a["source_name"] = (a.get("source") or {}).get("name")
-        items.append(RawItemDTO(**a))
+        products.append(RawItemDTO(**a))
 
-    return items
+    return products
 
 
 def map_youtube(data: dict, region="SA"):
-    items = data.get("items", [])
-    if not isinstance(items, list):
+    products = data.get("products", [])
+    if not isinstance(products, list):
         return []
 
     results = []
 
-    for item in items:
-        if not isinstance(item, dict):
+    for product in products:
+        if not isinstance(product, dict):
             continue
-        video_id = item.get("id", {}).get("videoId")
+        video_id = product.get("id", {}).get("videoId")
         if not video_id:
             continue
-        snippet = item.get("snippet", {})
+        snippet = product.get("snippet", {})
 
         results.append(
             RawItemDTO(
@@ -118,7 +116,7 @@ def map_reddit(submissions, subreddit_name):
 
     from datetime import datetime
 
-    items = []
+    products = []
 
     for submission in submissions:
         if submission.score < MIN_SCORE:
@@ -137,7 +135,7 @@ def map_reddit(submissions, subreddit_name):
         )
         region = _REGION_MAP.get(subreddit_name.lower())
 
-        items.append(
+        products.append(
             RawItemDTO(
                 title=submission.title,
                 body=description,
@@ -153,4 +151,4 @@ def map_reddit(submissions, subreddit_name):
                 platform="reddit",
             )
         )
-    return items
+    return products

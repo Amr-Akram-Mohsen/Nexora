@@ -11,7 +11,7 @@
   </div>
 
   {# ── Sidebar title row ── #}
-  <div class="sidebar-heading flex items-center justify-between">
+  <div class="sidebar-heading flex products-center justify-between">
     <span class="sidebar-heading__label">
       <i class="{{ 'fas fa-newspaper' if target_type == 'articles' else 'fas fa-box-open' }}"></i>
       {{ 'Article Filters' if target_type == 'articles' else 'Product Filters' }}
@@ -30,8 +30,8 @@
   </div>
 
   {# ── Price active indicator (products only, shown when price filter is active) ── #}
-  {% if target_type == 'item' and (active_filters.min_price or active_filters.max_price) %}
-  <div class="sidebar-price-active flex items-center">
+  {% if target_type == 'product' and (active_filters.min_price or active_filters.max_price) %}
+  <div class="sidebar-price-active flex products-center">
     <i class="fas fa-dollar-sign"></i>
     <span>
       {% if active_filters.min_price and active_filters.max_price %}
@@ -74,14 +74,14 @@
   {% endfor %}
 
     {# ── Price Range (products only) ── #}
-    {% if target_type == 'item' %}
+    {% if target_type == 'product' %}
     <details class="filter-section filter-section--price" {{ 'open' if active_filters.min_price or
       active_filters.max_price else 'open' }}>
-      <summary class="filter-section__summary flex items-center justify-between">
+      <summary class="filter-section__summary flex products-center justify-between">
         <span class="filter-section__title gap-2">
           <i class="fas fa-dollar-sign"></i> Price Range
         </span>
-        <span class="filter-section__meta flex items-center">
+        <span class="filter-section__meta flex products-center">
           {% if active_filters.min_price or active_filters.max_price %}
           <span class="filter-section__badge">Active</span>
           {% endif %}
@@ -98,15 +98,15 @@
         {% endif %}
         {% endfor %}
 
-        <div class="price-range-inputs flex items-center gap-2">
+        <div class="price-range-inputs flex products-center gap-2">
           <div class="price-input-group flex flex-col">
             <label for="min_price" class="price-input-label">Min</label>
-            <div class="price-input-wrapper flex items-center">
+            <div class="price-input-wrapper flex products-center">
               <span class="price-currency">$</span>
               {{ input(type="number", id="min_price", name="min_price", placeholder="0", value=active_filters.min_price or '', class="price-input", required=False, attrs={"min": "0", "step": "1"}) }}
             </div>
           </div>
-          <div class="price-range-divider flex items-center"><span></span></div>
+          <div class="price-range-divider flex products-center"><span></span></div>
           <div class="price-input-group">
             <label for="max_price" class="price-input-label">Max</label>
             <div class="price-input-wrapper">
@@ -124,7 +124,7 @@
     {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     {% if target_type == 'articles' %}
     <div class="sidebar-trending">
-      <div class="sidebar-trending__header flex items-center gap-2">
+      <div class="sidebar-trending__header flex products-center gap-2">
         <i class="fas fa-fire"></i>
         <span class="sidebar-trending__title">Trending Now</span>
       </div>
@@ -161,7 +161,7 @@
     {% endif %}
 
     {# ── PRODUCTS: Promo CTA block ── #}
-    {% if target_type == 'item' %}
+    {% if target_type == 'product' %}
     <div class="sidebar-promo sidebar-promo--products">
       <div class="sidebar-promo__icon">
         <i class="fas fa-bolt"></i>
@@ -169,7 +169,7 @@
       <h4 class="sidebar-promo__title">User Favorites</h4>
       <p class="sidebar-promo__text">Discover what others are buying this week.</p>
       <a href="{{ url_for(request.endpoint, **dict(request.view_args, sort='popular')) }}"
-        class="sidebar-promo__link flex items-center">
+        class="sidebar-promo__link flex products-center">
         View Most Popular
         <i class="fas fa-arrow-right"></i>
       </a>

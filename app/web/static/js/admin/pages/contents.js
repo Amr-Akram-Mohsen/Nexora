@@ -178,7 +178,7 @@
 
     if (selectedIds.size > 0) {
       toolbar.classList.remove("is-hidden");
-      countSpan.textContent = `${selectedIds.size.toLocaleString()} content items selected`;
+      countSpan.textContent = `${selectedIds.size.toLocaleString()} content products selected`;
       applyBtn.disabled = !actionSelect.value;
     } else {
       toolbar.classList.add("is-hidden");
@@ -233,7 +233,7 @@
 
     showModal(
       "Confirm Bulk Action",
-      `Are you sure you want to execute ${actionText} on the ${selectedIds.size} selected items?`,
+      `Are you sure you want to execute ${actionText} on the ${selectedIds.size} selected products?`,
       () => {
         window.api.post("/admin/contents/bulk", payload)
           .then((res) => {

@@ -22,7 +22,7 @@
   pointer-events: all;
   line-height: 1.5;
   display: flex;
-  align-items: center;
+  align-products: center;
   justify-content: space-between;
   gap: 0.5rem;
 }

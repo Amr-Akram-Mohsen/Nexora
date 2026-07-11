@@ -1,5 +1,5 @@
 function handleImageControls(control) {
-    const gallery = control.closest(".item-gallery");
+    const gallery = control.closest(".product-gallery");
     if (!gallery) return;
     const displayImg = gallery.querySelector("[data-gallery-main]");
     if (!displayImg) return;
@@ -18,8 +18,8 @@ function handleImageControls(control) {
     const indexEl = gallery.querySelector(`[data-gallery-index]`);
     if (indexEl) indexEl.textContent = newIndex;
     // 3. Update Sync Arrows
-    const prevBtn = gallery.querySelector(".item-gallery__nav--prev");
-    const nextBtn = gallery.querySelector(".item-gallery__nav--next");
+    const prevBtn = gallery.querySelector(".product-gallery__nav--prev");
+    const nextBtn = gallery.querySelector(".product-gallery__nav--next");
     if (prevBtn) {
         prevBtn.dataset.galleryNewImage = newIndex - 1;
         prevBtn.classList.toggle("disabled", newIndex === 1);
@@ -54,7 +54,7 @@ function navigateGallery(direction) {
     if (totalEl) totalEl.textContent = images.length;
 }
 function initGallery(e) {
-    const gallery = e.target.closest(".item-gallery");
+    const gallery = e.target.closest(".product-gallery");
     if (!gallery) return;
     const thumbs = [...gallery.querySelectorAll("[data-gallery-thumb] img")];
     if (!thumbs.length) return;
@@ -83,7 +83,7 @@ const Gallery = {
     update(images = []) {
         const gallery =
             document.querySelector(
-                ".item-gallery"
+                ".product-gallery"
             )
         if (
             !gallery ||
@@ -149,7 +149,7 @@ function handleGalleryClick(e) {
         if (galleryOverlay) galleryOverlay.hidden = true;
         return true;
     }
-    const imageControl = e.target.closest(".item-gallery__nav, .item-gallery__thumb");
+    const imageControl = e.target.closest(".product-gallery__nav, .product-gallery__thumb");
     if (imageControl) {
         handleImageControls(imageControl);
         return true;

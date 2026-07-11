@@ -15,10 +15,10 @@ def subscribers_rows():
     status = request.args.get("subscriber_status_filter", "").strip()
     has_user = request.args.get("subscriber_user_filter", "").strip()
 
-    items, total, pages, stats = get_admin_subscribers_paginated(search, status, has_user, page, per_page)
+    products, total, pages, stats = get_admin_subscribers_paginated(search, status, has_user, page, per_page)
 
     subscribers = []
-    for s in items:
+    for s in products:
         status_label = 'active' if (s.is_confirmed and not s.unsubscribed_at) else ('inactive' if s.unsubscribed_at else 'pending')
         subscribers.append({
             "id": s.id,
@@ -29,7 +29,7 @@ def subscribers_rows():
             "unsubscribed_at": s.unsubscribed_at.strftime('%Y-%m-%d') if s.unsubscribed_at else "—"
         })
 
-    html = render_template("admin/components/_rows.html", items=subscribers, domain="subscribers")
+    html = render_template("admin/components/_rows.html", products=subscribers, domain="subscribers")
     
     res = make_response(html)
     res.headers["X-Total"] = total

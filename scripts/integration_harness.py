@@ -78,9 +78,9 @@ def find_fetch_fn(module):
             return attr
     return None
 
-def items_to_plain(items):
+def items_to_plain(products):
     out = []
-    for it in items:
+    for it in products:
         try:
             if hasattr(it, "model_dump"):
                 out.append(it.model_dump())
@@ -95,14 +95,14 @@ def items_to_plain(items):
             out.append(str(it))
     return out
 
-def minimal_validate_item(item):
+def minimal_validate_item(product):
     # Ensure at least platform, and one of external_id/url, and one of title/description/content/content_text
     reasons = []
-    if not item.get("platform"):
+    if not product.get("platform"):
         reasons.append("missing platform")
-    if not (item.get("external_id") or item.get("url")):
+    if not (product.get("external_id") or product.get("url")):
         reasons.append("missing external_id and url")
-    if not (item.get("title") or item.get("description") or item.get("content") or item.get("content_text")):
+    if not (product.get("title") or product.get("description") or product.get("content") or product.get("content_text")):
         reasons.append("missing title/description/content")
     return reasons
 
@@ -216,21 +216,21 @@ def run_one(module_name, out_dir, discovery, app, extra_urls=None):
 
         # normalize results -> list
         if results is None:
-            items = []
+            products = []
         elif isinstance(results, (list, tuple)):
-            items = list(results)
+            products = list(results)
         elif isinstance(results, dict):
-            # try to find items container
-            for key in ("items", "articles", "data", "results"):
+            # try to find products container
+            for key in ("products", "articles", "data", "results"):
                 if key in results and isinstance(results[key], (list, tuple)):
-                    items = list(results[key]); break
+                    products = list(results[key]); break
             else:
-                items = [results]
+                products = [results]
         else:
             # single object
-            items = [results]
+            products = [results]
 
-        plain_items = items_to_plain(items)
+        plain_items = items_to_plain(products)
         mod_res["items_count"] = len(plain_items)
         mod_res["items_sample"] = plain_items[:MAX_SAMPLE_ITEMS]
         mod_res["meta"]["sample_hash"] = sha1_of(mod_res["items_sample"])
@@ -289,7 +289,7 @@ def main(args):
             print(f"[harness] running {m} ...", flush=True)
             res = run_one(m, fixtures_dir, discovery, app, extra_urls=sample_urls)
             path = write_fixture(fixtures_dir, m, res)
-            print(f"  => ok={res.get('ok')} items={res.get('items_count')} fixture={path}")
+            print(f"  => ok={res.get('ok')} products={res.get('items_count')} fixture={path}")
             if res.get("error"):
                 print("   error:", res["error"].get("message"))
             results.append(res)

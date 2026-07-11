@@ -67,7 +67,7 @@
 
 /* ── Cross-Domain Bridge Strip ───────────────────────────────────────────
    "Shop What You Read" — homepage conversion bridge between editorial
-   content sections and commercial item sections.
+   content sections and commercial product sections.
    Uses the full-width gradient to visually mark the domain transition.
 ────────────────────────────────────────────────────────────────────────── */
 
@@ -158,7 +158,7 @@
   }
 .cross-domain-bridge__inner {
     flex-direction: column;
-    align-items: flex-start;
+    align-products: flex-start;
   }
 
   .cross-domain-bridge__title {

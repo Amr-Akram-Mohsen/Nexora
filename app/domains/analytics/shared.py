@@ -56,7 +56,7 @@ def build_period_split_query(join_col, group_col, interaction_model, start_a, st
 def compute_quality_scores(metrics: list, key_fn, *, ctr_key="ctr", imp_key="impressions", click_key="clicks") -> dict:
     """
     Compute normalized CTR × engagement_weight quality score for a metric list.
-    key_fn: callable(item) -> dict key name.
+    key_fn: callable(product) -> dict key name.
     """
     max_ctr = max((m[ctr_key] for m in metrics), default=0.0)
     max_imp = max((m[imp_key] for m in metrics), default=0)

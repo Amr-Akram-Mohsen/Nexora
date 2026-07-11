@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from datetime import datetime, timezone, timedelta
 from app.core.extensions import db
 from app.domains.content.models import Content, Article, Video, Post
-from app.domains.taxonomy.models import Category, Section, Source, Topic, Brand, IntentFacet, GenderFacet, PriceTierFacet
+from app.domains.taxonomy.models import Category, Section, Source, IntentFacet, GenderFacet, PriceTierFacet
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.relationships import ArticleSource
 
@@ -70,8 +70,8 @@ def get_admin_content_metadata():
     categories = get_taxonomy_mappings(Category)
     sections   = get_taxonomy_mappings(Section)
     sources    = get_taxonomy_mappings(Source)
-    topics     = get_taxonomy_mappings(Topic)
-    brands     = get_taxonomy_mappings(Brand)
+    topics     = []
+    brands     = []
     intents    = get_taxonomy_mappings(IntentFacet)
     genders    = get_taxonomy_mappings(GenderFacet)
     price_tiers= get_taxonomy_mappings(PriceTierFacet)
@@ -95,8 +95,8 @@ def get_admin_content_stats():
     drafts = total - published
     failed = db.session.query(func.count(Article.id)).filter(Article.status == "failed").scalar()
     
-    no_topics = db.session.query(func.count(Content.id)).filter(~Content.topics.any()).scalar()
-    no_brands = db.session.query(func.count(Content.id)).filter(~Content.brands.any()).scalar()
+    no_topics = 0
+    no_brands = 0
 
     return {
         "total": total,
@@ -132,11 +132,11 @@ def get_admin_deduplication_groups():
     groups = []
     for title, count in dup_titles:
         if not title: continue
-        items = db.session.execute(select(Content).where(Content.title == title)).scalars().all()
+        products = db.session.execute(select(Content).where(Content.title == title)).scalars().all()
         groups.append({
             "title": title,
             "count": count,
-            "content_list": [{"id": i.id, "type": i.object_type, "published_at": i.published_at.isoformat() if i.published_at else None, "source": i.source.name if i.source else "None"} for i in items]
+            "content_list": [{"id": i.id, "type": i.object_type, "published_at": i.published_at.isoformat() if i.published_at else None, "source": i.source.name if i.source else "None"} for i in products]
         })
     return groups
 
@@ -149,9 +149,8 @@ def get_admin_content_inspect_raw(id):
             joinedload(Content.gender),
             joinedload(Content.intent),
             joinedload(Content.price_tier),
-            selectinload(Content.brands),
-            selectinload(Content.topics),
-            selectinload(Content.linked_items),
+            selectinload(Content.content_entities),
+            selectinload(Content.linked_products),
             selectinload(Content.comments).joinedload(Comment.user)
         ).where(Content.id == id)
     )

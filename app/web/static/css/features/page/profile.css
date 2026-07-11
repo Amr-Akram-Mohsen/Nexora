@@ -39,7 +39,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
-  align-items: start;
+  align-products: start;
 }
 
 @media (min-width: 992px) {
@@ -119,12 +119,12 @@
   padding: 1.25rem 1.5rem;
 }
 
-.meta-item {
+.meta-product {
   padding-block: 0.625rem;
   font-size: var(--text-sm);
 }
 
-.meta-item:not(:last-child) {
+.meta-product:not(:last-child) {
   border-bottom: 1px solid var(--border);
 }
 
@@ -193,7 +193,7 @@
 @media (min-width: 768px) {
   .profile-form-grid {
     grid-template-columns: 1fr auto;
-    align-items: end;
+    align-products: end;
   }
 }
 .form-field {flex-direction: column;
@@ -212,7 +212,7 @@
   padding: 1.5rem;
 }
 
-.newsletter-status-item {
+.newsletter-status-product {
   width: 100%;
 }
 
@@ -274,7 +274,7 @@
 }
 
 /* --- Collections Management --- */
-.collection-manage-item {
+.collection-manage-product {
   border: 1px solid var(--border-light);
   background: rgba(var(--background-rgb), 0.5);
 }
@@ -309,7 +309,7 @@
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   justify-content: center;
-  align-items: center;
+  align-products: center;
 }
 
 .modal-overlay.active {

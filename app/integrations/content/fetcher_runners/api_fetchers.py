@@ -8,11 +8,11 @@ def run_newsapi_fetch():
         api_key_name="NEWS_API_KEY",
     )
 
-def run_newsapi_ai_fetch():
+def run_event_registry_fetch():
     return run_fetcher(
-        source_name="newsapi_ai",
+        source_name="event_registry",
         object_type="article",
-        api_key_name="NEWSAPI_AI_API_KEY",
+        api_key_name="EVENT_REGISTRY_API_KEY",
     )
 
 

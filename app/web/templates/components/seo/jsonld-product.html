@@ -1,24 +1,24 @@
-{% macro render_product_jsonld(item) %}
+{% macro render_product_jsonld(product) %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org/",
   "@type": "Product",
-  "name": "{{ item.name | e }}",
+  "name": "{{ product.name | e }}",
   "image": [
-    "{{ url_for('static', filename=item.image_url, _external=True) if item.image_url else '' }}"
+    "{{ url_for('static', filename=product.image_url, _external=True) if product.image_url else '' }}"
   ],
-  "description": "{{ item.quick_details | e if item.quick_details else '' }}",
-  "sku": "{{ item.default_variant.sku if item.default_variant else '' }}",
+  "description": "{{ product.quick_details | e if product.quick_details else '' }}",
+  "sku": "{{ product.default_variant.sku if product.default_variant else '' }}",
   "brand": {
     "@type": "Brand",
-    "name": "{{ item.brand.name if item.brand else '' }}"
+    "name": "{{ product.brand.name if product.brand else '' }}"
   },
   "offers": {
     "@type": "AggregateOffer",
     "url": "{{ request.url }}",
-    "priceCurrency": "{{ item.default_variant.currency if item.default_variant else 'USD' }}",
-    "lowPrice": "{{ item.min_price if item.min_price else (item.price if item.price else '0.00') }}",
-    "offerCount": "{{ item.stores | length }}"
+    "priceCurrency": "{{ product.default_variant.currency if product.default_variant else 'USD' }}",
+    "lowPrice": "{{ product.min_price if product.min_price else (product.price if product.price else '0.00') }}",
+    "offerCount": "{{ product.stores | length }}"
   }
 }
 </script>

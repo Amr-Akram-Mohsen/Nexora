@@ -5,14 +5,14 @@
   {{ empty_state("No cross-domain conflicts detected!") }}
 {% else %}
   <div class="admin-table-wrapper insights-table-scroll">
-    {% call standard_table(["Content", "Content Brands", "Item", "Item Brand", "Action"]) %}
-        {% for item in data %}
+    {% call standard_table(["Content", "Content Brands", "Product", "Product Brand", "Action"]) %}
+        {% for product in data %}
         <tr>
-          <td>{{ item.content_title }}</td>
-          <td>{{ badge(item.content_brands | join(', ') if item.content_brands else 'None', "orange") }}</td>
-          <td>{{ item.item_name }}</td>
-          <td>{{ badge(item.item_brand, "orange") }}</td>
-          <td>{{ button(text="Fix Content Brand", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "apply-insight", "data-id": item.content_id, "data-insight-type": "Brand", "data-suggested-id": item.suggested_brand_id}, variant=none) }}</td>
+          <td>{{ product.content_title }}</td>
+          <td>{{ badge(product.content_brands | join(', ') if product.content_brands else 'None', "orange") }}</td>
+          <td>{{ product.item_name }}</td>
+          <td>{{ badge(product.item_brand, "orange") }}</td>
+          <td>{{ button(text="Fix Content Brand", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "apply-insight", "data-id": product.content_id, "data-insight-type": "Brand", "data-suggested-id": product.suggested_brand_id}, variant=none) }}</td>
         </tr>
         {% endfor %}
     {% endcall %}

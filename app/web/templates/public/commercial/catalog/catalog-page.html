@@ -8,7 +8,7 @@ listing_sort_script %}
 {% from "components/ui/empty-state.html" import empty_state %}
 
 {% set page_title = page_title or 'Deals' %}
-{% set results = items %}
+{% set results = products %}
 
 {% block title %}Deals | Nexora{% endblock %}
 
@@ -24,7 +24,7 @@ listing_sort_script %}
 SLOT: sidebar
 ═══════════════════════════════════════ #}
 {% if slot == 'sidebar' %}
-{% include "commercial/features/item-sidebar.html" %}
+{% include "commercial/features/product-sidebar.html" %}
 {% endif %}
 
 {# ═══════════════════════════════════════
@@ -55,8 +55,8 @@ SLOT: results
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {% set block_target_type = 'commercial' if block['type'] == 'item' else 'content' %}
-  {{ grid(block['items'], target_type=block_target_type, carousel=true) }}
+  {% set block_target_type = 'commercial' if block['type'] == 'product' else 'content' %}
+  {{ grid(block['products'], target_type=block_target_type, carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>
@@ -86,7 +86,7 @@ action_url=url_for(request.endpoint, **request.view_args)
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
-  {{ grid(block['items'], target_type=block['type'], carousel=true) }}
+  {{ grid(block['products'], target_type=block['type'], carousel=true) }}
   {% endcall %}
   {% endfor %}
 </div>

@@ -1,20 +1,20 @@
 {% from "components/ui/core.html" import badge, button %}
-{% macro render_item_compact_card(item) %}
-<a href="{{ url_for('item.item_page', item_id=item.id) }}" class="inline-product-card gap-2 flex" data-domain-type="commercial">
+{% macro render_item_compact_card(product) %}
+<a href="{{ url_for('product.item_page', product_id=product.id) }}" class="inline-product-card gap-2 flex" data-domain-type="commercial">
   <div class="inline-product__image">
-    {% if item.image_url %}
-    <img src="{{ item.image_url }}" alt="{{ item.name }}" loading="lazy">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
     {% else %}
     <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="Placeholder" loading="lazy">
     {% endif %}
   </div>
 
   <div class="inline-product__info flex">
-    {{ badge(item.item_type, attrs={'data-type': 'item'}) }}
-    <div class="inline-product__title">{{ item.name }}</div>
-    {% if item.price %}
+    {{ badge(product.product_type, attrs={'data-type': 'product'}) }}
+    <div class="inline-product__title">{{ product.name }}</div>
+    {% if product.price %}
     <div class="inline-product__price">
-      From {{ item.price }} {{ item.default_variant.currency if item.default_variant else '' }}
+      From {{ product.price }} {{ product.default_variant.currency if product.default_variant else '' }}
     </div>
     {% endif %}
   </div>

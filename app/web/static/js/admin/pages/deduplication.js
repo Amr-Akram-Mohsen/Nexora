@@ -6,7 +6,7 @@
   'use strict';
 
   function removeCardById(id) {
-    var card = document.getElementById('dup-item-' + id);
+    var card = document.getElementById('dup-product-' + id);
     if (card) {
       card.classList.add('is-removing');
       setTimeout(function () { card.remove(); }, 300);
@@ -32,23 +32,23 @@
             if (data && data.success) {
               showToast('Duplicate deleted successfully.', 'success');
             } else {
-              showToast((data && data.error) || 'Failed to delete item.', 'error');
-              var card = document.getElementById('dup-item-' + id);
+              showToast((data && data.error) || 'Failed to delete product.', 'error');
+              var card = document.getElementById('dup-product-' + id);
               if (card) card.classList.remove('is-removing');
             }
           })
           .catch(function () {
-            var card = document.getElementById('dup-item-' + id);
+            var card = document.getElementById('dup-product-' + id);
             if (card) card.classList.remove('is-removing');
           });
       }
     );
   }
 
-  function deleteAllButFirst(groupIndex, items) {
-    if (!items || items.length <= 1) return;
+  function deleteAllButFirst(groupIndex, products) {
+    if (!products || products.length <= 1) return;
 
-    var sorted = items.slice().sort(function (a, b) { return a.id - b.id; });
+    var sorted = products.slice().sort(function (a, b) { return a.id - b.id; });
     var idsToDelete = sorted.slice(1).map(function (i) { return i.id; });
 
     showModal(
@@ -61,7 +61,7 @@
             if (data && data.success) {
               showToast('Kept oldest; removed ' + idsToDelete.length + ' duplicate(s).', 'success');
             } else {
-              showToast((data && data.error) || 'Failed to delete items.', 'error');
+              showToast((data && data.error) || 'Failed to delete products.', 'error');
               var panel = document.getElementById('dup-group-' + groupIndex);
               if (panel) panel.classList.remove('is-removing');
             }
@@ -89,13 +89,13 @@
 
     if (action === 'keep-oldest') {
       var groupIndex = btn.dataset.group;
-      var items;
+      var products;
       try {
-        items = JSON.parse(btn.dataset.items);
+        products = JSON.parse(btn.dataset.products);
       } catch (_) {
-        items = [];
+        products = [];
       }
-      deleteAllButFirst(groupIndex, items);
+      deleteAllButFirst(groupIndex, products);
     }
   });
 

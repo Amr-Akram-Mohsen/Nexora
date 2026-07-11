@@ -11,7 +11,7 @@
 <div class="dist-list flex">
   {% for c in by_category %}
     {% set pct = ((c.count / max_val.val) * 100) | round | int %}
-    {{ distribution_link_bar(c.name, "{:,} items".format(c.count), pct, "/admin/contents?category=" ~ c.slug, "bar-purple") }}
+    {{ distribution_link_bar(c.name, "{:,} products".format(c.count), pct, "/admin/contents?category=" ~ c.slug, "bar-purple") }}
   {% endfor %}
 </div>
 {% endif %}

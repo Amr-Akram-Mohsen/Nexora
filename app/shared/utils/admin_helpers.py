@@ -36,8 +36,8 @@ def delete_model_workflow(model_class, model_id, name_attr=None, session=None):
 
 def execute_paginated_query(stmt, count_stmt, page, per_page, session=None):
     """
-    Handles offset calculation, total counts, page math, and returns (items, total, pages).
-    Returns elements as a tuple: (items, total, pages)
+    Handles offset calculation, total counts, page math, and returns (products, total, pages).
+    Returns elements as a tuple: (products, total, pages)
     """
     import math
     if session is None:
@@ -45,10 +45,10 @@ def execute_paginated_query(stmt, count_stmt, page, per_page, session=None):
         
     total = session.scalar(count_stmt) or 0
     offset = (page - 1) * per_page
-    items = session.execute(stmt.limit(per_page).offset(offset)).all()
+    products = session.execute(stmt.limit(per_page).offset(offset)).all()
     pages = math.ceil(total / per_page) if per_page else 1
     
-    return items, total, pages
+    return products, total, pages
 
 def toggle_model_flag_workflow(model_class, model_id, flag_attr, target_value=None, session=None):
     """

@@ -1,6 +1,6 @@
 # app/admin/recommendations.py
 """
-Admin content-item recommendation management endpoints.
+Admin content-product recommendation management endpoints.
 
 Refactoring applied:
 - Global @admin_required guard via before_request (R-01).
@@ -11,8 +11,8 @@ from flask import Blueprint, jsonify, request, render_template
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.content.models import Content
-from app.domains.item.models import Item
-from app.domains.relationships import content_items
+from app.domains.product.models import Product
+from app.domains.relationships import content_products
 from app.web.routes.admin.helpers import paginate_manual, render_admin_rows_response
 from app.domains.recommendation.service.admin import (
     get_recommendation_stats,
@@ -33,13 +33,13 @@ apply_admin_guard(bp)
 
 @bp.route("/stats", methods=["GET"])
 def recommendation_stats():
-    """Aggregate stats for content-item matches."""
+    """Aggregate stats for content-product matches."""
     return jsonify(get_recommendation_stats())
 
 
 @bp.route("/matches", methods=["GET"])
 def list_matches():
-    """Paginated list of content-item associations for admin inspection."""
+    """Paginated list of content-product associations for admin inspection."""
     page     = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 25, type=int)
     search   = request.args.get("search", "").strip()
@@ -70,7 +70,7 @@ def matches_rows():
             "widget_ctr": r["widget_ctr"],
             "last_active": r["last_active"],
             "linked_items_count": r["linked_items_count"],
-            "linked_items_list": [i['id'] for i in r["items"]]
+            "linked_items_list": [i['id'] for i in r["products"]]
         })
 
     return render_admin_rows_response(
@@ -135,8 +135,8 @@ def inspect_user_interests(user_id):
     )
 
 
-@bp.route("/matches/<int:content_id>/<int:item_id>", methods=["DELETE"])
-def unlink_match(content_id, item_id):
-    """Remove a content-item association."""
-    unlink_match_workflow(content_id, item_id)
+@bp.route("/matches/<int:content_id>/<int:product_id>", methods=["DELETE"])
+def unlink_match(content_id, product_id):
+    """Remove a content-product association."""
+    unlink_match_workflow(content_id, product_id)
     return jsonify({"success": True, "message": "Association removed."})

@@ -12,7 +12,7 @@
 {% set status_class = "status-badge user" %}
 {% set status_text = "Pending" %}
 {% endif %}
-<div class="integration-row flex items-center gap-3">
+<div class="integration-row flex products-center gap-3">
   <span class="integration-name">{{ intg.name | upper }}</span>
   {{ badge(text=status_text, class="integration-status " ~ status_class) }}
   <span class="integration-meta">

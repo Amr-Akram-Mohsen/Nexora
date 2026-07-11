@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-delete-collection').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const collectionName = e.currentTarget.dataset.collection;
-      if (confirm(`Are you sure you want to delete the collection "${collectionName}"? This will permanently remove the items from your saved list.`)) {
+      if (confirm(`Are you sure you want to delete the collection "${collectionName}"? This will permanently remove the products from your saved list.`)) {
         try {
           const res = await fetch("/collection/delete", {
             method: 'POST',

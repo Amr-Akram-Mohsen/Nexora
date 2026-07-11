@@ -21,7 +21,7 @@ def get_related_contents_scored(
     session=None,
 ) -> list[dict]:
     """
-    Return top-N content items most relevant to ``content_id``.
+    Return top-N content products most relevant to ``content_id``.
     Delegates to the content domain query service.
     """
     from app.domains.content.service.query import get_related_contents

@@ -101,7 +101,7 @@
   font-weight: var(--weight-md);
 }
 
-.meta-item {
+.meta-product {
   gap: 0.5rem;
   transition: color 0.3s;
 }

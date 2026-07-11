@@ -10,7 +10,7 @@
     pointer-events: none;
     transition: opacity 0.2s ease;
     display: grid !important;
-    place-items: center;
+    place-products: center;
     overflow-y: auto;
     padding: 2rem 1rem;
     box-sizing: border-box;
@@ -204,13 +204,13 @@
     gap: 0.875rem;
 }
 
-.inspect-store-card-item {
+.inspect-store-card-product {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
 
-.inspect-store-card-item strong {
+.inspect-store-card-product strong {
     font-size: 0.65rem;
     text-transform: uppercase;
     color: var(--muted-foreground);
@@ -218,7 +218,7 @@
     font-weight: var(--weight-bold);
 }
 
-.inspect-store-card-item span {
+.inspect-store-card-product span {
     font-size: var(--text-sm);
     color: var(--foreground);
     font-weight: var(--weight-medium);
@@ -251,7 +251,7 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     display: flex;
-    align-items: center;
+    align-products: center;
     gap: 0.5rem;
     transition: border-color 0.2s ease;
 }
@@ -277,7 +277,7 @@
 .inspect-url-link {
     color: var(--brand-blue);
     display: flex;
-    align-items: center;
+    align-products: center;
     justify-content: center;
     transition: opacity 0.2s;
 }
@@ -373,7 +373,7 @@
     gap: 1rem;
     padding: 1rem;
     border-bottom: 1px solid var(--border);
-    align-items: center;
+    align-products: center;
     transition: background-color 0.2s ease;
 }
 
@@ -397,7 +397,7 @@
 
 .v-sku {
     gap: 0.35rem;
-    align-items: flex-start;
+    align-products: flex-start;
 }
 
 .variant-sku-text {
@@ -409,7 +409,7 @@
 
 .variant-default-badge {
     display: inline-flex;
-    align-items: center;
+    align-products: center;
     gap: 0.25rem;
     background: rgba(var(--brand-green-rgb), 0.1);
     color: var(--brand-green);
@@ -423,7 +423,7 @@
 
 .variant-attr-pill {
     display: inline-flex;
-    align-items: center;
+    align-products: center;
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     overflow: hidden;
@@ -461,14 +461,14 @@
 
 .variant-stats-group {
     display: flex;
-    align-items: center;
+    align-products: center;
     justify-content: flex-end;
     gap: 0.875rem;
 }
 
 .variant-stat {
     display: inline-flex;
-    align-items: center;
+    align-products: center;
     gap: 0.35rem;
     font-size: var(--text-sm);
     color: var(--muted-foreground);
@@ -490,7 +490,7 @@
         padding: 1rem;
     }
     .v-col {
-        align-items: flex-start !important;
+        align-products: flex-start !important;
         text-align: left !important;
     }
     .variant-stats-group {
@@ -515,7 +515,7 @@
     margin-top: 0.5rem;
 }
 
-.inspect-spec-item {
+.inspect-spec-product {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -526,13 +526,13 @@
     transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.inspect-spec-item:hover {
+.inspect-spec-product:hover {
     background: var(--card);
     border-color: var(--border);
     box-shadow: var(--shadow-sm);
 }
 
-.inspect-spec-item strong {
+.inspect-spec-product strong {
     font-size: 0.7rem;
     text-transform: uppercase;
     color: var(--muted-foreground);
@@ -540,7 +540,7 @@
     font-weight: var(--weight-bold);
 }
 
-.inspect-spec-item span {
+.inspect-spec-product span {
     font-size: var(--text-sm);
     color: var(--foreground);
     font-weight: var(--weight-medium);
@@ -580,7 +580,7 @@
     gap: 1.25rem;
 }
 
-.inspect-json-node-item {
+.inspect-json-node-product {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -591,20 +591,20 @@
     transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.inspect-json-node-item:hover {
+.inspect-json-node-product:hover {
     background: var(--card);
     border-color: var(--border);
     box-shadow: var(--shadow-sm);
 }
 
-.inspect-json-node-item-full {
+.inspect-json-node-product-full {
     grid-column: 1 / -1;
     background: transparent;
     padding: 0;
     border: none;
 }
 
-.inspect-json-node-item-full:hover {
+.inspect-json-node-product-full:hover {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
@@ -666,7 +666,7 @@
     color: var(--muted-foreground);
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-products: center;
     user-select: none;
     transition: background-color 0.2s ease, color 0.2s ease;
 }

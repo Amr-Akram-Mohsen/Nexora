@@ -1,6 +1,6 @@
 # app/utils/matcher.py
 """
-Article ↔ Item Matcher — Phase 6C
+Article ↔ Product Matcher — Phase 6C
 ===================================
 Links articles to related products based on multi-signal scoring.
 
@@ -17,8 +17,8 @@ import logging
 from datetime import datetime, timedelta
 from app.core.extensions import db
 from app.domains.content.models import Article, Content
-from app.domains.item.models import Item
-from app.domains.item.service.options import get_item_load_options
+from app.domains.product.models import Product
+from app.domains.product.service.options import get_item_load_options
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +37,12 @@ def _tokenize(text: str) -> set[str]:
     return {w for w in words if len(w) >= 3}
 
 
-def _score_match(article_tokens: set[str], item: Item) -> int:
+def _score_match(article_tokens: set[str], product: Product) -> int:
     """
-    Score how well an item matches an article based on multiple signals.
+    Score how well an product matches an article based on multiple signals.
 
     Scoring:
-      +3  — full item name substring found in article title (high confidence)
+      +3  — full product name substring found in article title (high confidence)
       +2  — brand name present in article title
       +1  — category name present in article tokens
       +1  — each significant model keyword (len >= 4) present in article tokens
@@ -51,13 +51,13 @@ def _score_match(article_tokens: set[str], item: Item) -> int:
     Returns an integer score; MIN_SCORE is the threshold for linking.
     """
     score = 0
-    item_name_lower  = item.name.lower()
-    brand_name_lower = item.brand.name.lower()
-    cat_name_lower   = item.category.name.lower() if item.category else ""
+    item_name_lower  = product.name.lower()
+    brand_name_lower = product.brand.name.lower()
+    cat_name_lower   = product.category.name.lower() if product.category else ""
 
     article_text = " ".join(article_tokens)
 
-    # Signal 1: full item name in text
+    # Signal 1: full product name in text
     if item_name_lower in article_text:
         score += 3
 
@@ -69,7 +69,7 @@ def _score_match(article_tokens: set[str], item: Item) -> int:
     if cat_name_lower and cat_name_lower in article_text:
         score += 1
 
-    # Signal 4: model keywords (individual significant words from item name)
+    # Signal 4: model keywords (individual significant words from product name)
     if score < 3:   # skip if already high-confidence
         model_keywords = [
             w for w in re.findall(r"[a-z0-9]+", item_name_lower)
@@ -86,7 +86,7 @@ def match_articles_to_items(
     since: datetime | None = None,
 ) -> int:
     """
-    Scan unmatched (or stale) articles and link them to relevant items.
+    Scan unmatched (or stale) articles and link them to relevant products.
 
     Args:
         dry_run:  If True, calculate matches but don't commit to DB.
@@ -94,19 +94,19 @@ def match_articles_to_items(
                   Defaults to articles not yet matched or matched > REPROCESS_AFTER ago.
 
     Returns:
-        Number of new article-item links created.
+        Number of new article-product links created.
     """
-    logger.info("[Matcher] Starting article-to-item matching (batch_size=%d, min_score=%d)…",
+    logger.info("[Matcher] Starting article-to-product matching (batch_size=%d, min_score=%d)…",
                 BATCH_SIZE, MIN_SCORE)
 
-    # Load all items once — item count is much smaller than article count
-    # and each item is lightweight (name + brand + category only needed)
-    items = Item.query.options(*get_item_load_options("minimal")).all()
-    if not items:
-        logger.info("[Matcher] No items found. Nothing to match against.")
+    # Load all products once — product count is much smaller than article count
+    # and each product is lightweight (name + brand + category only needed)
+    products = Product.query.options(*get_item_load_options("minimal")).all()
+    if not products:
+        logger.info("[Matcher] No products found. Nothing to match against.")
         return 0
 
-    logger.info("[Matcher] Loaded %d items to match against.", len(items))
+    logger.info("[Matcher] Loaded %d products to match against.", len(products))
 
     total_links   = 0
     page          = 0
@@ -128,23 +128,23 @@ def match_articles_to_items(
             search_text  = f"{article.title} {article.description or ''}"
             article_tokens = _tokenize(search_text)
 
-            current_links = len(article.linked_items)
+            current_links = len(article.linked_products)
             batch_links   = 0
 
-            for item in items:
+            for product in products:
                 if current_links + batch_links >= MAX_LINKS_PER_ARTICLE:
                     break
-                if item in article.linked_items:
+                if product in article.linked_products:
                     continue
 
-                score = _score_match(article_tokens, item)
+                score = _score_match(article_tokens, product)
                 if score >= MIN_SCORE:
-                    article.linked_items.append(item)
+                    article.linked_products.append(product)
                     batch_links += 1
                     total_links += 1
                     logger.debug(
                         "[Matcher] score=%d  '%s'  <->  '%s'",
-                        score, item.name, article.title[:60],
+                        score, product.name, article.title[:60],
                     )
 
             # Stamp the article so we don't re-process it next run
@@ -161,6 +161,6 @@ def match_articles_to_items(
 
         page += 1
 
-    logger.info("[Matcher] Done. Created %d new article-item links.", total_links)
+    logger.info("[Matcher] Done. Created %d new article-product links.", total_links)
     return total_links
 

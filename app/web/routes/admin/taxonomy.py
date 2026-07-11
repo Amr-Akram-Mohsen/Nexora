@@ -3,13 +3,13 @@ from flask import Blueprint, jsonify, request, render_template
 from app.core.decorators import admin_required
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section, Source, AttributeFacet, GenderFacet, IntentFacet, PriceTierFacet
+from app.domains.taxonomy.models import Category, Brand, Entity, Section, Source, AttributeFacet, GenderFacet, IntentFacet, PriceTierFacet
 from app.shared.utils.slug import generate_slug
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, update
 import difflib
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.analytics.taxonomy_intelligence import get_taxonomy_intelligence
 from app.domains.taxonomy.service.query import paginate_taxonomy_entity
 from app.domains.taxonomy.service.admin import (
@@ -229,12 +229,12 @@ def categories_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Category, page, per_page, search, status, health)
-    item_ids = [c.id for c in pagination.items]
+    product_ids = [c.id for c in pagination.products]
     from app.domains.taxonomy.service.metrics import get_category_metrics
-    metrics = get_category_metrics(item_ids)
+    metrics = get_category_metrics(product_ids)
         
     serialized = []
-    for c in pagination.items:
+    for c in pagination.products:
         m = metrics.get(c.id, {})
         c_count = m.get("content_count", 0)
         i_count = m.get("item_count", 0)
@@ -247,7 +247,7 @@ def categories_rows():
             
         counts = {
             "content count": c_count,
-            "item count": i_count
+            "product count": i_count
         }
         serialized.append(serialize_taxonomy(c, counts=counts, health=health))
 
@@ -260,19 +260,19 @@ def categories_rows():
 @bp.route("/brands/rows", methods=["GET"])
 def brands_rows():
     """Return server-rendered HTML rows partial for brands AJAX injection."""
-    from app.domains.relationships import content_brands
+
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
     status = request.args.get("status")
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Brand, page, per_page, search, status, health)
-    item_ids = [b.id for b in pagination.items]
+    product_ids = [b.id for b in pagination.products]
     from app.domains.taxonomy.service.metrics import get_brand_metrics
-    metrics = get_brand_metrics(item_ids)
+    metrics = get_brand_metrics(product_ids)
         
     serialized = []
-    for b in pagination.items:
+    for b in pagination.products:
         m = metrics.get(b.id, {})
         c_count = m.get("content_count", 0)
         i_count = m.get("item_count", 0)
@@ -285,7 +285,7 @@ def brands_rows():
             
         counts = {
             "content count": c_count,
-            "item count": i_count,
+            "product count": i_count,
         }
         serialized.append(serialize_taxonomy(b, counts=counts, health=health))
 
@@ -298,19 +298,21 @@ def brands_rows():
 @bp.route("/topics/rows", methods=["GET"])
 def topics_rows():
     """Return server-rendered HTML rows partial for topics AJAX injection."""
-    from app.domains.relationships import content_topics
+
     page, per_page = parse_pagination_params(default_per_page=50)
     search = request.args.get("search", "").strip()
     status = request.args.get("status")
     health = request.args.get("health")
 
-    pagination = paginate_taxonomy_entity(Topic, page, per_page, search, status, health)
-    item_ids = [t.id for t in pagination.items]
+    from app.domains.taxonomy.models import Entity
+    extra_filter = Entity.entity_type.in_(['topic', 'tag', 'concept'])
+    pagination = paginate_taxonomy_entity(Entity, page, per_page, search, status, health, extra_filter=extra_filter)
+    product_ids = [t.id for t in pagination.products]
     from app.domains.taxonomy.service.metrics import get_topic_metrics
-    metrics = get_topic_metrics(item_ids)
+    metrics = get_topic_metrics(product_ids)
         
     serialized = []
-    for t in pagination.items:
+    for t in pagination.products:
         m = metrics.get(t.id, {})
         c_count = m.get("content_count", 0)
         cat_count = m.get("category_spread", 0)
@@ -342,12 +344,12 @@ def sections_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Section, page, per_page, search, status, health)
-    item_ids = [s.id for s in pagination.items]
+    product_ids = [s.id for s in pagination.products]
     from app.domains.taxonomy.service.metrics import get_section_metrics
-    metrics = get_section_metrics(item_ids)
+    metrics = get_section_metrics(product_ids)
         
     serialized = []
-    for s in pagination.items:
+    for s in pagination.products:
         m = metrics.get(s.id, {})
         c_count = m.get("content_count", 0)
         cat_count = m.get("category_spread", 0)
@@ -421,12 +423,12 @@ def attributes_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(AttributeFacet, page, per_page, search, health=health)
-    item_ids = [a.id for a in pagination.items]
+    product_ids = [a.id for a in pagination.products]
     from app.domains.taxonomy.service.metrics import get_attribute_metrics
-    metrics = get_attribute_metrics(item_ids)
+    metrics = get_attribute_metrics(product_ids)
         
     serialized = []
-    for a in pagination.items:
+    for a in pagination.products:
         m = metrics.get(a.id, {})
         c_count = m.get("content_count", 0)
         
@@ -550,13 +552,13 @@ def _get_facet_rows(model, domain_type, field_id_name):
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(model, page, per_page, search, health=health, field_name=field_id_name)
-    item_ids = [a.id for a in pagination.items]
+    product_ids = [a.id for a in pagination.products]
     
     from app.domains.taxonomy.service.metrics import get_facet_metrics
-    metrics = get_facet_metrics(item_ids, field_id_name)
+    metrics = get_facet_metrics(product_ids, field_id_name)
     
     serialized = []
-    for a in pagination.items:
+    for a in pagination.products:
         m = metrics.get(a.id, {})
         c_count = m.get("content_count", 0)
         
@@ -621,7 +623,7 @@ def inspect_brand(id):
 @bp.route("/topics/<int:id>/inspect", methods=["GET"])
 @admin_required
 def inspect_topic(id):
-    return _render_taxonomy_inspect(Topic, id, "Topic", "topic")
+    return _render_taxonomy_inspect(Entity, id, "Topic", "topic")
 
 @bp.route("/sections/<int:id>/inspect", methods=["GET"])
 @admin_required

@@ -55,18 +55,18 @@ transition: all 0.2s ease;
   color: var(--domain-primary, var(--primary));
 }
 
-.contact-item:hover .contact-icon {
+.contact-product:hover .contact-icon {
   background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.08);
 }
 
-.contact-item h3 {
+.contact-product h3 {
   font-size: 0.9375rem; /* 15px */
   font-weight: 700;
   color: var(--foreground);
   margin: 0 0 0.35rem 0;
 }
 
-.contact-item p {
+.contact-product p {
   font-size: 0.875rem; /* 14px */
   color: var(--muted-foreground);
   line-height: 1.5;

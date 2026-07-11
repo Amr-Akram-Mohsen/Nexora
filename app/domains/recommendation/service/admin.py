@@ -1,22 +1,22 @@
 from sqlalchemy import select, func
 from app.core.extensions import db
 from app.domains.content.models import Content
-from app.domains.item.models import Item
-from app.domains.relationships import content_items
+from app.domains.product.models import Product
+from app.domains.relationships import content_products
 from app.domains.interaction.models import RecommendationImpression, RecommendationClick
 from datetime import datetime, timedelta, timezone
 
 def get_recommendation_stats():
     total_matches = db.session.execute(
-        select(func.count()).select_from(content_items)
+        select(func.count()).select_from(content_products)
     ).scalar() or 0
 
     linked_contents = db.session.execute(
-        select(func.count(func.distinct(content_items.c.content_id)))
+        select(func.count(func.distinct(content_products.c.content_id)))
     ).scalar() or 0
 
     linked_items = db.session.execute(
-        select(func.count(func.distinct(content_items.c.item_id)))
+        select(func.count(func.distinct(content_products.c.product_id)))
     ).scalar() or 0
 
     total_impressions = db.session.execute(
@@ -55,12 +55,12 @@ def get_recommendation_stats():
 def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range=None):
     base_stmt = (
         select(Content.id)
-        .join(content_items, Content.id == content_items.c.content_id)
+        .join(content_products, Content.id == content_products.c.content_id)
     )
     if search:
         like = f"%{search}%"
-        base_stmt = base_stmt.join(Item, Item.id == content_items.c.item_id)
-        base_stmt = base_stmt.where(Content.title.ilike(like) | Item.name.ilike(like))
+        base_stmt = base_stmt.join(Product, Product.id == content_products.c.product_id)
+        base_stmt = base_stmt.where(Content.title.ilike(like) | Product.name.ilike(like))
         
     context_id_expr = Content.object_type + '/' + func.cast(Content.object_id, db.String)
 
@@ -92,23 +92,23 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
     from app.shared.utils.admin_helpers import execute_paginated_query
     
     total_stmt = select(func.count()).select_from(base_stmt.subquery())
-    items, total, pages = execute_paginated_query(base_stmt, total_stmt, page, per_page)
-    content_ids = [i[0] for i in items]
+    products, total, pages = execute_paginated_query(base_stmt, total_stmt, page, per_page)
+    content_ids = [i[0] for i in products]
 
     if not content_ids:
         return total, pages, []
 
     detail_stmt = (
-        select(Content, Item)
+        select(Content, Product)
         .select_from(Content)
-        .join(content_items, Content.id == content_items.c.content_id)
-        .join(Item, Item.id == content_items.c.item_id)
+        .join(content_products, Content.id == content_products.c.content_id)
+        .join(Product, Product.id == content_products.c.product_id)
         .where(Content.id.in_(content_ids))
     )
     rows = db.session.execute(detail_stmt).all()
 
     grouped = {}
-    for content, item in rows:
+    for content, product in rows:
         if content.id not in grouped:
             grouped[content.id] = {
                 "content_id": content.id,
@@ -116,9 +116,9 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
                 "content_views": content.view_count or 0,
                 "object_type": content.object_type,
                 "object_id": content.object_id,
-                "items": []
+                "products": []
             }
-        grouped[content.id]["items"].append(item)
+        grouped[content.id]["products"].append(product)
     
     serialized = []
     for cid in content_ids:
@@ -158,14 +158,14 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
                 "widget_clicks": widget_clicks,
                 "widget_ctr": widget_ctr,
                 "last_active": last_active,
-                "linked_items_count": len(g["items"]),
-                "items": [
+                "linked_items_count": len(g["products"]),
+                "products": [
                     {
                         "id": i.id,
-                        "name": i.name or f"Item #{i.id}",
-                        "type": i.item_type,
+                        "name": i.name or f"Product #{i.id}",
+                        "type": i.product_type,
                         "clicks": i.click_count or 0
-                    } for i in g["items"]
+                    } for i in g["products"]
                 ]
             })
     return total, pages, serialized
@@ -173,13 +173,13 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
 def get_admin_match_inspect_raw(content_id):
     from sqlalchemy.orm import selectinload
     content = db.session.execute(
-        select(Content).options(selectinload(Content.linked_items)).where(Content.id == content_id)
+        select(Content).options(selectinload(Content.linked_products)).where(Content.id == content_id)
     ).scalar_one_or_none()
     if not content:
         return None
         
-    from app.domains.interaction.models import ItemClick
-    from app.domains.item.models import ItemStoreLink, ItemVariant
+    from app.domains.interaction.models import ProductClick
+    from app.domains.product.models import ProductStoreLink, ProductVariant
     
     referrer_pattern = f"%{content.object_type}/{content.object_id}%" if content.object_id else f"%/{content.id}%"
     context_id_val = f"{content.object_type}/{content.object_id}" if content.object_id else f"article/{content.id}"
@@ -201,13 +201,13 @@ def get_admin_match_inspect_raw(content_id):
     )
     
     linked_items_stats = []
-    for i in content.linked_items:
+    for i in content.linked_products:
         context_clicks = db.session.scalar(
-            select(func.count(ItemClick.id))
-            .join(ItemStoreLink, ItemClick.item_store_link_id == ItemStoreLink.id)
-            .join(ItemVariant, ItemStoreLink.variant_id == ItemVariant.id)
-            .where(ItemVariant.item_id == i.id)
-            .where(ItemClick.referrer.ilike(referrer_pattern))
+            select(func.count(ProductClick.id))
+            .join(ProductStoreLink, ProductClick.product_store_link_id == ProductStoreLink.id)
+            .join(ProductVariant, ProductStoreLink.variant_id == ProductVariant.id)
+            .where(ProductVariant.product_id == i.id)
+            .where(ProductClick.referrer.ilike(referrer_pattern))
         ) or 0
         
         widget_clicks = db.session.scalar(
@@ -271,8 +271,8 @@ def get_admin_entity_performance():
                 content = db.session.get(Content, int(r.entity_id))
                 if content: name = content.title
             else:
-                item = db.session.get(Item, int(r.entity_id))
-                if item: name = item.name
+                product = db.session.get(Product, int(r.entity_id))
+                if product: name = product.name
                 
         results.append({
             "entity_id": r.entity_id,
@@ -438,7 +438,7 @@ def get_admin_slot_analysis():
 def get_admin_user_interests_raw(user_id):
     from app.domains.user.models import User
     from app.domains.recommendation.models import UserInterest, UserEntityInterest
-    from app.domains.taxonomy.models import Brand, Category, Topic
+    from app.domains.taxonomy.models import Category, Entity
     
     user = db.session.get(User, user_id)
     if not user:
@@ -446,25 +446,24 @@ def get_admin_user_interests_raw(user_id):
         
     scores = db.session.execute(
         select(
-            UserEntityInterest.brand_id,
+            UserEntityInterest.entity_id,
             UserEntityInterest.category_id,
-            UserEntityInterest.topic_id,
             func.sum(UserEntityInterest.score).label("total_score")
         )
         .join(UserInterest, UserEntityInterest.user_interest_id == UserInterest.id)
         .where(UserInterest.user_id == user_id)
-        .group_by(UserEntityInterest.brand_id, UserEntityInterest.category_id, UserEntityInterest.topic_id)
+        .group_by(UserEntityInterest.entity_id, UserEntityInterest.category_id)
         .order_by(func.sum(UserEntityInterest.score).desc())
         .limit(5)
     ).all()
     
     return (user, scores)
 
-def delete_admin_match(content_id, item_id):
+def delete_admin_match(content_id, product_id):
     db.session.execute(
-        content_items.delete().where(
-            content_items.c.content_id == content_id,
-            content_items.c.item_id == item_id,
+        content_products.delete().where(
+            content_products.c.content_id == content_id,
+            content_products.c.product_id == product_id,
         )
     )
     db.session.commit()

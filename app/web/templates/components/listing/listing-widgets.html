@@ -2,7 +2,7 @@
 
 {% macro listing_header(title, count, label, active_filters, get_sort_url) %}
 {# Mobile filter toggle button #}
-<div class="listing-mobile-bar flex items-center justify-between">
+<div class="listing-mobile-bar flex products-center justify-between">
   {% from "components/ui/core.html" import button %}
   {% call button(id="filterToggleBtn", class="filter-toggle-btn gap-2", attrs={"aria-label": "Open filters"}, icon="fas fa-sliders-h", unstyled=True) %}
     <span>Filters</span>
@@ -11,12 +11,12 @@
       {% if v %}{% set active_count.n = active_count.n + 1 %}{% endif %}
     {% endfor %}
     {% if active_count.n > 0 %}
-      <span class="filter-toggle-badge justify-center inline-flex items-center">{{ active_count.n }}</span>
+      <span class="filter-toggle-badge justify-center inline-flex products-center">{{ active_count.n }}</span>
     {% endif %}
   {% endcall %}
 
   {# Inline sort (mobile) #}
-  <div class="listing-sort-compact flex items-center gap-2">
+  <div class="listing-sort-compact flex products-center gap-2">
     <select id="sort-select-mobile" class="sort-select sort-select--compact" aria-label="Sort results">
       <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest</option>
       <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest</option>
@@ -26,7 +26,7 @@
 </div>
 
 {# Desktop header row #}
-<div class="listing-header__inner flex items-center justify-between flex-wrap gap-4">
+<div class="listing-header__inner flex products-center justify-between flex-wrap gap-4">
   <div class="listing-summary flex">
     <h1 class="listing-title">{{ title }}</h1>
     <p class="listing-count">
@@ -35,9 +35,9 @@
     </p>
   </div>
 
-  <div class="listing-sort flex items-center">
+  <div class="listing-sort flex products-center">
     <label for="sort-select" class="sort-label">Sort by</label>
-    <div class="sort-select-wrapper flex items-center">
+    <div class="sort-select-wrapper flex products-center">
       <i class="fas fa-sort sort-select-icon"></i>
       <select id="sort-select" class="sort-select" aria-label="Sort results">
         <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First</option>
@@ -70,9 +70,9 @@
     {% if values %}
       {% set vals = values if values is iterable and values is not string else [values] %}
       {% for val in vals %}
-        <div class="filter-tag flex items-center gap-2 inline-flex">
+        <div class="filter-tag flex products-center gap-2 inline-flex">
           <span>{{ val | replace('-', ' ') | title }}</span>
-          <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag justify-center inline-flex items-center"
+          <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag justify-center inline-flex products-center"
             aria-label="Remove {{ val }} filter">&times;</a>
         </div>
       {% endfor %}
@@ -81,7 +81,7 @@
 
   {# Price range chip #}
   {% if active_filters.min_price or active_filters.max_price %}
-    <div class="filter-tag filter-tag--price flex items-center gap-2 inline-flex">
+    <div class="filter-tag filter-tag--price flex products-center gap-2 inline-flex">
       <i class="fas fa-dollar-sign" style="font-size:9px;opacity:.8;"></i>
       <span>
         {%- if active_filters.min_price and active_filters.max_price -%}
@@ -92,7 +92,7 @@
           Up to {{ active_filters.max_price }}
         {%- endif -%}
       </span>
-      <a href="{{ reset_url }}" class="remove-tag justify-center inline-flex items-center" aria-label="Remove price filter">&times;</a>
+      <a href="{{ reset_url }}" class="remove-tag justify-center inline-flex products-center" aria-label="Remove price filter">&times;</a>
     </div>
   {% endif %}
 
@@ -109,37 +109,37 @@
 
   {# Previous #}
   {% if pagination.has_prev %}
-    <a href="{{ get_page_url(pagination.prev_num) }}" class="pagination__btn pagination__btn--prev justify-center inline-flex items-center"
+    <a href="{{ get_page_url(pagination.prev_num) }}" class="pagination__btn pagination__btn--prev justify-center inline-flex products-center"
       aria-label="Previous page">
       <i class="fas fa-chevron-left"></i>
     </a>
   {% else %}
-    <span class="pagination__btn pagination__btn--prev is-disabled justify-center inline-flex items-center" aria-disabled="true">
+    <span class="pagination__btn pagination__btn--prev is-disabled justify-center inline-flex products-center" aria-disabled="true">
       <i class="fas fa-chevron-left"></i>
     </span>
   {% endif %}
 
   {# Page numbers #}
-  <div class="pagination__pages flex items-center gap-1">
+  <div class="pagination__pages flex products-center gap-1">
     {% for p in range(1, pagination.pages + 1) %}
       {% if p == pagination.page %}
-        <span class="pagination__page is-active justify-center inline-flex items-center" aria-current="page">{{ p }}</span>
+        <span class="pagination__page is-active justify-center inline-flex products-center" aria-current="page">{{ p }}</span>
       {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
-        <a href="{{ get_page_url(p) }}" class="pagination__page justify-center inline-flex items-center">{{ p }}</a>
+        <a href="{{ get_page_url(p) }}" class="pagination__page justify-center inline-flex products-center">{{ p }}</a>
       {% elif p == pagination.page - 3 or p == pagination.page + 3 %}
-        <span class="pagination__ellipsis justify-center inline-flex items-center">…</span>
+        <span class="pagination__ellipsis justify-center inline-flex products-center">…</span>
       {% endif %}
     {% endfor %}
   </div>
 
   {# Next #}
   {% if pagination.has_next %}
-    <a href="{{ get_page_url(pagination.next_num) }}" class="pagination__btn pagination__btn--next justify-center inline-flex items-center"
+    <a href="{{ get_page_url(pagination.next_num) }}" class="pagination__btn pagination__btn--next justify-center inline-flex products-center"
       aria-label="Next page">
       <i class="fas fa-chevron-right"></i>
     </a>
   {% else %}
-    <span class="pagination__btn pagination__btn--next is-disabled justify-center inline-flex items-center" aria-disabled="true">
+    <span class="pagination__btn pagination__btn--next is-disabled justify-center inline-flex products-center" aria-disabled="true">
       <i class="fas fa-chevron-right"></i>
     </span>
   {% endif %}

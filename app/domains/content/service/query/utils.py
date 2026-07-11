@@ -4,7 +4,7 @@ from app.domains.content.models import Content
 def get_content_eager_loads(mode="default"):
     """
     Retrieves eager-loading options based on the specified mode/profile.
-    - 'detail': Eager loading for detail views (including linked items, variants, etc.)
+    - 'detail': Eager loading for detail views (including linked products, variants, etc.)
     - 'list': Eager loading for list views (topics, brands, joined section/category)
     - 'default': Default eager loading (topics, brands, section, category via selectinload)
     - None or 'none': No eager loading
@@ -106,7 +106,8 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
     Applies unified content filters across public and admin interfaces.
     """
     from sqlalchemy import select, or_
-    from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet, PriceTierFacet, AttributeFacet, Section, Source, GenderFacet
+    from app.domains.taxonomy.models import Category, Brand, Entity, IntentFacet, PriceTierFacet, AttributeFacet, Section, Source, GenderFacet
+    from app.domains.relationships import ContentEntity
     from app.domains.content.models import Content
     
     if session is None:
@@ -145,16 +146,16 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
     topics = _normalize(filters.get("topic"))
     if topics and _is_allowed("topic"):
         if "none" in topics:
-            stmt = stmt.where(~Content.topics.any())
+            stmt = stmt.where(~Content.content_entities.any(ContentEntity.entity.has(Entity.entity_type.in_(['topic', 'tag', 'concept']))))
         else:
-            stmt = stmt.where(Content.topics.any(Topic.slug.in_(topics)))
+            stmt = stmt.where(Content.content_entities.any(ContentEntity.entity.has(Entity.slug.in_(topics))))
 
     brands = _normalize(filters.get("brand"))
     if brands and _is_allowed("brand"):
         if "none" in brands:
-            stmt = stmt.where(~Content.brands.any())
+            stmt = stmt.where(~Content.content_entities.any(ContentEntity.entity.has(Entity.entity_type == 'brand')))
         else:
-            stmt = stmt.where(Content.brands.any(Brand.slug.in_(brands)))
+            stmt = stmt.where(Content.content_entities.any(ContentEntity.entity.has(Entity.slug.in_(brands))))
 
     intents = _normalize(filters.get("intent"))
     if intents and _is_allowed("intent"):

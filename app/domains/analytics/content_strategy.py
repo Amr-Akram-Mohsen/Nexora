@@ -15,7 +15,7 @@ def generate_content_strategy(opportunities_data):
     # Quick lookup maps
     cat_map = {c["name"]: c for c in categories_data}
     brand_map = {b["name"]: b for b in brands_data}
-    intent_map = {item["category_name"]: item for item in intent_data}
+    intent_map = {product["category_name"]: product for product in intent_data}
     
     # Related content CTR signal
     related_content_ctr = rec_perf.get("related_content_ctr", 0.0)

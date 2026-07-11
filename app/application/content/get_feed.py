@@ -40,7 +40,7 @@ def get_feed_data(section_slug, active_filters, page=1):
         filter_options["attributes"] = get_attributes_for_section(
             section_slug, category_slugs=category_slugs
         )
-    has_results = len(pagination["items"]) > 0
+    has_results = len(pagination["products"]) > 0
     from app.application.recommendation.contextual import get_contextual_recommendations
     recommendation_blocks = get_contextual_recommendations(
         active_filters, has_results, section=section, target_type="content"
@@ -48,7 +48,7 @@ def get_feed_data(section_slug, active_filters, page=1):
 
     return {
         "section": serialize_model(section),
-        "contents": pagination["items"],
+        "contents": pagination["products"],
         "pagination": pagination,
         "allowed_filters": allowed_filters,
         "filter_options": filter_options,

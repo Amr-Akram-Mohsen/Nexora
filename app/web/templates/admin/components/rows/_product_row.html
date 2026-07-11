@@ -1,0 +1,50 @@
+{% from "components/ui/core.html" import badge, button %}
+{% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
+<td data-field="name">
+  <div class="flex products-center gap-2">
+    <strong class="cell-primary-text">{{ row.name }}</strong>
+  </div>
+</td>
+<td data-field="category">
+  {% if row.brand_name %}
+  {{ row.category_name }} / {{ row.brand_name }}
+  {% else %}
+  {{ row.category_name }}
+  {% endif %}
+</td>
+<td data-field="price">
+  <div class="flex products-center gap-2">
+    <span>
+      {% if row.min_price is not none %}
+      {{ row.min_price }}
+      {% if row.max_price and row.max_price > row.min_price %}
+      – {{ row.max_price }}
+      {% endif %}
+      {{ row.currency }}
+      {% endif %}
+    </span>
+    {% if row.has_discount %}
+    {{ badge("Discount", icon='fa-solid fa-tag', variant="success") }}
+    {% endif %}
+  </div>
+</td>
+<td data-field="store-count">{{ row.store_count }}</td>
+<td data-field="sync-age">
+  {% set value = row.sync_age %}
+  {% if value is not none %}
+  {% set variant = 'success' if value <= 1 else 'warning' if value <=7 else 'danger' %} {{ badge(value ~ "d" ,
+    variant=variant) }} {% endif %} </td>
+<td data-field="health">
+  {% set value = row.health %}
+  {% if value is not none %}
+  {% set title, variant = ('Catalog Health: Excellent', 'success') if value >= 80 else
+  ('Catalog Health: Needs Work', 'warning') if value >= 50 else
+  ('Catalog Health: Poor', 'danger') %}
+  {{ badge(value ~ "%", variant=variant, attrs={"title": title}) }}
+  {% endif %}
+</td>
+<td data-field="click-count">{{ row.click_count }}</td>
+<td data-field="added">{{ row.created_at if row.created_at else '' }}</td>
+{% if not hide_action_column %}
+{{ action_cell("products", row.id) }}
+{% endif %}

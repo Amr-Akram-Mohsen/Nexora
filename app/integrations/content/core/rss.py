@@ -158,15 +158,15 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
 
         # 304 Not Modified — nothing new, skip processing
         if status == 304:
-            log_integration_success(logger, _NAME, items=0, status=304, url=feed_url)
-            return {"items": [], "etag": etag, "modified": modified}
+            log_integration_success(logger, _NAME, products=0, status=304, url=feed_url)
+            return {"products": [], "etag": etag, "modified": modified}
 
         if not getattr(feed, "entries", None):
             log_integration_warning(
                 logger, _NAME, reason="empty_feed", url=feed_url, status=status
             )
             return {
-                "items": [],
+                "products": [],
                 "etag": feed.get("etag"),
                 "modified": feed.get("modified"),
             }
@@ -208,9 +208,9 @@ def fetch_rss_query(q_obj: dict, **kwargs) -> list[dict]:
                 }
             )
 
-        log_integration_success(logger, _NAME, items=len(raw_items), url=feed_url)
+        log_integration_success(logger, _NAME, products=len(raw_items), url=feed_url)
         return {
-            "items": raw_items,
+            "products": raw_items,
             "etag": feed.get("etag"),
             "modified": feed.get("modified"),
         }

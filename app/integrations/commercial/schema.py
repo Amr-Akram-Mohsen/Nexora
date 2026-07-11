@@ -36,7 +36,7 @@ class ParsedStoreLink:
     store_slug: str
     affiliate_url: str
     original_url: str
-    external_item_id: Optional[str]
+    external_product_id: Optional[str]
     price: Optional[Decimal]
     old_price: Optional[Decimal]
     currency: Optional[str]
@@ -56,7 +56,7 @@ class ParsedProduct:
     description: Optional[str]
     brand_name: Optional[str]
     category_name: Optional[str]
-    item_type: Optional[str]
+    product_type: Optional[str]
     source_type: str
     rating: Optional[float]
     review_count: Optional[int]

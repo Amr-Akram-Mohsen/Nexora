@@ -13,13 +13,13 @@
 }
 
 /* Detail page context — slightly larger stars in the meta row */
-.detail-page[data-domain-type="commercial"] .meta-item .star {
+.detail-page[data-domain-type="commercial"] .meta-product .star {
   font-size: var(--text-base);
 }
 
 /* ─── Rating value ───────────────────────────────────────────────────── */
 
-.item-rating {
+.product-rating {
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   color: #f59e0b;
@@ -28,7 +28,7 @@
 
 /* ─── Reviews count ──────────────────────────────────────────────────── */
 
-.item-reviews-count {
+.product-reviews-count {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
   text-decoration: underline;
@@ -36,15 +36,15 @@
   cursor: default;
 }
 
-/* ─── Inline meta separator (dot between items) ──────────────────────── */
+/* ─── Inline meta separator (dot between products) ──────────────────────── */
 
-.meta-item {
+.meta-product {
   gap: 0.2rem;
 }
 
-/* Dot separator between meta items */
-.detail-page__meta .meta-item + .item-rating::before,
-.detail-page__meta .item-rating + .item-reviews-count::before {
+/* Dot separator between meta products */
+.detail-page__meta .meta-product + .product-rating::before,
+.detail-page__meta .product-rating + .product-reviews-count::before {
   content: "·";
   display: inline-block;
   margin-right: 0.375rem;

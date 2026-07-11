@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.core.extensions import db
 from app.domains.interaction.service.query import get_saved_items
 from app.shared.constants.core import TargetType
-from app.domains.item.service.query import get_items_by_ids
+from app.domains.product.service.query import get_items_by_ids
 from app.domains.content.service.content_access import assign_target_to_contents
 from app.domains.content.service.query.filtering import get_contents_by_ids
 
@@ -32,10 +32,10 @@ def get_saved_articles_workflow(user_id):
     serialized = assign_target_to_contents(sorted_contents, session=db.session)
     
     # Add collection_name
-    for item in serialized:
-        save_obj = saves_map.get(item["id"])
+    for product in serialized:
+        save_obj = saves_map.get(product["id"])
         if save_obj:
-            item["collection_name"] = save_obj.collection_name
+            product["collection_name"] = save_obj.collection_name
             
     return serialized
 
@@ -44,20 +44,20 @@ def get_saved_products_workflow(user_id):
     Retrieves and serializes all saved products for a user.
     Uses batch loading to avoid N+1 queries.
     """
-    saves = get_saved_items(user_id, TargetType.ITEM)
+    saves = get_saved_items(user_id, TargetType.PRODUCT)
     if not saves:
         return []
     
-    item_ids = [s.target_id for s in saves]
+    product_ids = [s.target_id for s in saves]
     saves_map = {s.target_id: s for s in saves}
     
-    # Load all items and serialize with all card relations eager loaded
-    serialized = get_items_by_ids(item_ids, serialize=True, load="card")
+    # Load all products and serialize with all card relations eager loaded
+    serialized = get_items_by_ids(product_ids, serialize=True, load="card")
     
     # Add collection_name
-    for item in serialized:
-        save_obj = saves_map.get(item["id"])
+    for product in serialized:
+        save_obj = saves_map.get(product["id"])
         if save_obj:
-            item["collection_name"] = save_obj.collection_name
+            product["collection_name"] = save_obj.collection_name
             
     return serialized

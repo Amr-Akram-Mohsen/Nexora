@@ -2,9 +2,9 @@
 
 <header class="admin-header">
 
-    <div class="admin-header__inner flex items-center justify-between">
+    <div class="admin-header__inner flex products-center justify-between">
 
-        <div class="admin-header__left flex items-center">
+        <div class="admin-header__left flex products-center">
 
             {{ button(id="sidebar-toggle", type="button", class="admin-sidebar-toggle btn--icon gap-2", variant="ghost", attrs={"aria-label": "Toggle Sidebar"}, icon="fas fa-bars") }}
 
@@ -22,7 +22,7 @@
 
         </div>
 
-        <div class="admin-header__actions flex items-center">
+        <div class="admin-header__actions flex products-center">
 
             <a href="/" target="_blank" class="btn btn--ghost admin-header__site-link gap-2">
                 <i class="fas fa-external-link-alt"></i>
@@ -48,13 +48,13 @@
 
                 <div class="user-dropdown">
 
-                    <div class="user-info dropdown-item">
+                    <div class="user-info dropdown-product">
                         <span class="user-email">
                             {{ user_email }}
                         </span>
                     </div>
 
-                    <a href="{{ url_for('user.profile') }}" class="dropdown-item flex items-center">
+                    <a href="{{ url_for('user.profile') }}" class="dropdown-product flex products-center">
                         <i class="fas fa-id-card"></i>
                         Profile
                     </a>
@@ -69,7 +69,7 @@
                     variant="",
                     type="submit",
                     icon="fas fa-sign-out-alt",
-                    class="dropdown-item logout-btn"
+                    class="dropdown-product logout-btn"
                     ) }}
                     {% endcall %}
 

@@ -31,7 +31,7 @@ function getTableSpinnerHtml(colspan, text = "Loading…", extraClass = "") {
   return getTableStateHtml(colspan, getSpinnerHtml(text, extraClass), "table-loading-cell");
 }
 
-function getEmptyStateHtml(message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
+function getEmptyStateHtml(message = "No products found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
   return templateToHtml("global-empty-template", ".dashboard-empty", div => {
     if (extraClass) div.classList.add(...extraClass.split(" ").filter(Boolean));
     div.querySelector(".dashboard-state-icon").textContent = icon;
@@ -42,7 +42,7 @@ function getEmptyStateHtml(message = "No items found.", submessage = "Try adjust
   });
 }
 
-function getTableEmptyStateHtml(colspan, message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
+function getTableEmptyStateHtml(colspan, message = "No products found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
   return getTableStateHtml(colspan, getEmptyStateHtml(message, submessage, extraClass, icon));
 }
 

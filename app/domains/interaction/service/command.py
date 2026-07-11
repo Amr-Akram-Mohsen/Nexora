@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import update
 from functools import lru_cache
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 
 from app.core.extensions import db
 from ..models import View, Reaction, Comment, Save, Share
@@ -13,7 +13,7 @@ from app.shared.constants.core import TargetType
 def get_model_map():
     return {
         "content": Content,
-        "item": Item,
+        "product": Product,
         "comment": Comment,
     }
 
@@ -354,7 +354,7 @@ def rename_collection(user, old_name: str, new_name: str):
         
     saves = Save.query.filter_by(user_id=user.id, collection_name=old_name).all()
     for save in saves:
-        # Check if the new collection name already has this item saved
+        # Check if the new collection name already has this product saved
         existing = Save.query.filter_by(
             user_id=user.id,
             target_type=save.target_type,

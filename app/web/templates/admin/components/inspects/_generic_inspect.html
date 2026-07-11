@@ -5,13 +5,13 @@
 {% from "admin/components/ui/dashboard.html" import dashboard_empty %}
 
 {% set linked_items_table = {
-    "id": "linked-items",
+    "id": "linked-products",
     "preview_table": ["ID", "Name", "Type", "Clicks", "Actions"]
 } %}
 
 <div class="inspect-details-group flex">
   {% if source_header is defined and source_header %}
-    <div class="inspect-header-custom flex items-center gap-4">
+    <div class="inspect-header-custom flex products-center gap-4">
       <img src="{{ source_header.logo_url }}" alt="{{ source_header.name }} Logo" class="inspect-header-logo">
       <div>
         <h2 class="inspect-header-title">{{ source_header.name }}</h2>
@@ -19,7 +19,7 @@
       </div>
     </div>
   {% elif inspect_header is defined and inspect_header %}
-    <div class='inspect-header-custom flex items-center gap-2'>
+    <div class='inspect-header-custom flex products-center gap-2'>
       {% if inspect_header.badges %}
         {% for badge in inspect_header.badges %}
           <span class='badge {{ badge.badge_class }}'>{{ badge.value }}</span>
@@ -76,15 +76,15 @@
   {% call inspect_section('Linked Products') %}
   {% if linked_items %}
   {% call admin_crud_table(linked_items_table) %}
-    {% for item in linked_items %}
+    {% for product in linked_items %}
     <tr>
-      <td>#{{ item.id }}</td>
-      <td>{{ item.name }}</td>
-      <td><span class='status-badge'>{{ item.type }}</span></td>
-      <td class='col-metric'>{{ '{:,}'.format(item.clicks) }}</td>
+      <td>#{{ product.id }}</td>
+      <td>{{ product.name }}</td>
+      <td><span class='status-badge'>{{ product.type }}</span></td>
+      <td class='col-metric'>{{ '{:,}'.format(product.clicks) }}</td>
       <td>
         {{ action_button('Unlink', action_type='delete', icon='fa-solid fa-lock-open', extra_class='user-action-delete',
-           attrs={'data-action': 'unlink-match', 'data-content-id': inspect_id, 'data-item-id': item.id}) }}
+           attrs={'data-action': 'unlink-match', 'data-content-id': inspect_id, 'data-product-id': product.id}) }}
       </td>
     </tr>
     {% endfor %}
@@ -104,7 +104,7 @@
 
   {% if user_interests is defined and user_interests %}
   {% call inspect_section('User Interests & Affinities') %}
-    {% set items = user_interests.items %}
+    {% set products = user_interests.products %}
     {% set affinities = user_interests.affinities %}
     {% include "admin/components/_user_interests.html" %}
   {% endcall %}
@@ -119,7 +119,7 @@
 
   {% if top_items is defined and top_items %}
   {% call inspect_section('Top Products (by Clicks)') %}
-    {% set items = top_items %}
+    {% set products = top_items %}
     {% include "admin/components/_top_items_table.html" %}
   {% endcall %}
   {% endif %}

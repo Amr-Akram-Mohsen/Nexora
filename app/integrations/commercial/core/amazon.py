@@ -44,7 +44,7 @@ def _get_api(marketplace: str) -> DefaultApi:
 
 
 def search_products(keywords: str, marketplace: str = "sa", category_query: str = "All", max_results: int = 10) -> list[dict]:
-    """Search for products using PA-API. Returns a list of parsed item dicts."""
+    """Search for products using PA-API. Returns a list of parsed product dicts."""
     cfg = MARKETPLACES.get(marketplace, MARKETPLACES["sa"])
     api = _get_api(marketplace)
     associate_tag = current_app.config.get(f"AMAZON_ASSOCIATE_TAG_{marketplace.upper()}")
@@ -72,9 +72,9 @@ def search_products(keywords: str, marketplace: str = "sa", category_query: str 
     try:
         response = api.search_items(request)
         results = []
-        if response.search_result and response.search_result.items:
-            for item in response.search_result.items:
-                parsed = _parse_item(item, marketplace, cfg, category_query)
+        if response.search_result and response.search_result.products:
+            for product in response.search_result.products:
+                parsed = _parse_item(product, marketplace, cfg, category_query)
                 if parsed:
                     results.append(parsed)
         return results
@@ -94,7 +94,7 @@ def get_product_by_asin(asin: str, marketplace: str = "sa") -> dict | None:
     request = GetItemsRequest(
         partner_tag=associate_tag,
         partner_type=PartnerType.ASSOCIATES,
-        item_ids=[asin],
+        product_ids=[asin],
         resources=[
             "Offers.Listings.Price",
             "Offers.Listings.SavingBasis",
@@ -105,43 +105,43 @@ def get_product_by_asin(asin: str, marketplace: str = "sa") -> dict | None:
 
     try:
         response = api.get_items(request)
-        if response.items_result and response.items_result.items:
-            return _parse_item(response.items_result.items[0], marketplace, cfg, "general")
+        if response.items_result and response.items_result.products:
+            return _parse_item(response.items_result.products[0], marketplace, cfg, "general")
     except ApiException as e:
         logger.error(f"Amazon PA-API GetItems Error ({marketplace.upper()}): {e}")
     return None
 
 
-def _parse_item(item, marketplace: str, cfg: dict, category_slug: str) -> dict | None:
+def _parse_item(product, marketplace: str, cfg: dict, category_slug: str) -> dict | None:
     try:
-        asin = item.asin
-        title = item.item_info.title.display_value if item.item_info and item.item_info.title else None
+        asin = product.asin
+        title = product.item_info.title.display_value if product.item_info and product.item_info.title else None
         if not title:
             return None
 
         # Brand
         brand = None
-        if item.item_info and item.item_info.by_line_info and item.item_info.by_line_info.brand:
-            brand = item.item_info.by_line_info.brand.display_value
+        if product.item_info and product.item_info.by_line_info and product.item_info.by_line_info.brand:
+            brand = product.item_info.by_line_info.brand.display_value
 
         # Features (bullets)
         features = []
-        if item.item_info and item.item_info.features and item.item_info.features.display_values:
-            features = item.item_info.features.display_values
+        if product.item_info and product.item_info.features and product.item_info.features.display_values:
+            features = product.item_info.features.display_values
 
         # Image
         image_url = None
-        if item.images and item.images.primary and item.images.primary.large:
-            image_url = item.images.primary.large.url
+        if product.images and product.images.primary and product.images.primary.large:
+            image_url = product.images.primary.large.url
 
         # Price & Availability
         price = None
         old_price = None
         availability = "Unknown"
-        affiliate_url = item.detail_page_url
+        affiliate_url = product.detail_page_url
 
-        if item.offers and item.offers.listings:
-            listing = item.offers.listings[0]
+        if product.offers and product.offers.listings:
+            listing = product.offers.listings[0]
             if listing.price:
                 price = listing.price.amount
             if listing.saving_basis:
@@ -165,5 +165,5 @@ def _parse_item(item, marketplace: str, cfg: dict, category_slug: str) -> dict |
             "category_slug":  category_slug,
         }
     except Exception:
-        logger.exception(f"Error parsing Amazon item {asin}")
+        logger.exception(f"Error parsing Amazon product {asin}")
         return None

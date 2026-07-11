@@ -99,8 +99,8 @@ def _serialize_reaction(r, users, titles_map):
     
     if r.target_type == "content":
         icon = "📄 Content"
-    elif r.target_type == "item":
-        icon = "📦 Item"
+    elif r.target_type == "product":
+        icon = "📦 Product"
     else:
         icon = "💬 Comment"
 

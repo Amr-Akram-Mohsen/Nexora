@@ -1,14 +1,14 @@
 {# app/web/templates/admin/distribution/_scheduling_queue.html #}
 {% from "components/ui/core.html" import button, badge %}
 <div class="suggestions-list-scroll flex flex-col gap-3">
-    {% for item in items %}
-    <div class="rec-action-card {% if item.is_overdue %}overdue-alert-card{% endif %}">
-        <div class="flex justify-between items-start">
-            <div class="flex items-center gap-2">
-                <span class="platform-icon">{{ item.platform_icon }}</span>
-                <span class="platform-name font-bold">{{ item.platform }}</span>
+    {% for product in products %}
+    <div class="rec-action-card {% if product.is_overdue %}overdue-alert-card{% endif %}">
+        <div class="flex justify-between products-start">
+            <div class="flex products-center gap-2">
+                <span class="platform-icon">{{ product.platform_icon }}</span>
+                <span class="platform-name font-bold">{{ product.platform }}</span>
             </div>
-            {% if item.is_overdue %}
+            {% if product.is_overdue %}
             {{ badge(text="OVERDUE", class="status-badge badge-danger") }}
             {% else %}
             {{ badge(text="SCHEDULED", class="status-badge badge-warning") }}
@@ -16,18 +16,18 @@
         </div>
 
         <h4 class="rec-action-title source-title-truncate scheduling-queue-title">
-            {{ item.source_title }}
+            {{ product.source_title }}
         </h4>
 
-        <div class="rec-action-issue flex gap-2 items-center">
+        <div class="rec-action-issue flex gap-2 products-center">
             <span class="font-bold">Date:</span>
             <span>
-                {{ item.publish_date.strftime('%Y-%m-%d %H:%M') }}
+                {{ product.publish_date.strftime('%Y-%m-%d %H:%M') }}
             </span>
         </div>
 
         <div class="flex justify-end">
-            {{ button(text="Review", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "view-distribution-draft", "data-id": item.id, "data-source-type": item.source_type, "data-source-id": item.source_id, "data-platform": item.platform}, variant=none) }}
+            {{ button(text="Review", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "view-distribution-draft", "data-id": product.id, "data-source-type": product.source_type, "data-source-id": product.source_id, "data-platform": product.platform}, variant=none) }}
         </div>
     </div>
     {% else %}

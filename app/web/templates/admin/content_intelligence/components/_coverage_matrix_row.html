@@ -1,12 +1,12 @@
-{% if items %}
-  {% for item in items %}
+{% if products %}
+  {% for product in products %}
     <tr>
-      <td >{{ item.name }}</td>
-      <td class="col-metric"><span class="status-badge">{{ item.demand }}</span></td>
-      <td class="col-metric"><span class="status-badge">{{ item.coverage }}</span></td>
+      <td >{{ product.name }}</td>
+      <td class="col-metric"><span class="status-badge">{{ product.demand }}</span></td>
+      <td class="col-metric"><span class="status-badge">{{ product.coverage }}</span></td>
       <td>
-        {% set gap_class = 'badge-danger' if item.gap_score == 'High Gap' else ('badge-warning' if item.gap_score == 'Medium Gap' else 'badge-success') %}
-        <span class="status-badge {{ gap_class }}">{{ item.gap_score }}</span>
+        {% set gap_class = 'badge-danger' if product.gap_score == 'High Gap' else ('badge-warning' if product.gap_score == 'Medium Gap' else 'badge-success') %}
+        <span class="status-badge {{ gap_class }}">{{ product.gap_score }}</span>
       </td>
     </tr>
   {% endfor %}

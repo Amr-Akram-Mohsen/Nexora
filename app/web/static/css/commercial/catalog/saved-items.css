@@ -1,4 +1,4 @@
-/* saved-items.css - Styling for Saved Items Page layout & grid sections */
+/* saved-products.css - Styling for Saved Items Page layout & grid sections */
 
 .saved-collections {width: 100%;
 }
@@ -54,7 +54,7 @@
   margin-right: 0.5rem;
 }
 
-.move-item-select {
+.move-product-select {
   appearance: none;
   background: transparent;
   border: 1px solid var(--border-light);
@@ -65,7 +65,7 @@
   cursor: pointer;
 }
 
-.move-item-select-icon {
+.move-product-select-icon {
   position: absolute;
   right: 0.4rem;
   top: 50%;

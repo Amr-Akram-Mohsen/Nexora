@@ -3,10 +3,10 @@
 {% if data %}
   {% set max_count = data | map(attribute='count') | max %}
   {% set colors = ['var(--brand-red)', 'var(--brand-orange)', 'var(--brand-orange)', 'var(--brand-orange)', 'var(--brand-orange)'] %}
-  {% for item in data %}
-    {% set pct = (item.count / max_count * 100)|round(1) if max_count > 0 else 0 %}
+  {% for product in data %}
+    {% set pct = (product.count / max_count * 100)|round(1) if max_count > 0 else 0 %}
     {% set color = colors[loop.index0 % colors|length] %}
-    {{ breakdown_progress_bar(item.name, item.count, pct, color, 'fa-solid fa-store') }}
+    {{ breakdown_progress_bar(product.name, product.count, pct, color, 'fa-solid fa-store') }}
   {% endfor %}
 {% else %}
   <div class="table-empty-state">No out-of-stock issues detected.</div>

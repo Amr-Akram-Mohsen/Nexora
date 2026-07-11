@@ -1,13 +1,13 @@
 {% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
   {% call standard_table(["Category Name", "Total Clicks", "Top Countries (Click Volume)"]) %}
-      {% for item in data %}
+      {% for product in data %}
       <tr>
-        <td><strong>{{ item.category_name }}</strong></td>
-        <td><strong>{{ item.total_clicks }}</strong></td>
+        <td><strong>{{ product.category_name }}</strong></td>
+        <td><strong>{{ product.total_clicks }}</strong></td>
         <td>
           <div class="flex flex-wrap gap-2">
-            {% for c in item.countries %}
+            {% for c in product.countries %}
             <span class="status-badge badge-blue">{{ c.country }} ({{ c.click_count }})</span>
             {% endfor %}
           </div>

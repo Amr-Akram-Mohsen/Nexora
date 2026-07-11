@@ -1,13 +1,13 @@
 /**
  * Progressive Reveal feature for large card collections.
- * Handles client-side hiding and staggered revealing of grid items.
+ * Handles client-side hiding and staggered revealing of grid products.
  */
 
 const REVEAL_LIMIT = 12;
 
 /**
  * Initializes all expandable grids on the page.
- * Hides items beyond the initial limit and shows their corresponding "Show More" buttons.
+ * Hides products beyond the initial limit and shows their corresponding "Show More" buttons.
  */
 function initProgressiveReveal() {
     const grids = document.querySelectorAll('[data-expandable-grid="true"]');
@@ -15,11 +15,11 @@ function initProgressiveReveal() {
     grids.forEach(grid => {
         const children = Array.from(grid.children);
         
-        // Only apply progressive reveal if items exceed the initial limit
+        // Only apply progressive reveal if products exceed the initial limit
         if (children.length > REVEAL_LIMIT) {
-            // Hide items beyond the limit
+            // Hide products beyond the limit
             for (let i = REVEAL_LIMIT; i < children.length; i++) {
-                children[i].classList.add('grid-item-hidden');
+                children[i].classList.add('grid-product-hidden');
             }
             
             // Find and show the associated toggle button
@@ -35,15 +35,15 @@ function initProgressiveReveal() {
 }
 
 /**
- * Reveals the next batch of hidden items in the grid.
+ * Reveals the next batch of hidden products in the grid.
  * @param {HTMLElement} grid - The grid container element
  * @param {HTMLElement} button - The button element that triggered the reveal
  */
 function revealNextBatch(grid, button) {
     if (!grid) return;
     
-    const hiddenItems = Array.from(grid.children).filter(item => 
-        item.classList.contains('grid-item-hidden')
+    const hiddenItems = Array.from(grid.children).filter(product => 
+        product.classList.contains('grid-product-hidden')
     );
     
     if (hiddenItems.length === 0) {
@@ -54,24 +54,24 @@ function revealNextBatch(grid, button) {
     // Determine the next batch to reveal
     const batchToReveal = hiddenItems.slice(0, REVEAL_LIMIT);
     
-    batchToReveal.forEach((item, index) => {
+    batchToReveal.forEach((product, index) => {
         // Remove hidden class
-        item.classList.remove('grid-item-hidden');
+        product.classList.remove('grid-product-hidden');
         
         // Apply staggered animation
-        item.style.setProperty('--reveal-idx', index);
-        item.classList.add('is-revealing');
+        product.style.setProperty('--reveal-idx', index);
+        product.classList.add('is-revealing');
         
         // Clean up animation class and variable after animation ends
-        item.addEventListener('animationend', () => {
-            item.classList.remove('is-revealing');
-            item.style.removeProperty('--reveal-idx');
+        product.addEventListener('animationend', () => {
+            product.classList.remove('is-revealing');
+            product.style.removeProperty('--reveal-idx');
         }, { once: true });
     });
     
-    // Check if there are still hidden items remaining
-    const remainingHidden = Array.from(grid.children).filter(item => 
-        item.classList.contains('grid-item-hidden')
+    // Check if there are still hidden products remaining
+    const remainingHidden = Array.from(grid.children).filter(product => 
+        product.classList.contains('grid-product-hidden')
     );
     
     if (remainingHidden.length === 0 && button) {

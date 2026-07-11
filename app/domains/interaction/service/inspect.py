@@ -1,14 +1,14 @@
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from app.core.extensions import db
-from app.domains.interaction.models import Comment, Reaction, ItemClick
-from app.domains.item.models import ItemStoreLink, Store, ItemVariant, Item
+from app.domains.interaction.models import Comment, Reaction, ProductClick
+from app.domains.product.models import ProductStoreLink, Store, ProductVariant, Product
 
 def get_comment_inspect_metrics(comment_id: int) -> dict:
     stmt = select(Comment).options(
         selectinload(Comment.user),
         selectinload(Comment.content_target),
-        selectinload(Comment.item),
+        selectinload(Comment.product),
         selectinload(Comment.parent),
         selectinload(Comment.replies)
     ).where(Comment.id == comment_id)
@@ -42,36 +42,36 @@ def get_comment_inspect_metrics(comment_id: int) -> dict:
 
 def get_link_clicks_metrics(link_id: int) -> dict:
     stmt = (
-        select(ItemStoreLink.id.label("link_id"), ItemStoreLink.affiliate_url, Store.name.label("store_name"), Item.name.label("item_name"))
-        .select_from(ItemStoreLink)
-        .join(Store, ItemStoreLink.store_id == Store.id)
-        .join(ItemVariant, ItemStoreLink.variant_id == ItemVariant.id)
-        .join(Item, ItemVariant.item_id == Item.id)
-        .where(ItemStoreLink.id == link_id)
+        select(ProductStoreLink.id.label("link_id"), ProductStoreLink.affiliate_url, Store.name.label("store_name"), Product.name.label("item_name"))
+        .select_from(ProductStoreLink)
+        .join(Store, ProductStoreLink.store_id == Store.id)
+        .join(ProductVariant, ProductStoreLink.variant_id == ProductVariant.id)
+        .join(Product, ProductVariant.product_id == Product.id)
+        .where(ProductStoreLink.id == link_id)
     )
     link_data = db.session.execute(stmt).mappings().first()
     
     if not link_data:
          return None
          
-    total_clicks = db.session.scalar(select(func.count()).select_from(ItemClick).where(ItemClick.item_store_link_id == link_id)) or 0
-    latest_click = db.session.scalar(select(func.max(ItemClick.created_at)).where(ItemClick.item_store_link_id == link_id))
+    total_clicks = db.session.scalar(select(func.count()).select_from(ProductClick).where(ProductClick.product_store_link_id == link_id)) or 0
+    latest_click = db.session.scalar(select(func.max(ProductClick.created_at)).where(ProductClick.product_store_link_id == link_id))
     
     country_stats = db.session.execute(
-        select(ItemClick.country, func.count(ItemClick.id))
-        .where(ItemClick.item_store_link_id == link_id)
-        .group_by(ItemClick.country)
-        .order_by(func.count(ItemClick.id).desc())
+        select(ProductClick.country, func.count(ProductClick.id))
+        .where(ProductClick.product_store_link_id == link_id)
+        .group_by(ProductClick.country)
+        .order_by(func.count(ProductClick.id).desc())
         .limit(5)
     ).all()
     
     referrer_stats = db.session.execute(
-        select(ItemClick.referrer, func.count(ItemClick.id))
-        .where(ItemClick.item_store_link_id == link_id)
-        .where(ItemClick.referrer.isnot(None))
-        .where(ItemClick.referrer != "")
-        .group_by(ItemClick.referrer)
-        .order_by(func.count(ItemClick.id).desc())
+        select(ProductClick.referrer, func.count(ProductClick.id))
+        .where(ProductClick.product_store_link_id == link_id)
+        .where(ProductClick.referrer.isnot(None))
+        .where(ProductClick.referrer != "")
+        .group_by(ProductClick.referrer)
+        .order_by(func.count(ProductClick.id).desc())
         .limit(5)
     ).all()
 

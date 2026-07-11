@@ -1,5 +1,5 @@
 {% if oos_items_count > 0 %}
-  <div><strong>Complete OOS Detected:</strong> {{ oos_items_count }} items are entirely Out of Stock across all mapped stores.</div>
+  <div><strong>Complete OOS Detected:</strong> {{ oos_items_count }} products are entirely Out of Stock across all mapped stores.</div>
 {% endif %}
 {% for store in high_null_price_stores %}
   <div><strong>Missing Price Data:</strong> {{ store.name }} has a {{ store.null_rate }}% null-price rate. Sync may be broken.</div>

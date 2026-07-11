@@ -114,11 +114,11 @@ def run_import(batch_path: Path, dry_run: bool = False, store_override: Optional
             continue
 
         inserter = ProductInserter(db.session)
-        item = inserter.insert(parsed)
+        product = inserter.insert(parsed)
 
-        if item is not None:
+        if product is not None:
             db.session.commit()
-            logger.info("[Import] Inserted: '%s' (id=%s, slug=%s)", item.name, item.id, item.slug)
+            logger.info("[Import] Inserted: '%s' (id=%s, slug=%s)", product.name, product.id, product.slug)
             inserted += 1
         else:
             # None means duplicate (already logged) or a DB exception (inserter logs it).

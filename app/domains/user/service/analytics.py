@@ -2,7 +2,7 @@ from sqlalchemy import select, or_, and_, func
 from datetime import datetime
 from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 
 ENGAGEMENT_WEIGHTS = {
     'views': 1,
@@ -31,7 +31,7 @@ def get_user_dashboard_stats():
     growth = {m: c for m, c in growth_data if m}
 
     views_sub = select(View.user_id, func.count(View.id).label("cnt")).where(View.user_id.isnot(None)).group_by(View.user_id).subquery()
-    clicks_sub = select(ItemClick.user_id, func.count(ItemClick.id).label("cnt")).where(ItemClick.user_id.isnot(None)).group_by(ItemClick.user_id).subquery()
+    clicks_sub = select(ProductClick.user_id, func.count(ProductClick.id).label("cnt")).where(ProductClick.user_id.isnot(None)).group_by(ProductClick.user_id).subquery()
     saves_sub = select(Save.user_id, func.count(Save.id).label("cnt")).group_by(Save.user_id).subquery()
     reactions_sub = select(Reaction.user_id, func.count(Reaction.id).label("cnt")).group_by(Reaction.user_id).subquery()
     comments_sub = select(Comment.user_id, func.count(Comment.id).label("cnt")).group_by(Comment.user_id).subquery()
@@ -76,7 +76,7 @@ def get_user_dashboard_stats():
 def build_user_query(search, role, status, verified, subscription, provider, sort_by=None, sort_dir=None):
     """Shared query builder for users listing and rows endpoint."""
     views_sub = select(View.user_id, func.count(View.id).label("cnt")).where(View.user_id.isnot(None)).group_by(View.user_id).subquery()
-    clicks_sub = select(ItemClick.user_id, func.count(ItemClick.id).label("cnt")).where(ItemClick.user_id.isnot(None)).group_by(ItemClick.user_id).subquery()
+    clicks_sub = select(ProductClick.user_id, func.count(ProductClick.id).label("cnt")).where(ProductClick.user_id.isnot(None)).group_by(ProductClick.user_id).subquery()
     saves_sub = select(Save.user_id, func.count(Save.id).label("cnt")).group_by(Save.user_id).subquery()
     reactions_sub = select(Reaction.user_id, func.count(Reaction.id).label("cnt")).group_by(Reaction.user_id).subquery()
     comments_sub = select(Comment.user_id, func.count(Comment.id).label("cnt")).group_by(Comment.user_id).subquery()
@@ -154,7 +154,7 @@ def get_user_analytics_metrics(id: int):
     """Return raw metrics counts and latest activities for a given user."""
     stmt_metrics = select(
         (select(func.count(View.id)).where(View.user_id == id)).scalar_subquery(),
-        (select(func.count(ItemClick.id)).where(ItemClick.user_id == id)).scalar_subquery(),
+        (select(func.count(ProductClick.id)).where(ProductClick.user_id == id)).scalar_subquery(),
         (select(func.count(Save.id)).where(Save.user_id == id)).scalar_subquery(),
         (select(func.count(Reaction.id)).where(Reaction.user_id == id)).scalar_subquery(),
         (select(func.count(Comment.id)).where(Comment.user_id == id)).scalar_subquery(),
@@ -201,7 +201,7 @@ def get_user_analytics_metrics(id: int):
     latest_view = db.session.scalar(select(View).where(View.user_id == id).order_by(View.created_at.desc()).limit(1))
     latest_reaction = db.session.scalar(select(Reaction).where(Reaction.user_id == id).order_by(Reaction.created_at.desc()).limit(1))
     latest_share = db.session.scalar(select(Share).where(Share.user_id == id).order_by(Share.created_at.desc()).limit(1))
-    latest_click = db.session.scalar(select(ItemClick).where(ItemClick.user_id == id).order_by(ItemClick.created_at.desc()).limit(1))
+    latest_click = db.session.scalar(select(ProductClick).where(ProductClick.user_id == id).order_by(ProductClick.created_at.desc()).limit(1))
 
     from app.domains.user.service.tiers import score_to_tier
     engagement_tier = score_to_tier(engagement_score)
@@ -226,14 +226,14 @@ def get_user_analytics_metrics(id: int):
     
     def get_title(obj):
         target = getattr(obj, "target", None)
-        return getattr(target, "title", getattr(target, "name", "Unknown Item"))
+        return getattr(target, "title", getattr(target, "name", "Unknown Product"))
 
     if latest_comment: activities.append((latest_comment.created_at, f"Commented: {latest_comment.content[:50]}..."))
     if latest_save: activities.append((latest_save.created_at, f"Saved: {get_title(latest_save)}"))
     if latest_view: activities.append((latest_view.created_at, f"Viewed: {get_title(latest_view)}"))
     if latest_reaction: activities.append((latest_reaction.created_at, f"Reacted ({latest_reaction.type}): {get_title(latest_reaction)}"))
     if latest_share: activities.append((latest_share.created_at, f"Shared: {get_title(latest_share)}"))
-    if latest_click: activities.append((latest_click.created_at, "Clicked Item Link"))
+    if latest_click: activities.append((latest_click.created_at, "Clicked Product Link"))
 
     if activities:
         activities.sort(key=lambda x: x[0] or datetime.min, reverse=True)

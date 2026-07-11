@@ -1,12 +1,12 @@
 /* ─── Specification row ──────────────────────────────────────────────── */
 
 /*
-  Each item-detail-item is a card-like row:
+  Each product-detail-product is a card-like row:
   - Label (left): muted tinted background, uppercase small caps
   - Value (right): clean background, readable weight
 */
 
-.item-detail-item {
+.product-detail-product {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -17,24 +17,24 @@
   padding: 0;
 }
 
-.item-detail-item:hover {
+.product-detail-product:hover {
   border-color: rgba(var(--domain-primary-rgb), 0.35);
   box-shadow: 0 2px 8px rgba(var(--domain-primary-rgb), var(--alpha-soft));
 }
 
 /* ─── Hidden extras (toggled by JS) ─────────────────────────────────── */
 
-.item-detail-item--hidden {
+.product-detail-product--hidden {
   display: none;
 }
 
-.item-detail-item--hidden.is-visible {
+.product-detail-product--hidden.is-visible {
   display: flex;
 }
 
 /* ─── Detail group (grouped sections e.g. "Dimensions") ─────────────── */
 
-.item-details-group {
+.product-details-group {
   border: 1px solid rgba(var(--domain-primary-rgb), 0.1);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -42,18 +42,18 @@
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.item-details-group:hover {
+.product-details-group:hover {
   border-color: rgba(var(--domain-primary-rgb), 0.25);
   box-shadow: var(--shadow-sm);
 }
 
-.item-details-group:last-child {
+.product-details-group:last-child {
   margin-bottom: 0;
 }
 
 /* ─── Group heading ──────────────────────────────────────────────────── */
 
-.item-details-group__title {
+.product-details-group__title {
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
   text-transform: uppercase;
@@ -67,7 +67,7 @@
 
 /* ─── Inner grid — max 2 columns ──────────────────────────────────────── */
 
-.item-details-group__items {
+.product-details-group__items {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.375rem;
@@ -76,14 +76,14 @@
 }
 
 @media (max-width: 560px) {
-  .item-details-group__items {
+  .product-details-group__items {
     grid-template-columns: 1fr;
   }
 }
 
 /* ─── Label cell ─────────────────────────────────────────────────────── */
 
-.item-detail-item__label {
+.product-detail-item__label {
   flex: 0 0 42%;
   height: 100%;
   max-width: 42%;
@@ -100,14 +100,14 @@
   transition: color 0.2s ease, background 0.2s ease;
 }
 
-.item-detail-item:hover .item-detail-item__label {
+.product-detail-product:hover .product-detail-item__label {
   color: var(--foreground);
   background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
 }
 
 /* ─── Value cell ─────────────────────────────────────────────────────── */
 
-.item-detail-item__value {
+.product-detail-item__value {
   flex: 1;
   min-width: 0;
   padding: 0.5rem 0.75rem;
@@ -123,7 +123,7 @@
 
 /* ─── List variant (sequence values) ────────────────────────────────── */
 
-.item-details-group__list {
+.product-details-group__list {
   margin: 0;
   padding: 0.625rem 0.875rem 0.625rem 1.5rem;
   list-style: disc;
@@ -132,13 +132,13 @@
   line-height: 1.6;
 }
 
-.item-details-group__list li {
+.product-details-group__list li {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 /* Plain scalar */
-.item-detail-scalar {
+.product-detail-scalar {
   font-size: var(--text-sm);
   color: var(--foreground);
   overflow-wrap: anywhere;
@@ -147,7 +147,7 @@
 
 /* ─── "Show More / Show Less" toggle button ──────────────────────────── */
 
-.item-details-inline-toggle {background-color: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
+.product-details-inline-toggle {background-color: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   color: var(--domain-primary);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
@@ -162,7 +162,7 @@
 letter-spacing: 0.01em;
 }
 
-.item-details-inline-toggle:hover {
+.product-details-inline-toggle:hover {
   background-color: var(--domain-primary);
   color: #fff;
   border-color: var(--domain-primary);
@@ -170,15 +170,15 @@ letter-spacing: 0.01em;
   transform: translateY(-1px);
 }
 
-.item-details-inline-toggle:active {
+.product-details-inline-toggle:active {
   transform: translateY(0);
 }
 
 /* Chevron rotation when expanded */
-.item-details-inline-toggle[aria-expanded="true"] .fa-chevron-down {
+.product-details-inline-toggle[aria-expanded="true"] .fa-chevron-down {
   transform: rotate(180deg);
 }
 
-.item-details-inline-toggle .fa-chevron-down {
+.product-details-inline-toggle .fa-chevron-down {
   transition: transform 0.25s ease;
 }

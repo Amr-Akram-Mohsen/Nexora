@@ -101,7 +101,7 @@ class IngestionWorkflow:
         execute this run (burst protection).  When not explicitly provided,
         the profile's ``max_queries_per_run`` is used automatically.
 
-        Returns the number of newly stored content items.
+        Returns the number of newly stored content products.
         """
         # Apply burst cap from profile unless an explicit override is provided.
         if limit is None:
@@ -260,7 +260,7 @@ class IngestionWorkflow:
                 # Weight mapping: high=3, medium=2, low=1
                 cat_weights[sec_cat] = 3 if velocity == "high" else 2 if velocity == "medium" else 1
 
-            # Rotate starting category to prevent the first taxonomy items from dominating
+            # Rotate starting category to prevent the first taxonomy products from dominating
             try:
                 from app.shared.utils.rotation_state import RotationState
                 rotator = RotationState("category_batch")
@@ -472,7 +472,7 @@ class IngestionWorkflow:
 
             # Handle both list and dict response types
             if isinstance(response, dict):
-                raw_items = response.get("items", [])
+                raw_items = response.get("products", [])
                 new_etag = response.get("etag")
                 new_modified = response.get("modified")
             else:
@@ -501,7 +501,7 @@ class IngestionWorkflow:
             log_fetch_query_error(logger, self.source_name, query=q_text, error=e)
             return 0, 0, 0
 
-        # 4. Process each raw item
+        # 4. Process each raw product
         query_stored = 0
         query_updated = 0
 
@@ -544,14 +544,9 @@ class IngestionWorkflow:
 
             try:
                 if object_type == "article":
-                    if not enriched_dict.get(
-                        "is_content_scraped"
-                    ) or not enriched_dict.get("image_url"):
-                        enriched_dict["status"] = "pending"
-                        enriched_dict["is_published"] = False
-                    else:
-                        enriched_dict["status"] = "complete"
-                        enriched_dict["is_published"] = True
+                    # Phase 1: All articles start as discovered and wait for Diffbot enrichment
+                    enriched_dict["status"] = "discovered"
+                    enriched_dict["is_published"] = False
                 else:
                     has_visual = bool(
                         enriched_dict.get("thumbnail_url")
@@ -619,7 +614,7 @@ class IngestionWorkflow:
 
 
 def _safe_title(raw) -> str:
-    """Extract a short display title from a raw item (DTO or dict)."""
+    """Extract a short display title from a raw product (DTO or dict)."""
     title = getattr(raw, "title", None)
     if not title and hasattr(raw, "get"):
         title = raw.get("title", "")

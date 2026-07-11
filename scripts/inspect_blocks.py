@@ -111,8 +111,8 @@ def _block_preview(block: dict, max_chars: int = 120) -> str:
         cap = block.get("caption") or ""
         return f"[image]     {url[:70]}{'…' if len(url) > 70 else ''}  caption={bool(cap)}"
     elif btype == "list":
-        items = block.get("items", [])
-        return f"[list {'ol' if block.get('ordered') else 'ul'}]    {len(items)} items  first=«{_strip_html(items[0])[:60] if items else ''}»"
+        products = block.get("products", [])
+        return f"[list {'ol' if block.get('ordered') else 'ul'}]    {len(products)} products  first=«{_strip_html(products[0])[:60] if products else ''}»"
     elif btype == "quote":
         return f"[quote]     {_strip_html(block.get('text', ''))[:max_chars]}"
     elif btype == "table":
@@ -139,11 +139,11 @@ def _check_suspicious(block: dict) -> list[str]:
                 warnings.append(f"Suspicious UI text: «{raw[:80]}»")
                 break
     elif btype == "list":
-        for item in block.get("items", []):
-            raw = _strip_html(item).lower().strip()
+        for product in block.get("products", []):
+            raw = _strip_html(product).lower().strip()
             for phrase in SUSPICIOUS_PHRASES:
                 if raw == phrase:
-                    warnings.append(f"Suspicious list item: «{raw}»")
+                    warnings.append(f"Suspicious list product: «{raw}»")
                     break
     return warnings
 
@@ -207,8 +207,8 @@ def _sanity_check(blocks: list[dict]) -> list[str]:
         for w in sus:
             issues.append(f"{label}: 🚨 {w}")
 
-        # List with no items
-        if btype == "list" and not block.get("items"):
+        # List with no products
+        if btype == "list" and not block.get("products"):
             issues.append(f"{label}: ❌ Empty list block")
 
     return issues

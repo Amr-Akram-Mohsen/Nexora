@@ -1,4 +1,4 @@
-from app.domains.taxonomy.models import Category, Brand, Topic, Section
+from app.domains.taxonomy.models import Category, Brand, Entity, Section
 
 
 def serialize_taxonomy(t, counts=None, health=None):
@@ -27,8 +27,8 @@ def _serialize_taxonomy_base(obj, **kwargs):
         "id": obj.id,
         "name": obj.name,
         "slug": obj.slug,
-        "is_active": obj.is_active,
-        "sort_order": obj.sort_order,
+        "is_active": getattr(obj, "is_active", True),
+        "sort_order": getattr(obj, "sort_order", 0),
     }
     data.update(kwargs)
     return data
@@ -40,7 +40,7 @@ def serialize_brand(b):
     return _serialize_taxonomy_base(b, industry=b.industry, is_featured=b.is_featured)
 
 def serialize_topic(t):
-    return _serialize_taxonomy_base(t, is_featured=t.is_featured)
+    return _serialize_taxonomy_base(t)
 
 def serialize_section(s):
     return _serialize_taxonomy_base(s, description=s.description)

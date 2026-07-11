@@ -29,7 +29,7 @@ def register_commands(app):
     def link_contents_command():
         from app.application.recommendation.matcher import match_articles_to_items
 
-        app.logger.info("Starting content-to-item matcher...")
+        app.logger.info("Starting content-to-product matcher...")
         count = match_articles_to_items()
         app.logger.info("Matcher complete! Created %d new links.", count)
 

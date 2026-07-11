@@ -7,7 +7,7 @@ CRUD_TABLES = {
         "detailed_table": {
             "account info": ["id", "name", "email", "role", "status", "provider"],
             "security & auth": ["verified", "verified at", "verification sent", "password changed", "joined", "last active"],
-            "engagement metrics": ["engagement tier", "engagement profile", "engagement score", "views", "item clicks", "saves", "reactions", "comments", "shares", "recommendations shown", "recommendations clicked"],
+            "engagement metrics": ["engagement tier", "engagement profile", "engagement score", "views", "product clicks", "saves", "reactions", "comments", "shares", "recommendations shown", "recommendations clicked"],
             "activity & interests": ["recent activity", "subscription"]
         }
     },
@@ -43,8 +43,8 @@ CRUD_TABLES = {
             "status & lifecycle pipeline": ["published at", "ingested at", "enrichment status", "last enrichment attempt", "status", "rendering status"]
         }
     },
-    "items": {
-        "id": "items",
+    "products": {
+        "id": "products",
         "preview_table": ["Name", "Category / Brand", "Price", "Store Count", "Sync Age", "Health", "Click Count", "Added", "Actions"],
         "detailed_table": {
             "product core mappings": ["id", "name", "category", "brand", "source", "added", "last synced"],
@@ -94,7 +94,7 @@ CRUD_TABLES = {
         "preview_table": ["Content Title", "Content Views", "Linked Items Count", "Linked Items IDs", "Actions"],
         "detailed_table": {
             "content info": ["id", "title", "type", "category", "views count"],
-            "item info": ["id", "name", "category", "brand", "price", "store count", "total clicks"],
+            "product info": ["id", "name", "category", "brand", "price", "store count", "total clicks"],
         }
     },
     "categories": {
@@ -102,7 +102,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Hierarchy Level", "Content Count", "Product Count", "Health Status", "Actions"],
         "detailed_table": {
             "category info": ["id", "slug", "name", "status", "sort order", "hierarchy level", "parent name"],
-            "related metadata": ["child categories", "content count", "item count"],
+            "related metadata": ["child categories", "content count", "product count"],
         }
     },
     "brands": {
@@ -110,7 +110,7 @@ CRUD_TABLES = {
         "preview_table": ["Name", "Status", "Content Count", "Product Count", "Health Status", "Actions"],
         "detailed_table": {
             "brand info": ["id", "slug", "name", "logo", 'industry', "featured", "status", "sort order"],
-            "related metadata": ["content count", "item count"]
+            "related metadata": ["content count", "product count"]
         }
     },
     "topics": {
@@ -184,7 +184,7 @@ CRUD_TABLES = {
         "id": "clicks",
         "preview_table": ["Product Name", "Category", "Brand", "Store", "Count", "Latest Click"],
         "detailed_table": {
-            "link info": ["store name", "item name", "total clicks", "latest click"],
+            "link info": ["store name", "product name", "total clicks", "latest click"],
             "traffic geography": ["top countries"],
             "traffic sources": ["top referrers"]
         }

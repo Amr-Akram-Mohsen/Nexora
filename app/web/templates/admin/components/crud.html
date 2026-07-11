@@ -1,13 +1,13 @@
 {# ==========================================================
 SHARED ROW WRAPPER
-Renders a <tbody> with all items passed through the row macro.
+Renders a <tbody> with all products passed through the row macro.
   Each _rows.html partial imports this + its own render_row macro.
   ========================================================== #}
-  {% macro admin_crud_rows(items, render_row, colspan, empty_text="No items found.", domain_type=none,
+  {% macro admin_crud_rows(products, render_row, colspan, empty_text="No products found.", domain_type=none,
   domain_target_type=none, hide_action_column=false) %}
 <tbody>
-  {% for item in items %}
-  {{ render_row(item, domain_type, domain_target_type, hide_action_column) }}
+  {% for product in products %}
+  {{ render_row(product, domain_type, domain_target_type, hide_action_column) }}
   {% else %}
   <tr>
     <td colspan="{{ colspan or 3 }}" class="table-loading-cell">

@@ -49,67 +49,67 @@
 </div>
 {% endmacro %}
 
-{% macro render_cell(item) %}
-{% if item.is_list %}
+{% macro render_cell(product) %}
+{% if product.is_list %}
 <ul class="inspect-inline-list">
-  {% for entry in item.value %}
+  {% for entry in product.value %}
   <li><strong>{{ entry.label }}</strong>{% if entry.detail %}: {{ entry.detail }}{% elif entry.count %}: {{
     entry.count }}{% endif %}</li>
   {% endfor %}
 </ul>
-{% elif item.is_labeled %}
-<span><strong>{{ item.value.label }}</strong>: {{ item.value.detail }}</span>
-{% elif item.is_link %}
-{% if item.value.external %}
-{{ link(text=item.value.label, href=item.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank"}, unstyled=True) }}
+{% elif product.is_labeled %}
+<span><strong>{{ product.value.label }}</strong>: {{ product.value.detail }}</span>
+{% elif product.is_link %}
+{% if product.value.external %}
+{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex products-center gap-1 w-fit", icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank"}, unstyled=True) }}
 {% else %}
-{{ link(text=item.value.label, href=item.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", unstyled=True) }}
+{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex products-center gap-1 w-fit", unstyled=True) }}
 {% endif %}
-{% elif item.is_breadcrumb %}
-<div class="flex items-center gap-2 flex-wrap">
-  {% for crumb in item.value %}
+{% elif product.is_breadcrumb %}
+<div class="flex products-center gap-2 flex-wrap">
+  {% for crumb in product.value %}
   {{ link(text=crumb.label, href=crumb.link, unstyled=True) }}
   {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}
   {% endfor %}
 </div>
-{% elif item.link %}
-{{ link(text=item.value, href=item.link, class="admin-link", unstyled=True) }}
-{% elif item.badge %}
+{% elif product.link %}
+{{ link(text=product.value, href=product.link, class="admin-link", unstyled=True) }}
+{% elif product.badge %}
   {% set badge_class = "badge-danger" %}
-  {% if item.value|lower == "power user" %}
+  {% if product.value|lower == "power user" %}
     {% set badge_class = "badge-origin" %}
-  {% elif item.value|lower == "high" %}
+  {% elif product.value|lower == "high" %}
     {% set badge_class = "badge-success" %}
-  {% elif item.value|lower == "medium" %}
+  {% elif product.value|lower == "medium" %}
     {% set badge_class = "badge-warning" %}
   {% endif %}
-  {{ badge(item.value, class=badge_class, variant=none) }}
-{% elif item.is_boolean %}
-  {% set lbl_lower = item.label|lower %}
+  {{ badge(product.value, class=badge_class, variant=none) }}
+{% elif product.is_boolean %}
+  {% set lbl_lower = product.label|lower %}
   {% if lbl_lower == "status" %}
-    <span>{{ "Live Index" if item.value else "Draft" }}</span>
+    <span>{{ "Live Index" if product.value else "Draft" }}</span>
   {% elif lbl_lower == "rendering status" %}
-    <span>{{ "Active" if item.value else "Inactive" }}</span>
+    <span>{{ "Active" if product.value else "Inactive" }}</span>
   {% else %}
-    <span>{{ "Yes" if item.value else "No" }}</span>
+    <span>{{ "Yes" if product.value else "No" }}</span>
   {% endif %}
-{% elif item.is_number %}
-<span>{{ item.value|intcomma }}{% if item.detail %} ({{ item.detail }}){% endif %}</span>
-{% elif item.is_datetime %}
-<span>{{ item.value|format_datetime }}</span>
+{% elif product.is_number %}
+<span>{{ product.value|intcomma }}{% if product.detail %} ({{ product.detail }}){% endif %}</span>
+{% elif product.is_datetime %}
+<span>{{ product.value|format_datetime }}</span>
 {% else %}
-<span>{{ item.value }}</span>
+<span>{{ product.value }}</span>
 {% endif %}
 {% endmacro %}
 
 {% macro admin_inspect_attributes_table(fields) %}
 <div class="admin-table-wrapper">
   {% call standard_table(none, class="admin-table vertical-table") %}
-      {% for item in fields %}
+      {% for product in fields %}
       <tr>
-        <th class="cell-label">{{ item.label }}</th>
+        <th class="cell-label">{{ product.label }}</th>
         <td class="cell-value">
-          {{ render_cell(item) }}
+          {{ render_cell(product) }}
         </td>
       </tr>
       {% endfor %}
@@ -123,9 +123,9 @@
   {% set metric_headers = fields | map(attribute="label") | list %}
   {% call standard_table(metric_headers) %}
       <tr>
-        {% for item in fields %}
+        {% for product in fields %}
         <td class="cell-value">
-          {{ render_cell(item) }}
+          {{ render_cell(product) }}
         </td>
         {% endfor %}
       </tr>

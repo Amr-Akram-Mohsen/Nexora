@@ -59,7 +59,7 @@ async function submitUserInteraction(
 
             // Special behavior for Saved Items page: remove card if unsaved
             if (result.status === 'unsaved' && window.location.pathname.includes('/saved')) {
-                const card = targetItem.closest('.card, .article-card, .item-card');
+                const card = targetItem.closest('.card, .article-card, .product-card');
                 if (card) {
                     card.style.opacity = '0';
                     card.style.transform = 'scale(0.95)';
@@ -243,11 +243,11 @@ function handleInteractionClick(e) {
 
     if (!ensureAuthenticated(e, interactionBtn, generalMsg + interactionType)) return false;
 
-    const item = interactionBtn.closest("[data-id]");
-    if (!item) return false;
+    const product = interactionBtn.closest("[data-id]");
+    if (!product) return false;
 
-    if (item.hasAttribute('data-comment-id')) {
-        const commentAuthor = item.querySelector('.comment__author').textContent.trim();
+    if (product.hasAttribute('data-comment-id')) {
+        const commentAuthor = product.querySelector('.comment__author').textContent.trim();
 
         if (commentAuthor === userEmail) {
             showInlineTooltip(interactionBtn, "You can't react on your own comment");
@@ -260,13 +260,13 @@ function handleInteractionClick(e) {
         if (!isUnsaving) {
             const predefinedCollection = interactionBtn.dataset.collection;
             if (predefinedCollection) {
-                submitUserInteraction(item, interactionType, interactionBtn, null, { collection_name: predefinedCollection });
+                submitUserInteraction(product, interactionType, interactionBtn, null, { collection_name: predefinedCollection });
                 return true;
             }
 
             promptCollectionName(interactionBtn).then(collection => {
                 if (collection !== null) {
-                    submitUserInteraction(item, interactionType, interactionBtn, null, { collection_name: collection });
+                    submitUserInteraction(product, interactionType, interactionBtn, null, { collection_name: collection });
                 }
             });
             return true;
@@ -274,7 +274,7 @@ function handleInteractionClick(e) {
     }
 
     submitUserInteraction(
-        item,
+        product,
         interactionType,
         interactionBtn || null
     );
@@ -282,8 +282,8 @@ function handleInteractionClick(e) {
 }
 
 async function handleShareInteraction(shareBtn) {
-    const item = shareBtn.closest("[data-id]");
-    if (!item) return;
+    const product = shareBtn.closest("[data-id]");
+    if (!product) return;
 
     const shareData = {
         title: document.title,
@@ -302,12 +302,12 @@ async function handleShareInteraction(shareBtn) {
         }
 
         if (isAuthenticated) {
-            submitUserInteraction(item, "share", shareBtn);
+            submitUserInteraction(product, "share", shareBtn);
         }
     } catch (error) {
         if (error?.name !== "AbortError") {
             console.error("Share failed", error);
-            showInlineTooltip(shareBtn, "Could not share this item");
+            showInlineTooltip(shareBtn, "Could not share this product");
         }
     }
 }

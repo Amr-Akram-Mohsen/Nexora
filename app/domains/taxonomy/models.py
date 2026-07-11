@@ -1,11 +1,7 @@
-from app.core.extensions import db
-from app.domains.relationships import (
-    content_topics,
-    content_brands,
-    content_attributes,
-)
-from app.shared.utils.slug import generate_slug, normalize_name
 
+from app.core.extensions import db
+from app.shared.utils.slug import generate_slug, normalize_name
+from app.domains.relationships import content_attributes
 
 # ==================== METADATA MODELS ====================
 class Source(db.Model):
@@ -69,7 +65,7 @@ class Section(db.Model):
     def __repr__(self):
         return f"<Section id={self.id} name='{self.name}'>"
 
-
+# DEPRECATED: Being replaced by Entity model. Kept to prevent ImportErrors in analytics/admin.
 class Topic(db.Model):
     __tablename__ = "topics"
     id = db.Column(db.Integer, primary_key=True)
@@ -84,26 +80,8 @@ class Topic(db.Model):
     def get_by_slug(slug, session):
         return session.query(Topic).filter_by(slug=slug).first()
 
-    @staticmethod
-    def get_or_create(name, session):
-        """Checks for topic existence, creates if missing."""
-        if not name:
-            return None
-        slug = generate_slug(name)
-        topic = Topic.get_by_slug(slug, session)
-        if not topic:
-            topic = Topic(name=name, slug=slug, normalized_name=normalize_name(name))
-            session.add(topic)
-            session.flush()
-        return topic
-
-    contents = db.relationship(
-        "Content", secondary=content_topics, back_populates="topics"
-    )
-
     def __repr__(self):
         return f"<Topic {self.slug}>"
-
 
 class Brand(db.Model):
     __tablename__ = "brands"
@@ -138,14 +116,10 @@ class Brand(db.Model):
             session.flush()  # Makes brand.id available for relationships
         return brand
 
-    contents = db.relationship(
-        "Content", secondary=content_brands, back_populates="brands"
-    )
-    items = db.relationship("Item", back_populates="brand")
+    products = db.relationship("Product", back_populates="brand")
 
     def __repr__(self):
         return f"<Brand {self.slug}>"
-
 
 class Category(db.Model):
     __tablename__ = "categories"
@@ -190,7 +164,7 @@ class Category(db.Model):
 
     parent = db.relationship("Category", remote_side=[id], backref="children")
     contents = db.relationship("Content", back_populates="category")
-    items = db.relationship("Item", back_populates="category")
+    products = db.relationship("Product", back_populates="category")
 
     def __repr__(self):
         return f"<Category {self.slug}>"
@@ -304,32 +278,67 @@ class Entity(db.Model):
     slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
     external_uri = db.Column(db.String(255), unique=True, index=True)
     entity_type = db.Column(db.String(50), index=True)
+    # Values: 'person' | 'organization' | 'location' | 'concept' | 'wiki_category' | 'tag'
     image_url = db.Column(db.Text)
 
+    # NEW — provenance and enrichment
+    provider = db.Column(db.String(30), nullable=True, index=True)
+    # Values: 'event_registry' | 'diffbot' | 'youtube' | 'wikidata' | 'manual'
+    provider_confidence = db.Column(db.Float, nullable=True)
+    description = db.Column(db.Text, nullable=True)       # from Wikidata/Wikipedia (future)
+    aliases = db.Column(db.JSON, nullable=True)            # alternate names ['AI', 'A.I.']
+    wikidata_id = db.Column(db.String(50), nullable=True, index=True)
+    wikipedia_url = db.Column(db.Text, nullable=True)
+
+    content_entities = db.relationship("ContentEntity", back_populates="entity")
+
     @staticmethod
-    def get_or_create(name, session, external_uri=None, entity_type=None):
+    def get_or_create(name, session, external_uri=None, entity_type=None, provider=None, provider_confidence=None):
+        """
+        Get existing entity by external_uri (preferred) or slug fallback.
+        Creates new entity if not found.
+        Updates entity_type and provider if the existing record has None values.
+        """
         if not name:
             return None
         slug = generate_slug(name)
-        
+
         entity = None
         if external_uri:
             entity = session.query(Entity).filter_by(external_uri=external_uri).first()
         if not entity:
             entity = session.query(Entity).filter_by(slug=slug).first()
-            
+
         if not entity:
             entity = Entity(
                 name=name,
                 slug=slug,
                 external_uri=external_uri,
-                entity_type=entity_type
+                entity_type=entity_type,
+                provider=provider,
+                provider_confidence=provider_confidence,
             )
             session.add(entity)
             session.flush()
+        else:
+            # Update sparse fields if the existing record is missing them
+            if entity_type and not entity.entity_type:
+                entity.entity_type = entity_type
+            if external_uri and not entity.external_uri:
+                entity.external_uri = external_uri
+            if provider and not entity.provider:
+                entity.provider = provider
         return entity
 
-    content_entities = db.relationship("ContentEntity", back_populates="entity")
+    @staticmethod
+    def get_by_slug(slug, session):
+        return session.query(Entity).filter_by(slug=slug).first()
+
+    @staticmethod
+    def get_by_uri(external_uri, session):
+        if not external_uri:
+            return None
+        return session.query(Entity).filter_by(external_uri=external_uri).first()
 
 class Location(db.Model):
     __tablename__ = "locations"

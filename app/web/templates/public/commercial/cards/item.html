@@ -1,28 +1,28 @@
 {% extends "components/cards/base-card.html" %}
-{% from "commercial/features/item-image.html" import render_image_url %}
+{% from "commercial/features/product-image.html" import render_image_url %}
 {% from "components/ui/core.html" import badge, button %}
 {% from "commercial/features/rating.html" import render_stars %}
 
-{% set best_link = item.store_links[0] if item.store_links else None %}
+{% set best_link = product.store_links[0] if product.store_links else None %}
 
-{% block card_class %}card--item{% endblock %}
-{% block card_type %}{{ item.item_type }}{% endblock %}
-{% block card_id %}{{ item.id }}{% endblock %}
+{% block card_class %}card--product{% endblock %}
+{% block card_type %}{{ product.product_type }}{% endblock %}
+{% block card_id %}{{ product.id }}{% endblock %}
 {% block card_domain %}commercial{% endblock %}
-{% block card_link %}{{ url_for('item.item_page', item_id=item.id) }}{% endblock %}
+{% block card_link %}{{ url_for('product.item_page', product_id=product.id) }}{% endblock %}
 
 {% block image_content %}
-  {# Item type tag #}
-  {% if item.item_type %}
-  <div class="card__tag card__tag--{{ item.item_type }}">{{ item.item_type }}</div>
+  {# Product type tag #}
+  {% if product.product_type %}
+  <div class="card__tag card__tag--{{ product.product_type }}">{{ product.product_type }}</div>
   {% endif %}
-  {{ render_image_url(item.image_url, item.name) }}
+  {{ render_image_url(product.image_url, product.name) }}
 {% endblock %}
 
 {% block image_overlays %}
   {{ badge('Product', 'badge--card-type') }}
   {# Compare toggle #}
-  {{ button(class="compare-toggle-btn", attrs={"data-id": item.id, "data-name": item.name, "title": "Add to compare", "aria-label": "Add " ~ item.name ~ " to compare"}, icon="fas fa-balance-scale", unstyled=True) }}
+  {{ button(class="compare-toggle-btn", attrs={"data-id": product.id, "data-name": product.name, "title": "Add to compare", "aria-label": "Add " ~ product.name ~ " to compare"}, icon="fas fa-balance-scale", unstyled=True) }}
   {# Discount badge #}
   {% if best_link and best_link.old_price and best_link.price %}
   {% set discount = ((best_link.old_price - best_link.price) / best_link.old_price * 100) | int %}
@@ -33,46 +33,46 @@
 {% endblock %}
 
 {% block meta_top %}
-  {{ badge(item.category.name, 'badge--category', 'secondary') if item.category else '' }}
-  {{ badge(item.brand.name, 'badge--brand', 'secondary') if item.brand else '' }}
+  {{ badge(product.category.name, 'badge--category', 'secondary') if product.category else '' }}
+  {{ badge(product.brand.name, 'badge--brand', 'secondary') if product.brand else '' }}
 {% endblock %}
 
-{% block title_class %}item-name{% endblock %}
-{% block title_text %}{{ item.name }}{% endblock %}
+{% block title_class %}product-name{% endblock %}
+{% block title_text %}{{ product.name }}{% endblock %}
 
 {% block meta_bottom %}
-  <div class="card__rating flex items-center gap-1">
-    {{ render_stars(item.rating or 0) }}
-    <span class="item-rating">({{ item.rating or 0 }})</span>
+  <div class="card__rating flex products-center gap-1">
+    {{ render_stars(product.rating or 0) }}
+    <span class="product-rating">({{ product.rating or 0 }})</span>
   </div>
-  <span class="item-reviews-count">{{ item.review_count or 0 }} reviews</span>
+  <span class="product-reviews-count">{{ product.review_count or 0 }} reviews</span>
 {% endblock %}
 
 {% block interactions %}
-  {% set content = item %}
+  {% set content = product %}
   {% include "components/interactions/interactions-compact.html" %}
 {% endblock %}
 
 {% block actions %}
-  <div class="item-actions flex flex-col gap-3 gap-4 flex-wrap">
-    <div class="item-price-box flex items-center gap-2">
+  <div class="product-actions flex flex-col gap-3 gap-4 flex-wrap">
+    <div class="product-price-box flex products-center gap-2">
       {% if best_link %}
-      <span class="item-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
+      <span class="product-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
       {% if best_link.old_price %}
-      <span class="item-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
+      <span class="product-price-old">{{ best_link.currency }} {{ best_link.old_price }}</span>
       {% endif %}
       {% else %}
-      <span class="item-price-unavailable">Check current price</span>
+      <span class="product-price-unavailable">Check current price</span>
       {% endif %}
     </div>
-    <div class="item-store-box flex items-center justify-between">
-      <div class="item-store-badge flex items-center">
+    <div class="product-store-box flex products-center justify-between">
+      <div class="product-store-badge flex products-center">
         {% if best_link and best_link.store.logo_url %}
         <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
           loading="lazy">
         {% endif %}
       </div>
-      <a href="{{ url_for('item.item_page', item_id=item.id) }}" class="item__view-link">
+      <a href="{{ url_for('product.item_page', product_id=product.id) }}" class="item__view-link">
         {{ button(text="View Deal", class="item__view-btn") }}
       </a>
     </div>

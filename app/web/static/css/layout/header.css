@@ -113,7 +113,7 @@
   word-break: break-all;
 }
 
-.dropdown-item {
+.dropdown-product {
   gap: .5rem;
   padding: .55rem .75rem;
   border-radius: var(--radius-md);
@@ -122,12 +122,12 @@
   transition: background .15s;
 }
 
-.dropdown-item:hover {
+.dropdown-product:hover {
   background: rgba(var(--brand-purple-rgb), .1);
   color: var(--brand-purple);
 }
 
-.dropdown-item i {
+.dropdown-product i {
   width: 16px;
   text-align: center;
 }
@@ -361,7 +361,7 @@
 .header-country {
   position: relative;
   display: flex;
-  align-items: center;
+  align-products: center;
   margin-right: 0.25rem;
 }
 

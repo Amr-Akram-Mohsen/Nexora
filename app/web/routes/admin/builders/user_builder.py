@@ -18,7 +18,7 @@ def build_user_inspect_view_model(aggregated_data: dict) -> dict:
 
     engagement_breakdown_data = {
         "Views": views_count,
-        "Item Clicks": clicks_count,
+        "Product Clicks": clicks_count,
         "Saves": saves_count,
         "Reactions": reactions_count,
         "Comments": comments_count,
@@ -66,7 +66,7 @@ def build_user_inspect_view_model(aggregated_data: dict) -> dict:
         "comments": comments_data,
         "saves": saves_count,
         "shares": shares_count,
-        "item clicks": clicks_count,
+        "product clicks": clicks_count,
         "recommendations shown": recs_seen,
         "recommendations clicked": recs_clicked,
         
@@ -92,7 +92,7 @@ def build_user_inspect_view_model(aggregated_data: dict) -> dict:
     user_interests_data = None
     if dto["interests"] or dto["affinities"].get("Brands"):
         user_interests_data = {
-            "items": dto["interests"],
+            "products": dto["interests"],
             "affinities": dto["affinities"]
         }
 

@@ -6,16 +6,16 @@
 <ul class="activity-feed">
   {% for s in stats.provider_activities %}
   {% call activity_list_item(icon="fa-solid fa-satellite-dish", icon_class="icon-comment ingest-log-icon",
-  extra_class="ingest-log-item") %}
+  extra_class="ingest-log-product") %}
   <p class="activity-text ingest-log-text">
     <strong class="provider-name">{{ s.name }}</strong>
     {{ badge(text="slug: " ~ s.slug, class="status-badge active badge-type-compact badge-indigo provider-slug", variant=none) }}
   </p>
   <p class="activity-meta ingest-log-text">
-    Volume: <strong class="provider-content-count">{{ "{:,}".format(s.content_count or 0) }}</strong> content items
+    Volume: <strong class="provider-content-count">{{ "{:,}".format(s.content_count or 0) }}</strong> content products
     &amp; <strong class="provider-product-count">{{ "{:,}".format(s.product_count or 0) }}</strong> products
   </p>
-  <p class="activity-meta ingest-log-meta flex items-center gap-2">
+  <p class="activity-meta ingest-log-meta flex products-center gap-2">
     Last Ingest Activity: <strong class="provider-activity-time">{{ s.latest_activity_formatted }}</strong>
     {% if s.days_since_last_ingestion is not none and s.days_since_last_ingestion > 7 %}
     {{ badge(text="Stale Source", class="status-badge badge-danger badge-type-compact", attrs={"title": "No new content in >7 days"}, variant=none) }}

@@ -1,8 +1,8 @@
 from sqlalchemy import select, func
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section
+from app.domains.taxonomy.models import Category, Brand, Entity, Section
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 
 def _generate_suggestions_for_entities(unmapped_content, entities, entity_type):
     suggestions = []
@@ -22,11 +22,11 @@ def _generate_suggestions_for_entities(unmapped_content, entities, entity_type):
     return suggestions
 
 def get_taxonomy_insights_suggestions(limit: int = 50):
-    from app.domains.relationships import content_brands
+    from app.domains.relationships import ContentEntity
     
     unmapped_brand = db.session.execute(
         select(Content).where(
-            ~db.session.query(content_brands.c.brand_id).filter(content_brands.c.content_id == Content.id).exists()
+            ~db.session.query(ContentEntity.content_id).filter(ContentEntity.content_id == Content.id).join(Entity, Entity.id == ContentEntity.entity_id).filter(Entity.entity_type == 'brand').exists()
         ).order_by(Content.id.desc()).limit(200)
     ).scalars().all()
     
@@ -34,7 +34,7 @@ def get_taxonomy_insights_suggestions(limit: int = 50):
         select(Content).where(Content.category_id == None).order_by(Content.id.desc()).limit(200)
     ).scalars().all()
 
-    brands = db.session.execute(select(Brand)).scalars().all()
+    brands = db.session.execute(select(Entity).where(Entity.entity_type == 'brand')).scalars().all()
     categories = db.session.execute(select(Category)).scalars().all()
     
     suggestions = []
@@ -45,41 +45,43 @@ def get_taxonomy_insights_suggestions(limit: int = 50):
 
 
 def get_taxonomy_insights_coherence(limit: int = 50):
-    from app.domains.relationships import content_items
+    from app.domains.relationships import content_products, ContentEntity
     
     from sqlalchemy.orm import selectinload
     contents = db.session.execute(
         select(Content)
-        .options(selectinload(Content.brands))
+        .options(selectinload(Content.content_entities).selectinload(ContentEntity.entity))
         .where(
-            db.session.query(content_items.c.item_id).filter(content_items.c.content_id == Content.id).exists()
+            db.session.query(content_products.c.product_id).filter(content_products.c.content_id == Content.id).exists()
         ).order_by(Content.id.desc()).limit(100)
     ).scalars().all()
     
     conflicts = []
     for c in contents:
-        items = db.session.execute(
-            select(Item)
-            .options(selectinload(Item.brand))
-            .join(content_items, content_items.c.item_id == Item.id)
-            .where(content_items.c.content_id == c.id)
+        products = db.session.execute(
+            select(Product)
+            .options(selectinload(Product.brand))
+            .join(content_products, content_products.c.product_id == Product.id)
+            .where(content_products.c.content_id == c.id)
         ).scalars().all()
         
-        if not items: continue
+        if not products: continue
         
-        content_brand_ids = {b.id for b in c.brands}
+        content_brand_ids = {ce.entity.id for ce in c.content_entities if ce.entity.entity_type == 'brand' or ce.entity.origin == 'legacy_brand'}
         
-        for item in items:
-            if item.brand_id and content_brand_ids and item.brand_id not in content_brand_ids:
-                conflicts.append({
-                    "content_id": c.id,
-                    "content_title": c.title,
-                    "content_brands": [b.name for b in c.brands],
-                    "item_id": item.id,
-                    "item_name": item.name,
-                    "item_brand": item.brand.name if item.brand else "Unknown",
-                    "suggested_brand_id": item.brand_id
-                })
+        for product in products:
+            if product.brand:
+                item_entity = db.session.execute(select(Entity).where(Entity.slug == product.brand.slug)).scalar()
+                if item_entity and content_brand_ids and item_entity.id not in content_brand_ids:
+                    conflicts.append({
+                        "content_id": c.id,
+                        "content_title": c.title,
+                        "content_brands": [ce.entity.name for ce in c.content_entities if ce.entity.entity_type == 'brand' or ce.entity.origin == 'legacy_brand'],
+                        "product_id": product.id,
+                        "item_name": product.name,
+                        "item_brand": product.brand.name if product.brand else "Unknown",
+                        "suggested_brand_id": item_entity.id
+                    })
                 
     return conflicts[:limit]
 
@@ -90,10 +92,11 @@ def apply_taxonomy_insight(content_id: int, type_: str, suggested_id: int):
         raise ValueError("Content not found")
         
     if type_ == "Brand":
-        from app.domains.relationships import content_brands
-        exists = db.session.scalar(select(content_brands.c.content_id).where(content_brands.c.content_id == content_id, content_brands.c.brand_id == suggested_id))
+        from app.domains.relationships import ContentEntity
+        exists = db.session.scalar(select(ContentEntity.id).where(ContentEntity.content_id == content_id, ContentEntity.entity_id == suggested_id))
         if not exists:
-            db.session.execute(content_brands.insert().values(content_id=content_id, brand_id=suggested_id))
+            ce = ContentEntity(content_id=content_id, entity_id=suggested_id, origin="manual", confidence=1.0)
+            db.session.add(ce)
     elif type_ == "Category":
         content.category_id = suggested_id
         

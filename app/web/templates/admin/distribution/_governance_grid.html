@@ -1,10 +1,10 @@
 {% from "components/ui/core.html" import link, badge %}
 <!-- Summary / Config Mode Bar -->
-<div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-governance-summary">
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-shield-halved"></i> Governance Mode: {{ badge(text=mode, class="status-badge") }}</div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-check"></i> Safe / Executed: {{ badge(text=approved_tasks|length, class="status-badge") }}</div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-hourglass-half"></i> Needs Approval: {{ badge(text=queued_tasks|length, class="status-badge") }}</div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-xmark"></i> Blocked Tasks: {{ badge(text=blocked_tasks|length, class="status-badge") }}</div>
+<div class="publishing-summary-bar flex flex-wrap gap-6 products-center" id="execution-governance-summary">
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-shield-halved"></i> Governance Mode: {{ badge(text=mode, class="status-badge") }}</div>
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-check"></i> Safe / Executed: {{ badge(text=approved_tasks|length, class="status-badge") }}</div>
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-hourglass-half"></i> Needs Approval: {{ badge(text=queued_tasks|length, class="status-badge") }}</div>
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-xmark"></i> Blocked Tasks: {{ badge(text=blocked_tasks|length, class="status-badge") }}</div>
 </div>
 
 <div class="insights-kanban-grid" id="execution-governance-grid-container">
@@ -16,21 +16,21 @@
 
   {% for q in queues %}
     <div class="kanban-column flex">
-      <div class="publishing-column-header {{ q.headerClass }} flex justify-between items-center">
+      <div class="publishing-column-header {{ q.headerClass }} flex justify-between products-center">
         <div >{{ q.name }}</div>
         <div>{{ badge(text=q.statusLabel, class="status-badge") }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not q.list %}
-          <div  >No items in this queue.</div>
+          <div  >No products in this queue.</div>
         {% else %}
           {% for task in q.list %}
             {% set platformIcon = 'fa-solid fa-tv' if task.platform == 'youtube' else 'fa-solid fa-thumbtack' if task.platform == 'pinterest' else 'fa-solid fa-pen-to-square' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' or task.action == 'publish' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             {% set riskBadgeClass = 'badge-danger' if task.risk_level == 'HIGH' else 'badge-warning' if task.risk_level == 'MEDIUM' else 'badge-success' %}
             <div class="kanban-task-card">
-              <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
-                <span class="kanban-task-platform flex gap-1 items-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
+              <div class="kanban-task-header flex-wrap justify-between flex gap-1 products-center">
+                <span class="kanban-task-platform flex gap-1 products-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
                 {{ badge(text=task.action, class="status-badge " ~ actionBadgeClass) }}
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>

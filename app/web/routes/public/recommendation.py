@@ -29,7 +29,7 @@ def search():
         log_route_success(
             logger,
             "/search",
-            items=len(results),
+            products=len(results),
             template="search-results.html",
         )
 

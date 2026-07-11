@@ -34,7 +34,7 @@ def get_filtered_contents(
     """
     Handles complex filtering and pagination for section contents.
     """
-    from app.domains.taxonomy.models import Category, Brand, Topic
+
     from .utils import build_content_stmt
     from app.core.extensions import db
     from sqlalchemy.orm import selectinload
@@ -62,13 +62,13 @@ def get_filtered_contents(
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
     from ..content_access import assign_target_to_contents
-    items = assign_target_to_contents(
-        pagination.items,
+    products = assign_target_to_contents(
+        pagination.products,
         session
     )
 
     return {
-        "items": items,
+        "products": products,
         "page": pagination.page,
         "pages": pagination.pages,
         "total": pagination.total,
@@ -88,20 +88,28 @@ def get_all_contents_metadata(session=None):
     return session.execute(stmt).all()
 
 
-def get_candidate_contents_for_item(item, session=None):
+def get_candidate_contents_for_item(product, session=None):
     from sqlalchemy import select, or_
     from ...models import Content
     if session is None:
         from app.core.extensions import db
         session = db.session
     conditions = []
-    if item.category_id:
-        conditions.append(Content.category_id == item.category_id)
+    if product.category_id:
+        conditions.append(Content.category_id == product.category_id)
     stmt = select(Content)
-    if item.brand_id:
-        from app.domains.relationships import content_brands
-        stmt = stmt.outerjoin(content_brands, Content.id == content_brands.c.content_id)
-        conditions.append(content_brands.c.brand_id == item.brand_id)
+    if product.brand_id:
+        from app.domains.relationships import ContentEntity
+        from app.domains.taxonomy.models import Entity, Brand
+        brand = session.get(Brand, product.brand_id)
+        if brand:
+            entity = Entity.get_by_slug(brand.slug, session)
+            if entity:
+                stmt = stmt.join(
+                    ContentEntity,
+                    (ContentEntity.content_id == Content.id) & (ContentEntity.entity_id == entity.id)
+                )
+                conditions.append(ContentEntity.entity_id == entity.id)
     if not conditions:
         return []
     stmt = stmt.where(or_(*conditions)).order_by(Content.published_at.desc()).limit(1000)
@@ -121,13 +129,13 @@ def get_contents_for_matching_batch(offset, batch_size, cutoff=None, cutoff_naiv
     return session.execute(stmt).scalars().all()
 
 
-def get_existing_content_item_links_by_contents(content_ids, session=None):
+def get_existing_content_product_links_by_contents(content_ids, session=None):
     from sqlalchemy import select
-    from app.domains.relationships import content_items
+    from app.domains.relationships import content_products
     if session is None:
         from app.core.extensions import db
         session = db.session
-    stmt = select(content_items.c.content_id, content_items.c.item_id).where(content_items.c.content_id.in_(content_ids))
+    stmt = select(content_products.c.content_id, content_products.c.product_id).where(content_products.c.content_id.in_(content_ids))
     return session.execute(stmt).all()
 
 
@@ -163,7 +171,7 @@ def get_unscraped_articles(limit, retry_threshold, session=None):
             & (Content.is_active),
         )
         .where(
-            (Article.status == "pending")
+            (Article.status == "discovered")
             | (
                 (Article.status == "failed")
                 & (Article.last_enrichment_attempt < retry_threshold)
@@ -234,14 +242,12 @@ def get_content_paginated(filters, sort_by=None, sort_dir=None, page=1, per_page
                 .having(func.count(Content.id) > 1)
             ).subquery()
             stmt = stmt.where(Content.title.in_(dup_sub))
-        elif quality == "missing_topics":
-            stmt = stmt.where(~Content.topics.any())
-        elif quality == "missing_brands":
-            stmt = stmt.where(~Content.brands.any())
+        elif quality == "missing_entities":
+            stmt = stmt.where(~Content.content_entities.any())
         elif quality == "missing_source":
             stmt = stmt.where(Content.source_id.is_(None))
-        elif quality == "enrichment_failed":
-            stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == "failed")))
+        elif quality == "enrichment_pending":
+            stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == "discovered")))
             
     active = filters.get("active")
     if active:

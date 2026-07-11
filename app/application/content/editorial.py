@@ -1,6 +1,6 @@
 def assess_publishing_readiness(content_dto: dict, extraction_assessment: dict | None = None) -> dict:
     """
-    Assesses whether a content item is ready to be published based on its serialized DTO
+    Assesses whether a content product is ready to be published based on its serialized DTO
     and an optional extraction assessment (for articles).
     """
     checklist = []

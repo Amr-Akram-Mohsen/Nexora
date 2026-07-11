@@ -3,29 +3,29 @@
 <header class="site-header">
 
   <div class="container">
-    <div class="header flex items-center justify-between">
+    <div class="header flex products-center justify-between">
       <!-- Logo -->
-      {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
+      {% call link(href="/", class="logo group flex products-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
         {% include "logos/nexora-logo.html" %}
       {% endcall %}
 
       <!-- Desktop Navigation -->
-      <nav class="main-nav md:flex items-center">
+      <nav class="main-nav md:flex products-center">
         {% for section in main_sections %}
-        {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link gap-2 inline-flex items-center", unstyled=True) }}
+        {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link gap-2 inline-flex products-center", unstyled=True) }}
         {% endfor %}
-        {{ link(text="Deals", href=url_for('item.deals'), class="main-nav__link gap-2 inline-flex items-center", icon="fas fa-tag", unstyled=True) }}
+        {{ link(text="Deals", href=url_for('product.deals'), class="main-nav__link gap-2 inline-flex products-center", icon="fas fa-tag", unstyled=True) }}
       </nav>
 
       <!-- Actions -->
-      <div class="header-actions flex items-center">
+      <div class="header-actions flex products-center">
         {% set v = 'ghost' %}
         {% set class = 'btn--icon ' %}
 
         <!-- Country Toggle -->
         <div class="header-country">
           {% set current_country = request.cookies.get('country') %}
-          <span class="header-country__label flex items-center gap-2">
+          <span class="header-country__label flex products-center gap-2">
             {% if current_country == 'sa' %}
             KSA
             {% elif current_country == 'ae' %}
@@ -80,7 +80,7 @@
           {% endcall %}
 
           <div class="user-dropdown">
-            {% set item_class = "dropdown-item flex items-center"%}
+            {% set item_class = "dropdown-product flex products-center"%}
             {% if is_authenticated %}
             <div class="user-info {{ item_class }}">
               <span class="user-email">{{ user_name or user_email }}</span>
@@ -104,7 +104,7 @@
               {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form")
               %}
               {% call button(type="submit", class=item_class ~ " switch-btn", unstyled=True) %}
-                <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
+                <span class="switch-avatar justify-center inline-flex products-center">{{ acc.avatar_letter }}</span>
                 <div class="switch-details flex">
                   <span class="switch-name">{{ acc.name }}</span>
                   <span class="switch-email">{{ acc.email }}</span>
@@ -157,14 +157,14 @@
     <div class="header-search" id="header-search-panel">
       {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET",
       include_csrf=False, attrs={"role": "search", "aria-label": "Site Search"}) %}
-      <div class="header-search__wrapper flex items-center">
+      <div class="header-search__wrapper flex products-center">
         {{ input(
         name="query", type="search",
         placeholder="Search contents and products...",
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        {{ button(type="button", class="header-search__clear justify-center inline-flex items-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
+        {{ button(type="button", class="header-search__clear justify-center inline-flex products-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
         {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
         attrs={"aria-label": "Submit search"}) }}
       </div>
@@ -174,9 +174,9 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
-      {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link flex gap-3 items-center", unstyled=True) }}
+      {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link flex gap-3 products-center", unstyled=True) }}
       {% endfor %}
-      {{ link(text="Deals", href=url_for('item.deals'), class="mobile-nav__link flex gap-3 items-center", icon="fas fa-tag", unstyled=True) }}
+      {{ link(text="Deals", href=url_for('product.deals'), class="mobile-nav__link flex gap-3 products-center", icon="fas fa-tag", unstyled=True) }}
     </nav>
 
   </div>

@@ -12,7 +12,7 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
 
     for ui in user.user_interests:
         target_name = f"{ui.target_type.title()} #{ui.target_id}"
-        if ui.target_type == 'item' and ui.target_id in items_map:
+        if ui.target_type == 'product' and ui.target_id in items_map:
             target_name = items_map[ui.target_id]
         elif ui.target_type in ('article', 'content') and ui.target_id in articles_map:
             target_name = articles_map[ui.target_id]
@@ -41,7 +41,7 @@ def serialize_user_inspect_dto(user, metrics: dict, brands_map: dict, categories
     interests_data.sort(key=lambda x: x["last_interaction"] or "", reverse=True)
 
     def sort_agg(d):
-        return [{"name": k, "score": round(v, 1)} for k, v in sorted(d.items(), key=lambda item: item[1], reverse=True)[:5]]
+        return [{"name": k, "score": round(v, 1)} for k, v in sorted(d.items(), key=lambda product: product[1], reverse=True)[:5]]
 
     aggregated_affinities = {
         "Brands": sort_agg(agg_brands),

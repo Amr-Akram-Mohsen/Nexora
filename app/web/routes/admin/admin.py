@@ -46,16 +46,16 @@ def dashboard_contents():
     )
 
 
-@bp.route("/items")
+@bp.route("/products")
 def dashboard_items():
     return render_template(
-        "admin/product_intelligence/items.html",
+        "admin/product_intelligence/products.html",
         title="Product Management",
-        domain="items",
-        table=CRUD_TABLES["items"],
+        domain="products",
+        table=CRUD_TABLES["products"],
     )
 
-@bp.route("/items/dashboard")
+@bp.route("/products/dashboard")
 def dashboard_items_analytics():
     return render_template(
         "admin/product_intelligence/items_dashboard.html",
@@ -178,9 +178,9 @@ def content_detail(id):
     return render_template("admin/components/_inspect.html", title=f"Content {id}", domain="contents", **data)
 
 
-@bp.route("/items/<int:id>")
+@bp.route("/products/<int:id>")
 def item_detail(id):
-    from app.application.item.admin import get_item_inspect_workflow
+    from app.application.product.admin import get_item_inspect_workflow
     from app.web.routes.admin.builders.item_builder import build_item_inspect_view_model
     from flask import abort
     
@@ -189,7 +189,7 @@ def item_detail(id):
         abort(404)
         
     data = build_item_inspect_view_model(aggregated_data)
-    return render_template("admin/components/_inspect.html", title=f"Product {id}", domain="items", **data)
+    return render_template("admin/components/_inspect.html", title=f"Product {id}", domain="products", **data)
 
 
 @bp.route("/users/<int:id>")
@@ -208,7 +208,7 @@ def user_detail(id):
 
 @bp.route("/stores/<int:id>")
 def store_detail(id):
-    from app.application.item.admin import get_store_inspect_workflow
+    from app.application.product.admin import get_store_inspect_workflow
     from app.web.routes.admin.builders.item_builder import build_store_inspect_view_model
     from flask import abort
     

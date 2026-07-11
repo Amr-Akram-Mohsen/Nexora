@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import func, select, cast, Date, desc, extract
 from app.core.extensions import db, cache
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 
 def _get_trend_data(model, date_col, thirty_days_ago):
     stmt = (
@@ -51,7 +51,7 @@ def get_analytics_dashboard_data() -> dict:
         "views": _get_trend_data(View, View.created_at, thirty_days_ago),
         "saves": _get_trend_data(Save, Save.created_at, thirty_days_ago),
         "shares": _get_trend_data(Share, Share.created_at, thirty_days_ago),
-        "clicks": _get_trend_data(ItemClick, ItemClick.created_at, thirty_days_ago),
+        "clicks": _get_trend_data(ProductClick, ProductClick.created_at, thirty_days_ago),
     }
 
     deltas = {
@@ -60,7 +60,7 @@ def get_analytics_dashboard_data() -> dict:
         "views": _get_delta_data(View, View.created_at, fourteen_days_ago, seven_days_ago),
         "saves": _get_delta_data(Save, Save.created_at, fourteen_days_ago, seven_days_ago),
         "shares": _get_delta_data(Share, Share.created_at, fourteen_days_ago, seven_days_ago),
-        "clicks": _get_delta_data(ItemClick, ItemClick.created_at, fourteen_days_ago, seven_days_ago),
+        "clicks": _get_delta_data(ProductClick, ProductClick.created_at, fourteen_days_ago, seven_days_ago),
     }
 
     # P3-3: Sentiment Distribution
@@ -101,8 +101,8 @@ def get_analytics_dashboard_data() -> dict:
         if r.target_type == "content":
             c = db.session.get(Content, r.target_id)
             if c: target_name = c.title
-        elif r.target_type == "item":
-            i = db.session.get(Item, r.target_id)
+        elif r.target_type == "product":
+            i = db.session.get(Product, r.target_id)
             if i: target_name = i.name
         top_saves.append({
             "target_type": r.target_type,
@@ -113,10 +113,10 @@ def get_analytics_dashboard_data() -> dict:
 
     # P3-7: Click Country Distribution
     country_rows = db.session.execute(
-        select(ItemClick.country, func.count(ItemClick.id))
-        .where(ItemClick.country.isnot(None))
-        .group_by(ItemClick.country)
-        .order_by(desc(func.count(ItemClick.id)))
+        select(ProductClick.country, func.count(ProductClick.id))
+        .where(ProductClick.country.isnot(None))
+        .group_by(ProductClick.country)
+        .order_by(desc(func.count(ProductClick.id)))
         .limit(10)
     ).all()
     country_dist = {r[0] or "Unknown": r[1] for r in country_rows}

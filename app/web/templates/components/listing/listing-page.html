@@ -11,7 +11,7 @@
     <aside class="listing-sidebar" id="listingSidebar" aria-label="Filters">
       <div class="listing-sidebar__inner">
         {# Sidebar header (mobile close) #}
-        <div class="sidebar-header flex items-center justify-between">
+        <div class="sidebar-header flex products-center justify-between">
           <span class="sidebar-header__title">Filters</span>
           {% from "components/ui/core.html" import button %}
           {{ button(id="sidebarClose", class="sidebar-close-btn btn--icon", attrs={"aria-label": "Close filters"}, icon="fas fa-times", unstyled=True) }}
@@ -31,7 +31,7 @@
       {# ── Active Filter Chips ── #}
       {% set active_filter_content = caller('active_filters') %}
       {% if active_filter_content and active_filter_content | trim %}
-      <div class="listing-filters-active flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
+      <div class="listing-filters-active flex flex-wrap products-center gap-2" role="region" aria-label="Active filters">
         {{ active_filter_content }}
       </div>
       {% endif %}

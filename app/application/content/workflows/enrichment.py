@@ -15,109 +15,71 @@ logger = logging.getLogger(__name__)
 _NAME = "rescrape"
 
 
-def reprocess_unscraped_articles(limit: int = 50, extractor_service: str = "diffbot") -> int:
+def enrich_discovered_articles(limit: int = 50) -> int:
     """
     Phase 2: Enrichment Workflow
-    Fetches articles in 'pending' / 'failed' status and performs full scraping.
+    Fetches articles in 'discovered' / 'failed' status and performs Diffbot enrichment.
     """
     from datetime import datetime, timedelta
     from app.domains.content.service.query.filtering import get_unscraped_articles, get_content_by_object
+    from app.application.content.ingestion.article_ingestion import process_diffbot_enrichment
+    from app.integrations.content.utilities.extractor_clients import diffbot_extract
 
     retry_threshold = datetime.utcnow() - timedelta(hours=24)
     unscraped = get_unscraped_articles(limit, retry_threshold)
 
     if not unscraped:
-        log_integration_success(logger, _NAME, items=0, total=0, mode="full_scrape")
+        log_integration_success(logger, _NAME, products=0, total=0, mode="diffbot_enrich")
         return 0
 
-    log_integration_start(logger, _NAME, mode="full_scrape", processing=len(unscraped), extractor=extractor_service)
+    log_integration_start(logger, _NAME, mode="diffbot_enrich", processing=len(unscraped), extractor="diffbot")
     success_count = 0
 
-    from app.integrations.content.enrichment.pipeline import full_article_scraping_pipeline
-
     for article in unscraped:
-        url = article.url or ""
+        url = article.url or article.canonical_url
+        if not url:
+            article.status = "failed"
+            db.session.commit()
+            continue
+            
         article.last_enrichment_attempt = datetime.utcnow()
 
         try:
-            raw_data = {
-                "url":          url,
-                "title":        article.title,
-                "description":  article.description,
-                "content":      article.content_html,
-                "image_url":    article.image_url,
-                "canonical_url": article.canonical_url,
-            }
+            # Call Diffbot directly
+            diffbot_data = diffbot_extract(url)
+            
+            is_success = process_diffbot_enrichment(article, diffbot_data, db.session)
 
-            enriched_dto = full_article_scraping_pipeline(raw_data, extractor_service=extractor_service)
-            enriched = (
-                enriched_dto.model_dump()
-                if hasattr(enriched_dto, "model_dump")
-                else dict(enriched_dto)
-            )
-
-            # Update content ONLY if scraper found something substantial
-            new_text = enriched.get("content_text")
-            if new_text and len(new_text) > (article.word_count or 0):
-                article.content_text     = new_text
-                article.content_html     = enriched.get("content_html")
-                article.word_count       = enriched.get("word_count", 0)
-                article.quality_score    = enriched.get("quality_score", 0.0)
-                article.is_content_scraped = enriched.get("is_content_scraped", False)
-                article.ingestion_method = enriched.get("ingestion_method")
-                article.summary          = enriched.get("summary")
+            if is_success:
+                # Quality gate
+                is_good_quality = (article.word_count or 0) > 250 and article.image_url
                 
-                # Extended metadata (tags, categories, etc.)
-                article.authors          = enriched.get("authors") or article.authors
-                article.extended_metadata = enriched.get("extended_metadata", {})
-                article.images            = enriched.get("images")
-                article.videos            = enriched.get("videos")
+                content_rec = get_content_by_object("article", article.id)
                 
-
-            # Backfill missing metadata (conservative — only fill gaps)
-            if enriched.get("image_url") and not article.image_url:
-                article.image_url = enriched["image_url"]
-            if enriched.get("canonical_url") and not article.canonical_url:
-                article.canonical_url = enriched["canonical_url"]
-
-            # Quality gate: enough content AND has an image
-            is_good_quality = (article.word_count or 0) > 250 and article.image_url
-
-            # Sync with Content record
-            content_rec = get_content_by_object("article", article.id)
-
-            if is_good_quality:
-                article.status = "complete"
-                success_count += 1
-                if content_rec:
-                    log_item_ingested(
-                        logger, _NAME,
-                        content_id=content_rec.id,
-                        object_id=article.id,
-                        status="published",
+                if is_good_quality:
+                    # Auto-publish policy: if it passes the quality gate, publish it immediately
+                    article.status = "published"
+                    success_count += 1
+                    
+                    if content_rec:
+                        content_rec.is_published = True
+                        log_item_ingested(
+                            logger, _NAME,
+                            content_id=content_rec.id,
+                            object_id=article.id,
+                            status="published",
+                            words=article.word_count,
+                        )
+                else:
+                    article.status = "failed"
+                    log_item_skipped(
+                        logger, _NAME, article.title[:60],
+                        reason=f"quality_gate_{article.status}",
                         words=article.word_count,
                     )
-            else:
-                article.status = "partial" if (article.word_count or 0) > 100 else "failed"
-                log_item_skipped(
-                    logger, _NAME, article.title[:60],
-                    reason=f"quality_gate_{article.status}",
-                    words=article.word_count,
-                )
 
-            if content_rec:
-                content_rec.is_published = article.status == "complete"
-                
-                # Automatically apply Diffbot taxonomy relations to the database!
-                if article.extended_metadata:
-                    from app.domains.content.service.command import apply_relationships
+                if content_rec:
                     from app.domains.content.service.search import populate_content_search_fields
-                    
-                    raw_data_for_relations = {
-                        "extended_metadata": article.extended_metadata,
-                        "url": article.url,
-                    }
-                    apply_relationships(content_rec, raw_data_for_relations, session=db.session)
                     populate_content_search_fields(content_rec, article, "article")
 
             db.session.commit()
@@ -131,7 +93,7 @@ def reprocess_unscraped_articles(limit: int = 50, extractor_service: str = "diff
 
     log_integration_success(
         logger, _NAME,
-        items=success_count,
+        products=success_count,
         total=len(unscraped),
     )
     return success_count

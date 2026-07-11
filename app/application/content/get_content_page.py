@@ -20,9 +20,9 @@ def get_content_page_data(content_id):
 
     Returns:
         content          — serialized content dict
-        related_contents — scored related content items
+        related_contents — scored related content products
         trending_contents— trending content in the same section
-        matched_items    — items matched by the Article↔Item matcher (affil. CTA)
+        matched_items    — products matched by the Article↔Product matcher (affil. CTA)
     """
     content = get_content_page_static_data(content_id)
     # content is now a serialized dictionary
@@ -41,10 +41,10 @@ def get_content_page_data(content_id):
         limit=6, days=7, section_ids=section_ids, exclude_ids=tuple(seen_content_ids)
     )
 
-    # Items matched via the Content↔Item matcher — primary affiliate signal
-    # Exclude any directly linked items from matched items
-    linked_item_ids = {i["id"] for i in content.get("linked_items", []) if i.get("id")}
-    matched_items = get_items_for_content_cached(content["id"], limit=6, exclude_ids=tuple(linked_item_ids) if linked_item_ids else None)
+    # Items matched via the Content↔Product matcher — primary affiliate signal
+    # Exclude any directly linked products from matched products
+    linked_product_ids = {i["id"] for i in content.get("linked_items", []) if i.get("id")}
+    matched_items = get_items_for_content_cached(content["id"], limit=6, exclude_ids=tuple(linked_product_ids) if linked_product_ids else None)
 
     return {
         "content": content,

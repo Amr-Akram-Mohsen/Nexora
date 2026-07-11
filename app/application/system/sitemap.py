@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from flask import url_for
 from app.domains.taxonomy.service.query import get_active_sections
 from app.domains.content.service.query.filtering import get_all_contents_metadata
-from app.domains.item.service.query import get_all_items_metadata
+from app.domains.product.service.query import get_all_items_metadata
 
 
 def generate_static_sitemap(app):
@@ -59,14 +59,14 @@ def generate_static_sitemap(app):
                 ]
             )
 
-        # 4. Items (id + created_at only — avoid loading full item graphs)
-        item_rows = get_all_items_metadata()
-        for item_id, created_at in item_rows:
+        # 4. Items (id + created_at only — avoid loading full product graphs)
+        product_rows = get_all_items_metadata()
+        for product_id, created_at in product_rows:
             last_mod = (
                 (created_at or datetime.now(timezone.utc)).date().isoformat()
             )
             pages.append(
-                [url_for("item.item_page", item_id=item_id, _external=True), last_mod]
+                [url_for("product.item_page", product_id=product_id, _external=True), last_mod]
             )
 
 

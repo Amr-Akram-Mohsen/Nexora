@@ -5,7 +5,7 @@
 <ul class="activity-feed">
   {% for log in logs %}
   {% set is_success = log.status == "Success" %}
-  <li class="activity-item flex ">
+  <li class="activity-product flex ">
     <div class="activity-icon flex-center {{ 'icon-like' if is_success else 'icon-dislike' }}">
       {{ ('<i class="fa-solid fa-check"></i>' if is_success else '<i class="fa-solid fa-xmark"></i>')|safe }}
     </div>
@@ -18,14 +18,14 @@
           <span class="activity-target log-category">{{ log.category }}</span>
         </p>
 
-        <span class="log-badges gap-2 flex items-center">
+        <span class="log-badges gap-2 flex products-center">
           {{ badge(text=log.status | upper, class="status-badge " ~ ('active' if is_success else 'inactive')) }}
           {{ badge(text=log.type | upper, class="status-badge") }}
         </span>
       </div>
 
       <p class="activity-meta log-query">Query: "{{ log.query }}"</p>
-      <div class="activity-meta log-time flex items-center gap-2">
+      <div class="activity-meta log-time flex products-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span>{{ log.time_formatted }}</span>
         {% if log.failures > 0 %}

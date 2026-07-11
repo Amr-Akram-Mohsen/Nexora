@@ -11,7 +11,7 @@
 <div class="dist-list flex">
   {% for s in top_performing_product %}
   {% set pct = ((s.clicks / max_val.val) * 100) | round | int %}
-  {{ distribution_link_bar(s.name, "{:,} clicks".format(s.clicks), pct, "/admin/items?source=" ~ s.slug ~ "&sort_by=click_count&sort_dir=desc", "bar-trend bar-orange") }}
+  {{ distribution_link_bar(s.name, "{:,} clicks".format(s.clicks), pct, "/admin/products?source=" ~ s.slug ~ "&sort_by=click_count&sort_dir=desc", "bar-trend bar-orange") }}
   {% endfor %}
 </div>
 {% endif %}

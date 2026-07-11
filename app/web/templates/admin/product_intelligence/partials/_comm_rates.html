@@ -1,9 +1,9 @@
 {% from "admin/components/ui/dashboard.html" import breakdown_progress_bar %}
 {% if data %}
   {% set max_rate = data | map(attribute='avg_rate') | max %}
-  {% for item in data[:10] %}
-    {% set pct = (item.avg_rate / max_rate * 100)|round(1) if max_rate > 0 else 0 %}
-    {{ breakdown_progress_bar(item.name, item.avg_rate|round(1) ~ '%', pct, "var(--brand-teal)") }}
+  {% for product in data[:10] %}
+    {% set pct = (product.avg_rate / max_rate * 100)|round(1) if max_rate > 0 else 0 %}
+    {{ breakdown_progress_bar(product.name, product.avg_rate|round(1) ~ '%', pct, "var(--brand-teal)") }}
   {% endfor %}
 {% else %}
   <div class="table-empty-state">No commission rate data available.</div>

@@ -2,11 +2,11 @@ from app.core.extensions import db
 from ...content.models import Content
 from sqlalchemy import func, select
 from app.infrastructure import cache
-from app.domains.relationships import content_brands
+from app.domains.relationships import ContentEntity
 from ..models import (
     Category,
     Brand,
-    Topic,
+    Entity,
     IntentFacet,
     PriceTierFacet,
     Section,
@@ -15,8 +15,8 @@ from ..models import (
 
 REL_MODELS = {
     "category": Category,
-    "topic": Topic,
     "brand": Brand,
+    "entity": Entity,
     "intent": IntentFacet,
     "price_tier": PriceTierFacet,
     "attributes": AttributeFacet,
@@ -111,7 +111,24 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
     if not rel_model:
         raise ValueError("Invalid relationship name")
 
-    stmt = select(*build_filter_projection(rel_model)).join(rel_model.contents)
+    if rel_name in ["category", "intent", "price_tier", "attributes"]:
+        stmt = select(*build_filter_projection(rel_model)).join(rel_model.contents)
+    elif rel_name == "entity":
+        stmt = select(*build_filter_projection(rel_model)).join(ContentEntity, ContentEntity.entity_id == Entity.id).join(Content, Content.id == ContentEntity.content_id)
+    elif rel_name == "brand":
+        # Legacy frontend might still ask for 'brand'. We route to Entity where type='brand'
+        rel_model = Entity
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(ContentEntity, ContentEntity.entity_id == Entity.id)\
+            .join(Content, Content.id == ContentEntity.content_id)\
+            .where(Entity.entity_type == 'brand')
+    elif rel_name == "topic":
+        # Route to Entity where type in ('topic', 'tag', 'concept')
+        rel_model = Entity
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(ContentEntity, ContentEntity.entity_id == Entity.id)\
+            .join(Content, Content.id == ContentEntity.content_id)\
+            .where(Entity.entity_type.in_(['topic', 'tag', 'concept']))
 
     stmt = apply_content_section_filters(
         stmt=stmt,
@@ -141,24 +158,32 @@ def get_types_for_section(section_slug, session=None):
 
 @cache.memoize(timeout=3600)
 def get_popular_general_topics(limit=4, session=None):
-    stmt = select(*build_filter_projection(Topic)).limit(limit)
+    stmt = select(*build_filter_projection(Entity)).where(Entity.entity_type.in_(['topic', 'concept', 'tag'])).limit(limit)
     return execute_mapped_query(stmt, session)
 
 
 @cache.memoize(timeout=3600)
 def get_popular_brands(limit=5, session=None):
-    """
-    Return brands ordered by the number of linked items (descending).
-    Previously returned brands in arbitrary row order.
-    """
-    from app.domains.item.models import Item
+    from datetime import datetime, timedelta, timezone
+    from app.domains.content.models import Content
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
 
     stmt = (
-        select(*build_filter_projection(Brand), func.count(Item.id).label("item_count"))
-        .join(Item, Item.brand_id == Brand.id, isouter=True)
-        .where(Brand.is_active.is_(True))
-        .group_by(Brand.id, Brand.slug, Brand.name)
-        .order_by(func.count(Item.id).desc())
+        select(
+            *build_filter_projection(Entity),
+            func.sum(Content.view_count).label("recent_views"),
+        )
+        .join(ContentEntity, Entity.id == ContentEntity.entity_id)
+        .join(Content, Content.id == ContentEntity.content_id)
+        .where(
+            (Entity.entity_type == "brand") | (Entity.entity_type == "organization"),
+            Content.is_active.is_(True),
+            Content.is_published.is_(True),
+            Content.published_at >= cutoff,
+        )
+        .group_by(Entity.id, Entity.slug, Entity.name)
+        .order_by(func.sum(Content.view_count).desc())
         .limit(limit)
     )
     return execute_mapped_query(stmt, session)
@@ -179,20 +204,6 @@ def get_section_by_slug(slug, session=None):
 
 @cache.memoize(timeout=1800)
 def get_trending_brands(limit: int = 6, days: int = 7, session=None):
-    """
-    Return brands ranked by the sum of view counts on recently published content.
-
-    Brands whose content got the most views in the past ``days`` days appear
-    first — a reliable signal of editorial trending momentum.
-
-    Args:
-        limit: Maximum number of brands to return.
-        days:  Look-back window in days.
-        session: Optional DB session context.
-
-    Returns:
-        List of mapping rows with ``slug``, ``name``, and ``recent_views``.
-    """
     from datetime import datetime, timedelta, timezone
     from app.domains.content.models import Content
 
@@ -200,18 +211,18 @@ def get_trending_brands(limit: int = 6, days: int = 7, session=None):
 
     stmt = (
         select(
-            *build_filter_projection(Brand),
+            *build_filter_projection(Entity),
             func.sum(Content.view_count).label("recent_views"),
         )
-        .join(content_brands, Brand.id == content_brands.c.brand_id)
-        .join(Content, Content.id == content_brands.c.content_id)
+        .join(ContentEntity, Entity.id == ContentEntity.entity_id)
+        .join(Content, Content.id == ContentEntity.content_id)
         .where(
-            Brand.is_active.is_(True),
+            (Entity.entity_type == "brand") | (Entity.entity_type == "organization"),
             Content.is_active.is_(True),
             Content.is_published.is_(True),
             Content.published_at >= cutoff,
         )
-        .group_by(Brand.id, Brand.slug, Brand.name)
+        .group_by(Entity.id, Entity.slug, Entity.name)
         .order_by(func.sum(Content.view_count).desc())
         .limit(limit)
     )
@@ -219,10 +230,10 @@ def get_trending_brands(limit: int = 6, days: int = 7, session=None):
 
 
 def _get_distinct_item_taxonomy(model_class, session=None):
-    from app.domains.item.models import Item
+    from app.domains.product.models import Product
     stmt = (
         select(model_class.slug, model_class.name)
-        .join(Item)
+        .join(Product)
         .distinct()
         .order_by(model_class.name)
     )
@@ -299,14 +310,17 @@ def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit, se
 
     return execute_mapped_query(stmt, session)
 
-def paginate_taxonomy_entity(model, page, per_page, search="", status=None, health=None, field_name=None):
+def paginate_taxonomy_entity(model, page, per_page, search="", status=None, health=None, field_name=None, extra_filter=None):
     """Generic pagination utility for taxonomy entities supporting search, status, and health checks."""
     from app.domains.content.models import Content
-    from app.domains.item.models import Item
-    from app.domains.relationships import content_brands, content_topics, content_attributes
-    from app.domains.taxonomy.models import Category, Brand, Topic, Section, AttributeFacet
+    from app.domains.product.models import Product
+    from app.domains.relationships import content_attributes, ContentEntity
+    from app.domains.taxonomy.models import Category, Brand, Entity, Section, AttributeFacet
     
     stmt = select(model).order_by(model.name.asc())
+    if extra_filter is not None:
+        stmt = stmt.where(extra_filter)
+        
     if search:
         stmt = stmt.where(model.name.ilike(f"%{search}%"))
         
@@ -322,12 +336,12 @@ def paginate_taxonomy_entity(model, page, per_page, search="", status=None, heal
         
         if model == Category:
             cond_content = db.session.query(Content.id).filter(Content.category_id == Category.id).exists()
-            cond_item = db.session.query(Item.id).filter(Item.category_id == Category.id).exists()
+            cond_item = db.session.query(Product.id).filter(Product.category_id == Category.id).exists()
         elif model == Brand:
-            cond_content = db.session.query(content_brands.c.content_id).filter(content_brands.c.brand_id == Brand.id).exists()
-            cond_item = db.session.query(Item.id).filter(Item.brand_id == Brand.id).exists()
-        elif model == Topic:
-            cond_content = db.session.query(content_topics.c.content_id).filter(content_topics.c.topic_id == Topic.id).exists()
+            # For Brand, we only check product usage now
+            cond_item = db.session.query(Product.id).filter(Product.brand_id == Brand.id).exists()
+        elif model == Entity:
+            cond_content = db.session.query(ContentEntity.content_id).filter(ContentEntity.entity_id == Entity.id).exists()
         elif model == Section:
             cond_content = db.session.query(Content.id).filter(Content.section_id == Section.id).exists()
         elif model == AttributeFacet:

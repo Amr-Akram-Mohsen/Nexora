@@ -1,14 +1,14 @@
 from sqlalchemy import select, update
 import difflib
 from app.core.extensions import db
-from app.domains.taxonomy.models import Category, Brand, Topic, Section, AttributeFacet
+from app.domains.taxonomy.models import Category, Brand, Entity, Section, AttributeFacet
 from app.domains.content.models import Content
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 
 DOMAIN_MAP = {
     "categories": Category,
     "brands": Brand,
-    "topics": Topic,
+    "topics": Entity,
     "sections": Section,
     "attributes": AttributeFacet,
 }
@@ -18,7 +18,10 @@ def detect_taxonomy_duplicates(domain: str, threshold: int = 85):
         raise ValueError("Invalid domain")
         
     model_class = DOMAIN_MAP[domain]
-    records = db.session.execute(select(model_class)).scalars().all()
+    stmt = select(model_class)
+    if domain == "topics":
+        stmt = stmt.where(model_class.entity_type.in_(['topic', 'tag', 'concept']))
+    records = db.session.execute(stmt).scalars().all()
     duplicates = []
     
     for i in range(len(records)):
@@ -69,16 +72,21 @@ def merge_taxonomy_entities(domain: str, source_id: int, target_id: int):
         
     if domain == "categories":
         db.session.execute(update(Content).where(Content.category_id == source.id).values(category_id=target.id))
-        db.session.execute(update(Item).where(Item.category_id == source.id).values(category_id=target.id))
+        db.session.execute(update(Product).where(Product.category_id == source.id).values(category_id=target.id))
         
     elif domain == "brands":
-        from app.domains.relationships import content_brands
-        _merge_m2m(content_brands, source.id, target.id, "brand_id")
-        db.session.execute(update(Item).where(Item.brand_id == source.id).values(brand_id=target.id))
+        from app.domains.relationships import ContentEntity
+        db.session.execute(update(Product).where(Product.brand_id == source.id).values(brand_id=target.id))
+        
+        source_entity = db.session.execute(select(Entity).where(Entity.slug == source.slug)).scalar()
+        target_entity = db.session.execute(select(Entity).where(Entity.slug == target.slug)).scalar()
+        if source_entity and target_entity:
+            _merge_m2m(ContentEntity.__table__, source_entity.id, target_entity.id, "entity_id")
+            db.session.delete(source_entity)
         
     elif domain == "topics":
-        from app.domains.relationships import content_topics
-        _merge_m2m(content_topics, source.id, target.id, "topic_id")
+        from app.domains.relationships import ContentEntity
+        _merge_m2m(ContentEntity.__table__, source.id, target.id, "entity_id")
         
     elif domain == "sections":
         db.session.execute(update(Content).where(Content.section_id == source.id).values(section_id=target.id))

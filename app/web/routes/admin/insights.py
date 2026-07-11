@@ -217,7 +217,7 @@ def widget_top_opportunities():
         time_frame = "7_days"
         
     dec_data = get_decision_intelligence_data(lightweight=True)
-    return render_template("admin/content_intelligence/components/_top_opportunities_row.html", items=dec_data.get("top_opportunities", []))
+    return render_template("admin/content_intelligence/components/_top_opportunities_row.html", products=dec_data.get("top_opportunities", []))
 
 
 @bp.route("/widget/coverage-matrix", methods=["GET"])
@@ -227,7 +227,7 @@ def widget_coverage_matrix():
         time_frame = "7_days"
         
     coverage_matrix = get_content_coverage_matrix()
-    return render_template("admin/content_intelligence/_coverage_matrix_chart.html", items=coverage_matrix)
+    return render_template("admin/content_intelligence/_coverage_matrix_chart.html", products=coverage_matrix)
 
 
 @bp.route("/widget/intent-opportunities", methods=["GET"])
@@ -237,7 +237,7 @@ def widget_intent_opportunities():
         time_frame = "7_days"
         
     intent_opportunities = get_intent_opportunity_data()
-    return render_template("admin/content_intelligence/_intent_opportunities_cards.html", items=intent_opportunities)
+    return render_template("admin/content_intelligence/_intent_opportunities_cards.html", products=intent_opportunities)
 
 
 @bp.route("/widget/intent-ctr-heatmap", methods=["GET"])
@@ -307,7 +307,7 @@ def widget_brand_opportunities():
         time_frame = "7_days"
         
     brand_opportunities = get_brand_opportunity_data()
-    return render_template("admin/content_intelligence/components/_brand_opportunities_row.html", items=brand_opportunities)
+    return render_template("admin/content_intelligence/components/_brand_opportunities_row.html", products=brand_opportunities)
 
 
 @bp.route("/widget/content-completeness", methods=["GET"])
@@ -362,13 +362,13 @@ def widget_content_strategy():
         cached = generate_content_strategy(opps_payload)
         set_cached("strategy", time_frame, cached)
 
-    items = cached
+    products = cached
     if entity_filter:
         lower_filter = entity_filter.lower()
-        items = [item for item in items if lower_filter in str(item.get("entity", "")).lower()]
+        products = [product for product in products if lower_filter in str(product.get("entity", "")).lower()]
         
-    headers = {"X-Empty": "true"} if not items else {}
-    return render_template("admin/content_intelligence/components/_content_strategy_row.html", items=items), 200, headers
+    headers = {"X-Empty": "true"} if not products else {}
+    return render_template("admin/content_intelligence/components/_content_strategy_row.html", products=products), 200, headers
 
 
 @bp.route("/widget/asset-mapping", methods=["GET"])
@@ -397,13 +397,13 @@ def widget_asset_mapping():
         cached = map_content_strategy_to_assets(strategy)
         set_cached("assets", time_frame, cached)
 
-    items = cached
+    products = cached
     if entity_filter:
         lower_filter = entity_filter.lower()
-        items = [item for item in items if lower_filter in str(item.get("entity", "")).lower()]
+        products = [product for product in products if lower_filter in str(product.get("entity", "")).lower()]
         
-    headers = {"X-Empty": "true"} if not items else {}
-    return render_template("admin/content_intelligence/components/_asset_mapping_row.html", items=items), 200, headers
+    headers = {"X-Empty": "true"} if not products else {}
+    return render_template("admin/content_intelligence/components/_asset_mapping_row.html", products=products), 200, headers
 
 
 @bp.route("/widget/performance-feedback", methods=["GET"])
@@ -422,7 +422,7 @@ def widget_performance_feedback():
     
     if entity_filter:
         lower_filter = entity_filter.lower()
-        eval_results = [item for item in eval_results if lower_filter in str(item.get("entity", "")).lower()]
+        eval_results = [product for product in eval_results if lower_filter in str(product.get("entity", "")).lower()]
         failures = [
             f for f in failures
             if lower_filter in str(f.get("entity", "")).lower() or lower_filter in str(f.get("title", "")).lower()

@@ -17,7 +17,7 @@ from app.core.extensions import db
 @cache.memoize(timeout=3600)
 def get_related_contents_for_content_cached(content_id: int, limit: int = 6) -> list:
     """
-    Cached wrapper: scored related content for a content item.
+    Cached wrapper: scored related content for a content product.
 
     Uses multi-signal scoring (topic, brand, category, section, recency,
     popularity) with no section lock.
@@ -38,7 +38,7 @@ def get_trending_contents_cached_v2(
     Cached wrapper: trending content, optionally filtered by type/section.
 
     Args:
-        limit:       Maximum items.
+        limit:       Maximum products.
         days:        Look-back window for view counting.
         object_type: 'article', 'video', or 'post' (None = all).
         section_ids: Tuple of section IDs to scope results (None = global).
@@ -62,15 +62,15 @@ def get_editors_picks_cached(limit: int = 6, exclude_ids: tuple | None = None) -
 
 
 # ---------------------------------------------------------------------------
-# Item recommendations
+# Product recommendations
 # ---------------------------------------------------------------------------
 
 @cache.memoize(timeout=3600)
 def get_items_for_content_cached(content_id: int, limit: int = 8, exclude_ids: tuple | None = None) -> list:
     """
-    Cached wrapper: items recommended for a content piece.
+    Cached wrapper: products recommended for a content piece.
 
-    Combines directly linked items (content_items association) with
+    Combines directly linked items (content_products association) with
     taxonomy-matched items (brand/category overlap).
     """
     from app.domains.recommendation.service import get_items_for_content
@@ -79,21 +79,21 @@ def get_items_for_content_cached(content_id: int, limit: int = 8, exclude_ids: t
 
 @cache.memoize(timeout=600)
 def get_trending_items_cached(limit: int = 8, days: int = 7, exclude_ids: tuple | None = None) -> list:
-    """Cached wrapper: items ranked by recent views + clicks."""
+    """Cached wrapper: products ranked by recent views + clicks."""
     from app.domains.recommendation.service import get_trending_items
     return get_trending_items(limit=limit, days=days, exclude_ids=exclude_ids, session=db.session)
 
 
 @cache.memoize(timeout=3600)
-def get_contents_for_item_cached(item_id: int, limit: int = 6) -> list:
+def get_contents_for_item_cached(product_id: int, limit: int = 6) -> list:
     """
-    Cached wrapper: content (articles, reviews, posts) relevant to an item.
+    Cached wrapper: content (articles, reviews, posts) relevant to an product.
 
-    Combines directly linked content (content_items association) with
+    Combines directly linked content (content_products association) with
     taxonomy-matched content (brand/category overlap).
     """
     from app.domains.recommendation.service import get_contents_for_item
-    return get_contents_for_item(item_id=item_id, limit=limit, session=db.session)
+    return get_contents_for_item(product_id=product_id, limit=limit, session=db.session)
 
 
 # ---------------------------------------------------------------------------
@@ -144,9 +144,9 @@ def get_popular_items_cached(
     limit: int = 6,
 ) -> list[dict]:
     """
-    Cached filter-aware query for popular items/deals matching active filters.
+    Cached filter-aware query for popular products/deals matching active filters.
     """
-    from app.domains.item.service.query import get_popular_items
+    from app.domains.product.service.query import get_popular_items
     return get_popular_items(
         category_slugs=category_slugs,
         brand_slugs=brand_slugs,

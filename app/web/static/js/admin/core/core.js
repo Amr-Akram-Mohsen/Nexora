@@ -50,7 +50,7 @@ class AdminListController {
           cleanKey = this.filterKeys[id];
         } else {
           // Fallback legacy regex mapping
-          cleanKey = id.replace(/^(filter-item-|filter-|item-sort-|item-|user-)/, '').replace(/-/g, '_');
+          cleanKey = id.replace(/^(filter-product-|filter-|product-sort-|product-|user-)/, '').replace(/-/g, '_');
         }
         filters[cleanKey] = el.value;
       }
@@ -374,7 +374,7 @@ function renderSpinner(container, text = "Loading…") {
   container.appendChild(clone);
 }
 
-function renderEmptyState(container, message = "No items found.", submessage = "", iconClass = "") {
+function renderEmptyState(container, message = "No products found.", submessage = "", iconClass = "") {
   if (!container) return;
   const tpl = document.getElementById('global-empty-template');
   if (!tpl) return;

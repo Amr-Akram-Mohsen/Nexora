@@ -1,7 +1,7 @@
 from app.domains.interaction.service import react, save_item, post_comment, record_share, get_comment_by_id
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.content.models import Content
-from app.domains.item.service import get_item_by_id
+from app.domains.product.service import get_item_by_id
 from app.domains.recommendation.interest_service import handle_interaction_interest, handle_comment_interaction
 from app.shared.constants.core import TargetType
 from app.core.extensions import db
@@ -16,7 +16,7 @@ def handle_interaction_workflow(user, target_type, target_id, interaction_type, 
             target = get_comment_by_id(comment_id)
         elif target_type == TargetType.CONTENT:
             target = db.session.get(Content, target_id)
-        elif target_type == TargetType.ITEM:
+        elif target_type == TargetType.PRODUCT:
             target = get_item_by_id(target_id, load="minimal")
 
         if not target:

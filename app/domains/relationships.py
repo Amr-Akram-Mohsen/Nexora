@@ -24,30 +24,42 @@ class ContentEntity(db.Model):
     entity_id = db.Column(db.Integer, db.ForeignKey("entities.id"), primary_key=True)
     relevance_score = db.Column(db.Float, default=0.0)
     
+    # NEW fields
+    origin = db.Column(db.String(30), nullable=True, index=True)
+    # Values: 'event_registry' | 'diffbot' | 'youtube' | 'brand_legacy' | 'manual' | 'ai'
+    confidence = db.Column(db.Float, nullable=True)
+    # Provider-assigned confidence (0.0–1.0), NULL if unknown
+    
     content = db.relationship("Content", back_populates="content_entities")
     entity = db.relationship("Entity", back_populates="content_entities")
 
-content_topics = db.Table(
-    "content_topics",
-    db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
-    db.Column("topic_id", db.Integer, db.ForeignKey("topics.id"), primary_key=True),
-    db.Index("ix_content_topics_topic", "topic_id"),
-    db.Index("ix_content_topics_content", "content_id"),
-)
+    @staticmethod
+    def get_or_create(content_id, entity_id, session, origin=None, relevance_score=0.0, confidence=None):
+        """Get existing link or create new one. Updates origin if provided."""
+        existing = session.query(ContentEntity).filter_by(
+            content_id=content_id, entity_id=entity_id
+        ).first()
+        if not existing:
+            existing = ContentEntity(
+                content_id=content_id,
+                entity_id=entity_id,
+                relevance_score=relevance_score,
+                origin=origin,
+                confidence=confidence,
+            )
+            session.add(existing)
+            session.flush()
+        return existing
 
-content_brands = db.Table(
-    "content_brands",
-    db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
-    db.Column("brand_id", db.Integer, db.ForeignKey("brands.id"), primary_key=True),
-    db.Index("ix_content_brands_brand", "brand_id"),
-    db.Index("ix_content_brands_content", "content_id"),
-)
+
 
 # Links a review/content directly to the product(s) it covers
-content_items = db.Table(
-    "content_items",
+content_products = db.Table(
+    "content_products",
     db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
-    db.Column("item_id", db.Integer, db.ForeignKey("items.id"), primary_key=True),
+    db.Column("product_id", db.Integer, db.ForeignKey("products.id"), primary_key=True),
+    db.Index("ix_content_products_content", "content_id"),
+    db.Index("ix_content_products_product", "product_id"),
 )
 
 

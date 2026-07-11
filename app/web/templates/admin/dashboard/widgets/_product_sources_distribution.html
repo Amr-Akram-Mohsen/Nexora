@@ -11,7 +11,7 @@
 <div class="dist-list flex">
   {% for s in product_by_source %}
   {% set pct = ((s.count / max_val.val) * 100) | round | int %}
-  <a class="dist-row-link" href="/admin/items?source={{ s.slug }}">
+  <a class="dist-row-link" href="/admin/products?source={{ s.slug }}">
     <div class="dist-row flex justify-between">
       <span class="dist-row-name">{{ s.name }}</span>
       <span class="dist-row-count">{{ "{:,}".format(s.count) }} products</span>

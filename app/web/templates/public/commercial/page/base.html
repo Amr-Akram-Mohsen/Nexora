@@ -1,15 +1,15 @@
 {% extends "layout/base.html" %}
 
 {% set content = {
-'object_type': 'item',
-'target': item,
+'object_type': 'product',
+'target': product,
 'section': None,
 'linked_items': []
 } %}
 
-{% set page_css = "css/commercial/page/item.css" %}
+{% set page_css = "css/commercial/page/product.css" %}
 
-{% from "commercial/features/item-gallery.html" import item_gallery %}
+{% from "commercial/features/product-gallery.html" import item_gallery %}
 {% from "components/ui/core.html" import badge, button %}
 {% from "commercial/features/rating.html" import render_stars %}
 
@@ -18,11 +18,11 @@
 {% endblock %}
 
 {% block title %}
-Nexora | {{ item.name }}
+Nexora | {{ product.name }}
 {% endblock %}
 
 {% block description %}
-{{ (item.description or '') | truncate(160) }}
+{{ (product.description or '') | truncate(160) }}
 {% endblock %}
 
 {% block og_type %}
@@ -30,72 +30,72 @@ product
 {% endblock %}
 
 {% block og_image %}
-{{ item.images[0].image_url if item.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}
+{{ product.images[0].image_url if product.images else url_for('static', filename='img/og-preview.jpg', _external=True) }}
 {% endblock %}
 
 {% block structured_data %}
 {% from "components/seo/jsonld-product.html" import render_product_jsonld %}
-{{ render_product_jsonld(item) }}
+{{ render_product_jsonld(product) }}
 {% endblock %}
 
 {% block content %}
-<section class="detail-page" data-id="{{ item.id }}" data-type="{{ item.item_type }}" data-domain-type="commercial">
+<section class="detail-page" data-id="{{ product.id }}" data-type="{{ product.product_type }}" data-domain-type="commercial">
 
     <div class="container">
 
         {# ══ Breadcrumbs — full width top row ══ #}
-        <div class="detail-page__top flex items-center justify-between gap-6">
-            <div class="detail-page__breadcrumbs-wrapper flex items-center">
+        <div class="detail-page__top flex products-center justify-between gap-6">
+            <div class="detail-page__breadcrumbs-wrapper flex products-center">
                 {% include "commercial/features/breadcrumbs.html" %}
             </div>
         </div>
 
         {# ══ Main (display:contents on desktop — children participate directly in grid) ══
         Source / mobile order: header → gallery → content → specs
-        Desktop visual order is controlled by grid-template-areas in item.css #}
+        Desktop visual order is controlled by grid-template-areas in product.css #}
         <div class="detail-page__main">
 
             {# ── Right column: title, badges, rating, price, quick-details ── #}
             <div class="detail-page__header">
 
-                <div class="detail-page__badges flex flex-wrap items-center gap-3">
-                    {{ badge(item.category.name, 'badge--category') if item.category else '' }}
-                    {{ badge(item.brand.name, 'badge--brand') if item.brand else '' }}
+                <div class="detail-page__badges flex flex-wrap products-center gap-3">
+                    {{ badge(product.category.name, 'badge--category') if product.category else '' }}
+                    {{ badge(product.brand.name, 'badge--brand') if product.brand else '' }}
                 </div>
 
-                <h1 class="detail-page__title">{{ item.name }}</h1>
+                <h1 class="detail-page__title">{{ product.name }}</h1>
 
-                <div class="detail-page__meta flex items-center flex-wrap">
+                <div class="detail-page__meta flex products-center flex-wrap">
 
-                    <div class="meta-item flex items-center">
-                        {{ render_stars(item.rating or 0) }}
+                    <div class="meta-product flex products-center">
+                        {{ render_stars(product.rating or 0) }}
                     </div>
 
-                    <span class="item-rating">({{ item.rating or 0 }})</span>
+                    <span class="product-rating">({{ product.rating or 0 }})</span>
 
-                    <span class="item-reviews-count">
-                        {{ item.review_count or 0 }} reviews
+                    <span class="product-reviews-count">
+                        {{ product.review_count or 0 }} reviews
                     </span>
 
                 </div>
 
                 {# Price — immediately below rating for clear hierarchy #}
-                {% if item.default_variant %}
-                <div class="item-price-summary flex flex-wrap">
+                {% if product.default_variant %}
+                <div class="product-price-summary flex flex-wrap">
                     <span class="current-price">
-                        {{ item.default_variant.price }}
-                        {{ item.default_variant.currency }}
+                        {{ product.default_variant.price }}
+                        {{ product.default_variant.currency }}
                     </span>
-                    {% if item.default_variant.old_price %}
-                    <span class="old-price">{{ item.default_variant.old_price }}</span>
+                    {% if product.default_variant.old_price %}
+                    <span class="old-price">{{ product.default_variant.old_price }}</span>
                     {% endif %}
                 </div>
                 {% endif %}
 
                 {# Quick details — key specs at a glance #}
-                {% if item.quick_details %}
-                <div class="item-quick-details">
-                    {% for detail in item.quick_details[:6] %}
+                {% if product.quick_details %}
+                <div class="product-quick-details">
+                    {% for detail in product.quick_details[:6] %}
                     <div class="quick-detail flex">
                         <span class="quick-detail__label">{{ detail.label }}</span>
                         <span class="quick-detail__value">{{ detail.value }}</span>
@@ -107,13 +107,13 @@ product
             </div>
 
             {# Variants + purchase options — below header in right column #}
-            <div class="detail-page__variants flex flex-wrap items-start gap-4">
-                {% if item.has_variants %}
+            <div class="detail-page__variants flex flex-wrap products-start gap-4">
+                {% if product.has_variants %}
                 {% include "commercial/features/variant-selector.html" %}
                 {% endif %}
 
-                {% if item.store_links %}
-                {% set store_links = item.store_links %}
+                {% if product.store_links %}
+                {% set store_links = product.store_links %}
                 <div class="purchase-sidebar">
                     {% include "commercial/features/purchase-options.html" %}
                 </div>
@@ -122,34 +122,34 @@ product
 
             {# ── Left-column top: gallery (always left, always above specs) ── #}
             <div class="detail-page__image">
-                {{ item_gallery(item) }}
+                {{ item_gallery(product) }}
             </div>
 
 
 
             {# ── Left-column bottom: specifications (always below gallery) ── #}
-            {% if item.quick_details and item.quick_details|length > 0 %}
+            {% if product.quick_details and product.quick_details|length > 0 %}
             <div class="detail-page__specs">
 
-                <div class="item-details-card">
+                <div class="product-details-card">
 
-                    <h3 class="item-details-card__title flex items-center">
-                        <span class="item-details-card__bar"></span>
+                    <h3 class="product-details-card__title flex products-center">
+                        <span class="product-details-card__bar"></span>
                         {% block details_title %}
                         Product Details
                         {% endblock %}
                     </h3>
 
-                    {% set full_details = item.structured_details.get('groups')
-                    if item.structured_details else None %}
+                    {% set full_details = product.structured_details.get('groups')
+                    if product.structured_details else None %}
 
                     {% if full_details %}
-                    <div class="item-details-card__items flex flex-col gap-3">
+                    <div class="product-details-card__items flex flex-col gap-3">
                         {% from "commercial/features/render-details.html" import render_details %}
                         {{ render_details(full_details) }}
                     </div>
 
-                    {% call button(type="button", id="toggle-specs-btn", class="item-details-inline-toggle flex-center gap-2 justify-center items-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
+                    {% call button(type="button", id="toggle-specs-btn", class="product-details-inline-toggle flex-center gap-2 justify-center products-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
                         <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         Show More
                     {% endcall %}
@@ -163,32 +163,32 @@ product
 
             {# ── Left-column body: description + category blocks ── #}
             <div class="detail-page__content">
-                <div class="item-content">
+                <div class="product-content">
 
                     {# Highlights card — key features above the description #}
-                    {% if item.structured_details and item.structured_details.highlights %}
-                    <div class="item-highlights item-details-card">
-                        <h3 class="item-details-card__title flex items-center">
-                            <span class="item-details-card__bar"></span>
+                    {% if product.structured_details and product.structured_details.highlights %}
+                    <div class="product-highlights product-details-card">
+                        <h3 class="product-details-card__title flex products-center">
+                            <span class="product-details-card__bar"></span>
                             Highlights
                         </h3>
-                        <ul class="item-highlights__list gap-2 flex">
-                            {% for key, value in item.structured_details.highlights.items() %}
-                            <li class="item-highlight-row flex gap-3">
-                                <strong class="item-highlight-row__key">{{ key|replace('_',' ')|title }}</strong>
-                                <span class="item-highlight-row__val">{{ value }}</span>
+                        <ul class="product-highlights__list gap-2 flex">
+                            {% for key, value in product.structured_details.highlights.items() %}
+                            <li class="product-highlight-row flex gap-3">
+                                <strong class="product-highlight-row__key">{{ key|replace('_',' ')|title }}</strong>
+                                <span class="product-highlight-row__val">{{ value }}</span>
                             </li>
                             {% endfor %}
                         </ul>
                     </div>
                     {% endif %}
 
-                    {{ item.description or '' }}
+                    {{ product.description or '' }}
 
                     {% block category_content %}
                     {% endblock %}
 
-                    {% if item.store_links %}
+                    {% if product.store_links %}
                     {% include "partials/affiliate-disclosure.html" %}
                     {% endif %}
 
@@ -210,7 +210,7 @@ product
         <section class="section recommendation-section recommendation-section--products" id="related-products"
             data-recommendation-container="related_product"
             data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
-            <div class="section__header flex justify-between gap-6 items-center">
+            <div class="section__header flex justify-between gap-6 products-center">
                 <h2 class="title">You May Also Like</h2>
             </div>
             {{ grid(related_items[:4], target_type='commercial') }}
@@ -226,7 +226,7 @@ product
             {% if related_articles %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 items-center">
+                <div class="section__header flex justify-between gap-6 products-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-newspaper" aria-hidden="true"></i> Articles & Reviews
@@ -242,7 +242,7 @@ product
             {% if related_videos %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 items-center">
+                <div class="section__header flex justify-between gap-6 products-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-video" aria-hidden="true"></i> Related Videos
@@ -258,7 +258,7 @@ product
             {% if buying_guides %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 items-center">
+                <div class="section__header flex justify-between gap-6 products-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-book-open" aria-hidden="true"></i> Buying Guides & Tutorials
@@ -279,7 +279,7 @@ product
 
 <script type="application/json" id="variant-data">
 
-{{ item.variant_data|tojson }}
+{{ product.variant_data|tojson }}
 
 </script>
 

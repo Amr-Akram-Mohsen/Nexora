@@ -2,24 +2,24 @@
 {% set comment_count = content.comment_count %}
 {% from"components/ui/core.html" import button %}
 
-<div class="interaction-panel interaction-panel--compact flex items-center justify-between"
+<div class="interaction-panel interaction-panel--compact flex products-center justify-between"
   data-type="{{ content.type }}" data-id="{{ content.id }}">
 
   <div class="interaction-stats flex">
 
-    <span class="interaction-stat flex items-center">
+    <span class="interaction-stat flex products-center">
       <i class="fa-regular fa-eye"></i>
       <span>{{ view_count }}</span>
     </span>
 
-    <span class="interaction-stat flex items-center">
+    <span class="interaction-stat flex products-center">
       <i class="fa-regular fa-comment"></i>
       <span>{{ comment_count }}</span>
     </span>
 
   </div>
 
-  <div class="interaction-panel__actions interaction-panel__actions--compact flex items-center gap-2 gap-1">
+  <div class="interaction-panel__actions interaction-panel__actions--compact flex products-center gap-2 gap-1">
 
     {% if content.object_type == 'video' %}
     {{ button(

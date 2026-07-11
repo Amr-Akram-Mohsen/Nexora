@@ -14,7 +14,7 @@ from sqlalchemy import case, func, literal_column, cast
 
 def get_related_contents(content_id, limit=6, session=None):
     """
-    Return top-N content items most relevant to ``content_id``.
+    Return top-N content products most relevant to ``content_id``.
 
     Scoring signals applied at the SQL aggregation level:
       - Topic overlap   : +3.0 per shared topic
@@ -28,13 +28,14 @@ def get_related_contents(content_id, limit=6, session=None):
 
     Args:
         session:    DB session (defaults to ``db.session``).
-        content_id: ID of the reference content item.
+        content_id: ID of the reference content product.
         limit:      Maximum number of results.
 
     Returns:
         List of serialized content dicts.
     """
-    from app.domains.taxonomy.models import Topic, Brand
+    from app.domains.taxonomy.models import Entity
+    from app.domains.relationships import ContentEntity
     from sqlalchemy import Float
     from .utils import build_content_stmt, build_ranked_content_stmt, fetch_serialized_contents
 
@@ -51,22 +52,29 @@ def get_related_contents(content_id, limit=6, session=None):
     if not reference:
         return []
 
-    topic_ids = [t.id for t in reference.topics]
-    brand_ids = [b.id for b in reference.brands]
+    topic_entity_ids = []
+    brand_entity_ids = []
+    for ce in reference.content_entities:
+        if ce.entity:
+            if ce.entity.entity_type in ("tag", "concept", "topic"):
+                topic_entity_ids.append(ce.entity_id)
+            elif ce.entity.entity_type == "brand" or ce.origin == "legacy_brand":
+                brand_entity_ids.append(ce.entity_id)
+
     category_id = reference.category_id
     section_id = reference.section_id
 
     # --- Build scoring expressions ---
 
     # Topic: +3 per shared topic
-    if topic_ids:
-        topic_score = case((Topic.id.in_(topic_ids), 3.0), else_=0.0)
+    if topic_entity_ids:
+        topic_score = case((ContentEntity.entity_id.in_(topic_entity_ids), 3.0), else_=0.0)
     else:
         topic_score = literal_column("0.0")
 
     # Brand: +2 if any brand matches (MAX to avoid per-row double-counting)
-    if brand_ids:
-        brand_score = case((Brand.id.in_(brand_ids), 2.0), else_=0.0)
+    if brand_entity_ids:
+        brand_score = case((ContentEntity.entity_id.in_(brand_entity_ids), 2.0), else_=0.0)
     else:
         brand_score = literal_column("0.0")
 
@@ -97,8 +105,7 @@ def get_related_contents(content_id, limit=6, session=None):
     stmt = build_content_stmt(active_only=True, published_only=True, eager_load="default")
     stmt = (
         stmt
-        .outerjoin(Content.topics)
-        .outerjoin(Content.brands)
+        .outerjoin(Content.content_entities)
         .where(Content.id != content_id)
     )
 

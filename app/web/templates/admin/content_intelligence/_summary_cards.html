@@ -4,7 +4,7 @@
 {% from "admin/components/ui/tables.html" import standard_table %}
 
 <!-- Section 1: Recommendation CTR Dashboard -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-link"></i> Recommendation Widget Performance</h2>
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-link"></i> Recommendation Widget Performance</h2>
 <div class="dashboard-stats-grid" id="recommendation-ctr-grid">
   {% if metrics %}
     {{ metric_card("Overall CTR", "%.2f"|format(metrics.overall_ctr) ~ "%", "Across all recommendation slots") }}
@@ -20,14 +20,14 @@
 </div>
 
 <!-- Section 1.5: Recommendation Intelligence Summary -->
-<h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-brain"></i> Recommendation Intelligence Summary</h2>
+<h2 class="insight-group-title flex gap-3 products-center"><i class="fa-solid fa-brain"></i> Recommendation Intelligence Summary</h2>
 <div class="insights-double-grid" id="recommendation-intelligence-panel" >
   <!-- Left Side: Quality Scores & Benchmark -->
   {% call admin_panel('Quality Scores & Benchmarks', "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.", icon="fa-solid fa-chart-pie") %}
     <div class="benchmark-list flex gap-3">
       <!-- Cross Category Benchmarking Widget -->
       <div class="benchmark-card">
-        <h4 class="benchmark-header gap-2 flex items-center">
+        <h4 class="benchmark-header gap-2 flex products-center">
           <i class="fas fa-chart-line"></i> Cross-Category Benchmarks
         </h4>
         <div id="category-benchmark-summary">
@@ -60,7 +60,7 @@
 
       <!-- Quality Scores Tabular View -->
       <div class="quality-score-section">
-        <h4 class="quality-score-header gap-2 flex items-center">
+        <h4 class="quality-score-header gap-2 flex products-center">
           <i class="fas fa-star"></i> Quality Score Breakdown
         </h4>
         <div class="insights-table-scroll">
@@ -120,7 +120,7 @@
               <strong>Diagnosis:</strong> {{ ddata.action_suggestion.diagnosis }}
             </p>
             <div class="rec-action-box flex">
-              <div class="rec-action-box-header flex items-center">
+              <div class="rec-action-box-header flex products-center">
                 <span><i class="fa-solid fa-lightbulb"></i> Recommended Action:</span>
               </div>
               <div class="rec-action-box-recommendation">

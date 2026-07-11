@@ -13,7 +13,7 @@ from main import app
 from app.core.extensions import db
 from app.domains.taxonomy.models import Source
 from app.domains.content.models import Content, Article, Video, Post
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.relationships import ArticleSource
 from app.shared.utils.slug import generate_slug
 from app.shared.constants.taxonomy import TRUSTED_SOURCES
@@ -99,11 +99,11 @@ def backfill_providers():
         db.session.commit()
         print("Content source mappings backfilled.")
 
-        # Backfill Item rows
-        print("\n--- Backfilling Item Source mappings ---")
-        items = Item.query.all()
-        for item in items:
-            source_type = item.source_type or "aliexpress"
+        # Backfill Product rows
+        print("\n--- Backfilling Product Source mappings ---")
+        products = Product.query.all()
+        for product in products:
+            source_type = product.source_type or "aliexpress"
             slug = generate_slug(source_type)
             source = Source.query.filter_by(slug=slug).first()
             if not source:
@@ -115,11 +115,11 @@ def backfill_providers():
                 )
                 db.session.add(source)
                 db.session.flush()
-                print(f"Created item source on-the-fly: {source.name} ({slug})")
-            item.source_id = source.id
+                print(f"Created product source on-the-fly: {source.name} ({slug})")
+            product.source_id = source.id
 
         db.session.commit()
-        print("Item source mappings backfilled.")
+        print("Product source mappings backfilled.")
         print("\n--- BACKFILL COMPLETE ---")
 
 if __name__ == "__main__":

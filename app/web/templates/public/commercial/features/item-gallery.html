@@ -1,47 +1,47 @@
-{% from "commercial/features/item-image.html" import render_image_url %}
+{% from "commercial/features/product-image.html" import render_image_url %}
 {% from "components/ui/core.html" import button %}
-{% macro item_gallery(item) %}
-{% if item.images %}
+{% macro item_gallery(product) %}
+{% if product.images %}
 
-<div class="item-gallery" data-gallery>
+<div class="product-gallery" data-gallery>
 
   <!-- MAIN IMAGE -->
-  <div class="item-gallery__viewer">
+  <div class="product-gallery__viewer">
 
     {{ render_image_url(
-    item.images[0].image_url,
-    item.name,
-    'item-gallery__img img-cover',
+    product.images[0].image_url,
+    product.name,
+    'product-gallery__img img-cover',
     {'data-gallery-main': '1'}
     ) }}
 
     <!-- Fullscreen button -->
-    {{ button(type="button", class="item-gallery__fullscreen", attrs={"data-gallery-open": "1", "aria-label": "Zoom image"}, icon="fa fa-expand", unstyled=True) }}
+    {{ button(type="button", class="product-gallery__fullscreen", attrs={"data-gallery-open": "1", "aria-label": "Zoom image"}, icon="fa fa-expand", unstyled=True) }}
 
-    {% if item.images|length > 1 %}
+    {% if product.images|length > 1 %}
 
     <!-- arrows -->
-    {{ button(type="button", class="item-gallery__nav item-gallery__nav--prev", attrs={"data-gallery-new-image": "0", "disabled": "", "aria-label": "Previous image"}, icon="fa fa-chevron-left", unstyled=True) }}
-    {{ button(type="button", class="item-gallery__nav item-gallery__nav--next", attrs={"data-gallery-new-image": "2", "aria-label": "Next image"}, icon="fa fa-chevron-right", unstyled=True) }}
+    {{ button(type="button", class="product-gallery__nav product-gallery__nav--prev", attrs={"data-gallery-new-image": "0", "disabled": "", "aria-label": "Previous image"}, icon="fa fa-chevron-left", unstyled=True) }}
+    {{ button(type="button", class="product-gallery__nav product-gallery__nav--next", attrs={"data-gallery-new-image": "2", "aria-label": "Next image"}, icon="fa fa-chevron-right", unstyled=True) }}
 
     <!-- counter -->
-    <div class="item-gallery__counter">
+    <div class="product-gallery__counter">
       <span data-gallery-index>1</span> /
-      <span data-gallery-length>{{ item.images|length }}</span>
+      <span data-gallery-length>{{ product.images|length }}</span>
     </div>
 
     {% endif %}
 
   </div>
 
-  {% if item.images|length > 1 %}
+  {% if product.images|length > 1 %}
 
   <!-- thumbnails -->
-  <div class="item-gallery__thumbs">
+  <div class="product-gallery__thumbs">
 
-    {% for image in item.images %}
-    {% call button(type="button", class="item-gallery__thumb" ~ (" is-active" if loop.first else ""), attrs={"data-gallery-thumb": loop.index, "aria-label": "View product image " ~ loop.index}, unstyled=True) %}
-      {{ render_image_url(image.image_url, item.name, 'img-cover') }}
+    {% for image in product.images %}
+    {% call button(type="button", class="product-gallery__thumb" ~ (" is-active" if loop.first else ""), attrs={"data-gallery-thumb": loop.index, "aria-label": "View product image " ~ loop.index}, unstyled=True) %}
+      {{ render_image_url(image.image_url, product.name, 'img-cover') }}
     {% endcall %}
     {% endfor %}
 

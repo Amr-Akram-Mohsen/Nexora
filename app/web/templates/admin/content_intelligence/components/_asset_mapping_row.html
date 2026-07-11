@@ -1,15 +1,15 @@
 {% from "components/ui/core.html" import button %}
-{% if items %}
-{% for item in items %}
-<tr class="asset-mapping-row" data-entity="{{ item.entity or '' }}">
+{% if products %}
+{% for product in products %}
+<tr class="asset-mapping-row" data-entity="{{ product.entity or '' }}">
     <td>
-        <div >{{ item.entity }} | {{ item.type|upper }}</div>
+        <div >{{ product.entity }} | {{ product.type|upper }}</div>
     </td>
     <td>
-        <div class="asset-mapping-item-meta">Score: {{ "%.2f"|format(item.opportunity_score) }}</div>
+        <div class="asset-mapping-product-meta">Score: {{ "%.2f"|format(product.opportunity_score) }}</div>
     </td>
-    <td class="col-asset-count">{{ (item.existing_assets or [])|length }} Assets</td>
-    <td class="col-gap-count">{{ (item.missing_assets or [])|length }} Gaps</td>
+    <td class="col-asset-count">{{ (product.existing_assets or [])|length }} Assets</td>
+    <td class="col-gap-count">{{ (product.missing_assets or [])|length }} Gaps</td>
     <td>
         <div class="asset-mapping-actions">
             {{ button(type="button", class="btn btn-outline btn-sm asset-mapping-details-toggle gap-2", attrs={"aria-expanded": "false"}, icon="fa fa-chevron-right", text="View", unstyled=True) }}
@@ -23,11 +23,11 @@
                 <div>
                     <h6 >Existing Assets</h6>
                     <ul class="asset-mapping-list flex gap-3" >
-                        {% if item.existing_assets %}
-                        {% for asset in item.existing_assets %}
-                        <li class="asset-mapping-item">
-                            <div class="asset-mapping-item-header gap-2 justify-between flex flex-wrap items-center">
-                                <div class="asset-mapping-item-title">
+                        {% if product.existing_assets %}
+                        {% for asset in product.existing_assets %}
+                        <li class="asset-mapping-product">
+                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap products-center">
+                                <div class="asset-mapping-product-title">
                                     {% if asset.type == 'video' %}<i class="fa-solid fa-video"></i>{% elif asset.type == 'article' %}<i class="fa-regular fa-file-lines"></i>{% else %}<i class="fa-solid fa-bag-shopping"></i>{% endif %}
                                     {{ asset.title }}
                                 </div>
@@ -39,13 +39,13 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <div class="asset-mapping-item-meta">
+                            <div class="asset-mapping-product-meta">
                                 Relevance Match: {{ (asset.relevance_score * 100)|round|int }}%
                             </div>
                         </li>
                         {% endfor %}
                         {% else %}
-                        <li class="asset-mapping-item" >
+                        <li class="asset-mapping-product" >
                             No matching assets found in database.
                         </li>
                         {% endif %}
@@ -54,11 +54,11 @@
                 <div>
                     <h6 >Missing Assets (Gaps)</h6>
                     <ul class="asset-mapping-list flex gap-3" >
-                        {% if item.missing_assets %}
-                        {% for gap in item.missing_assets %}
-                        <li class="asset-mapping-item">
-                            <div class="asset-mapping-item-header gap-2 justify-between flex flex-wrap items-center">
-                                <div class="asset-mapping-item-title">
+                        {% if product.missing_assets %}
+                        {% for gap in product.missing_assets %}
+                        <li class="asset-mapping-product">
+                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap products-center">
+                                <div class="asset-mapping-product-title">
                                     <span class="status-badge">{{ gap.content_type|upper }}</span>
                                     {{ gap.missing_topic }}
                                 </div>
@@ -73,15 +73,15 @@
                                 </div>
                             </div>
                             {% if gap.reason %}
-                            <div class="asset-mapping-item-meta"><strong>Reason:</strong> {{ gap.reason }}</div>
+                            <div class="asset-mapping-product-meta"><strong>Reason:</strong> {{ gap.reason }}</div>
                             {% endif %}
                             {% if gap.priority_justification %}
-                            <div class="asset-mapping-item-meta"><strong>Justification:</strong> {{ gap.priority_justification }}</div>
+                            <div class="asset-mapping-product-meta"><strong>Justification:</strong> {{ gap.priority_justification }}</div>
                             {% endif %}
                         </li>
                         {% endfor %}
                         {% else %}
-                        <li class="asset-mapping-item" >
+                        <li class="asset-mapping-product" >
                             No content gaps identified.
                         </li>
                         {% endif %}

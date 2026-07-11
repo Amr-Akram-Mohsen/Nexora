@@ -3,12 +3,12 @@ from app.web.routes.admin.tables import get_inspect_table
 def build_comment_inspect_view_model(aggregated_data: dict) -> dict:
     dto = aggregated_data["comment_dto"]
     
-    total_target_comments = sum(item["count"] for item in dto["sentiment_distribution"])
+    total_target_comments = sum(product["count"] for product in dto["sentiment_distribution"])
     sentiment_dist = []
-    for item in dto["sentiment_distribution"]:
-        count = item["count"]
+    for product in dto["sentiment_distribution"]:
+        count = product["count"]
         pct = (count / total_target_comments * 100) if total_target_comments > 0 else 0
-        s_label = item["sentiment"].title() if item["sentiment"] else 'Neutral'
+        s_label = product["sentiment"].title() if product["sentiment"] else 'Neutral'
         sentiment_dist.append({"label": s_label, "count": f"{count} ({pct:.1f}%)"})
     
     reactions_html = None
@@ -59,7 +59,7 @@ def build_link_clicks_view_model(aggregated_data: dict) -> dict:
         
     data = {
         "store name": dto["store_name"],
-        "item name": dto["item_name"],
+        "product name": dto["item_name"],
         "total clicks": str(dto["total_clicks"]),
         "latest click": dto["latest_click"][:10] if dto["latest_click"] else None,
         "top countries": {"value": top_countries, "is_list": True} if top_countries else None,

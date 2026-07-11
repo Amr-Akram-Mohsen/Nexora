@@ -120,7 +120,7 @@ function handleMoreFiltersClick(e) {
     if (!btn) return false;
     
     const section = btn.closest('.filter-section');
-    const extras = section.querySelectorAll('.filter-item--extra');
+    const extras = section.querySelectorAll('.filter-product--extra');
     const isExpanded = btn.getAttribute('aria-expanded') === 'true';
 
     extras.forEach(el => {
@@ -164,7 +164,7 @@ function initListingSidebar() {
 function initSearchHighlighting() {
     // Initial Search Highlighting
     if (window.SEARCH_QUERY) {
-        const cards = document.querySelectorAll('.card__title, .card__excerpt, .item-card__name, .item-card__description');
+        const cards = document.querySelectorAll('.card__title, .card__excerpt, .product-card__name, .product-card__description');
         const escapedQuery = String(window.SEARCH_QUERY).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedQuery})`, 'gi');
         cards.forEach(card => {

@@ -250,16 +250,16 @@ def update_memory_layer(evaluation_results):
     existing_entities = {m["entity"] for m in memory_data}
     changed = False
     
-    for item in evaluation_results:
-        ent = item["entity"]
+    for product in evaluation_results:
+        ent = product["entity"]
         if ent not in existing_entities:
-            outcome = "success" if item["evaluation"] == "overperforming" else ("failure" if item["evaluation"] == "underperforming" else "success")
+            outcome = "success" if product["evaluation"] == "overperforming" else ("failure" if product["evaluation"] == "underperforming" else "success")
             memory_data.append({
                 "entity": ent,
-                "platform": item["platform"],
-                "intent": item["predicted_intent"],
+                "platform": product["platform"],
+                "intent": product["predicted_intent"],
                 "outcome": outcome,
-                "impact_score": round(item["performance_delta"]["accuracy_score"], 2)
+                "impact_score": round(product["performance_delta"]["accuracy_score"], 2)
             })
             existing_entities.add(ent)
             changed = True

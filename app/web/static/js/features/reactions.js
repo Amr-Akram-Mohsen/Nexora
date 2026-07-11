@@ -53,12 +53,12 @@ async function initAllReactions() {
     const targets = [];
 
     buttons.forEach(btn => {
-        const item = btn.closest("[data-id]");
-        if (!item) return;
-        if (item.hasAttribute('data-comment-id')) {
-            targets.push({ 'type': 'comment', 'id': item.dataset.commentId });
+        const product = btn.closest("[data-id]");
+        if (!product) return;
+        if (product.hasAttribute('data-comment-id')) {
+            targets.push({ 'type': 'comment', 'id': product.dataset.commentId });
         } else {
-            targets.push({ 'type': item.dataset.type, 'id': item.dataset.id });
+            targets.push({ 'type': product.dataset.type, 'id': product.dataset.id });
         }
     });
 
@@ -87,13 +87,13 @@ async function initAllReactions() {
         if (!data) return;
 
         buttons.forEach(btn => {
-            const item = btn.closest("[data-id]");
-            if (!item) return;
+            const product = btn.closest("[data-id]");
+            if (!product) return;
             let key = null;
-            if (item.hasAttribute('data-comment-id')) {
-                key = `comment:${item.dataset.commentId}`;
+            if (product.hasAttribute('data-comment-id')) {
+                key = `comment:${product.dataset.commentId}`;
             } else {
-                key = `${item.dataset.type}:${item.dataset.id}`;
+                key = `${product.dataset.type}:${product.dataset.id}`;
             }
             btn.classList.toggle('active', btn.dataset.reaction === data[key]);
         });

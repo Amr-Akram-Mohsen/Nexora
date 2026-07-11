@@ -18,8 +18,8 @@ metadata = MetaData()
 
 print("Loading table schema...")
 
-content_items = Table(
-    "content_items",
+content_products = Table(
+    "content_products",
     metadata,
     autoload_with=local_engine,
 )
@@ -28,7 +28,7 @@ print("Reading local rows...")
 
 with local_engine.connect() as src:
     rows = src.execute(
-        text("SELECT * FROM content_items")
+        text("SELECT * FROM content_products")
     ).mappings().all()
 
 print(f"Found {len(rows)} rows")
@@ -38,7 +38,7 @@ with remote_engine.begin() as dst:
 
     dst.execute(
         text(
-            "TRUNCATE TABLE content_items RESTART IDENTITY CASCADE"
+            "TRUNCATE TABLE content_products RESTART IDENTITY CASCADE"
         )
     )
 
@@ -50,7 +50,7 @@ with remote_engine.begin() as dst:
         batch = [dict(row) for row in rows[i:i + batch_size]]
 
         dst.execute(
-            content_items.insert(),
+            content_products.insert(),
             batch
         )
 

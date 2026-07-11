@@ -1,10 +1,10 @@
 {% from "admin/components/ui/tables.html" import standard_table %}
 <div class="insights-table-scroll">
   {% call standard_table(["Content Piece (Article)", "Commerce Transition Volume", "Funnel Rank"]) %}
-      {% for item in data %}
+      {% for product in data %}
       <tr>
-        <td><strong>{{ item.title }}</strong><br><small>Content ID: {{ item.content_id }}</small></td>
-        <td><strong>{{ item.recommendation_clicks }}</strong> product clicks generated</td>
+        <td><strong>{{ product.title }}</strong><br><small>Content ID: {{ product.content_id }}</small></td>
+        <td><strong>{{ product.recommendation_clicks }}</strong> product clicks generated</td>
         <td><span class="status-badge badge-blue">#{{ loop.index }} Commerce Funnel</span></td>
       </tr>
       {% else %}

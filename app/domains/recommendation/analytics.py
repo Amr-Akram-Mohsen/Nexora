@@ -2,10 +2,10 @@ from sqlalchemy import func, distinct, and_, select
 from datetime import datetime, timedelta
 from app.shared.constants.core import TargetType
 from app.core.extensions import db
-from app.domains.item.models import Item, ItemVariant, ItemStoreLink
-from app.domains.interaction.models import ItemClick, View
+from app.domains.product.models import Product, ProductVariant, ProductStoreLink
+from app.domains.interaction.models import ProductClick, View
 
-def get_item_analytics(item_id, session=None):
+def get_item_analytics(product_id, session=None):
     if session is None:
         session = db.session
 
@@ -17,8 +17,8 @@ def get_item_analytics(item_id, session=None):
             func.coalesce(View.user_id, View.ip_address)
         ))
     ).where(
-        View.target_type == TargetType.ITEM,
-        View.target_id == item_id,
+        View.target_type == TargetType.PRODUCT,
+        View.target_id == product_id,
         View.created_at >= last_24h
     )
     views_24h = session.execute(stmt_views_24h).scalar() or 0
@@ -28,32 +28,32 @@ def get_item_analytics(item_id, session=None):
             func.coalesce(View.user_id, View.ip_address)
         ))
     ).where(
-        View.target_type == TargetType.ITEM,
-        View.target_id == item_id
+        View.target_type == TargetType.PRODUCT,
+        View.target_id == product_id
     )
     views_all = session.execute(stmt_views_all).scalar() or 0
 
     # ---- Clicks ----
     stmt_clicks_24h = select(
         func.count(distinct(
-            func.coalesce(ItemClick.user_id, ItemClick.ip_address)
+            func.coalesce(ProductClick.user_id, ProductClick.ip_address)
         ))
-    ).join(ItemStoreLink)\
-    .join(ItemVariant)\
+    ).join(ProductStoreLink)\
+    .join(ProductVariant)\
     .where(
-        ItemVariant.item_id == item_id,
-        ItemClick.created_at >= last_24h
+        ProductVariant.product_id == product_id,
+        ProductClick.created_at >= last_24h
     )
     clicks_24h = session.execute(stmt_clicks_24h).scalar() or 0
 
     stmt_clicks_all = select(
         func.count(distinct(
-            func.coalesce(ItemClick.user_id, ItemClick.ip_address)
+            func.coalesce(ProductClick.user_id, ProductClick.ip_address)
         ))
-    ).join(ItemStoreLink)\
-    .join(ItemVariant)\
+    ).join(ProductStoreLink)\
+    .join(ProductVariant)\
     .where(
-        ItemVariant.item_id == item_id
+        ProductVariant.product_id == product_id
     )
     clicks_all = session.execute(stmt_clicks_all).scalar() or 0
 
@@ -70,21 +70,21 @@ def get_item_analytics(item_id, session=None):
         "ctr_all": round(ctr_all, 4),
     }
 
-def get_top_store_for_item(item_id, last_hours=24, session=None):
+def get_top_store_for_item(product_id, last_hours=24, session=None):
     if session is None:
         session = db.session
 
     since = datetime.utcnow() - timedelta(hours=last_hours)
 
     stmt = select(
-        ItemStoreLink.id,
-        ItemStoreLink.store_id,
-        func.count(ItemClick.id).label("clicks")
-    ).join(ItemClick).where(
-        ItemStoreLink.variant_id == item_id,
-        ItemClick.created_at >= since
-    ).group_by(ItemStoreLink.id).order_by(
-        func.count(ItemClick.id).desc()
+        ProductStoreLink.id,
+        ProductStoreLink.store_id,
+        func.count(ProductClick.id).label("clicks")
+    ).join(ProductClick).where(
+        ProductStoreLink.variant_id == product_id,
+        ProductClick.created_at >= since
+    ).group_by(ProductStoreLink.id).order_by(
+        func.count(ProductClick.id).desc()
     )
 
     row = session.execute(stmt).first()

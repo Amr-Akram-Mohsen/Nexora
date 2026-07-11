@@ -2,30 +2,28 @@ from sqlalchemy.orm import joinedload, selectinload
 from app.domains.content.models import Content
 
 CONTENT_EAGER_LOADS = [
-    selectinload(Content.topics),
-    selectinload(Content.brands),
+    selectinload(Content.content_entities),
     selectinload(Content.section),
     selectinload(Content.category),
 ]
 
 CONTENT_LIST_EAGER_LOADS = [
-    selectinload(Content.topics),
-    selectinload(Content.brands),
+    selectinload(Content.content_entities),
     joinedload(Content.section),
     joinedload(Content.category),
 ]
 
 
 def get_content_detail_loads():
-    from app.domains.item.models import Item, ItemVariant, ItemStoreLink
+    from app.domains.product.models import Product, ProductVariant, ProductStoreLink
 
     return [
         *CONTENT_LIST_EAGER_LOADS,
-        selectinload(Content.linked_items).joinedload(Item.brand),
-        selectinload(Content.linked_items).joinedload(Item.category),
-        selectinload(Content.linked_items).selectinload(Item.images),
-        selectinload(Content.linked_items)
-        .selectinload(Item.variants)
-        .selectinload(ItemVariant.store_links)
-        .selectinload(ItemStoreLink.store),
+        selectinload(Content.linked_products).joinedload(Product.brand),
+        selectinload(Content.linked_products).joinedload(Product.category),
+        selectinload(Content.linked_products).selectinload(Product.images),
+        selectinload(Content.linked_products)
+        .selectinload(Product.variants)
+        .selectinload(ProductVariant.store_links)
+        .selectinload(ProductStoreLink.store),
     ]

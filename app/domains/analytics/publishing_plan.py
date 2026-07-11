@@ -18,17 +18,17 @@ def generate_content_publishing_plan(mapped_content_data):
     3-day category overlaps, content decay prioritization, and momentum signals.
     """
     intent_opps = get_intent_opportunity_data()
-    intent_map = {item["category_name"]: item for item in intent_opps}
+    intent_map = {product["category_name"]: product for product in intent_opps}
     
     # 1. Fetch momentum & compute scheduling weights
     cat_trends = {t["name"].lower(): float(t["pct_change"]) for t in get_trending_categories_data()}
     brand_trends = {t["name"].lower(): float(t["pct_change"]) for t in get_trending_brands_data()}
 
     items_with_weights = []
-    for item in mapped_content_data:
-        entity = item["entity"]
-        etype = item["type"]
-        score = item["opportunity_score"]
+    for product in mapped_content_data:
+        entity = product["entity"]
+        etype = product["type"]
+        score = product["opportunity_score"]
         
         # Get category/brand momentum trend from preloaded maps
         if etype.lower() == "category":
@@ -38,7 +38,7 @@ def generate_content_publishing_plan(mapped_content_data):
         
         # Get content traffic decay for existing assets
         max_decay = 0.0
-        for asset in item.get("existing_assets", []):
+        for asset in product.get("existing_assets", []):
             if asset["id"].startswith("content_"):
                 c_id = int(asset["id"].split("_")[1])
                 decay = get_content_decay(c_id)
@@ -49,13 +49,13 @@ def generate_content_publishing_plan(mapped_content_data):
         composite_score = score * 100.0 + (momentum * 0.1) + (max_decay * 0.5)
         
         items_with_weights.append({
-            "item": item,
+            "product": product,
             "momentum": momentum,
             "max_decay": max_decay,
             "composite_score": composite_score
         })
         
-    # Sort items by composite score descending
+    # Sort products by composite score descending
     items_with_weights.sort(key=lambda x: x["composite_score"], reverse=True)
     
     # Platform point complexities
@@ -76,10 +76,10 @@ def generate_content_publishing_plan(mapped_content_data):
     entity_last_day = {}
     
     for entry in items_with_weights:
-        item = entry["item"]
-        entity = item["entity"]
-        etype = item["type"]
-        score = item["opportunity_score"]
+        product = entry["product"]
+        entity = product["entity"]
+        etype = product["type"]
+        score = product["opportunity_score"]
         max_decay = entry["max_decay"]
         
         # 2. Select primary platform based on intent matching
@@ -94,7 +94,7 @@ def generate_content_publishing_plan(mapped_content_data):
         points = PLATFORM_POINTS.get(platform, 1.0)
         
         # 3. Reuse vs Update vs Create decisions
-        existing_assets = item.get("existing_assets", [])
+        existing_assets = product.get("existing_assets", [])
         matching_asset = None
         for asset in existing_assets:
             if platform == "youtube" and asset["type"] == "video":
@@ -141,7 +141,7 @@ def generate_content_publishing_plan(mapped_content_data):
             # Decay tasks should start Day 1-3
             start_day = 1
         elif score < 0.45:
-            # Low opportunity items go directly to backlog / Weeks 3-4 (Day 15+)
+            # Low opportunity products go directly to backlog / Weeks 3-4 (Day 15+)
             start_day = 15
             
         scheduled_day = None

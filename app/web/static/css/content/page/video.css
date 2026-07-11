@@ -121,7 +121,7 @@
   cursor: nwse-resize;
   z-index: 10001;
   box-shadow: var(--shadow-md);
-  align-items: center;
+  align-products: center;
   justify-content: center;
 }
 
@@ -161,7 +161,7 @@
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  align-items: center;
+  align-products: center;
   justify-content: center;
   cursor: pointer;
   z-index: 10000;

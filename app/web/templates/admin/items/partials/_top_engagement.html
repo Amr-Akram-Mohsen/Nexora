@@ -1,21 +1,21 @@
 {% if data %}
-  {% for item in data %}
-    <li class="overview-top-item flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
+  {% for product in data %}
+    <li class="overview-top-product flex products-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
       <div class="overview-top-rank font-bold text-[var(--brand-primary)] w-8 text-center bg-[var(--brand-primary-subtle)] rounded-md py-1 text-xs">
         #{{ loop.index }}
       </div>
       <div class="overview-top-name truncate px-3 flex-1">
-        <a href="/admin/items?search={{ item.id }}" class="overview-top-link-title font-medium text-[var(--text-main)] hover:text-[var(--brand-primary)] transition-colors" title="{{ item.name }}">
-          {{ item.name }}
+        <a href="/admin/products?search={{ product.id }}" class="overview-top-link-title font-medium text-[var(--text-main)] hover:text-[var(--brand-primary)] transition-colors" title="{{ product.name }}">
+          {{ product.name }}
         </a>
       </div>
-      <div class="overview-top-value text-right flex flex-col items-end" style="min-width: 80px;">
+      <div class="overview-top-value text-right flex flex-col products-end" style="min-width: 80px;">
         <div class="text-[var(--brand-green)] font-bold text-sm bg-[var(--brand-green-subtle)] px-2 py-0.5 rounded-md">
-          {{ item.ctr }}% CTR
+          {{ product.ctr }}% CTR
         </div>
         <div class="text-xs text-muted font-normal mt-1 flex gap-2 justify-end">
-          <span title="Save Rate"><i class="fa-solid fa-bookmark text-[var(--brand-orange)] mr-1 text-[10px]"></i>{{ item.save_rate }}%</span>
-          <span title="Like Rate"><i class="fa-solid fa-heart text-[var(--brand-red)] mr-1 text-[10px]"></i>{{ item.like_rate }}%</span>
+          <span title="Save Rate"><i class="fa-solid fa-bookmark text-[var(--brand-orange)] mr-1 text-[10px]"></i>{{ product.save_rate }}%</span>
+          <span title="Like Rate"><i class="fa-solid fa-heart text-[var(--brand-red)] mr-1 text-[10px]"></i>{{ product.like_rate }}%</span>
         </div>
       </div>
     </li>

@@ -10,12 +10,13 @@ from app.shared.utils.logging import (
 )
 from .http import _get_session
 from .fetch_engine import safe_get_json, safe_post_json
-from .fetchers_mappers import map_newsapi, map_newsapi_ai, map_gnews, map_youtube, map_reddit
+from .fetchers_mappers import map_newsapi, map_event_registry, map_gnews, map_youtube, map_reddit
 
 logger = logging.getLogger(__name__)
 
 
 def fetch_newsapi_query(q_obj, **kwargs):
+    logger.warning("fetch_newsapi_query is deprecated. Using Event Registry instead.")
     api_key = current_app.config.get("NEWS_API_KEY")
     if not api_key:
         log_integration_warning(logger, "newsapi", reason="no_api_key")
@@ -50,18 +51,19 @@ def fetch_newsapi_query(q_obj, **kwargs):
         source_name="newsapi",
     )
 
-    items = map_newsapi(data)
-    if isinstance(items, list):
-        log_integration_success(logger, "newsapi", items=len(items), query=q_text)
+    products = map_newsapi(data)
+    if isinstance(products, list):
+        log_integration_success(logger, "newsapi", products=len(products), query=q_text)
     else:
         log_integration_warning(
             logger, "newsapi", reason="unexpected_response_shape", query=q_text
         )
 
-    return items
+    return products
 
 
 def fetch_gnews_query(q_obj, **kwargs):
+    logger.warning("fetch_gnews_query is deprecated. Using Event Registry instead.")
     api_key = current_app.config.get("GNEWS_API_KEY")
     if not api_key:
         log_integration_warning(logger, "gnews", reason="no_api_key")
@@ -91,15 +93,15 @@ def fetch_gnews_query(q_obj, **kwargs):
         source_name="gnews",
     )
 
-    items = map_gnews(data, region=region)
-    if isinstance(items, list):
-        log_integration_success(logger, "gnews", items=len(items), query=q_text)
+    products = map_gnews(data, region=region)
+    if isinstance(products, list):
+        log_integration_success(logger, "gnews", products=len(products), query=q_text)
     else:
         log_integration_warning(
             logger, "gnews", reason="unexpected_response_shape", query=q_text
         )
 
-    return items
+    return products
 
 def _parse_to_er_query(query_str: str) -> dict:
     blocks = []
@@ -138,15 +140,16 @@ def _parse_to_er_query(query_str: str) -> dict:
         
     return {"$and": and_conditions}
 
-def fetch_newsapi_ai_query(q_obj, **kwargs):
-    api_key = current_app.config.get("NEWSAPI_AI_API_KEY")
+def fetch_event_registry_query(q_obj, **kwargs):
+    # Support both EVENT_REGISTRY_API_KEY and NEWSAPI_AI_API_KEY for backward compatibility
+    api_key = current_app.config.get("EVENT_REGISTRY_API_KEY") or current_app.config.get("NEWSAPI_AI_API_KEY")
     if not api_key:
-        log_integration_warning(logger, "newsapi_ai", reason="no_api_key")
+        log_integration_warning(logger, "event_registry", reason="no_api_key")
         return []
 
     q_text = q_obj.get("query", "")
 
-    log_integration_start(logger, "newsapi_ai", query=q_text)
+    log_integration_start(logger, "event_registry", query=q_text)
     time.sleep(2.5)
     session = _get_session()
 
@@ -173,18 +176,18 @@ def fetch_newsapi_ai_query(q_obj, **kwargs):
         json_data=payload,
         timeout=(5, 15),
         logger=logger,
-        source_name="newsapi_ai",
+        source_name="event_registry",
     )
 
-    items = map_newsapi_ai(data)
-    if isinstance(items, list):
-        log_integration_success(logger, "newsapi_ai", items=len(items), query=q_text)
+    products = map_event_registry(data)
+    if isinstance(products, list):
+        log_integration_success(logger, "event_registry", products=len(products), query=q_text)
     else:
         log_integration_warning(
-            logger, "newsapi_ai", reason="unexpected_response_shape", query=q_text
+            logger, "event_registry", reason="unexpected_response_shape", query=q_text
         )
 
-    return items
+    return products
 
 
 
@@ -229,16 +232,16 @@ def fetch_youtube_query(q_obj, **kwargs):
         source_name="youtube",
     )
 
-    items = map_youtube(data, region=region_code)
+    products = map_youtube(data, region=region_code)
 
-    if isinstance(items, list):
-        log_integration_success(logger, "youtube", items=len(items), query=q_text)
+    if isinstance(products, list):
+        log_integration_success(logger, "youtube", products=len(products), query=q_text)
     else:
         log_integration_warning(
             logger, "youtube", reason="unexpected_response_shape", query=q_text
         )
 
-    return items
+    return products
 
 
 def fetch_reddit_query(q_obj, **kwargs):
@@ -276,18 +279,18 @@ def fetch_reddit_query(q_obj, **kwargs):
 
         submissions = list(subreddit.hot(limit=15))
 
-        items = map_reddit(submissions, sub_name)
+        products = map_reddit(submissions, sub_name)
 
-        if items:
+        if products:
             log_integration_success(
-                logger, "reddit", items=len(items), subreddit=sub_name
+                logger, "reddit", products=len(products), subreddit=sub_name
             )
         else:
             log_integration_warning(
                 logger, "reddit", reason="empty_results", subreddit=sub_name
             )
 
-        return items
+        return products
 
     except Exception as e:
         log_integration_error(logger, "reddit", e, subreddit=sub_name, exc_info=True)

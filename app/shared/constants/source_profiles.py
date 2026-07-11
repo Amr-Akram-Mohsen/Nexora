@@ -67,17 +67,17 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
         allowed_sections=["news", "trends"],
     ),
-    "newsapi_ai": SourceProfile(
+    "event_registry": SourceProfile(
         content_type="article",
         transport="api",
-        cooldown_hours=12,
-        max_queries_per_run=5,
+        cooldown_hours=6,
+        max_queries_per_run=20,
         requires_scraping=True,
         freshness_priority="very_high",
-        quality_weight=0.75,
+        quality_weight=0.90,
         empty_result_penalty=True,
         expected_media=["image"],
-        dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
+        dedupe_strategy=["er_uri", "canonical_url", "normalized_url"],
         allowed_sections=["news", "trends"],
     ),
     "gnews": SourceProfile(
@@ -108,7 +108,7 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         # Query pool: ~1,046 total. Running every 3h = 8 runs/day.
         # Budget per run: 100 / 8 = 12.5 → use 10 (strict — YouTube quota is
         # the most expensive resource in the pipeline).
-        # 10 runs × 10 searches × 10 items/search = 1,000 videos/day maximum.
+        # 10 runs × 10 searches × 10 products/search = 1,000 videos/day maximum.
         max_queries_per_run=50,
         quota_cost=100,
         requires_scraping=False,

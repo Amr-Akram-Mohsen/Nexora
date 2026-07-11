@@ -77,25 +77,22 @@ def dedupe_queries(queries: List[Dict]) -> List[Dict]:
 # ---------------------------------------------------------------------------
 
 # Maximum expanded_terms to iterate over per (template × intent) combination.
-# Boolean sources (newsapi, gnews, reddit) support OR-clauses so they get
+# Boolean sources (event_registry, reddit) support OR-clauses so they get
 # more terms per query. Non-boolean sources (youtube, rss) must stay simple.
 _MAX_EXPANDED_TERMS: dict[str, int] = {
-    "newsapi": 5,
-    "gnews":   4,   # GNews is quota-sensitive — fewer terms
+    "event_registry": 5,
     "reddit":  4,
-    "youtube": 3,   # YouTube: keep queries concise; 3 terms × templates = right size
+    "youtube": 3,
     "rss":     3,
 }
 
 # Maximum intent keyword terms to iterate.
 # Boolean sources combine intent terms into one OR-block anyway.
-# Non-boolean sources (YouTube, RSS) iterate plain terms separately — each
-# generates a full set of template queries, so capping at 1 halves the pool.
+# Non-boolean sources (YouTube, RSS) iterate plain terms separately.
 _MAX_INTENT_TERMS: dict[str, int] = {
-    "newsapi": 3,   # Combined into OR-block anyway, no multiplier effect
-    "gnews":   3,
+    "event_registry": 3,
     "reddit":  2,
-    "youtube": 1,   # Biggest win: prevents 2× duplication for YouTube
+    "youtube": 1,
     "rss":     1,
 }
 
@@ -116,7 +113,7 @@ def build_query_variants(
     Build rich query variations for a single category+intent+source combination.
 
     Query count is now tightly bounded per source:
-      - Boolean sources (newsapi, gnews, reddit): OR-block counts as 1 intent
+      - Boolean sources (event_registry, reddit): OR-block counts as 1 intent
         term but covers multiple signals simultaneously.
       - Non-boolean sources (youtube, rss): limited to 1 intent term and 3
         expanded terms to prevent exponential growth.
@@ -142,20 +139,10 @@ def build_query_variants(
 
     templates = QUERY_TEMPLATES.get(section_slug, ["{category}"])
 
-    # Sanitize category name for sensitive parsers (GNews)
-    if source == "gnews":
-        category_name = category_name.replace(" & ", " and ").replace("&", "and")
-
     category_terms = [category_name]
     if selected_brand:
         category_terms.append(selected_brand)
     category_terms.extend(keywords)
-
-    if source == "gnews":
-        if selected_brand:
-            category_terms = [f"{selected_brand} {category_name}", selected_brand]
-        else:
-            category_terms = [category_name]
 
     expanded_terms = []
     slug = category_slug.lower()
@@ -166,16 +153,8 @@ def build_query_variants(
 
     for term in category_terms:
         if expansion and is_bool_source:
-            if source == "gnews":
-                inner_list = expansion.strip("()").split(" OR ")[:2]
-                quoted_inner = [f'"{x}"' if " " in x and not x.startswith('"') else x for x in inner_list]
-                inner = " OR ".join(quoted_inner)
-                
-                quoted_term = f'"{term}"' if " " in term and not term.startswith('"') else term
-                expanded_terms.append(f"({quoted_term} OR {inner})")
-            else:
-                inner = expansion.strip("()")
-                expanded_terms.append(f"({term} OR {inner})")
+            inner = expansion.strip("()")
+            expanded_terms.append(f"({term} OR {inner})")
         else:
             expanded_terms.append(term)
             if expansion and not is_bool_source:
@@ -228,20 +207,11 @@ def build_query_variants(
         q_str = q_str.replace("( ", "(").replace(" )", ")")
 
         import re
-        if source in ["gnews", "newsapi"]:
+        if source == "event_registry":
             def limit_or_2(m):
                 parts = m.group(1).split(" OR ")
                 return "(" + " OR ".join(parts[:2]) + ")"
             q_str = re.sub(r"\(([^)]+)\)", limit_or_2, q_str)
-            
-            if source == "gnews":
-                toks = q_str.split()
-                # Strict limit for GNews to avoid 400 errors: max 8 tokens total
-                if len(toks) > 8:
-                    # Try to keep the first few tokens which usually have the intent/brand
-                    q_str = " ".join(toks[:8])
-                # Explicitly insert AND between parenthesis groups for GNews
-                q_str = re.sub(r"\)\s*\(", ") AND (", q_str)
 
         q_str = re.sub(r"\(\s*(?:OR\s+)+", "(", q_str)
         q_str = re.sub(r"(?:\s+OR)+\s*\)", ")", q_str)
@@ -256,11 +226,7 @@ def build_query_variants(
     for t_idx, template in enumerate(templates):
         for e_idx, term in enumerate(expanded_terms[:max_terms]):
             if is_bool_source and len(intent_terms) > 1:
-                if source == "gnews":
-                    quoted_intents = [f'"{x}"' if " " in x and not x.startswith('"') else x for x in intent_terms[:3]]
-                    intent_block = f"({' OR '.join(quoted_intents)})"
-                else:
-                    intent_block = f"({' OR '.join(intent_terms[:3])})"
+                intent_block = f"({' OR '.join(intent_terms[:3])})"
                 process_intent_terms = [intent_block]
             else:
                 process_intent_terms = intent_terms[:max_intents]
@@ -280,7 +246,7 @@ def build_query_variants(
                     feature=feature,
                 )
 
-                if "{category}" not in template and source != "gnews":
+                if "{category}" not in template:
                     raw_query = f"{term} {raw_query}"
 
                 query = _safe_query(raw_query, is_bool_source)
@@ -300,11 +266,7 @@ def build_query_variants(
 
                 temporal, exploration, suffix = _pick_modifiers(position, source, category_slug)
 
-                if source == "gnews":
-                    # GNews: temporal modifiers like "this month" break text search.
-                    # Use the API's date filters instead of appending them to the query string.
-                    pass
-                elif source == "youtube":
+                if source == "youtube":
                     if temporal:
                         query += f" {temporal}"
                 elif source == "rss":

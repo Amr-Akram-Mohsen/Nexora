@@ -2,7 +2,7 @@
   <!-- Active contents row -->
   <div>
     <div class="health-row flex justify-between">
-      <span class="flex items-center gap-2">
+      <span class="flex products-center gap-2">
         <span class="status-badge active badge-compact">Active</span>
         <span class="health-label-text">Live Index</span>
       </span>
@@ -18,7 +18,7 @@
   <!-- Inactive contents row -->
   <div>
     <div class="health-row flex justify-between">
-      <span class="flex items-center gap-2">
+      <span class="flex products-center gap-2">
         <span class="status-badge inactive badge-compact">Inactive</span>
         <span class="health-label-text">Hidden Archive</span>
       </span>
@@ -31,8 +31,8 @@
   </div>
 
   <!-- Moderation Queue Link -->
-  <a class="dashboard-stat-card clickable-card moderation-queue-link flex items-center justify-between" href="/admin/contents?published=false">
-    <div class="flex items-center gap-sm">
+  <a class="dashboard-stat-card clickable-card moderation-queue-link flex products-center justify-between" href="/admin/contents?published=false">
+    <div class="flex products-center gap-sm">
       <span class="text-lg-icon"><i class="fa-solid fa-hourglass-half"></i></span>
       <div>
         <div class="activity-text">Moderation Queue</div>
@@ -55,7 +55,7 @@
       <div class="trend-chart-list flex">
         {% for trend in stats.growth_trends %}
           {% set pct = ((trend.count / max_count.val) * 100) | round | int %}
-          <div class="trend-chart-item flex items-center gap-2">
+          <div class="trend-chart-product flex products-center gap-2">
             <span class="trend-chart-date">{{ trend.date }}</span>
             <div class="overview-breakdown-bar-track bar-track-trend">
               <div class="overview-breakdown-bar bar-trend" style="width: {{ pct }}%;"></div>

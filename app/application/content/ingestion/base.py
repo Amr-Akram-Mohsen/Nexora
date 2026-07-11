@@ -14,7 +14,7 @@ def generic_ingest(session, object_type, raw_data, factory_func):
     Standardized ingestion flow for any content type.
     """
     try:
-        # Wrap the item ingestion in a nested transaction (SAVEPOINT)
+        # Wrap the product ingestion in a nested transaction (SAVEPOINT)
         with session.begin_nested():
             # 1. Deduplication and Model Creation
             obj, is_new = get_or_create_content(
@@ -30,17 +30,6 @@ def generic_ingest(session, object_type, raw_data, factory_func):
             if not obj:
                 return None, "skipped"
 
-            # Update existing article with better text from newsapi_ai
-            obj_upgraded = False
-            if not is_new and object_type == "article":
-                if raw_data.get("ingestion_method") == "newsapi_ai":
-                    new_text = raw_data.get("content_text")
-                    if new_text and len(new_text) > len(obj.content_text or ""):
-                        obj.content_text = new_text
-                        obj.is_content_scraped = True
-                        obj.status = "complete"
-                        obj.word_count = len(new_text.split())
-                        obj_upgraded = True
 
             # 2. Resolve Taxonomy (Section/Category)
             section, category = resolve_taxonomy(raw_data, session)
@@ -70,7 +59,7 @@ def generic_ingest(session, object_type, raw_data, factory_func):
             if is_new:
                 return content, "created"
             
-            if updated_relationships or was_content_updated or obj_upgraded:
+            if updated_relationships or was_content_updated:
                 return content, updated_relationships or "updated"
             
             # If it's not new and nothing changed, it's effectively a skipped duplicate

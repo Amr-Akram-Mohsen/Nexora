@@ -3,7 +3,7 @@ class TargetType:
     ARTICLE = "article"
     VIDEO = "video"
     POST = "post"
-    ITEM = "item"
+    PRODUCT = "product"
     ELECTRONICS = "electronics"
     PERFUMES = "perfumes"
     ACCESSORIES = "accessories"

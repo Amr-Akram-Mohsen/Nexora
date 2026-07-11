@@ -1,9 +1,9 @@
 {% from "components/ui/core.html" import badge %}
 <!-- Summary Metrics Bar -->
-<div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="publishing-plan-summary">
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-bullseye"></i> Total Scheduled: <strong>{{ total_tasks }}</strong></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-tv"></i> Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
-  <div class="publishing-summary-item gap-2 flex items-center"><i class="fa-solid fa-hammer"></i> Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
+<div class="publishing-summary-bar flex flex-wrap gap-6 products-center" id="publishing-plan-summary">
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-bullseye"></i> Total Scheduled: <strong>{{ total_tasks }}</strong></div>
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-tv"></i> Platform Mix: <strong>YouTube: {{ platform_counts.youtube }}</strong> &middot; <strong>Pinterest: {{ platform_counts.pinterest }}</strong> &middot; <strong>Blog: {{ platform_counts.blog }}</strong></div>
+  <div class="publishing-summary-product gap-2 flex products-center"><i class="fa-solid fa-hammer"></i> Actions: <strong>Create: {{ action_counts.create }}</strong> &middot; <strong>Update: {{ action_counts.update }}</strong> &middot; <strong>Reuse: {{ action_counts.reuse }}</strong> &middot; <strong>Postpone: {{ action_counts.postpone }}</strong></div>
 </div>
 
 <div class="insights-kanban-grid" id="publishing-plan-grid-container">
@@ -22,20 +22,20 @@
     {% endif %}
 
     <div class="kanban-column flex">
-      <div class="publishing-column-header {{ headerClass }} flex justify-between items-center">
+      <div class="publishing-column-header {{ headerClass }} flex justify-between products-center">
         <div >{{ name }}</div>
         <div>{{ badge(text=statusLabel, class="status-badge") }}</div>
       </div>
       <div class="kanban-column-body flex gap-3">
         {% if not week.tasks %}
-          <div  >No items in this queue.</div>
+          <div  >No products in this queue.</div>
         {% else %}
           {% for task in week.tasks %}
             {% set platformIcon = 'fa-solid fa-tv' if task.platform == 'youtube' else 'fa-solid fa-thumbtack' if task.platform == 'pinterest' else 'fa-solid fa-pen-to-square' %}
             {% set actionBadgeClass = 'badge-danger' if task.action == 'create' else 'badge-warning' if task.action == 'update' else 'badge-success' %}
             <div class="kanban-task-card">
-              <div class="kanban-task-header flex-wrap justify-between flex gap-1 items-center">
-                <span class="kanban-task-platform flex gap-1 items-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
+              <div class="kanban-task-header flex-wrap justify-between flex gap-1 products-center">
+                <span class="kanban-task-platform flex gap-1 products-center"><i class="{{ platformIcon }}"></i> {{ task.platform|upper }}</span>
                 {{ badge(text=task.action, class="status-badge " ~ actionBadgeClass) }}
               </div>
               <h4 class="kanban-task-title">{{ task.entity }}</h4>

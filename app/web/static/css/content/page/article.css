@@ -117,7 +117,7 @@
 @media (max-width: 640px) {
   .article-cta-box {
     flex-direction: column;
-    align-items: flex-start;
+    align-products: flex-start;
     /* high-fidelity left-alignment on compact viewports */
     gap: 1.5rem;
     padding-block: 1.5rem;
@@ -302,7 +302,7 @@ hr.article-divider {
 
 .article-summary-content {
   display: flex;
-  align-items: flex-start;
+  align-products: flex-start;
   gap: 1rem;
 }
 
@@ -361,7 +361,7 @@ hr.article-divider {
 
 .article-tag-link {
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   gap: 0.375rem;
   padding: 0.5rem 1rem;
   border-radius: var(--radius-full);

@@ -30,11 +30,11 @@ def sections(section_slug):
             logger.warning("[ROUTE][/sections/%s] no data returned — 404", section_slug)
             abort(404)
 
-        item_count = len(data.get("items") or data.get("contents") or [])
+        item_count = len(data.get("products") or data.get("contents") or [])
         log_route_success(
             logger,
             f"/sections/{section_slug}",
-            items=item_count,
+            products=item_count,
             template="catalog-page.html",
         )
 

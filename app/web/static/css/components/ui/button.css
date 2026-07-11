@@ -45,7 +45,7 @@
 .admin-btn-primary,
 .admin-toolbar button {
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
@@ -71,7 +71,7 @@
 .admin-btn-secondary,
 .dashboard-btn-secondary {
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
@@ -98,7 +98,7 @@
 .dashboard-btn-danger,
 .dashboard-delete-btn {
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
@@ -123,7 +123,7 @@
 
 .btn-purple {
   display: inline-flex;
-  align-items: center;
+  align-products: center;
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;

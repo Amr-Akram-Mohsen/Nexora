@@ -84,8 +84,8 @@ def extract_image_url(data: dict) -> str | None:
     if not raw_image: return None
     
     if isinstance(raw_image, list) and raw_image:
-        item = raw_image[0]
-        url = item.get("url") if isinstance(item, dict) else str(item)
+        product = raw_image[0]
+        url = product.get("url") if isinstance(product, dict) else str(product)
     elif isinstance(raw_image, dict):
         url = raw_image.get("url")
     else:

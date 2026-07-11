@@ -2,10 +2,10 @@ from functools import lru_cache
 @lru_cache
 def get_target_map():
     from app.domains.content.models import Content
-    from app.domains.item.models import Item
+    from app.domains.product.models import Product
     return {
         "content": Content,
-        "item": Item,
+        "product": Product,
     }
 
 def resolve_target(session, target_type, target_id):

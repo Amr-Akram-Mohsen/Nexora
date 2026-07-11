@@ -3,14 +3,14 @@
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
 {% from "admin/components/ui/forms.html" import admin_filter_select %}
-<div class="flex justify-between items-center">
-  <h2 class="insight-group-title flex gap-3 items-center">
+<div class="flex justify-between products-center">
+  <h2 class="insight-group-title flex gap-3 products-center">
     <i class="fa-solid fa-mobile-screen"></i> Social Distribution Tracking
   </h2>
   <div class="flex gap-2">
     {{ admin_filter_select("dist-filter-platform", name=none, options=[("youtube", "YouTube"), ("pinterest", "Pinterest"), ("facebook", "Facebook"), ("instagram", "Instagram"), ("twitter", "Twitter"), ("linkedin", "LinkedIn")], default_val="", default_text="All Platforms") }}
     {{ admin_filter_select("dist-filter-status", name=none, options=[("published", "Published"), ("scheduled", "Scheduled"), ("draft", "Draft")], default_val="", default_text="All Statuses") }}
-    {{ admin_filter_select("dist-filter-type", name=none, options=[("content", "Content"), ("item", "Item")], default_val="", default_text="All Types") }}
+    {{ admin_filter_select("dist-filter-type", name=none, options=[("content", "Content"), ("product", "Product")], default_val="", default_text="All Types") }}
   </div>
 </div>
 

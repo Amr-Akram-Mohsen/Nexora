@@ -8,7 +8,7 @@ export function getErrorStateHtml(message = "Failed to load data. Please try aga
   return window.getErrorStateHtml(message, extraClass);
 }
 
-export function getEmptyStateHtml(message = "No items found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
+export function getEmptyStateHtml(message = "No products found.", submessage = "Try adjusting your filters or search terms.", extraClass = "", icon = "📭") {
   return window.getEmptyStateHtml(message, submessage, extraClass, icon);
 }
 

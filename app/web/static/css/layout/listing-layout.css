@@ -9,7 +9,7 @@
   display: grid;
   grid-template-columns: var(--sidebar-width, 280px) 1fr;
   gap: var(--listing-gap, 2rem);
-  align-items: start;
+  align-products: start;
   max-width: var(--container-max-width, 1400px);
   margin-inline: auto;
   padding-inline: 1.5rem;
@@ -117,7 +117,7 @@
 /* --- Listing Mobile Bar (Refined & Premium Card) --- */
 .listing-mobile-bar {
   display: none;
-  align-items: center;
+  align-products: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1rem;
@@ -279,7 +279,7 @@ border: 1px solid var(--border);
 
   .sidebar-close-btn {
     display: inline-flex;
-    align-items: center;
+    align-products: center;
     justify-content: center;
   }
 }

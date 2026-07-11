@@ -72,7 +72,7 @@ font-size: var(--text-sm);
 .interaction-panel__meta i {
   font-size: .9rem;
 }
-.item-actions {
+.product-actions {
   margin-top: .5rem;
   padding-top: .5rem;
   border-top: 1px dashed var(--border);

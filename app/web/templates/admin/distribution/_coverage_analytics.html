@@ -3,12 +3,12 @@
 <div class="distribution-double-grid insights-double-grid">
   <!-- Content Coverage -->
   <div class="distribution-coverage-card rec-stat-card">
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between products-center">
       <h5 class="coverage-title">Content Distribution Coverage</h5>
       {{ badge(text="CONTENT", class="status-badge badge-info", icon="fa-solid fa-pen-to-square") }}
     </div>
 
-    <div class="coverage-stats flex items-center justify-between">
+    <div class="coverage-stats flex products-center justify-between">
       <div class="coverage-score">
         <span class="coverage-percentage">{{ stats.content.percentage }}%</span>
         <span class="coverage-meta">of active published content</span>
@@ -34,34 +34,34 @@
     {% endif %}
   </div>
 
-  <!-- Item Coverage -->
+  <!-- Product Coverage -->
   <div class="distribution-coverage-card rec-stat-card">
-    <div class="flex justify-between items-center">
-      <h5 class="coverage-title">Item Distribution Coverage</h5>
-      {{ badge(text="ITEM", class="status-badge badge-secondary", icon="fa-solid fa-box") }}
+    <div class="flex justify-between products-center">
+      <h5 class="coverage-title">Product Distribution Coverage</h5>
+      {{ badge(text="PRODUCT", class="status-badge badge-secondary", icon="fa-solid fa-box") }}
     </div>
 
-    <div class="coverage-stats flex items-center justify-between">
+    <div class="coverage-stats flex products-center justify-between">
       <div class="coverage-score">
-        <span class="coverage-percentage">{{ stats.item.percentage }}%</span>
-        <span class="coverage-meta">of catalog items</span>
+        <span class="coverage-percentage">{{ stats.product.percentage }}%</span>
+        <span class="coverage-meta">of catalog products</span>
       </div>
       <div class="coverage-counts">
-        <div class="coverage-distributed">{{ stats.item.distributed }} Distributed</div>
-        <div class="coverage-total">{{ stats.item.total }} Total Active</div>
+        <div class="coverage-distributed">{{ stats.product.distributed }} Distributed</div>
+        <div class="coverage-total">{{ stats.product.total }} Total Active</div>
       </div>
     </div>
 
     <div class="coverage-progress-bar-wrap">
       <div class="coverage-progress-bar bg-light">
-        <div class="coverage-progress-fill bg-secondary" style="width: {{ stats.item.percentage }}%;"></div>
+        <div class="coverage-progress-fill bg-secondary" style="width: {{ stats.product.percentage }}%;"></div>
       </div>
     </div>
 
-    {% set item_gap = stats.item.total - stats.item.distributed %}
+    {% set item_gap = stats.product.total - stats.product.distributed %}
     {% if item_gap > 0 %}
     <p class="coverage-insight">
-      <span><i class="fa-solid fa-triangle-exclamation"></i> Opportunity:</span> {{ item_gap }} items have not been
+      <span><i class="fa-solid fa-triangle-exclamation"></i> Opportunity:</span> {{ item_gap }} products have not been
       promoted across social platforms.
     </p>
     {% endif %}

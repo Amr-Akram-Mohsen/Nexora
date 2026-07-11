@@ -1,11 +1,11 @@
 from sqlalchemy import func, select, desc, case, cast, Integer
 from functools import lru_cache
 from app.core.extensions import db
-from app.domains.interaction.models import View, Reaction, Comment, Save, ItemClick, RecommendationImpression, RecommendationClick
+from app.domains.interaction.models import View, Reaction, Comment, Save, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
-from app.domains.item.models import Item, ItemStoreLink, ItemVariant
-from app.domains.taxonomy.models import Category, Brand, Topic, IntentFacet
-from app.domains.relationships import content_brands, content_topics, content_items
+from app.domains.product.models import Product, ProductStoreLink, ProductVariant
+from app.domains.taxonomy.models import Category, Brand, Entity, IntentFacet
+from app.domains.relationships import content_products, ContentEntity
 from app.domains.analytics.shared import (
     get_start_date,
     finalize_trend_stats,
@@ -82,28 +82,28 @@ def get_content_opportunities():
     categories = db.session.execute(select(Category.id, Category.name)).all()
     cat_map = {c.id: {"id": c.id, "name": c.name, "demand": 0, "content_count": 0} for c in categories}
 
-    stmt = select(Item.category_id, func.count(View.id))\
-        .join(View, (View.target_id == Item.id) & (View.target_type == "item"))\
+    stmt = select(Product.category_id, func.count(View.id))\
+        .join(View, (View.target_id == Product.id) & (View.target_type == "product"))\
         .where(View.created_at >= start_30d)\
-        .group_by(Item.category_id)
+        .group_by(Product.category_id)
     for cid, cnt in db.session.execute(stmt):
         if cid in cat_map:
             cat_map[cid]["demand"] += cnt or 0
 
-    stmt = select(Item.category_id, func.count(ItemClick.id))\
-        .join(ItemVariant, ItemVariant.item_id == Item.id)\
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)\
-        .join(ItemClick, ItemClick.item_store_link_id == ItemStoreLink.id)\
-        .where(ItemClick.created_at >= start_30d)\
-        .group_by(Item.category_id)
+    stmt = select(Product.category_id, func.count(ProductClick.id))\
+        .join(ProductVariant, ProductVariant.product_id == Product.id)\
+        .join(ProductStoreLink, ProductStoreLink.variant_id == ProductVariant.id)\
+        .join(ProductClick, ProductClick.product_store_link_id == ProductStoreLink.id)\
+        .where(ProductClick.created_at >= start_30d)\
+        .group_by(Product.category_id)
     for cid, cnt in db.session.execute(stmt):
         if cid in cat_map:
             cat_map[cid]["demand"] += cnt or 0
 
-    stmt = select(Item.category_id, func.count(Save.id))\
-        .join(Save, (Save.target_id == Item.id) & (Save.target_type == "item"))\
+    stmt = select(Product.category_id, func.count(Save.id))\
+        .join(Save, (Save.target_id == Product.id) & (Save.target_type == "product"))\
         .where(Save.created_at >= start_30d)\
-        .group_by(Item.category_id)
+        .group_by(Product.category_id)
     for cid, cnt in db.session.execute(stmt):
         if cid in cat_map:
             cat_map[cid]["demand"] += cnt or 0
@@ -114,76 +114,85 @@ def get_content_opportunities():
             cat_map[cid]["content_count"] = cnt or 0
 
     sorted_by_demand = sorted(cat_map.values(), key=lambda x: x["demand"], reverse=True)
-    for rank, item in enumerate(sorted_by_demand, 1):
-        item["demand_rank"] = rank
+    for rank, product in enumerate(sorted_by_demand, 1):
+        product["demand_rank"] = rank
 
     sorted_by_volume = sorted(cat_map.values(), key=lambda x: x["content_count"], reverse=True)
-    for rank, item in enumerate(sorted_by_volume, 1):
-        item["volume_rank"] = rank
+    for rank, product in enumerate(sorted_by_volume, 1):
+        product["volume_rank"] = rank
 
     cat_opps = []
-    for item in cat_map.values():
-        item["gap_score"] = item["volume_rank"] - item["demand_rank"]
-        if item["demand"] > 0:
-            cat_opps.append(item)
+    for product in cat_map.values():
+        product["gap_score"] = product["volume_rank"] - product["demand_rank"]
+        if product["demand"] > 0:
+            cat_opps.append(product)
 
     cat_opps.sort(key=lambda x: x["gap_score"], reverse=True)
 
-    brands = db.session.execute(select(Brand.id, Brand.name)).all()
+    brands = db.session.execute(
+        select(Entity.id, Entity.name)
+        .where((Entity.entity_type == "brand") | (Entity.entity_type == "organization"))
+    ).all()
     brand_map = {b.id: {"id": b.id, "name": b.name, "demand": 0, "content_count": 0} for b in brands}
 
-    stmt = select(Item.brand_id, func.count(View.id))\
-        .join(View, (View.target_id == Item.id) & (View.target_type == "item"))\
+    stmt = select(Entity.id, func.count(View.id))\
+        .join(Brand, Brand.slug == Entity.slug)\
+        .join(Product, Product.brand_id == Brand.id)\
+        .join(View, (View.target_id == Product.id) & (View.target_type == "product"))\
         .where(View.created_at >= start_30d)\
-        .group_by(Item.brand_id)
+        .group_by(Entity.id)
     for bid, cnt in db.session.execute(stmt):
         if bid in brand_map:
             brand_map[bid]["demand"] += cnt or 0
 
-    stmt = select(Item.brand_id, func.count(ItemClick.id))\
-        .join(ItemVariant, ItemVariant.item_id == Item.id)\
-        .join(ItemStoreLink, ItemStoreLink.variant_id == ItemVariant.id)\
-        .join(ItemClick, ItemClick.item_store_link_id == ItemStoreLink.id)\
-        .where(ItemClick.created_at >= start_30d)\
-        .group_by(Item.brand_id)
+    stmt = select(Entity.id, func.count(ProductClick.id))\
+        .join(Brand, Brand.slug == Entity.slug)\
+        .join(Product, Product.brand_id == Brand.id)\
+        .join(ProductVariant, ProductVariant.product_id == Product.id)\
+        .join(ProductStoreLink, ProductStoreLink.variant_id == ProductVariant.id)\
+        .join(ProductClick, ProductClick.product_store_link_id == ProductStoreLink.id)\
+        .where(ProductClick.created_at >= start_30d)\
+        .group_by(Entity.id)
     for bid, cnt in db.session.execute(stmt):
         if bid in brand_map:
             brand_map[bid]["demand"] += cnt or 0
 
-    stmt = select(Item.brand_id, func.count(Save.id))\
-        .join(Save, (Save.target_id == Item.id) & (Save.target_type == "item"))\
+    stmt = select(Entity.id, func.count(Save.id))\
+        .join(Brand, Brand.slug == Entity.slug)\
+        .join(Product, Product.brand_id == Brand.id)\
+        .join(Save, (Save.target_id == Product.id) & (Save.target_type == "product"))\
         .where(Save.created_at >= start_30d)\
-        .group_by(Item.brand_id)
+        .group_by(Entity.id)
     for bid, cnt in db.session.execute(stmt):
         if bid in brand_map:
             brand_map[bid]["demand"] += cnt or 0
 
-    stmt = select(content_brands.c.brand_id, func.count(View.id))\
-        .join(View, (View.target_id == content_brands.c.content_id) & (View.target_type == "content"))\
+    stmt = select(ContentEntity.entity_id, func.count(View.id))\
+        .join(View, (View.target_id == ContentEntity.content_id) & (View.target_type == "content"))\
         .where(View.created_at >= start_30d)\
-        .group_by(content_brands.c.brand_id)
+        .group_by(ContentEntity.entity_id)
     for bid, cnt in db.session.execute(stmt):
         if bid in brand_map:
             brand_map[bid]["demand"] += cnt or 0
 
-    stmt = select(content_brands.c.brand_id, func.count(content_brands.c.content_id)).group_by(content_brands.c.brand_id)
+    stmt = select(ContentEntity.entity_id, func.count(ContentEntity.content_id)).group_by(ContentEntity.entity_id)
     for bid, cnt in db.session.execute(stmt):
         if bid in brand_map:
             brand_map[bid]["content_count"] = cnt or 0
 
     sorted_brands_demand = sorted(brand_map.values(), key=lambda x: x["demand"], reverse=True)
-    for rank, item in enumerate(sorted_brands_demand, 1):
-        item["demand_rank"] = rank
+    for rank, product in enumerate(sorted_brands_demand, 1):
+        product["demand_rank"] = rank
 
     sorted_brands_volume = sorted(brand_map.values(), key=lambda x: x["content_count"], reverse=True)
-    for rank, item in enumerate(sorted_brands_volume, 1):
-        item["volume_rank"] = rank
+    for rank, product in enumerate(sorted_brands_volume, 1):
+        product["volume_rank"] = rank
 
     brand_opps = []
-    for item in brand_map.values():
-        item["gap_score"] = item["volume_rank"] - item["demand_rank"]
-        if item["demand"] > 0:
-            brand_opps.append(item)
+    for product in brand_map.values():
+        product["gap_score"] = product["volume_rank"] - product["demand_rank"]
+        if product["demand"] > 0:
+            brand_opps.append(product)
 
     brand_opps.sort(key=lambda x: x["gap_score"], reverse=True)
 
@@ -229,37 +238,37 @@ def get_content_vs_product_performance():
             cat_map[cid]["content_engagement"] = int(val or 0)
 
     stmt = select(
-        Item.category_id,
-        func.sum(Item.view_count + Item.click_count + Item.save_count)
-    ).group_by(Item.category_id)
+        Product.category_id,
+        func.sum(Product.view_count + Product.click_count + Product.save_count)
+    ).group_by(Product.category_id)
     for cid, val in db.session.execute(stmt):
         if cid in cat_map:
             cat_map[cid]["product_engagement"] = int(val or 0)
 
-    items = list(cat_map.values())
-    if not items:
+    products = list(cat_map.values())
+    if not products:
         return []
 
-    sorted_content = sorted(items, key=lambda x: x["content_engagement"], reverse=True)
-    sorted_product = sorted(items, key=lambda x: x["product_engagement"], reverse=True)
+    sorted_content = sorted(products, key=lambda x: x["content_engagement"], reverse=True)
+    sorted_product = sorted(products, key=lambda x: x["product_engagement"], reverse=True)
 
     median_content = sorted_content[len(sorted_content) // 2]["content_engagement"] if sorted_content else 0
     median_product = sorted_product[len(sorted_product) // 2]["product_engagement"] if sorted_product else 0
 
-    for item in items:
-        hc = item["content_engagement"] >= median_content and item["content_engagement"] > 0
-        hp = item["product_engagement"] >= median_product and item["product_engagement"] > 0
+    for product in products:
+        hc = product["content_engagement"] >= median_content and product["content_engagement"] > 0
+        hp = product["product_engagement"] >= median_product and product["product_engagement"] > 0
 
         if hc and not hp:
-            item["status"] = "High Content, Low Product"
+            product["status"] = "High Content, Low Product"
         elif hp and not hc:
-            item["status"] = "High Product, Low Content"
+            product["status"] = "High Product, Low Content"
         elif hc and hp:
-            item["status"] = "High Both"
+            product["status"] = "High Both"
         else:
-            item["status"] = "Low Both"
+            product["status"] = "Low Both"
 
-    return items
+    return products
 
 def get_intent_opportunity_data():
     categories = db.session.execute(select(Category.id, Category.name)).all()
@@ -325,9 +334,9 @@ def get_content_coverage_matrix():
             cat_map[cid]["demand_score"] += int(val or 0)
 
     stmt_item = select(
-        Item.category_id,
-        func.sum(Item.view_count + Item.click_count + Item.save_count)
-    ).group_by(Item.category_id)
+        Product.category_id,
+        func.sum(Product.view_count + Product.click_count + Product.save_count)
+    ).group_by(Product.category_id)
     for cid, val in db.session.execute(stmt_item).all():
         if cid in cat_map:
             cat_map[cid]["demand_score"] += int(val or 0)
@@ -337,7 +346,7 @@ def get_content_coverage_matrix():
         if cid in cat_map:
             cat_map[cid]["content_count"] = val or 0
 
-    stmt_prod_count = select(Item.category_id, func.count(Item.id)).group_by(Item.category_id)
+    stmt_prod_count = select(Product.category_id, func.count(Product.id)).group_by(Product.category_id)
     for cid, val in db.session.execute(stmt_prod_count).all():
         if cid in cat_map:
             cat_map[cid]["product_count"] = val or 0
@@ -445,9 +454,19 @@ def get_content_completeness_report():
         )
     ).all()
     
-    topic_counts = dict(db.session.execute(select(content_topics.c.content_id, func.count(content_topics.c.topic_id)).group_by(content_topics.c.content_id)).all())
-    brand_counts = dict(db.session.execute(select(content_brands.c.content_id, func.count(content_brands.c.brand_id)).group_by(content_brands.c.content_id)).all())
-    item_counts = dict(db.session.execute(select(content_items.c.content_id, func.count(content_items.c.item_id)).group_by(content_items.c.content_id)).all())
+    topic_counts = dict(db.session.execute(
+        select(ContentEntity.content_id, func.count(ContentEntity.entity_id))
+        .join(Entity, Entity.id == ContentEntity.entity_id)
+        .where(Entity.entity_type.in_(["tag", "topic", "concept"]))
+        .group_by(ContentEntity.content_id)
+    ).all())
+    brand_counts = dict(db.session.execute(
+        select(ContentEntity.content_id, func.count(ContentEntity.entity_id))
+        .join(Entity, Entity.id == ContentEntity.entity_id)
+        .where((Entity.entity_type == "brand") | (Entity.entity_type == "organization"))
+        .group_by(ContentEntity.content_id)
+    ).all())
+    item_counts = dict(db.session.execute(select(content_products.c.content_id, func.count(content_products.c.product_id)).group_by(content_products.c.content_id)).all())
     
     categories = db.session.execute(select(Category.id, Category.name)).all()
     cat_map = {c.id: {"name": c.name, "total_content": 0, "total_score": 0.0} for c in categories}
@@ -501,7 +520,10 @@ def get_user_interest_coverage_gap():
     categories = db.session.execute(select(Category.id, Category.name)).all()
     cat_map = {c.id: {"id": c.id, "name": c.name, "type": "category", "interest_score": 0.0, "content_count": 0} for c in categories}
     
-    brands = db.session.execute(select(Brand.id, Brand.name)).all()
+    brands = db.session.execute(
+        select(Entity.id, Entity.name)
+        .where((Entity.entity_type == "brand") | (Entity.entity_type == "organization"))
+    ).all()
     brand_map = {b.id: {"id": b.id, "name": b.name, "type": "brand", "interest_score": 0.0, "content_count": 0} for b in brands}
     
     cat_interest = db.session.execute(
@@ -514,9 +536,11 @@ def get_user_interest_coverage_gap():
             cat_map[cid]["interest_score"] = float(score or 0)
             
     brand_interest = db.session.execute(
-        select(UserEntityInterest.brand_id, func.sum(UserEntityInterest.score))
+        select(Entity.id, func.sum(UserEntityInterest.score))
+        .join(Brand, Brand.id == UserEntityInterest.brand_id)
+        .join(Entity, Entity.slug == Brand.slug)
         .where(UserEntityInterest.brand_id.isnot(None))
-        .group_by(UserEntityInterest.brand_id)
+        .group_by(Entity.id)
     ).all()
     for bid, score in brand_interest:
         if bid in brand_map:
@@ -531,8 +555,8 @@ def get_user_interest_coverage_gap():
             cat_map[cid]["content_count"] = cnt or 0
             
     brand_content = db.session.execute(
-        select(content_brands.c.brand_id, func.count(content_brands.c.content_id))
-        .group_by(content_brands.c.brand_id)
+        select(ContentEntity.entity_id, func.count(ContentEntity.content_id))
+        .group_by(ContentEntity.entity_id)
     ).all()
     for bid, cnt in brand_content:
         if bid in brand_map:
@@ -559,11 +583,11 @@ def get_user_interest_coverage_gap():
 
 def get_category_sentiment_health():
     from app.domains.interaction.models import Comment
-    from app.domains.item.models import Item
+    from app.domains.product.models import Product
     
     cat_expr = case(
         (Comment.target_type == 'content', Content.category_id),
-        (Comment.target_type == 'item', Item.category_id),
+        (Comment.target_type == 'product', Product.category_id),
         else_=None
     )
     
@@ -573,7 +597,7 @@ def get_category_sentiment_health():
         func.count(Comment.id).label('comment_count')
     ).select_from(Comment)\
      .outerjoin(Content, (Comment.target_type == 'content') & (Comment.target_id == Content.id))\
-     .outerjoin(Item, (Comment.target_type == 'item') & (Comment.target_id == Item.id))\
+     .outerjoin(Product, (Comment.target_type == 'product') & (Comment.target_id == Product.id))\
      .where(cat_expr.isnot(None))\
      .where(Comment.sentiment.isnot(None))\
      .group_by(cat_expr, Comment.sentiment)

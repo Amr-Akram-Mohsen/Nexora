@@ -6,7 +6,7 @@
 underperforming assets.") %}
 <div class="accuracy-panel-body flex gap-6">
     <!-- Strategy Accuracy Widget -->
-    <div class="insights-accuracy-card gap-5 flex justify-between items-center">
+    <div class="insights-accuracy-card gap-5 flex justify-between products-center">
         <div>
             <h4 class="insights-accuracy-title">Strategy Accuracy Index</h4>
             <p class="insights-accuracy-meta">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest 0.6).
@@ -19,7 +19,7 @@ underperforming assets.") %}
 
     <!-- Failures List -->
     <div>
-        <h4 class="quality-score-header gap-2 flex items-center">
+        <h4 class="quality-score-header gap-2 flex products-center">
             <i class="fas fa-exclamation-triangle"></i> Failure Diagnostics & Recommendations
         </h4>
         <div id="feedback-failures-list" class="insights-failures-scroll flex gap-4">
@@ -32,7 +32,7 @@ underperforming assets.") %}
             {% set severityBadge = 'badge-danger' if fail.severity == 'high' else 'badge-warning' if fail.severity ==
             'medium' else 'badge-secondary' %}
             <div class="failure-card">
-                <div class="failure-header flex-wrap justify-between flex gap-1 items-center">
+                <div class="failure-header flex-wrap justify-between flex gap-1 products-center">
                     <span class="failure-type"><i class="fa-solid fa-triangle-exclamation"></i> {{ fail.failure_type|replace('_', ' ') }}</span>
                     <span class="status-badge {{ severityBadge }}">{{ fail.severity|upper }}</span>
                 </div>
@@ -59,36 +59,36 @@ baseline expectations.") %}
                 </td>
             </tr>
             {% else %}
-            {% for item in evaluation_results %}
-            {% set evalBadgeClass = 'badge-success' if item.evaluation == 'overperforming' else 'badge-danger' if
-            item.evaluation == 'underperforming' else 'badge-secondary' %}
-            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if item.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if item.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>'
+            {% for product in evaluation_results %}
+            {% set evalBadgeClass = 'badge-success' if product.evaluation == 'overperforming' else 'badge-danger' if
+            product.evaluation == 'underperforming' else 'badge-secondary' %}
+            {% set platformIcon = '<i class="fa-solid fa-tv"></i>' if product.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if product.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>'
             %}
             <tr>
                 <td>
-                    <div class="flex gap-2 items-center">
-                        <div>{{ platformIcon|safe }} {{ item.title }}</div>
-                        {% if item.is_simulated %}
+                    <div class="flex gap-2 products-center">
+                        <div>{{ platformIcon|safe }} {{ product.title }}</div>
+                        {% if product.is_simulated %}
                         <span class="status-badge badge-warning" title="CTR metrics are simulated due to insufficient impression data">Simulated</span>
                         {% endif %}
                     </div>
                 </td>
                 <td>
-                    <div >{{ item.entity }}</div>
-                    <div class="asset-mapping-item-meta">Intent: <code>{{ item.predicted_intent }}</code></div>
+                    <div >{{ product.entity }}</div>
+                    <div class="asset-mapping-product-meta">Intent: <code>{{ product.predicted_intent }}</code></div>
                 </td>
                 <td class="col-metric">
-                    <span >{{ "%.1f"|format(item.expected_performance.ctr) }}%</span> / <span >{{ "%.1f"|format(item.actual_performance.ctr) }}%</span>
+                    <span >{{ "%.1f"|format(product.expected_performance.ctr) }}%</span> / <span >{{ "%.1f"|format(product.actual_performance.ctr) }}%</span>
                 </td>
-                <td><span class="status-badge {{ evalBadgeClass }}">{{ item.evaluation }}</span></td>
+                <td><span class="status-badge {{ evalBadgeClass }}">{{ product.evaluation }}</span></td>
                 <td class="col-metric">
-                    {% if item.actual_performance.decay_rate > 0 %}
-                    <span class="status-badge badge-danger badge-type-compact" title="30-day traffic drop"><i class="fa-solid fa-caret-down"></i> {{ "%.1f"|format(item.actual_performance.decay_rate) }}%</span>
+                    {% if product.actual_performance.decay_rate > 0 %}
+                    <span class="status-badge badge-danger badge-type-compact" title="30-day traffic drop"><i class="fa-solid fa-caret-down"></i> {{ "%.1f"|format(product.actual_performance.decay_rate) }}%</span>
                     {% else %}
                     <span class="status-badge badge-secondary badge-type-compact">—</span>
                     {% endif %}
                 </td>
-                <td >{{ item.reason }}</td>
+                <td >{{ product.reason }}</td>
             </tr>
             {% endfor %}
             {% endif %}

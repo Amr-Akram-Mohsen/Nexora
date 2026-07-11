@@ -11,7 +11,7 @@
 <div class="dist-list flex">
   {% for s in stats.top_acquisition_channels %}
     {% set pct = ((s.count / max_val.val) * 100) | round | int %}
-    {{ distribution_link_bar(s.channel|title, "{:,} items".format(s.count), pct, "/admin/contents?ingestion_origin=" ~ s.channel, "bar-trend") }}
+    {{ distribution_link_bar(s.channel|title, "{:,} products".format(s.count), pct, "/admin/contents?ingestion_origin=" ~ s.channel, "bar-trend") }}
   {% endfor %}
 </div>
 {% endif %}

@@ -1,14 +1,14 @@
 from datetime import datetime
 from app.core.extensions import db
 from .models import UserInterest, UserEntityInterest
-from app.domains.item.models import Item
+from app.domains.product.models import Product
 from app.domains.content.models import Article
 from .interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
 from sqlalchemy import select
 
 def extract_entities_from_target(target):
-    if isinstance(target, Item):
+    if isinstance(target, Product):
         return [{
             "brand_id": target.brand_id,
             "category_id": target.category_id
@@ -90,7 +90,7 @@ def handle_interaction_interest(user, target, action, session=None):
         return
 
     target_type = (
-        TargetType.ITEM if isinstance(target, Item)
+        TargetType.PRODUCT if isinstance(target, Product)
         else TargetType.ARTICLE
     )
 
@@ -128,7 +128,7 @@ def handle_comment_interaction(user, target, comment_sentiment, session=None):
         return
 
     # sentiment influence (NO interaction increment)
-    target_type = TargetType.ITEM if isinstance(target, Item) else TargetType.ARTICLE
+    target_type = TargetType.PRODUCT if isinstance(target, Product) else TargetType.ARTICLE
 
     for entity in extract_entities_from_target(target):
         update_user_interest(

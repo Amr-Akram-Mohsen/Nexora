@@ -146,7 +146,7 @@ def widget_action_queue():
         time_frame = "7_days"
         
     dec_data = get_decision_intelligence_data(lightweight=True)
-    return render_template("admin/distribution/_action_queue_cards.html", items=dec_data.get("action_queue", []))
+    return render_template("admin/distribution/_action_queue_cards.html", products=dec_data.get("action_queue", []))
 
 
 @bp.route("/widget/publishing-plan", methods=["GET"])
@@ -338,7 +338,7 @@ def widget_social_distribution():
     return render_template(
         "admin/distribution/_social_distribution_rows.html",
         widget_type="social_distribution",
-        items=data["view_models"],
+        products=data["view_models"],
         summary_stats=data["summary_stats"],
         pagination=data["pagination"]
     ), 200, headers
@@ -355,7 +355,7 @@ def widget_overview_kpis():
 def widget_scheduling_queue():
     from app.domains.distribution.services import get_admin_scheduling_queue
     view_models = get_admin_scheduling_queue()
-    return render_template("admin/distribution/_scheduling_queue.html", items=view_models)
+    return render_template("admin/distribution/_scheduling_queue.html", products=view_models)
 
 
 @bp.route("/widget/health-alerts", methods=["GET"])
@@ -390,7 +390,7 @@ def generate_distribution_draft():
     from app.domains.distribution.services import generate_admin_distribution_draft
     
     data = request.json
-    source_type = data.get("source_type") # 'content' or 'item'
+    source_type = data.get("source_type") # 'content' or 'product'
     source_id = data.get("source_id")
     platform_name = data.get("platform")
     

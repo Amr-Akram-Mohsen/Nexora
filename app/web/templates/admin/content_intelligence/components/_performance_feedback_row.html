@@ -5,23 +5,23 @@
     </td>
 </tr>
 {% else %}
-{% for item in evaluation_results %}
-{% set evalBadgeClass = 'badge-success' if item.evaluation == 'overperforming' else 'badge-danger' if
-item.evaluation == 'underperforming' else 'badge-secondary' %}
-{% set platformIcon = '<i class="fa-solid fa-tv"></i>' if item.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if item.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
+{% for product in evaluation_results %}
+{% set evalBadgeClass = 'badge-success' if product.evaluation == 'overperforming' else 'badge-danger' if
+product.evaluation == 'underperforming' else 'badge-secondary' %}
+{% set platformIcon = '<i class="fa-solid fa-tv"></i>' if product.platform == 'youtube' else '<i class="fa-solid fa-thumbtack"></i>' if product.platform == 'pinterest' else '<i class="fa-solid fa-pen-to-square"></i>' %}
 <tr>
     <td>
-        <div >{{ platformIcon|safe }} {{ item.title }}</div>
+        <div >{{ platformIcon|safe }} {{ product.title }}</div>
     </td>
     <td>
-        <div >{{ item.entity }}</div>
-        <div class="asset-mapping-item-meta">Intent: <code>{{ item.predicted_intent }}</code></div>
+        <div >{{ product.entity }}</div>
+        <div class="asset-mapping-product-meta">Intent: <code>{{ product.predicted_intent }}</code></div>
     </td>
     <td class="col-metric">
-        <span >{{ "%.1f"|format(item.expected_performance.ctr) }}%</span> / <span >{{ "%.1f"|format(item.actual_performance.ctr) }}%</span>
+        <span >{{ "%.1f"|format(product.expected_performance.ctr) }}%</span> / <span >{{ "%.1f"|format(product.actual_performance.ctr) }}%</span>
     </td>
-    <td><span class="status-badge {{ evalBadgeClass }}">{{ item.evaluation }}</span></td>
-    <td >{{ item.reason }}</td>
+    <td><span class="status-badge {{ evalBadgeClass }}">{{ product.evaluation }}</span></td>
+    <td >{{ product.reason }}</td>
 </tr>
 {% endfor %}
 {% endif %}

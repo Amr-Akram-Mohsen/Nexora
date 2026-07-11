@@ -7,7 +7,7 @@ Refactoring applied:
 - Inline imports moved to module top-level (R-23).
 - Hardcoded source list removed; sources now derived dynamically from
   LastAPIFetch records in the database (R-10).
-- Source type classification (article vs item) read from the Source model's
+- Source type classification (article vs product) read from the Source model's
   source_type field; falls back to a configurable default set when not present.
 - All queries use modern select() style (R-07).
 """
@@ -20,8 +20,8 @@ from datetime import date
 
 bp = Blueprint("api_ingestion", __name__, url_prefix="/admin/ingestions")
 
-# Known item-type source names (used as a fallback when Source.source_type
-# is not populated).  Add new item sources here or, preferably, set
+# Known product-type source names (used as a fallback when Source.source_type
+# is not populated).  Add new product sources here or, preferably, set
 # source_type on the Source model row.
 _ITEM_SOURCE_NAMES = frozenset({"amazon_sa", "amazon_ae", "noon"})
 
@@ -40,7 +40,7 @@ def integrations_status():
     
     data = get_admin_integrations_status_data()
     if request.args.get('format') == 'html':
-        return render_template("admin/components/rows/_ingestion_status_cards.html", items=data)
+        return render_template("admin/components/rows/_ingestion_status_cards.html", products=data)
         
     return jsonify(data)
 
@@ -54,6 +54,6 @@ def integrations_logs():
     data = get_admin_integrations_logs_data()
     if request.args.get('format') == 'html':
         # Add domain_type so _rows.html knows which row template to load
-        return render_template("admin/components/_rows.html", items=data, domain_type="ingestion_log", empty_text="No recent events.")
+        return render_template("admin/components/_rows.html", products=data, domain_type="ingestion_log", empty_text="No recent events.")
         
     return jsonify(data)

@@ -116,7 +116,7 @@ def list_contents():
         page=page,
         per_page=per_page
     )
-    page_items = pagination.items
+    page_items = pagination.products
 
     # Batch-load polymorphic targets and duplicate titles
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
@@ -127,7 +127,7 @@ def list_contents():
     ]
 
     return jsonify({
-        "items": serialized,
+        "products": serialized,
         "page": pagination.page,
         "pages": pagination.pages,
         "total": pagination.total,
@@ -137,7 +137,7 @@ def list_contents():
 
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_content(id):
-    """Safely delete a content item and its interactions and polymorphic target."""
+    """Safely delete a content product and its interactions and polymorphic target."""
     success = delete_content_workflow(id)
     if not success:
         return jsonify({"error": "Content not found"}), 404
@@ -147,7 +147,7 @@ def delete_content(id):
 
 @bp.route("/<int:id>/toggle-publish", methods=["POST"])
 def toggle_publish(id):
-    """Quickly toggle the publish status of a content item."""
+    """Quickly toggle the publish status of a content product."""
     data = request.get_json() or {}
     action = data.get("action")
     
@@ -173,7 +173,7 @@ def contents_rows():
         page=page,
         per_page=per_page
     )
-    page_items = pagination.items
+    page_items = pagination.products
 
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 
@@ -191,7 +191,7 @@ def contents_rows():
 
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_content(id):
-    """Render the inspect partial for a single content item."""
+    """Render the inspect partial for a single content product."""
     aggregated_data = get_content_inspect_workflow(id)
     if not aggregated_data:
         return jsonify({"error": "Content not found"}), 404
@@ -218,13 +218,13 @@ def bulk_actions():
             return jsonify({"error": "No matching contents found"}), 404
         
         msg_map = {
-            "activate": f"Activated {count} content items.",
-            "deactivate": f"Deactivated {count} content items.",
-            "publish": f"Published {count} content items.",
-            "unpublish": f"Unpublished {count} content items.",
-            "review": f"Marked {count} content items for review.",
-            "recategorize": f"Moved {count} content items to new category.",
-            "delete": f"Successfully deleted {count} content items and associated data."
+            "activate": f"Activated {count} content products.",
+            "deactivate": f"Deactivated {count} content products.",
+            "publish": f"Published {count} content products.",
+            "unpublish": f"Unpublished {count} content products.",
+            "review": f"Marked {count} content products for review.",
+            "recategorize": f"Moved {count} content products to new category.",
+            "delete": f"Successfully deleted {count} content products and associated data."
         }
         return jsonify({"success": True, "message": msg_map.get(action, "Operation completed")})
     except ValueError as e:

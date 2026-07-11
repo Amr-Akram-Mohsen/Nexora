@@ -22,13 +22,13 @@ from app.application.linking.content_item_matching import run_content_item_match
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Run Content ↔ Item cross-domain matching and linking workflow."
+        description="Run Content ↔ Product cross-domain matching and linking workflow."
     )
     parser.add_argument(
         "--since-days",
         type=int,
         default=None,
-        help="Only check contents ingested or items created within this many days. If omitted, check all.",
+        help="Only check contents ingested or products created within this many days. If omitted, check all.",
     )
     parser.add_argument(
         "--threshold",
@@ -46,7 +46,7 @@ def main():
     args = parser.parse_args()
 
     print("\n==================================================")
-    print("  Nexora Content <-> Item Matching & Linking Runner  ")
+    print("  Nexora Content <-> Product Matching & Linking Runner  ")
     print("==================================================")
     print(f"Parameters: since-days={args.since_days}, threshold={args.threshold}, batch-size={args.batch_size}")
     print("--------------------------------------------------")

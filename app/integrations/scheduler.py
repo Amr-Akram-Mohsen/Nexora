@@ -114,8 +114,8 @@ def init_scheduler(app):
     def _run_enrich():
         with app.app_context():
             try:
-                from app.application.content.workflows.enrichment import reprocess_unscraped_articles
-                count = reprocess_unscraped_articles(50)
+                from app.application.content.workflows.enrichment import enrich_discovered_articles
+                count = enrich_discovered_articles(50)
                 logger.info("[Scheduler] Enriched %d articles", count)
             except Exception:
                 logger.exception("[Scheduler] Enrichment job failed")
@@ -130,7 +130,7 @@ def init_scheduler(app):
     # ── Amazon price refresh: every 12 hours ─────────────────────
     _scheduler.add_job(
         func=lambda: _run_in_context(
-            app, "app.application.content.workflows.enrichment.reprocess_unscraped_articles"
+            app, "app.application.content.workflows.enrichment.enrich_discovered_articles"
         ),
         trigger=IntervalTrigger(hours=12),
         id="refresh_prices",

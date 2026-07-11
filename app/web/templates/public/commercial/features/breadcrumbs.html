@@ -1,6 +1,6 @@
 {% from "components/ui/core.html" import breadcrumbs %}
-{% set paths = [{"label": "Deals", "url": url_for('item.deals')}] %}
-{% if item.category %}
-  {% set _ = paths.append({"label": item.category.name, "url": url_for('item.deals', category=item.category.slug)}) %}
+{% set paths = [{"label": "Deals", "url": url_for('product.deals')}] %}
+{% if product.category %}
+  {% set _ = paths.append({"label": product.category.name, "url": url_for('product.deals', category=product.category.slug)}) %}
 {% endif %}
-{{ breadcrumbs(paths=paths, current_page=item.name | truncate(35)) }}
+{{ breadcrumbs(paths=paths, current_page=product.name | truncate(35)) }}

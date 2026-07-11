@@ -1,11 +1,11 @@
 from app.core.extensions import db
-from app.domains.relationships import content_items
+from app.domains.relationships import content_products
 
-def unlink_match_workflow(content_id, item_id):
+def unlink_match_workflow(content_id, product_id):
     db.session.execute(
-        content_items.delete().where(
-            content_items.c.content_id == content_id,
-            content_items.c.item_id == item_id,
+        content_products.delete().where(
+            content_products.c.content_id == content_id,
+            content_products.c.product_id == product_id,
         )
     )
     db.session.commit()

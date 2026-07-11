@@ -8,7 +8,7 @@ from .content import (
     get_trending_contents_scored,
     get_editors_picks,
 )
-from .items import (
+from .products import (
     get_items_for_content,
     get_trending_items,
     get_popular_items_by_brand,

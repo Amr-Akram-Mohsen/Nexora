@@ -6,8 +6,8 @@
 <tr id="{{ domain_type }}-row">
   {% if domain_type == "content" %}
   {% include "admin/components/rows/_content_row.html" %}
-  {% elif domain_type == "item" %}
-  {% include "admin/components/rows/_item_row.html" %}
+  {% elif domain_type == "product" %}
+  {% include "admin/components/rows/_product_row.html" %}
   {% elif domain_type == "user" %}
   {% include "admin/components/rows/_user_row.html" %}
   {% elif domain_type == "comment" %}
@@ -26,5 +26,5 @@
 </tr>
 {% endmacro %}
 
-{{ admin_crud_rows(items, render_row, empty_text="Nothing found.", domain_type=domain_type or none,
+{{ admin_crud_rows(products, render_row, empty_text="Nothing found.", domain_type=domain_type or none,
 domain_target_type=domain_target_type or none, hide_action_column=hide_action_column or false) }}

@@ -3,7 +3,7 @@ const PurchaseOptions = {
     update(variant) {
         const container =
             document.querySelector(
-                ".item-buy-links__items"
+                ".product-buy-links__items"
             )
         if (
             !container ||
@@ -22,10 +22,10 @@ const PurchaseOptions = {
 href="${link.url}"
 target="_blank"
 rel="noopener noreferrer"
-class="link item-buy-link flex items-center justify-between"
+class="link product-buy-link flex products-center justify-between"
 >
-<div class="item-buy-link__info flex flex-col">
-<div class="item-buy-link__store flex items-center">
+<div class="product-buy-link__info flex flex-col">
+<div class="product-buy-link__store flex products-center">
 ${link.logo
                             ?
                             `<img
@@ -43,7 +43,7 @@ ${link.name}
 ${link.price
                             ?
                             `
-<div class="item-buy-link__price">
+<div class="product-buy-link__price">
 ${link.currency}
 ${link.price}
 </div>
@@ -52,7 +52,7 @@ ${link.price}
                             ""
                         }
 </div>
-<span class="item-buy-link__icon">
+<span class="product-buy-link__icon">
 <i class="fas fa-external-link-alt"></i>
 </span>
 </a>
