@@ -11,6 +11,7 @@ from app.shared.utils.slug import generate_slug, normalize_name
 class Source(db.Model):
     __tablename__ = "sources"
     id = db.Column(db.Integer, primary_key=True)
+    external_uri = db.Column(db.String(255), unique=True, index=True)
     name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
     domain = db.Column(db.String(255), unique=True, nullable=False, index=True)
@@ -25,6 +26,23 @@ class Source(db.Model):
     @staticmethod
     def get_by_domain(domain, session):
         return session.query(Source).filter_by(domain=domain).first()
+
+    @staticmethod
+    def get_or_create(name, domain, session):
+        """Checks for source existence by domain, creates if missing."""
+        if not domain or not name:
+            return None
+        source = Source.get_by_domain(domain, session)
+        if not source:
+            slug = generate_slug(name)
+            source = Source(
+                name=name,
+                slug=slug,
+                domain=domain
+            )
+            session.add(source)
+            session.flush()
+        return source
 
     article_sources = db.relationship("ArticleSource", back_populates="source")
 
@@ -132,6 +150,7 @@ class Brand(db.Model):
 class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
+    external_uri = db.Column(db.String(255), unique=True, index=True)
     name = db.Column(db.String(100), nullable=False)
     normalized_name = db.Column(db.String(150), index=True)
     slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
@@ -274,4 +293,69 @@ class AttributeFacet(db.Model):
 
     contents = db.relationship(
         "Content", secondary=content_attributes, back_populates="attributes"
+    )
+
+
+
+class Entity(db.Model):
+    __tablename__ = "entities"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False) # Diffbot label / NewsAPI label
+    slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
+    external_uri = db.Column(db.String(255), unique=True, index=True)
+    entity_type = db.Column(db.String(50), index=True)
+    image_url = db.Column(db.Text)
+
+    @staticmethod
+    def get_or_create(name, session, external_uri=None, entity_type=None):
+        if not name:
+            return None
+        slug = generate_slug(name)
+        
+        entity = None
+        if external_uri:
+            entity = session.query(Entity).filter_by(external_uri=external_uri).first()
+        if not entity:
+            entity = session.query(Entity).filter_by(slug=slug).first()
+            
+        if not entity:
+            entity = Entity(
+                name=name,
+                slug=slug,
+                external_uri=external_uri,
+                entity_type=entity_type
+            )
+            session.add(entity)
+            session.flush()
+        return entity
+
+    content_entities = db.relationship("ContentEntity", back_populates="entity")
+
+class Location(db.Model):
+    __tablename__ = "locations"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
+    country_code = db.Column(db.String(10), index=True)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    @staticmethod
+    def get_or_create(name, session, country_code=None):
+        if not name:
+            return None
+        slug = generate_slug(name)
+        location = session.query(Location).filter_by(slug=slug).first()
+        if not location:
+            location = Location(
+                name=name,
+                slug=slug,
+                country_code=country_code
+            )
+            session.add(location)
+            session.flush()
+        return location
+
+    contents = db.relationship(
+        "Content", secondary="content_locations", back_populates="locations"
     )

@@ -1,14 +1,22 @@
 import logging
 import difflib
 from urllib.parse import urlparse
-from ..utilities.extract_article_content import scrape_article_content
-from ..utilities.extractor_clients import extract_with_apis
-from ..utilities.quality import score_content_quality
 from app.domains.content.service.normalization import (
     normalize_content_shaping as normalize_content,
     text_to_html,
 )
-from ..utilities.metadata import recover_article_metadata
+
+def score_content_quality(content_html: str, content_text: str) -> float:
+    if not content_text:
+        return 0.0
+    words = len(content_text.split())
+    if words > 500:
+        return 1.0
+    elif words > 200:
+        return 0.8
+    elif words > 50:
+        return 0.5
+    return 0.2
 from app.shared.utils.logging import (
     log_integration_start,
     log_integration_success,
@@ -95,7 +103,7 @@ def normalize_ingested_data(item: Any) -> EnrichedItemDTO:
 
     # Ensure mandatory fields exist
     data.setdefault("is_content_scraped", False)
-    data.setdefault("content_source", "api")
+    data.setdefault("ingestion_method", "api")
 
     return EnrichedItemDTO(**data)
 
@@ -117,7 +125,7 @@ def ingest_enrichment_router(item: ClassifiedItemDTO) -> EnrichedItemDTO:
 # ── PHASE 2: HEAVY ENRICHMENT (Scraping / Articles Only) ──────────────────────
 
 
-def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecrawl") -> EnrichedItemDTO:
+def full_article_scraping_pipeline(item: Any, extractor_service: str = "diffbot") -> EnrichedItemDTO:
     """
     Entry point for Phase 2 Background Worker.
     Performs heavy network-based enrichment (Scraping, Extractor APIs).
@@ -147,54 +155,55 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
                 "word_count": norm["word_count"],
                 "quality_score": score,
                 "is_content_scraped": False,
-                "content_source": "api",
+                "ingestion_method": "api",
             }
         )
 
     # Concurrent Fetching using ThreadPoolExecutor
     import concurrent.futures
-    from app.application.content.ingestion.scraper_pipeline import fetch_and_clean_firecrawl, fetch_and_clean_jina
+    from app.application.content.ingestion.scraper_pipeline import fetch_and_clean_diffbot
 
     def _fetch_extractor():
         try:
             log_scrape_start(logger, url)
 
-            if extractor_service.lower() == "jina":
-                res = fetch_and_clean_jina(url, hero_image_url=data.get("image_url"))
-            else:
-                res = fetch_and_clean_firecrawl(url, hero_image_url=data.get("image_url"))
+            res = fetch_and_clean_diffbot(url, hero_image_url=data.get("image_url"))
 
-            norm = normalize_content(res["content_html"], None)
-            score = score_content_quality(res["content_html"], res["content_markdown"])
+            score = score_content_quality(res["content_html"], res["content_text"])
 
-            # Boost quality score when content_blocks were produced (structured output)
-            blocks = res.get("content_blocks")
-            if blocks and len(blocks) >= 5:
-                score = min(1.0, score * 1.15)
+            source_name = res.get("ingestion_method", "diffbot")
+            log_scrape_success(logger, url, words=len(res.get("content_text", "").split()), source=source_name)
 
-            source_name = res.get("content_source", extractor_service)
-            block_count = len(blocks) if blocks else 0
-            log_scrape_success(logger, url, words=len(res["content_markdown"].split()), source=source_name)
-            logger.debug(
-                "[enrich] url=%s  blocks=%d  words=%d  score=%.3f",
-                url[:80], block_count, len(res["content_markdown"].split()), score,
-            )
-
-            author    = res["metadata"].get("author") or res["metadata"].get("article:author")
-            image_url = res["metadata"].get("og:image") or res["metadata"].get("ogImage")
+            metadata = res["metadata"] # Full diffbot JSON object
+            
+            authors = metadata.get("authors")
+            if not authors and metadata.get("author"):
+                authors = [{"name": metadata.get("author")}]
+                
+            image_url = metadata.get("icon") or data.get("image_url") # or primary image
+            
+            # Diffbot has an images array, grab the primary
+            diffbot_images = metadata.get("images", [])
+            for img in diffbot_images:
+                if img.get("primary"):
+                    image_url = img.get("url")
+                    break
 
             return {
-                "content_html":     res["content_html"],
-                "content_markdown": res["content_markdown"],
-                "content_blocks":   res.get("content_blocks"),
-                "content_text":     res["content_markdown"],
-                "word_count":       len(res["content_markdown"].split()),
+                "content_html":     res.get("content_html"),
+                "content_text":     res.get("content_text", ""),
+                "word_count":       len(res.get("content_text", "").split()),
                 "quality_score":    score,
                 "is_content_scraped": True,
-                "content_source":   source_name,
-                "author":           author,
-                "extended_metadata": res["metadata"],
-                "extracted_images": res["extracted_images"],
+                "ingestion_method": "diffbot",
+                "authors":          authors,
+                "extended_metadata": metadata, # raw tags/categories preserved here for the inserter
+                "images":           res["images"],
+                "videos":           metadata.get("videos"),
+                "summary":          metadata.get("naturalLanguage", {}).get("summary"),
+                "language":         metadata.get("humanLanguage"),
+                "sentiment_score":  metadata.get("sentiment"),
+                "external_uri":     metadata.get("diffbotUri"),
                 "image_url":        image_url,
             }
         except Exception as e:
@@ -202,16 +211,15 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
         return None
 
     best_existing_wc = candidates[0]["word_count"] if candidates else 0
-    futures = []
     
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        if trusted or best_existing_wc < 200:
-            futures.append(executor.submit(_fetch_extractor))
-            
-        for future in concurrent.futures.as_completed(futures):
-            res = future.result()
-            if res:
-                candidates.append(res)
+    if trusted or best_existing_wc < 200:
+        res = _fetch_extractor()
+        if res:
+            candidates.append(res)
+        
+        # Add a delay to respect API rate limits (Diffbot is 1 request/sec on free tier)
+        import time
+        time.sleep(1.5)
 
     # 4. Fallback (Local)
     if not candidates and description:
@@ -224,7 +232,7 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
                 "word_count": norm["word_count"],
                 "quality_score": score,
                 "is_content_scraped": False,
-                "content_source": "fallback",
+                "ingestion_method": "fallback",
             }
         )
 
@@ -238,14 +246,8 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
     canonical_url = data.get("canonical_url")
 
     # Metadata Recovery (HEAD/Lightweight Scrape)
-    if not selected_image or not canonical_url:
-        recovered = recover_article_metadata(url)
-        if not selected_image:
-            selected_image = best_candidate.get("image_url") or recovered.get(
-                "image_url"
-            )
-        if not canonical_url:
-            canonical_url = recovered.get("canonical_url")
+    if not selected_image:
+        selected_image = best_candidate.get("image_url")
 
     # Update state
     data.update(best_candidate)
@@ -253,7 +255,6 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
         {
             "image_url": selected_image,
             "canonical_url": canonical_url,
-            "content": best_candidate["content_html"],
         }
     )
 
@@ -261,7 +262,7 @@ def full_article_scraping_pipeline(item: Any, extractor_service: str = "firecraw
         logger,
         _NAME,
         items=1,
-        source=best_candidate["content_source"],
+        source=best_candidate["ingestion_method"],
         score=f"{best_candidate['quality_score']:.3f}",
         words=best_candidate["word_count"],
         mode="phase_2_full",

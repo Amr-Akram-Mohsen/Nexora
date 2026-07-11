@@ -72,7 +72,7 @@ class Content(db.Model):
     # Optional (future-proofing)
     review_count = db.Column(db.Integer, default=0, index=True)
 
-    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
     section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)
 
     gender_id = db.Column(db.Integer, db.ForeignKey("gender_facets.id"))
@@ -95,6 +95,20 @@ class Content(db.Model):
     attributes = db.relationship(
         "AttributeFacet",
         secondary=content_attributes,
+        back_populates="contents"
+    )
+
+    # Entities (NewsAPI concepts / Diffbot tags)
+    content_entities = db.relationship(
+        "ContentEntity",
+        back_populates="content",
+        cascade="all, delete-orphan"
+    )
+
+    # Locations
+    locations = db.relationship(
+        "Location",
+        secondary="content_locations",
         back_populates="contents"
     )
     

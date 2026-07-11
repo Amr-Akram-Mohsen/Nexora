@@ -208,6 +208,8 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         "topics": [serialize_model(t) for t in (content_obj.topics or [])],
         "brands": [serialize_model(b) for b in (content_obj.brands or [])],
         "linked_items": [serialize_item(i) for i in (content_obj.linked_items or [])] if include_linked_items else None,
+        "entities": [serialize_model(e.entity) for e in (content_obj.content_entities or []) if e.entity],
+        "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
     }
 
     return data

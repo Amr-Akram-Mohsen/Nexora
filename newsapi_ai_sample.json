@@ -1,0 +1,220 @@
+{
+  "uri": "9389913939",
+  "lang": "ita",
+  "isDuplicate": false,
+  "date": "2026-07-10",
+  "time": "15:09:49",
+  "dateTime": "2026-07-10T15:09:49Z",
+  "dateTimePub": "2026-07-10T15:08:30Z",
+  "dataType": "news",
+  "sim": 0,
+  "url": "https://taorminanews24.com/iphone-ultra-pieghevole-arriva-la-super-batteria-da-5-000-mah/",
+  "title": "iPhone Ultra Pieghevole: arriva la super batteria da 5.000 mAh",
+  "body": "I piani di Apple per il debutto nel settore degli smartphone flessibili si arricchiscono di dettagli cruciali. Fino a oggi il dibattito si era concentrato quasi esclusivamente sull'estetica del dispositivo e sulla resistenza dei pannelli pieghevoli. Tuttavia, il vero nodo da sciogliere per i laboratori di Cupertino riguarda la gestione dei consumi. Trovare il giusto equilibrio tra uno spessore ridotto ai minimi termini e la necessit\u00e0 di alimentare schermi enormi rappresenta la sfida ingegneristica pi\u00f9 complessa per questa categoria di prodotti.\n\nLe ultime notizie provenienti dalla catena di montaggio asiatica indicano che una soluzione \u00e8 vicina. Fonti interne ai fornitori della Mela hanno infatti intercettato il deposito dei brevetti di due accumulatori inediti ideati specificamente per la variante Ultra. A lanciare l'indiscrezione sulla piattaforma social Weibo \u00e8 stato l'esperto del settore Digital Chat Station. I dati condivisi evidenziano la scelta di una configurazione asimmetrica a doppio modulo, una strategia geometrica necessaria per bilanciare i pesi all'interno delle due met\u00e0 del telefono.\n\nL'analisi delle singole specifiche tecniche rivela una dotazione energetica di primissimo livello. Il sistema integrato sfrutter\u00e0 un primo blocco pi\u00f9 compatto da 1.921 mAh, affiancato da un secondo elemento principale con una capienza di 2.962 mAh. Sommando i due valori si ottiene un amperaggio minimo di base pari a 4.883 mAh. Una configurazione simile si tradurr\u00e0 nei test di laboratorio in una capacit\u00e0 commerciale effettiva che superer\u00e0 agevolmente la soglia psicologica dei 5.000 mAh, allineandosi agli attuali standard dei telefoni tradizionali.\n\nQuesto posizionamento strategico evidenzia la volont\u00e0 di non accettare compromessi sull'esperienza utente. L'integrazione tra un comparto hardware cos\u00ec robusto e l'ottimizzazione software dei processori proprietari Apple Silicon potrebbe garantire prestazioni eccezionali. Se i dati venissero confermati, la casa di Cupertino sarebbe riuscita a neutralizzare il principale difetto storico dei dispositivi pieghevoli prima ancora della presentazione, trasformando la durata della carica in una delle armi vincenti del nuovo flagship.",
+  "source": {
+    "uri": "taorminanews24.com",
+    "dataType": "news",
+    "title": "TaorminaNews24"
+  },
+  "authors": [],
+  "concepts": [
+    {
+      "uri": "http://en.wikipedia.org/wiki/Ampere",
+      "type": "wiki",
+      "score": 5,
+      "label": {
+        "eng": "Ampere"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Node_(networking)",
+      "type": "wiki",
+      "score": 3,
+      "label": {
+        "eng": "Node (networking)"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Electrical_resistance_and_conductance",
+      "type": "wiki",
+      "score": 3,
+      "label": {
+        "eng": "Electrical resistance and conductance"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Engineering",
+      "type": "wiki",
+      "score": 3,
+      "label": {
+        "eng": "Engineering"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/IPhone",
+      "type": "wiki",
+      "score": 3,
+      "label": {
+        "eng": "IPhone"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Apple_Inc.",
+      "type": "org",
+      "score": 3,
+      "label": {
+        "eng": "Apple Inc."
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Smartphone",
+      "type": "wiki",
+      "score": 3,
+      "label": {
+        "eng": "Smartphone"
+      }
+    },
+    {
+      "uri": "http://it.wikipedia.org/wiki/Batteria_ricaricabile",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Batteria ricaricabile"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Computing_platform",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Computing platform"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Assembly_line",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Assembly line"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Patent",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Patent"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Telephone",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Telephone"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Online_chat",
+      "type": "wiki",
+      "score": 2,
+      "label": {
+        "eng": "Online chat"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Asia",
+      "type": "loc",
+      "score": 2,
+      "label": {
+        "eng": "Asia"
+      },
+      "location": null
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Cupertino,_California",
+      "type": "loc",
+      "score": 2,
+      "label": {
+        "eng": "Cupertino, California"
+      },
+      "location": {
+        "type": "place",
+        "label": {
+          "eng": "Cupertino, California"
+        },
+        "country": {
+          "type": "country",
+          "label": {
+            "eng": "United States"
+          }
+        }
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Apple-designed_processors",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Apple-designed processors"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Processor_(computing)",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Processor (computing)"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Technical_standard",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Technical standard"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Computer_hardware",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Computer hardware"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Psychology",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Psychology"
+      }
+    },
+    {
+      "uri": "http://en.wikipedia.org/wiki/Software",
+      "type": "wiki",
+      "score": 1,
+      "label": {
+        "eng": "Software"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "uri": "news/Business",
+      "label": "news/Business",
+      "wgt": 81
+    },
+    {
+      "uri": "iptc/economy,_business_and_finance",
+      "label": "iptc/economy, business and finance",
+      "wgt": 84
+    }
+  ],
+  "image": "https://taorminanews24.com/wp-content/uploads/2026/07/iphone-ultra-.jpg",
+  "eventUri": null,
+  "sentiment": null,
+  "wgt": 521392189,
+  "relevance": 2
+}

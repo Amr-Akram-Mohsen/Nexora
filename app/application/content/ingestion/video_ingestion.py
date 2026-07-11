@@ -1,6 +1,6 @@
 from app.domains.content.models import Video
 from .base import generic_ingest
-from app.integrations.content.utilities.cleaner import clean_video_data
+from app.domains.content.service.normalization import normalize_video_data
 
 
 def create_video_model(data):
@@ -18,7 +18,7 @@ def create_video_model(data):
 
 
 def ingest_video(session, raw_data):
-    cleaned = clean_video_data(raw_data)
+    cleaned = normalize_video_data(raw_data)
     if not cleaned:
         return None, "skipped"
 

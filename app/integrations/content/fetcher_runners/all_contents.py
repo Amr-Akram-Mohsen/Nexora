@@ -5,6 +5,7 @@ from .api_fetchers import (
     run_gnews_fetch,
     run_youtube_fetch,
     run_reddit_fetch,
+    run_newsapi_ai_fetch,
 )
 
 from .rss import run_rss_fetch
@@ -21,6 +22,7 @@ _SOURCES = [
     ("youtube",  run_youtube_fetch),
     ("rss",      run_rss_fetch),
     ("reddit",   run_reddit_fetch),
+    ("newsapi_ai", run_newsapi_ai_fetch),
 ]
 
 

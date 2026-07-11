@@ -93,10 +93,10 @@ CATEGORY_TOPIC_MAP = {
 # ==========================================================
 
 DEFAULT_SOURCE_ALIGNMENT = {
-    "news": ["gnews", "newsapi"],
+    "news": ["gnews", "newsapi", "newsapi_ai"],
     "reviews": ["youtube", "rss", "reddit"],
     "tutorials": ["youtube", "rss"],
-    "trends": ["newsapi", "reddit"],
+    "trends": ["newsapi", "newsapi_ai", "reddit"],
     "community": ["reddit"],
 }
 
@@ -107,8 +107,8 @@ DEFAULT_SOURCE_ALIGNMENT = {
 
 CATEGORY_SOURCE_OVERRIDES = {
     "electronics": {
-        "news": ["gnews", "newsapi", "rss"],
-        "trends": ["newsapi", "reddit", "rss"],
+        "news": ["gnews", "newsapi", "newsapi_ai", "rss"],
+        "trends": ["newsapi", "newsapi_ai", "reddit", "rss"],
     },
     "perfumes": {
         "news": ["youtube", "reddit", "gnews"],
@@ -117,7 +117,7 @@ CATEGORY_SOURCE_OVERRIDES = {
         "trends": ["reddit", "youtube"],
     },
     "accessories": {
-        "news": ["rss", "newsapi", "gnews"],
+        "news": ["rss", "newsapi", "newsapi_ai", "gnews"],
         "reviews": ["youtube", "reddit", "rss"],
         "community": ["reddit"],
     },
@@ -144,7 +144,7 @@ INTENT_KEYWORDS = {
 }
 
 # Sources that support (OR / AND / Parentheses)
-BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "reddit", "gnews"]
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "newsapi_ai", "reddit", "gnews"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS
@@ -710,6 +710,14 @@ SOURCE_DIALECTS = {
         ],
     },
     "newsapi": {
+        "news": [
+            "launch",
+            "announced",
+            "release",
+            "unveiled",
+        ]
+    },
+    "newsapi_ai": {
         "news": [
             "launch",
             "announced",

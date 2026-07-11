@@ -217,8 +217,15 @@ def build_query_variants(
             elif clean_tl not in seen:
                 seen.add(clean_tl)
                 deduped.append(t)
+            else:
+                # Keep structural parentheses even if the word is dropped
+                prefix = "(" * t.count("(")
+                suffix = ")" * t.count(")")
+                if prefix or suffix:
+                    deduped.append(f"{prefix}{suffix}")
         
         q_str = " ".join(deduped)
+        q_str = q_str.replace("( ", "(").replace(" )", ")")
 
         import re
         if source in ["gnews", "newsapi"]:

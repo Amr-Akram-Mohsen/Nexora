@@ -6,22 +6,27 @@ class Article(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
+    external_uri = db.Column(db.String(255), unique=True, index=True)
     title = db.Column(db.String(300), nullable=False)
     description = db.Column(db.Text)
+    summary = db.Column(db.Text)
 
     # New layered content fields
     content_text = db.Column(db.Text)
     content_html = db.Column(db.Text)
-    content_markdown = db.Column(db.Text)
-    content_blocks = db.Column(JSONB, nullable=True)  # canonical structured representation
     word_count = db.Column(db.Integer)
 
     quality_score = db.Column(db.Float, default=0.0)
     is_content_scraped = db.Column(db.Boolean, default=False)
-    content_source = db.Column(db.String(50))
-    author = db.Column(db.String(255))
+    
+    ingestion_method = db.Column(db.String(50)) # 'diffbot', 'newsapi', 'scraper'
+    language = db.Column(db.String(10), index=True)
+    sentiment_score = db.Column(db.Float, index=True)
+    
+    authors = db.Column(db.JSON)
     extended_metadata = db.Column(db.JSON)
-    extracted_images = db.Column(db.JSON)
+    images = db.Column(db.JSON) # Formerly extracted_images
+    videos = db.Column(db.JSON)
 
     # Staged ingestion fields
     status = db.Column(
@@ -29,9 +34,11 @@ class Article(db.Model):
     )  # pending, enriching, complete, failed
     last_enrichment_attempt = db.Column(db.DateTime)
 
-    body = db.Column(db.Text)  # Keep for migration
     image_url = db.Column(db.Text)
     canonical_url = db.Column(db.String(500), index=True)
+
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=True)
+    event = db.relationship("Event", back_populates="articles")
 
     primary_source_id = db.Column(
         db.Integer, db.ForeignKey("article_sources.id"), nullable=True
@@ -46,6 +53,12 @@ class Article(db.Model):
         back_populates="article",
         cascade="all, delete-orphan",
         foreign_keys="ArticleSource.article_id",
+    )
+
+    categories = db.relationship(
+        "Category",
+        secondary="article_categories",
+        backref="articles"
     )
 
     # -------- Helpers --------
@@ -127,8 +140,36 @@ class Article(db.Model):
         return self.description or (
             self.content_text[:160]
             if self.content_text
-            else (self.body[:160] if self.body else None)
+            else None
         )
+
+    @property
+    def formatted_paragraphs(self):
+        if not self.content_text:
+            return []
+        
+        # If the text naturally has newlines, use them
+        if '\n' in self.content_text:
+            return [p.strip() for p in self.content_text.split('\n') if p.strip()]
+        
+        # If no newlines exist (e.g. NewsAPI AI), split artificially by sentences
+        import re
+        # Split by punctuation followed by space and a capital letter
+        sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z0-9])', self.content_text)
+        
+        chunks = []
+        current_chunk = []
+        for s in sentences:
+            current_chunk.append(s)
+            # Group 4 sentences per paragraph
+            if len(current_chunk) >= 4:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = []
+                
+        if current_chunk:
+            chunks.append(" ".join(current_chunk))
+            
+        return chunks
 
     def __repr__(self):
         return f"<Article {self.id} '{self.title[:30]}'>"

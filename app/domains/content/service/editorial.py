@@ -98,9 +98,17 @@ def assess_video_description(description: str | None) -> dict:
     }
 
 def assess_article_extraction(target) -> dict:
-    has_content_text = bool(getattr(target, "content_text", None))
-    content_blocks = getattr(target, "content_blocks", None) or []
-    has_content_blocks = bool(content_blocks)
+    content_html = getattr(target, "content_html", None) or ""
+    content_text = getattr(target, "content_text", None) or ""
+
+    has_content_html = bool(content_html)
+    has_content_text = bool(content_text)
+
+    # Calculate approximate lengths and ratios
+    text_length = len(content_text)
+    html_length = len(content_html)
+    text_to_html_ratio = text_length / html_length if html_length > 0 else 0
+
     has_description = bool(getattr(target, "description", None))
     word_count = getattr(target, "word_count", 0)
     read_time_minutes = getattr(target, "read_time_minutes", None)
@@ -108,31 +116,9 @@ def assess_article_extraction(target) -> dict:
     is_scraped = getattr(target, "is_content_scraped", False)
     extraction_status = getattr(target, "status", "unknown")
     
-    # Document Structure Summary
-    block_summary = {
-        "total_blocks": len(content_blocks),
-        "heading_count": 0,
-        "paragraph_count": 0,
-        "image_count": 0,
-        "embed_count": 0,
-        "quote_count": 0,
-        "table_count": 0,
-        "unknown_count": 0,
-    }
-    
-    for block in content_blocks:
-        b_type = block.get("type", "unknown") if isinstance(block, dict) else "unknown"
-        if b_type == "heading": block_summary["heading_count"] += 1
-        elif b_type == "paragraph": block_summary["paragraph_count"] += 1
-        elif b_type == "image": block_summary["image_count"] += 1
-        elif b_type == "embed": block_summary["embed_count"] += 1
-        elif b_type == "blockquote": block_summary["quote_count"] += 1
-        elif b_type == "table": block_summary["table_count"] += 1
-        else: block_summary["unknown_count"] += 1
-            
-    extracted_images = getattr(target, "extracted_images", None) or []
-    has_extracted_images = bool(extracted_images)
-    extracted_image_count = len(extracted_images)
+    images = getattr(target, "images", None) or []
+    has_images = bool(images)
+    image_count = len(images)
     
     extended_metadata = getattr(target, "extended_metadata", None) or {}
     has_extended_metadata = bool(extended_metadata)
@@ -146,7 +132,6 @@ def assess_article_extraction(target) -> dict:
         warnings.append({"label": "Article body was not extracted (scraping skipped or failed)", "severity": "high"})
     if word_count < 100:
         warnings.append({"label": "Article body is very short — may lack editorial value", "severity": "medium"})
-    if block_summary["paragraph_count"] == 0 and has_content_text:
         warnings.append({"label": "No structured paragraphs detected despite having content text", "severity": "medium"})
     if not has_description:
         warnings.append({"label": "No description/excerpt available for preview surfaces", "severity": "low"})
@@ -167,16 +152,15 @@ def assess_article_extraction(target) -> dict:
         
     return {
         "has_content_text": has_content_text,
-        "has_content_blocks": has_content_blocks,
+        "has_content_html": has_content_html,
         "has_description": has_description,
         "word_count": word_count,
         "read_time_minutes": read_time_minutes,
         "quality_score": quality_score,
         "is_scraped": is_scraped,
         "extraction_status": extraction_status,
-        "block_summary": block_summary,
-        "has_extracted_images": has_extracted_images,
-        "extracted_image_count": extracted_image_count,
+        "has_images": has_images,
+        "image_count": image_count,
         "has_extended_metadata": has_extended_metadata,
         "metadata_key_count": metadata_key_count,
         "warnings": warnings,

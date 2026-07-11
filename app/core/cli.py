@@ -6,6 +6,7 @@ from app.integrations.content.fetcher_runners.all_contents import (
     run_reddit_fetch,
     run_rss_fetch,
     run_content_fetch,
+    run_newsapi_ai_fetch
 )
 # from app.integrations.content.fetcher_runners.rss import run_rss_fetch
 # from app.integrations.content.fetcher_runners.all_contents import run_content_fetch
@@ -56,6 +57,10 @@ def register_commands(app):
     def fetch_youtube_command():
         run_youtube_fetch()
 
+    @app.cli.command("fetch-newsapi-ai")
+    def fetch_newsapi_ai_command():
+        run_newsapi_ai_fetch()
+
     @app.cli.command("fetch-reddit")
     def fetch_reddit_command():
         run_reddit_fetch()
@@ -74,7 +79,7 @@ def register_commands(app):
 
     import click
     @app.cli.command("enrich-articles")
-    @click.option("--extractor", default="firecrawl", help="Extractor service to use (e.g. firecrawl, jina)")
+    @click.option("--extractor", default="diffbot", help="Extractor service to use (e.g. diffbot)")
     def enrich_articles_command(extractor):
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import (
@@ -82,7 +87,7 @@ def register_commands(app):
         )
 
         app.logger.info(f"Starting full-body enrichment using {extractor}...")
-        count = reprocess_unscraped_articles(30, extractor_service=extractor)
+        count = reprocess_unscraped_articles(5, extractor_service=extractor)
         app.logger.info("Done! Successfully published %d articles.", count)
 
     @app.cli.command("init-content-status")

@@ -6,7 +6,7 @@ from app.core.extensions import db
 from app.application.content.workflows.ingestion import run_orchestrated_ingestion
 from .api_fetchers import (
     fetch_newsapi_query,
-    fetch_gnews_query,
+    fetch_newsapi_ai_query,
     fetch_youtube_query,
     fetch_reddit_query,
 )
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 FETCHER_FUNCS_MAP = {
     "newsapi": fetch_newsapi_query,
-    "gnews": fetch_gnews_query,
+    "newsapi_ai": fetch_newsapi_ai_query,
     "rss": fetch_rss_query,
     "youtube": fetch_youtube_query,
     "reddit": fetch_reddit_query,

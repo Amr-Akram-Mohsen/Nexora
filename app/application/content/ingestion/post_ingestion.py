@@ -1,6 +1,6 @@
 from app.domains.content.models import Post
 from .base import generic_ingest
-from app.integrations.content.utilities.cleaner import clean_post_data
+from app.domains.content.service.normalization import normalize_post_data
 
 
 def create_post_model(data):
@@ -17,7 +17,7 @@ def create_post_model(data):
 
 
 def ingest_post(session, raw_data):
-    cleaned = clean_post_data(raw_data)
+    cleaned = normalize_post_data(raw_data)
     if not cleaned:
         return None, "skipped"
 

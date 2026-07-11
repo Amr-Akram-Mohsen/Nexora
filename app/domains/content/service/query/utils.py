@@ -35,16 +35,7 @@ def build_content_stmt(active_only=True, published_only=True, eager_load="defaul
     if published_only:
         stmt = stmt.where(Content.is_published == True)
     
-    # Additional condition for testing article markdown content
-    from app.domains.content.models import Article
-    stmt = stmt.outerjoin(Article, (Content.object_id == Article.id) & (Content.object_type == 'article'))
-    stmt = stmt.where(
-        or_(
-            Content.object_type != 'article',
-            Article.content_markdown.is_not(None)
-        )
-    )
-        
+
     loads = get_content_eager_loads(eager_load)
     if loads:
         stmt = stmt.options(*loads)

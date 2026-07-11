@@ -74,7 +74,16 @@
 </div>
 {% endblock %}
 
+{% block base_image %}
+
+<div class="article-hero-image">
+  {{ render_image_url(article.image_url, article.title, additional_classes='hero-img') }}
+</div>
+
+{% endblock %}
+
 {% block base_content %}
+<div class="article-description">{{ article.description }}</div>
 <div class="article-content">
   {% if content.linked_items %}
   {% include "partials/affiliate-disclosure.html" %}

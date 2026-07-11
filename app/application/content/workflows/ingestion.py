@@ -42,6 +42,7 @@ _TAXONOMY_GROUPS = ["electronics", "perfumes", "accessories"]
 
 QUOTA_SERVICE_MAP = {
     "newsapi": NewsApiQuotaService,
+    "newsapi_ai": NewsApiQuotaService,
     "gnews": GNewsQuotaService,
     "youtube": YouTubeQuotaService,
 }
@@ -570,7 +571,7 @@ class IngestionWorkflow:
                             self.source_name,
                             item_title,
                             status="stored",
-                            published=enriched_dict.get("is_published"),
+                            published=content_obj.is_published if hasattr(content_obj, "is_published") else enriched_dict.get("is_published"),
                         )
                     elif status == "skipped":
                         log_item_skipped(

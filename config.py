@@ -33,6 +33,8 @@ class Config:
     NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
     GNEWS_API_KEY = os.environ.get("GNEWS_API_KEY")
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
+    NEWSAPI_AI_API_KEY = os.environ.get("NEWSAPI_AI_API_KEY")
+    DIFFBOT_API_KEY = os.environ.get("DIFFBOT_API_KEY")
 
     FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY")
     JINA_AI_API_KEY = os.environ.get("JINA_AI_API_KEY")

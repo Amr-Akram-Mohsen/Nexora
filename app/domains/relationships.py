@@ -2,6 +2,31 @@ from app.core.extensions import db
 
 # ==================== ASSOCIATION TABLES ====================
 
+content_locations = db.Table(
+    "content_locations",
+    db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
+    db.Column("location_id", db.Integer, db.ForeignKey("locations.id"), primary_key=True),
+    db.Index("ix_content_locations_location", "location_id"),
+    db.Index("ix_content_locations_content", "content_id"),
+)
+
+article_categories = db.Table(
+    "article_categories",
+    db.Column("article_id", db.Integer, db.ForeignKey("articles.id"), primary_key=True),
+    db.Column("category_id", db.Integer, db.ForeignKey("categories.id"), primary_key=True),
+    db.Index("ix_article_categories_category", "category_id"),
+    db.Index("ix_article_categories_article", "article_id"),
+)
+
+class ContentEntity(db.Model):
+    __tablename__ = "content_entities"
+    content_id = db.Column(db.Integer, db.ForeignKey("contents.id"), primary_key=True)
+    entity_id = db.Column(db.Integer, db.ForeignKey("entities.id"), primary_key=True)
+    relevance_score = db.Column(db.Float, default=0.0)
+    
+    content = db.relationship("Content", back_populates="content_entities")
+    entity = db.relationship("Entity", back_populates="content_entities")
+
 content_topics = db.Table(
     "content_topics",
     db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),

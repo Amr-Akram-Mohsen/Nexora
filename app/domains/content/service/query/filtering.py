@@ -188,35 +188,7 @@ def get_content_by_object(object_type, object_id, session=None):
     return session.execute(stmt).scalars().first()
 
 
-def get_markdown_only_articles(limit, session=None):
-    """
-    Return articles that have been scraped (content_markdown is set)
-    but have not yet been processed into content_blocks.
-    These are targeted FIRST during enrich-articles runs before normal
-    unscraped articles are processed.
-    """
-    from sqlalchemy import select
-    from ...models import Article, Content
-    if session is None:
-        from app.core.extensions import db
-        session = db.session
-    stmt = (
-        select(Article)
-        .join(
-            Content,
-            (Content.object_type == "article")
-            & (Content.object_id == Article.id)
-            & (Content.is_active),
-        )
-        .where(
-            Article.content_markdown.is_not(None),
-            Article.content_blocks.is_(None),
-            Article.status == "complete",  # only fully-scraped articles
-        )
-        .order_by(Content.published_at.desc())
-        .limit(limit)
-    )
-    return session.execute(stmt).scalars().all()
+
 
 
 def get_content_paginated(filters, sort_by=None, sort_dir=None, page=1, per_page=20, session=None):

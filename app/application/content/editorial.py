@@ -36,7 +36,7 @@ def assess_publishing_readiness(content_dto: dict, extraction_assessment: dict |
     object_type = content_dto.get("object_type")
     
     if object_type == "article" and extraction_assessment:
-        has_extracted_body = extraction_assessment.get("has_content_blocks") or extraction_assessment.get("has_content_text")
+        has_extracted_body = extraction_assessment.get("has_content_html") or extraction_assessment.get("has_content_text")
         add_check("Body content extracted", has_extracted_body, 20, is_blocking=True)
         
         word_count = extraction_assessment.get("word_count", 0)

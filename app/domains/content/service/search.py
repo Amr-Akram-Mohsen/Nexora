@@ -2,7 +2,7 @@ from sqlalchemy import func, select
 from app.domains.content.models import Content
 from .content_access import assign_target_to_contents
 
-def build_content_search_vector(content):
+def build_content_search_vector(content, body_text=""):
     return (
         func.setweight(
             func.to_tsvector(
@@ -34,6 +34,17 @@ def build_content_search_vector(content):
                     )
                 ),
                 "C"
+            )
+        ).op("||")(
+            func.setweight(
+                func.to_tsvector(
+                    "english",
+                    func.coalesce(
+                        body_text,
+                        ""
+                    )
+                ),
+                "D"
             )
         )
     )
@@ -98,6 +109,22 @@ def populate_content_search_fields(content, obj, object_type):
         else ""
     )
 
+    entity_names = " ".join(
+        ce.entity.name
+        for ce in content.content_entities
+        if ce.entity
+    )
+
+    event_title = ""
+    if hasattr(obj, "event") and obj.event:
+        event_title = obj.event.title or ""
+
+    body_text = ""
+    if object_type in ("article", "post"):
+        body_text = getattr(obj, "content_text", "") or ""
+    elif object_type == "video":
+        body_text = getattr(obj, "description", "") or ""
+
     content.search_text = " ".join(
         filter(
             None,
@@ -117,11 +144,14 @@ def populate_content_search_fields(content, obj, object_type):
                 gender_name,
                 intent_name,
                 price_tier_name,
+                
+                entity_names,
+                event_title,
             ]
         )
     )
 
-    content.search_vector = build_content_search_vector(content)
+    content.search_vector = build_content_search_vector(content, body_text=body_text)
 
 
 

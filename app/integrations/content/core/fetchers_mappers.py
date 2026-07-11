@@ -1,6 +1,40 @@
 from app.shared.dto.ingestion import RawItemDTO
 
 
+def map_newsapi_ai(data: dict, region="en"):
+    # Event Registry format
+    articles_data = data.get("articles", {})
+    results = articles_data.get("results", []) if isinstance(articles_data, dict) else []
+    
+    if not isinstance(results, list):
+        return []
+
+    items = []
+    for a in results:
+        if not isinstance(a, dict):
+            continue
+        a["image_url"] = a.get("image")
+        a["source_name"] = (a.get("source") or {}).get("title")
+        # Ensure url is present
+        a["url"] = a.get("url")
+        a["content_text"] = a.get("body")
+        a["ingestion_method"] = "newsapi_ai"
+        
+        # Explicitly set this to None so it isn't incorrectly populated
+        a["content_html"] = None
+        
+        # Extract rich metadata for ingestion
+        a["extended_metadata"] = a.get("extended_metadata", {})
+        if a.get("concepts"):
+            a["extended_metadata"]["concepts"] = a.get("concepts")
+        if a.get("categories"):
+            a["extended_metadata"]["categories"] = a.get("categories")
+        if a.get("eventUri"):
+            a["extended_metadata"]["eventUri"] = a.get("eventUri")
+            
+        items.append(RawItemDTO(**a))
+    return items
+
 def map_newsapi(data: dict, region="en"):
     articles = data.get("articles", [])
     if not isinstance(articles, list):

@@ -1,10 +1,11 @@
 from collections import defaultdict
 from app.core.extensions import db
-from ..models import Article, Content
+from ..models import Article, Content, Event
 from ...taxonomy.models import (
     Topic, Brand, AttributeFacet,
-    GenderFacet, IntentFacet, PriceTierFacet, Source
+    GenderFacet, IntentFacet, PriceTierFacet, Source, Category, Entity
 )
+from app.domains.relationships import ContentEntity
 
 from app.shared.utils.slug import generate_slug
 from .content_access import resolve
@@ -142,10 +143,77 @@ def apply_relationships(content, data, session=None) -> dict:
             content.price_tier_id = p.id
             updated_relationships["facets"]["price_tier"] = p.slug
 
+    # -------- Entities, Events, and Article Categories (NewsAPI AI) --------
+    extended_metadata = data.get("extended_metadata", {})
+    if content.object_type == "article" and extended_metadata:
+        obj = resolve(content, session=session)
+        if obj:
+            # Events
+            if "eventUri" in extended_metadata:
+                event_uri = extended_metadata["eventUri"]
+                event = Event.get_or_create(external_uri=event_uri, session=session, title=data.get("title"))
+                if event and obj.event_id != event.id:
+                    obj.event_id = event.id
+                    updated_relationships["event"] = event.external_uri
+
+            # Categories (Article Categories)
+            if "categories" in extended_metadata:
+                for cat_data in extended_metadata["categories"]:
+                    cat_label = cat_data if isinstance(cat_data, str) else cat_data.get("name", cat_data.get("label", ""))
+                    if not cat_label: continue
+                    cat = Category.get_or_create(cat_label, session=session)
+                    if cat and cat not in obj.categories:
+                        obj.categories.append(cat)
+                        updated_relationships.setdefault("categories", []).append(cat.slug)
+
+            # Entities (Concepts)
+            if "concepts" in extended_metadata:
+                for concept in extended_metadata["concepts"]:
+                    if isinstance(concept, str):
+                        concept_uri = None
+                        concept_label = concept
+                        entity_type = "tag"
+                        score = 0
+                    else:
+                        concept_uri = concept.get("uri")
+                        concept_label = concept.get("label", {}).get("eng", concept.get("label", "")) if isinstance(concept.get("label"), dict) else concept.get("label", "")
+                        entity_type = concept.get("type", "tag")
+                        score = concept.get("score", 0)
+
+                    if not concept_label: continue
+
+                    entity = Entity.get_or_create(
+                        name=concept_label, 
+                        session=session, 
+                        external_uri=concept_uri, 
+                        entity_type=entity_type
+                    )
+                    
+                    if entity:
+                        # Check if already linked
+                        existing_ce = session.query(ContentEntity).filter_by(content_id=content.id, entity_id=entity.id).first()
+                        if not existing_ce:
+                            ce = ContentEntity(content_id=content.id, entity_id=entity.id, relevance_score=score)
+                            session.add(ce)
+                            updated_relationships.setdefault("entities", []).append(entity.slug)
+                            
+                    # If this is a location, also populate the Locations model!
+                    if entity_type in ("location", "place"):
+                        from app.domains.taxonomy.models import Location
+                        loc = Location.get_or_create(concept_label, session=session)
+                        if loc and loc not in content.locations:
+                            content.locations.append(loc)
+                            updated_relationships.setdefault("locations", []).append(loc.slug)
+
     # -------- Sources (ONLY for article) --------
     if content.object_type == "article":
         obj = resolve(content, session=session)
         if obj:
+            if not data.get("source_name") and "siteName" in extended_metadata:
+                data["source_name"] = extended_metadata["siteName"]
+            if not data.get("url"):
+                data["url"] = obj.url
+                
             link_article_sources(obj, data, session=session)
             if obj.preferred_source_relation and obj.preferred_source_relation.source:
                 content.source_id = obj.preferred_source_relation.source.id
