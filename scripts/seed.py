@@ -11,9 +11,10 @@ import logging
 from app.core.extensions import db
 from app.shared.utils.slug import generate_slug, normalize_name
 from app.shared.constants.taxonomy import TAXONOMY
+from sqlalchemy import select
 
 from app.domains.taxonomy.models import (
-    Section, Category, Topic, Brand, Source,
+    Section, Category, Brand, Source,
     GenderFacet, IntentFacet, PriceTierFacet, AttributeFacet
 )
 
@@ -40,7 +41,7 @@ def seed_db():
                 allowed_filters=[
                     "category",
                     "brand",
-                    "topic",
+                    "entity",
                     "price_tier",
                     "intent",
                     "gender",
@@ -78,17 +79,8 @@ def seed_db():
                 db.session.add(child)
                 logger.info(f"[Seeder]     -> Leaf: {child_data['name']}")
 
-        # 3. Seed Topics
-        for t_data in TAXONOMY.get("topics", []):
-            topic = Topic(
-                name=t_data["name"],
-                slug=generate_slug(t_data["name"]),
-                normalized_name=normalize_name(t_data["name"]),
-            )
-            db.session.add(topic)
-            logger.info(f"[Seeder]   + Topic: {t_data['name']}")
 
-        # 4. Seed Brands
+        # 3. Seed Brands
         for b_data in TAXONOMY.get("brands", []):
             brand = Brand(
                 name=b_data["name"],
@@ -98,7 +90,7 @@ def seed_db():
             db.session.add(brand)
             logger.info(f"[Seeder]   + Brand: {b_data['name']}")
         
-        # 5. Seed Facets
+        # 4. Seed Facets
         facets = TAXONOMY.get("facets", {})
 
         # Gender
@@ -130,9 +122,11 @@ def seed_db():
             category_obj = None
 
             if attr.get("category"):
-                category_obj = Category.query.filter_by(
-                    normalized_name=normalize_name(attr["category"])
-                ).first()
+                category_obj = db.session.scalar(
+                    select(Category).filter_by(
+                        normalized_name=normalize_name(attr["category"])
+                    )
+                )
 
             db.session.add(AttributeFacet(
                 name=attr["name"],
@@ -142,7 +136,7 @@ def seed_db():
             logger.info(f"[Seeder] [Facets]   + Attributes: {attr['name']}")
         
         from app.shared.constants.taxonomy import TRUSTED_SOURCES
-        # 6. Seed Trusted Sources
+        # 5. Seed Trusted Sources
         for s in TRUSTED_SOURCES:
             db.session.add(Source(
                 name=s["name"],

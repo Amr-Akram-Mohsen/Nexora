@@ -4,7 +4,7 @@ class TargetType:
     VIDEO = "video"
     POST = "post"
     PRODUCT = "product"
-    ELECTRONICS = "electronics"
+    TECHNOLOGY = "technology"
     PERFUMES = "perfumes"
     ACCESSORIES = "accessories"
 

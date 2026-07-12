@@ -31,43 +31,7 @@ from .source_profile_model import SourceProfile
 # ============================================================
 
 SOURCE_PROFILES: dict[str, SourceProfile] = {
-    "rss": SourceProfile(
-        content_type="article",
-        transport="feed",
-        # RSS uses etag/last-modified — zero cooldown is correct since the
-        # protocol itself handles freshness (304 Not Modified).
-        cooldown_hours=0,
-        # RSS has only a handful of feeds; run them all every cycle.
-        max_queries_per_run=25,
-        requires_scraping=True,
-        supports_etag=True,
-        supports_last_modified=True,
-        freshness_priority="high",
-        quality_weight=0.85,
-        empty_result_penalty=False,
-        expected_media=["image"],
-        dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
-        allowed_sections=["news", "reviews", "tutorials", "trends"],
-    ),
-    "newsapi": SourceProfile(
-        content_type="article",
-        transport="api",
-        # 12h base cooldown.
-        # Velocity scaling: smartphones → 3h, niche perfumes → 24h.
-        cooldown_hours=12,
-        # Daily quota: 100 requests.
-        # Assuming ~6 meaningful runs/day (after cooldowns thin the pool):
-        #   100 / 6 = ~16 → use 15 (conservative margin).
-        max_queries_per_run=50,
-        requires_scraping=True,
-        freshness_priority="very_high",
-        quality_weight=0.75,
-        empty_result_penalty=True,
-        expected_media=["image"],
-        dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
-        allowed_sections=["news", "trends"],
-    ),
-    "event_registry": SourceProfile(
+    "newsapi_ai": SourceProfile(
         content_type="article",
         transport="api",
         cooldown_hours=6,
@@ -78,37 +42,12 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         empty_result_penalty=True,
         expected_media=["image"],
         dedupe_strategy=["er_uri", "canonical_url", "normalized_url"],
-        allowed_sections=["news", "trends"],
-    ),
-    "gnews": SourceProfile(
-        content_type="article",
-        transport="api",
-        # 16h base — GNews has a stricter daily quota than NewsAPI.
-        # Velocity: smartphones → 4h, niche perfumes → 32h.
-        cooldown_hours=15,
-        # Daily quota: 100 requests.
-        # Pool is smaller (~134 total queries); runs are fewer.
-        # 100 / 6 = ~16 → use 12 (extra margin for GNews being quota-sensitive).
-        max_queries_per_run=30,
-        requires_scraping=True,
-        freshness_priority="high",
-        quality_weight=0.70,
-        empty_result_penalty=True,
-        expected_media=["image"],
-        dedupe_strategy=["canonical_url", "normalized_url", "title_similarity"],
-        allowed_sections=["news", "trends"],
+        allowed_sections=["news", "deals", "trends"],
     ),
     "youtube": SourceProfile(
         content_type="video",
         transport="api",
-        # 24h base cooldown.
-        # Velocity: smartphones → 6h, niche perfumes → 48h (effectively weekly).
         cooldown_hours=24,
-        # Daily quota: 10,000 units → 100 searches (each costs 100 units).
-        # Query pool: ~1,046 total. Running every 3h = 8 runs/day.
-        # Budget per run: 100 / 8 = 12.5 → use 10 (strict — YouTube quota is
-        # the most expensive resource in the pipeline).
-        # 10 runs × 10 searches × 10 products/search = 1,000 videos/day maximum.
         max_queries_per_run=50,
         quota_cost=100,
         requires_scraping=False,
@@ -116,23 +55,6 @@ SOURCE_PROFILES: dict[str, SourceProfile] = {
         quality_weight=0.90,
         expected_media=["thumbnail"],
         dedupe_strategy=["external_id", "normalized_url"],
-        allowed_sections=["reviews", "tutorials", "trends", "community"],
-    ),
-    "reddit": SourceProfile(
-        content_type="post",
-        transport="api",
-        # 8h base cooldown.
-        # Velocity: smartphones → 2h, niche perfumes → 16h.
-        cooldown_hours=8,
-        # Reddit quota: effectively unlimited (OAuth 60 req/min).
-        # Cap is for DB write throughput, not API limits.
-        max_queries_per_run=25,
-        quota_cost=1,
-        requires_scraping=False,
-        freshness_priority="high",
-        quality_weight=0.65,
-        expected_media=["thumbnail", "image"],
-        dedupe_strategy=["external_id", "normalized_url"],
-        allowed_sections=["community", "trends", "reviews"],
+        allowed_sections=["reviews", "guides", "deals", "community", "trends"],
     ),
 }

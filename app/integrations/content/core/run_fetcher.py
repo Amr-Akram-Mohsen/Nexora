@@ -5,13 +5,9 @@ from flask import current_app
 from app.core.extensions import db
 from app.application.content.workflows.ingestion import run_orchestrated_ingestion
 from .api_fetchers import (
-    fetch_newsapi_query,
-    fetch_event_registry_query,
-    fetch_gnews_query,
+    fetch_newsapi_ai_query,
     fetch_youtube_query,
-    fetch_reddit_query,
 )
-from .rss import fetch_rss_query
 
 from app.shared.utils.logging import (
     log_integration_warning,
@@ -27,12 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 FETCHER_FUNCS_MAP = {
-    "newsapi": fetch_newsapi_query,
-    "event_registry": fetch_event_registry_query,
-    "gnews": fetch_gnews_query,
-    "rss": fetch_rss_query,
+    "newsapi_ai": fetch_newsapi_ai_query,
     "youtube": fetch_youtube_query,
-    "reddit": fetch_reddit_query,
 }
 
 
@@ -41,6 +33,11 @@ def run_fetcher(
     source_name: str,
     object_type: str,
     api_key_name: str | None = None,
+    target_section: str | None = None,
+    target_category: str | None = None,
+    profile_overrides: dict | None = None,
+    dry_run: bool = False,
+    limit: int | None = None,
 ):
     if api_key_name and not current_app.config.get(api_key_name):
         log_integration_warning(
@@ -61,16 +58,28 @@ def run_fetcher(
         last_error = None
         for attempt in range(3):
             try:
-                count = run_orchestrated_ingestion(
+                result = run_orchestrated_ingestion(
                     session=db.session,
                     source_name=source_name,
                     object_type=object_type,
                     api_fetcher=FETCHER_FUNCS_MAP.get(source_name),
+                    target_section=target_section,
+                    target_category=target_category,
+                    profile_overrides=profile_overrides,
+                    dry_run=dry_run,
+                    limit=limit,
                 )
+
+                if dry_run:
+                    return {
+                        "status": "success",
+                        "dry_run": True,
+                        "queries": result
+                    }
 
                 return {
                     "status": "success",
-                    "count": count,
+                    "count": result,
                 }
             except OperationalError as e:
                 last_error = e

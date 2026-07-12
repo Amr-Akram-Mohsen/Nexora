@@ -84,7 +84,7 @@ def load_memory_layer():
                 {"entity": "Laptops", "platform": "blog", "intent": "buying-guide", "outcome": "success", "impact_score": 0.78, "version": 1},
                 {"entity": "Perfumes", "platform": "pinterest", "intent": "gift-ideas", "outcome": "failure", "impact_score": 0.32, "version": 1},
                 {"entity": "Bags", "platform": "pinterest", "intent": "gift-ideas", "outcome": "success", "impact_score": 0.82, "version": 1},
-                {"entity": "Electronics", "platform": "blog", "intent": "buying-guide", "outcome": "failure", "impact_score": 0.28, "version": 1}
+                {"entity": "Technology", "platform": "blog", "intent": "buying-guide", "outcome": "failure", "impact_score": 0.28, "version": 1}
             ]
         }
 

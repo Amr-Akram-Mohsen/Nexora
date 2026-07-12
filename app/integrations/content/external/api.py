@@ -15,8 +15,7 @@ from app.shared.utils.logging import log_cooldown_skip
 logger = logging.getLogger(__name__)
 
 # ── Per-day limits for free tiers ─────────────────────────────────
-NEWSAPI_DAILY_LIMIT = 100
-GNEWS_DAILY_LIMIT = 100
+NEWSAPI_AI_DAILY_LIMIT = 100
 YOUTUBE_DAILY_QUOTA = 10_000  # units; 1 search = 100 units
 
 
@@ -43,20 +42,12 @@ def _record_call(api_name: str, units: int = 1):
 # ── Public helpers — one per API ──────────────────────────────────
 
 
-def can_call_newsapi() -> bool:
-    return _today_count("newsapi") < NEWSAPI_DAILY_LIMIT
+def can_call_newsapi_ai() -> bool:
+    return _today_count("newsapi_ai") < NEWSAPI_AI_DAILY_LIMIT
 
 
-def record_newsapi_call():
-    _record_call("newsapi")
-
-
-def can_call_gnews() -> bool:
-    return _today_count("gnews") < GNEWS_DAILY_LIMIT
-
-
-def record_gnews_call():
-    _record_call("gnews")
+def record_newsapi_ai_call():
+    _record_call("newsapi_ai")
 
 
 def can_call_youtube(units: int = 100) -> bool:

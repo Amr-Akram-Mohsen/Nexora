@@ -65,24 +65,6 @@ class Section(db.Model):
     def __repr__(self):
         return f"<Section id={self.id} name='{self.name}'>"
 
-# DEPRECATED: Being replaced by Entity model. Kept to prevent ImportErrors in analytics/admin.
-class Topic(db.Model):
-    __tablename__ = "topics"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), nullable=False)
-    normalized_name = db.Column(db.String(150), index=True)
-    slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    is_featured = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=True)
-    sort_order = db.Column(db.Integer, default=0)
-
-    @staticmethod
-    def get_by_slug(slug, session):
-        return session.query(Topic).filter_by(slug=slug).first()
-
-    def __repr__(self):
-        return f"<Topic {self.slug}>"
-
 class Brand(db.Model):
     __tablename__ = "brands"
     id = db.Column(db.Integer, primary_key=True)

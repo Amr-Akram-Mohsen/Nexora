@@ -12,7 +12,7 @@ from app.domains.taxonomy.models import Brand, Category
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_ITEM_TYPE = "electronics"
+DEFAULT_ITEM_TYPE = "technology"
 
 
 def get_or_create_brand(name: str) -> Brand:
@@ -64,7 +64,7 @@ def store_amazon_item(data: dict) -> Product | None:
     """
     brand_name = data.get("brand_name") or "Unknown"
     brand = get_or_create_brand(brand_name)
-    category_slug = data.get("category_slug") or "electronics"
+    category_slug = data.get("category_slug") or "technology"
     category = get_or_create_category(category_slug)
     store = get_amazon_store(data["country"])
 

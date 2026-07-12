@@ -85,7 +85,7 @@ PAGES_CONTENT = {
     'about': [
         {"card_type": "info", "icon": "fas fa-newspaper", "title": "Tech News", "text": "Latest developments in AI, gadgets, cybersecurity, and innovation."},
         {"card_type": "info", "icon": "fas fa-star", "title": "Product Reviews", "text": "Honest reviews of smartphones, laptops, wearables, and smart home devices."},
-        {"card_type": "info", "icon": "fas fa-graduation-cap", "title": "Tutorials", "text": "Practical guides to help you use technology safely and effectively."},
+        {"card_type": "info", "icon": "fas fa-graduation-cap", "title": "Guides", "text": "Practical guides to help you use technology safely and effectively."},
         {"card_type": "info", "icon": "fas fa-shield-alt", "title": "Digital Privacy", "text": "Tips, tools, and devices to protect your data and online presence."}
     ],
 }

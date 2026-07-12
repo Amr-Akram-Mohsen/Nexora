@@ -196,7 +196,7 @@ class Product(db.Model):
     @cached_property
     def structured_details(self):
         data = self.full_details
-        if self.product_type == "electronics":
+        if self.product_type == "technology":
             return {
                 "highlights": self.pick_keys(
                     {

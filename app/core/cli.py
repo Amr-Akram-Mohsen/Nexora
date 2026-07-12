@@ -1,15 +1,9 @@
 # app/core/cli.py
 from app.integrations.content.fetcher_runners.all_contents import (
-    run_newsapi_fetch,
-    run_gnews_fetch,
     run_youtube_fetch,
-    run_reddit_fetch,
-    run_rss_fetch,
     run_content_fetch,
     run_newsapi_ai_fetch
 )
-# from app.integrations.content.fetcher_runners.rss import run_rss_fetch
-# from app.integrations.content.fetcher_runners.all_contents import run_content_fetch
 
 
 def register_commands(app):
@@ -41,17 +35,7 @@ def register_commands(app):
         created = seed_arabclicks_stores()
         app.logger.info("Done! %d new ArabClicks stores seeded.", created)
 
-    @app.cli.command("fetch-newsapi")
-    def fetch_newsapi_command():
-        run_newsapi_fetch()
 
-    @app.cli.command("fetch-gnews")
-    def fetch_gnews_command():
-        run_gnews_fetch()
-
-    @app.cli.command("fetch-rss")
-    def fetch_rss_command():
-        run_rss_fetch()
 
     @app.cli.command("fetch-youtube")
     def fetch_youtube_command():
@@ -61,14 +45,12 @@ def register_commands(app):
     def fetch_newsapi_ai_command():
         run_newsapi_ai_fetch()
 
-    @app.cli.command("fetch-reddit")
-    def fetch_reddit_command():
-        run_reddit_fetch()
+
 
     @app.cli.command("fetch-all")
     def fetch_all_command():
         """Runs all active fetchers in one go."""
-        app.logger.info("--- [1/2] Fetching Articles (RSS/NewsAPI/GNews/YouTube) ---")
+        app.logger.info("--- [1/2] Fetching Articles (NewsAPI_AI/YouTube) ---")
         run_content_fetch()
 
     @app.cli.command("fetch-test")

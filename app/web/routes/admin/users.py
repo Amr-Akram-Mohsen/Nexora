@@ -17,7 +17,7 @@ from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, or_, and_, func
-from app.domains.taxonomy.models import Category, Topic, Brand
+from app.domains.taxonomy.models import Category, Brand
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.recommendation.models import UserInterest, UserEntityInterest
 

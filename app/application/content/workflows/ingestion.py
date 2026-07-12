@@ -6,9 +6,8 @@ from ..ingestion.services import (
     EnrichmentService,
     TaxonomyEnrichmentService,
     GenericQuotaService,
-    GNewsQuotaService,
     YouTubeQuotaService,
-    NewsApiQuotaService,
+    NewsApiAiQuotaService,
     CooldownService,
     ClassificationService,
 )
@@ -38,12 +37,10 @@ logger = logging.getLogger(__name__)
 
 # Taxonomy parent-group order used for round-robin rotation.
 # Matches the top-level category names in TAXONOMY["categories"].
-_TAXONOMY_GROUPS = ["electronics", "perfumes", "accessories"]
+_TAXONOMY_GROUPS = ["technology", "perfumes", "accessories"]
 
 QUOTA_SERVICE_MAP = {
-    "newsapi": NewsApiQuotaService,
-    "newsapi_ai": NewsApiQuotaService,
-    "gnews": GNewsQuotaService,
+    "newsapi_ai": NewsApiAiQuotaService,
     "youtube": YouTubeQuotaService,
 }
 
@@ -54,7 +51,7 @@ class IngestionWorkflow:
 
     Enhancements over the original:
     * Taxonomy-group-aware batching — on each run only queries belonging to
-      the *current* parent group (electronics / perfumes / accessories) are
+      the *current* parent group (technology / perfumes / accessories) are
       considered, and a BatchState cursor rotates the active group so
       coverage spreads across executions.
     * Progressive logging — a [FETCH] progress line is emitted after every
@@ -66,15 +63,22 @@ class IngestionWorkflow:
     def __init__(
         self,
         source_name: str,
+        profile_overrides: Optional[Dict] = None,
     ):
         self.source_name = source_name
-        self.discovery = None if source_name == "rss" else DiscoveryService()
+        self.discovery = DiscoveryService()
         self.quota_service = QUOTA_SERVICE_MAP.get(source_name, GenericQuotaService)()
         self.enrichment_service = EnrichmentService()
         self.taxonomy_enrichment_service = TaxonomyEnrichmentService()
         self.cooldown_service = CooldownService()
         self.classification_service = ClassificationService()
-        self.profile = SOURCE_PROFILES[source_name]
+        
+        base_profile = SOURCE_PROFILES[source_name]
+        if profile_overrides:
+            import dataclasses
+            self.profile = dataclasses.replace(base_profile, **profile_overrides)
+        else:
+            self.profile = base_profile
 
         logger.info(
             "[FETCH][%s] run started  max_queries_per_run=%s",
@@ -92,8 +96,11 @@ class IngestionWorkflow:
         object_type: str,
         fetcher: Callable,
         limit: Optional[int] = None,
+        target_section: Optional[str] = None,
+        target_category: Optional[str] = None,
+        dry_run: bool = False,
         **fetch_params,
-    ) -> int:
+    ) -> int | list:
         """
         Execute the ingestion workflow for a single fetch run.
 
@@ -122,7 +129,12 @@ class IngestionWorkflow:
         flat_tasks = []
 
         for section, categories in queries_registry.items():
+            if target_section and section != target_section:
+                continue
             for category, queries in categories.items():
+                cat_slug = category.split(":")[-1] if ":" in category else category
+                if target_category and cat_slug != target_category and category != target_category:
+                    continue
                 last_index = cursor_state.get(section, category)
 
                 start = last_index
@@ -174,7 +186,7 @@ class IngestionWorkflow:
                 exc,
             )
 
-        if batch_state:
+        if batch_state and not (target_section or target_category):
             # We try to find a group that has fresh tasks.
             # We check up to len(_TAXONOMY_GROUPS) to avoid infinite loops if everything is on cooldown.
             groups_checked = 0
@@ -308,6 +320,13 @@ class IngestionWorkflow:
             eligible=total_eligible,
             limit=limit or "inf",
         )
+        # ── Dry Run Short Circuit ─────────────────────────────────────
+        if dry_run:
+            logger.info("[FETCH][%s] dry_run=True  returning %d queries", self.source_name, total_tasks)
+            for section, category, q_obj, idx, total in flat_tasks:
+                cursor_state.update(section, category, idx, total)
+            return [t[2] for t in flat_tasks]
+
         # ── Main loop ─────────────────────────────────────────────────
         total_stored = 0
         total_updated = 0
@@ -632,8 +651,13 @@ def run_orchestrated_ingestion(
     object_type: str,
     api_fetcher: Callable,
     manual_queries: Optional[List[Dict]] = None,
+    target_section: Optional[str] = None,
+    target_category: Optional[str] = None,
+    profile_overrides: Optional[Dict] = None,
+    dry_run: bool = False,
+    limit: Optional[int] = None,
     **extra_params,
-) -> int:
+) -> int | list:
     """
     Helper to run an orchestrated ingestion run using injected dependencies.
 
@@ -641,6 +665,7 @@ def run_orchestrated_ingestion(
     """
     workflow = IngestionWorkflow(
         source_name=source_name,
+        profile_overrides=profile_overrides,
     )
 
     if manual_queries:
@@ -660,5 +685,9 @@ def run_orchestrated_ingestion(
         session=session,
         object_type=object_type,
         fetcher=api_fetcher,
+        target_section=target_section,
+        target_category=target_category,
+        dry_run=dry_run,
+        limit=limit,
         **extra_params,
     )

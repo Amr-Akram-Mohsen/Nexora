@@ -291,10 +291,10 @@ def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit, se
         category_ids = set()
         for cat in categories:
             category_ids.add(cat.id)
-            # Add parent category if it exists (e.g. Smartphones -> Electronics)
+            # Add parent category if it exists (e.g. Smartphones -> Technology)
             if cat.parent_id:
                 category_ids.add(cat.parent_id)
-            # Add child categories if any exist (e.g. Electronics -> Smartphones, Laptops)
+            # Add child categories if any exist (e.g. Technology -> Smartphones, Laptops)
             if cat.children:
                 for child in cat.children:
                     category_ids.add(child.id)

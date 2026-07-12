@@ -10,7 +10,7 @@ Section keys returned by ``get_home_page_data()``:
   hero_sliders          — Trends section content (for the hero slider)
   latest_reviews        — Most recent reviews
   tech_news             — Most recent news content
-  tutorials             — Tutorial content
+  guides                — Guides content
   popular_this_week     — Trending content across all sections (7-day window)
   recommended_videos    — Trending video content specifically
   recommended_articles  — Trending article content specifically
@@ -83,7 +83,7 @@ def get_home_page_data():
     # ── Priority 4: Chronological & Fillers ───────────────────────────────
     latest_reviews = filter_and_track(get_contents_render_cached(filter_values=("reviews",), rows_count=36), seen_content_ids, limit=24)
     tech_news = filter_and_track(get_contents_render_cached(filter_values=("news",), rows_count=36), seen_content_ids, limit=24)
-    tutorials = filter_and_track(get_contents_render_cached(filter_values=("tutorials",), rows_count=36), seen_content_ids, limit=24)
+    guides = filter_and_track(get_contents_render_cached(filter_values=("guides",), rows_count=36), seen_content_ids, limit=24)
     recently_added = filter_and_track(get_filtered_items_for_home(filter_type="recent", limit=30), seen_product_ids, limit=10)
 
     return {
@@ -93,7 +93,7 @@ def get_home_page_data():
         # ── Content ────────────────────────────────────────────────────────
         "latest_reviews": latest_reviews,
         "tech_news": tech_news,
-        "tutorials": tutorials,
+        "guides": guides,
         "popular_this_week": popular_this_week,
         "recommended_videos": recommended_videos,
         "recommended_articles": recommended_articles,

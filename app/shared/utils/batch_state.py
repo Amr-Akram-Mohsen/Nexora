@@ -4,7 +4,7 @@ Lightweight taxonomy-group batch cursor.
 
 Persists a small JSON file under the instance/cache directory so each
 fetch run can pick up from where the previous one left off, rotating
-through the taxonomy parent groups (electronics → perfumes → accessories)
+through the taxonomy parent groups (technology → perfumes → accessories)
 instead of always starting from the beginning.
 
 No external dependencies — plain stdlib json + pathlib.
@@ -12,7 +12,7 @@ No external dependencies — plain stdlib json + pathlib.
 Usage::
 
     state = BatchState("newsapi")
-    group   = state.current_group(GROUPS)   # e.g. "electronics"
+    group   = state.current_group(GROUPS)   # e.g. "technology"
     state.advance(GROUPS)                   # move cursor to next group
 """
 
@@ -47,7 +47,7 @@ def _state_path(source: str) -> Path:
 
 class BatchState:
     """
-    Tracks which taxonomy parent group (e.g. 'electronics', 'perfumes',
+    Tracks which taxonomy parent group (e.g. 'technology', 'perfumes',
     'accessories') should be processed in the current fetch run.
 
     The cursor value is the *index* into ``groups`` and is stored on disk

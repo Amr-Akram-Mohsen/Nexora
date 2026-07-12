@@ -20,7 +20,7 @@ PERFUME_CATEGORIES = {
     "oud-oriental",
 }
 
-ELECTRONICS_CATEGORIES = {
+TECHNOLOGY_CATEGORIES = {
     "smartphones",
     "laptops",
     "tablets",
@@ -119,8 +119,8 @@ def detect_facets(
     _add_if("wireless",          ["wireless", "bluetooth"], text, facets)
     _add_if("fast charging",     ["fast charging", "quick charge", "rapid charge", "65w", "120w"], text, facets)
 
-    # Electronics-specific
-    if category_slug in ELECTRONICS_CATEGORIES:
+    # Technology-specific
+    if category_slug in TECHNOLOGY_CATEGORIES:
         _add_if("foldable",          ["foldable", "flip phone", "fold"], text, facets)
         _add_if("gaming",            ["gaming", "game mode", "refresh rate 120", "144hz"], text, facets)
         _add_if("AI features",       ["ai camera", "ai feature", "on-device ai", "generative ai"], text, facets)

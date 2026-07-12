@@ -9,12 +9,16 @@ TAXONOMY = {
       "description": "Hands-on product testing and expert opinions."
     },
     {
-      "name": "Tutorials",
-      "description": "Guides, tips, and how-to articles."
+      "name": "Guides",
+      "description": "Tutorials, buying guides, and how-to articles."
     },
     {
       "name": "Trends",
       "description": "Market insights and hot upcoming products."
+    },
+    {
+      "name": "Deals",
+      "description": "Price drops, sales, and temporary offers."
     },
     {
       "name": "Community",
@@ -23,7 +27,7 @@ TAXONOMY = {
   ],
   "categories": [
     {
-      "name": "Electronics",
+      "name": "Technology",
       "is_leaf": False,
       "children": [
         {
@@ -140,23 +144,7 @@ TAXONOMY = {
       "is_leaf": True
     }
   ],
-  "topics": [
-    {
-      "name": "Gaming"
-    },
-    {
-      "name": "Home Office"
-    },
-    {
-      "name": "Photography"
-    },
-    {
-      "name": "Fitness"
-    },
-    {
-      "name": "Travel Gear"
-    }
-  ],
+
   "brands": [
     {
       "name": "Apple",
@@ -285,15 +273,6 @@ TAXONOMY = {
       },
       {
         "name": "First Impressions"
-      },
-      {
-        "name": "Review"
-      },
-      {
-        "name": "News"
-      },
-      {
-        "name": "Tutorial"
       }
     ],
     "price_tier": [
@@ -353,47 +332,47 @@ TAXONOMY = {
       },
       {
         "name": "Portable",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "High Performance",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Lightweight",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Waterproof",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Noise Cancelling",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Battery Life",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Fast Charging",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Wireless",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Ray Tracing",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Overclocking",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Handheld",
-        "category": "Electronics"
+        "category": "Technology"
       },
       {
         "name": "Mechanical",
@@ -421,13 +400,13 @@ TAXONOMY = {
 
 REDDIT_SUBREDDITS = {
     "community": {
-        "electronics": ["gadgets", "smartphones", "Android", "iphone", "hardware", "Apple", "Samsung", "PCMasterRace", "GooglePixel"],
+        "technology": ["gadgets", "smartphones", "Android", "iphone", "hardware", "Apple", "Samsung", "PCMasterRace", "GooglePixel"],
         "perfumes":    ["fragrance", "scents", "malefragrance", "feminineFragrance", "oud", "IndieExchange"],
         "accessories": ["Watches", "LuxuryPurse", "DesignerBags", "Sunglasses", "streetwear", "malefashionadvice"],
         "regional":    ["saudiarabia", "dubai", "abudhabi", "emirates"], 
     },
     "trends": {
-        "electronics": ["technology", "futurology", "startups"],
+        "technology": ["technology", "futurology", "startups"],
         "perfumes":    ["fragrance", "scents"],
         "accessories": ["streetwear", "highfashion"],
     }

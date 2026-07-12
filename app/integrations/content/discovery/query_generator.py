@@ -80,20 +80,16 @@ def dedupe_queries(queries: List[Dict]) -> List[Dict]:
 # Boolean sources (event_registry, reddit) support OR-clauses so they get
 # more terms per query. Non-boolean sources (youtube, rss) must stay simple.
 _MAX_EXPANDED_TERMS: dict[str, int] = {
-    "event_registry": 5,
-    "reddit":  4,
+    "newsapi_ai": 5,
     "youtube": 3,
-    "rss":     3,
 }
 
 # Maximum intent keyword terms to iterate.
 # Boolean sources combine intent terms into one OR-block anyway.
 # Non-boolean sources (YouTube, RSS) iterate plain terms separately.
 _MAX_INTENT_TERMS: dict[str, int] = {
-    "event_registry": 3,
-    "reddit":  2,
+    "newsapi_ai": 3,
     "youtube": 1,
-    "rss":     1,
 }
 
 
@@ -113,9 +109,9 @@ def build_query_variants(
     Build rich query variations for a single category+intent+source combination.
 
     Query count is now tightly bounded per source:
-      - Boolean sources (event_registry, reddit): OR-block counts as 1 intent
+      - Boolean sources (newsapi_ai): OR-block counts as 1 intent
         term but covers multiple signals simultaneously.
-      - Non-boolean sources (youtube, rss): limited to 1 intent term and 3
+      - Non-boolean sources (youtube): limited to 1 intent term and 3
         expanded terms to prevent exponential growth.
     """
 
@@ -207,7 +203,7 @@ def build_query_variants(
         q_str = q_str.replace("( ", "(").replace(" )", ")")
 
         import re
-        if source == "event_registry":
+        if source == "newsapi_ai":
             def limit_or_2(m):
                 parts = m.group(1).split(" OR ")
                 return "(" + " OR ".join(parts[:2]) + ")"
@@ -269,9 +265,7 @@ def build_query_variants(
                 if source == "youtube":
                     if temporal:
                         query += f" {temporal}"
-                elif source == "rss":
-                    pass
-                elif source != "reddit":
+                else:
                     if temporal:
                         query += f" {temporal}"
                     # Do not add exploration or suffix to news/trends, as it ruins precision.

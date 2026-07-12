@@ -14,10 +14,8 @@ from app.integrations.content.external.api import (
     get_fetch_metadata,
     mark_fetched,
     mark_failed,
-    can_call_newsapi,
-    record_newsapi_call,
-    can_call_gnews,
-    record_gnews_call,
+    can_call_newsapi_ai,
+    record_newsapi_ai_call,
     can_call_youtube,
     record_youtube_call,
 )
@@ -129,24 +127,14 @@ class CooldownService(CooldownPort):
         mark_failed(section, cache_key, error=error, source=source)
 
 
-class NewsApiQuotaService(QuotaPort):
+class NewsApiAiQuotaService(QuotaPort):
     def can_call(self):
 
-        return can_call_newsapi()
+        return can_call_newsapi_ai()
 
     def record_call(self):
 
-        record_newsapi_call()
-
-
-class GNewsQuotaService(QuotaPort):
-    def can_call(self):
-
-        return can_call_gnews()
-
-    def record_call(self):
-
-        record_gnews_call()
+        record_newsapi_ai_call()
 
 
 class YouTubeQuotaService(QuotaPort):

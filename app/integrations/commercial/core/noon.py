@@ -205,7 +205,7 @@ def discover_noon_products(
     #         "currency":      cfg["currency"],
     #         "country":       cfg["country"],
     #         "marketplace":   store_slug,
-    #         "category_slug": "electronics",  # adjust per query
+    #         "category_slug": "technology",  # adjust per query
     #     }
     #     for product in raw_results
     # ]

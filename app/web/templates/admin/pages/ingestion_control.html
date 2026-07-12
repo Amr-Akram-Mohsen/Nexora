@@ -1,0 +1,123 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "components/ui/modal.html" import modal %}
+{% from "components/ui/spinner.html" import spinner, table_spinner %}
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_settings_card %}
+{% from "components/ui/core.html" import button, input, select %}
+
+{% block title %}Ingestion Control — Nexora Admin{% endblock %}
+
+{% block admin_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/pages/ingestion.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+
+{{ admin_page_header("Ingestion Control", "Manually trigger, inspect, and track the content ingestion pipeline.") }}
+
+<div class="settings-grid">
+
+  <!-- Manual Trigger Panel -->
+  {% call admin_settings_card("Trigger Ingestion", "Run or dry-run an API fetch", 'fa-solid fa-play') %}
+    <form id="ingestion-form" class="flex flex-col gap-4">
+      <div class="form-group">
+        <label class="form-label" for="source_name">Source</label>
+        <select class="form-input" id="source_name" name="source_name" required>
+          <option value="newsapi_ai">NewsAPI.ai (Articles)</option>
+          <option value="youtube">YouTube (Videos)</option>
+        </select>
+      </div>
+
+      <div class="form-group flex gap-4">
+        <div class="flex-1">
+          <label class="form-label" for="target_section">Target Section (Optional)</label>
+          <select class="form-input" id="target_section" name="target_section">
+            <option value="">-- All Sections --</option>
+            <option value="news">News</option>
+            <option value="reviews">Reviews</option>
+            <option value="guides">Guides</option>
+            <option value="deals">Deals</option>
+            <option value="trends">Trends</option>
+            <option value="community">Community</option>
+          </select>
+        </div>
+        <div class="flex-1">
+          <label class="form-label" for="target_category">Target Category Slug (Optional)</label>
+          {{ input(type="text", id="target_category", name="target_category", placeholder="e.g. technology") }}
+        </div>
+      </div>
+
+      <div class="form-group flex gap-4">
+        <div class="flex-1">
+          <label class="form-label" for="limit">Max Queries Limit (Optional)</label>
+          {{ input(type="number", id="limit", name="limit", placeholder="Default from profile") }}
+        </div>
+        <div class="flex-1">
+          <label class="form-label" for="cooldown_hours">Cooldown Hours Override</label>
+          {{ input(type="number", id="cooldown_hours", name="cooldown_hours", placeholder="e.g. 0 to bypass cache") }}
+        </div>
+      </div>
+
+      <label class="settings-toggle-row flex products-center justify-between gap-4">
+        <span class="settings-toggle-label">
+          <strong>Dry Run (Pseudo Environment)</strong><br>
+          <span class="hint">Generates queries without consuming API quota.</span>
+        </span>
+        <span class="settings-toggle-wrapper">
+          {{ input(type="checkbox", id="dry_run", name="dry_run", class="settings-toggle-input", checked=true) }}
+          <span class="settings-toggle-track"></span>
+        </span>
+      </label>
+
+      <div class="flex justify-end gap-2 mt-4">
+        {{ button(text="Execute", class="admin-btn-primary", attrs={"id": "trigger-btn", "type": "submit"}, variant=none) }}
+      </div>
+    </form>
+    
+    <div id="task-status-container" class="mt-4 ingestion-hidden">
+        <p><strong>Status:</strong> <span id="task-status-text">Pending...</span></p>
+        <div id="task-result-container" class="mt-2"></div>
+    </div>
+  {% endcall %}
+
+  <!-- Cache Helpers Dashboard -->
+  {% call admin_settings_card("Cache Helpers", "Current Rotation & Cursor States", 'fa-solid fa-database') %}
+    <div id="cache-helpers-container">
+      {{ spinner("Loading cache state...") }}
+    </div>
+  {% endcall %}
+
+</div>
+
+<!-- HTML Templates for JavaScript Cloning -->
+<template id="cache-helpers-template">
+    <pre class="cache-helpers-view"></pre>
+</template>
+
+<template id="query-table-template">
+    <table class="ingestion-query-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Query</th>
+            </tr>
+        </thead>
+        <tbody class="query-table-body"></tbody>
+    </table>
+</template>
+
+<template id="query-row-template">
+    <tr>
+        <td class="query-index"></td>
+        <td><code class="ingestion-query-code"></code></td>
+    </tr>
+</template>
+
+<template id="result-message-template">
+    <p class="result-message"></p>
+</template>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/ingestion.js') }}"></script>
+{% endblock %}

@@ -1,17 +1,9 @@
 import logging
 
 from app.integrations.content.fetcher_runners.api_fetchers import (
-    run_newsapi_fetch,
-    run_event_registry_fetch,
-    run_gnews_fetch,
     run_youtube_fetch,
-    run_reddit_fetch,
+    run_newsapi_ai_fetch,
 )
-# Note: run_newsapi_ai_fetch is not implemented but cli expects it. We provide a dummy if needed or export it if it exists in api_fetchers.
-def run_newsapi_ai_fetch():
-    pass
-
-from .rss import run_rss_fetch
 
 from app.shared.utils.logging import log_runner_banner
 
@@ -20,10 +12,8 @@ logger = logging.getLogger(__name__)
 # Sources in priority order — changing this order changes which source
 # gets first access to quota/DB writes when run synchronously.
 _SOURCES = [
-    ("event_registry", run_event_registry_fetch),
-    ("youtube",  run_youtube_fetch),
-    ("rss",      run_rss_fetch),
-    ("reddit",   run_reddit_fetch),
+    ("newsapi_ai", run_newsapi_ai_fetch),
+    ("youtube",    run_youtube_fetch),
 ]
 
 

@@ -1,29 +1,6 @@
 from ..core.run_fetcher import run_fetcher
 
 
-def run_newsapi_fetch():
-    return run_fetcher(
-        source_name="newsapi",
-        object_type="article",
-        api_key_name="NEWS_API_KEY",
-    )
-
-def run_event_registry_fetch():
-    return run_fetcher(
-        source_name="event_registry",
-        object_type="article",
-        api_key_name="EVENT_REGISTRY_API_KEY",
-    )
-
-
-def run_gnews_fetch():
-    return run_fetcher(
-        source_name="gnews",
-        object_type="article",
-        api_key_name="GNEWS_API_KEY",
-    )
-
-
 def run_youtube_fetch():
     return run_fetcher(
         source_name="youtube",
@@ -32,9 +9,10 @@ def run_youtube_fetch():
     )
 
 
-def run_reddit_fetch():
+def run_newsapi_ai_fetch():
     return run_fetcher(
-        source_name="reddit",
-        object_type="post",
-        api_key_name="REDDIT_CLIENT_ID",
+        source_name="newsapi_ai",
+        object_type="article",
+        api_key_name="NEWSAPI_AI_API_KEY",
     )
+

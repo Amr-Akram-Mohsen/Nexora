@@ -36,7 +36,7 @@ def get_item_page_data(product_id):
         section_slug = c.get("section", {}).get("slug") if c.get("section") else None
         if c.get("object_type") == "video":
             related_videos.append(c)
-        elif c.get("object_type") == "article" and section_slug == "tutorials":
+        elif c.get("object_type") == "article" and section_slug == "guides":
             buying_guides.append(c)
         elif c.get("object_type") == "article":
             related_articles.append(c)

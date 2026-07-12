@@ -7,11 +7,8 @@ Jobs registered here and their recommended intervals:
 
   Source     | Interval | Rationale
   -----------|----------|--------------------------------------------------
-  newsapi    | 4h       | 100 req/day ÷ 6 runs = 15/run (max_queries_per_run)
-  gnews      | 6h       | 100 req/day ÷ 4 runs = 25/run, use 12 (extra margin)
+  newsapi_ai | 4h       | 100 req/day
   youtube    | 3h       | 10,000 units/day = 100 searches; 8 runs × 10 = 80 ✓
-  reddit     | 4h       | Unlimited quota; 6 runs × 25 = 150 posts/day
-  rss        | 2h       | Etag-protected — near-free, gets freshest feeds
   enrich     | 2h       | Publish pending articles that were scraped
 
 All jobs push a Flask app context so SQLAlchemy sessions work safely.
@@ -54,36 +51,13 @@ def init_scheduler(app):
 
     _scheduler = BackgroundScheduler(timezone="Asia/Riyadh", daemon=True)
 
-    # ── RSS: every 2 hours ───────────────────────────────────────
-    # Etag/Last-Modified protected — almost free. Gets the freshest feeds.
+    # ── NewsAPI AI: every 4 hours ───────────────────────────────────
     _scheduler.add_job(
         func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_rss_fetch"
-        ),
-        trigger=IntervalTrigger(hours=2),
-        id="fetch_rss",
-        replace_existing=True,
-    )
-
-    # ── NewsAPI: every 4 hours ───────────────────────────────────
-    # 100 req/day budget. 4h × 6 runs = 15 max_queries_per_run each. ✓
-    _scheduler.add_job(
-        func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_newsapi_fetch"
+            app, "app.integrations.content.fetcher_runners.all_contents.run_newsapi_ai_fetch"
         ),
         trigger=IntervalTrigger(hours=4),
-        id="fetch_newsapi",
-        replace_existing=True,
-    )
-
-    # ── GNews: every 6 hours ─────────────────────────────────────
-    # 100 req/day budget. 6h × 4 runs = 12 max_queries_per_run each. ✓
-    _scheduler.add_job(
-        func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_gnews_fetch"
-        ),
-        trigger=IntervalTrigger(hours=6),
-        id="fetch_gnews",
+        id="fetch_newsapi_ai",
         replace_existing=True,
     )
 
@@ -98,16 +72,7 @@ def init_scheduler(app):
         replace_existing=True,
     )
 
-    # ── Reddit: every 4 hours ────────────────────────────────────
-    # Unlimited OAuth quota. 4h × 6 runs × 25 posts = 150 posts/day.
-    _scheduler.add_job(
-        func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_reddit_fetch"
-        ),
-        trigger=IntervalTrigger(hours=4),
-        id="fetch_reddit",
-        replace_existing=True,
-    )
+
 
     # ── Article enrichment: every 2 hours ────────────────────────
     # Scrapes and publishes pending articles. Light workload.
@@ -156,8 +121,7 @@ def init_scheduler(app):
 
     _scheduler.start()
     logger.info(
-        "[Scheduler] All jobs registered. "
-        "RSS=2h, NewsAPI=4h, GNews=6h, YouTube=3h, Reddit=4h, Enrich=2h"
+        "NewsAPI_AI=4h, YouTube=3h, Enrich=2h"
     )
 
 

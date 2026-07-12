@@ -13,13 +13,13 @@ def _leaf_slug(slug: str) -> str:
     Strip the parent prefix from a composite slug.
 
     The discovery layer produces composite category keys like
-    ``"electronics:smartphones"``.  The DB stores leaf categories under their
+    ``"technology:smartphones"``.  The DB stores leaf categories under their
     leaf slug (``"smartphones"``).  This helper extracts the leaf part so the
     DB lookup always succeeds.
 
     Examples::
 
-        "electronics:smartphones" → "smartphones"
+        "technology:smartphones" → "smartphones"
         "perfumes:niche-artisanal" → "niche-artisanal"
         "smartphones"              → "smartphones"   (already a leaf)
     """
@@ -46,7 +46,7 @@ def resolve_taxonomy(data, session=None):
     Resolution order for the category:
       1. Leaf slug (e.g. "smartphones")
       2. Composite slug as-is (legacy / edge-case)
-      3. Parent slug (e.g. "electronics") – broad fallback
+      3. Parent slug (e.g. "technology") – broad fallback
       4. "uncategorized" – last resort
 
     Falls back to "news" for the section when the slug is missing/unknown.
@@ -63,7 +63,7 @@ def resolve_taxonomy(data, session=None):
     # ── Category ─────────────────────────────────────────────────────────
     raw_cat_slug = data.get("category_slug") or ""
 
-    # 1. Preferred: leaf slug  (strips "electronics:" prefix)
+    # 1. Preferred: leaf slug  (strips "technology:" prefix)
     leaf = _leaf_slug(raw_cat_slug)
     category = Category.get_by_slug(leaf, session) if leaf else None
 

@@ -93,11 +93,12 @@ CATEGORY_TOPIC_MAP = {
 # ==========================================================
 
 DEFAULT_SOURCE_ALIGNMENT = {
-    "news": ["gnews", "newsapi", "event_registry"],
-    "reviews": ["youtube", "rss", "reddit"],
-    "tutorials": ["youtube", "rss"],
-    "trends": ["newsapi", "event_registry", "reddit"],
-    "community": ["reddit"],
+    "news": ["newsapi_ai", "rss"],
+    "reviews": ["youtube", "rss"],
+    "guides": ["youtube", "rss"],
+    "deals": ["newsapi_ai", "rss"],
+    "trends": ["newsapi_ai", "rss"],
+    "community": [],
 }
 
 
@@ -106,20 +107,22 @@ DEFAULT_SOURCE_ALIGNMENT = {
 # ==========================================================
 
 CATEGORY_SOURCE_OVERRIDES = {
-    "electronics": {
-        "news": ["gnews", "newsapi", "event_registry", "rss"],
-        "trends": ["newsapi", "event_registry", "reddit", "rss"],
+    "technology": {
+        "news": ["newsapi_ai", "rss"],
+        "deals": ["newsapi_ai", "rss"],
+        "trends": ["newsapi_ai", "rss"],
     },
     "perfumes": {
-        "news": ["youtube", "reddit", "gnews"],
-        "reviews": ["youtube", "reddit"],
-        "tutorials": ["youtube"],
-        "trends": ["reddit", "youtube"],
+        "news": ["youtube", "newsapi_ai"],
+        "reviews": ["youtube", "rss"],
+        "guides": ["youtube"],
+        "deals": ["youtube", "newsapi_ai"],
+        "trends": ["youtube", "newsapi_ai"],
     },
     "accessories": {
-        "news": ["rss", "newsapi", "event_registry", "gnews"],
-        "reviews": ["youtube", "reddit", "rss"],
-        "community": ["reddit"],
+        "news": ["rss", "newsapi_ai"],
+        "reviews": ["youtube", "rss"],
+        "community": [],
     },
 }
 
@@ -141,10 +144,11 @@ INTENT_KEYWORDS = {
     "Tutorial": ["how to", "setup guide", "tips and tricks"],
     "Top List": ["best", "top 5", "top 10"],
     "News": ["launch", "announced", "release", "unveiled"],
+    "Deals": ["discount", "sale", "deal", "price drop", "coupon"],
 }
 
 # Sources that support (OR / AND / Parentheses)
-BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "event_registry", "reddit", "gnews"]
+BOOLEAN_SUPPORTED_SOURCES = ["newsapi_ai"]
 
 # ==========================================================
 # SECTION DEFAULT INTENTS
@@ -153,8 +157,9 @@ BOOLEAN_SUPPORTED_SOURCES = ["newsapi", "event_registry", "reddit", "gnews"]
 SECTION_DEFAULT_INTENTS = {
     "news": ["News"],
     "reviews": ["Review"],  # "First Impressions" generates near-identical queries
-    "tutorials": ["Tutorial"],
-    "trends": ["Top List"],  # "Buying Guide" overlaps heavily with "Top List"
+    "guides": ["Tutorial", "Buying Guide"],
+    "deals": ["Deals", "Value Check"],
+    "trends": ["Top List"],
     "community": ["Comparison"],  # "Review" is already covered by the reviews section
 }
 
@@ -177,12 +182,17 @@ QUERY_TEMPLATES = {
         # already injected as a separate entry in expanded_terms, so
         # "{brand} review" is generated naturally via the category template.
     ],
-    "tutorials": [
-        "{category} (setup OR guide OR tips OR {problem})",
+    "guides": [
+        "how to use {feature} on {category}",
+        "best {category} setup guide"
+    ],
+    "deals": [
+        "{category} ({feature} OR deals OR anticipated) {year}",
+        "{category} price drop {year}"
     ],
     "trends": [
         "{category} ({feature} OR trends OR anticipated) {year}",
-        "{category} buying guide {year}",
+        "{category} market analysis {year}"
     ],
     "community": [
         "{category} (discussion OR issues OR {problem})",
@@ -746,7 +756,7 @@ EXPLORATION_MODIFIERS = [
 ]
 
 SEARCH_KEYWORD_EXPANSIONS = {
-    # Electronics
+    # Technology
     "smartphones": "(android phone OR flagship phone OR camera phone OR mobile phone)",
     "laptops": "(ultrabook OR gaming laptop OR creator laptop OR MacBook OR notebook)",
     "tablets": "(iPad OR android tablet OR drawing tablet OR e-reader)",
