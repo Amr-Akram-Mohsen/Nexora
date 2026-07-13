@@ -375,7 +375,7 @@ a.clickable-card:hover .dashboard-stat-value {
 .activity-product {
     gap: 0.875rem;
     padding: 0.875rem 1.25rem;
-    align-products: flex-start;
+    align-items: flex-start;
     border-bottom: 1px solid var(--border);
 }
 
@@ -459,14 +459,37 @@ a.clickable-card:hover .dashboard-stat-value {
     width: var(--seg-width, 0%);
 }
 
-.stacked-bar-segment--primary  { background: var(--brand-primary, var(--brand-blue)); }
-.stacked-bar-segment--purple   { background: var(--brand-purple); }
-.stacked-bar-segment--orange   { background: var(--brand-orange); }
-.stacked-bar-segment--green    { background: var(--brand-green); }
-.stacked-bar-segment--red      { background: var(--brand-red); }
-.stacked-bar-segment--blue     { background: var(--brand-blue); }
-.stacked-bar-segment--teal     { background: var(--brand-teal); }
-.stacked-bar-segment--muted    { background: var(--muted-foreground); }
+.stacked-bar-segment--primary {
+    background: var(--brand-primary, var(--brand-blue));
+}
+
+.stacked-bar-segment--purple {
+    background: var(--brand-purple);
+}
+
+.stacked-bar-segment--orange {
+    background: var(--brand-orange);
+}
+
+.stacked-bar-segment--green {
+    background: var(--brand-green);
+}
+
+.stacked-bar-segment--red {
+    background: var(--brand-red);
+}
+
+.stacked-bar-segment--blue {
+    background: var(--brand-blue);
+}
+
+.stacked-bar-segment--teal {
+    background: var(--brand-teal);
+}
+
+.stacked-bar-segment--muted {
+    background: var(--muted-foreground);
+}
 
 /* --- Legend Swatch Dots --- */
 
@@ -477,14 +500,37 @@ a.clickable-card:hover .dashboard-stat-value {
     flex-shrink: 0;
 }
 
-.legend-dot--primary  { background: var(--brand-primary, var(--brand-blue)); }
-.legend-dot--purple   { background: var(--brand-purple); }
-.legend-dot--orange   { background: var(--brand-orange); }
-.legend-dot--green    { background: var(--brand-green); }
-.legend-dot--red      { background: var(--brand-red); }
-.legend-dot--blue     { background: var(--brand-blue); }
-.legend-dot--teal     { background: var(--brand-teal); }
-.legend-dot--muted    { background: var(--muted-foreground); }
+.legend-dot--primary {
+    background: var(--brand-primary, var(--brand-blue));
+}
+
+.legend-dot--purple {
+    background: var(--brand-purple);
+}
+
+.legend-dot--orange {
+    background: var(--brand-orange);
+}
+
+.legend-dot--green {
+    background: var(--brand-green);
+}
+
+.legend-dot--red {
+    background: var(--brand-red);
+}
+
+.legend-dot--blue {
+    background: var(--brand-blue);
+}
+
+.legend-dot--teal {
+    background: var(--brand-teal);
+}
+
+.legend-dot--muted {
+    background: var(--muted-foreground);
+}
 
 /* --- Chart Legend Row --- */
 
@@ -497,7 +543,7 @@ a.clickable-card:hover .dashboard-stat-value {
 
 .chart-legend-product {
     display: flex;
-    align-products: center;
+    align-items: center;
     gap: 0.375rem;
     font-size: var(--text-xs);
     color: var(--foreground);
@@ -630,7 +676,7 @@ a.clickable-card:hover .dashboard-stat-value {
     font-size: var(--text-xs);
     color: var(--muted-foreground);
     display: flex;
-    align-products: center;
+    align-items: center;
     gap: 0.375rem;
 }
 

@@ -7,6 +7,7 @@ def create_article_model(data):
     return Article(
         title=data.get("title"),
         description=data.get("description"),
+        body=data.get("body"),
         content_text=data.get("content_text"),
         content_html=data.get("content_html"),
         word_count=data.get("word_count"),
@@ -26,11 +27,11 @@ def process_diffbot_enrichment(article, diffbot_data, session):
     Applies Diffbot enrichment data to a discovered Article.
     Updates content fields, extracts authors, and manages the status transition.
     """
-    if not diffbot_data or "objects" not in diffbot_data or not diffbot_data["objects"]:
+    if not diffbot_data or "metadata" not in diffbot_data:
         article.status = "failed"
         return False
 
-    obj = diffbot_data["objects"][0]
+    obj = diffbot_data["metadata"]
     
     # 1. Update Core Content Fields
     article.content_text = obj.get("text")

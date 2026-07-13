@@ -117,6 +117,7 @@ def normalize_article_data(enriched: EnrichedItemDTO) -> ArticleCreateDTO | None
         "source_name":    sanitize_text(data.get("source_name") or (data.get("source") or {}).get("name") or ""),
         "content_html":   sanitize_html(data.get("content_html") or data.get("content")),
         "content_text":   sanitize_text(data.get("content_text") or ""),
+        "body":           sanitize_text(data.get("body") or ""),
         "canonical_url":  normalize_url(data.get("canonical_url"))
     })
     
@@ -133,6 +134,7 @@ def normalize_video_data(raw: dict) -> dict | None:
         "published_at":   parse_date(data.get("published_at")),
         "channel_name":   sanitize_text(data.get("channel_name") or ""),
         "thumbnail_url":  data.get("thumbnail_url"),
+        "duration_seconds": data.get("duration_seconds")
     })
     return data
 

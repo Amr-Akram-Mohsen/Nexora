@@ -189,7 +189,7 @@
     border-radius: 4px;
     overflow: hidden;
     display: flex;
-    align-products: center;
+    align-items: center;
 }
 
 .engagement-breakdown-bar-fill {
@@ -199,6 +199,7 @@
     border-radius: 4px;
     transition: width 0.3s ease;
 }
+
 /* --- Refactored Inspect Utilities --- */
 
 .inspect-header-custom {
@@ -305,7 +306,7 @@
 
 .editorial-signal-product {
     display: flex;
-    align-products: center;
+    align-items: center;
     gap: 0.5rem;
 }
 

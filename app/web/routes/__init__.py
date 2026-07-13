@@ -14,6 +14,7 @@ from .admin import (
     api_distribution_bp,
     api_subscribers_bp,
     api_analytics_bp,
+    api_scraping_bp,
     api_admin_bp
 )
 

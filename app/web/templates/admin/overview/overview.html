@@ -51,7 +51,7 @@
   <!-- Top Items by clicks -->
   {% call admin_table_panel('Top Items', "by click count", icon="fa-solid fa-bag-shopping", inner_id="top-products-container") %}
     {% set products = stats.top_items %}
-    {% include "admin/dashboard/widgets/_top_items.html" %}
+    {% include "admin/dashboard/widgets/_top_products.html" %}
   {% endcall %}
 
   <!-- Top Performing Providers -->

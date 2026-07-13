@@ -63,7 +63,7 @@
           <span class="hint">Generates queries without consuming API quota.</span>
         </span>
         <span class="settings-toggle-wrapper">
-          {{ input(type="checkbox", id="dry_run", name="dry_run", class="settings-toggle-input", checked=true) }}
+          {{ input(type="checkbox", id="dry_run", name="dry_run", class="settings-toggle-input", required=False, attrs={"checked": "checked"}) }}
           <span class="settings-toggle-track"></span>
         </span>
       </label>

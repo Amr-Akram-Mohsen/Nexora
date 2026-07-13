@@ -105,6 +105,16 @@
       title="Ingestion Channels">
       <span class="nav-icon"><i class="fa-solid fa-plug"></i></span> <span class="nav-link-text">Ingestion Channels</span>
     </a>
+    <a href="{{ url_for('api_ingestion.ingestion_control') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'ingestion_control' %}active{% endif %}"
+      title="Ingestion Control">
+      <span class="nav-icon"><i class="fa-solid fa-gamepad"></i></span> <span class="nav-link-text">Ingestion Control</span>
+    </a>
+    <a href="{{ url_for('api_scraping.scraping_control') }}"
+      class="nav-link flex items-center gap-2 {% if (domain|default('')) == 'scraping_control' %}active{% endif %}"
+      title="Scraping Control">
+      <span class="nav-icon"><i class="fa-solid fa-spider"></i></span> <span class="nav-link-text">Scraping Control</span>
+    </a>
     <a href="{{ url_for('admin.dashboard_sources') }}"
       class="nav-link flex products-center gap-2 {% if (domain|default('')) == 'sources' %}active{% endif %}"
       title="Sources">

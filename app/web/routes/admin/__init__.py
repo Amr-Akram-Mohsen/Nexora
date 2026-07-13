@@ -13,6 +13,7 @@ from .insights import bp as api_insights_bp
 from .distribution import bp as api_distribution_bp
 from .subscribers import bp as api_subscribers_bp
 from .analytics import bp as api_analytics_bp
+from .scraping import bp as api_scraping_bp
 
 from .admin import bp as api_admin_bp
 

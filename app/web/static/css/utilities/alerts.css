@@ -22,7 +22,7 @@
   pointer-events: all;
   line-height: 1.5;
   display: flex;
-  align-products: center;
+  align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
 }
@@ -47,20 +47,22 @@
 /* Category backgrounds */
 .alert-success {
   background-color: var(--brand-green);
-  border-left-color: rgba(0,0,0,0.2);
+  border-left-color: rgba(0, 0, 0, 0.2);
 }
 
 .alert-error {
-  background-color: #ef4444; /* Red */
-  border-left-color: rgba(0,0,0,0.2);
+  background-color: #ef4444;
+  /* Red */
+  border-left-color: rgba(0, 0, 0, 0.2);
 }
 
 .alert-warning {
-  background-color: #f59e0b; /* Amber */
-  border-left-color: rgba(0,0,0,0.2);
+  background-color: #f59e0b;
+  /* Amber */
+  border-left-color: rgba(0, 0, 0, 0.2);
 }
 
 .alert-info {
   background-color: var(--brand-blue);
-  border-left-color: rgba(0,0,0,0.2);
+  border-left-color: rgba(0, 0, 0, 0.2);
 }

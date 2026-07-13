@@ -112,7 +112,7 @@ label[data-disabled="true"] * {
   color: var(--muted-foreground);
   margin-left: auto;
   display: inline-flex;
-  align-products: center;
+  align-items: center;
   gap: 0.3rem;
   white-space: nowrap;
   padding: 0.2rem 0.5rem;
@@ -150,7 +150,7 @@ label[data-disabled="true"] * {
   color: var(--muted-foreground);
   box-shadow: var(--shadow-md);
   display: flex;
-  align-products: center;
+  align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 999;
@@ -190,5 +190,5 @@ label[data-disabled="true"] * {
 }
 
 .small {
-    color: var(--muted-foreground);
+  color: var(--muted-foreground);
 }

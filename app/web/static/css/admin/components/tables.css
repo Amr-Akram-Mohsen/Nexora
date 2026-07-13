@@ -201,7 +201,7 @@
 
 .content-metric-product {
     display: inline-flex;
-    align-products: center;
+    align-items: center;
     gap: 0.25rem;
     white-space: nowrap;
 }

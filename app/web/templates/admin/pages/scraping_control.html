@@ -1,0 +1,82 @@
+{% extends "admin/layout/admin_base.html" %}
+{% from "admin/components/ui/panels.html" import admin_page_header, admin_settings_card, admin_list_panel %}
+{% from "components/ui/core.html" import button, input, select %}
+
+{% block title %}Scraping Control — Nexora Admin{% endblock %}
+
+{% block admin_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/pages/scraping.css') }}">
+{% endblock %}
+
+{% set domain = "scraping_control" %}
+
+{% block admin_content %}
+{{ admin_page_header("Scraping & Enrichment Control", "Manually trigger background enrichment and full-body scraping for pending articles.") }}
+
+<div class="settings-grid">
+  <div class="settings-main">
+    {% call admin_settings_card("Trigger Scraping", "Scrape unscraped articles", 'fa-solid fa-spider') %}
+    <form id="scraping-form" class="settings-form">
+      
+      <label class="settings-field">
+        <span class="settings-field-label">Batch Limit</span>
+        {{ input(type="number", name="limit", id="scraping-limit", value="10", class="settings-input", attrs={"min": "1", "max": "100"}) }}
+        <span class="hint">Number of articles to scrape in this run (max 100 to avoid timeouts).</span>
+      </label>
+
+      <div class="settings-actions">
+        {{ button(text="Start Scraping Batch", type="submit", class="admin-btn-primary", icon="fa-solid fa-play", id="trigger-btn") }}
+      </div>
+    </form>
+    {% endcall %}
+
+    <div id="task-status-container" class="scraping-hidden">
+      {% call admin_settings_card("Running Task", "Current background scraping job", 'fa-solid fa-spinner fa-spin', id="task-card") %}
+        <div class="task-progress-wrapper">
+          <div class="task-header">
+            <span class="task-name" id="task-name">Initializing...</span>
+            <span class="task-status-badge" id="task-status">Pending</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="task-progress-fill" style="width: 0%"></div>
+          </div>
+          <div class="task-meta" id="task-meta"></div>
+        </div>
+        
+        <div id="scraping-results-container" class="scraping-hidden">
+          <h4 class="scraping-results-title">Scraping Diagnostics</h4>
+          <div class="scraping-stats-grid" id="scraping-stats">
+            <!-- Stats injected here -->
+          </div>
+          <div class="scraping-details-list" id="scraping-details">
+            <!-- Details injected here -->
+          </div>
+        </div>
+      {% endcall %}
+    </div>
+  </div>
+</div>
+
+<!-- TEMPLATES -->
+<template id="stat-card-template">
+  <div class="scraping-stat-card">
+    <div class="stat-label"></div>
+    <div class="stat-value"></div>
+  </div>
+</template>
+
+<template id="detail-row-template">
+  <div class="scraping-detail-row">
+    <div class="detail-icon"></div>
+    <div class="detail-content">
+      <div class="detail-title"></div>
+      <div class="detail-meta"></div>
+    </div>
+  </div>
+</template>
+
+{% endblock %}
+
+{% block admin_scripts %}
+<script src="{{ url_for('static', filename='js/admin/pages/scraping.js') }}"></script>
+{% endblock %}

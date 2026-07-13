@@ -19,11 +19,11 @@
 }
 
 .products-center {
-  align-products: center;
+  align-items: center;
 }
 
 .products-start {
-  align-products: flex-start;
+  align-items: flex-start;
 }
 
 .inline-flex {
@@ -32,13 +32,13 @@
 
 .flex-center {
   display: flex;
-  align-products: center;
+  align-items: center;
   justify-content: center;
 }
 
 .inline-flex-center {
   display: inline-flex;
-  align-products: center;
+  align-items: center;
   justify-content: center;
 }
 

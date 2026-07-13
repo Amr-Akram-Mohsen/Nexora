@@ -12,11 +12,13 @@ class RawItemDTO(BaseModel):
 
     title: Optional[str] = None
     description: Optional[str] = None
+    body: Optional[str] = None
     url: Optional[str] = None
     external_id: Optional[str] = None
     platform: Optional[str] = None
     published_at: Optional[Any] = None
     image_url: Optional[str] = None
+    duration_seconds: Optional[int] = None
 
     # NEW — Event Registry first-class fields
     er_concepts: Optional[list] = None
@@ -44,9 +46,11 @@ class EnrichedItemDTO(ClassifiedItemDTO):
 
     content_html: Optional[str] = None
     content_text: Optional[str] = None
+    body: Optional[str] = None
     summary: Optional[str] = None
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0
+    duration_seconds: Optional[int] = None
     
     ingestion_method: Optional[str] = None
     language: Optional[str] = None
@@ -83,6 +87,7 @@ class ArticleCreateDTO(BaseModel):
     source_name: Optional[str] = None
     content_html: Optional[str] = None
     content_text: Optional[str] = None
+    body: Optional[str] = None
     summary: Optional[str] = None
     word_count: Optional[int] = 0
     quality_score: Optional[float] = 0.0

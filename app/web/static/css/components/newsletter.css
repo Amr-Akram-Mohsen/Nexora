@@ -36,7 +36,9 @@
   justify-products: center;
   text-align: center;
 }
-.newsletter-icon {width: 3rem;
+
+.newsletter-icon {
+  width: 3rem;
   height: 3rem;
   border-radius: var(--radius-full);
   color: var(--brand-blue);
@@ -153,7 +155,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.95fr);
   gap: 1rem;
-  align-products: start;
+  align-items: start;
 }
 
 .newsletter-page-panel {

@@ -678,9 +678,17 @@
     margin-top: 0.25rem;
 }
 
-.url-present { color: var(--success, #10b981); }
-.url-warning { color: var(--warning, #f59e0b); }
-.url-missing { color: var(--muted-foreground); }
+.url-present {
+    color: var(--success, #10b981);
+}
+
+.url-warning {
+    color: var(--warning, #f59e0b);
+}
+
+.url-missing {
+    color: var(--muted-foreground);
+}
 
 .pagination-controls {
     padding: 0.5rem 0;
@@ -723,15 +731,32 @@
     }
 }
 
-.stat-success { color: var(--success, #10b981); }
-.stat-warning { color: var(--warning, #f59e0b); }
-.stat-info { color: var(--brand-blue, #3b82f6); }
-.stat-danger { color: var(--brand-red, #ef4444); }
+.stat-success {
+    color: var(--success, #10b981);
+}
 
-.overdue-alert-card { border-color: var(--brand-red, #ef4444); }
-.primary-stat-card { border-color: var(--primary, var(--brand-blue)); }
+.stat-warning {
+    color: var(--warning, #f59e0b);
+}
 
-.stat-primary-label, .stat-primary-value {
+.stat-info {
+    color: var(--brand-blue, #3b82f6);
+}
+
+.stat-danger {
+    color: var(--brand-red, #ef4444);
+}
+
+.overdue-alert-card {
+    border-color: var(--brand-red, #ef4444);
+}
+
+.primary-stat-card {
+    border-color: var(--primary, var(--brand-blue));
+}
+
+.stat-primary-label,
+.stat-primary-value {
     color: var(--primary, var(--brand-blue));
     font-weight: var(--weight-bold);
 }
@@ -1033,7 +1058,7 @@
 }
 
 .rec-action-box {
-    align-products: flex-start;
+    align-items: flex-start;
 }
 
 /* Strategy Row Components */
@@ -1054,7 +1079,7 @@
 
 .strategy-platform-product {
     display: flex;
-    align-products: flex-start;
+    align-items: flex-start;
     gap: 0.5rem;
     padding: 0.5rem;
     background: rgba(var(--brand-blue-rgb), 0.03);

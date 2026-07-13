@@ -1,5 +1,6 @@
 from app.core.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
+from datetime import datetime, timezone
 
 class Video(db.Model):
     __tablename__ = "videos"

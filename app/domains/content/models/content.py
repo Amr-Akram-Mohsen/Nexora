@@ -89,8 +89,6 @@ class Content(db.Model):
     price_tier = db.relationship("PriceTierFacet", back_populates="contents")
     source = db.relationship("Source", backref="contents")
 
-
-
     attributes = db.relationship(
         "AttributeFacet",
         secondary=content_attributes,

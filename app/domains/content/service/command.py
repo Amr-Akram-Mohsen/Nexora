@@ -144,21 +144,20 @@ def apply_relationships(content, data, session=None) -> dict:
             updated_relationships["facets"]["price_tier"] = p.slug
 
     # -------- Entities, Events, and Article Categories (NewsAPI AI) --------
-    extended_metadata = data.get("extended_metadata", {})
-    if content.object_type == "article" and extended_metadata:
-        obj = resolve(content, session=session)
-        if obj:
+    obj = resolve(content, session=session)
+    if obj:
+        if content.object_type == "article":
             # Events
-            if "eventUri" in extended_metadata:
-                event_uri = extended_metadata["eventUri"]
+            if data.get("er_event_uri"):
+                event_uri = data["er_event_uri"]
                 event = Event.get_or_create(external_uri=event_uri, session=session, title=data.get("title"))
                 if event and obj.event_id != event.id:
                     obj.event_id = event.id
                     updated_relationships["event"] = event.external_uri
 
             # Categories (Article Categories)
-            if "categories" in extended_metadata:
-                for cat_data in extended_metadata["categories"]:
+            if data.get("er_categories"):
+                for cat_data in data["er_categories"]:
                     cat_label = cat_data if isinstance(cat_data, str) else cat_data.get("name", cat_data.get("label", ""))
                     if not cat_label: continue
                     cat = Category.get_or_create(cat_label, session=session)
@@ -166,19 +165,19 @@ def apply_relationships(content, data, session=None) -> dict:
                         obj.categories.append(cat)
                         updated_relationships.setdefault("categories", []).append(cat.slug)
 
-            # Entities (Concepts)
-            if "concepts" in extended_metadata:
-                for concept in extended_metadata["concepts"]:
-                    if isinstance(concept, str):
-                        concept_uri = None
-                        concept_label = concept
-                        entity_type = "tag"
-                        score = 0
-                    else:
-                        concept_uri = concept.get("uri")
-                        concept_label = concept.get("label", {}).get("eng", concept.get("label", "")) if isinstance(concept.get("label"), dict) else concept.get("label", "")
-                        entity_type = concept.get("type", "tag")
-                        score = concept.get("score", 0)
+        # Entities (Concepts) - Applies to ALL content types
+        if data.get("er_concepts"):
+            for concept in data["er_concepts"]:
+                if isinstance(concept, str):
+                    concept_uri = None
+                    concept_label = concept
+                    entity_type = "tag"
+                    score = 0
+                else:
+                    concept_uri = concept.get("uri")
+                    concept_label = concept.get("label", {}).get("eng", concept.get("label", "")) if isinstance(concept.get("label"), dict) else concept.get("label", "")
+                    entity_type = concept.get("type", "tag")
+                    score = concept.get("score", 0)
 
                     if not concept_label: continue
 

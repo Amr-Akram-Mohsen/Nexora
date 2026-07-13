@@ -37,7 +37,7 @@
   letter-spacing: -0.02em;
   text-transform: capitalize;
   display: inline-flex;
-  align-products: center;
+  align-items: center;
   gap: 0.75rem;
 }
 
@@ -72,7 +72,7 @@
   display: grid;
   gap: var(--card-gap, 1.5rem);
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  align-products: start;
+  align-items: start;
 }
 
 .contents-listing .grid-auto {

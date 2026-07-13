@@ -43,6 +43,7 @@ from app.web.routes import (
     api_distribution_bp,
     api_subscribers_bp,
     api_analytics_bp,
+    api_scraping_bp,
     api_admin_bp
 )
 
@@ -220,6 +221,7 @@ def create_app():
     app.register_blueprint(api_distribution_bp)
     app.register_blueprint(api_subscribers_bp)
     app.register_blueprint(api_analytics_bp)
+    app.register_blueprint(api_scraping_bp)
     app.register_blueprint(api_admin_bp)
 
     @app.before_request

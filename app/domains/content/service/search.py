@@ -70,16 +70,6 @@ def populate_content_search_fields(content, obj, object_type):
     
     canonical = getattr(obj, "canonical_url", "")
 
-    brand_names = " ".join(
-        brand.name
-        for brand in content.brands
-    )
-
-    topic_names = " ".join(
-        topic.name
-        for topic in content.topics
-    )
-
     attribute_names = " ".join(
         attr.name
         for attr in content.attributes
@@ -125,31 +115,44 @@ def populate_content_search_fields(content, obj, object_type):
     elif object_type == "video":
         body_text = getattr(obj, "description", "") or ""
 
-    content.search_text = " ".join(
+    search_str = " ".join(
         filter(
             None,
             [
                 content.title,
                 content.preview_text,
-
                 canonical,
                 source,
-
-                brand_names,
-                topic_names,
                 attribute_names,
-
                 category_name,
-
                 gender_name,
                 intent_name,
                 price_tier_name,
-                
                 entity_names,
                 event_title,
             ]
         )
     )
+
+    # Expand common compound tech/product words so user searches match
+    # e.g., if category is "smartwatches", we also want "smart watches" in the vector
+    compounds_map = {
+        "smartwatches": "smart watches smartwatch",
+        "smartwatch": "smart watches smartwatch",
+        "earbuds": "ear buds earbud",
+        "earbud": "ear buds earbud",
+    }
+    
+    extra_terms = []
+    search_str_lower = search_str.lower()
+    for compound, expansion in compounds_map.items():
+        if compound in search_str_lower:
+            extra_terms.append(expansion)
+            
+    if extra_terms:
+        search_str += " " + " ".join(extra_terms)
+
+    content.search_text = search_str
 
     content.search_vector = build_content_search_vector(content, body_text=body_text)
 

@@ -1,5 +1,6 @@
 from app.core.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
+from datetime import datetime, timezone
 
 class Post(db.Model):
     __tablename__ = "posts"

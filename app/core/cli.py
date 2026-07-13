@@ -61,15 +61,15 @@ def register_commands(app):
 
     import click
     @app.cli.command("enrich-articles")
-    @click.option("--extractor", default="diffbot", help="Extractor service to use (e.g. diffbot)")
-    def enrich_articles_command(extractor):
+    def enrich_articles_command():
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import (
-            reprocess_unscraped_articles,
+            enrich_discovered_articles,
         )
 
-        app.logger.info(f"Starting full-body enrichment using {extractor}...")
-        count = reprocess_unscraped_articles(5, extractor_service=extractor)
+        app.logger.info("Starting full-body enrichment using Diffbot...")
+        results = enrich_discovered_articles(limit=5)
+        count = results.get("published", 0)
         app.logger.info("Done! Successfully published %d articles.", count)
 
     @app.cli.command("init-content-status")

@@ -12,6 +12,7 @@ class Article(db.Model):
     summary = db.Column(db.Text)
 
     # New layered content fields
+    body = db.Column(db.Text)
     content_text = db.Column(db.Text)
     content_html = db.Column(db.Text)
     word_count = db.Column(db.Integer)

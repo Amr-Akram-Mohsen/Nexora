@@ -30,7 +30,7 @@
   overflow-y: hidden;
   scrollbar-width: none; */
   /* white-space: nowrap; */
-  align-products: flex-start;
+  align-items: flex-start;
   /* flex-direction: column; */
 }
 
@@ -121,7 +121,7 @@
 
 .snippet-content__badge {
   display: inline-flex;
-  align-products: center;
+  align-items: center;
   gap: 0.25rem;
   background: rgba(var(--domain-primary-rgb), var(--alpha-soft));
   padding: 0.15rem 0.4rem;

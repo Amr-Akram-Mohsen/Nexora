@@ -17,7 +17,8 @@ def map_newsapi_ai(data: dict, region="en"):
         a["source_name"] = (a.get("source") or {}).get("title")
         # Ensure url is present
         a["url"] = a.get("url")
-        a["content_text"] = a.get("body")
+        a["body"] = a.get("body")
+        a["content_text"] = None
         a["ingestion_method"] = "newsapi_ai"
         
         # Explicitly set this to None so it isn't incorrectly populated
@@ -34,7 +35,7 @@ def map_newsapi_ai(data: dict, region="en"):
     return products
 
 def map_youtube(data: dict, region="SA"):
-    products = data.get("products", [])
+    products = data.get("items", [])
     if not isinstance(products, list):
         return []
 

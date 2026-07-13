@@ -73,7 +73,9 @@
 }
 
 @keyframes auth-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* --- Vertical Field Spacing & Labels --- */
@@ -89,7 +91,7 @@
   letter-spacing: -0.01em;
   margin: 0;
   display: flex;
-  align-products: center;
+  align-items: center;
   line-height: 1;
 }
 
@@ -135,12 +137,13 @@
 
 .password-wrapper {
   position: relative;
-width: 100%;
+  width: 100%;
 }
 
 .password-wrapper input {
   padding-right: 2.75rem !important;
 }
+
 .password-toggle {
   position: absolute;
   right: 0.75rem;
@@ -152,7 +155,7 @@ width: 100%;
   font-size: 0.875rem;
   line-height: 1;
   transition: color 0.15s ease;
-width: 1.5rem;
+  width: 1.5rem;
   height: 1.5rem;
   border-radius: 4px;
 }
@@ -170,7 +173,9 @@ width: 1.5rem;
 .password-strength {
   margin-top: 0.5rem;
 }
-.password-strength-bar {margin-bottom: 0.3rem;
+
+.password-strength-bar {
+  margin-bottom: 0.3rem;
 }
 
 .strength-segment {
@@ -195,16 +200,19 @@ width: 1.5rem;
   font-size: 0.75rem;
   margin-top: 0.3rem;
   display: none;
-  align-products: center;
+  align-items: center;
   gap: 0.3rem;
   line-height: 1.4;
 }
 
-.confirm-match.visible { display: flex; }
+.confirm-match.visible {
+  display: flex;
+}
 
 /* --- Social login Button --- */
 
-.google-auth-btn {height: 2.75rem;
+.google-auth-btn {
+  height: 2.75rem;
   font-weight: 600;
   font-size: 0.875rem;
   border-radius: var(--radius-lg);

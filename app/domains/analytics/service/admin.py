@@ -265,6 +265,16 @@ def get_admin_dashboard_stats_data():
 
     # ── Provider activity summary ─────────────────────────────────────────
     # Product source tracking was removed — only track content by source
+    content_agg = db.session.execute(
+        select(
+            Content.source_id,
+            func.count(Content.id).label("c_count"),
+            func.max(Content.ingested_at).label("latest_content")
+        )
+        .where(Content.source_id.is_not(None))
+        .group_by(Content.source_id)
+    ).all()
+
     content_by_sid = {r.source_id: r for r in content_agg}
     item_by_sid    = {}
     all_source_ids = {r.source_id for r in content_agg}

@@ -119,6 +119,6 @@
 
 .about-cta__btn {
   display: inline-flex;
-  align-products: center;
+  align-items: center;
   gap: 0.5rem;
 }

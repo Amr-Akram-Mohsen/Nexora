@@ -361,7 +361,7 @@
 .header-country {
   position: relative;
   display: flex;
-  align-products: center;
+  align-items: center;
   margin-right: 0.25rem;
 }
 
@@ -372,7 +372,8 @@
   font-weight: 600;
   color: var(--muted-foreground);
   transition: all 0.2s ease;
-  pointer-events: none; /* Let clicks pass through to select */
+  pointer-events: none;
+  /* Let clicks pass through to select */
 }
 
 .header-country__label i {
