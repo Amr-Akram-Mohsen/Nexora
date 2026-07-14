@@ -1,9 +1,13 @@
-{% macro grid(products, target_type="content", carousel=false) %}
-<div class="{{ 'grid-carousel flex gap-6' if carousel else 'grid-auto' }}"
+{% macro grid(products, target_type="content", carousel=false, card_type="default") %}
+<div class="{{ 'grid-carousel flex gap-4' if carousel else 'grid-auto' }}"
   data-expandable-grid="{{ 'false' if carousel else 'true' }}">
   {% for product in products %}
-  {% set current_target_type = product.domain_type if product.domain_type else target_type %}
-  {% include current_target_type ~ "/dispatcher/card.html" %}
+    {% if card_type == "mini" %}
+      {% include "components/ui/mini-card.html" %}
+    {% else %}
+      {% set current_target_type = product.domain_type if product.domain_type else target_type %}
+      {% include current_target_type ~ "/dispatcher/card.html" %}
+    {% endif %}
   {% endfor %}
 </div>
 {% endmacro %}

@@ -56,7 +56,12 @@ def get_popular_contents(
     if category_slugs:
         stmt = stmt.join(Content.category).where(Category.slug.in_(list(category_slugs)))
     if brand_slugs:
-        stmt = stmt.join(Content.brands).where(Brand.slug.in_(list(brand_slugs)))
+        from app.domains.relationships import ContentEntity
+        from app.domains.taxonomy.models import Entity
+        stmt = stmt.join(Content.content_entities).join(ContentEntity.entity).where(
+            Entity.entity_type == 'brand',
+            Entity.slug.in_(list(brand_slugs))
+        )
     if intent_slugs:
         stmt = stmt.join(Content.intent).where(IntentFacet.slug.in_(list(intent_slugs)))
 

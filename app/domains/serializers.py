@@ -33,16 +33,48 @@ def serialize_target(obj, session=None):
     }
 
     # ── Type-Specific Enrichment ─────────────────────────────────────
+    
+    def _normalize_authors(raw_authors):
+        import re
+        
+        def slugify(text):
+            if not text:
+                return ""
+            return re.sub(r'[-\s]+', '-', re.sub(r'[^\w\s-]', '', text.lower())).strip('-')
+            
+        if not raw_authors:
+            return []
+        if isinstance(raw_authors, str):
+            raw_authors = [raw_authors]
+        
+        normalized = []
+        for a in raw_authors:
+            if isinstance(a, str):
+                normalized.append({"name": a, "slug": slugify(a)})
+            elif isinstance(a, dict) and a.get("name"):
+                name = a["name"]
+                slug = slugify(name)
+                url = a.get("link") if a.get("link") else a.get("uri") if a.get("uri") else None
+                normalized.append({"name": name, "slug": slug, "url": url})
+        return normalized
 
     if type_name == "article":
+        # Derive is_content_scraped from status or content_html presence
+        status = getattr(obj, "status", None)
+        is_content_scraped = status in ("ready", "published", "complete") or bool(getattr(obj, "content_html", None))
+        
+        # Serialize primary source relation cleanly
+        primary_source_rel = getattr(obj, "primary_source", None)
+        primary_source = serialize_model(primary_source_rel.source) if primary_source_rel and primary_source_rel.source else None
+        
         data.update(
             {
                 "source_name": obj.source_name,
                 "source_url": obj.source_url,
                 "read_time_minutes": obj.read_time_minutes,
-                "extended_metadata": getattr(obj, "extended_metadata", None),
+                "is_content_scraped": is_content_scraped,
                 "author": getattr(obj, "author", None),
-                "authors": getattr(obj, "authors", []),
+                "authors": _normalize_authors(getattr(obj, "authors", [])),
                 "content_text": getattr(obj, "content_text", None),
                 "content_html": getattr(obj, "content_html", None),
                 "summary": getattr(obj, "summary", None),
@@ -52,7 +84,7 @@ def serialize_target(obj, session=None):
                 "word_count": getattr(obj, "word_count", 0),
                 "sentiment_score": getattr(obj, "sentiment_score", None),
                 "event": serialize_model(getattr(obj, "event", None)),
-                "primary_source": serialize_model(getattr(obj, "primary_source", None)),
+                "primary_source": primary_source,
             }
         )
 

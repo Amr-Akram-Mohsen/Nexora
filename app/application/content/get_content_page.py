@@ -9,13 +9,15 @@ from app.domains.interaction.service import record_view
 from app.infrastructure import cache
 from app.infrastructure.cache import normalize_filters
 from app.shared.constants.core import TargetType
-from app.infrastructure import cache
-from app.shared.constants.core import TargetType
 
 
 @cache.memoize(timeout=1800)
 def get_content_page_static_data(content_id):
-    return get_content_by_id(content_id)
+    content = get_content_by_id(content_id)
+    if content and content.get("linked_items"):
+        from app.domains.product.serializers import serialize_item
+        content["linked_items"] = [serialize_item(item) for item in content["linked_items"] if item]
+    return content
 
 
 def get_content_page_data(content_id):
@@ -78,8 +80,15 @@ def get_content_page_data(content_id):
             }
 
     # 2. Source Carousel (More from [Source])
-    if content.get("source"):
-        source = content["source"]
+    # Use content.source (from Content.source FK) first, fallback to article-level source_name
+    source = content.get("source")
+    if not source and content.get("target"):
+        source_name = content["target"].get("source_name")
+        if source_name:
+            import re
+            slug = re.sub(r'[-\s]+', '-', re.sub(r'[^\w\s-]', '', source_name.lower())).strip('-')
+            source = {"name": source_name, "slug": slug}
+    if source and source.get("slug"):
         items = get_carousel_contents_cached(
             normalize_filters({"source": [source["slug"]]}),
             exclude_ids_key=exclude_ids

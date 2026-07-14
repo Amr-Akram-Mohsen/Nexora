@@ -121,24 +121,20 @@ def get_or_create_content(
 
         if object_type == "article":
             from app.domains.relationships import ArticleSource
+            from sqlalchemy import select, or_
 
-            # Check primary URL
-            stmt_url = select(ArticleSource).where(ArticleSource.url == url_fallback)
-            res = session.execute(stmt_url).scalars().first()
+            urls_to_check = [u for u in (url_fallback, canonical_url) if u]
+            if urls_to_check:
+                # Check all known URLs simultaneously
+                stmt_url = select(ArticleSource).where(ArticleSource.url.in_(urls_to_check))
+                res = session.execute(stmt_url).scalars().first()
 
-            # If not found, check if canonical_url matches an existing article's canonical or primary source URL
-            if not res and canonical_url:
-                # Does canonical_url match any Source URL?
-                stmt_canon = select(ArticleSource).where(ArticleSource.url == canonical_url)
-                res = session.execute(stmt_canon).scalars().first()
-
-                # Or does it match any Article's stored canonical_url?
-                if not res:
+                if res:
+                    obj = session.get(model, res.article_id)
+                elif canonical_url:
+                    # Fallback to checking the article canonical URL directly if no source matched
                     stmt_art = select(model).where(model.canonical_url == canonical_url)
                     obj = session.execute(stmt_art).scalars().first()
-
-            if res and not obj:
-                obj = session.get(model, res.article_id)
         elif hasattr(model, "url"):
             stmt_url = select(model).where(model.url == url_fallback)
             obj = session.execute(stmt_url).scalars().first()

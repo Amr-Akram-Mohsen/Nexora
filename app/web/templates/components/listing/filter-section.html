@@ -23,6 +23,10 @@
       {%- elif filter_name == 'type' -%}<i class="fas fa-shapes"></i> Type
       {%- elif filter_name == 'attributes' -%}<i class="fas fa-sliders-h"></i> Attributes
       {%- elif filter_name == 'intent' -%}<i class="fas fa-lightbulb"></i> Intent
+      {%- elif filter_name == 'source' -%}<i class="far fa-newspaper"></i> Sources
+      {%- elif filter_name == 'event' -%}<i class="fas fa-calendar-star"></i> Events
+      {%- elif filter_name == 'location' -%}<i class="fas fa-map-marker-alt"></i> Locations
+      {%- elif filter_name == 'author' -%}<i class="far fa-user"></i> Authors
       {%- else -%}<i class="fas fa-filter"></i> {{ filter_name | title }}
       {%- endif -%}
     </span>

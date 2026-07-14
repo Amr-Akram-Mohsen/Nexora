@@ -78,6 +78,50 @@
     </div>
   </div>
   {% endif %}
+
+  {% if content.topics or content.locations %}
+  <div class="video-metadata-tags mt-8 flex flex-wrap gap-2">
+    {% for loc in content.locations %}
+    {{ badge(text=loc.name, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
+    {% endfor %}
+    {% for topic in content.topics %}
+    {{ badge(text=topic.name, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if entity_carousel %}
+  {% from "components/ui/grid.html" import grid %}
+  <div class="recommendation-box recommendation-box--entity mt-10">
+    <h3 class="recommendation-box__title flex items-center">
+      <i class="fas fa-tag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+      {{ entity_carousel.title }}
+    </h3>
+    {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+  </div>
+  {% endif %}
+
+  {% if source_carousel %}
+  {% from "components/ui/grid.html" import grid %}
+  <div class="recommendation-box recommendation-box--source mt-12">
+    <h3 class="recommendation-box__title flex items-center">
+      <i class="far fa-newspaper" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+      {{ source_carousel.title }}
+    </h3>
+    {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+  </div>
+  {% endif %}
+
+  {% if author_carousel %}
+  {% from "components/ui/grid.html" import grid %}
+  <div class="recommendation-box recommendation-box--author mt-12">
+    <h3 class="recommendation-box__title flex items-center">
+      <i class="far fa-user" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+      {{ author_carousel.title }}
+    </h3>
+    {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
 

@@ -2,6 +2,7 @@
 
 {% block page_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename=page_css) }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/mini-card.css') }}" />
 {% endblock %}
 
 {% from "components/ui/core.html" import button %}
@@ -63,7 +64,7 @@
         <div class="recommendation-box recommendation-box--matched" data-recommendation-container="shop_product"
           data-entity-ids="{{ matched_items[:6] | map(attribute='id') | list | tojson | safe }}">
           <h3 class="recommendation-box__title flex items-center">
-            <i class="fas fa-shopping-bag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+            <i class="recommendation-box__icon fas fa-shopping-bag"></i>
             Shop Related Products
           </h3>
           {{ grid(matched_items[:6], target_type='commercial') }}
@@ -78,20 +79,20 @@
         {% if author_carousel %}
         <div class="recommendation-box recommendation-box--author mt-10">
           <h3 class="recommendation-box__title flex items-center">
-            <i class="fas fa-user-edit" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+            <i class="recommendation-box__icon fas fa-user-edit"></i>
             {{ author_carousel.title }}
           </h3>
-          {{ grid(author_carousel.items, target_type='content', carousel=true) }}
+          {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
         </div>
         {% endif %}
 
         {% if source_carousel %}
         <div class="recommendation-box recommendation-box--source mt-10">
           <h3 class="recommendation-box__title flex items-center">
-            <i class="fas fa-newspaper" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+            <i class="recommendation-box__icon fas fa-newspaper"></i>
             {{ source_carousel.title }}
           </h3>
-          {{ grid(source_carousel.items, target_type='content', carousel=true) }}
+          {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
         </div>
         {% endif %}
         

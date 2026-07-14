@@ -108,7 +108,7 @@ def get_taxonomy_content_stats(entity_id, field=None, relationship_table=None, f
 @cache.memoize(timeout=3600)
 def get_relationships_for_section(section_slug, rel_name, limit=20, session=None):
     rel_model = REL_MODELS.get(rel_name, None)
-    if not rel_model:
+    if rel_name not in REL_MODELS and rel_name not in ["entity", "brand", "topic", "tag", "source", "event", "location"]:
         raise ValueError("Invalid relationship name")
 
     if rel_name in ["category", "intent", "price_tier", "attributes"]:
@@ -146,6 +146,13 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
         stmt = select(*build_filter_projection(rel_model))\
             .join(Article, Article.event_id == Event.id)\
             .join(Content, (Content.object_id == Article.id) & (Content.object_type == 'article'))
+    elif rel_name == "location":
+        from app.domains.taxonomy.models import Location
+        from app.domains.relationships import content_locations
+        rel_model = Location
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(content_locations, content_locations.c.location_id == Location.id)\
+            .join(Content, Content.id == content_locations.c.content_id)
 
     stmt = apply_content_section_filters(
         stmt=stmt,

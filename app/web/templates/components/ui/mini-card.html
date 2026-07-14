@@ -1,0 +1,13 @@
+<a href="{{ url_for('content.content_page', content_id=product.id) }}" class="mini-card flex flex-col gap-3">
+    {% if product.target and product.target.image_url %}
+    <div class="mini-card__image shrink-0">
+        <img src="{{ product.target.image_url }}" alt="{{ product.target.title }}" loading="lazy">
+    </div>
+    {% endif %}
+    <div class="mini-card__content flex flex-col justify-center">
+        <h4 class="mini-card__title">{{ product.target.title }}</h4>
+        <div class="mini-card__meta flex items-center gap-2">
+            <time class="mini-card__date">{{ product.published_at | format_date('%b %d, %Y') }}</time>
+        </div>
+    </div>
+</a>

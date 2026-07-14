@@ -34,6 +34,7 @@ def fetch_and_clean_diffbot(url: str, hero_image_url: str | None = None, api_key
         "timeout": 60000,  # 60s render timeout for Diffbot
         "scroll": "slow",
         "naturalLanguage": "summary",
+        "generateSummary": True,
     }
 
     response = None

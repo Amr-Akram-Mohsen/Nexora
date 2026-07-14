@@ -18,11 +18,17 @@
     {% if article.event %}
     {{ badge(text=article.event.name, class="badge--event", variant="primary", icon="fas fa-map-marker-alt") }}
     {% endif %}
+    {% if article.authors and article.authors|length > 0 %}
+    {{ badge(text=article.authors[0].name, class="badge--author", variant="secondary", icon="fas fa-user-edit") }}
+    {% endif %}
+    {% if content.locations and content.locations|length > 0 %}
+    {{ badge(text=content.locations[0].name, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
+    {% endif %}
     {% if article.sentiment_score is not none %}
       {% if article.sentiment_score >= 0.2 %}
       {{ badge(text="Positive", class="badge--sentiment", variant="success", icon="fas fa-smile") }}
       {% elif article.sentiment_score <= -0.2 %}
-      {{ badge(text="Critical", class="badge--sentiment", variant="danger", icon="fas fa-frown") }}
+      {{ badge(text="Negative", class="badge--sentiment", variant="danger", icon="fas fa-frown") }}
       {% else %}
       {{ badge(text="Neutral", class="badge--sentiment", variant="info", icon="fas fa-meh") }}
       {% endif %}
@@ -42,7 +48,7 @@
       {% if article.primary_source %}
         {{ article.primary_source.name }}
       {% elif article.authors and article.authors|length > 0 %}
-        {{ article.authors[0] }}
+        {{ article.authors[0].name }}
       {% else %}
         Article
       {% endif %}

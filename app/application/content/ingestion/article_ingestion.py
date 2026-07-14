@@ -51,7 +51,7 @@ def process_diffbot_enrichment(article, diffbot_data, session):
         norm_sum = _norm(summary)
         if len(norm_sum) > 20:
             norm_desc = _norm(article.description)
-            norm_text_start = _norm(article.content_text[:len(summary) + 400]) if article.content_text else ""
+            norm_text_start = _norm(article.content_text[:len(summary) * 2 + 400]) if article.content_text else ""
             
             is_redundant = False
             
@@ -60,9 +60,15 @@ def process_diffbot_enrichment(article, diffbot_data, session):
             elif norm_desc and SequenceMatcher(None, norm_sum, norm_desc).ratio() > 0.85:
                 is_redundant = True
             elif norm_text_start:
-                prefix = norm_text_start[:len(norm_sum)]
-                if len(prefix) > 20 and SequenceMatcher(None, norm_sum, prefix).ratio() > 0.85:
-                    is_redundant = True
+                prefix = norm_text_start[:len(norm_sum) + 100]
+                if len(prefix) > 20:
+                    match = SequenceMatcher(None, norm_sum, prefix).find_longest_match(0, len(norm_sum), 0, len(prefix))
+                    # If the longest contiguous matching block is at least 80% of the summary length, consider it redundant
+                    if match.size > len(norm_sum) * 0.8:
+                        is_redundant = True
+                    # Also try ratio on the direct slice just in case
+                    elif SequenceMatcher(None, norm_sum, norm_text_start[:len(norm_sum)]).ratio() > 0.85:
+                        is_redundant = True
                     
             if is_redundant:
                 summary = None

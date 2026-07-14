@@ -1,6 +1,5 @@
 from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model, serialize_target
-from app.domains.product.serializers import serialize_item
 from app.domains.content.service.editorial import assess_video_description, assess_article_extraction
 def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     if not target:
@@ -29,12 +28,8 @@ def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     elif object_type == "article":
         return {
             "is_content_scraped": getattr(target, "is_content_scraped", False),
-            "word_count": getattr(target, "word_count", 0),
-            "read_time_minutes": getattr(target, "read_time_minutes", None),
             "article_quality_score": getattr(target, "quality_score", 0),
             "last_enrichment_attempt": target.last_enrichment_attempt.isoformat() if getattr(target, "last_enrichment_attempt", None) else None,
-            "original_url": getattr(target, "url", None),
-            "description": getattr(target, "description", None),
             "extraction_assessment": assess_article_extraction(target)
         }
     return {}
@@ -206,10 +201,11 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         if getattr(content_obj, "category", None) and content_obj.category.slug != "uncategorized"
         else None,
         "section": serialize_model(content_obj.section),
+        "source": serialize_model(content_obj.source) if getattr(content_obj, "source", None) else None,
         "target": serialize_target(target_obj, session) if target_obj else None,
         "topics": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type in ('topic', 'tag', 'concept')],
         "brands": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type == 'brand'],
-        "linked_items": [serialize_item(i) for i in (content_obj.linked_products or [])] if include_linked_items else None,
+        "linked_items": content_obj.linked_products if include_linked_items else None,
         "entities": [serialize_model(e.entity) for e in (content_obj.content_entities or []) if e.entity],
         "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
     }

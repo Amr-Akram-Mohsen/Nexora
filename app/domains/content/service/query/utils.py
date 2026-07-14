@@ -202,6 +202,11 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
             )
         )
 
+    locations = _normalize(filters.get("location"))
+    if locations and _is_allowed("location"):
+        from app.domains.content.models import Location
+        stmt = stmt.where(Content.locations.any(Location.slug.in_(locations)))
+
     authors = _normalize(filters.get("author"))
     if authors and _is_allowed("author"):
         # For Article, authors is a JSON array of strings

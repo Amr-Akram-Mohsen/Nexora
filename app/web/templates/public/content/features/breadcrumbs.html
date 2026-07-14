@@ -4,4 +4,8 @@
 {% set _ = paths.append({"label": content.section.name, "url": url_for('content.sections',
 section_slug=content.section.slug)}) %}
 {% endif %}
+{% if content.category %}
+{% set _ = paths.append({"label": content.category.name, "url": url_for('content.sections',
+section_slug=content.section.slug) ~ '?category=' ~ content.category.slug}) %}
+{% endif %}
 {{ breadcrumbs(paths=paths, current_page=content.target.title | truncate(35)) }}

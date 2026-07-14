@@ -28,54 +28,92 @@ def get_contents_render(
     return fetch_serialized_contents(stmt, session)
 
 
-def get_filtered_contents(
-    section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None
+def _get_paginated_contents(
+    filters=None, allowed_filters=None, section_id=None,
+    active_only=True, published_only=True,
+    sort_by=None, sort_dir=None, page=1, per_page=20, session=None, for_admin=False
 ):
+    from sqlalchemy import select, or_, func
+    from ...models import Content, Article
+    from app.domains.taxonomy.models import Category
+    from .utils import build_content_stmt, apply_content_filters
+    
+    if session is None:
+        from app.core.extensions import db
+        session = db.session
+
+    if filters is None:
+        filters = {}
+
+    stmt = build_content_stmt(active_only=active_only, published_only=published_only, eager_load="list")
+    if section_id:
+        stmt = stmt.where(Content.section_id == section_id)
+        
+    stmt = apply_content_filters(stmt, filters, allowed_filters=allowed_filters, session=session)
+
+    quality = None
+    if for_admin:
+        quality = filters.get("quality")
+        if quality:
+            if quality == "missing_category":
+                stmt = stmt.where(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
+            elif quality == "missing_metadata":
+                stmt = stmt.where(or_(Content.title.is_(None), Content.title == "", Content.preview_text.is_(None), Content.preview_text == ""))
+            elif quality == "duplicate":
+                dup_sub = select(Content.title).group_by(Content.title).having(func.count(Content.id) > 1).subquery()
+                stmt = stmt.where(Content.title.in_(dup_sub))
+            elif quality == "missing_entities":
+                stmt = stmt.where(~Content.content_entities.any())
+            elif quality == "missing_source":
+                stmt = stmt.where(Content.source_id.is_(None))
+            elif quality == "enrichment_pending":
+                stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == "discovered")))
+
+        active = filters.get("active")
+        if active:
+            stmt = stmt.where(Content.is_active == (active.lower() == "true"))
+        published = filters.get("published")
+        if published:
+            stmt = stmt.where(Content.is_published == (published.lower() == "true"))
+
+    if for_admin and sort_by:
+        _CONTENT_SORT_MAP = {
+            "id": Content.id, "published_at": Content.published_at, "ingested_at": Content.ingested_at,
+            "view_count": Content.view_count, "like_count": Content.like_count, "comment_count": Content.comment_count,
+            "share_count": Content.share_count, "save_count": Content.save_count, "score": Content.score, "title": Content.title,
+        }
+        sort_col = _CONTENT_SORT_MAP.get(sort_by, Content.published_at)
+        sort_dir = sort_dir.lower() if sort_dir and sort_dir.lower() in ("asc", "desc") else "desc"
+        stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
+    else:
+        if filters.get("sort") == "oldest":
+            stmt = stmt.order_by(Content.published_at.asc())
+        else:
+            stmt = stmt.order_by(Content.published_at.desc())
+            
+    from app.core.extensions import db
+    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+    
+    if for_admin:
+        return pagination, quality
+        
+    from ..content_access import assign_target_to_contents
+    products = assign_target_to_contents(pagination.items, session)
+    return {
+        "products": products, "page": pagination.page, "pages": pagination.pages,
+        "total": pagination.total, "per_page": pagination.per_page,
+        "has_next": pagination.has_next, "has_prev": pagination.has_prev,
+    }
+
+def get_filtered_contents(section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None):
     """
     Handles complex filtering and pagination for section contents.
     """
-
-    from .utils import build_content_stmt
-    from app.core.extensions import db
-    from sqlalchemy.orm import selectinload
-    
-    if session is None:
-        session = db.session
-
-    if active_filters is None:
-        active_filters = {}
-    if allowed_filters is None:
-        allowed_filters = []
-
-    stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
-    stmt = stmt.where(Content.section_id == section_id)
-
-    from .utils import apply_content_filters
-    stmt = apply_content_filters(stmt, active_filters, allowed_filters, session=session)
-
-    if active_filters.get("sort") == "oldest":
-        stmt = stmt.order_by(Content.published_at.asc())
-    else:
-        stmt = stmt.order_by(Content.published_at.desc())
-
-    # Standard 2.0 statement pagination using Flask-SQLAlchemy db.paginate
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-
-    from ..content_access import assign_target_to_contents
-    products = assign_target_to_contents(
-        pagination.items,
-        session
+    return _get_paginated_contents(
+        filters=active_filters, allowed_filters=allowed_filters, section_id=section_id,
+        active_only=True, published_only=True,
+        page=page, per_page=per_page, session=session, for_admin=False
     )
-
-    return {
-        "products": products,
-        "page": pagination.page,
-        "pages": pagination.pages,
-        "total": pagination.total,
-        "per_page": pagination.per_page,
-        "has_next": pagination.has_next,
-        "has_prev": pagination.has_prev,
-    }
 
 
 def get_all_contents_metadata(session=None):
@@ -203,64 +241,14 @@ def get_content_by_object(object_type, object_id, session=None):
 
 
 def get_content_paginated(filters, sort_by=None, sort_dir=None, page=1, per_page=20, session=None):
-    from sqlalchemy import select, or_, func
-    from ...models import Content, Article
-    from app.domains.taxonomy.models import Category
-    from .utils import build_content_stmt, apply_content_filters
-    
-    if session is None:
-        from app.core.extensions import db
-        session = db.session
-
-    _CONTENT_SORT_MAP = {
-        "id": Content.id,
-        "published_at": Content.published_at,
-        "ingested_at": Content.ingested_at,
-        "view_count": Content.view_count,
-        "like_count": Content.like_count,
-        "comment_count": Content.comment_count,
-        "share_count": Content.share_count,
-        "save_count": Content.save_count,
-        "score": Content.score,
-        "title": Content.title,
-    }
-    
-    sort_col = _CONTENT_SORT_MAP.get(sort_by, Content.published_at)
-    sort_dir = sort_dir.lower() if sort_dir and sort_dir.lower() in ("asc", "desc") else "desc"
-
-    stmt = build_content_stmt(active_only=False, published_only=False, eager_load="list")
-    
-    stmt = apply_content_filters(stmt, filters, session=session)
-
-    quality = filters.get("quality")
-    if quality:
-        if quality == "missing_category":
-            stmt = stmt.where(or_(Content.category_id.is_(None), Content.category.has(Category.slug == "uncategorized")))
-        elif quality == "missing_metadata":
-            stmt = stmt.where(or_(Content.title.is_(None), Content.title == "", Content.preview_text.is_(None), Content.preview_text == ""))
-        elif quality == "duplicate":
-            dup_sub = (
-                select(Content.title)
-                .group_by(Content.title)
-                .having(func.count(Content.id) > 1)
-            ).subquery()
-            stmt = stmt.where(Content.title.in_(dup_sub))
-        elif quality == "missing_entities":
-            stmt = stmt.where(~Content.content_entities.any())
-        elif quality == "missing_source":
-            stmt = stmt.where(Content.source_id.is_(None))
-        elif quality == "enrichment_pending":
-            stmt = stmt.where(Content.object_type == "article", Content.object_id.in_(select(Article.id).where(Article.status == "discovered")))
-            
-    active = filters.get("active")
-    if active:
-        stmt = stmt.where(Content.is_active == (active.lower() == "true"))
-    published = filters.get("published")
-    if published:
-        stmt = stmt.where(Content.is_published == (published.lower() == "true"))
-        
-    stmt = stmt.order_by(sort_col.asc() if sort_dir == "asc" else sort_col.desc())
-    
-    from app.core.extensions import db
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    return pagination, quality
+    return _get_paginated_contents(
+        filters=filters,
+        active_only=False,
+        published_only=False,
+        sort_by=sort_by,
+        sort_dir=sort_dir,
+        page=page,
+        per_page=per_page,
+        session=session,
+        for_admin=True
+    )

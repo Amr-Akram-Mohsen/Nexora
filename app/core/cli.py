@@ -69,7 +69,7 @@ def register_commands(app):
         )
 
         app.logger.info("Starting full-body enrichment using Diffbot...")
-        results = enrich_discovered_articles(limit=25, force=force)
+        results = enrich_discovered_articles(limit=5, force=force)
         count = results.get("published", 0)
         app.logger.info("Done! Successfully published %d articles.", count)
 

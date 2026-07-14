@@ -102,3 +102,60 @@
   padding: 0.1rem 0.3rem;
   font-size: var(--text-xs);
 }
+
+/* ── Semantic Variant Definitions ─────────────────────────────────────────── */
+/* These are used by the badge() macro via variant="X" which produces .variant--X */
+
+.variant--secondary {
+  --variant-bg: rgba(var(--foreground-rgb), 0.06);
+  --variant-color: var(--muted-foreground);
+  --variant-hover-bg: rgba(var(--foreground-rgb), 0.1);
+}
+
+.variant--success {
+  --variant-bg: rgba(var(--brand-green-rgb), 0.1);
+  --variant-color: var(--brand-green-dark, #16a34a);
+  --variant-hover-bg: rgba(var(--brand-green-rgb), 0.15);
+}
+
+.variant--danger {
+  --variant-bg: rgba(var(--destructive-rgb), 0.08);
+  --variant-color: var(--brand-red, #dc2626);
+  --variant-hover-bg: rgba(var(--destructive-rgb), 0.14);
+}
+
+.variant--info {
+  --variant-bg: rgba(var(--brand-blue-rgb), 0.08);
+  --variant-color: var(--brand-blue, #3b82f6);
+  --variant-hover-bg: rgba(var(--brand-blue-rgb), 0.14);
+}
+
+/* ── Semantic Badge Modifier Classes ──────────────────────────────────────── */
+/* Domain-specific badge types for content UI */
+
+.badge--category {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.badge--event {
+  font-weight: var(--weight-bold);
+}
+
+.badge--topic {
+  letter-spacing: 0.03em;
+}
+
+.badge--location {
+  letter-spacing: 0.03em;
+}
+
+.badge--author {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge--sentiment {
+  letter-spacing: 0.03em;
+}
