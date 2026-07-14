@@ -3,8 +3,8 @@
 <div class="suggestions-list-scroll flex flex-col gap-3">
     {% for product in products %}
     <div class="rec-action-card {% if product.is_overdue %}overdue-alert-card{% endif %}">
-        <div class="flex justify-between products-start">
-            <div class="flex products-center gap-2">
+        <div class="flex justify-between items-start">
+            <div class="flex items-center gap-2">
                 <span class="platform-icon">{{ product.platform_icon }}</span>
                 <span class="platform-name font-bold">{{ product.platform }}</span>
             </div>
@@ -19,7 +19,7 @@
             {{ product.source_title }}
         </h4>
 
-        <div class="rec-action-issue flex gap-2 products-center">
+        <div class="rec-action-issue flex gap-2 items-center">
             <span class="font-bold">Date:</span>
             <span>
                 {{ product.publish_date.strftime('%Y-%m-%d %H:%M') }}

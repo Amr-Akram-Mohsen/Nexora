@@ -14,8 +14,8 @@
 
 
     <!-- Top Nav Row -->
-    <div class="detail-page__top flex products-center justify-between gap-6">
-      <div class="detail-page__breadcrumbs-wrapper flex products-center">
+    <div class="detail-page__top flex items-center justify-between gap-6">
+      <div class="detail-page__breadcrumbs-wrapper flex items-center">
         {% include "content/features/breadcrumbs.html" %}
       </div>
       <div class="detail-page__back-wrapper">
@@ -43,7 +43,7 @@
         {% if content.linked_items %}
         {% from "content/cards/product-compact.html" import render_item_compact_card %}
         <div class="recommendation-box recommendation-box--linked">
-          <h3 class="recommendation-box__title flex products-center">Products Mentioned In This Article</h3>
+          <h3 class="recommendation-box__title flex items-center">Products Mentioned In This Article</h3>
           <div class="recommendation-box__grid">
             {% for product in content.linked_items %}
             {{ render_item_compact_card(product) }}
@@ -62,7 +62,7 @@
         {% if extra_items %}
         <div class="recommendation-box recommendation-box--matched" data-recommendation-container="shop_product"
           data-entity-ids="{{ matched_items[:6] | map(attribute='id') | list | tojson | safe }}">
-          <h3 class="recommendation-box__title flex products-center">
+          <h3 class="recommendation-box__title flex items-center">
             <i class="fas fa-shopping-bag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
             Shop Related Products
           </h3>
@@ -73,6 +73,28 @@
         </div>
         {% endif %}
         {% endif %}
+        
+        {# ── Author and Source Discovery Carousels ── #}
+        {% if author_carousel %}
+        <div class="recommendation-box recommendation-box--author mt-10">
+          <h3 class="recommendation-box__title flex items-center">
+            <i class="fas fa-user-edit" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+            {{ author_carousel.title }}
+          </h3>
+          {{ grid(author_carousel.items, target_type='content', carousel=true) }}
+        </div>
+        {% endif %}
+
+        {% if source_carousel %}
+        <div class="recommendation-box recommendation-box--source mt-10">
+          <h3 class="recommendation-box__title flex items-center">
+            <i class="fas fa-newspaper" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+            {{ source_carousel.title }}
+          </h3>
+          {{ grid(source_carousel.items, target_type='content', carousel=true) }}
+        </div>
+        {% endif %}
+        
       </div>
 
       <!-- Extra (Moved inside Main) -->

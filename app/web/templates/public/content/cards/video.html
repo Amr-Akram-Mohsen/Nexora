@@ -10,9 +10,9 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
 {% endblock %}
 
 {% block meta_top %}
-<div class="card__meta-top flex products-center gap-2 justify-between">
+<div class="card__meta-top flex items-center gap-2 justify-between">
   {% if content.category %}
-  {{ badge(content.category.name, 'badge--category', 'secondary') }}
+  {{ badge(text=content.category.name, class="badge--category", variant="secondary") }}
   {% endif %}
   <span class="platform-icon platform-icon--youtube inline-flex-center">
     <i class="fab fa-youtube"></i>
@@ -21,9 +21,9 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
 {% endblock %}
 
 {% block meta_bottom %}
-<div class="card__meta-group flex products-center gap-2">
+<div class="card__meta-group flex items-center gap-2">
   {% if video.channel_name %}
-  <div class="card__meta-product flex products-center gap-2">
+  <div class="card__meta-product flex items-center gap-2">
     <i class="fas fa-play-circle card__meta-icon"></i>
     <span class="card__meta-text truncate">{{ video.channel_name }}</span>
   </div>

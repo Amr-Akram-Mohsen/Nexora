@@ -189,10 +189,23 @@ def full_article_scraping_pipeline(product: Any, extractor_service: str = "diffb
                     image_url = img.get("url")
                     break
 
+            # Diffbot often returns the first paragraph as the summary. 
+            # Nullify it to prevent redundant "AI Summary" UI blocks.
+            summary = metadata.get("summary")
+            content_text = res.get("content_text", "")
+            if summary:
+                clean_summary = summary.strip()
+                if content_text and content_text.strip().startswith(clean_summary):
+                    summary = None
+                elif content_text and clean_summary in content_text[:len(clean_summary) + 150]:
+                    summary = None
+                elif description and clean_summary == description.strip():
+                    summary = None
+
             return {
                 "content_html":     res.get("content_html"),
-                "content_text":     res.get("content_text", ""),
-                "word_count":       len(res.get("content_text", "").split()),
+                "content_text":     content_text,
+                "word_count":       len(content_text.split()),
                 "quality_score":    score,
                 "is_content_scraped": True,
                 "ingestion_method": "diffbot",
@@ -200,7 +213,7 @@ def full_article_scraping_pipeline(product: Any, extractor_service: str = "diffb
                 "extended_metadata": metadata, # raw tags/categories preserved here for the inserter
                 "images":           res["images"],
                 "videos":           metadata.get("videos"),
-                "summary":          metadata.get("summary"),
+                "summary":          summary,
                 "language":         metadata.get("humanLanguage"),
                 "sentiment_score":  metadata.get("sentiment"),
                 "external_uri":     metadata.get("diffbotUri"),

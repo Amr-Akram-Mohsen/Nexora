@@ -11,13 +11,13 @@
   {{ stat_card("Total Items", value_id="stats-total-products", icon="fa-solid fa-box-open", meta_text="in catalog", meta_id="stats-meta-products", attrs={"data-filter": "", "data-val": ""}, class="card clickable-card filter-link") }}
 
   <!-- Image Coverage -->
-  {{ stat_card("Image Coverage", value_id="stats-image-coverage", icon="fa-regular fa-image", meta_text="with images", meta_id="stats-meta-images", attrs={"data-filter": "filter-product-has-images", "data-val": "false", "title": "Click to view products without images"}, class="card clickable-card filter-link") }}
+  {{ stat_card("Image Coverage", value_id="stats-image-coverage", icon="fa-regular fa-image", meta_text="with images", meta_id="stats-meta-images", attrs={"data-filter": "filter-item-has-images", "data-val": "false", "title": "Click to view products without images"}, class="card clickable-card filter-link") }}
 
   <!-- Brand Assignment -->
-  {{ stat_card("Brand Assigned", value_id="stats-brand-coverage", icon="fa-solid fa-tag", meta_text="have brand", meta_id="stats-meta-brands", attrs={"data-filter": "filter-product-has-brand", "data-val": "false", "title": "Click to view unbranded products"}, class="card clickable-card filter-link") }}
+  {{ stat_card("Brand Assigned", value_id="stats-brand-coverage", icon="fa-solid fa-tag", meta_text="have brand", meta_id="stats-meta-brands", attrs={"data-filter": "filter-item-has-brand", "data-val": "false", "title": "Click to view unbranded products"}, class="card clickable-card filter-link") }}
 
   <!-- Active Link Coverage -->
-  {{ stat_card("Active Links", value_id="stats-link-coverage", icon="fa-solid fa-link", meta_text="have store link", meta_id="stats-meta-links", attrs={"data-filter": "filter-product-availability", "data-val": "OutOfStock", "title": "Click to view products with no active links"}, class="card clickable-card filter-link") }}
+  {{ stat_card("Active Links", value_id="stats-link-coverage", icon="fa-solid fa-link", meta_text="have store link", meta_id="stats-meta-links", attrs={"data-filter": "filter-item-availability", "data-val": "OutOfStock", "title": "Click to view products with no active links"}, class="card clickable-card filter-link") }}
 
   <!-- Stale Syncs -->
   {{ stat_card("Stale Syncs", value_id="stats-stale-syncs", icon="fa-solid fa-clock-rotate-left", meta_text="> 7 days old", attrs={"data-filter": "product-sort-by", "data-val": "last_synced_at", "title": "Click to sort by stalest sync"}, class="card clickable-card filter-link") }}
@@ -29,30 +29,30 @@
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
 {# Row 1: Search & Basic Filters #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("product-search", "Search by name or ID…") }}
-  {{ admin_filter_select("filter-product-brand", None, [], default_val="", default_text="All Brands",
+  {{ admin_filter_select("filter-item-brand", None, [], default_val="", default_text="All Brands",
   extra_class="filter-select-product") }}
-  {{ admin_filter_select("filter-product-category", None, [], default_val="", default_text="All Categories",
+  {{ admin_filter_select("filter-item-category", None, [], default_val="", default_text="All Categories",
   extra_class="filter-select-product") }}
-  {{ admin_filter_select("filter-product-source", None, [], default_val="", default_text="All Sources",
+  {{ admin_filter_select("filter-item-source", None, [], default_val="", default_text="All Sources",
   extra_class="filter-select-product") }}
-  {{ admin_filter_select("filter-product-type", None, [], default_val="", default_text="All Types",
+  {{ admin_filter_select("filter-item-type", None, [], default_val="", default_text="All Types",
   extra_class="filter-select-product") }}
 </div>
 
 {# Row 1.5: Health & Quality Filters #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
-  {{ admin_filter_select("filter-product-has-images", None, [("true", "Has Images"), ("false", "No Images")],
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_filter_select("filter-item-has-images", None, [("true", "Has Images"), ("false", "No Images")],
   default_val="", default_text="Images: All", extra_class="filter-select-product") }}
-  {{ admin_filter_select("filter-product-has-brand", None, [("true", "Has Brand"), ("false", "No Brand")], default_val="",
+  {{ admin_filter_select("filter-item-has-brand", None, [("true", "Has Brand"), ("false", "No Brand")], default_val="",
   default_text="Brand: All", extra_class="filter-select-product") }}
-  {{ admin_filter_select("filter-product-availability", None, [("InStock", "In Stock"), ("OutOfStock", "Out of Stock")],
+  {{ admin_filter_select("filter-item-availability", None, [("InStock", "In Stock"), ("OutOfStock", "Out of Stock")],
   default_val="", default_text="Availability: All", extra_class="filter-select-product") }}
 </div>
 
 {# Row 2: Sorting & Reset #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   <div class="filter-sort-group gap-2">
     <span class="filter-label-xs">Sort:</span>
     {{ admin_filter_select("product-sort-by", None, [("id", "ID / Newest"), ("created_at", "Date Added"), ("name", "Name"),

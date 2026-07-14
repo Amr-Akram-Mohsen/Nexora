@@ -95,14 +95,14 @@ def list_items():
     sort_col, sort_dir = parse_sort_params(_ITEM_SORT_MAP, Product.id)
 
     pagination = get_admin_items_page(request.args, sort_col, sort_dir, page, per_page)
-    page_ids = [product.id for product in pagination.products]
+    page_ids = [product.id for product in pagination.items]
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
     from app.domains.product.serializers import serialize_product_row
     serialized = []
     
-    for product in pagination.products:
+    for product in pagination.items:
         price_info  = min_price_map.get(product.id, {})
         store_info  = store_info_map.get(product.id, {})
         has_image   = image_info_map.get(product.id, False)
@@ -189,14 +189,14 @@ def items_rows():
     sort_col, sort_dir = parse_sort_params(_ITEM_SORT_MAP, Product.id)
 
     pagination = get_admin_items_page(request.args, sort_col, sort_dir, page, per_page)
-    page_ids = [product.id for product in pagination.products]
+    page_ids = [product.id for product in pagination.items]
 
     min_price_map, store_info_map, image_info_map, spec_info_map = load_admin_item_aggregates(page_ids)
 
     from app.domains.product.serializers import serialize_product_row
     serialized = []
     
-    for product in pagination.products:
+    for product in pagination.items:
         price_info = min_price_map.get(product.id, {})
         store_info = store_info_map.get(product.id, {})
         has_image = image_info_map.get(product.id, False)

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 _NAME = "rescrape"
 
 
-def enrich_discovered_articles(limit: int = 50) -> dict:
+def enrich_discovered_articles(limit: int = 50, force: bool = False) -> dict:
     """
     Phase 2: Enrichment Workflow
     Fetches articles in 'discovered' / 'failed' status and performs Diffbot enrichment.
@@ -25,7 +25,7 @@ def enrich_discovered_articles(limit: int = 50) -> dict:
     from app.application.content.ingestion.article_ingestion import process_diffbot_enrichment
     from app.application.content.ingestion.scraper_pipeline import fetch_and_clean_diffbot
 
-    retry_threshold = datetime.utcnow() - timedelta(hours=24)
+    retry_threshold = datetime.utcnow() + timedelta(days=365) if force else datetime.utcnow() - timedelta(hours=24)
     unscraped = get_unscraped_articles(limit, retry_threshold)
 
     if not unscraped:
@@ -114,6 +114,9 @@ def enrich_discovered_articles(limit: int = 50) -> dict:
             results["details"].append({"title": article.title, "status": "failed", "reason": str(e), "url": url})
             log_item_skipped(logger, _NAME, url[:60], reason="exception", error=str(e))
             log_integration_error(logger, _NAME, e, url=url[:60])
+
+        import time
+        time.sleep(1.5)  # Pace requests to avoid 429 Too Many Requests
 
     log_integration_success(
         logger, _NAME,

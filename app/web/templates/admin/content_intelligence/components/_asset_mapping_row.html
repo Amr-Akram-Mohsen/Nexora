@@ -26,7 +26,7 @@
                         {% if product.existing_assets %}
                         {% for asset in product.existing_assets %}
                         <li class="asset-mapping-product">
-                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap products-center">
+                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap items-center">
                                 <div class="asset-mapping-product-title">
                                     {% if asset.type == 'video' %}<i class="fa-solid fa-video"></i>{% elif asset.type == 'article' %}<i class="fa-regular fa-file-lines"></i>{% else %}<i class="fa-solid fa-bag-shopping"></i>{% endif %}
                                     {{ asset.title }}
@@ -57,7 +57,7 @@
                         {% if product.missing_assets %}
                         {% for gap in product.missing_assets %}
                         <li class="asset-mapping-product">
-                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap products-center">
+                            <div class="asset-mapping-product-header gap-2 justify-between flex flex-wrap items-center">
                                 <div class="asset-mapping-product-title">
                                     <span class="status-badge">{{ gap.content_type|upper }}</span>
                                     {{ gap.missing_topic }}

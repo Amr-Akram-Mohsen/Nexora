@@ -17,8 +17,8 @@
 
 {% if slot == 'sidebar' %}
 <div class="sidebar-accent"></div>
-<div class="sidebar-heading flex products-center justify-between">
-  <span class="sidebar-heading__label flex products-center">
+<div class="sidebar-heading flex items-center justify-between">
+  <span class="sidebar-heading__label flex items-center">
     <i class="fas fa-history"></i> History
   </span>
 </div>
@@ -26,8 +26,8 @@
 <div class="filter-sidebar">
   <div class="filter-section">
     <ul class="filter-list flex flex-col">
-      <li class="filter-product is-active" id="filter-all">
-        <a href="#all" class="filter-item__link flex products-center justify-between">
+      <li class="filter-item is-active" id="filter-all">
+        <a href="#all" class="filter-item__link flex items-center justify-between">
           <span>Recently Viewed</span>
           <span class="filter-section__badge">{{ history_items|length }}</span>
         </a>
@@ -38,7 +38,7 @@
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-header__inner flex-wrap gap-4 justify-between products-center">
+<div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
   <div class="listing-summary flex">
     <h1 class="listing-title">Your Reading History</h1>
     <p class="listing-count">

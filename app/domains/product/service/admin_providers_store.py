@@ -86,7 +86,7 @@ def get_admin_stores_page(page, per_page, search, network, country, sync_stalene
 
     stmt = stmt.order_by(Store.name.asc())
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    page_store_ids = [st.id for st in pagination.products]
+    page_store_ids = [st.id for st in pagination.items]
 
     if page_store_ids:
         product_count_rows = db.session.execute(
@@ -164,7 +164,7 @@ def get_admin_stores_page(page, per_page, search, network, country, sync_stalene
     now = datetime.now(timezone.utc)
     
     serialized = []
-    for st in pagination.products:
+    for st in pagination.items:
         product_count   = product_count_map.get(st.id, 0)
         latest_activity = latest_activity_map.get(st.id)
         clicks          = clicks_map.get(st.id, 0)

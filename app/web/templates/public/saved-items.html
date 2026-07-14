@@ -17,27 +17,27 @@
 
 {% if slot == 'sidebar' %}
 <div class="sidebar-accent"></div>
-<div class="sidebar-heading flex products-center justify-between">
-  <span class="sidebar-heading__label flex products-center">
+<div class="sidebar-heading flex items-center justify-between">
+  <span class="sidebar-heading__label flex items-center">
     <i class="far fa-bookmark"></i> Library
   </span>
 </div>
 
 <div class="filter-sidebar">
   <div class="filter-section">
-    <h3 class="filter-section__title flex products-center gap-2">
+    <h3 class="filter-section__title flex items-center gap-2">
       <i class="far fa-folder"></i> Collections
     </h3>
     <ul class="filter-list flex flex-col">
-      <li class="filter-product is-active" id="filter-all">
-        {% call link(href="#all", class="filter-item__link flex products-center justify-between", unstyled=True) %}
+      <li class="filter-item is-active" id="filter-all">
+        {% call link(href="#all", class="filter-item__link flex items-center justify-between", unstyled=True) %}
           <span>All Saved</span>
           <span class="filter-section__badge">{{ saved_items|length + saved_articles|length }}</span>
         {% endcall %}
       </li>
       {% for collection in collections %}
-      <li class="filter-product">
-        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex products-center justify-between", unstyled=True) %}
+      <li class="filter-item">
+        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex items-center justify-between", unstyled=True) %}
           <span>{{ collection }}</span>
         {% endcall %}
       </li>
@@ -48,12 +48,12 @@
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-header__inner flex-wrap gap-4 justify-between products-center">
+<div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
   <div class="listing-summary flex">
     <h1 class="listing-title">Your Saved Items</h1>
     <p class="listing-count">
       <span class="listing-count__num" id="total-count">{{ saved_articles|length + saved_items|length }}</span>
-      <span id="total-count-label">products</span> in your library
+      <span id="total-count-label">items</span> in your library
     </p>
   </div>
 </div>
@@ -77,7 +77,7 @@
     <div class="flex flex-col gap-10">
       {% if coll_items %}
       <section class="saved-collection flex flex-col gap-4" data-domain-type="commercial">
-        <h3 class="saved-collection-title flex justify-between products-center">
+        <h3 class="saved-collection-title flex justify-between items-center">
           <span>Products</span>
           <span class="count-badge text-sm">({{ coll_items|length }})</span>
         </h3>
@@ -87,7 +87,7 @@
       
       {% if coll_articles %}
       <section class="saved-collection flex flex-col gap-4" data-domain-type="content">
-        <h3 class="saved-collection-title flex justify-between products-center">
+        <h3 class="saved-collection-title flex justify-between items-center">
           <span>Articles</span>
           <span class="count-badge text-sm">({{ coll_articles|length }})</span>
         </h3>

@@ -41,7 +41,7 @@
 {% block title_text %}{{ product.name }}{% endblock %}
 
 {% block meta_bottom %}
-  <div class="card__rating flex products-center gap-1">
+  <div class="card__rating flex items-center gap-1">
     {{ render_stars(product.rating or 0) }}
     <span class="product-rating">({{ product.rating or 0 }})</span>
   </div>
@@ -55,7 +55,7 @@
 
 {% block actions %}
   <div class="product-actions flex flex-col gap-3 gap-4 flex-wrap">
-    <div class="product-price-box flex products-center gap-2">
+    <div class="product-price-box flex items-center gap-2">
       {% if best_link %}
       <span class="product-price-current">{{ best_link.currency }} {{ best_link.price }}</span>
       {% if best_link.old_price %}
@@ -65,8 +65,8 @@
       <span class="product-price-unavailable">Check current price</span>
       {% endif %}
     </div>
-    <div class="product-store-box flex products-center justify-between">
-      <div class="product-store-badge flex products-center">
+    <div class="product-store-box flex items-center justify-between">
+      <div class="product-store-badge flex items-center">
         {% if best_link and best_link.store.logo_url %}
         <img src="{{ url_for('static', filename=best_link.store.logo_url) }}" alt="{{ best_link.store.name }}"
           loading="lazy">

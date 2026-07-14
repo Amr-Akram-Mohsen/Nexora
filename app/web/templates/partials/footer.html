@@ -6,8 +6,8 @@
     <div class="footer-grid">
 
       <!-- Column 1: Brand -->
-      <div class="footer-column footer-brand flex flex-col products-start gap-3">
-        {% call link(href="/", class="logo group flex products-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
+      <div class="footer-column footer-brand flex flex-col items-start gap-3">
+        {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
           {% include "logos/nexora-logo.html" %}
         {% endcall %}
         {# <p class="footer-slogan">
@@ -45,7 +45,7 @@
         <h4 class="footer-title">Support & Legal</h4>
         {# <div class="footer-contact flex flex-col">
           <span class="footer-text">Prefer email? Reach us directly at:</span>
-          <a href="mailto:hello@nexora.com" class="footer-link footer-email flex products-center gap-2">
+          <a href="mailto:hello@nexora.com" class="footer-link footer-email flex items-center gap-2">
             <i class="far fa-envelope"></i> hello@nexora.com
           </a>
         </div> #}
@@ -75,17 +75,17 @@
         Nexora is reader-supported. When you buy through links on our site, we may earn an affiliate commission.
       </p>
 
-      <div class="footer-bottom__row flex flex-wrap products-center justify-between gap-4">
+      <div class="footer-bottom__row flex flex-wrap items-center justify-between gap-4">
         <p class="footer-copy">
           © {{ current_year }}
           {{ link(text="Nexora", href="/", class="footer-brand-link", unstyled=True) }}. All rights reserved.
         </p>
 
-        <div class="footer-trust flex products-center gap-4">
-          <span class="trust-badge flex products-center gap-2" title="SSL Secure">
+        <div class="footer-trust flex items-center gap-4">
+          <span class="trust-badge flex items-center gap-2" title="SSL Secure">
             <i class="fas fa-lock"></i> SSL Secure
           </span>
-          <span class="trust-badge flex products-center gap-2" title="100% Independent Reviews">
+          <span class="trust-badge flex items-center gap-2" title="100% Independent Reviews">
             <i class="fas fa-shield-alt"></i> 100% Independent
           </span>
         </div>

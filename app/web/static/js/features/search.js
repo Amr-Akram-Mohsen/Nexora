@@ -120,7 +120,7 @@ function handleMoreFiltersClick(e) {
     if (!btn) return false;
     
     const section = btn.closest('.filter-section');
-    const extras = section.querySelectorAll('.filter-product--extra');
+    const extras = section.querySelectorAll('.filter-item--extra');
     const isExpanded = btn.getAttribute('aria-expanded') === 'true';
 
     extras.forEach(el => {

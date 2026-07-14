@@ -3,9 +3,9 @@ async function initAllSaves() {
     const targets = [];
 
     buttons.forEach(btn => {
-        const product = btn.closest("[data-id]");
-        if (!product) return;
-        targets.push({ 'type': product.dataset.type, 'id': product.dataset.id });
+        const item = btn.closest("[data-id]");
+        if (!item) return;
+        targets.push({ 'type': item.dataset.type, 'id': item.dataset.id });
     });
 
     // Deduplicate targets
@@ -34,9 +34,9 @@ async function initAllSaves() {
         const data = await res.json();
 
         buttons.forEach(btn => {
-            const product = btn.closest("[data-id]");
-            if (!product) return;
-            const key = `${product.dataset.type}:${product.dataset.id}`;
+            const item = btn.closest("[data-id]");
+            if (!item) return;
+            const key = `${item.dataset.type}:${item.dataset.id}`;
 
             btn.classList.toggle('active', key in data);
         });
@@ -55,7 +55,7 @@ function updateSavedHeaderCount() {
 
     if (!totalCountEl || !collectionsContainer) return;
     
-    const numProducts = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
+    const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
     const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card').length;
 
     totalCountEl.textContent = numProducts + numArticles;
@@ -63,9 +63,9 @@ function updateSavedHeaderCount() {
 }
 
 function setSavedActiveFilter(activeId) {
-    const filters = document.querySelectorAll('.filter-product');
+    const filters = document.querySelectorAll('.filter-item');
     filters.forEach(el => el.classList.remove('is-active'));
-    const activeEl = document.getElementById(activeId) || document.querySelector(`a[href="${activeId}"]`)?.closest('.filter-product');
+    const activeEl = document.getElementById(activeId) || document.querySelector(`a[href="${activeId}"]`)?.closest('.filter-item');
     if (activeEl) activeEl.classList.add('is-active');
 }
 
@@ -95,7 +95,7 @@ function handleSavedItemsFilterClick(e) {
     const filterLink = e.target.closest('.filter-item__link');
     if (!filterLink || !filterLink.closest('.filter-sidebar')) return false;
     
-    const filterItem = filterLink.closest('.filter-product');
+    const filterItem = filterLink.closest('.filter-item');
     if (!filterItem) return false;
 
     const href = filterLink.getAttribute('href');
@@ -129,7 +129,7 @@ function initSavedItemsPage() {
 
     // MutationObserver to sync counts and sidebar filters dynamically on card removal (unsave)
     const observer = new MutationObserver(function(mutations) {
-        const numProducts = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
+        const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
         const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card').length;
         const totalCount = numProducts + numArticles;
 
@@ -156,7 +156,7 @@ function initMoveToCollection() {
     const collectionsContainer = document.querySelector('.saved-collections');
     if (!collectionsContainer) return;
     
-    const collectionElements = document.querySelectorAll('.filter-product:not(#filter-all) .filter-item__link span:first-child');
+    const collectionElements = document.querySelectorAll('.filter-item:not(#filter-all) .filter-item__link span:first-child');
     const collections = Array.from(collectionElements).map(el => el.textContent.trim());
     
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="csrf_token"]')?.value;
@@ -183,15 +183,15 @@ function initMoveToCollection() {
         
         const selectHtml = `
             <div class="move-collection-wrapper">
-                <select class="move-product-select" aria-label="Move to collection">
+                <select class="move-item-select" aria-label="Move to collection">
                     ${optionsHtml}
                 </select>
-                <i class="fas fa-chevron-down move-product-select-icon"></i>
+                <i class="fas fa-chevron-down move-item-select-icon"></i>
             </div>
         `;
         actions.insertAdjacentHTML('afterbegin', selectHtml);
         
-        actions.querySelector('.move-product-select').addEventListener('change', async (e) => {
+        actions.querySelector('.move-item-select').addEventListener('change', async (e) => {
             const newCollection = e.target.value;
             if (!newCollection) return;
             

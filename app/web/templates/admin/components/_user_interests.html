@@ -8,7 +8,7 @@
       <h4>Top {{ aff_type }}</h4>
       <div class="flex flex-col gap-2">
         {% for product in items_list %}
-        <div class="affinity-product flex products-center justify-between">
+        <div class="affinity-product flex items-center justify-between">
           <span title="{{ product.name }}">{{ product.name }}</span>
           {{ badge(product.score ~ " pts", class="badge-primary badge-sm", variant=none) }}
         </div>
@@ -26,10 +26,10 @@
     <div class="user-interests-list flex flex-col gap-2">
       {% for product in products %}
       <div class="interest-card profile-section-card" id="user-interest-card">
-        <div class="flex justify-between products-start gap-2">
+        <div class="flex justify-between items-start gap-2">
           <div class="flex flex-col gap-1">
             <strong title="{{ product.target_name }}">{{ product.target_name }}</strong>
-            <div class="flex products-center gap-2">
+            <div class="flex items-center gap-2">
               {{ badge(product.target_type|title, class="badge-secondary", attrs={"id": "interest-badge-sm"}, variant=none) }}
               <span>{{ product.score }} pts</span>
             </div>

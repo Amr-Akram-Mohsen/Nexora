@@ -61,12 +61,12 @@
 <span><strong>{{ product.value.label }}</strong>: {{ product.value.detail }}</span>
 {% elif product.is_link %}
 {% if product.value.external %}
-{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex products-center gap-1 w-fit", icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank"}, unstyled=True) }}
+{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", icon="fas fa-external-link-alt fa-xs", attrs={"target": "_blank"}, unstyled=True) }}
 {% else %}
-{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex products-center gap-1 w-fit", unstyled=True) }}
+{{ link(text=product.value.label, href=product.value.link, class="activity-target inspect-link flex items-center gap-1 w-fit", unstyled=True) }}
 {% endif %}
 {% elif product.is_breadcrumb %}
-<div class="flex products-center gap-2 flex-wrap">
+<div class="flex items-center gap-2 flex-wrap">
   {% for crumb in product.value %}
   {{ link(text=crumb.label, href=crumb.link, unstyled=True) }}
   {% if not loop.last %}<i class="fas fa-chevron-right fa-xs text-muted"></i>{% endif %}

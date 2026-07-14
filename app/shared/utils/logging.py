@@ -78,6 +78,21 @@ def log_item_ingested(
 ) -> None:
     """Log an product being stored or updated in the DB."""
     pub_str = f"  published={published}" if published is not None else ""
+    
+    # Format updated_relationships nicer if present
+    if "updated_relationships" in kwargs:
+        ur = kwargs.pop("updated_relationships")
+        if isinstance(ur, dict): 
+            summary = []
+            for k, v in ur.items():
+                if isinstance(v, list) or isinstance(v, dict):
+                    summary.append(f"{k}={len(v)}")
+                else:
+                    summary.append(f"{k}={v}")
+            kwargs["updates"] = "[" + ", ".join(summary) + "]"
+        else:
+            kwargs["updates"] = str(ur)[:100] + "..." if len(str(ur)) > 100 else str(ur)
+
     extras = "  ".join([f"{k}={v}" for k, v in kwargs.items()])
     logger.info(
         '[INGEST][%s] %-8s  content_id=%s  object_id=%s%s  %s', source, status, content_id, object_id, pub_str, extras

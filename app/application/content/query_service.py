@@ -28,3 +28,28 @@ def get_filtered_contents_cached(
     return domain_query.get_filtered_contents(
         section_id, active_filters, allowed_filters, page, per_page
     )
+
+
+@cache.memoize(timeout=3600)
+def get_carousel_contents_cached(active_filters_key, exclude_ids_key=None, limit=6):
+    """
+    Fetches contents for a carousel component based on specific filters (e.g. topic, brand, author).
+    Limits to `limit` items, and excludes `exclude_ids_key`.
+    """
+    active_filters = filters_from_normalized(active_filters_key)
+    allowed_filters = list(active_filters.keys())
+    
+    # We fetch limit + 1 just in case one item is excluded, 
+    # though it's better to fetch a few more if we have multiple exclusions.
+    # But since get_filtered_contents doesn't support exclude_ids yet, we filter post-query.
+    res = domain_query.get_filtered_contents(
+        None, active_filters, allowed_filters, page=1, per_page=limit + 5
+    )
+    
+    contents = res.get("products", []) # get_filtered_contents returns 'products' key
+    
+    if exclude_ids_key:
+        exclude_set = set(exclude_ids_key)
+        contents = [c for c in contents if c["id"] not in exclude_set]
+        
+    return contents[:limit]

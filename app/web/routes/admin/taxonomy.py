@@ -229,12 +229,12 @@ def categories_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Category, page, per_page, search, status, health)
-    product_ids = [c.id for c in pagination.products]
+    product_ids = [c.id for c in pagination.items]
     from app.domains.taxonomy.service.metrics import get_category_metrics
     metrics = get_category_metrics(product_ids)
         
     serialized = []
-    for c in pagination.products:
+    for c in pagination.items:
         m = metrics.get(c.id, {})
         c_count = m.get("content_count", 0)
         i_count = m.get("item_count", 0)
@@ -267,12 +267,12 @@ def brands_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Brand, page, per_page, search, status, health)
-    product_ids = [b.id for b in pagination.products]
+    product_ids = [b.id for b in pagination.items]
     from app.domains.taxonomy.service.metrics import get_brand_metrics
     metrics = get_brand_metrics(product_ids)
         
     serialized = []
-    for b in pagination.products:
+    for b in pagination.items:
         m = metrics.get(b.id, {})
         c_count = m.get("content_count", 0)
         i_count = m.get("item_count", 0)
@@ -307,12 +307,12 @@ def topics_rows():
     from app.domains.taxonomy.models import Entity
     extra_filter = Entity.entity_type.in_(['topic', 'tag', 'concept'])
     pagination = paginate_taxonomy_entity(Entity, page, per_page, search, status, health, extra_filter=extra_filter)
-    product_ids = [t.id for t in pagination.products]
+    product_ids = [t.id for t in pagination.items]
     from app.domains.taxonomy.service.metrics import get_topic_metrics
     metrics = get_topic_metrics(product_ids)
         
     serialized = []
-    for t in pagination.products:
+    for t in pagination.items:
         m = metrics.get(t.id, {})
         c_count = m.get("content_count", 0)
         cat_count = m.get("category_spread", 0)
@@ -344,12 +344,12 @@ def sections_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(Section, page, per_page, search, status, health)
-    product_ids = [s.id for s in pagination.products]
+    product_ids = [s.id for s in pagination.items]
     from app.domains.taxonomy.service.metrics import get_section_metrics
     metrics = get_section_metrics(product_ids)
         
     serialized = []
-    for s in pagination.products:
+    for s in pagination.items:
         m = metrics.get(s.id, {})
         c_count = m.get("content_count", 0)
         cat_count = m.get("category_spread", 0)
@@ -423,12 +423,12 @@ def attributes_rows():
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(AttributeFacet, page, per_page, search, health=health)
-    product_ids = [a.id for a in pagination.products]
+    product_ids = [a.id for a in pagination.items]
     from app.domains.taxonomy.service.metrics import get_attribute_metrics
     metrics = get_attribute_metrics(product_ids)
         
     serialized = []
-    for a in pagination.products:
+    for a in pagination.items:
         m = metrics.get(a.id, {})
         c_count = m.get("content_count", 0)
         
@@ -552,13 +552,13 @@ def _get_facet_rows(model, domain_type, field_id_name):
     health = request.args.get("health")
 
     pagination = paginate_taxonomy_entity(model, page, per_page, search, health=health, field_name=field_id_name)
-    product_ids = [a.id for a in pagination.products]
+    product_ids = [a.id for a in pagination.items]
     
     from app.domains.taxonomy.service.metrics import get_facet_metrics
     metrics = get_facet_metrics(product_ids, field_id_name)
     
     serialized = []
-    for a in pagination.products:
+    for a in pagination.items:
         m = metrics.get(a.id, {})
         c_count = m.get("content_count", 0)
         

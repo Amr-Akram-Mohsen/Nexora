@@ -16,7 +16,7 @@
     {% for group in duplicate_groups %}
     <div class="overview-panel bg-card border border-border radius-md dup-group-panel"
          id="dup-group-{{ loop.index }}">
-      <div class="dup-group-header flex justify-between products-center">
+      <div class="dup-group-header flex justify-between items-center">
         <div>
           <h3 class="dup-group-title">{{ group.title }}</h3>
           <p class="dup-group-meta">{{ group.count }} identical titles found</p>
@@ -27,7 +27,7 @@
       <div class="dup-group-body">
         {% for product in group.content_list %}
         <div class="dup-product-card" id="dup-product-{{ product.id }}" data-id="{{ product.id }}">
-          <div class="flex justify-between products-center">
+          <div class="flex justify-between items-center">
             {{ badge(text=product.type, class="badge badge-type badge-compact") }}
             <span class="dup-product-meta">ID: {{ product.id }}</span>
           </div>
@@ -41,7 +41,7 @@
           </div>
           <div class="dup-product-actions">
             <a href="/admin/contents/{{ product.id }}" target="_blank"
-               class="user-action-btn flex products-center justify-center gap-1">
+               class="user-action-btn flex items-center justify-center gap-1">
               <i class="fas fa-eye"></i> Inspect
             </a>
             {{ button(class="user-action-btn user-action-delete justify-center gap-1", attrs={"data-action": "delete-dup", "data-id": product.id}, icon="fas fa-trash", text="Delete", unstyled=True) }}

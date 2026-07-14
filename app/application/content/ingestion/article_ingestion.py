@@ -36,25 +36,57 @@ def process_diffbot_enrichment(article, diffbot_data, session):
     # 1. Update Core Content Fields
     article.content_text = obj.get("text")
     article.content_html = obj.get("html")
-    article.summary = obj.get("summary")
     article.language = obj.get("humanLanguage")
     article.word_count = len(article.content_text.split()) if article.content_text else 0
     article.sentiment_score = obj.get("sentiment")
     
+    summary = obj.get("summary")
+    if summary:
+        import re
+        from difflib import SequenceMatcher
+        
+        def _norm(t):
+            return re.sub(r'[^a-z0-9]', '', (t or "").lower())
+            
+        norm_sum = _norm(summary)
+        if len(norm_sum) > 20:
+            norm_desc = _norm(article.description)
+            norm_text_start = _norm(article.content_text[:len(summary) + 400]) if article.content_text else ""
+            
+            is_redundant = False
+            
+            if norm_sum in norm_text_start or (norm_desc and (norm_sum in norm_desc or norm_desc in norm_sum)):
+                is_redundant = True
+            elif norm_desc and SequenceMatcher(None, norm_sum, norm_desc).ratio() > 0.85:
+                is_redundant = True
+            elif norm_text_start:
+                prefix = norm_text_start[:len(norm_sum)]
+                if len(prefix) > 20 and SequenceMatcher(None, norm_sum, prefix).ratio() > 0.85:
+                    is_redundant = True
+                    
+            if is_redundant:
+                summary = None
+            
+    article.summary = summary
     # 2. Extract Media
     if "images" in obj:
-        article.images = [{"url": img.get("url"), "title": img.get("title")} for img in obj.get("images", [])]
+        article.images = obj.get("images", [])
     if "videos" in obj:
-        article.videos = [{"url": vid.get("url")} for vid in obj.get("videos", [])]
+        article.videos = obj.get("videos", [])
 
     # 3. Handle Authors
     authors = []
-    if "author" in obj:
-        authors.append(obj["author"])
-    if "authors" in obj:
-        authors.extend([a.get("name") for a in obj["authors"] if a.get("name")])
+    if obj.get("authors"):
+        authors = obj.get("authors")
+    elif obj.get("author"):
+        author_val = obj.get("author")
+        if isinstance(author_val, str):
+            authors = [{"name": author_val}]
+        elif isinstance(author_val, dict):
+            authors = [author_val]
+            
     if authors:
-        article.authors = list(set(authors))
+        article.authors = authors
 
     # 4. Integrate Diffbot Tags (via ContentEntity)
     if "tags" in obj:

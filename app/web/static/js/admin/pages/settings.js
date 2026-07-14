@@ -153,7 +153,7 @@
   function bindLogFilters() {
     const btnAll = document.getElementById("filter-all-logs");
     const btnArticles = document.getElementById("filter-article-logs");
-    const btnItems = document.getElementById("filter-product-logs");
+    const btnItems = document.getElementById("filter-item-logs");
     if (!btnAll) return;
 
     const btns = [btnAll, btnArticles, btnItems];

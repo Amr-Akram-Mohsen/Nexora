@@ -20,132 +20,122 @@
 {% block base_header %}
 <div class="article-header flex flex-col">
   <div class="article-header__badges flex flex-wrap gap-3">
-    {{ badge(content.category.name, 'badge--category') }}
-    {% for topic in content.topics[:2] %}
-    {{ badge(topic.name, 'badge--topic', 'secondary') }}
-    {% endfor %}
-  </div>
-
-  <h1 class="article-header__title">{{ article.title }}</h1>
-
-  <div class="article-header__meta flex flex-wrap products-center gap-4">
-    <div class="meta-pill gap-2 flex products-center">
-      <i class="far fa-newspaper"></i>
-      <span class="meta-pill__text">{{ article.source_name }}</span>
-    </div>
-
-    {% if article.authors %}
-    {% set author_name = "" %}
-    {% if article.authors is string %}
-    {% set author_name = article.authors %}
-    {% elif article.authors is iterable and article.authors|length > 0 %}
-    {% if article.authors[0] is mapping and article.authors[0].name %}
-    {% set author_name = article.authors|map(attribute='name')|join(', ') %}
-    {% else %}
-    {% set author_name = article.authors|join(', ') %}
+    {{ badge(text=content.category.name, class="badge--category") }}
+    {% if article.event %}
+    {{ badge(text=article.event.name, class="badge--event", variant="primary", icon="fas fa-map-marker-alt") }}
     {% endif %}
-    {% endif %}
+    {% if article.sentiment_score is not none %}
+    {% if article.sentiment_score >= 0.2 %}
+    {{ badge(text="Positive", class="badge--sentiment", variant="success", icon="fas fa-smile") }}
+    {% elif article.sentiment_score <= -0.2 %} {{ badge(text="Critical" , class="badge--sentiment" , variant="danger" ,
+      icon="fas fa-frown" ) }} {% else %} {{ badge(text="Neutral" , class="badge--sentiment" , variant="info" ,
+      icon="fas fa-meh" ) }} {% endif %} {% endif %} {% for topic in content.topics[:2] %} {{ badge(text=topic.name,
+      class="badge--topic" , variant="secondary" ) }} {% endfor %} </div>
 
-    {% if author_name %}
-    <div class="meta-pill gap-2 flex products-center">
-      <i class="far fa-user"></i>
-      <span class="meta-pill__text">{{ author_name }}</span>
-    </div>
-    {% endif %}
-    {% endif %}
+      <h1 class="article-header__title">{{ article.title }}</h1>
 
-    <div class="meta-pill gap-2 flex products-center">
-      <i class="far fa-clock"></i>
-      <span class="meta-pill__text">{{ article.read_time_minutes }} min read</span>
-    </div>
-
-    <div class="meta-pill gap-2 flex products-center">
-      <i class="far fa-calendar"></i>
-      <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
-    </div>
-
-    {% if article.is_content_scraped %}
-    <div class="meta-pill meta-pill--success gap-2 flex products-center" title="Full Article Extracted">
-      <i class="fas fa-check-circle"></i>
-      <span class="meta-pill__text">Verified Content</span>
-    </div>
-    {% endif %}
-  </div>
-</div>
-{% endblock %}
-
-{% block base_content %}
-<div class="article-content">
-  {% if content.linked_items %}
-  {% include "partials/affiliate-disclosure.html" %}
-  {% endif %}
-
-  <div class="article-rich-text">
-    {% if article.summary %}
-    <div class="article-summary-box">
-      <div class="article-summary-accent"></div>
-      <div class="article-summary-content">
-        <div class="article-summary-icon">
-          <i class="fas fa-sparkles"></i>
+      <div class="article-header__meta flex flex-wrap items-center gap-4">
+        <div class="meta-pill gap-2 flex items-center">
+          <i class="far fa-newspaper"></i>
+          <span class="meta-pill__text">{% if article.primary_source %}{{ article.primary_source.name }}{% else %}{{
+            article.source_name }}{% endif %}</span>
         </div>
-        <div class="article-summary-text">
-          <h4 class="article-summary-title">AI Summary</h4>
-          <p class="article-summary-desc">{{ article.summary }}</p>
+
+        {% if article.authors %}
+        {% set author_name = "" %}
+        {% if article.authors is string %}
+        {% set author_name = article.authors %}
+        {% elif article.authors is iterable and article.authors|length > 0 %}
+        {% if article.authors[0] is mapping and article.authors[0].name %}
+        {% set author_name = article.authors|map(attribute='name')|join(', ') %}
+        {% else %}
+        {% set author_name = article.authors|join(', ') %}
+        {% endif %}
+        {% endif %}
+
+        {% if author_name %}
+        <div class="meta-pill gap-2 flex items-center">
+          <i class="far fa-user"></i>
+          <span class="meta-pill__text">{{ author_name }}</span>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div class="meta-pill gap-2 flex items-center">
+          <i class="far fa-clock"></i>
+          <span class="meta-pill__text">{{ article.read_time_minutes }} min read</span>
+        </div>
+
+        <div class="meta-pill gap-2 flex items-center">
+          <i class="far fa-calendar"></i>
+          <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
+        </div>
+
+        {% if article.is_content_scraped %}
+        <div class="meta-pill meta-pill--success gap-2 flex items-center" title="Full Article Extracted">
+          <i class="fas fa-check-circle"></i>
+          <span class="meta-pill__text">Verified Content</span>
+        </div>
+        {% endif %}
+      </div>
+  </div>
+  {% endblock %}
+
+  {% block base_content %}
+  <div class="article-content">
+    {% if content.linked_items %}
+    {% include "partials/affiliate-disclosure.html" %}
+    {% endif %}
+
+    <div class="article-rich-text">
+      {% if article.summary %}
+      <div class="article-summary-box">
+        <div class="article-summary-accent"></div>
+        <div class="article-summary-content">
+          <div class="article-summary-icon">
+            <i class="fas fa-sparkles"></i>
+          </div>
+          <div class="article-summary-text">
+            <h4 class="article-summary-title">AI Summary</h4>
+            <p class="article-summary-desc">{{ article.summary }}</p>
+          </div>
         </div>
       </div>
-    </div>
-    {% endif %}
-    {% if article.content_html %}
-    <div class="article-html">
-      {{ article.content_html | safe }}
-    </div>
-    {% endif %}
-  </div>
+      {% endif %}
+      {% if article.content_html %}
+      <div class="article-html">
+        {{ article.content_html | safe }}
+      </div>
+      {% endif %}
 
-  {% if content.locations %}
-  <div class="article-tags-section">
-    <div class="article-tags-title">Locations</div>
-    <div class="article-tags-list">
-      {% for loc in content.locations %}
-      <a href="/catalog?q={{ loc.slug | urlencode }}" class="article-tag-link">
-        <i class="fas fa-map-marker-alt"></i>
-        {{ loc.name }}
+      {% if entity_carousel %}
+      {% from "components/ui/grid.html" import grid %}
+      <div class="recommendation-box recommendation-box--entity mt-10">
+        <h3 class="recommendation-box__title flex items-center">
+          <i class="fas fa-tag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
+          {{ entity_carousel.title }}
+        </h3>
+        {{ grid(entity_carousel.items, target_type='content', carousel=true) }}
+      </div>
+      {% endif %}
+    </div>
+
+
+
+    <div class="article-cta-box flex items-center justify-between">
+      <div class="cta-content">
+        <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
+        <h4 class="cta-title">Want to read more?</h4>
+        <p class="cta-text">Check out the full story on the original publisher's website.</p>
+      </div>
+      <a href="{{ article.source_url or article.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
+        {{ button(text="Read Full Article", variant="primary", icon="fas fa-external-link-alt") }}
       </a>
-      {% endfor %}
     </div>
   </div>
-  {% endif %}
+  {% endblock %}
 
-  {% if content.entities %}
-  <div class="article-tags-section">
-    <div class="article-tags-title">Tags & Concepts</div>
-    <div class="article-tags-list">
-      {% for entity in content.entities %}
-      <a href="/catalog?q={{ entity.slug | urlencode }}" class="article-tag-link">
-        <i class="fas fa-hashtag"></i>
-        {{ entity.name }}
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  {% if article.images %}
-  <div class="article-images-count">{{ article.images | length }} Images</div>
-  {% endif %}
-  {% if article.videos %}
-  <div class="article-videos-count">{{ article.videos | length }} videos</div>
-  {% endif %}
-
-  <div class="article-cta-box flex products-center justify-between">
-    <div class="cta-content">
-      <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
-      <h4 class="cta-title">Want to read more?</h4>
-      <p class="cta-text">Check out the full story on the original publisher's website.</p>
-    </div>
-    <a href="{{ article.source_url or article.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
-      {{ button(text="Read Full Article", variant="primary", icon="fas fa-external-link-alt") }}
-    </a>
-  </div>
-</div>
-{% endblock %}
+  {% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/features/article-gallery.js') }}" defer></script>
+  {% endblock %}

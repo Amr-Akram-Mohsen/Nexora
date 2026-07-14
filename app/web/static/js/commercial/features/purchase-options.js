@@ -22,10 +22,10 @@ const PurchaseOptions = {
 href="${link.url}"
 target="_blank"
 rel="noopener noreferrer"
-class="link product-buy-link flex products-center justify-between"
+class="link product-buy-link flex items-center justify-between"
 >
 <div class="product-buy-link__info flex flex-col">
-<div class="product-buy-link__store flex products-center">
+<div class="product-buy-link__store flex items-center">
 ${link.logo
                             ?
                             `<img

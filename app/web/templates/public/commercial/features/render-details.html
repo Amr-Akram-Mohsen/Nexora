@@ -33,7 +33,7 @@
 {% set counter.value = counter.value + 1 %}
 {% set hidden_class = " product-detail-product--hidden" if counter.value > 6 else "" %}
 
-<div class="product-detail-product flex products-start {{ hidden_class }}">
+<div class="product-detail-product flex items-start {{ hidden_class }}">
   <span class="product-detail-item__label">
     {{ key.replace('_',' ') | title }}
   </span>

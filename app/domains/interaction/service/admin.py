@@ -46,9 +46,9 @@ def get_admin_comments_page(page, per_page, sentiment, target_type, search, user
             pass
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, titles_map = _load_interaction_context(pagination.products)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_comment(c, users, titles_map) for c in pagination.products]
+    serialized = [_serialize_comment(c, users, titles_map) for c in pagination.items]
     return pagination, serialized
 
 def delete_admin_comment(id):
@@ -93,9 +93,9 @@ def get_admin_reactions_page(page, per_page, reaction_type, target, user_search)
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, titles_map = _load_interaction_context(pagination.products)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_reaction(r, users, titles_map) for r in pagination.products]
+    serialized = [_serialize_reaction(r, users, titles_map) for r in pagination.items]
     return pagination, serialized
 
 def get_admin_views_page(page, per_page, target, start_date, end_date):
@@ -217,9 +217,9 @@ def get_admin_saves_page(page, per_page, target, user_search):
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, titles_map = _load_interaction_context(pagination.products)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_save(s, users, titles_map) for s in pagination.products]
+    serialized = [_serialize_save(s, users, titles_map) for s in pagination.items]
 
     return pagination, serialized
 
@@ -246,8 +246,8 @@ def get_admin_shares_page(page, per_page, target, user_search):
         )
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    users, titles_map = _load_interaction_context(pagination.products)
+    users, titles_map = _load_interaction_context(pagination.items)
 
-    serialized = [_serialize_share(s, users, titles_map) for s in pagination.products]
+    serialized = [_serialize_share(s, users, titles_map) for s in pagination.items]
 
     return pagination, serialized

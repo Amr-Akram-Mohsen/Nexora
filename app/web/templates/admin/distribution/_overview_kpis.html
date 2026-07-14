@@ -1,7 +1,7 @@
 {# app/web/templates/admin/distribution/_overview_kpis.html #}
 <div class="distribution-overview-kpis-grid" id="distribution-overview-kpis">
   <div class="rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label">Total Posts</p>
       <p class="dashboard-stat-value">{{ stats.total_posts }}</p>
     </div>
@@ -9,7 +9,7 @@
   </div>
   
   <div class="rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label stat-success">Published</p>
       <p class="dashboard-stat-value stat-success">{{ stats.published }}</p>
     </div>
@@ -17,7 +17,7 @@
   </div>
   
   <div class="rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label stat-warning">Scheduled</p>
       <p class="dashboard-stat-value stat-warning">{{ stats.scheduled }}</p>
     </div>
@@ -25,7 +25,7 @@
   </div>
   
   <div class="rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label">Drafts</p>
       <p class="dashboard-stat-value">{{ stats.drafts }}</p>
     </div>
@@ -33,7 +33,7 @@
   </div>
   
   <div class="rec-stat-card {% if stats.overdue > 0 %}overdue-alert-card{% endif %}">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label {% if stats.overdue > 0 %}stat-danger{% endif %}">Overdue</p>
       <p class="dashboard-stat-value {% if stats.overdue > 0 %}stat-danger{% endif %}">{{ stats.overdue }}</p>
     </div>
@@ -41,7 +41,7 @@
   </div>
   
   <div class="rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label stat-info">Total Views</p>
       <p class="dashboard-stat-value stat-info">{{ stats.total_views }}</p>
     </div>
@@ -49,7 +49,7 @@
   </div>
   
   <div class="rec-stat-card primary-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <p class="dashboard-stat-label stat-primary-label">Engagement</p>
       <p class="dashboard-stat-value stat-primary-value">{{ stats.total_engagement|int }}</p>
     </div>

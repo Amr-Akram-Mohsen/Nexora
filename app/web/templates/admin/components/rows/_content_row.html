@@ -2,7 +2,7 @@
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">
   <div class="content-cell-title flex flex-col gap-1">
-    <strong class="cell-primary-text flex products-center gap-1">
+    <strong class="cell-primary-text flex items-center gap-1">
       {% set type_icon = 'fas fa-newspaper' if row.object_type == 'article' else ('fas fa-play-circle' if row.object_type == 'video' else 'fab fa-reddit') %}
       <i class="{{ type_icon }} content-type-icon" title="{{ row.object_type | title }}"></i>
       {{ row.title }}
@@ -14,27 +14,27 @@
       {{ badge(row.health_score ~ "% Health", variant=health_variant, class="badge-compact") }}
 
       {% if not row.has_topics %}
-      {{ badge("No Topics", icon='fas fa-exclamation-triangle', class="status-badge inactive flex products-center gap-1",
+      {{ badge("No Topics", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1",
       attrs={"title": "No Topics"}, variant=none) }}
       {% endif %}
 
       {% if not row.has_brands %}
-      {{ badge("No Brands", icon='fas fa-exclamation-triangle', class="status-badge inactive flex products-center gap-1",
+      {{ badge("No Brands", icon='fas fa-exclamation-triangle', class="status-badge inactive flex items-center gap-1",
       attrs={"title": "No Brands"}, variant=none) }}
       {% endif %}
 
       {% if not row.has_source %}
-      {{ badge("No Source", icon='fas fa-times-circle', class="status-badge inactive flex products-center gap-1",
+      {{ badge("No Source", icon='fas fa-times-circle', class="status-badge inactive flex items-center gap-1",
       attrs={"title": "No Source"}, variant=none) }}
       {% endif %}
 
       {% if row.object_type == "article" and row.enrichment_status == "failed" %}
-      {{ badge("Failed", icon='fas fa-ban', class="status-badge inactive flex products-center gap-1", attrs={"title":
+      {{ badge("Failed", icon='fas fa-ban', class="status-badge inactive flex items-center gap-1", attrs={"title":
       "Enrichment Failed"}, variant=none) }}
       {% endif %}
 
       {% if row.is_duplicate %}
-      {{ badge("Duplicate", icon='fas fa-copy', class="status-badge user flex products-center gap-1", attrs={"title":
+      {{ badge("Duplicate", icon='fas fa-copy', class="status-badge user flex items-center gap-1", attrs={"title":
       "Duplicate Title"}, variant=none) }}
       {% endif %}
     </div>
@@ -86,8 +86,8 @@
   {% set is_pub = row.is_published %}
   {% set btn_status = 'unpublish' if is_pub else 'publish' %}
   {% set btn_label = 'Unpublish' if is_pub else 'Publish' %}
-  {% set btn_class = 'user-action-btn btn-text-subtle-danger flex products-center justify-center gap-1' if is_pub else
-  'user-action-btn user-action-toggle-active flex products-center justify-center gap-1' %}
+  {% set btn_class = 'user-action-btn btn-text-subtle-danger flex items-center justify-center gap-1' if is_pub else
+  'user-action-btn user-action-toggle-active flex items-center justify-center gap-1' %}
   {% set btn_icon = 'fas fa-eye-slash' if is_pub else 'fas fa-upload' %}
 
   {{ button(text=btn_label, class=btn_class, icon=btn_icon, attrs={"data-action": "toggle-publish", "data-id": row.id,

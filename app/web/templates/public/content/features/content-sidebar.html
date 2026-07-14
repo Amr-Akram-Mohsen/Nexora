@@ -2,7 +2,7 @@
 {% from "components/ui/core.html" import badge, button %}
 
 {# ── Canonical filter priority order ── #}
-{% set filter_priority = ['category', 'brand', 'intent', 'price_tier', 'store', 'type'] %}
+{% set filter_priority = ['category', 'brand', 'tag', 'event', 'source', 'intent', 'price_tier', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
@@ -11,7 +11,7 @@
   </div>
 
   {# ── Sidebar title row ── #}
-  <div class="sidebar-heading flex products-center justify-between">
+  <div class="sidebar-heading flex items-center justify-between">
     <span class="sidebar-heading__label">
       <i class="fas fa-filter"></i>
       Filters
@@ -52,26 +52,26 @@
 
   {# Render each filter group #}
   {% from "components/listing/filter-section.html" import filter_section %}
-  {% for filter_name in filters_to_render if filter_name != 'topic' %}
+  {% for filter_name in filters_to_render %}
     {{ filter_section(filter_name, filter_options.get(filter_name, []), active_filters, get_filter_url) }}
   {% endfor %}
 
     {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     <div class="sidebar-trending">
-      <div class="sidebar-trending__header flex products-center gap-2">
+      <div class="sidebar-trending__header flex items-center gap-2">
         <i class="fas fa-fire"></i>
         <span class="sidebar-trending__title">Trending Now</span>
       </div>
       <div class="sidebar-trending__links flex flex-col gap-1">
 
-        {# Show active topic quick-links if topics available #}
-        {% set topic_opts = filter_options.get('topic', []) %}
-        {% if topic_opts %}
-        {% for opt in topic_opts[:5] %}
+        {# Show active tag quick-links if tags available #}
+        {% set tag_opts = filter_options.get('tag', []) %}
+        {% if tag_opts %}
+        {% for opt in tag_opts[:5] %}
         {% set slug = opt.slug if opt.slug is defined else opt %}
         {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
-        {% set is_active = slug in active_filters.get('topic', []) or slug == active_filters.get('topic') %}
-        <a href="{{ get_filter_url('topic', slug, multi=true) }}"
+        {% set is_active = slug in active_filters.get('tag', []) or slug == active_filters.get('tag') %}
+        <a href="{{ get_filter_url('tag', slug, multi=true) }}"
           class="sidebar-trending__link {{ 'is-active' if is_active }}">
           <i class="fas fa-arrow-trend-up"></i>
           <span class="truncate">{{ name }}</span>

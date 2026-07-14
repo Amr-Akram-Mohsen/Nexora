@@ -19,32 +19,32 @@
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Total Content</div>
     <div class="dashboard-stat-value">{{ stats.kpi.total }}</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-database"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-database"></i></div>
   </div>
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Published</div>
     <div class="dashboard-stat-value">{{ stats.kpi.published }}</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-check-circle"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
   </div>
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Drafts &amp; Review</div>
     <div class="dashboard-stat-value">{{ stats.kpi.drafts }}</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-edit"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-edit"></i></div>
   </div>
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Enrichment Failed</div>
     <div class="dashboard-stat-value">{{ stats.kpi.failed }}</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-times-circle"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-times-circle"></i></div>
   </div>
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Unclassified</div>
     <div class="dashboard-stat-value">{{ stats.kpi.no_tax }}</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-tags"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-tags"></i></div>
   </div>
   <div class="dashboard-stat-card">
     <div class="dashboard-stat-label">Scrape Coverage</div>
     <div class="dashboard-stat-value">{{ stats.kpi.scrape_coverage }}%</div>
-    <div class="dashboard-stat-icon flex products-center justify-center"><i class="fas fa-spider"></i></div>
+    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-spider"></i></div>
   </div>
 </div>
 
@@ -77,7 +77,7 @@
       <div class="overview-breakdown-grid flex gap-2">
         {% set total = stats.kpi.total if stats.kpi.total > 0 else 1 %}
         {% for origin, count in stats.origin_dist.items() %}
-        <div class="flex products-center gap-2 dist-row">
+        <div class="flex items-center gap-2 dist-row">
           <div class="overview-breakdown-label" title="{{ origin }}">{{ origin }}</div>
           <div class="overview-breakdown-bar-track">
             <div class="overview-breakdown-bar bar-purple" data-pct="{{ (count / total * 100)|round(1) }}"></div>
@@ -139,7 +139,7 @@
           {% if age == '< 30 Days' %}{% set dot = 'legend-dot--green' %}
           {% elif age == '30-90 Days' %}{% set dot = 'legend-dot--purple' %}
           {% else %}{% set dot = 'legend-dot--orange' %}{% endif %}
-          <div class="chart-legend-product flex products-center gap-1">
+          <div class="chart-legend-product flex items-center gap-1">
             <span class="legend-dot {{ dot }}"></span>
             <span class="chart-legend-label">{{ age }}</span>
             <span class="chart-legend-count">({{ count }})</span>
@@ -175,7 +175,7 @@
           {% if tier == 'High (67-100)' %}{% set dot = 'legend-dot--primary' %}
           {% elif tier == 'Medium (34-66)' %}{% set dot = 'legend-dot--blue' %}
           {% else %}{% set dot = 'legend-dot--red' %}{% endif %}
-          <div class="chart-legend-product flex products-center gap-1">
+          <div class="chart-legend-product flex items-center gap-1">
             <span class="legend-dot {{ dot }}"></span>
             <span class="chart-legend-label">{{ tier }}</span>
             <span class="chart-legend-count">({{ count }})</span>

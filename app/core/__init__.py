@@ -54,11 +54,11 @@ class _LevelAwareFormatter(logging.Formatter):
     """Detail lines use HH:MM:SS only; ERROR/CRITICAL append source location."""
 
     _PLAIN = logging.Formatter(
-        "%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%H:%M:%S"
+        "%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%a %Y-%m-%d %I:%M:%S %p"
     )
     _DETAIL = logging.Formatter(
         "%(asctime)s  %(levelname)-7s  %(message)s  [%(filename)s:%(lineno)d]",
-        datefmt="%H:%M:%S",
+        datefmt="%a %Y-%m-%d %I:%M:%S %p",
     )
 
     def format(self, record: logging.LogRecord) -> str:

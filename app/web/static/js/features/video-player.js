@@ -138,7 +138,7 @@ function initVideoPlayerEnhancements() {
             if (wrapper && iframe) {
                 const videoUrl = iframe.src.replace('embed/', 'watch?v=').split('?')[0];
                 wrapper.innerHTML = `
-                    <div class="flex flex-col products-center justify-center h-full w-full bg-black text-center p-6 absolute inset-0 z-50">
+                    <div class="flex flex-col items-center justify-center h-full w-full bg-black text-center p-6 absolute inset-0 z-50">
                         <i class="fab fa-youtube text-red-600 mb-4" style="font-size: 3rem;"></i>
                         <h3 class="text-white text-xl font-bold mb-2">Playback Disabled</h3>
                         <p class="text-gray-400 mb-6 max-w-md">The owner of this video has disabled playback on other websites. Don't worry, you can still watch it directly on YouTube!</p>

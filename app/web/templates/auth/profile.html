@@ -21,8 +21,8 @@
       <!-- Sidebar: User Summary -->
       <aside class="profile-sidebar">
         {% call card(class="profile-user-card") %}
-        <div class="profile-user-info flex flex-col products-center">
-          <div class="profile-avatar flex-center flex justify-center products-center">
+        <div class="profile-user-info flex flex-col items-center">
+          <div class="profile-avatar flex-center flex justify-center items-center">
             {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
           </div>
           <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
@@ -39,12 +39,12 @@
         </div>
 
         <div class="profile-meta-list">
-          <div class="meta-product flex products-center justify-between">
+          <div class="meta-product flex items-center justify-between">
             <span class="meta-label">Provider</span>
             <span class="meta-value capitalize">{{ current_user.provider or 'Local' }}</span>
           </div>
 
-          <div class="meta-product flex products-center justify-between">
+          <div class="meta-product flex items-center justify-between">
             <span class="meta-label">Member Since</span>
             <span class="meta-value">{{ current_user.created_at | format_date('%Y-%m-%d') }}</span>
           </div>
@@ -88,7 +88,7 @@
         class="settings-card") %}
         <div class="newsletter-settings-box" data-newsletter data-newsletter-placement="profile">
           {% if subscriber and subscriber.is_active %}
-          <div class="newsletter-status-product flex products-center justify-between flex-wrap gap-4">
+          <div class="newsletter-status-product flex items-center justify-between flex-wrap gap-4">
             <div>
               <p class="newsletter-status-title">Weekly Digest Ingestion</p>
               <p class="newsletter-status-subtitle text-muted-foreground">You are currently receiving reviews, deals,
@@ -103,7 +103,7 @@
             {% endcall %}
           </div>
           {% else %}
-          <div class="newsletter-status-product flex products-center justify-between flex-wrap gap-4">
+          <div class="newsletter-status-product flex items-center justify-between flex-wrap gap-4">
             <div>
               <p class="newsletter-status-title">Weekly Digest Ingestion</p>
               <p class="newsletter-status-subtitle text-muted-foreground">
@@ -131,7 +131,7 @@
         <!-- Card: Security & Password -->
         {% if current_user.provider != 'google' %}
         <div class="card glass settings-card">
-          <div class="card-header flex products-center justify-between" data-action="toggle-password-form"
+          <div class="card-header flex items-center justify-between" data-action="toggle-password-form"
             style="cursor: pointer;">
             <div>
               <h3 class="card-section-title" style="margin-bottom: 0;">Security & Password</h3>
@@ -175,7 +175,7 @@
 
     <!-- Card: Collections Management -->
     <div class="card glass settings-card">
-      <div class="card-header flex products-center justify-between">
+      <div class="card-header flex items-center justify-between">
         <div>
           <h3 class="card-section-title" style="margin-bottom: 0;">Saved Collections</h3>
           <p class="card-section-desc" style="margin-top: 0.25rem;">Manage your saved collections across the platform.
@@ -188,13 +188,13 @@
       <div class="card-body collections-list flex flex-col gap-4 mt-6">
         {% if collections %}
         {% for collection in collections %}
-        <div class="collection-manage-product flex products-center justify-between p-4 border rounded-md">
+        <div class="collection-manage-product flex items-center justify-between p-4 border rounded-md">
           <div class="collection-info flex flex-col gap-1">
             <span class="font-semibold text-lg collection-name-display">{{ collection.name }}</span>
             <span class="text-sm text-muted-foreground">{{ collection.count }} products</span>
           </div>
 
-          <div class="collection-actions flex products-center gap-2">
+          <div class="collection-actions flex items-center gap-2">
             {{ button(text="Rename", type="button", variant="ghost", class="text-sm btn-rename-collection", icon="fas
             fa-edit", attrs={"data-collection": collection.name}) }}
             {{ button(text="Delete", type="button", variant="ghost", class="text-sm text-red-500 hover:bg-red-50

@@ -9,13 +9,13 @@ else "badge-secondary" %}
 
 {% call opportunity_card(product.title, data_attrs=data_attrs, expandable=true) %}
 <div class="opp-metrics gap-2">
-  <div class="opp-metric-product flex gap-1 products-center">Target <strong>{{ product.target }}</strong></div>
-  <div class="opp-metric-product flex gap-1 products-center">Type <strong>{{ product.type }}</strong></div>
-  <div class="opp-metric-product flex gap-1 products-center">Priority {{ badge(text=product.priority, class="status-badge " ~ priorityBadgeClass) }}</div>
-  <div class="opp-metric-product flex gap-1 products-center">Confidence <strong>{{ (product.confidence * 100)|round|int
+  <div class="opp-metric-product flex gap-1 items-center">Target <strong>{{ product.target }}</strong></div>
+  <div class="opp-metric-product flex gap-1 items-center">Type <strong>{{ product.type }}</strong></div>
+  <div class="opp-metric-product flex gap-1 items-center">Priority {{ badge(text=product.priority, class="status-badge " ~ priorityBadgeClass) }}</div>
+  <div class="opp-metric-product flex gap-1 items-center">Confidence <strong>{{ (product.confidence * 100)|round|int
       }}%</strong></div>
 </div>
-<div class="opp-action flex products-center justify-between">
+<div class="opp-action flex items-center justify-between">
   <span>Impact: {{ product.impact }}</span>
 </div>
 <div class="action-card-details is-hidden">

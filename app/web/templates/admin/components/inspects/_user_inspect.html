@@ -13,7 +13,7 @@
       {% if inspect_header is defined and inspect_header %}
       <div class="inspect-header-block">
         <h2>{{ inspect_header.name }}</h2>
-        <div class="flex flex-wrap gap-4 products-center">
+        <div class="flex flex-wrap gap-4 items-center">
           <span><strong>Email:</strong> {{ inspect_header.email }}</span>
           <span><strong>Joined:</strong> {{ inspect_header.joined|truncate(10, True, '') if inspect_header.joined else '' }}</span>
           {% if inspect_header.last_active %}

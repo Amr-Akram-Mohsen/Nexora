@@ -6,7 +6,7 @@
 underperforming assets.") %}
 <div class="accuracy-panel-body flex gap-6">
     <!-- Strategy Accuracy Widget -->
-    <div class="insights-accuracy-card gap-5 flex justify-between products-center">
+    <div class="insights-accuracy-card gap-5 flex justify-between items-center">
         <div>
             <h4 class="insights-accuracy-title">Strategy Accuracy Index</h4>
             <p class="insights-accuracy-meta">Weighted by platform signal values (YouTube 1.0, Blog 0.8, Pinterest 0.6).
@@ -19,7 +19,7 @@ underperforming assets.") %}
 
     <!-- Failures List -->
     <div>
-        <h4 class="quality-score-header gap-2 flex products-center">
+        <h4 class="quality-score-header gap-2 flex items-center">
             <i class="fas fa-exclamation-triangle"></i> Failure Diagnostics & Recommendations
         </h4>
         <div id="feedback-failures-list" class="insights-failures-scroll flex gap-4">
@@ -32,7 +32,7 @@ underperforming assets.") %}
             {% set severityBadge = 'badge-danger' if fail.severity == 'high' else 'badge-warning' if fail.severity ==
             'medium' else 'badge-secondary' %}
             <div class="failure-card">
-                <div class="failure-header flex-wrap justify-between flex gap-1 products-center">
+                <div class="failure-header flex-wrap justify-between flex gap-1 items-center">
                     <span class="failure-type"><i class="fa-solid fa-triangle-exclamation"></i> {{ fail.failure_type|replace('_', ' ') }}</span>
                     <span class="status-badge {{ severityBadge }}">{{ fail.severity|upper }}</span>
                 </div>
@@ -66,7 +66,7 @@ baseline expectations.") %}
             %}
             <tr>
                 <td>
-                    <div class="flex gap-2 products-center">
+                    <div class="flex gap-2 items-center">
                         <div>{{ platformIcon|safe }} {{ product.title }}</div>
                         {% if product.is_simulated %}
                         <span class="status-badge badge-warning" title="CTR metrics are simulated due to insufficient impression data">Simulated</span>

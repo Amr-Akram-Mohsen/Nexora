@@ -63,7 +63,7 @@ def get_filtered_contents(
 
     from ..content_access import assign_target_to_contents
     products = assign_target_to_contents(
-        pagination.products,
+        pagination.items,
         session
     )
 
@@ -174,7 +174,10 @@ def get_unscraped_articles(limit, retry_threshold, session=None):
             (Article.status == "discovered")
             | (
                 (Article.status == "failed")
-                & (Article.last_enrichment_attempt < retry_threshold)
+                & (
+                    Article.last_enrichment_attempt.is_(None) |
+                    (Article.last_enrichment_attempt < retry_threshold)
+                )
             )
         )
         .order_by(Content.published_at.desc())

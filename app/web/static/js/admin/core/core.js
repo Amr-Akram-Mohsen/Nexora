@@ -50,7 +50,7 @@ class AdminListController {
           cleanKey = this.filterKeys[id];
         } else {
           // Fallback legacy regex mapping
-          cleanKey = id.replace(/^(filter-product-|filter-|product-sort-|product-|user-)/, '').replace(/-/g, '_');
+          cleanKey = id.replace(/^(filter-item-|filter-|product-sort-|product-|user-)/, '').replace(/-/g, '_');
         }
         filters[cleanKey] = el.value;
       }

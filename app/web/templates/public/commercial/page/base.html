@@ -44,8 +44,8 @@ product
     <div class="container">
 
         {# ══ Breadcrumbs — full width top row ══ #}
-        <div class="detail-page__top flex products-center justify-between gap-6">
-            <div class="detail-page__breadcrumbs-wrapper flex products-center">
+        <div class="detail-page__top flex items-center justify-between gap-6">
+            <div class="detail-page__breadcrumbs-wrapper flex items-center">
                 {% include "commercial/features/breadcrumbs.html" %}
             </div>
         </div>
@@ -58,16 +58,16 @@ product
             {# ── Right column: title, badges, rating, price, quick-details ── #}
             <div class="detail-page__header">
 
-                <div class="detail-page__badges flex flex-wrap products-center gap-3">
+                <div class="detail-page__badges flex flex-wrap items-center gap-3">
                     {{ badge(product.category.name, 'badge--category') if product.category else '' }}
                     {{ badge(product.brand.name, 'badge--brand') if product.brand else '' }}
                 </div>
 
                 <h1 class="detail-page__title">{{ product.name }}</h1>
 
-                <div class="detail-page__meta flex products-center flex-wrap">
+                <div class="detail-page__meta flex items-center flex-wrap">
 
-                    <div class="meta-product flex products-center">
+                    <div class="meta-product flex items-center">
                         {{ render_stars(product.rating or 0) }}
                     </div>
 
@@ -107,7 +107,7 @@ product
             </div>
 
             {# Variants + purchase options — below header in right column #}
-            <div class="detail-page__variants flex flex-wrap products-start gap-4">
+            <div class="detail-page__variants flex flex-wrap items-start gap-4">
                 {% if product.has_variants %}
                 {% include "commercial/features/variant-selector.html" %}
                 {% endif %}
@@ -133,7 +133,7 @@ product
 
                 <div class="product-details-card">
 
-                    <h3 class="product-details-card__title flex products-center">
+                    <h3 class="product-details-card__title flex items-center">
                         <span class="product-details-card__bar"></span>
                         {% block details_title %}
                         Product Details
@@ -149,7 +149,7 @@ product
                         {{ render_details(full_details) }}
                     </div>
 
-                    {% call button(type="button", id="toggle-specs-btn", class="product-details-inline-toggle flex-center gap-2 justify-center products-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
+                    {% call button(type="button", id="toggle-specs-btn", class="product-details-inline-toggle flex-center gap-2 justify-center items-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
                         <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         Show More
                     {% endcall %}
@@ -168,7 +168,7 @@ product
                     {# Highlights card — key features above the description #}
                     {% if product.structured_details and product.structured_details.highlights %}
                     <div class="product-highlights product-details-card">
-                        <h3 class="product-details-card__title flex products-center">
+                        <h3 class="product-details-card__title flex items-center">
                             <span class="product-details-card__bar"></span>
                             Highlights
                         </h3>
@@ -210,7 +210,7 @@ product
         <section class="section recommendation-section recommendation-section--products" id="related-products"
             data-recommendation-container="related_product"
             data-entity-ids="{{ related_items[:4] | map(attribute='id') | list | tojson | safe }}">
-            <div class="section__header flex justify-between gap-6 products-center">
+            <div class="section__header flex justify-between gap-6 items-center">
                 <h2 class="title">You May Also Like</h2>
             </div>
             {{ grid(related_items[:4], target_type='commercial') }}
@@ -226,7 +226,7 @@ product
             {% if related_articles %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 products-center">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-newspaper" aria-hidden="true"></i> Articles & Reviews
@@ -242,7 +242,7 @@ product
             {% if related_videos %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 products-center">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-video" aria-hidden="true"></i> Related Videos
@@ -258,7 +258,7 @@ product
             {% if buying_guides %}
             <div class="recommendation-group" data-recommendation-container="related_content"
                 data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">
-                <div class="section__header flex justify-between gap-6 products-center">
+                <div class="section__header flex justify-between gap-6 items-center">
                     <div class="flex flex-col">
                         <h2 class="title">
                             <i class="fas fa-book-open" aria-hidden="true"></i> Buying Guides & Tutorials

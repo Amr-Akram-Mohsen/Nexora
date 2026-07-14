@@ -2,11 +2,11 @@
 {% from "components/ui/core.html" import button, badge %}
 {% if summary_stats %}
 <div class="distribution-summary-bar flex gap-4">
-  <div class="flex products-center gap-2">{{ badge(text="DRAFT: " ~ summary_stats.draft, class="status-badge badge-secondary") }}</div>
-  <div class="flex products-center gap-2">{{ badge(text="SCHEDULED: " ~ summary_stats.scheduled, class="status-badge badge-warning") }}</div>
-  <div class="flex products-center gap-2">{{ badge(text="PUBLISHED: " ~ summary_stats.published, class="status-badge badge-success") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="DRAFT: " ~ summary_stats.draft, class="status-badge badge-secondary") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="SCHEDULED: " ~ summary_stats.scheduled, class="status-badge badge-warning") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="PUBLISHED: " ~ summary_stats.published, class="status-badge badge-success") }}</div>
   {% if summary_stats.overdue > 0 %}
-  <div class="flex products-center gap-2">{{ badge(text="OVERDUE: " ~ summary_stats.overdue, class="status-badge badge-danger") }}</div>
+  <div class="flex items-center gap-2">{{ badge(text="OVERDUE: " ~ summary_stats.overdue, class="status-badge badge-danger") }}</div>
   {% endif %}
 </div>
 {% endif %}
@@ -14,14 +14,14 @@
 {% for product in products %}
 <tr id="distribution-row-{{ product.id }}">
   <td>
-    <div class="flex products-center gap-2">
+    <div class="flex items-center gap-2">
       <span title="{{ product.platform }}" class="platform-icon">{{ product.platform_icon }}</span>
       <span class="platform-name">{{ product.platform }}</span>
     </div>
   </td>
   <td>
     <div class="flex flex-col gap-1">
-      <div class="flex products-center gap-2">
+      <div class="flex items-center gap-2">
         {% if product.source_type == 'content' %}
         {{ badge(text="CONTENT", class="status-badge badge-info", icon="fa-solid fa-pen-to-square", attrs={"title": "Content"}) }}
         {% else %}
@@ -72,7 +72,7 @@
     </div>
   </td>
   <td>
-    <div class="flex products-center gap-2">
+    <div class="flex items-center gap-2">
       {% if product.has_url %}
         <span class="url-present" title="URL Present"><i class="fa-solid fa-check"></i></span>
       {% else %}
@@ -97,11 +97,11 @@
 {% if pagination and pagination.pages > 1 %}
 <tr class="pagination-row">
   <td colspan="7">
-    <div class="flex justify-between products-center pagination-controls">
+    <div class="flex justify-between items-center pagination-controls">
       <div class="pagination-info">
         Showing {{ pagination.first }} to {{ pagination.last }} of {{ pagination.total }} entries
       </div>
-      <div class="flex products-center gap-2">
+      <div class="flex items-center gap-2">
         {% if pagination.has_prev %}
         {{ button(text="Previous", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "fetch-and-inject-html", "data-url": "/admin/distribution/widget/social-distribution?page=" ~ pagination.prev_num, "data-target": "social-distribution-table-body", "data-loading-msg": "Loading distribution history...", "data-colspan": "7"}, variant=none) }}
         {% else %}

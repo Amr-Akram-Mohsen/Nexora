@@ -15,7 +15,7 @@
 
   <!-- Availability Breakdown Panel (Donut) -->
   {% call admin_padded_panel("Availability Breakdown", "Current status of all tracked products", actions='<i class="fa-solid fa-chart-pie"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-availability"></canvas>
       </div>
@@ -34,7 +34,7 @@
 <div class="overview-top-grid">
   <!-- Average Sync Age by Store (Bar) -->
   {% call admin_padded_panel("Avg Sync Age by Store", "Average age of product data per merchant (days)", actions='<i class="fa-solid fa-chart-bar"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-sync-age"></canvas>
       </div>
@@ -43,7 +43,7 @@
 
   <!-- Sync Cadence Timeline (Sparkline) -->
   {% call admin_padded_panel("Sync Cadence Timeline", "Daily volume of verifications over 30 days", actions='<i class="fa-solid fa-chart-line"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-sync-cadence"></canvas>
       </div>
@@ -89,7 +89,7 @@
 <!-- Commission Gap Alert -->
 <div id="commission-gap-alert-container">
   {% from "components/ui/core.html" import alert %}
-  {% call alert(type="warning", icon='<i class="fa-solid fa-triangle-exclamation"></i>', class="admin-alert admin-alert-warning products-center") %}
+  {% call alert(type="warning", icon='<i class="fa-solid fa-triangle-exclamation"></i>', class="admin-alert admin-alert-warning items-center") %}
     <strong>Commission Gap Detected:</strong> <span id="commission-gap-alert-text"></span>
   {% endcall %}
 </div>
@@ -113,7 +113,7 @@
 
   <!-- Tracking Coverage (Donut) -->
   {% call admin_padded_panel("Tracking Coverage", "Attribution link health", actions='<i class="fa-solid fa-chart-pie"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-tracking-coverage"></canvas>
       </div>
@@ -122,7 +122,7 @@
 
   <!-- Deeplink Freshness (Donut) -->
   {% call admin_padded_panel("Deeplink Freshness", "Age since URL generation", actions='<i class="fa-solid fa-chart-pie"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-deeplink-freshness"></canvas>
       </div>
@@ -135,7 +135,7 @@
 
   <!-- Program Distribution (Bar) -->
   {% call admin_padded_panel("Program Distribution", "Link volume by affiliate program", actions='<i class="fa-solid fa-chart-bar"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-program-distribution"></canvas>
       </div>
@@ -182,7 +182,7 @@
 
   <!-- Currency Mix (Donut) -->
   {% call admin_padded_panel("Currency Mix", "Distribution of priced links", actions='<i class="fa-solid fa-money-bill-1-wave"></i>') %}
-    <div class="flex products-center justify-center">
+    <div class="flex items-center justify-center">
       <div>
         <canvas id="chart-currency-mix"></canvas>
       </div>
@@ -200,7 +200,7 @@
 
 <!-- Full Width Panel for Price Staleness Stacked Bar -->
 {% call admin_padded_panel("Price Staleness Distribution", "Fresh vs. Stale pricing data per merchant", actions='<i class="fa-solid fa-layer-group"></i>') %}
-  <div class="flex products-center justify-center">
+  <div class="flex items-center justify-center">
     <div>
       <canvas id="chart-price-staleness"></canvas>
     </div>

@@ -18,11 +18,11 @@
   justify-content: center;
 }
 
-.products-center {
+.items-center {
   align-items: center;
 }
 
-.products-start {
+.items-start {
   align-items: flex-start;
 }
 

@@ -4,7 +4,7 @@
 {% macro render_video_editorial_panel(description, quality) %}
 <div class="profile-section-card flex gap-3">
   <div class="editorial-panel-body">
-    <div class="flex justify-between products-center editorial-section">
+    <div class="flex justify-between items-center editorial-section">
       <div>
         <strong>Recommendation: </strong>
         {% set variant = 'success' %}
@@ -43,7 +43,7 @@
     
     <details class="inspect-accordion">
       <summary>
-        <div class="flex products-center gap-2"><i class="fas fa-align-left"></i> Description Preview</div>
+        <div class="flex items-center gap-2"><i class="fas fa-align-left"></i> Description Preview</div>
       </summary>
       <div class="inspect-accordion-content editorial-description-preview">
         {{ description if description else "No description available." }}
@@ -112,7 +112,7 @@
 {% macro render_publishing_readiness_panel(readiness) %}
 <div class="profile-section-card flex gap-3">
   <div class="editorial-panel-body">
-    <div class="flex justify-between products-center editorial-section">
+    <div class="flex justify-between items-center editorial-section">
       <div>
         <strong>Publishing Readiness: </strong>
         {% set variant = 'success' %}

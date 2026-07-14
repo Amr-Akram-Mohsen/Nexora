@@ -26,7 +26,7 @@ status" %}
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("stores-search", "Search by name, slug, or website…") }}
   {{ admin_filter_select("filter-network", None, [], default_val="", default_text="All Networks",
   extra_class="filter-select-product") }}

@@ -3,12 +3,12 @@
 <div class="distribution-double-grid insights-double-grid">
   <!-- Content Coverage -->
   <div class="distribution-coverage-card rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <h5 class="coverage-title">Content Distribution Coverage</h5>
       {{ badge(text="CONTENT", class="status-badge badge-info", icon="fa-solid fa-pen-to-square") }}
     </div>
 
-    <div class="coverage-stats flex products-center justify-between">
+    <div class="coverage-stats flex items-center justify-between">
       <div class="coverage-score">
         <span class="coverage-percentage">{{ stats.content.percentage }}%</span>
         <span class="coverage-meta">of active published content</span>
@@ -36,12 +36,12 @@
 
   <!-- Product Coverage -->
   <div class="distribution-coverage-card rec-stat-card">
-    <div class="flex justify-between products-center">
+    <div class="flex justify-between items-center">
       <h5 class="coverage-title">Product Distribution Coverage</h5>
       {{ badge(text="PRODUCT", class="status-badge badge-secondary", icon="fa-solid fa-box") }}
     </div>
 
-    <div class="coverage-stats flex products-center justify-between">
+    <div class="coverage-stats flex items-center justify-between">
       <div class="coverage-score">
         <span class="coverage-percentage">{{ stats.product.percentage }}%</span>
         <span class="coverage-meta">of catalog products</span>

@@ -10,7 +10,7 @@
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
 {# Row 1: Search & Basic Filters #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("content-search", "Search title or ID…") }}
   {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")],
   default_val="", default_text="All Content Types", extra_class="filter-select-product") }}
@@ -31,7 +31,7 @@
 </div>
 
 {# Row 2: Ingest Details & Compliance #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms",
   extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-ingestion-origin", None, [], default_val="", default_text="All Ingestion Origins",
@@ -55,7 +55,7 @@
 </div>
 
 {# Row 3: Date Filters & Sorting #}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   <span class="filter-label-xs">Date Range:</span>
   {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")],
   default_val="published_at", default_text=None, extra_class="filter-input-auto") }}
@@ -64,7 +64,7 @@
   <span class="filter-text-divider">to</span>
   {{ input(type="date", id="filter-end-date", class="dashboard-filter-input filter-input-auto", required=False) }}
 
-  <div class="filter-sort-group flex products-center gap-2">
+  <div class="filter-sort-group flex items-center gap-2">
     <span class="filter-label-xs">Sort:</span>
     {{ admin_filter_select("sort-by", None, [
     ("id", "ID / Newest"),
@@ -88,13 +88,13 @@
 
 {% block crud_actions %}
 {# Bulk Actions Toolbar (hidden by default) #}
-<div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between products-center is-hidden">
-  <div class="flex products-center gap-2">
+<div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
+  <div class="flex items-center gap-2">
     <span><i class="fa-solid fa-bolt"></i></span>
     <span id="bulk-selection-count" class="bulk-selection-count">0 products selected</span>
   </div>
 
-  <div class="bulk-controls-group flex products-center gap-sm gap-2">
+  <div class="bulk-controls-group flex items-center gap-sm gap-2">
     {{ admin_filter_select("bulk-action-select", None, [
     ("activate", "Activate Selected"),
     ("deactivate", "Deactivate Selected"),
@@ -116,7 +116,7 @@
 {% block crud_summary %}
 {% call admin_summary_bar("contents-count", "products", summary_id="contents-summary") %}
 <div class="flex flex-col gap-2">
-  <div id="contents-stats-bar" class="flex products-center flex-wrap gap-2 is-hidden">
+  <div id="contents-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden">
     <div class="overview-breakdown-bar-track flex" style="width: 250px;">
       <div id="stat-bar-published" class="overview-breakdown-bar bar-active" style="--seg-width: 0%;"></div>
       <div id="stat-bar-drafts" class="overview-breakdown-bar" style="--bar-color: var(--brand-purple); --seg-width: 0%;"></div>

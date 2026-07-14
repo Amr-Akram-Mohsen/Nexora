@@ -150,6 +150,13 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
         else:
             stmt = stmt.where(Content.content_entities.any(ContentEntity.entity.has(Entity.slug.in_(topics))))
 
+    tags = _normalize(filters.get("tag"))
+    if tags and _is_allowed("tag"):
+        if "none" in tags:
+            stmt = stmt.where(~Content.content_entities.any(ContentEntity.entity.has(Entity.entity_type.in_(['tag', 'concept']))))
+        else:
+            stmt = stmt.where(Content.content_entities.any(ContentEntity.entity.has(Entity.slug.in_(tags))))
+
     brands = _normalize(filters.get("brand"))
     if brands and _is_allowed("brand"):
         if "none" in brands:
@@ -184,6 +191,36 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
     sources = _normalize(filters.get("source"))
     if sources and _is_allowed("source"):
         stmt = stmt.where(Content.source.has(Source.slug.in_(sources)))
+
+    events = _normalize(filters.get("event"))
+    if events and _is_allowed("event"):
+        from app.domains.content.models import Article, Event
+        stmt = stmt.where(
+            Content.object_type == "article",
+            Content.object_id.in_(
+                select(Article.id).where(Article.event.has(Event.slug.in_(events)))
+            )
+        )
+
+    authors = _normalize(filters.get("author"))
+    if authors and _is_allowed("author"):
+        # For Article, authors is a JSON array of strings
+        # We can use func.jsonb_array_elements_text or a simple LIKE for now, or just the JSONB contains operator.
+        # SQLAlchemy supports JSONB contains: `Article.authors.contains(authors)` (if it's a list)
+        from app.domains.content.models import Article
+        from sqlalchemy import cast
+        from sqlalchemy.dialects.postgresql import JSONB
+        # If we just want a simple text match for the author
+        author_filters = []
+        for a in authors:
+            author_filters.append(cast(Article.authors, db.String).ilike(f"%{a}%"))
+        
+        stmt = stmt.where(
+            Content.object_type == "article",
+            Content.object_id.in_(
+                select(Article.id).where(or_(*author_filters))
+            )
+        )
 
     search = filters.get("search")
     if search and search.strip() and _is_allowed("search"):

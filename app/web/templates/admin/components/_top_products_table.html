@@ -6,7 +6,7 @@
       {% for product in products %}
       <tr>
         <td>
-            <div class="flex products-center gap-2">
+            <div class="flex items-center gap-2">
                 {% if product.image_url %}
                     <img src="{{ product.image_url }}" alt="Thumbnail" class="product-thumbnail-small">
                 {% else %}

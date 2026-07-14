@@ -14,8 +14,8 @@
 {% set is_open = (options | length <= 8) or (group_active.count > 0) %}
 
 <details class="filter-section {{ 'filter-section--has-active' if group_active.count > 0 }}" {{ 'open' if is_open }}>
-  <summary class="filter-section__summary flex products-center justify-between">
-    <span class="filter-section__title flex products-center gap-2">
+  <summary class="filter-section__summary flex items-center justify-between">
+    <span class="filter-section__title flex items-center gap-2">
       {%- if filter_name == 'category' -%}<i class="fas fa-th-large"></i> Categories
       {%- elif filter_name == 'brand' -%}<i class="fas fa-tag"></i> Brands
       {%- elif filter_name == 'topic' -%}<i class="fas fa-hashtag"></i> Topics
@@ -26,7 +26,7 @@
       {%- else -%}<i class="fas fa-filter"></i> {{ filter_name | title }}
       {%- endif -%}
     </span>
-    <span class="filter-section__meta flex products-center">
+    <span class="filter-section__meta flex items-center">
       {% if group_active.count > 0 %}
         {{ badge(group_active.count, class="filter-section__badge", variant=none) }}
       {% endif %}
@@ -41,8 +41,8 @@
       {% set is_active = slug in active_filters.get(filter_name, []) or slug == active_filters.get(filter_name) %}
       {% set render_extra = (loop.index > 8) and not is_active %}
 
-      <li class="filter-product {{ 'is-active' if is_active }} {{ 'filter-product--extra' if render_extra }}" {% if render_extra %}style="display: none;" {% endif %}>
-        <a href="{{ get_filter_url(filter_name, slug, multi=True) }}" class="filter-item__link flex products-center" title="{{ name }}">
+      <li class="filter-item {{ 'is-active' if is_active }} {{ 'filter-item--extra' if render_extra }}" {% if render_extra %}style="display: none;" {% endif %}>
+        <a href="{{ get_filter_url(filter_name, slug, multi=True) }}" class="filter-item__link flex items-center" title="{{ name }}">
           <span class="filter-checkbox" aria-hidden="true">
             {% if is_active %}
               <i class="fa-solid fa-check"></i>
@@ -55,7 +55,7 @@
 
     {# Clickable "Show more" toggle if list is long (>8) #}
     {% if options | length > 8 %}
-      <li class="filter-product filter-product--more-toggle">
+      <li class="filter-item filter-item--more-toggle">
                 {{ button(class="filter-item__more-link", attrs={"data-action": "toggle-more-filters", "aria-expanded": "false"}, icon="fas fa-plus", text="Show more (+" ~ (options | length - 8) ~ ")", unstyled=True) }}
       </li>
     {% endif %}

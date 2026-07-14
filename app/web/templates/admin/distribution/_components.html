@@ -2,7 +2,7 @@
 
 {% macro metric_card(label, value, meta) %}
 <div class="rec-stat-card">
-  <div class="flex justify-between products-center">
+  <div class="flex justify-between items-center">
     <p class="dashboard-stat-label">{{ label }}</p>
     <p class="dashboard-stat-value">{{ value }}</p>
   </div>
@@ -12,7 +12,7 @@
 
 {% macro opportunity_card(title, data_attrs="", expandable=false) %}
 <div class="insights-opp-card flex" {{ data_attrs|safe }}>
-  <div class="flex justify-between products-center">
+  <div class="flex justify-between items-center">
     <h3 class="opp-title" title="{{ title }}">{{ title }}</h3>
     {% if expandable %}
       <span class="expand-arrow"><i class="fa-solid fa-caret-down"></i></span>

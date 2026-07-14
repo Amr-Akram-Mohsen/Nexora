@@ -15,7 +15,7 @@
   {% set badge_icon = "fa-solid fa-comments" %}
   {% endif %}
   {% call activity_list_item(icon=badge_icon, icon_class="icon-save ingest-log-icon", extra_class="ingest-log-product") %}
-  <div class="activity-text ingest-log-text flex products-center gap-2">
+  <div class="activity-text ingest-log-text flex items-center gap-2">
     {{ badge(text=r.type, class="status-badge badge-type-compact " ~ badge_class) }}
     {{ link(text="#" ~ r.id, href="/admin/contents?search=" ~ r.id, class="activity-target text-deco-none",
     unstyled=True) }}

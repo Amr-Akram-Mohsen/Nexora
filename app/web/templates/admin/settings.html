@@ -21,13 +21,13 @@
 
   <!-- Cache Controls -->
   {% call admin_settings_card("Cache", "Invalidate server-side cache", 'fa-solid fa-server') %}
-    {{ button(text="Clear Cache", class="admin-btn-primary settings-action-btn gap-2 products-center", attrs={"id": "clear-cache-btn"}, variant=none) }}
+    {{ button(text="Clear Cache", class="admin-btn-primary settings-action-btn gap-2 items-center", attrs={"id": "clear-cache-btn"}, variant=none) }}
     <p class="hint">Clears server cache. First request after clearing may be slower.</p>
   {% endcall %}
 
   <!-- Maintenance Mode -->
   {% call admin_settings_card("Maintenance Mode", "Take the site offline for maintenance", 'fa-solid fa-wrench') %}
-    <label class="settings-toggle-row flex products-center justify-between gap-4">
+    <label class="settings-toggle-row flex items-center justify-between gap-4">
       <span class="settings-toggle-label">Enable maintenance mode</span>
       <span class="settings-toggle-wrapper">
         {% from "components/ui/core.html" import input %}
@@ -55,7 +55,7 @@
     <div class="settings-tabs-wrapper flex gap-1">
       {{ button(text="All Events", class="settings-tab active", attrs={"id": "filter-all-logs"}, variant=none) }}
       {{ button(text="Articles", class="settings-tab", attrs={"id": "filter-article-logs"}, variant=none) }}
-      {{ button(text="Items", class="settings-tab", attrs={"id": "filter-product-logs"}, variant=none) }}
+      {{ button(text="Items", class="settings-tab", attrs={"id": "filter-item-logs"}, variant=none) }}
     </div>
     <div id="ingestion-log-container" class="settings-log-container">
       {{ spinner("Loading logs...") }}
@@ -65,13 +65,13 @@
   <!-- Danger Zone -->
   {% set danger_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>' %}
   {% call admin_settings_card("Danger Zone", "Irreversible destructive operations", danger_icon, is_danger=True) %}
-    <div class="settings-danger-row flex products-center justify-between flex-wrap gap-4">
+    <div class="settings-danger-row flex items-center justify-between flex-wrap gap-4">
       <div class="danger-info">
         <strong>Reset System</strong>
         <p class="hint">Wipes all system configuration, integrations, and resets the application state. This action
           cannot be undone.</p>
       </div>
-      {{ button(text='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg> Reset System'|safe, class="admin-btn-danger settings-action-btn gap-2 products-center", attrs={"id": "reset-system-btn"}, variant=none) }}
+      {{ button(text='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg> Reset System'|safe, class="admin-btn-danger settings-action-btn gap-2 items-center", attrs={"id": "reset-system-btn"}, variant=none) }}
     </div>
   {% endcall %}
 

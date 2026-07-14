@@ -40,10 +40,9 @@ def serialize_target(obj, session=None):
                 "source_name": obj.source_name,
                 "source_url": obj.source_url,
                 "read_time_minutes": obj.read_time_minutes,
-                "images": getattr(obj, "images", None),
-                "videos": getattr(obj, "videos", None),
                 "extended_metadata": getattr(obj, "extended_metadata", None),
                 "author": getattr(obj, "author", None),
+                "authors": getattr(obj, "authors", []),
                 "content_text": getattr(obj, "content_text", None),
                 "content_html": getattr(obj, "content_html", None),
                 "summary": getattr(obj, "summary", None),
@@ -51,6 +50,9 @@ def serialize_target(obj, session=None):
                 "body": getattr(obj, "body", None),
                 "description": getattr(obj, "description", None),
                 "word_count": getattr(obj, "word_count", 0),
+                "sentiment_score": getattr(obj, "sentiment_score", None),
+                "event": serialize_model(getattr(obj, "event", None)),
+                "primary_source": serialize_model(getattr(obj, "primary_source", None)),
             }
         )
 

@@ -11,7 +11,7 @@
     <div class="comment__body">
       <div class="comment__bubble">
         <!-- Header -->
-        <div class="comment__header flex products-center gap-2">
+        <div class="comment__header flex items-center gap-2">
           <span class="comment__author">
             {{ comment.user.email }}
           </span>
@@ -25,7 +25,7 @@
         </p>
       </div>
       <!-- Interactions -->
-      <div class="comment__actions flex products-center gap-4">
+      <div class="comment__actions flex items-center gap-4">
         {% set v = 'ghost' %}
         {{ button(
         text=comment.like_count or 0, btn_span_class="reaction-count",

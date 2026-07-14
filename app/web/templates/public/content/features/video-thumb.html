@@ -9,8 +9,8 @@ wrapper_class='card__img-wrapper', priority='low') %}
     <div class="video-preview__surface">
         {{ render_image_url(thumbnail_url, title, additional_classes='video-preview__img', priority=priority) }}
 
-        <div class="video-preview__overlay flex justify-center products-center">
-            {% call button(class="video-preview__play-btn justify-center products-center", attrs={"aria-label": "Play " ~ title, "data-action": "lazy-play"}, unstyled=True) %}
+        <div class="video-preview__overlay flex justify-center items-center">
+            {% call button(class="video-preview__play-btn justify-center items-center", attrs={"aria-label": "Play " ~ title, "data-action": "lazy-play"}, unstyled=True) %}
                 <div class="play-icon-wrapper">
                     <i class="fas fa-play"></i>
                 </div>

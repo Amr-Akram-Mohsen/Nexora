@@ -34,10 +34,12 @@ Category Re-assignment
     CATEGORY_CONFIDENCE_THRESHOLD points to trigger re-assignment.
 
 Topic Enrichment
-  - Removed
+  - Scans title and description for taxonomy category names and keywords.
+  - Appends matches to `er_concepts` as 'topic' entities.
 
 Brand Enrichment
-  - Removed
+  - Scans title and description for known brands and aliases from the taxonomy.
+  - Appends matches to `er_concepts` as 'brand' entities.
 
 Attribute Enrichment
   - Extends facets["attributes"] using the existing facet_detector logic,
@@ -383,6 +385,20 @@ def enrich_taxonomy(product: EnrichedItemDTO | dict) -> EnrichedItemDTO:
     )
     data["facets"] = facets
 
+    # ── 3. Brand & Topic Entity Enrichment (Videos Only) ──────────────────
+    # Articles already get rich entities from Diffbot/NewsAPI. We only run
+    # this lightweight extractor for videos to fill the gap.
+    is_video = data.get("is_video") or data.get("platform") == "youtube" or ("youtube.com" in (data.get("url") or "").lower())
+    
+    if is_video:
+        existing_concepts = data.get("er_concepts") or []
+        enriched_concepts = _enrich_entities(
+            title=title,
+            description=description,
+            existing_concepts=existing_concepts,
+        )
+        data["er_concepts"] = enriched_concepts
+
     logger.debug(
         "[%s] done  category=%s  attributes=%d",
         _NAME,
@@ -526,3 +542,70 @@ def _enrich_facets(
             facets["gender"] = "unisex"
 
     return facets
+
+# ---------------------------------------------------------------------------
+# Entity Enrichment (Brands & Topics)
+# ---------------------------------------------------------------------------
+
+def _enrich_entities(title: str, description: str, existing_concepts: list) -> list:
+    """
+    Scans the text for known brands and topics (from TAXONOMY) and appends them
+    to the er_concepts list if they are found. Uses exact word-boundary matching.
+    """
+    text = f"{title} {description}"
+    concepts = list(existing_concepts) if existing_concepts else []
+    
+    # Helper to extract a clean string label from whatever format the concept is in
+    def _extract_label(c: Any) -> str:
+        if isinstance(c, str):
+            return c.lower()
+        lbl = c.get("label", "")
+        if isinstance(lbl, dict):
+            lbl = lbl.get("eng", "")
+        return lbl.lower()
+
+    existing_labels = set(_extract_label(c) for c in concepts)
+
+    # 1. Brands
+    for brand in TAXONOMY.get("brands", []):
+        brand_name = brand["name"]
+        if brand_name.lower() in existing_labels:
+            continue
+        
+        # Check brand name directly
+        if _keyword_score(text, [brand_name]) > 0:
+            concepts.append({
+                "label": brand_name,
+                "type": "brand",
+                "score": 90
+            })
+            existing_labels.add(brand_name.lower())
+            continue
+            
+        # Check aliases
+        aliases = brand.get("aliases", [])
+        if aliases and _keyword_score(text, aliases) > 0:
+            concepts.append({
+                "label": brand_name,
+                "type": "brand",
+                "score": 85
+            })
+            existing_labels.add(brand_name.lower())
+
+    # 2. Topics (Taxonomy leaf categories act as topics)
+    for cat_group in TAXONOMY.get("categories", []):
+        for child in cat_group.get("children", []):
+            topic_name = child["name"]
+            if topic_name.lower() in existing_labels:
+                continue
+                
+            keywords = child.get("search_keywords", [])
+            if _keyword_score(text, [topic_name] + keywords) > 0:
+                concepts.append({
+                    "label": topic_name,
+                    "type": "topic",
+                    "score": 85
+                })
+                existing_labels.add(topic_name.lower())
+
+    return concepts

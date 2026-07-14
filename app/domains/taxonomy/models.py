@@ -107,9 +107,9 @@ class Category(db.Model):
     __tablename__ = "categories"
     id = db.Column(db.Integer, primary_key=True)
     external_uri = db.Column(db.String(255), unique=True, index=True)
-    name = db.Column(db.String(100), nullable=False)
-    normalized_name = db.Column(db.String(150), index=True)
-    slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(255), nullable=False)
+    normalized_name = db.Column(db.String(255), index=True)
+    slug = db.Column(db.String(255), unique=True, nullable=False, index=True)
     parent_id = db.Column(
         db.Integer, db.ForeignKey("categories.id", ondelete="CASCADE"), nullable=True
     )
@@ -256,8 +256,8 @@ class AttributeFacet(db.Model):
 class Entity(db.Model):
     __tablename__ = "entities"
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False) # Diffbot label / NewsAPI label
-    slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(255), nullable=False) # Diffbot label / NewsAPI label
+    slug = db.Column(db.String(255), unique=True, nullable=False, index=True)
     external_uri = db.Column(db.String(255), unique=True, index=True)
     entity_type = db.Column(db.String(50), index=True)
     # Values: 'person' | 'organization' | 'location' | 'concept' | 'wiki_category' | 'tag'
@@ -283,6 +283,7 @@ class Entity(db.Model):
         """
         if not name:
             return None
+            
         slug = generate_slug(name)
 
         entity = None

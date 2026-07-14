@@ -1,7 +1,7 @@
 {% from "components/ui/core.html" import badge, button %}
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="name">
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <strong class="cell-primary-text">{{ row.name }}</strong>
   </div>
 </td>
@@ -13,7 +13,7 @@
   {% endif %}
 </td>
 <td data-field="price">
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <span>
       {% if row.min_price is not none %}
       {{ row.min_price }}

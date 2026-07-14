@@ -9,7 +9,7 @@
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("user-search", "Search by name or email…", icon_class="admin-toolbar-search-icon") }}
   {{ admin_filter_select("user-role-filter", None, [("admin", "Admins"), ("user", "Users")], default_val="", default_text="All Roles") }}
   {{ admin_filter_select("user-status-filter", None, [("active", "Active"), ("inactive", "Inactive")], default_val="", default_text="All Statuses") }}
@@ -48,7 +48,7 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar(domain ~ "-count", summary_label | default(domain), summary_id=domain ~ "-summary") %}
-  <div class="flex products-center gap-4">
+  <div class="flex items-center gap-4">
     <span id="summary-active-count" title="Active Users">Active: —</span>
     <span id="summary-admins-count" title="Admin Users">Admins: —</span>
     <span id="summary-subscribed-count" title="Newsletter Subscribers">Subscribed: —</span>

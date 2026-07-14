@@ -1,6 +1,6 @@
 {% macro admin_page_header(title, description, actions=None) %}
 <div class="admin-page-header">
-  <div class="admin-page-header-row flex justify-between products-center gap-4">
+  <div class="admin-page-header-row flex justify-between items-center gap-4">
     <div>
       <h1>{{ title }}</h1>
       {% if description %}
@@ -8,7 +8,7 @@
       {% endif %}
     </div>
     {% if actions %}
-    <div class="admin-page-header-actions flex products-center">
+    <div class="admin-page-header-actions flex items-center">
       {{ actions }}
     </div>
     {% endif %}
@@ -18,7 +18,7 @@
 
 {% macro admin_panel(title, subtitle=None, id=None, icon=None, header_class="", display_style=None, actions=None) %}
 <div class="overview-panel" {% if id %}id="{{ id }}" {% endif %} {% if display_style %} {% endif %}>
-  <div class="overview-panel-header {{ header_class }} flex justify-between products-center">
+  <div class="overview-panel-header {{ header_class }} flex justify-between items-center">
     <div>
       <h3 class="overview-panel-title">{% if icon %}<i class="{{ icon }}"></i> {% endif %}{{ title|safe }}</h3>
       {% if subtitle %}

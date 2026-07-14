@@ -23,7 +23,7 @@
   <!-- Filled dynamically by JS -->
 </div>
 
-<div id="taxonomy-stats-bar" class="flex products-center flex-wrap gap-2 is-hidden taxonomy-stats-bar">
+<div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden taxonomy-stats-bar">
   {% call badge(class="status-badge active") %}Total Entities: <span id="stat-total-entities">0</span>{% endcall %}
   {% call badge(class="status-badge inactive") %}Orphans: <span id="stat-orphan-entities">0</span> (<span id="stat-orphan-pct">0</span>%){% endcall %}
   {% call badge(class="badge-orange badge-compact") %}Missing Category: <span id="stat-missing-category">0</span>{% endcall %}
@@ -69,9 +69,9 @@
   {# Create Form #}
   <div class="admin-inline-form" id="category-create-form">
     <h3 class="admin-inline-form-title">Add New Category</h3>
-    <div class="admin-inline-form-row flex products-center flex-wrap gap-3">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       {{ input(type="text", id="new-category-name", placeholder="Category name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex products-center">
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-category-slug-preview">—</code>
       </div>
       {{ button(text="+ Add Category", class="admin-btn-primary", attrs={"id": "create-category-btn"}, variant=none) }}
@@ -79,7 +79,7 @@
   </div>
 
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("category-search", "Search categories…") }}
     {{ admin_filter_select("category-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
     {{ admin_filter_select("category-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
@@ -94,10 +94,10 @@
   {% call admin_tab_panel("brands") %}
   <div class="admin-inline-form" id="brand-create-form">
     <h3 class="admin-inline-form-title">Add New Brand</h3>
-    <div class="admin-inline-form-row flex products-center flex-wrap gap-3">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       {{ input(type="text", id="new-brand-name", placeholder="Brand name…", class="dashboard-filter-input admin-inline-input", required=False) }}
       {{ input(type="text", id="new-brand-industry", placeholder="Industry (optional)…", class="dashboard-filter-input admin-inline-input admin-inline-input-sm", required=False) }}
-      <div class="admin-inline-slug-preview flex products-center">
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-brand-slug-preview">—</code>
       </div>
       {{ button(text="+ Add Brand", class="admin-btn-primary", attrs={"id": "create-brand-btn"}, variant=none) }}
@@ -105,7 +105,7 @@
   </div>
 
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("brand-search", "Search brands…") }}
     {{ admin_filter_select("brand-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
     {{ admin_filter_select("brand-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
@@ -120,9 +120,9 @@
   {% call admin_tab_panel("topics") %}
   <div class="admin-inline-form" id="topic-create-form">
     <h3 class="admin-inline-form-title">Add New Topic</h3>
-    <div class="admin-inline-form-row flex products-center flex-wrap gap-3">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       {{ input(type="text", id="new-topic-name", placeholder="Topic name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex products-center">
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-topic-slug-preview">—</code>
       </div>
       {{ button(text="+ Add Topic", class="admin-btn-primary", attrs={"id": "create-topic-btn"}, variant=none) }}
@@ -130,7 +130,7 @@
   </div>
 
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("topic-search", "Search topics…") }}
     {{ admin_filter_select("topic-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
     {{ admin_filter_select("topic-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
@@ -144,7 +144,7 @@
   {# ── Sections Tab ─────────────────────────────────────────── #}
   {% call admin_tab_panel("sections") %}
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("section-search", "Search sections…") }}
     {{ admin_filter_select("section-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
     {{ admin_filter_select("section-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
@@ -158,9 +158,9 @@
   {% call admin_tab_panel("attributes") %}
   <div class="admin-inline-form" id="attribute-create-form">
     <h3 class="admin-inline-form-title">Add New Attribute</h3>
-    <div class="admin-inline-form-row flex products-center flex-wrap gap-3">
+    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
       {{ input(type="text", id="new-attribute-name", placeholder="Attribute name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex products-center">
+      <div class="admin-inline-slug-preview flex items-center">
         Slug: <code id="new-attribute-slug-preview">—</code>
       </div>
       {{ button(text="+ Add Attribute", class="admin-btn-primary", attrs={"id": "create-attribute-btn"}, variant=none) }}
@@ -168,7 +168,7 @@
   </div>
 
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("attribute-search", "Search attributes…") }}
     {{ admin_filter_select("attribute-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
     {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "attributes"}, variant=none) }}
@@ -181,7 +181,7 @@
   {# ── Gender Facets Tab ────────────────────────────────────── #}
   {% call admin_tab_panel("gender_facets") %}
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("gender-facet-search", "Search gender facets…") }}
     {{ admin_filter_select("gender_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
   </div>
@@ -192,7 +192,7 @@
   {# ── Intent Facets Tab ────────────────────────────────────── #}
   {% call admin_tab_panel("intent_facets") %}
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("intent-facet-search", "Search intent facets…") }}
     {{ admin_filter_select("intent_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
   </div>
@@ -203,7 +203,7 @@
   {# ── Price Tier Facets Tab ────────────────────────────────── #}
   {% call admin_tab_panel("price_tier_facets") %}
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("price-tier-facet-search", "Search price tier facets…") }}
     {{ admin_filter_select("price_tier_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
   </div>

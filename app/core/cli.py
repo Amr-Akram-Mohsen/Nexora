@@ -61,14 +61,15 @@ def register_commands(app):
 
     import click
     @app.cli.command("enrich-articles")
-    def enrich_articles_command():
+    @click.option("--force", is_flag=True, help="Ignore the 24-hour retry cooldown for failed articles")
+    def enrich_articles_command(force):
         """Perform full-body scraping and quality-gated publication for pending articles."""
         from app.application.content.workflows.enrichment import (
             enrich_discovered_articles,
         )
 
         app.logger.info("Starting full-body enrichment using Diffbot...")
-        results = enrich_discovered_articles(limit=5)
+        results = enrich_discovered_articles(limit=25, force=force)
         count = results.get("published", 0)
         app.logger.info("Done! Successfully published %d articles.", count)
 
@@ -113,6 +114,37 @@ def register_commands(app):
         app.logger.info("Generating sitemap...")
         count = generate_static_sitemap(app)
         app.logger.info("Done! Sitemap generated with %d URLs.", count)
+
+    @app.cli.command("enrich-videos-taxonomy")
+    def enrich_videos_taxonomy_command():
+        """Retroactively extracts and assigns Brands & Topics to existing videos."""
+        from app.domains.content.models import Video, Content
+        from app.core.extensions import db
+        from app.integrations.content.enrichment.taxonomy_enrichment import _enrich_entities
+        from app.domains.content.service.command import apply_relationships
+
+        app.logger.info("Starting taxonomy enrichment for existing videos...")
+        videos = Video.query.all()
+        updated_count = 0
+
+        for video in videos:
+            # Extract entities using the new keyword extractor
+            concepts = _enrich_entities(video.title or "", video.description or "", [])
+            if not concepts:
+                continue
+
+            # Get the Content wrapper
+            content_rec = Content.query.filter_by(object_type="video", object_id=video.id).first()
+            if not content_rec:
+                continue
+
+            # Apply relationships
+            raw_data = {"er_concepts": concepts, "ingestion_method": "keyword_extractor"}
+            apply_relationships(content_rec, raw_data, session=db.session)
+            updated_count += 1
+            
+        db.session.commit()
+        app.logger.info("Done! Enriched %d videos with Brands & Topics.", updated_count)
 
     @app.cli.command("run-scheduler")
     def run_scheduler_command():

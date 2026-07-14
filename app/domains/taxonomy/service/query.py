@@ -129,6 +129,23 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
             .join(ContentEntity, ContentEntity.entity_id == Entity.id)\
             .join(Content, Content.id == ContentEntity.content_id)\
             .where(Entity.entity_type.in_(['topic', 'tag', 'concept']))
+    elif rel_name == "tag":
+        # Unifies tags and concepts
+        rel_model = Entity
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(ContentEntity, ContentEntity.entity_id == Entity.id)\
+            .join(Content, Content.id == ContentEntity.content_id)\
+            .where(Entity.entity_type.in_(['topic', 'tag', 'concept']))
+    elif rel_name == "source":
+        from app.domains.taxonomy.models import Source
+        rel_model = Source
+        stmt = select(*build_filter_projection(rel_model)).join(Content, Content.source_id == Source.id)
+    elif rel_name == "event":
+        from app.domains.content.models import Event, Article
+        rel_model = Event
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(Article, Article.event_id == Event.id)\
+            .join(Content, (Content.object_id == Article.id) & (Content.object_type == 'article'))
 
     stmt = apply_content_section_filters(
         stmt=stmt,

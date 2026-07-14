@@ -116,7 +116,7 @@ def list_contents():
         page=page,
         per_page=per_page
     )
-    page_items = pagination.products
+    page_items = pagination.items
 
     # Batch-load polymorphic targets and duplicate titles
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
@@ -173,7 +173,7 @@ def contents_rows():
         page=page,
         per_page=per_page
     )
-    page_items = pagination.products
+    page_items = pagination.items
 
     targets_map, duplicate_titles = _load_content_relations(page_items, quality)
 

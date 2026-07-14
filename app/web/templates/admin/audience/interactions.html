@@ -62,18 +62,18 @@
 </div>
 
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("comment-search", "Search comment text…") }}
   {{ admin_filter_select("filter-comment-sentiment", None, [("positive", "Positive"), ("neutral", "Neutral"),
   ("negative", "Negative"), ("spam", "Spam")], default_val="", default_text="All Sentiments",
   extra_class="filter-select-product") }}
   {{ admin_filter_select("filter-comment-target", None, [("content", "Content"), ("product", "Product")], default_val="",
   default_text="All Targets", extra_class="filter-select-product") }}
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <span class="filter-label-xs">From:</span>
     {{ input(type="date", id="filter-comments-start-date", class="dashboard-filter-select filter-select-product", required=False) }}
   </div>
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <span class="filter-label-xs">To:</span>
     {{ input(type="date", id="filter-comments-end-date", class="dashboard-filter-select filter-select-product", required=False) }}
   </div>
@@ -90,7 +90,7 @@
 {% call admin_tab_panel("reactions") %}
 <div class="admin-tab-panel-body">
   {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("reactions-search", "Search target title…") }}
     {{ admin_filter_select("filter-reaction-type", None, [("like", "Likes"), ("dislike", "Dislikes")],
     default_val="", default_text="All Reaction Types", extra_class="filter-select-product") }}
@@ -108,13 +108,13 @@
 {# ── Views Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("views") %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("views-search", "Search target title…") }}
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <span class="filter-label-xs">From:</span>
     {{ input(type="date", id="filter-views-start-date", class="dashboard-filter-select filter-select-product", required=False) }}
   </div>
-  <div class="flex products-center gap-2">
+  <div class="flex items-center gap-2">
     <span class="filter-label-xs">To:</span>
     {{ input(type="date", id="filter-views-end-date", class="dashboard-filter-select filter-select-product", required=False) }}
   </div>
@@ -130,7 +130,7 @@
 {# ── Clicks Tab ───────────────────────────────────────────── #}
 {% call admin_tab_panel("clicks") %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("clicks-search", "Search product name…") }}
   {{ admin_search_input("filter-clicks-destination", "Search destination/store…", icon='fa-solid fa-store') }}
   {{ admin_reset_button("clear-clicks-filters-btn", "Reset") }}
@@ -145,7 +145,7 @@
 {# ── Saves Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("saves") %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("saves-search", "Search target title…") }}
   {{ admin_search_input("filter-saves-user", "Search user name/email…", icon='fa-solid fa-user') }}
   {{ admin_reset_button("clear-saves-filters-btn", "Reset") }}
@@ -160,7 +160,7 @@
 {# ── Shares Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("shares") %}
 {% call admin_toolbar_section() %}
-<div class="admin-toolbar-row flex products-center flex-wrap gap-3">
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("shares-search", "Search target title…") }}
   {{ admin_search_input("filter-shares-user", "Search user name/email…", icon='fa-solid fa-user') }}
   {{ admin_reset_button("clear-shares-filters-btn", "Reset") }}

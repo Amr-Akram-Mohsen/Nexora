@@ -11,7 +11,7 @@
 
 <div class="inspect-details-group flex">
   {% if source_header is defined and source_header %}
-    <div class="inspect-header-custom flex products-center gap-4">
+    <div class="inspect-header-custom flex items-center gap-4">
       <img src="{{ source_header.logo_url }}" alt="{{ source_header.name }} Logo" class="inspect-header-logo">
       <div>
         <h2 class="inspect-header-title">{{ source_header.name }}</h2>
@@ -19,7 +19,7 @@
       </div>
     </div>
   {% elif inspect_header is defined and inspect_header %}
-    <div class='inspect-header-custom flex products-center gap-2'>
+    <div class='inspect-header-custom flex items-center gap-2'>
       {% if inspect_header.badges %}
         {% for badge in inspect_header.badges %}
           <span class='badge {{ badge.badge_class }}'>{{ badge.value }}</span>

@@ -35,7 +35,7 @@ def paginate_response(pagination, items_key: str = "products") -> dict:
         A dict with {items_key, page, pages, total, per_page}.
     """
     return {
-        items_key: pagination.products,
+        items_key: pagination.items,
         "page": pagination.page,
         "pages": pagination.pages,
         "total": pagination.total,

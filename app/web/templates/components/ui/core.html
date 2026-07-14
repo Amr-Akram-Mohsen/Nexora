@@ -1,7 +1,7 @@
 {% macro alert(message, title=None, type="info", icon=None, class="", dismissible=False) %}
 <div class="alert flex flex-col alert-{{ type }} {{ class }}">
-  <div class="alert-header flex products-start justify-between">
-    <div class="alert-title-group flex products-center gap-2">
+  <div class="alert-header flex items-start justify-between">
+    <div class="alert-title-group flex items-center gap-2">
       {% if icon %}<span class="alert-icon">{{ icon|safe }}</span>{% endif %}
       {% if title %}<h4 class="alert-title m-0">{{ title }}</h4>{% endif %}
     </div>
@@ -24,10 +24,10 @@
 {% endmacro %}
 
 {% macro breadcrumbs(paths=[], current_page="", class="") %}
-<nav class="breadcrumbs flex products-center {{ class }}" aria-label="Breadcrumb">
-  <ul class="flex products-center">
+<nav class="breadcrumbs flex items-center {{ class }}" aria-label="Breadcrumb">
+  <ul class="flex items-center">
     <li>
-      <a href="/" class="breadcrumb-link inline-flex products-center">
+      <a href="/" class="breadcrumb-link inline-flex items-center">
         <i class="fas fa-home"></i>
       </a>
     </li>
@@ -36,7 +36,7 @@
     </li>
     {% for path in paths %}
     <li>
-      <a href="{{ path.url }}" class="breadcrumb-link inline-flex products-center">
+      <a href="{{ path.url }}" class="breadcrumb-link inline-flex items-center">
         {{ path.label }}
       </a>
     </li>
@@ -113,7 +113,7 @@ unstyled=False, id=None) %}
 {% endmacro %}
 
 {% macro label(text, for_id, class="") %}
-<label for="{{ for_id }}" class="label flex products-center {{ class }} gap-2">
+<label for="{{ for_id }}" class="label flex items-center {{ class }} gap-2">
   {{ text }}
 
   {% if caller is defined %}
@@ -125,7 +125,7 @@ unstyled=False, id=None) %}
 
 {% macro field(label_text="", for_id="", class="", label_class="", variant="vertical") %}
 <div
-  class="field-wrapper flex {{ 'flex-col' if variant == 'vertical' else 'flex-row products-center gap-2' }} {{ class }}">
+  class="field-wrapper flex {{ 'flex-col' if variant == 'vertical' else 'flex-row items-center gap-2' }} {{ class }}">
   {{ label(label_text, for_id, label_class) }}
   {{ caller() }}
 </div>
@@ -156,7 +156,7 @@ if type == 'checkbox' else 'input flex'
 
 {% macro link(text="", href="#", class="", icon=None, attrs={}, variant="primary", unstyled=False) %}
 <a href="{{ href }}"
-  class="{{ class if unstyled else ('link link--' ~ variant ~ ' ' ~ class ~ ' inline-flex products-center gap-2') }}" {%
+  class="{{ class if unstyled else ('link link--' ~ variant ~ ' ' ~ class ~ ' inline-flex items-center gap-2') }}" {%
   for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
   {% if icon %}
   <i class="{{ icon }}"></i>
@@ -174,7 +174,7 @@ if type == 'checkbox' else 'input flex'
   %}required{% endif %} class="textarea flex {{ class }}"></textarea>
 {% endmacro %}
 
-{% macro stat_card(label, value_id=None, icon=None, meta_text=None, meta_id=None, value_text=None, href=None, class="card clickable-card", inner_class="dashboard-stat-card flex flex-col products-center", attrs={}, label_first=True) %}
+{% macro stat_card(label, value_id=None, icon=None, meta_text=None, meta_id=None, value_text=None, href=None, class="card clickable-card", inner_class="dashboard-stat-card flex flex-col items-center", attrs={}, label_first=True) %}
 <a{% if href %} href="{{ href }}"{% endif %} class="{{ class }}"{% for k, v in attrs.items() %} {{ k }}="{{ v }}"{% endfor %}>
   <div class="{{ inner_class }}">
     {% if icon %}

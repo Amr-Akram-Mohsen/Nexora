@@ -93,7 +93,7 @@ def get_filtered_items(active_filters, page=1, per_page=24):
 
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     return {
-        "products": [serialize_item(product) for product in pagination.products],
+        "products": [serialize_item(product) for product in pagination.items],
         "page": pagination.page,
         "pages": pagination.pages,
         "total": pagination.total,

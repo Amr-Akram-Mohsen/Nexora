@@ -46,10 +46,10 @@
   function loadMeta() {
     return window.api.get('/admin/products/meta')
       .then(data => {
-        const brandSel = document.getElementById('filter-product-brand');
-        const catSel = document.getElementById('filter-product-category');
-        const sourceSel = document.getElementById('filter-product-source');
-        const typeSel = document.getElementById('filter-product-type');
+        const brandSel = document.getElementById('filter-item-brand');
+        const catSel = document.getElementById('filter-item-category');
+        const sourceSel = document.getElementById('filter-item-source');
+        const typeSel = document.getElementById('filter-item-type');
 
         if(brandSel) {
           (data.brands || []).forEach(b => {
@@ -111,13 +111,13 @@
     if (typeof applyUrlFilters !== "function") return;
     applyUrlFilters({
       search: "product-search",
-      brand: "filter-product-brand",
-      category: "filter-product-category",
-      source: "filter-product-source",
-      product_type: "filter-product-type",
-      has_images: "filter-product-has-images",
-      has_brand: "filter-product-has-brand",
-      availability: "filter-product-availability",
+      brand: "filter-item-brand",
+      category: "filter-item-category",
+      source: "filter-item-source",
+      product_type: "filter-item-type",
+      has_images: "filter-item-has-images",
+      has_brand: "filter-item-has-brand",
+      availability: "filter-item-availability",
       sort_by: "product-sort-by",
       sort_dir: "product-sort-dir"
     });
@@ -132,8 +132,8 @@
       endpoint: '/admin/products/',
       rowsEndpoint: '/admin/products/rows',
       filterIds: [
-        'filter-product-brand', 'filter-product-category', 'filter-product-source', 'filter-product-type',
-        'filter-product-has-images', 'filter-product-has-brand', 'filter-product-availability',
+        'filter-item-brand', 'filter-item-category', 'filter-item-source', 'filter-item-type',
+        'filter-item-has-images', 'filter-item-has-brand', 'filter-item-availability',
         'product-sort-by', 'product-sort-dir'
       ],
       colspan: 10,
