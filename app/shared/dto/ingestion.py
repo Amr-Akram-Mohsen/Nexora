@@ -24,6 +24,7 @@ class RawItemDTO(BaseModel):
     er_concepts: Optional[list] = None
     er_categories: Optional[list] = None
     er_event_uri: Optional[str] = None
+    er_event_data: Optional[dict] = None
     er_location: Optional[dict] = None
     er_source: Optional[dict] = None
     er_uri: Optional[str] = None   # canonical article URI
@@ -66,6 +67,7 @@ class EnrichedItemDTO(ClassifiedItemDTO):
     er_concepts: Optional[list] = None
     er_categories: Optional[list] = None
     er_event_uri: Optional[str] = None
+    er_event_data: Optional[dict] = None
     er_location: Optional[dict] = None
     er_source: Optional[dict] = None
     er_uri: Optional[str] = None

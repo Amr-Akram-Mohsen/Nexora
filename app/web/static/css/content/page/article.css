@@ -1,90 +1,102 @@
 @import "style.css";
 @import "article_content.css";
 
+/* --- Hero Section --- */
 .article-header {
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
+.article-header__category span {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--domain-primary);
+}
 
 .article-header__title {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  font-weight: 700;
-  line-height: 1.25;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
   color: var(--foreground);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   margin: 0;
+}
+
+.article-header__description {
+  font-size: var(--text-xl);
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  margin-top: 0.5rem;
 }
 
 .article-header__meta {
   color: var(--muted-foreground);
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-top: 0.25rem;
+  font-size: var(--text-sm);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.meta-author a {
+  font-weight: var(--weight-medium);
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.meta-author a:hover {
+  text-decoration: underline;
+}
+
+.meta-source span,
+.meta-author span {
+  font-weight: var(--weight-medium);
+  color: var(--foreground);
 }
 
 .meta-dot {
   color: var(--border);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
-.meta-author strong {
-  color: var(--foreground);
-  font-weight: 600;
-}
-
-.meta-pill {
-  background: var(--muted);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--muted-foreground);
-  border: 1px solid var(--border);
-}
-
-.meta-pill i {
-  color: var(--domain-primary);
-}
-
-.meta-pill--success {
-  /* Use article type color token (type-specific) rather than brand hardcode */
-  background: rgba(var(--type-article-rgb), 0.1);
-  color: rgb(var(--type-article-rgb));
-  border-color: rgba(var(--type-article-rgb), 0.2);
-}
-
-.meta-pill--success i {
-  color: rgb(var(--type-article-rgb));
-}
-
-.article-hero-image {
-  width: 100%;
-  aspect-ratio: 21/9;
-  border-radius: var(--radius-2xl);
-  overflow: hidden;
-  margin-bottom: 3rem;
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border);
-}
-
-@media (max-width: 768px) {
-  .article-hero-image {
-    aspect-ratio: 16/9;
-    margin-bottom: 2rem;
-  }
-}
-
+/* --- Content Area --- */
 .article-content {
   max-width: 800px;
-  /* margin: 0 auto; */
+  margin-top: 2rem;
 }
 
+/* AI Summary Box */
+.article-summary-box {
+  background: rgba(var(--muted-rgb), 0.5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.article-summary-icon i {
+  color: var(--domain-primary);
+  font-size: var(--text-xl);
+  margin-top: 0.25rem;
+}
+
+.article-summary-title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.article-summary-desc {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+/* Rich Text */
 .article-rich-text {
   font-size: 1.125rem;
   line-height: 1.8;
   color: var(--foreground);
-  margin-bottom: 4rem;
 }
 
 .article-rich-text p {
@@ -97,133 +109,53 @@
   font-weight: 700;
 }
 
-.article-cta-box {
+/* --- Sections (Metadata, Sources, Recommendations) --- */
+.article-semantic-metadata,
+.article-sources-box,
+.recommendation-box {
+  margin-top: 3rem;
+  padding-top: 2rem;
   border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 2rem 0;
-  /* clean vertical border separation, no box containers or shadows */
-  gap: 2rem;
-  margin-top: 4rem;
-  background: transparent;
 }
 
-.cta-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted-foreground);
-  margin-bottom: 0.35rem;
-  font-weight: 600;
-}
-
-.cta-title {
-  font-size: 1.35rem;
-  font-weight: 700;
+.article-section-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  margin-bottom: 1.5rem;
   color: var(--foreground);
-  margin: 0 0 0.4rem 0;
-  letter-spacing: -0.01em;
 }
 
-.cta-text {
-  font-size: 0.9375rem;
+.entity-group__title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--muted-foreground);
-  line-height: 1.5;
-  margin: 0;
 }
 
-@media (max-width: 640px) {
-  .article-cta-box {
-    flex-direction: column;
-    align-items: flex-start;
-    /* high-fidelity left-alignment on compact viewports */
-    gap: 1.5rem;
-    padding-block: 1.5rem;
-  }
-
-  .cta-button-link {
-    width: 100%;
-  }
-
-  .cta-button-link .btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-
-
-/* ── AI Summary Box ───────────────────────────────────────────────────────── */
-.article-summary-box {
-  padding: 1.25rem;
-  margin-bottom: 2rem;
-  background-color: var(--surface-alt, #f8fafc);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-}
-
-.article-summary-accent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(to bottom, var(--domain-primary), var(--brand-secondary, #3b82f6));
-}
-
-.article-summary-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.article-summary-icon {
-  padding: 0.5rem;
-  background-color: rgba(var(--domain-primary-rgb, 59, 130, 246), 0.1);
+.article-sources-card {
+  background: rgba(var(--muted-rgb), 0.3);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  color: var(--domain-primary);
-  flex-shrink: 0;
-  font-size: 1.25rem;
+  padding: 1.5rem;
 }
 
-.article-summary-text {
-  flex: 1;
+.cta-icon {
+  color: var(--muted-foreground);
+  font-size: var(--text-xl);
 }
 
-.article-summary-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--domain-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 0.5rem 0;
-}
-
-.article-summary-desc {
-  font-size: 1.125rem;
-  font-weight: 500;
+.cta-source-name {
+  font-weight: var(--weight-medium);
   color: var(--foreground);
-  line-height: 1.6;
-  margin: 0;
 }
 
-/* ── Article Metadata Tags ────────────────────────────────────────────────── */
-/* Locations + topic badges below the article body */
-.article-metadata-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border);
+.cta-source-date {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }
 
-/* ── Recommendation Box Icon ──────────────────────────────────────────────── */
-/* Ensure icons inside recommendation-box titles inherit domain color cleanly */
 .recommendation-box__icon {
   color: var(--domain-primary);
-  font-size: 1.1rem;
+  font-size: var(--text-xl);
 }

@@ -6,7 +6,10 @@
     {% endif %}
     <div class="mini-card__content flex flex-col justify-center">
         <h4 class="mini-card__title">{{ product.target.title }}</h4>
-        <div class="mini-card__meta flex items-center gap-2">
+        <div class="mini-card__meta flex items-center gap-2 text-sm text-muted-foreground">
+            {% if product.source %}
+            <span class="mini-card__source">{{ product.source.name }}</span>
+            {% endif %}
             <time class="mini-card__date">{{ product.published_at | format_date('%b %d, %Y') }}</time>
         </div>
     </div>

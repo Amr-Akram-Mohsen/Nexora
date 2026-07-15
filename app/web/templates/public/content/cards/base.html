@@ -8,7 +8,7 @@
 {% block title_text %}{{ product.target.title }}{% endblock %}
 
 {% block description %}
-<p class="card__excerpt">{{ product.target.preview_text or '' }}</p>
+<p class="card__excerpt">{{ product.display_preview or product.target.preview_text or '' }}</p>
 {% endblock %}
 
 {# Re-export the content variable for interactions-compact.html #}

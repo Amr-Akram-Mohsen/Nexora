@@ -3,7 +3,7 @@ from app.domains.serializers import (
     serialize_model,
     serialize_target,
 )
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 
 
 def get_model_map():
@@ -121,7 +121,6 @@ def get_or_create_content(
 
         if object_type == "article":
             from app.domains.relationships import ArticleSource
-            from sqlalchemy import select, or_
 
             urls_to_check = [u for u in (url_fallback, canonical_url) if u]
             if urls_to_check:

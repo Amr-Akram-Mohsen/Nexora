@@ -17,7 +17,7 @@ class Event(db.Model):
     last_updated = db.Column(db.DateTime, nullable=True)   # last time ER updated this event
     
     @staticmethod
-    def get_or_create(external_uri, session, title=None, importance=None, image_url=None, event_type=None):
+    def get_or_create(external_uri, session, title=None, importance=None, image_url=None, event_type=None, summary=None, event_date=None, article_count=0, last_updated=None):
         """Get existing event or create new. Updates mutable fields on existing records."""
         if not external_uri:
             return None
@@ -26,9 +26,13 @@ class Event(db.Model):
             event = Event(
                 external_uri=external_uri, 
                 title=title or "Unknown Event",
+                summary=summary,
+                event_date=event_date,
                 importance=importance,
                 image_url=image_url,
                 event_type=event_type,
+                article_count=article_count,
+                last_updated=last_updated
             )
             session.add(event)
             session.flush()
@@ -38,6 +42,14 @@ class Event(db.Model):
                 event.importance = importance
             if image_url and not event.image_url:
                 event.image_url = image_url
+            if summary and not event.summary:
+                event.summary = summary
+            if event_date and not event.event_date:
+                event.event_date = event_date
+            if article_count is not None and article_count > event.article_count:
+                event.article_count = article_count
+            if last_updated:
+                event.last_updated = last_updated
         return event
     
     @staticmethod
@@ -47,3 +59,4 @@ class Event(db.Model):
         return session.query(Event).filter_by(external_uri=external_uri).first()
     
     articles = db.relationship("Article", back_populates="event")
+

@@ -112,6 +112,15 @@
   --variant-hover-bg: rgba(var(--foreground-rgb), 0.1);
 }
 
+.variant--entity {
+  --variant-bg: rgba(var(--foreground-rgb), 0.04);
+  --variant-color: var(--muted-foreground);
+  --variant-border: rgba(var(--border-rgb), 0.5);
+  --variant-hover-bg: rgba(var(--foreground-rgb), 0.08);
+  --variant-hover-color: var(--foreground);
+  --variant-hover-border: var(--border);
+}
+
 .variant--success {
   --variant-bg: rgba(var(--brand-green-rgb), 0.1);
   --variant-color: var(--brand-green-dark, #16a34a);

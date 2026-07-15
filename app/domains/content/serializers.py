@@ -210,4 +210,46 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
     }
 
+    # -- UI Presentation Computed Fields --
+    display_preview = ""
+    if getattr(content_obj, "preview_text", None):
+        display_preview = content_obj.preview_text
+    elif target_obj and getattr(target_obj, "description", None):
+        display_preview = target_obj.description
+    elif target_obj and getattr(target_obj, "summary", None):
+        display_preview = target_obj.summary
+    elif target_obj and getattr(target_obj, "content_text", None):
+        display_preview = target_obj.content_text[:200] + "..." if len(target_obj.content_text) > 200 else target_obj.content_text
+        
+    display_badges = []
+    if content_obj.category and content_obj.category.slug != "uncategorized":
+        display_badges.append({"text": content_obj.category.name, "class": "badge--category", "variant": "secondary", "icon": None})
+        
+    locations = content_obj.locations or []
+    event = getattr(target_obj, "event", None) if target_obj else None
+    
+    if locations:
+        display_badges.append({"text": locations[0].name, "class": "badge--location", "variant": "info", "icon": "fas fa-map-marker-alt"})
+    elif event:
+        display_badges.append({"text": event.title, "class": "badge--event", "variant": "primary", "icon": "fas fa-map-marker-alt"})
+    else:
+        entities = [e.entity for e in (content_obj.content_entities or []) if e.entity]
+        if entities:
+            brand = next((e for e in entities if e.entity_type == "brand"), None)
+            topic = next((e for e in entities if e.entity_type in ("topic", "tag", "concept")), None)
+            if brand:
+                display_badges.append({"text": brand.name, "class": "badge--brand", "variant": "secondary", "icon": "fas fa-tag"})
+            elif topic:
+                display_badges.append({"text": topic.name, "class": "badge--topic", "variant": "secondary", "icon": "fas fa-hashtag"})
+
+    grouped_entities = {}
+    for ce in (content_obj.content_entities or []):
+        if ce.entity:
+            etype = ce.entity.entity_type
+            grouped_entities.setdefault(etype, []).append(serialize_model(ce.entity))
+            
+    data["display_preview"] = display_preview
+    data["display_badges"] = display_badges
+    data["grouped_entities"] = grouped_entities
+
     return data

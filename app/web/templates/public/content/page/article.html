@@ -18,100 +18,163 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="article-header flex flex-col">
-  <div class="article-header__badges flex flex-wrap gap-3">
-    {% if article.event %}
-    {{ badge(text=article.event.name, class="badge--event", variant="primary", icon="fas fa-map-marker-alt") }}
-    {% endif %}
-    {% for topic in content.topics[:2] %} {{ badge(text=topic.name,
-    class="badge--topic" , variant="secondary" ) }} {% endfor %} </div>
+<div class="article-header flex flex-col gap-4">
+  {% if content.category and content.category.slug != 'uncategorized' %}
+  <div class="article-header__category">
+    <span>{{ content.category.name }}</span>
+  </div>
+  {% endif %}
 
   <h1 class="article-header__title">{{ article.title }}</h1>
 
-  <div class="article-header__meta flex flex-wrap items-center gap-2">
+  {% if content.display_preview %}
+  <p class="article-header__description">{{ content.display_preview }}</p>
+  {% endif %}
+
+  <div class="article-header__meta flex flex-wrap items-center gap-3">
     {% if article.authors %}
-    <div class="meta-author">Written by:
-      {% set name = article.authors|map(attribute='name')|join(', ') %}
-      {% set url = article.authors|map(attribute='url')|join(', ') %}
-      {% if url %}
-      <a href="{{ url }}"><strong>{{ name }}</strong></a>
-      {% else %}
-      <strong>{{ name }}</strong>
-      {% endif %}
+    <div class="meta-author flex items-center gap-2">
+      <i class="fas fa-user-edit"></i>
+      <span>By
+        {% set name = article.authors|map(attribute='name')|join(', ') %}
+        {% set url = article.authors|map(attribute='url')|join(', ') %}
+        {% if url %}
+        <a href="{{ url }}">{{ name }}</a>
+        {% else %}
+        <span>{{ name }}</span>
+        {% endif %}
+      </span>
     </div>
+    <span class="meta-dot">&bull;</span>
     {% endif %}
 
-    <time class="meta-date">{{ content.published_at | format_date('%b %d, %Y') }}</time>
+    {% if content.source %}
+    <div class="meta-source flex items-center gap-2">
+      <i class="fas fa-newspaper"></i>
+      <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
+        class="font-medium hover:underline text-foreground">{{ content.source.name }}</a>
+    </div>
+    <span class="meta-dot">&bull;</span>
+    {% endif %}
 
-    <span class="meta-readtime">{{ article.read_time_minutes }} min read</span>
+    <time class="meta-date flex items-center gap-2">
+      <i class="far fa-calendar-alt"></i>
+      {{ content.published_at | format_date('%b %d, %Y') }}
+    </time>
+
+    {% if article.read_time_minutes %}
+    <span class="meta-dot">&bull;</span>
+    <span class="meta-readtime flex items-center gap-2">
+      <i class="far fa-clock"></i>
+      {{ article.read_time_minutes }} min read
+    </span>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
 
 {% block base_content %}
-<div class="article-content">
+<div class="article-content flex flex-col gap-4">
+  {% if article.summary %}
+  <div class="article-summary-box flex gap-3">
+    <div class="article-summary-icon">
+      <i class="fas fa-sparkles"></i>
+    </div>
+    <div class="article-summary-text">
+      <h4 class="article-summary-title">AI Summary</h4>
+      <p class="article-summary-desc">{{ article.summary }}</p>
+    </div>
+  </div>
+  {% endif %}
+
   {% if content.linked_items %}
   {% include "partials/affiliate-disclosure.html" %}
   {% endif %}
 
   <div class="article-rich-text">
-    {% if article.summary %}
-    <div class="article-summary-box">
-      <div class="article-summary-accent"></div>
-      <div class="article-summary-content">
-        <div class="article-summary-icon">
-          <i class="fas fa-sparkles"></i>
-        </div>
-        <div class="article-summary-text">
-          <h4 class="article-summary-title">AI Summary</h4>
-          <p class="article-summary-desc">{{ article.summary }}</p>
-        </div>
-      </div>
-    </div>
-    {% endif %}
     {% if article.content_html %}
     <div class="article-html">
       {{ article.content_html | safe }}
     </div>
     {% endif %}
-
-    {% if content.topics or content.locations %}
-    <div class="article-metadata-tags">
-      {% for loc in content.locations %}
-      {{ badge(text=loc.name, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
-      {% endfor %}
-      {% for topic in content.topics %}
-      {{ badge(text=topic.name, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    {% if entity_carousel %}
-    {% from "components/ui/grid.html" import grid %}
-    <div class="recommendation-box recommendation-box--entity">
-      <h3 class="recommendation-box__title flex items-center">
-        <i class="recommendation-box__icon fas fa-tag"></i>
-        {{ entity_carousel.title }}
-      </h3>
-      {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-    </div>
-    {% endif %}
   </div>
 
-  <div class="article-cta-box flex items-center justify-between mt-10">
-    <div class="cta-content">
-      <p class="cta-label">Source: <strong>{{ article.source_name }}</strong></p>
-      <h4 class="cta-title">Want to read more?</h4>
-      <p class="cta-text">Check out the full story on the original publisher's website.</p>
+  {% if content.grouped_entities or content.attributes %}
+  <div class="article-semantic-metadata">
+    <h3 class="article-section-title">Topics & Entities</h3>
+    <div class="flex flex-col gap-4">
+      {% for type, entities in content.grouped_entities.items() %}
+      {% set filter_key = 'brand' if type|lower == 'brand' else 'tag' %}
+      {% if entities|length == 1 %}
+      <div class="entity-group flex items-center gap-2">
+        <h4 class="entity-group__title m-0">{{ type }}:</h4>
+        {% set entity = entities[0] %}
+        {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', **{filter_key: entity.slug})) }}
+      </div>
+      {% else %}
+      <div class="entity-group flex flex-col gap-2">
+        <h4 class="entity-group__title">{{ type }}</h4>
+        <div class="flex flex-wrap gap-2">
+          {% for entity in entities %}
+          {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', **{filter_key: entity.slug})) }}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+
+      {% if content.attributes %}
+      <div class="entity-group flex flex-col gap-2">
+        <h4 class="entity-group__title">Attributes</h4>
+        <div class="flex flex-wrap gap-2">
+          {% for attr in content.attributes %}
+          {{ badge(text=attr, class="badge--attribute", variant="outline") }}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </div>
-    <a href="{{ article.source_url or article.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
-      {{ button(text="Read Full Article", variant="primary", icon="fas fa-external-link-alt") }}
-    </a>
   </div>
+  {% endif %}
+
+  <div class="article-sources-box">
+    <h3 class="article-section-title">Original Publication</h3>
+    <div class="article-sources-card flex items-center justify-between">
+      <div class="cta-content flex items-center gap-3">
+        <i class="fas fa-globe cta-icon"></i>
+        <div class="flex flex-col">
+          {% if content.source %}
+          <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
+            class="cta-source-name hover:underline text-foreground">{{ content.source.name }}</a>
+          {% else %}
+          <p class="cta-source-name">Unknown Source</p>
+          {% endif %}
+          {% if article.primary_source and article.primary_source.published_at %}
+          <span class="cta-source-date">{{ article.primary_source.published_at | format_date('%b %d, %Y') }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <a href="{{ article.source_url or article.url }}" class="cta-button-link" target="_blank" rel="noopener nofollow">
+        {{ button(text="View Original", variant="outline", icon="fas fa-arrow-right") }}
+      </a>
+    </div>
+  </div>
+
+  {% if entity_carousel %}
+  {% from "components/ui/grid.html" import grid %}
+  <div class="recommendation-box recommendation-box--entity">
+    <h3 class="article-section-title flex items-center gap-2">
+      <i class="recommendation-box__icon fas fa-tag"></i>
+      {{ entity_carousel.title }}
+    </h3>
+    {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/features/article-gallery.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/features/article-gallery.js') }}?v={{ range(1, 1000000) | random }}"
+  defer></script>
 {% endblock %}

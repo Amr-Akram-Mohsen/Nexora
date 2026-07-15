@@ -53,14 +53,14 @@
 </nav>
 {% endmacro %}
 
-{% macro badge(text="", class="", variant="primary", icon=None, attrs={}) %}
-
-<span
+{% macro badge(text="", class="", variant="primary", icon=None, href=None, attrs={}) %}
+{% set tag = "a" if href else "span" %}
+<{{ tag }} {% if href %}href="{{ href }}"{% endif %}
   class="badge{% if variant is not none %} variant--{{ variant }} badge--{{ variant }}{% endif %} {{ class }} inline-flex-center"
   {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
   {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}
   {%- if text -%}{{ text|safe }}{%- elif caller -%}{{ caller() }}{%- endif -%}
-</span>
+</{{ tag }}>
 {% endmacro %}
 
 {% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,

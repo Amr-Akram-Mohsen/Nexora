@@ -63,6 +63,25 @@ def is_trusted(url: str) -> bool:
     except Exception:
         return False
 
+def is_blacklisted(url: str) -> bool:
+    try:
+        from urllib.parse import urlparse
+        domain = urlparse(url).netloc.lower()
+        if domain.startswith("www."):
+            domain = domain[4:]
+        
+        return domain in {
+            "guru3d.com",
+            "in.investing.com",
+            "seekingalpha.com",
+            "storyboard18.com",
+            "thehansindia.com",
+            "klgadgetguy.com",
+            "newswav.com"
+        }
+    except Exception:
+        return False
+
 
 def _is_similar(text1: str, text2: str) -> bool:
     if not text1 or not text2:
@@ -142,6 +161,10 @@ def full_article_scraping_pipeline(product: Any, extractor_service: str = "diffb
 
     candidates = []
     trusted = is_trusted(url)
+    
+    if is_blacklisted(url):
+        logger.info("[enrichment] skipping diffbot scrape for blacklisted source: %s", url)
+        return normalize_ingested_data(product)
 
     # 1. Candidate: API/Initial Content (Local)
     initial_content = data.get("content", "")

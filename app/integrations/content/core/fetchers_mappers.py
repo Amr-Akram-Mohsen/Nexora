@@ -24,10 +24,24 @@ def map_newsapi_ai(data: dict, region="en"):
         # Explicitly set this to None so it isn't incorrectly populated
         a["content_html"] = None
         
+        a["published_at"] = a.get("dateTimePub") or a.get("dateTime") or a.get("date")
+        a["language"] = a.get("lang")
+        a["sentiment_score"] = a.get("sentiment")
+        a["authors"] = a.get("authors") or []
+        a["quality_score"] = a.get("relevance", 0.0)
+        
+        # Store non-standard fields here so they aren't lost
+        a["extended_metadata"] = {
+            "data_type": a.get("dataType"),
+            "weight": a.get("wgt"),
+            "shares": a.get("shares", {})
+        }
+
         # Extract rich metadata for ingestion
         a["er_concepts"] = a.get("concepts")
         a["er_categories"] = a.get("categories")
         a["er_event_uri"] = a.get("eventUri")
+        a["er_event_data"] = a.get("event")
         a["er_uri"] = a.get("uri")
         a["er_source"] = a.get("source")
             

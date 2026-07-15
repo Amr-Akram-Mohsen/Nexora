@@ -12,9 +12,17 @@ def get_feed_data(section_slug, active_filters, page=1):
     """
     Orchestrates data for a section feed (catalog page).
     """
-    section = get_section_by_slug(section_slug)
-    if not section:
-        return None
+    if section_slug == "all":
+        class MockSection:
+            id = None
+            name = "All Content"
+            slug = "all"
+            allowed_filters = ["category", "brand", "intent", "price_tier", "type", "attributes", "source", "event", "author", "tag", "location", "topic"]
+        section = MockSection()
+    else:
+        section = get_section_by_slug(section_slug)
+        if not section:
+            return None
 
     from app.domains.serializers import serialize_model
 
@@ -53,5 +61,30 @@ def get_feed_data(section_slug, active_filters, page=1):
         "allowed_filters": allowed_filters,
         "filter_options": filter_options,
         "recommendations": recommendation_blocks,
+    }
+
+def get_source_feed_data(source_slug, page=1):
+    from app.domains.taxonomy.models import Source
+    from app.core.extensions import db
+    from app.domains.serializers import serialize_model
+
+    source = db.session.query(Source).filter_by(slug=source_slug).first()
+    if not source:
+        return None
+
+    pagination = get_filtered_contents_cached(
+        None,
+        normalize_filters({"source": [source_slug]}),
+        ("source",),
+        page=page,
+    )
+
+    return {
+        "source": serialize_model(source),
+        "contents": pagination["products"],
+        "pagination": pagination,
+        "allowed_filters": [],
+        "filter_options": {},
+        "recommendations": [],
     }
 

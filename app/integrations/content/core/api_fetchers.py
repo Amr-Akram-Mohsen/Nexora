@@ -99,6 +99,9 @@ def fetch_newsapi_ai_query(q_obj, **kwargs):
         "apiKey": api_key,
         "includeArticleConcepts": True,
         "includeArticleCategories": True,
+        "includeConceptImage": True,
+        "includeConceptDescription": True,
+        "includeArticleEventUri": True,
     }
 
     data = safe_post_json(
@@ -168,7 +171,7 @@ def fetch_youtube_query(q_obj, **kwargs):
         session,
         "https://www.googleapis.com/youtube/v3/search",
         params=params,
-        timeout=(10),
+        timeout=(15, 30),
         logger=logger,
         source_name="youtube",
     )

@@ -1,51 +1,59 @@
 {
   "reviews": {
-    "technology:tablets": 5,
-    "technology:smartwatches": 8,
-    "technology:earbuds": 8,
-    "technology:headphones": 8,
-    "perfumes:niche-artisanal": 1,
-    "perfumes:oud-oriental": 1,
-    "perfumes:designer-fragrances": 1,
-    "accessories:watches": 2,
-    "accessories:bags": 3,
-    "accessories:sunglasses": 4,
-    "accessories:jewelry": 3,
-    "accessories:sneakers": 0,
-    "accessories:wallets": 3,
-    "accessories:mechanical-keyboards": 6,
-    "technology:cameras": 6,
-    "technology:pc-components": 6,
-    "technology:gaming-consoles": 7
+    "technology:tablets": 8,
+    "technology:smartwatches": 2,
+    "technology:earbuds": 1,
+    "technology:headphones": 1,
+    "perfumes:niche-artisanal": 2,
+    "perfumes:oud-oriental": 2,
+    "perfumes:designer-fragrances": 2,
+    "accessories:watches": 3,
+    "accessories:bags": 4,
+    "accessories:sunglasses": 5,
+    "accessories:jewelry": 4,
+    "accessories:sneakers": 3,
+    "accessories:wallets": 4,
+    "accessories:mechanical-keyboards": 8,
+    "technology:cameras": 8,
+    "technology:pc-components": 1,
+    "technology:gaming-consoles": 7,
+    "technology:smartphones": 3,
+    "technology:laptops": 3
   },
   "news": {
-    "perfumes:niche-artisanal": 3,
-    "perfumes:oud-oriental": 2,
-    "perfumes:designer-fragrances": 1
+    "perfumes:niche-artisanal": 4,
+    "perfumes:oud-oriental": 3,
+    "perfumes:designer-fragrances": 3
   },
   "guides": {
-    "perfumes:niche-artisanal": 2,
-    "perfumes:oud-oriental": 3,
-    "perfumes:designer-fragrances": 3,
-    "accessories:watches": 3,
-    "accessories:bags": 2,
-    "accessories:sunglasses": 1,
-    "accessories:jewelry": 1,
-    "accessories:sneakers": 3,
-    "accessories:wallets": 1,
-    "accessories:mechanical-keyboards": 2,
-    "technology:smartphones": 3,
-    "technology:laptops": 3,
-    "technology:tablets": 3
+    "perfumes:niche-artisanal": 3,
+    "perfumes:oud-oriental": 4,
+    "perfumes:designer-fragrances": 5,
+    "accessories:watches": 4,
+    "accessories:bags": 3,
+    "accessories:sunglasses": 2,
+    "accessories:jewelry": 2,
+    "accessories:sneakers": 6,
+    "accessories:wallets": 2,
+    "accessories:mechanical-keyboards": 4,
+    "technology:smartphones": 9,
+    "technology:laptops": 8,
+    "technology:tablets": 7,
+    "technology:smartwatches": 3,
+    "technology:earbuds": 2,
+    "technology:headphones": 2,
+    "technology:cameras": 2,
+    "technology:pc-components": 2,
+    "technology:gaming-consoles": 3
   },
   "trends": {
-    "perfumes:niche-artisanal": 3,
-    "perfumes:oud-oriental": 2,
-    "perfumes:designer-fragrances": 2
+    "perfumes:niche-artisanal": 5,
+    "perfumes:oud-oriental": 4,
+    "perfumes:designer-fragrances": 4
   },
   "deals": {
-    "perfumes:niche-artisanal": 2,
-    "perfumes:oud-oriental": 2,
-    "perfumes:designer-fragrances": 2
+    "perfumes:niche-artisanal": 4,
+    "perfumes:oud-oriental": 3,
+    "perfumes:designer-fragrances": 3
   }
 }

@@ -63,6 +63,13 @@ def get_related_contents(content_id, limit=6, session=None):
 
     category_id = reference.category_id
     section_id = reference.section_id
+    
+    event_id = None
+    if reference.object_type == "article":
+        from app.domains.content.models.article import Article
+        article_obj = session.get(Article, reference.object_id)
+        if article_obj:
+            event_id = article_obj.event_id
 
     # --- Build scoring expressions ---
 
@@ -81,6 +88,20 @@ def get_related_contents(content_id, limit=6, session=None):
     # Category: +1.5 for exact match
     category_score = case((Content.category_id == category_id, 1.5), else_=0.0)
 
+    # Event: +1.7 if any event matches
+    if event_id:
+        from app.domains.content.models.article import Article
+        from sqlalchemy import select
+        event_score = case((
+            Content.id.in_(
+                select(Content.id)
+                .join(Article, Content.object_id == Article.id)
+                .where(Content.object_type == "article", Article.event_id == event_id)
+            ), 1.7
+        ), else_=0.0)
+    else:
+        event_score = literal_column("0.0")
+
     # Section: +0.5 soft signal (not a hard filter)
     section_score = case((Content.section_id == section_id, 0.5), else_=0.0)
 
@@ -96,6 +117,7 @@ def get_related_contents(content_id, limit=6, session=None):
         func.sum(topic_score)
         + func.max(brand_score)
         + func.max(category_score)
+        + func.max(event_score)
         + func.max(section_score)
         + func.max(recency_score)
         + func.max(popularity_score)

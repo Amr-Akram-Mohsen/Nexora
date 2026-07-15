@@ -207,3 +207,4 @@ class Content(db.Model):
 
     def __repr__(self):
         return f"<Content {self.object_type}:{self.object_id}>"
+

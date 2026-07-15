@@ -14,7 +14,8 @@ def create_video_model(data):
         platform=data.get("platform", "youtube"),
         thumbnail_url=data.get("thumbnail_url"),
         channel_name=data.get("channel_name"),
-        duration_seconds=data.get("duration_seconds")
+        duration_seconds=data.get("duration_seconds"),
+        url=data.get("url")
     )
 
 

@@ -266,7 +266,6 @@ class Entity(db.Model):
     # NEW — provenance and enrichment
     provider = db.Column(db.String(30), nullable=True, index=True)
     # Values: 'event_registry' | 'diffbot' | 'youtube' | 'wikidata' | 'manual'
-    provider_confidence = db.Column(db.Float, nullable=True)
     description = db.Column(db.Text, nullable=True)       # from Wikidata/Wikipedia (future)
     aliases = db.Column(db.JSON, nullable=True)            # alternate names ['AI', 'A.I.']
     wikidata_id = db.Column(db.String(50), nullable=True, index=True)
@@ -275,11 +274,11 @@ class Entity(db.Model):
     content_entities = db.relationship("ContentEntity", back_populates="entity")
 
     @staticmethod
-    def get_or_create(name, session, external_uri=None, entity_type=None, provider=None, provider_confidence=None):
+    def get_or_create(name, session, external_uri=None, entity_type=None, provider=None, image_url=None):
         """
         Get existing entity by external_uri (preferred) or slug fallback.
         Creates new entity if not found.
-        Updates entity_type and provider if the existing record has None values.
+        Updates entity_type, provider, and image_url if the existing record has None values.
         """
         if not name:
             return None
@@ -299,7 +298,7 @@ class Entity(db.Model):
                 external_uri=external_uri,
                 entity_type=entity_type,
                 provider=provider,
-                provider_confidence=provider_confidence,
+                image_url=image_url
             )
             session.add(entity)
             session.flush()
@@ -311,6 +310,8 @@ class Entity(db.Model):
                 entity.external_uri = external_uri
             if provider and not entity.provider:
                 entity.provider = provider
+            if image_url and not entity.image_url:
+                entity.image_url = image_url
         return entity
 
     @staticmethod
@@ -329,11 +330,12 @@ class Location(db.Model):
     name = db.Column(db.String(150), nullable=False)
     slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
     country_code = db.Column(db.String(10), index=True)
+    country_name = db.Column(db.String(150))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
     @staticmethod
-    def get_or_create(name, session, country_code=None):
+    def get_or_create(name, session, country_code=None, country_name=None):
         if not name:
             return None
         slug = generate_slug(name)
@@ -342,10 +344,16 @@ class Location(db.Model):
             location = Location(
                 name=name,
                 slug=slug,
-                country_code=country_code
+                country_code=country_code,
+                country_name=country_name
             )
             session.add(location)
             session.flush()
+        else:
+            if country_name and not location.country_name:
+                location.country_name = country_name
+            if country_code and not location.country_code:
+                location.country_code = country_code
         return location
 
     contents = db.relationship(

@@ -18,6 +18,7 @@ def sync_content_fields(content, obj, object_type: str) -> None:
     """
     content.title = obj.title
     content.preview_text = getattr(obj, "preview_text", None)
+    content.score = getattr(obj, "quality_score", 0.0)
     if object_type == "article":
         content.is_published = (obj.status == "published")
 
@@ -148,12 +149,34 @@ def apply_relationships(content, data, session=None) -> dict:
     if obj:
         if content.object_type == "article":
             # Events
-            if data.get("er_event_uri"):
-                event_uri = data["er_event_uri"]
-                event = Event.get_or_create(external_uri=event_uri, session=session, title=data.get("title"))
-                if event and obj.event_id != event.id:
-                    obj.event_id = event.id
-                    updated_relationships["event"] = event.external_uri
+            if data.get("er_event_data") or data.get("er_event_uri"):
+                event_data = data.get("er_event_data") or {}
+                event_uri = event_data.get("uri") or data.get("er_event_uri")
+                if event_uri:
+                    title_raw = event_data.get("title")
+                    title_str = title_raw.get("eng", str(title_raw)) if isinstance(title_raw, dict) else (title_raw or data.get("title"))
+                    
+                    sum_raw = event_data.get("summary")
+                    summary_str = sum_raw.get("eng", str(sum_raw)) if isinstance(sum_raw, dict) else sum_raw
+                    
+                    from datetime import datetime
+                    event_date_str = event_data.get("eventDate")
+                    event_date = datetime.fromisoformat(event_date_str.replace("Z", "+00:00")) if event_date_str else None
+                    
+                    event = Event.get_or_create(
+                        external_uri=event_uri, 
+                        session=session, 
+                        title=title_str,
+                        summary=summary_str,
+                        event_date=event_date,
+                        article_count=event_data.get("articleCount", 0),
+                        importance=event_data.get("importance"),
+                        image_url=event_data.get("image"),
+                        event_type=event_data.get("type")
+                    )
+                    if event and (obj.event_id is None or obj.event_id != event.id):
+                        obj.event_id = event.id
+                        updated_relationships["event"] = event.external_uri
 
             # Categories (Article Categories)
             if data.get("er_categories"):
@@ -187,7 +210,7 @@ def apply_relationships(content, data, session=None) -> dict:
                         external_uri=concept_uri, 
                         entity_type=entity_type,
                         provider="event_registry",
-                        provider_confidence=score
+                        image_url=concept.get("image")
                     )
                     
                     if entity:
@@ -202,9 +225,10 @@ def apply_relationships(content, data, session=None) -> dict:
                         )
                         updated_relationships.setdefault("entities", []).append(entity.slug)
                     # If this is a location, also populate the Locations model!
-                    if entity_type in ("location", "place"):
+                    if entity_type in ("location", "place", "loc"):
                         from app.domains.taxonomy.models import Location
-                        loc = Location.get_or_create(concept_label, session=session)
+                        country_label = concept.get("location", {}).get("country", {}).get("label", {}).get("eng")
+                        loc = Location.get_or_create(concept_label, session=session, country_name=country_label)
                         if loc and loc not in content.locations:
                             content.locations.append(loc)
                             updated_relationships.setdefault("locations", []).append(loc.slug)

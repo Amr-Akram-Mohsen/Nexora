@@ -24,9 +24,12 @@ REL_MODELS = {
 
 
 def build_filter_projection(model):
+    from sqlalchemy import String, cast
+    slug_col = model.slug if hasattr(model, "slug") else cast(model.id, String)
+    name_col = model.name if hasattr(model, "name") else model.title if hasattr(model, "title") else cast(model.id, String)
     return (
-        model.slug.label("slug"),
-        model.name.label("name"),
+        slug_col.label("slug"),
+        name_col.label("name"),
     )
 
 
@@ -36,18 +39,23 @@ def apply_content_section_filters(
     section_slug,
     limit=20,
 ):
+    stmt = stmt.where(Content.is_active, Content.is_published)
+    
+    if section_slug and section_slug != "all":
+        stmt = stmt.join(Section, Section.id == Content.section_id).where(
+            func.lower(Section.slug) == func.lower(section_slug)
+        )
+        
+    group_cols = [model.id]
+    if hasattr(model, "slug"):
+        group_cols.append(model.slug)
+    if hasattr(model, "name"):
+        group_cols.append(model.name)
+    elif hasattr(model, "title"):
+        group_cols.append(model.title)
+
     return (
-        stmt.join(Section, Section.id == Content.section_id)
-        .where(
-            func.lower(Section.slug) == func.lower(section_slug),
-            Content.is_active,
-            Content.is_published,
-        )
-        .group_by(
-            model.id,
-            model.slug,
-            model.name,
-        )
+        stmt.group_by(*group_cols)
         .order_by(func.count(Content.id).desc())
         .limit(limit)
     )
@@ -166,12 +174,13 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
 
 @cache.memoize(timeout=3600)
 def get_types_for_section(section_slug, session=None):
-    stmt = (
-        select(Content.object_type)
-        .join(Section, Section.id == Content.section_id)
-        .where(func.lower(Section.slug) == func.lower(section_slug))
-        .group_by(Content.object_type)
-    )
+    stmt = select(Content.object_type)
+    if section_slug and section_slug != "all":
+        stmt = stmt.join(Section, Section.id == Content.section_id).where(
+            func.lower(Section.slug) == func.lower(section_slug)
+        )
+    
+    stmt = stmt.group_by(Content.object_type)
     rows = execute_mapped_query(stmt, session)
     return [
         {"slug": r["object_type"].lower(), "name": r["object_type"].title()}

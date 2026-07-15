@@ -39,28 +39,34 @@ def fetch_and_clean_diffbot(url: str, hero_image_url: str | None = None, api_key
 
     response = None
     for attempt in range(5):
-        response = requests.get(
-            "https://api.diffbot.com/v3/article",
-            params=params,
-            timeout=65,
-        )
-        if response.status_code == 429:
-            retry_str = response.headers.get("Retry-After")
-            try:
-                retry_after = int(retry_str) if retry_str else 3 * (2 ** attempt)
-            except (ValueError, TypeError):
-                # Diffbot might send non-standard formats like "0 days, 00:00:07"
-                retry_after = 3 * (2 ** attempt)
-                
-            logger.warning(
-                "[diffbot] 429 Too Many Requests (attempt %d/5) — sleeping %ds before retry",
-                attempt + 1,
-                retry_after
+        try:
+            response = requests.get(
+                "https://api.diffbot.com/v3/article",
+                params=params,
+                timeout=65,
             )
-            time.sleep(retry_after)
-            continue
-        response.raise_for_status()
-        break
+            if response.status_code == 429:
+                retry_str = response.headers.get("Retry-After")
+                try:
+                    retry_after = int(retry_str) if retry_str else 3 * (2 ** attempt)
+                except (ValueError, TypeError):
+                    retry_after = 3 * (2 ** attempt)
+                    
+                logger.warning(
+                    "[diffbot] 429 Too Many Requests (attempt %d/5) — sleeping %ds before retry",
+                    attempt + 1,
+                    retry_after
+                )
+                time.sleep(retry_after)
+                continue
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            if attempt < 4:
+                logger.warning("[diffbot] Request failed (attempt %d/5): %s — retrying", attempt + 1, e)
+                time.sleep(3 * (2 ** attempt))
+                continue
+            raise
     else:
         # All 5 attempts returned 429 — surface the error cleanly
         raise ValueError("Diffbot returned 429 Too Many Requests after 5 retries")

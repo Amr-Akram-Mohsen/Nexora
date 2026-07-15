@@ -159,3 +159,4 @@ class Article(db.Model):
 
     def __repr__(self):
         return f"<Article {self.id} '{self.title[:30]}'>"
+

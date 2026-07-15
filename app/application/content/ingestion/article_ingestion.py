@@ -16,6 +16,8 @@ def create_article_model(data):
         status=data.get("status", "discovered"),
         image_url=data.get("image_url"),
         authors=data.get("authors") or ([data.get("author")] if data.get("author") else None),
+        language=data.get("language"),
+        sentiment_score=data.get("sentiment_score"),
         extended_metadata=data.get("extended_metadata"),
         images=data.get("images"),
         videos=data.get("videos"),
@@ -117,8 +119,7 @@ def process_diffbot_enrichment(article, diffbot_data, session):
                     session=session,
                     external_uri=uri,
                     entity_type="tag",
-                    provider="diffbot",
-                    provider_confidence=score
+                    provider="diffbot"
                 )
                 
                 if entity:

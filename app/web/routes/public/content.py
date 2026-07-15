@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, request, render_template, abort
 from . import PUBLIC_TEMPLATES
-from app.application.content.get_feed import get_feed_data
+from app.application.content.get_feed import get_feed_data, get_source_feed_data
 from flask_login import current_user
 from app.shared.request import get_client_ip
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
@@ -46,6 +46,37 @@ def sections(section_slug):
         )
     except Exception as e:
         log_route_error(logger, f"/sections/{section_slug}", e)
+        raise
+
+
+@bp.route("/sources/<source_slug>")
+def source_page(source_slug):
+    page = request.args.get("page", 1, type=int)
+    log_route_start(logger, f"/sources/{source_slug}", page=page)
+
+    try:
+        data = get_source_feed_data(source_slug, page=page)
+        if not data:
+            logger.warning("[ROUTE][/sources/%s] no data returned — 404", source_slug)
+            abort(404)
+
+        item_count = len(data.get("contents") or [])
+        log_route_success(
+            logger,
+            f"/sources/{source_slug}",
+            products=item_count,
+            template="catalog-page.html",
+        )
+
+        return render_template(
+            "content/catalog/catalog-page.html",
+            target_type="content",
+            active_filters={"source": [source_slug]},
+            section={"name": data["source"].get("name", "Source"), "slug": "sources"},
+            **data,
+        )
+    except Exception as e:
+        log_route_error(logger, f"/sources/{source_slug}", e)
         raise
 
 

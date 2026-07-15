@@ -3,7 +3,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!articleContent) return;
 
     // Find all figures in the article body
-    const figures = Array.from(articleContent.querySelectorAll('figure'));
+    let figures = Array.from(articleContent.querySelectorAll('figure'));
+    
+    // Remove empty figures (e.g., just an empty <picture> tag or img without src)
+    figures = figures.filter(figure => {
+        const media = figure.querySelector('img, video, iframe');
+        
+        if (!media) {
+            figure.remove();
+            return false;
+        }
+
+        // If it's an image, make sure it actually has a source
+        if (media.tagName.toLowerCase() === 'img') {
+            const src = media.getAttribute('src');
+            if (!src || src.trim() === '') {
+                figure.remove();
+                return false;
+            }
+        }
+        
+        return true;
+    });
+
     if (figures.length === 0) return;
     
     // Group adjacent figures
@@ -39,6 +61,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // Move all figures in the group into the container
         group.forEach(figure => {
             gridContainer.appendChild(figure);
+        });
+    });
+
+    // ── Professional Loading State for Media ──
+    const mediaElements = articleContent.querySelectorAll('img, video, iframe');
+    mediaElements.forEach(media => {
+        // If image is already loaded (from cache), immediately mark it
+        if (media.tagName.toLowerCase() === 'img' && media.complete) {
+            media.classList.add('is-loaded');
+            return;
+        }
+        
+        // Otherwise wait for load event
+        media.addEventListener('load', () => {
+            media.classList.add('is-loaded');
+        });
+        
+        // For video elements
+        media.addEventListener('loadeddata', () => {
+            media.classList.add('is-loaded');
         });
     });
 });
