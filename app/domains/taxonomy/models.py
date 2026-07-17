@@ -144,9 +144,54 @@ class Category(db.Model):
             session.flush()
         return category
 
+    @staticmethod
+    def get_or_create_from_path(path: str, session):
+        """
+        Takes a path like 'dmoz/Science/Environment/Sustainability',
+        strips the provider prefix ('dmoz', 'iptc', 'news'),
+        and creates the proper parent-child category hierarchy.
+        Returns the leaf category.
+        """
+        if not path:
+            return None
+            
+        parts = path.split('/')
+        provider_prefixes = ('dmoz', 'iptc', 'news')
+        
+        # If the first part is a known provider prefix, remove it from the visual hierarchy
+        if parts[0].lower() in provider_prefixes:
+            parts = parts[1:]
+            
+        if not parts:
+            return None
+            
+        parent_cat = None
+        current_path_so_far = []
+        
+        for i, part_name in enumerate(parts):
+            is_leaf = (i == len(parts) - 1)
+            current_path_so_far.append(part_name)
+            
+            # Use get_or_create to cleanly generate slug, normalized_name, and link parent
+            cat = Category.get_or_create(
+                name=part_name,
+                session=session,
+                parent=parent_cat,
+                is_leaf=is_leaf
+            )
+            
+            # Only set the external_uri on the leaf node to preserve the original API mapping
+            if is_leaf and not cat.external_uri:
+                cat.external_uri = path
+                
+            parent_cat = cat
+            
+        return parent_cat
+
     parent = db.relationship("Category", remote_side=[id], backref="children")
     contents = db.relationship("Content", back_populates="category")
     products = db.relationship("Product", back_populates="category")
+    article_associations = db.relationship("ArticleCategory", back_populates="category", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Category {self.slug}>"
@@ -292,13 +337,18 @@ class Entity(db.Model):
             entity = session.query(Entity).filter_by(slug=slug).first()
 
         if not entity:
+            entity = session.query(Entity).filter_by(slug=slug).first()
+
+
+        if not entity:
             entity = Entity(
                 name=name,
                 slug=slug,
                 external_uri=external_uri,
                 entity_type=entity_type,
                 provider=provider,
-                image_url=image_url
+                image_url=image_url,
+                aliases=[]
             )
             session.add(entity)
             session.flush()

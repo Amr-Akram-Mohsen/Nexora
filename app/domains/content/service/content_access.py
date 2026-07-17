@@ -29,7 +29,7 @@ def resolve(content, session=None):
     return resolve_content_object(content, session=session)
 
 
-def assign_target_to_contents(contents, include_linked_items=False, session=None):
+def assign_target_to_contents(contents, include_linked_items=False, session=None, active_filters=None):
     if not contents:
         return contents
 
@@ -47,7 +47,7 @@ def assign_target_to_contents(contents, include_linked_items=False, session=None
     # Assign targets back to content objects
     for c in contents:
         target_obj = targets_map.get((c.object_type, c.object_id))
-        result.append(serialize_content(c, target_obj, session, include_linked_items))
+        result.append(serialize_content(c, target_obj, session, include_linked_items, active_filters=active_filters))
 
     return result
 

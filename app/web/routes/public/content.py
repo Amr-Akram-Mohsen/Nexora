@@ -16,7 +16,7 @@ def sections(section_slug):
     from app.web.helpers.filters import parse_active_filters
 
     active_filters = parse_active_filters(
-        list_names=["category", "brand", "intent", "price_tier", "type", "attributes", "source", "event", "author", "tag"]
+        list_names=["category", "entity", "intent", "price_tier", "type", "attributes", "source", "event", "author", "location"]
     )
     page = request.args.get("page", 1, type=int)
 
@@ -79,6 +79,43 @@ def source_page(source_slug):
         log_route_error(logger, f"/sources/{source_slug}", e)
         raise
 
+
+@bp.route("/api/globe-data")
+def globe_data():
+    """
+    Returns geographical data for the 3D globe visualization.
+    Extracts locations from Events and Articles.
+    """
+    from flask import jsonify, url_for
+    from app.core.extensions import db
+    from app.domains.taxonomy.models import Location
+    
+    locations = db.session.query(Location).filter(
+        Location.latitude.isnot(None),
+        Location.longitude.isnot(None)
+    ).all()
+    
+    data = []
+    for loc in locations:
+        content_count = len(loc.contents)
+        if content_count > 0:
+            # Determine intensity (size) by content count (cap at 1.5)
+            size = min(1.5, 0.1 + (content_count * 0.05))
+            
+            data.append({
+                "lat": loc.latitude,
+                "lng": loc.longitude,
+                "size": size,
+                "color": "#e11d48", # Nexora primary
+                "title": loc.name,
+                "content_count": content_count,
+                "url": url_for("content.sections", section_slug="news", location=loc.slug)
+            })
+            
+    # Sort by size descending and take top 150 to avoid clutter
+    data = sorted(data, key=lambda x: x["size"], reverse=True)[:150]
+            
+    return jsonify(data)
 
 @bp.route("/contents/<int:content_id>")
 def content_page(content_id):

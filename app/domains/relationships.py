@@ -10,12 +10,26 @@ content_locations = db.Table(
     db.Index("ix_content_locations_content", "content_id"),
 )
 
-article_categories = db.Table(
-    "article_categories",
+class ArticleCategory(db.Model):
+    __tablename__ = "article_categories"
+    article_id = db.Column(db.Integer, db.ForeignKey("articles.id"), primary_key=True)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), primary_key=True)
+    weight = db.Column(db.Float, default=0.0)
+    
+    article = db.relationship("Article", back_populates="category_associations")
+    category = db.relationship("Category", back_populates="article_associations")
+    
+    __table_args__ = (
+        db.Index("ix_article_categories_category", "category_id"),
+        db.Index("ix_article_categories_article", "article_id"),
+    )
+
+article_authors = db.Table(
+    "article_authors",
     db.Column("article_id", db.Integer, db.ForeignKey("articles.id"), primary_key=True),
-    db.Column("category_id", db.Integer, db.ForeignKey("categories.id"), primary_key=True),
-    db.Index("ix_article_categories_category", "category_id"),
-    db.Index("ix_article_categories_article", "article_id"),
+    db.Column("author_id", db.Integer, db.ForeignKey("authors.id"), primary_key=True),
+    db.Index("ix_article_authors_author", "author_id"),
+    db.Index("ix_article_authors_article", "article_id"),
 )
 
 class ContentEntity(db.Model):

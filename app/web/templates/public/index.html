@@ -11,6 +11,7 @@
 {% from"components/ui/core.html" import badge %}
 {% include "components/hero-sliders.html" %}
 <div class="container">
+  {% include "content/components/globe.html" %}
 
   {% if recently_viewed %}
   {% call section("Continue Reading", more_url=url_for('user.history')) %}

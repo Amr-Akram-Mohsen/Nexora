@@ -98,7 +98,7 @@ def _get_paginated_contents(
         return pagination, quality
         
     from ..content_access import assign_target_to_contents
-    products = assign_target_to_contents(pagination.items, session)
+    products = assign_target_to_contents(pagination.items, session, active_filters=filters)
     return {
         "products": products, "page": pagination.page, "pages": pagination.pages,
         "total": pagination.total, "per_page": pagination.per_page,
@@ -218,7 +218,7 @@ def get_unscraped_articles(limit, retry_threshold, session=None):
                 )
             )
         )
-        .order_by(Content.published_at.desc())
+        .order_by(Article.quality_score.desc(), Content.published_at.desc())
         .limit(limit)
     )
     return session.execute(stmt).scalars().all()

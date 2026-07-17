@@ -1,12 +1,12 @@
 from app.core.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
+from app.domains.relationships import ArticleCategory
 
 class Article(db.Model):
     __tablename__ = "articles"
 
     id = db.Column(db.Integer, primary_key=True)
 
-    external_uri = db.Column(db.String(255), unique=True, index=True)
     title = db.Column(db.String(300), nullable=False)
     description = db.Column(db.Text)
     summary = db.Column(db.Text)
@@ -23,7 +23,7 @@ class Article(db.Model):
     language = db.Column(db.String(10), index=True)
     sentiment_score = db.Column(db.Float, index=True)
     
-    authors = db.Column(db.JSON)
+    authors = db.relationship("Author", secondary="article_authors", backref="article_rels")
     extended_metadata = db.Column(
         db.JSON,
         comment=(
@@ -62,11 +62,16 @@ class Article(db.Model):
         foreign_keys="ArticleSource.article_id",
     )
 
-    categories = db.relationship(
-        "Category",
-        secondary="article_categories",
-        backref="articles"
+    category_associations = db.relationship(
+        "ArticleCategory",
+        back_populates="article",
+        cascade="all, delete-orphan"
     )
+    
+    # Optional: If you want to continue accessing `article.categories` as a list of Category objects
+    # Note: Using association_proxy requires importing it
+    from sqlalchemy.ext.associationproxy import association_proxy
+    categories = association_proxy("category_associations", "category", creator=lambda c: ArticleCategory(category=c))
 
     # -------- Helpers --------
     @property

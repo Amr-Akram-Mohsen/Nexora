@@ -2,7 +2,7 @@
 {% from "components/ui/core.html" import badge, button %}
 
 {# ── Canonical filter priority order ── #}
-{% set filter_priority = ['category', 'topic', 'author', 'location', 'brand', 'tag', 'event', 'source', 'intent', 'price_tier', 'store', 'type'] %}
+{% set filter_priority = ['category', 'entity', 'author', 'location', 'event', 'source', 'intent', 'price_tier', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
@@ -64,14 +64,14 @@
       </div>
       <div class="sidebar-trending__links flex flex-col gap-1">
 
-        {# Show active tag quick-links if tags available #}
-        {% set tag_opts = filter_options.get('tag', []) %}
-        {% if tag_opts %}
-        {% for opt in tag_opts[:5] %}
+        {# Show active entity quick-links if entities available #}
+        {% set entity_opts = filter_options.get('entity', []) %}
+        {% if entity_opts %}
+        {% for opt in entity_opts[:5] %}
         {% set slug = opt.slug if opt.slug is defined else opt %}
         {% set name = opt.name if opt.name is defined else opt | replace('-', ' ') | title %}
-        {% set is_active = slug in active_filters.get('tag', []) or slug == active_filters.get('tag') %}
-        <a href="{{ get_filter_url('tag', slug, multi=true) }}"
+        {% set is_active = slug in active_filters.get('entity', []) or slug == active_filters.get('entity') %}
+        <a href="{{ get_filter_url('entity', slug, multi=true) }}"
           class="sidebar-trending__link {{ 'is-active' if is_active }}">
           <i class="fas fa-arrow-trend-up"></i>
           <span class="truncate">{{ name }}</span>

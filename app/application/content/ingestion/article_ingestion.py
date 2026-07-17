@@ -4,6 +4,36 @@ from app.shared.dto.ingestion import EnrichedItemDTO
 
 
 def create_article_model(data):
+    from app.core.extensions import db
+    from app.domains.content.models.author import Author
+    
+    author_objs = []
+    authors_data = data.get("authors") or ([data.get("author")] if data.get("author") else [])
+    
+    for author_data in authors_data:
+        if isinstance(author_data, str):
+            author_data = {"name": author_data}
+            
+        name = author_data.get("name")
+        if not name:
+            continue
+            
+        uri = author_data.get("uri")
+        url = author_data.get("link") or author_data.get("authorUrl") or author_data.get("url")
+        type_val = author_data.get("type", "author")
+        is_agency = author_data.get("isAgency", False)
+        
+        author_obj = Author.get_or_create(
+            session=db.session,
+            name=name,
+            uri=uri,
+            url=url,
+            type_val=type_val,
+            is_agency=is_agency
+        )
+        if author_obj and author_obj not in author_objs:
+            author_objs.append(author_obj)
+
     return Article(
         title=data.get("title"),
         description=data.get("description"),
@@ -15,7 +45,7 @@ def create_article_model(data):
         ingestion_method=data.get("ingestion_method"),
         status=data.get("status", "discovered"),
         image_url=data.get("image_url"),
-        authors=data.get("authors") or ([data.get("author")] if data.get("author") else None),
+        authors=author_objs,
         language=data.get("language"),
         sentiment_score=data.get("sentiment_score"),
         extended_metadata=data.get("extended_metadata"),
@@ -38,9 +68,14 @@ def process_diffbot_enrichment(article, diffbot_data, session):
     # 1. Update Core Content Fields
     article.content_text = obj.get("text")
     article.content_html = obj.get("html")
-    article.language = obj.get("humanLanguage")
-    article.word_count = len(article.content_text.split()) if article.content_text else 0
-    article.sentiment_score = obj.get("sentiment")
+    
+    if not article.language:
+        article.language = obj.get("humanLanguage")
+    if not article.word_count:
+        article.word_count = len(article.content_text.split()) if article.content_text else 0
+    
+    if article.sentiment_score is None:
+        article.sentiment_score = obj.get("sentiment")
     
     summary = obj.get("summary")
     if summary:
@@ -83,18 +118,41 @@ def process_diffbot_enrichment(article, diffbot_data, session):
         article.videos = obj.get("videos", [])
 
     # 3. Handle Authors
-    authors = []
+    from app.domains.content.models.author import Author
+    
+    diffbot_authors_data = []
     if obj.get("authors"):
-        authors = obj.get("authors")
+        diffbot_authors_data = obj.get("authors")
     elif obj.get("author"):
         author_val = obj.get("author")
         if isinstance(author_val, str):
-            authors = [{"name": author_val}]
+            diffbot_authors_data = [{"name": author_val}]
         elif isinstance(author_val, dict):
-            authors = [author_val]
+            diffbot_authors_data = [author_val]
             
-    if authors:
-        article.authors = authors
+    if diffbot_authors_data:
+        existing_authors = article.authors or [] # Now a list of Author objects
+        
+        for new_a in diffbot_authors_data:
+            new_name = new_a.get("name", "") if isinstance(new_a, dict) else str(new_a)
+            if not new_name:
+                continue
+                
+            url = None
+            if isinstance(new_a, dict):
+                url = new_a.get("link") or new_a.get("authorUrl")
+                
+            # Use get_or_create which handles the alias resolution natively
+            author_obj = Author.get_or_create(
+                session=session,
+                name=new_name,
+                url=url
+            )
+            
+            if author_obj and author_obj not in existing_authors:
+                existing_authors.append(author_obj)
+                
+        article.authors = existing_authors
 
     # 4. Integrate Diffbot Tags (via ContentEntity)
     if "tags" in obj:
@@ -137,6 +195,46 @@ def process_diffbot_enrichment(article, diffbot_data, session):
     return True
 
 
+def update_article_model(obj, data):
+    changed = False
+    if data.get("body") and not obj.body:
+        obj.body = data.get("body")
+        changed = True
+    if data.get("word_count") and not obj.word_count:
+        obj.word_count = data.get("word_count")
+        changed = True
+        
+    if data.get("authors") and not obj.authors:
+        from app.core.extensions import db
+        from app.domains.content.models.author import Author
+        author_objs = []
+        for author_data in data.get("authors"):
+            if isinstance(author_data, str):
+                author_data = {"name": author_data}
+            name = author_data.get("name")
+            if not name: continue
+            author_obj = Author.get_or_create(
+                session=db.session,
+                name=name,
+                uri=author_data.get("uri"),
+                url=author_data.get("link") or author_data.get("authorUrl") or author_data.get("url"),
+                type_val=author_data.get("type", "author"),
+                is_agency=author_data.get("isAgency", False)
+            )
+            if author_obj and author_obj not in author_objs:
+                author_objs.append(author_obj)
+        if author_objs:
+            obj.authors = author_objs
+            changed = True
+            
+    if data.get("language") and not obj.language:
+        obj.language = data.get("language")
+        changed = True
+    if data.get("sentiment_score") is not None and obj.sentiment_score is None:
+        obj.sentiment_score = data.get("sentiment_score")
+        changed = True
+    return changed
+
 def ingest_article(session, raw_data):
     # Backward compatibility: wrap dict into EnrichedItemDTO if necessary
     if isinstance(raw_data, dict):
@@ -155,10 +253,10 @@ def ingest_article(session, raw_data):
     cleaned_dict = cleaned_dto.model_dump()
 
 
-
     return generic_ingest(
         session,
         object_type="article",
         raw_data=cleaned_dict,
         factory_func=create_article_model,
+        update_func=update_article_model,
     )

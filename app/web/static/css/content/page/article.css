@@ -59,6 +59,15 @@
   font-size: var(--text-xs);
 }
 
+.author-icon {
+  margin-left: 0.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.9em;
+}
+.author-icon:hover {
+  color: var(--foreground);
+}
+
 /* --- Content Area --- */
 .article-content {
   max-width: 800px;
@@ -158,4 +167,12 @@
 .recommendation-box__icon {
   color: var(--domain-primary);
   font-size: var(--text-xl);
+}
+
+.event-summary-card {
+  background: rgba(var(--brand-blue-rgb), 0.05);
+  border: 1px solid rgba(var(--brand-blue-rgb), 0.1);
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
 }

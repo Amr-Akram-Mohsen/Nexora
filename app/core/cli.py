@@ -45,6 +45,12 @@ def register_commands(app):
     def fetch_newsapi_ai_command():
         run_newsapi_ai_fetch()
 
+    @app.cli.command("fetch-events")
+    def fetch_events_command():
+        """Hydrates incomplete Events from NewsAPI AI."""
+        from app.application.content.workflows.event_hydration import run_event_hydration
+        run_event_hydration(limit=100)
+
 
 
     @app.cli.command("fetch-all")
@@ -69,7 +75,7 @@ def register_commands(app):
         )
 
         app.logger.info("Starting full-body enrichment using Diffbot...")
-        results = enrich_discovered_articles(limit=20, force=force)
+        results = enrich_discovered_articles(limit=50, force=force)
         count = results.get("published", 0)
         app.logger.info("Done! Successfully published %d articles.", count)
 

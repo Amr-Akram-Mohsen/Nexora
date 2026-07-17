@@ -59,6 +59,20 @@ def link_article_sources(article, data, session=None) -> bool:
                 if domain == t_domain or domain.endswith("." + t_domain):
                     authority_score = s_trusted.get("score", 70)
                     break
+                    
+            # Enhance authority score using NewsAPI AI Source Ranking if available
+            er_source = data.get("er_source") or {}
+            ranking_data = er_source.get("ranking") or {}
+            importance_rank = ranking_data.get("importanceRank")
+            
+            if importance_rank:
+                # Lower rank number = more important (e.g. 1 is top site)
+                if importance_rank <= 1000:
+                    authority_score = max(authority_score, 90)
+                elif importance_rank <= 10000:
+                    authority_score = max(authority_score, 75)
+                elif importance_rank <= 50000:
+                    authority_score = max(authority_score, 60)
             
             source = Source(
                 name=source_name,
@@ -180,13 +194,46 @@ def apply_relationships(content, data, session=None) -> dict:
 
             # Categories (Article Categories)
             if data.get("er_categories"):
+                from app.domains.relationships import ArticleCategory
                 for cat_data in data["er_categories"]:
                     cat_label = cat_data if isinstance(cat_data, str) else cat_data.get("name", cat_data.get("label", ""))
+                    wgt = 0.0
+                    if isinstance(cat_data, dict):
+                        wgt = float(cat_data.get("wgt", 0.0))
+                        
                     if not cat_label: continue
-                    cat = Category.get_or_create(cat_label, session=session)
-                    if cat and cat not in obj.categories:
-                        obj.categories.append(cat)
-                        updated_relationships.setdefault("categories", []).append(cat.slug)
+                    cat = Category.get_or_create_from_path(cat_label, session=session)
+                    if cat:
+                        existing_link = session.query(ArticleCategory).filter_by(
+                            article_id=obj.id, category_id=cat.id
+                        ).first()
+                        
+                        if existing_link:
+                            if existing_link.weight != wgt:
+                                existing_link.weight = wgt
+                        else:
+                            new_link = ArticleCategory(
+                                article=obj, 
+                                category=cat,
+                                weight=wgt
+                            )
+                            session.add(new_link)
+                            updated_relationships.setdefault("categories", []).append(cat.slug)
+
+            # Article Location
+            if data.get("er_location"):
+                loc_data = data["er_location"]
+                if isinstance(loc_data, dict):
+                    loc_label = (loc_data.get("label") or {}).get("eng")
+                    country_data = loc_data.get("country") or {}
+                    country_label = (country_data.get("label") or {}).get("eng")
+                    
+                    if loc_label:
+                        from app.domains.taxonomy.models import Location
+                        loc = Location.get_or_create(loc_label, session=session, country_name=country_label)
+                        if loc and loc not in content.locations:
+                            content.locations.append(loc)
+                            updated_relationships.setdefault("locations", []).append(loc.slug)
 
         # Entities (Concepts) - Applies to ALL content types
         if data.get("er_concepts"):
@@ -227,7 +274,10 @@ def apply_relationships(content, data, session=None) -> dict:
                     # If this is a location, also populate the Locations model!
                     if entity_type in ("location", "place", "loc"):
                         from app.domains.taxonomy.models import Location
-                        country_label = concept.get("location", {}).get("country", {}).get("label", {}).get("eng")
+                        location_data = concept.get("location") or {}
+                        country_data = location_data.get("country") or {}
+                        label_data = country_data.get("label") or {}
+                        country_label = label_data.get("eng")
                         loc = Location.get_or_create(concept_label, session=session, country_name=country_label)
                         if loc and loc not in content.locations:
                             content.locations.append(loc)

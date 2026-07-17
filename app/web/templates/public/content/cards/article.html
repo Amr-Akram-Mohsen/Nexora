@@ -29,6 +29,9 @@
     <span class="card__meta-text truncate">
       {% if product.source %}
         <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{ product.source.name }}</a>
+        {% if product.is_verified_source %}
+          <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+        {% endif %}
       {% else %}
         Article
       {% endif %}
@@ -43,10 +46,10 @@
   {% endif %}
 </div>
 
-{% if article.read_time_minutes %}
+{% if product.reading_time %}
 <span class="card__read-time">
   <i class="far fa-clock"></i>
-  {{ article.read_time_minutes }} min
+  {{ product.reading_time }} min
 </span>
 {% endif %}
 {% endblock %}

@@ -49,3 +49,9 @@ scrollbar-width: none;
   color: #ffffff;
   border-color: var(--domain-primary);
 }
+
+.catalog-recommendations {
+  margin-top: 3rem;
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+}

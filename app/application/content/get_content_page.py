@@ -116,6 +116,21 @@ def get_content_page_data(content_id):
                         "items": items
                     }
 
+    # 4. Developing Story Carousel (More on this Event)
+    event_carousel = None
+    event = content.get("event")
+    if event and event.get("external_uri"):
+        items = get_carousel_contents_cached(
+            normalize_filters({"event": [event["external_uri"]]}),
+            exclude_ids_key=exclude_ids
+        )
+        if items:
+            event_carousel = {
+                "title": "Developing Story",
+                "items": items,
+                "event": event
+            }
+
     return {
         "content": content,
         "related_contents": related_contents,
@@ -124,6 +139,7 @@ def get_content_page_data(content_id):
         "entity_carousel": entity_carousel,
         "author_carousel": author_carousel,
         "source_carousel": source_carousel,
+        "event_carousel": event_carousel,
     }
 
 

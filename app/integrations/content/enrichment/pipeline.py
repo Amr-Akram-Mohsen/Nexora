@@ -105,20 +105,9 @@ def normalize_ingested_data(product: Any) -> EnrichedItemDTO:
     data = product.model_dump() if hasattr(product, "model_dump") else dict(product)
 
     # 1. Basic Sanitization
-    content_raw = data.get("content", "") or data.get("description", "")
-    if content_raw:
-        norm = normalize_content(content_raw, data.get("description", ""))
-        data.update(
-            {
-                "content_html": norm["content_html"],
-                "content_text": norm["content_text"],
-                "word_count": norm["word_count"],
-                "quality_score": score_content_quality(
-                    norm["content_html"], norm["content_text"]
-                ),
-                "content": norm["content_html"],  # Backwards compatibility
-            }
-        )
+    # We no longer fake `content_text` or `content_html` from the description.
+    # Articles get their true `body` from NewsAPI, and `content_text`/`html` from Diffbot.
+    # We also preserve the `quality_score` (relevance) provided by the API.
 
     # Ensure mandatory fields exist
     data.setdefault("is_content_scraped", False)

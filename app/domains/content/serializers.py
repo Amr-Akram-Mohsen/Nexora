@@ -179,7 +179,7 @@ def serialize_content_row(c, target, duplicate_titles: set) -> dict:
         "ingestion_origin": c.ingestion_origin,
     }
 
-def serialize_content(content_obj, target_obj=None, session=None, include_linked_items=False):
+def serialize_content(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     """
     Serializes a Content model into a predictable dictionary.
     """
@@ -203,8 +203,6 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         "section": serialize_model(content_obj.section),
         "source": serialize_model(content_obj.source) if getattr(content_obj, "source", None) else None,
         "target": serialize_target(target_obj, session) if target_obj else None,
-        "topics": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type in ('topic', 'tag', 'concept')],
-        "brands": [serialize_model(ce.entity) for ce in (content_obj.content_entities or []) if ce.entity and ce.entity.entity_type == 'brand'],
         "linked_items": content_obj.linked_products if include_linked_items else None,
         "entities": [serialize_model(e.entity) for e in (content_obj.content_entities or []) if e.entity],
         "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
@@ -229,14 +227,44 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
     event = getattr(target_obj, "event", None) if target_obj else None
     
     if locations:
-        display_badges.append({"text": locations[0].name, "class": "badge--location", "variant": "info", "icon": "fas fa-map-marker-alt"})
+        display_loc = locations[0]
+        if active_filters:
+            req_locs = []
+            if "location" in active_filters:
+                r_loc = active_filters["location"]
+                req_locs.extend(r_loc if isinstance(r_loc, list) else [r_loc])
+            if "entity" in active_filters:
+                r_ent = active_filters["entity"]
+                req_locs.extend(r_ent if isinstance(r_ent, list) else [r_ent])
+                
+            loc_slugs = [s.lower() for s in req_locs if s]
+            for loc in locations:
+                if loc.slug.lower() in loc_slugs:
+                    display_loc = loc
+                    break
+        display_badges.append({"text": display_loc.name, "class": "badge--location", "variant": "info", "icon": "fas fa-map-marker-alt"})
     elif event:
         display_badges.append({"text": event.title, "class": "badge--event", "variant": "primary", "icon": "fas fa-map-marker-alt"})
     else:
         entities = [e.entity for e in (content_obj.content_entities or []) if e.entity]
         if entities:
-            brand = next((e for e in entities if e.entity_type == "brand"), None)
-            topic = next((e for e in entities if e.entity_type in ("topic", "tag", "concept")), None)
+            # Helper to find an active entity by type
+            def find_active_entity(valid_types):
+                # Try to find one that matches the active filter first
+                if active_filters and "entity" in active_filters:
+                    req_ents = active_filters["entity"]
+                    if isinstance(req_ents, str):
+                        req_ents = [req_ents]
+                    ent_slugs = [s.lower() for s in req_ents if s]
+                    for e in entities:
+                        if e.entity_type in valid_types and e.slug.lower() in ent_slugs:
+                            return e
+                # Fallback to the first one available
+                return next((e for e in entities if e.entity_type in valid_types), None)
+
+            brand = find_active_entity(("brand", "organization"))
+            topic = find_active_entity(("topic", "tag", "concept", "person"))
+            
             if brand:
                 display_badges.append({"text": brand.name, "class": "badge--brand", "variant": "secondary", "icon": "fas fa-tag"})
             elif topic:
@@ -248,8 +276,51 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
             etype = ce.entity.entity_type
             grouped_entities.setdefault(etype, []).append(serialize_model(ce.entity))
             
+    # Phase 2 UI Computed Fields
+    reading_time = None
+    if target_obj and getattr(target_obj, "word_count", 0):
+        reading_time = max(1, target_obj.word_count // 200)
+        
+    is_verified_source = False
+    if content_obj.source and getattr(content_obj.source, "authority_score", 0) >= 75:
+        is_verified_source = True
+        
+    authors = []
+    if target_obj and hasattr(target_obj, "article_authors"):
+        # Relational authors (from article_author mapping)
+        authors = [{"name": aa.author.name, "slug": aa.author.slug} for aa in target_obj.article_authors if aa.author]
+    elif target_obj and getattr(target_obj, "authors", None):
+        # Fallback to string array or raw dicts from API
+        raw_authors = target_obj.authors
+        if isinstance(raw_authors, list):
+            for a in raw_authors:
+                if isinstance(a, str):
+                    authors.append({"name": a})
+                elif isinstance(a, dict):
+                    authors.append({
+                        "name": a.get("name") or "Unknown Author",
+                        "url": a.get("url", a.get("uri", "")),
+                        "email": a.get("email", "")
+                    })
+
+    event = None
+    if target_obj and getattr(target_obj, "event", None):
+        e = target_obj.event
+        event = {
+            "external_uri": e.external_uri,
+            "title": e.title,
+            "summary": e.summary,
+            "event_date": e.event_date.isoformat() if e.event_date else None,
+            "image_url": e.image_url,
+            "event_type": e.event_type
+        }
+
     data["display_preview"] = display_preview
     data["display_badges"] = display_badges
     data["grouped_entities"] = grouped_entities
+    data["reading_time"] = reading_time
+    data["is_verified_source"] = is_verified_source
+    data["authors"] = authors
+    data["event"] = event
 
     return data

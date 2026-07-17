@@ -1,0 +1,36 @@
+/* globe.css */
+.globe-wrapper {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+    background: #000;
+}
+
+.globe-viz-container {
+    width: 100%;
+    height: 100%;
+}
+
+.globe-overlay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.globe-overlay h2 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.globe-overlay p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
+}

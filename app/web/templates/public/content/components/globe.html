@@ -1,0 +1,18 @@
+<!-- 3D Globe Component -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/content/components/globe.css') }}" />
+
+<div id="globe-container" class="globe-wrapper">
+    <div id="globeViz" class="globe-viz-container"></div>
+    
+    <!-- Optional Overlay text -->
+    <div class="globe-overlay">
+        <h2>Global News Activity</h2>
+        <p>Interact to explore trending locations</p>
+    </div>
+</div>
+
+<!-- Load Three.js and Globe.gl -->
+<script src="https://unpkg.com/three"></script>
+<script src="https://unpkg.com/globe.gl"></script>
+<!-- Initialize our Globe -->
+<script src="{{ url_for('static', filename='js/features/globe.js') }}"></script>

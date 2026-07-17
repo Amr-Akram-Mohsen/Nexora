@@ -32,17 +32,21 @@
   {% endif %}
 
   <div class="article-header__meta flex flex-wrap items-center gap-3">
-    {% if article.authors %}
+    {% if content.authors %}
     <div class="meta-author flex items-center gap-2">
       <i class="fas fa-user-edit"></i>
       <span>By
-        {% set name = article.authors|map(attribute='name')|join(', ') %}
-        {% set url = article.authors|map(attribute='url')|join(', ') %}
-        {% if url %}
-        <a href="{{ url }}">{{ name }}</a>
+        {% for author in content.authors %}
+        {% if author.url %}
+        <a href="{{ author.url }}" target="_blank" rel="noopener nofollow" class="hover:underline">{{ author.name }}</a>
         {% else %}
-        <span>{{ name }}</span>
+        <span>{{ author.name }}</span>
         {% endif %}
+        {% if author.email %}
+        <a href="mailto:{{ author.email }}" title="Email Author" class="author-icon"><i class="fas fa-envelope"></i></a>
+        {% endif %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
       </span>
     </div>
     <span class="meta-dot">&bull;</span>
@@ -51,8 +55,13 @@
     {% if content.source %}
     <div class="meta-source flex items-center gap-2">
       <i class="fas fa-newspaper"></i>
-      <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
-        class="font-medium hover:underline text-foreground">{{ content.source.name }}</a>
+      <div class="flex items-center">
+        <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
+          class="font-medium hover:underline text-foreground">{{ content.source.name }}</a>
+        {% if content.is_verified_source %}
+          <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+        {% endif %}
+      </div>
     </div>
     <span class="meta-dot">&bull;</span>
     {% endif %}
@@ -62,11 +71,11 @@
       {{ content.published_at | format_date('%b %d, %Y') }}
     </time>
 
-    {% if article.read_time_minutes %}
+    {% if content.reading_time %}
     <span class="meta-dot">&bull;</span>
     <span class="meta-readtime flex items-center gap-2">
       <i class="far fa-clock"></i>
-      {{ article.read_time_minutes }} min read
+      {{ content.reading_time }} min read
     </span>
     {% endif %}
   </div>
@@ -104,19 +113,18 @@
     <h3 class="article-section-title">Topics & Entities</h3>
     <div class="flex flex-col gap-4">
       {% for type, entities in content.grouped_entities.items() %}
-      {% set filter_key = 'brand' if type|lower == 'brand' else 'tag' %}
       {% if entities|length == 1 %}
       <div class="entity-group flex items-center gap-2">
         <h4 class="entity-group__title m-0">{{ type }}:</h4>
         {% set entity = entities[0] %}
-        {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', **{filter_key: entity.slug})) }}
+        {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
       </div>
       {% else %}
       <div class="entity-group flex flex-col gap-2">
         <h4 class="entity-group__title">{{ type }}</h4>
         <div class="flex flex-wrap gap-2">
           {% for entity in entities %}
-          {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', **{filter_key: entity.slug})) }}
+          {{ badge(text=entity.name, class="badge--entity hover:underline", variant="entity", href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
           {% endfor %}
         </div>
       </div>
@@ -144,8 +152,13 @@
         <i class="fas fa-globe cta-icon"></i>
         <div class="flex flex-col">
           {% if content.source %}
-          <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
-            class="cta-source-name hover:underline text-foreground">{{ content.source.name }}</a>
+          <div class="flex items-center">
+            <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
+              class="cta-source-name hover:underline text-foreground">{{ content.source.name }}</a>
+            {% if content.is_verified_source %}
+              <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+            {% endif %}
+          </div>
           {% else %}
           <p class="cta-source-name">Unknown Source</p>
           {% endif %}
@@ -159,6 +172,23 @@
       </a>
     </div>
   </div>
+
+  {% if event_carousel %}
+  <div class="recommendation-box recommendation-box--event">
+    <h3 class="article-section-title flex items-center gap-2">
+      <i class="recommendation-box__icon fas fa-bolt text-primary"></i>
+      {{ event_carousel.title }}
+    </h3>
+    <div class="event-summary-card">
+      <h4 class="event-title font-bold text-lg mb-2">{{ event_carousel.event.title }}</h4>
+      {% if event_carousel.event.summary %}
+      <p class="event-desc text-sm text-muted-foreground">{{ event_carousel.event.summary }}</p>
+      {% endif %}
+    </div>
+    {% from "components/ui/grid.html" import grid %}
+    {{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
+  </div>
+  {% endif %}
 
   {% if entity_carousel %}
   {% from "components/ui/grid.html" import grid %}

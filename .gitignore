@@ -46,3 +46,6 @@ nexora_public.sql
 
 scraper_tests/
 
+helpers/
+scripts/
+migrations/

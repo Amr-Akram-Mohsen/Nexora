@@ -17,7 +17,7 @@ def get_feed_data(section_slug, active_filters, page=1):
             id = None
             name = "All Content"
             slug = "all"
-            allowed_filters = ["category", "brand", "intent", "price_tier", "type", "attributes", "source", "event", "author", "tag", "location", "topic"]
+            allowed_filters = ["category", "entity", "intent", "price_tier", "type", "attributes", "source", "event", "author", "location"]
         section = MockSection()
     else:
         section = get_section_by_slug(section_slug)
@@ -35,7 +35,7 @@ def get_feed_data(section_slug, active_filters, page=1):
     )
 
     filter_options = {}
-    relationship_filters = ["category", "brand", "tag", "topic", "intent", "price_tier", "source", "event", "location"]
+    relationship_filters = ["category", "entity", "intent", "price_tier", "source", "event", "location"]
     
     for f in relationship_filters:
         if f in allowed_filters:

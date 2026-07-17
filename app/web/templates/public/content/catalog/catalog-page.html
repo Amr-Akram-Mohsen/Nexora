@@ -62,11 +62,13 @@ SLOT: results
 ═══════════════════════════════════════ #}
 {% if results %}
 {% if slot == 'results' %}
+{% if section.slug in ['all', 'news'] and not active_filters %}
+{% include "content/components/globe.html" %}
+{% endif %}
 {{ grid(results) }}
 
 {% if recommendations %}
-<div class="catalog-recommendations"
-  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+<div class="catalog-recommendations">
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}
@@ -96,8 +98,7 @@ action_url=url_for(request.endpoint, **request.view_args)
 ) }}
 
 {% if recommendations %}
-<div class="catalog-recommendations"
-  style="margin-top: 3rem; border-top: 1px solid var(--border-color, #eaeaea); padding-top: 2rem;">
+<div class="catalog-recommendations">
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
   {% call section(block['title'], more_url=false) %}

@@ -9,7 +9,7 @@ from app.domains.content.service import populate_content_search_fields
 
 logger = logging.getLogger(__name__)
 
-def generic_ingest(session, object_type, raw_data, factory_func):
+def generic_ingest(session, object_type, raw_data, factory_func, update_func=None):
     """
     Standardized ingestion flow for any content type.
     """
@@ -29,6 +29,13 @@ def generic_ingest(session, object_type, raw_data, factory_func):
 
             if not obj:
                 return None, "skipped"
+
+            was_obj_updated = False
+            if not is_new and update_func:
+                was_obj_updated = update_func(obj, raw_data)
+                if was_obj_updated:
+                    session.add(obj)
+                    session.flush()
 
 
             # 2. Resolve Taxonomy (Section/Category)
@@ -59,7 +66,7 @@ def generic_ingest(session, object_type, raw_data, factory_func):
             if is_new:
                 return content, "created"
             
-            if updated_relationships or was_content_updated:
+            if updated_relationships or was_content_updated or was_obj_updated:
                 return content, updated_relationships or "updated"
             
             # If it's not new and nothing changed, it's effectively a skipped duplicate

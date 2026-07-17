@@ -102,6 +102,9 @@ def fetch_newsapi_ai_query(q_obj, **kwargs):
         "includeConceptImage": True,
         "includeConceptDescription": True,
         "includeArticleEventUri": True,
+        "includeArticleLocation": True,
+        "includeLocationGeoLocation": True,
+        "includeSourceRanking": True,
     }
 
     data = safe_post_json(
@@ -212,3 +215,43 @@ def fetch_youtube_query(q_obj, **kwargs):
 
     return products
 
+
+def fetch_newsapi_event(event_uri: str, session=None):
+    """
+    Fetches rich metadata for a specific event URI from NewsAPI AI.
+    """
+    if not session:
+        session = _get_session()
+
+    api_key = current_app.config.get("EVENT_REGISTRY_API_KEY") or current_app.config.get("NEWSAPI_AI_API_KEY")
+    if not api_key:
+        return None
+
+    payload = {
+        "action": "getEvent",
+        "eventUri": event_uri,
+        "apiKey": api_key,
+        "includeEventTitle": True,
+        "includeEventSummary": True,
+        "includeEventArticleCounts": True,
+        "includeEventConcepts": True,
+        "includeEventCategories": True,
+        "includeEventLocation": True,
+        "includeEventDate": True,
+        "includeEventSocialScore": True,
+        "eventImageCount": 1,
+    }
+
+    try:
+        data = safe_post_json(
+            session,
+            "https://eventregistry.org/api/v1/event/getEvent",
+            json_data=payload,
+            timeout=(5, 15),
+            logger=logger,
+            source_name="newsapi_ai_event",
+        )
+        return data
+    except Exception as e:
+        logger.error(f"[FETCH] Failed to fetch event {event_uri}: {e}")
+        return None

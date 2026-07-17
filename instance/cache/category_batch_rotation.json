@@ -1,8 +1,8 @@
 {
-  "youtube_technology": 10,
-  "youtube_perfumes": 9,
+  "youtube_technology": 13,
+  "youtube_perfumes": 10,
   "youtube_accessories": 4,
-  "newsapi_ai_technology": 4,
-  "newsapi_ai_perfumes": 4,
-  "newsapi_ai_accessories": 4
+  "newsapi_ai_technology": 8,
+  "newsapi_ai_perfumes": 0,
+  "newsapi_ai_accessories": 5
 }

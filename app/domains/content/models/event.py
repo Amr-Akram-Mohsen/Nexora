@@ -46,6 +46,8 @@ class Event(db.Model):
                 event.summary = summary
             if event_date and not event.event_date:
                 event.event_date = event_date
+            if event_type and not event.event_type:
+                event.event_type = event_type
             if article_count is not None and article_count > event.article_count:
                 event.article_count = article_count
             if last_updated:
