@@ -47,6 +47,10 @@ class ContentEntity(db.Model):
     content = db.relationship("Content", back_populates="content_entities")
     entity = db.relationship("Entity", back_populates="content_entities")
 
+    __table_args__ = (
+        db.Index("ix_content_entities_entity_content", "entity_id", "content_id"),
+    )
+
     @staticmethod
     def get_or_create(content_id, entity_id, session, origin=None, relevance_score=0.0, confidence=None):
         """Get existing link or create new one. Updates origin if provided."""

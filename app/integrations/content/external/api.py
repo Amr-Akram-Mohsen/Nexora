@@ -15,7 +15,7 @@ from app.shared.utils.logging import log_cooldown_skip
 logger = logging.getLogger(__name__)
 
 # ── Per-day limits for free tiers ─────────────────────────────────
-NEWSAPI_AI_DAILY_LIMIT = 100
+NEWSAPI_AI_DAILY_LIMIT = 500
 YOUTUBE_DAILY_QUOTA = 10_000  # units; 1 search = 100 units
 
 

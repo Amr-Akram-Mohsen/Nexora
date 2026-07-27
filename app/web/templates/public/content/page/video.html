@@ -53,6 +53,13 @@
     </div>
     {% endif %}
 
+    {% if content.video_comments %}
+    <div class="meta-pill gap-2 flex items-center">
+      <i class="far fa-comment"></i>
+      <span class="meta-pill__text">{{ content.video_comments|length }} comments</span>
+    </div>
+    {% endif %}
+
     <div class="meta-pill gap-2 flex items-center">
       <i class="far fa-calendar-alt"></i>
       <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
@@ -87,6 +94,39 @@
     {% for topic in content.topics %}
     {{ badge(text=topic.name, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
     {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if content.video_comments %}
+  {% from "components/ui/core.html" import button %}
+  <div class="video-comments-section mt-12">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="video-description-box__title flex items-center gap-2">
+        <i class="fab fa-youtube" style="color:var(--domain-primary);"></i>
+        Top YouTube Comments
+      </h3>
+      {{ button(text="Show Comments", class="toggle-comments-btn", variant="outline", icon="fas fa-chevron-down",
+      attrs={"onclick": "document.getElementById('yt-comments-container').classList.toggle('is-visible')"}) }}
+    </div>
+    <div id="yt-comments-container" class="video-comments-list flex-col gap-4 mt-6">
+      {% for comment in content.video_comments %}
+      <div class="yt-comment flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <span class="yt-comment__author">{{ comment.author }}</span>
+          {% if comment.published_at %}
+          <span class="yt-comment__date">{{ comment.published_at | truncate(10, True, '') }}</span>
+          {% endif %}
+        </div>
+        <p class="yt-comment__text">{{ comment.text|safe }}</p>
+        <div class="flex items-center gap-4 mt-2 yt-comment__meta">
+          <span class="flex items-center gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes }}</span>
+          {% if comment.replies > 0 %}
+          <span class="flex items-center gap-1"><i class="fas fa-reply"></i> {{ comment.replies }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
   </div>
   {% endif %}
 
@@ -126,7 +166,7 @@
 {% endblock %}
 
 {% block scripts %}
-  {{ super() }}
-  <script src="{{ url_for('static', filename='js/features/video-sticky.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/features/video-player.js') }}" defer></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/features/video-sticky.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/features/video-player.js') }}" defer></script>
 {% endblock %}

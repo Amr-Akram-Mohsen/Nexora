@@ -58,8 +58,10 @@
       <div class="flex items-center">
         <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
           class="font-medium hover:underline text-foreground">{{ content.source.name }}</a>
-        {% if content.is_verified_source %}
+        {% if content.source_tier == "verified" %}
           <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+        {% elif content.source_tier == "trusted" %}
+          <i class="far fa-check-circle trusted-badge" title="Trusted Source" style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
         {% endif %}
       </div>
     </div>
@@ -155,8 +157,10 @@
           <div class="flex items-center">
             <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}"
               class="cta-source-name hover:underline text-foreground">{{ content.source.name }}</a>
-            {% if content.is_verified_source %}
+            {% if content.source_tier == "verified" %}
               <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+            {% elif content.source_tier == "trusted" %}
+              <i class="far fa-check-circle trusted-badge" title="Trusted Source" style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
             {% endif %}
           </div>
           {% else %}
@@ -205,6 +209,9 @@
 
 {% block scripts %}
 {{ super() }}
+<script id="article-media-data" type="application/json">
+  {{ content.media_images | tojson | safe }}
+</script>
 <script src="{{ url_for('static', filename='js/features/article-gallery.js') }}?v={{ range(1, 1000000) | random }}"
   defer></script>
 {% endblock %}

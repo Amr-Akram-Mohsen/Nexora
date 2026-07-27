@@ -35,7 +35,7 @@ def get_feed_data(section_slug, active_filters, page=1):
     )
 
     filter_options = {}
-    relationship_filters = ["category", "entity", "intent", "price_tier", "source", "event", "location"]
+    relationship_filters = ["category", "entity", "intent", "price_tier", "source", "event", "location", "author"]
     
     for f in relationship_filters:
         if f in allowed_filters:

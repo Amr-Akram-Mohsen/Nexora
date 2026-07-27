@@ -77,7 +77,11 @@ def is_blacklisted(url: str) -> bool:
             "storyboard18.com",
             "thehansindia.com",
             "klgadgetguy.com",
-            "newswav.com"
+            "newswav.com",
+            "abujaonline.info",
+            "medium.com",
+            "myhighplains.com",
+            "mp1st.com"
         }
     except Exception:
         return False

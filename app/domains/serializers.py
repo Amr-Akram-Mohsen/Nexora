@@ -95,6 +95,7 @@ def serialize_target(obj, session=None):
                 "channel_name": getattr(obj, "channel_name", "Unknown"),
                 "description": getattr(obj, "description", None),
                 "thumbnail_url": getattr(obj, "thumbnail_url", None),
+                "duration_seconds": getattr(obj, "duration_seconds", None),
             }
         )
 

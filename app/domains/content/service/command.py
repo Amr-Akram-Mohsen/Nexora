@@ -382,3 +382,43 @@ def execute_bulk_content_actions(action, contents, category_id=None, session=Non
             delete_content_and_relations(c, session)
     else:
         raise ValueError("Unsupported bulk action")
+
+def recalculate_content_score(content, target_obj, session=None):
+    if session is None:
+        session = db.session
+
+    quality_score = getattr(target_obj, "quality_score", 0.0) or 0.0
+    
+    authority_score = 0
+    if content.source:
+        authority_score = getattr(content.source, "authority_score", 50)
+    authority_score_normalized = authority_score / 100.0
+    
+    sentiment = getattr(target_obj, "sentiment_score", 0.0) or 0.0
+    sentiment_boost = 0.10 if sentiment > 0.2 else -0.05 if sentiment < -0.2 else 0.0
+    
+    entities_count = len(content.content_entities)
+    entity_richness = min(entities_count, 10) / 10.0
+    
+    category_weight_max = 0.0
+    if content.object_type == "article":
+        from app.domains.relationships import ArticleCategory
+        from sqlalchemy import func
+        cat_weight = session.query(func.max(ArticleCategory.weight)).filter_by(article_id=content.object_id).scalar()
+        category_weight_max = (cat_weight or 0.0) / 100.0
+
+    content_html = bool(getattr(target_obj, "content_html", None))
+    summary = bool(getattr(target_obj, "summary", None))
+    image_url = bool(getattr(target_obj, "image_url", None) or getattr(target_obj, "thumbnail_url", None))
+    completeness = (0.5 if content_html else 0.0) + (0.3 if summary else 0.0) + (0.2 if image_url else 0.0)
+    
+    content.score = (
+        (quality_score * 0.30)
+        + (authority_score_normalized * 0.25)
+        + (sentiment_boost * 0.10)
+        + (entity_richness * 0.15)
+        + (category_weight_max * 0.10)
+        + (completeness * 0.10)
+    )
+    
+    return content.score

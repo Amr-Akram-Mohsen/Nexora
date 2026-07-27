@@ -11,6 +11,7 @@ from app.shared.utils.logging import (
 from .http import _get_session
 from .fetch_engine import safe_get_json, safe_post_json
 from .fetchers_mappers import map_newsapi_ai, map_youtube
+from ..exceptions import PipelineQuotaExceededError
 
 logger = logging.getLogger(__name__)
 
@@ -205,6 +206,35 @@ def fetch_youtube_query(q_obj, **kwargs):
                 for p in products:
                     if p.external_id in durations:
                         p.duration_seconds = durations[p.external_id]
+
+            # Fetch comments for the fetched videos
+            quota_exceeded_for_comments = False
+            for p in products:
+                if not p.external_id or quota_exceeded_for_comments:
+                    continue
+                try:
+                    comments_params = {
+                        "part": "snippet",
+                        "videoId": p.external_id,
+                        "order": "relevance",
+                        "maxResults": 15,
+                        "key": api_key,
+                    }
+                    comments_data = safe_get_json(
+                        session,
+                        "https://www.googleapis.com/youtube/v3/commentThreads",
+                        params=comments_params,
+                        timeout=(5, 10),
+                        logger=logger,
+                        source_name="youtube_comments",
+                    )
+                    if comments_data and "items" in comments_data:
+                        p.video_comments = comments_data["items"]
+                except PipelineQuotaExceededError as e:
+                    logger.warning(f"YouTube comments quota exceeded, skipping comments for remaining videos. Error: {e}")
+                    quota_exceeded_for_comments = True
+                except Exception as e:
+                    logger.warning(f"Failed to fetch comments for video {p.external_id}: {e}")
 
     if isinstance(products, list):
         log_integration_success(logger, "youtube", products=len(products), query=q_text)

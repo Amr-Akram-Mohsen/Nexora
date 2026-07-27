@@ -48,6 +48,7 @@ def resolve_polymorphic_targets(products, type_attr="target_type", id_attr="targ
             stmt = stmt.options(
                 joinedload(model.primary_source).joinedload(ArticleSource.source),
                 selectinload(model.article_sources).selectinload(ArticleSource.source),
+                selectinload(model.authors),
             )
 
         objs = session.execute(stmt).scalars().all()

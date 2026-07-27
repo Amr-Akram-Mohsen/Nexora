@@ -27,8 +27,15 @@ def get_trending_contents(limit=6, days=7, section_ids=None, object_type=None, e
     if section_ids:
         stmt = stmt.join(Content.section).where(Section.id.in_(section_ids))
 
-    stmt = build_ranked_content_stmt(stmt, func.count(View.id), "recent_views")
-    
+    # REC-4: Recency-weighted trending — exponential time-decay with 2-day half-life.
+    # Each view contributes exp(-age_in_seconds / 172800). A view from 2 days ago
+    # is worth only 50% of a view from right now, making velocity the true signal.
+    epoch_diff = func.extract("epoch", func.now() - View.created_at)
+    decay_factor = func.exp(-epoch_diff / 172800.0)
+    trending_score = func.sum(decay_factor)
+
+    stmt = build_ranked_content_stmt(stmt, trending_score, "trending_score")
+
     if limit:
         stmt = stmt.limit(limit)
 

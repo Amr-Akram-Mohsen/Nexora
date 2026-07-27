@@ -27,7 +27,14 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
     <i class="fas fa-play-circle card__meta-icon"></i>
     <span class="card__meta-text truncate">{{ video.channel_name }}</span>
   </div>
+  <span class="card__meta-dot" aria-hidden="true"></span>
+  {% endif %}
 
+  {% if content.video_comments %}
+  <div class="card__meta-product flex items-center gap-1">
+    <i class="far fa-comment card__meta-icon"></i>
+    <span class="card__meta-text">{{ content.video_comments|length }}</span>
+  </div>
   <span class="card__meta-dot" aria-hidden="true"></span>
   {% endif %}
 

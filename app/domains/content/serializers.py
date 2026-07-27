@@ -7,6 +7,16 @@ def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
     
     if object_type == "video":
         description = getattr(target, "description", None)
+        comments_data = []
+        if hasattr(target, "video_comments"):
+            for c in target.video_comments:
+                comments_data.append({
+                    "id": c.id,
+                    "author": c.author_name,
+                    "text": c.text,
+                    "likes": c.like_count,
+                    "published_at": c.published_at.isoformat() if c.published_at else None
+                })
         return {
             "platform": getattr(target, "platform", None),
             "channel_name": getattr(target, "channel_name", None),
@@ -15,7 +25,8 @@ def _serialize_inspect_target(target, object_type) -> Dict[str, Any]:
             "external_id": getattr(target, "external_id", None),
             "description": description,
             "description_display_rule": getattr(target, "description_display_rule", "review"),
-            "description_quality": assess_video_description(description)
+            "description_quality": assess_video_description(description),
+            "video_comments": comments_data
         }
     elif object_type == "post":
         return {
@@ -186,6 +197,12 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
     if not content_obj:
         return None
 
+    top_content_entities = sorted(
+        content_obj.content_entities or [],
+        key=lambda ce: ce.relevance_score or 0.0,
+        reverse=True
+    )[:7]
+
     data = {
         "id": content_obj.id,
         "object_type": content_obj.object_type,
@@ -204,8 +221,10 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         "source": serialize_model(content_obj.source) if getattr(content_obj, "source", None) else None,
         "target": serialize_target(target_obj, session) if target_obj else None,
         "linked_items": content_obj.linked_products if include_linked_items else None,
-        "entities": [serialize_model(e.entity) for e in (content_obj.content_entities or []) if e.entity],
+        "entities": [serialize_model(e.entity) for e in top_content_entities if e.entity],
         "locations": [serialize_model(loc) for loc in (content_obj.locations or [])],
+        "topics": [serialize_model(e.entity) for e in top_content_entities if e.entity and e.entity.entity_type in ('topic', 'tag', 'concept')],
+        "brands": [serialize_model(e.entity) for e in top_content_entities if e.entity and e.entity.entity_type in ('brand', 'organization')]
     }
 
     # -- UI Presentation Computed Fields --
@@ -246,7 +265,7 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
     elif event:
         display_badges.append({"text": event.title, "class": "badge--event", "variant": "primary", "icon": "fas fa-map-marker-alt"})
     else:
-        entities = [e.entity for e in (content_obj.content_entities or []) if e.entity]
+        entities = [e.entity for e in top_content_entities if e.entity]
         if entities:
             # Helper to find an active entity by type
             def find_active_entity(valid_types):
@@ -270,20 +289,36 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
             elif topic:
                 display_badges.append({"text": topic.name, "class": "badge--topic", "variant": "secondary", "icon": "fas fa-hashtag"})
 
+    ENTITY_TYPE_LABELS = {
+        "person": "People",
+        "organization": "Organizations",
+        "brand": "Brands",
+        "location": "Places",
+        "concept": "Topics",
+        "tag": "Tags",
+        "topic": "Topics",
+        "wiki_category": "Topics",
+    }
     grouped_entities = {}
-    for ce in (content_obj.content_entities or []):
+    for ce in top_content_entities:
         if ce.entity:
             etype = ce.entity.entity_type
-            grouped_entities.setdefault(etype, []).append(serialize_model(ce.entity))
+            label = ENTITY_TYPE_LABELS.get(etype, etype.replace('_', ' ').title())
+            grouped_entities.setdefault(label, []).append(serialize_model(ce.entity))
             
     # Phase 2 UI Computed Fields
     reading_time = None
     if target_obj and getattr(target_obj, "word_count", 0):
         reading_time = max(1, target_obj.word_count // 200)
         
-    is_verified_source = False
-    if content_obj.source and getattr(content_obj.source, "authority_score", 0) >= 75:
-        is_verified_source = True
+    authority = getattr(content_obj.source, 'authority_score', 0) if content_obj.source else 0
+    source_tier = (
+        "verified"   if authority >= 80 else
+        "trusted"    if authority >= 60 else
+        "standard"   if authority >= 40 else
+        "unverified"
+    )
+    is_verified_source = (source_tier == "verified")
         
     authors = []
     if target_obj and hasattr(target_obj, "article_authors"):
@@ -315,12 +350,34 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
             "event_type": e.event_type
         }
 
+    media_images = []
+    media_videos = []
+    if target_obj:
+        media_images = getattr(target_obj, "images", []) or []
+        media_videos = getattr(target_obj, "videos", []) or []
+
+    video_comments = []
+    if content_obj.object_type == "video" and target_obj and hasattr(target_obj, "video_comments"):
+        for c in target_obj.video_comments:
+            video_comments.append({
+                "author": c.author_name,
+                "text": c.text,
+                "likes": c.like_count,
+                "replies": c.reply_count,
+                "published_at": c.published_at.isoformat() if c.published_at else None
+            })
+
     data["display_preview"] = display_preview
     data["display_badges"] = display_badges
     data["grouped_entities"] = grouped_entities
     data["reading_time"] = reading_time
     data["is_verified_source"] = is_verified_source
+    data["source_tier"] = source_tier
     data["authors"] = authors
     data["event"] = event
+    data["media_images"] = media_images
+    data["media_videos"] = media_videos
+    if video_comments:
+        data["video_comments"] = video_comments
 
     return data

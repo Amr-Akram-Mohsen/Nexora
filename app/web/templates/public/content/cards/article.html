@@ -29,8 +29,10 @@
     <span class="card__meta-text truncate">
       {% if product.source %}
         <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{ product.source.name }}</a>
-        {% if product.is_verified_source %}
+        {% if product.source_tier == "verified" %}
           <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+        {% elif product.source_tier == "trusted" %}
+          <i class="far fa-check-circle trusted-badge" title="Trusted Source" style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
         {% endif %}
       {% else %}
         Article

@@ -141,7 +141,31 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
                     for child in cat.children:
                         cat_ids.add(child.id)
             if cat_ids:
-                stmt = stmt.where(Content.category_id.in_(list(cat_ids)))
+                from app.domains.relationships import ArticleCategory
+                from sqlalchemy import func
+                
+                cat_ids_list = list(cat_ids)
+                
+                # Check how many articles map to these categories
+                cat_count = session.query(func.count(ArticleCategory.article_id)).filter(ArticleCategory.category_id.in_(cat_ids_list)).scalar() or 0
+                
+                # Dynamic weight strictness
+                if cat_count > 50:
+                    weight_threshold = 50.0
+                elif cat_count > 20:
+                    weight_threshold = 30.0
+                else:
+                    weight_threshold = 0.0
+                    
+                article_subq = select(ArticleCategory.article_id).where(
+                    ArticleCategory.category_id.in_(cat_ids_list),
+                    ArticleCategory.weight >= weight_threshold
+                )
+                
+                stmt = stmt.where(or_(
+                    Content.category_id.in_(cat_ids_list),
+                    (Content.object_type == 'article') & (Content.object_id.in_(article_subq))
+                ))
 
     entities = _normalize(filters.get("entity"))
     if entities and _is_allowed("entity"):
@@ -195,18 +219,17 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
 
     authors = _normalize(filters.get("author"))
     if authors and _is_allowed("author"):
-        # For Article, authors is a JSON array of strings
         from app.domains.content.models import Article
-        from sqlalchemy import cast, String
-        from sqlalchemy.dialects.postgresql import JSONB
-        author_filters = []
-        for a in authors:
-            author_filters.append(cast(Article.authors, String).ilike(f"%{a}%"))
+        from app.domains.content.models.author import Author
+        from app.domains.relationships import article_authors
         
         stmt = stmt.where(
             Content.object_type == "article",
             Content.object_id.in_(
-                select(Article.id).where(or_(*author_filters))
+                select(Article.id)
+                .join(article_authors, article_authors.c.article_id == Article.id)
+                .join(Author, Author.id == article_authors.c.author_id)
+                .where(Author.slug.in_(authors))
             )
         )
 

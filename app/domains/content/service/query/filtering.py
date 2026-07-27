@@ -195,7 +195,7 @@ def get_contents_by_ids(content_ids, session=None):
 
 
 def get_unscraped_articles(limit, retry_threshold, session=None):
-    from sqlalchemy import select
+    from sqlalchemy import select, func
     from ...models import Article, Content
     if session is None:
         from app.core.extensions import db
@@ -218,7 +218,7 @@ def get_unscraped_articles(limit, retry_threshold, session=None):
                 )
             )
         )
-        .order_by(Article.quality_score.desc(), Content.published_at.desc())
+        .order_by(func.coalesce(Article.enrichment_priority, Article.quality_score).desc(), Content.published_at.desc())
         .limit(limit)
     )
     return session.execute(stmt).scalars().all()

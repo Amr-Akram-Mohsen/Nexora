@@ -141,6 +141,7 @@
 .article-html li {
   margin-bottom: 0.6rem;
   line-height: 1.7;
+  list-style: none;
 }
 
 .article-html li::marker {

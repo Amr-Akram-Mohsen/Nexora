@@ -1,10 +1,5 @@
 from app.core.extensions import db
-from app.domains.serializers import (
-    serialize_model,
-    serialize_target,
-)
 from sqlalchemy import select, func, or_
-
 
 def get_model_map():
     from ..models import Article, Video, Post

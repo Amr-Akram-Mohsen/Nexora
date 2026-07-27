@@ -189,3 +189,43 @@
     width: 240px;
   }
 }
+
+/* YouTube Comments Section */
+.video-comments-list {
+  display: none;
+}
+.video-comments-list.is-visible {
+  display: flex;
+}
+
+.yt-comment {
+  background: var(--muted);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.yt-comment__author {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.yt-comment__date {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.yt-comment__text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.yt-comment__meta {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.yt-comment__meta i {
+  color: var(--domain-primary);
+}

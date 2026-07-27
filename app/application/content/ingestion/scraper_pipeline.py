@@ -62,10 +62,7 @@ def fetch_and_clean_diffbot(url: str, hero_image_url: str | None = None, api_key
             response.raise_for_status()
             break
         except requests.exceptions.RequestException as e:
-            if attempt < 4:
-                logger.warning("[diffbot] Request failed (attempt %d/5): %s — retrying", attempt + 1, e)
-                time.sleep(3 * (2 ** attempt))
-                continue
+            logger.warning("[diffbot] Network or request error: %s — terminating without retry", e)
             raise
     else:
         # All 5 attempts returned 429 — surface the error cleanly

@@ -2,6 +2,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const articleContent = document.querySelector('.article-html');
     if (!articleContent) return;
 
+    // ── Apply known media dimensions to prevent layout shifts ──
+    const mediaDataEl = document.getElementById('article-media-data');
+    let mediaImages = [];
+    if (mediaDataEl) {
+        try {
+            mediaImages = JSON.parse(mediaDataEl.textContent);
+        } catch (e) {
+            console.error("Failed to parse article media data", e);
+        }
+    }
+
+    if (mediaImages && mediaImages.length > 0) {
+        const allImages = articleContent.querySelectorAll('img');
+        allImages.forEach(img => {
+            const src = img.getAttribute('src');
+            if (!src) return;
+            
+            // Find matching image data from Diffbot JSON by URL
+            const matchedData = mediaImages.find(item => item.url === src);
+            if (matchedData) {
+                if (matchedData.width) img.setAttribute('width', matchedData.width);
+                if (matchedData.height) img.setAttribute('height', matchedData.height);
+                // Fallback to natural dimensions if provided
+                if (!matchedData.width && matchedData.naturalWidth) img.setAttribute('width', matchedData.naturalWidth);
+                if (!matchedData.height && matchedData.naturalHeight) img.setAttribute('height', matchedData.naturalHeight);
+            }
+        });
+    }
+
     // Find all figures in the article body
     let figures = Array.from(articleContent.querySelectorAll('figure'));
     

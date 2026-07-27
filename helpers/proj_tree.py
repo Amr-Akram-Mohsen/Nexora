@@ -2,7 +2,7 @@ import os
 
 ROOT = "."
 
-ALLOWED = {".py", ".html", ".css", ".js", ".log"}
+ALLOWED = {".py", ".html", ".css", ".js", ".log", '.md'}
 
 IGNORE_DIRS = {"__pycache__", ".git", ".idea", "venv", "env", ".github", ".vscode", "raw_html", "stores_programs_terms"}
 

@@ -5,17 +5,17 @@
 {% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
 <tr id="{{ domain_type }}-row">
   {% if domain_type == "content" %}
-  {% include "admin/components/rows/_content_row.html" %}
+  {% include "admin/content_library/row.html" %}
   {% elif domain_type == "product" %}
-  {% include "admin/components/rows/_product_row.html" %}
+  {% include "admin/product_intelligence/row.html" %}
   {% elif domain_type == "user" %}
-  {% include "admin/components/rows/_user_row.html" %}
+  {% include "admin/audience/row.html" %}
   {% elif domain_type == "comment" %}
-  {% include "admin/components/rows/_comment_row.html" %}
+  {% include "admin/interactions/_comment_row.html" %}
   {% elif domain_type == "source" %}
-  {% include "admin/components/rows/_source_row.html" %}
+  {% include "admin/acquisition/_source_row.html" %}
   {% elif domain_type == "store" %}
-  {% include "admin/components/rows/_store_row.html" %}
+  {% include "admin/acquisition/_store_row.html" %}
   {% elif domain_type == "rec" %}
   {% include "admin/components/rows/_rec_row.html" %}
   {% elif domain_type == "ingestion_log" %}

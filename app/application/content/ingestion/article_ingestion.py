@@ -2,6 +2,64 @@ from app.domains.content.models import Article
 from .base import generic_ingest
 from app.shared.dto.ingestion import EnrichedItemDTO
 
+def calculate_enrichment_priority(data: dict) -> float:
+    """
+    Calculates priority for Diffbot enrichment using only pre-enrichment signals.
+    Excludes Diffbot-dependent fields (content_text, html, summaries, etc.)
+    """
+    priority = 0.0
+    
+    quality_score = data.get("quality_score") or 0.0
+    priority += quality_score * 2.0
+    
+    er_source = data.get("er_source")
+    if isinstance(er_source, dict):
+        importance = er_source.get("importance", 0.0)
+        try:
+            priority += float(importance)
+        except (ValueError, TypeError):
+            pass
+            
+    er_concepts = data.get("er_concepts")
+    if isinstance(er_concepts, list):
+        priority += min(1.0, len(er_concepts) * 0.1)
+        
+    er_categories = data.get("er_categories")
+    if isinstance(er_categories, list):
+        priority += min(1.0, len(er_categories) * 0.2)
+        
+    er_location = data.get("er_location")
+    if isinstance(er_location, dict) and er_location:
+        priority += 0.2
+        
+    if data.get("er_event_uri") or data.get("er_event_data"):
+        priority += 1.5
+        
+    published_at = data.get("published_at")
+    if published_at:
+        import datetime
+        try:
+            if isinstance(published_at, str):
+                # basic ISO format parsing
+                if published_at.endswith('Z'):
+                    published_at = published_at[:-1] + '+00:00'
+                pub_date = datetime.datetime.fromisoformat(published_at)
+            else:
+                pub_date = published_at
+                
+            if isinstance(pub_date, datetime.datetime):
+                if pub_date.tzinfo is None:
+                    pub_date = pub_date.replace(tzinfo=datetime.timezone.utc)
+                now = datetime.datetime.now(datetime.timezone.utc)
+                age_hours = (now - pub_date).total_seconds() / 3600.0
+                if age_hours >= 0:
+                    freshness_boost = max(0.0, 1.0 - (age_hours / 48.0))
+                    priority += freshness_boost
+        except Exception:
+            pass
+            
+    return float(priority)
+
 
 def create_article_model(data):
     from app.core.extensions import db
@@ -16,6 +74,10 @@ def create_article_model(data):
             
         name = author_data.get("name")
         if not name:
+            continue
+            
+        # Filter out junk author names like "See full bio"
+        if name.strip().lower() in ("see full bio", "full bio", "author", "by"):
             continue
             
         uri = author_data.get("uri")
@@ -52,6 +114,7 @@ def create_article_model(data):
         images=data.get("images"),
         videos=data.get("videos"),
         summary=data.get("summary"),
+        enrichment_priority=calculate_enrichment_priority(data),
     )
 
 def process_diffbot_enrichment(article, diffbot_data, session):

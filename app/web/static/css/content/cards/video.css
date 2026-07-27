@@ -6,3 +6,7 @@
 [data-type="video"] {
   --card-aspect-ratio: 16/9;
 }
+
+.yt-comment {
+  padding: 0.5rem;
+}

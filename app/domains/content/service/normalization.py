@@ -29,7 +29,7 @@ _TRACKING_PARAMS = {
     "ref", "source", "mc_cid", "mc_eid", "fbclid", "gclid", "_ga",
     "cmpid", "linkId", "WT.mc_id",
 }
-BLOCKED_DOMAINS = ["wsj.com", "ft.com", "bloomberg.com", "nytimes.com", "thetimes.co.uk"]
+BLOCKED_DOMAINS = ["wsj.com", "ft.com", "bloomberg.com", "in.investing.com", "medium.com", "za.investing.com", "nytimes.com", "thetimes.co.uk"]
 DATE_FORMATS = [
     "%Y-%m-%dT%H:%M:%SZ",
     "%Y-%m-%dT%H:%M:%S%z",
@@ -128,13 +128,36 @@ def normalize_video_data(raw: dict) -> dict | None:
     title = sanitize_text(data.get("title") or "")
     if not title or not data.get("external_id"): return None
 
+    # Process comments
+    normalized_comments = []
+    for c in data.get("video_comments") or []:
+        snippet = c.get("snippet", {})
+        top_level = snippet.get("topLevelComment", {}).get("snippet", {})
+        if not top_level:
+            continue
+            
+        normalized_comments.append({
+            "external_id": c.get("id"),
+            "author_name": sanitize_text(top_level.get("authorDisplayName") or ""),
+            "author_channel_id": top_level.get("authorChannelId", {}).get("value") if isinstance(top_level.get("authorChannelId"), dict) else None,
+            "text": top_level.get("textDisplay") or "", # We might not want to strip HTML entirely as YouTube formats it, but let's sanitize it
+            "like_count": top_level.get("likeCount", 0),
+            "reply_count": snippet.get("totalReplyCount", 0),
+            "published_at": parse_date(top_level.get("publishedAt")),
+            "updated_at": parse_date(top_level.get("updatedAt")),
+        })
+        
+        # Sanitize text
+        normalized_comments[-1]["text"] = sanitize_html(normalized_comments[-1]["text"])
+
     data.update({
         "title":          title,
         "description":    sanitize_text(data.get("description") or ""),
         "published_at":   parse_date(data.get("published_at")),
         "channel_name":   sanitize_text(data.get("channel_name") or ""),
         "thumbnail_url":  data.get("thumbnail_url"),
-        "duration_seconds": data.get("duration_seconds")
+        "duration_seconds": data.get("duration_seconds"),
+        "video_comments": normalized_comments
     })
     return data
 

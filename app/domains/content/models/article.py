@@ -19,6 +19,13 @@ class Article(db.Model):
 
     quality_score = db.Column(db.Float, default=0.0)
     
+    enrichment_priority = db.Column(
+        db.Float, 
+        default=0.0, 
+        index=True,
+        comment="Priority score for enrichment worker. Calculated before enrichment."
+    )
+    
     ingestion_method = db.Column(db.String(50)) # 'diffbot', 'event_registry', 'scraper'
     language = db.Column(db.String(10), index=True)
     sentiment_score = db.Column(db.Float, index=True)

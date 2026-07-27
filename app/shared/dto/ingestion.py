@@ -19,6 +19,7 @@ class RawItemDTO(BaseModel):
     published_at: Optional[Any] = None
     image_url: Optional[str] = None
     duration_seconds: Optional[int] = None
+    video_comments: Optional[list] = None
 
     # NEW — Event Registry first-class fields
     er_concepts: Optional[list] = None

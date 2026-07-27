@@ -38,6 +38,7 @@ def apply_content_section_filters(
     model,
     section_slug,
     limit=20,
+    min_count=None
 ):
     stmt = stmt.where(Content.is_active, Content.is_published)
     
@@ -54,9 +55,12 @@ def apply_content_section_filters(
     elif hasattr(model, "title"):
         group_cols.append(model.title)
 
+    stmt = stmt.group_by(*group_cols)
+    if min_count:
+        stmt = stmt.having(func.count(Content.id) >= min_count)
+        
     return (
-        stmt.group_by(*group_cols)
-        .order_by(func.count(Content.id).desc())
+        stmt.order_by(func.count(Content.id).desc())
         .limit(limit)
     )
 
@@ -116,7 +120,7 @@ def get_taxonomy_content_stats(entity_id, field=None, relationship_table=None, f
 @cache.memoize(timeout=3600)
 def get_relationships_for_section(section_slug, rel_name, limit=20, session=None):
     rel_model = REL_MODELS.get(rel_name, None)
-    if rel_name not in REL_MODELS and rel_name not in ["entity", "brand", "topic", "tag", "source", "event", "location"]:
+    if rel_name not in REL_MODELS and rel_name not in ["entity", "brand", "topic", "tag", "source", "event", "location", "author"]:
         raise ValueError("Invalid relationship name")
 
     if rel_name in ["category", "intent", "price_tier", "attributes"]:
@@ -148,6 +152,15 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
         from app.domains.taxonomy.models import Source
         rel_model = Source
         stmt = select(*build_filter_projection(rel_model)).join(Content, Content.source_id == Source.id)
+    elif rel_name == "author":
+        from app.domains.content.models.author import Author
+        from app.domains.content.models.article import Article
+        from app.domains.relationships import article_authors
+        rel_model = Author
+        stmt = select(*build_filter_projection(rel_model))\
+            .join(article_authors, article_authors.c.author_id == Author.id)\
+            .join(Article, Article.id == article_authors.c.article_id)\
+            .join(Content, (Content.object_id == Article.id) & (Content.object_type == 'article'))
     elif rel_name == "event":
         from app.domains.content.models import Event, Article
         rel_model = Event
@@ -162,11 +175,18 @@ def get_relationships_for_section(section_slug, rel_name, limit=20, session=None
             .join(content_locations, content_locations.c.location_id == Location.id)\
             .join(Content, Content.id == content_locations.c.content_id)
 
+    min_count_map = {
+        "category": 5, "entity": 5, "brand": 5, "topic": 5, "tag": 5,
+        "author": 3, "source": 3
+    }
+    min_count = min_count_map.get(rel_name, 1)
+
     stmt = apply_content_section_filters(
         stmt=stmt,
         model=rel_model,
         section_slug=section_slug,
         limit=limit,
+        min_count=min_count
     )
 
     return execute_mapped_query(stmt, session)
