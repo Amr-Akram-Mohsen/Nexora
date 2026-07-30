@@ -1,6 +1,5 @@
-from sqlalchemy import select
-from ...models import Content
-
+from sqlalchemy import select, exists, and_, or_
+from ...models import Content, Article, Video, VideoComment
 def get_contents_render(
     filter_by_columns: tuple = ("section",),
     filter_values: tuple = (None,),
@@ -13,9 +12,38 @@ def get_contents_render(
     if session is None:
         from app.core.extensions import db
         session = db.session
-        
-    stmt = build_content_stmt(active_only=True, published_only=True, eager_load="list")
-    
+            
+    article_filter = and_(
+        Content.object_type == "article",
+        exists(
+            select(1).where(
+                and_(
+                    Article.id == Content.object_id,
+                    Article.summary.is_not(None),
+                )
+            )
+        ),
+    )
+
+    video_filter = and_(
+        Content.object_type == "video",
+        exists(
+            # select(1)
+            select(Video.id)
+            .join(VideoComment, VideoComment.video_id == Video.id)
+            .where(Video.id == Content.object_id)
+        ),
+    )
+
+    stmt = build_content_stmt(
+        active_only=True,
+        published_only=True,
+        eager_load="list",
+        extra_filters=[
+            or_(article_filter, video_filter)
+        ]
+    )
+
     if exclude_ids:
         stmt = stmt.where(Content.id.notin_(list(exclude_ids)))
         

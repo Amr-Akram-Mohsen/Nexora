@@ -107,7 +107,7 @@ class Article(db.Model):
         self.primary_source_id = best.id
 
     @property
-    def preferred_source_relation(self):
+    def preferred_source(self):
         # Use materialized primary_source if available for speed
         if self.primary_source:
             return self.primary_source
@@ -125,12 +125,12 @@ class Article(db.Model):
 
     @property
     def source_name(self):
-        rel = self.preferred_source_relation
+        rel = self.preferred_source
         return rel.source.name if rel else "Unknown"
 
     @property
     def source_url(self):
-        rel = self.preferred_source_relation
+        rel = self.preferred_source
         return rel.url if rel else None
 
     @property
@@ -139,7 +139,7 @@ class Article(db.Model):
 
     @property
     def alternative_source_relations(self):
-        primary = self.preferred_source_relation
+        primary = self.preferred_source
 
         return [rel for rel in self.article_sources if rel != primary]
 

@@ -28,12 +28,6 @@
   animation: spin 0.8s linear infinite;
 }
 
-.btn-back {
-  margin-bottom: 1.5rem;
-  justify-content: initial;
-}
-
-
 .btn-back i {
   width: 1rem;
   height: 1rem;

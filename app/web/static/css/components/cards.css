@@ -57,7 +57,7 @@
 
 .card__body,
 .card__content {
-  padding: 0.75rem;
+  padding: 0.5rem;
   flex-grow: 1;
   gap: 0.875rem;
 }
@@ -95,8 +95,8 @@
 .card__footer,
 
 .card__meta-bottom {
-  padding-top: 0.75rem;
-font-size: 0.75rem;
+  padding-top: 0.5rem;
+  font-size: 0.75rem;
   color: var(--muted-foreground);
   border-top: 1px solid var(--border);
 }
@@ -353,4 +353,4 @@ font-size: 0.75rem;
   color: #fff;
   border-color: var(--domain-primary);
 }
-.card__meta-bottom {margin-top: 10px;}
+.card__meta-bottom {/* margin-top: 10px; */}

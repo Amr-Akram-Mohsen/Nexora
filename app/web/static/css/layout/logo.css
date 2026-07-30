@@ -4,9 +4,9 @@
 
 .site-logo {
   color: var(--text-color);
-  display: block;
   height: 40px;
   width: auto;
+  flex-shrink: 0;
 }
 
 /* Embed as <img> — respects CSS color on supporting browsers */

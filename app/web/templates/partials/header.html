@@ -5,16 +5,19 @@
   <div class="container">
     <div class="header flex items-center justify-between">
       <!-- Logo -->
-      {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
-        {% include "logos/nexora-logo.html" %}
+      {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2",
+      unstyled=True) %}
+      {% include "logos/nexora-logo.html" %}
       {% endcall %}
 
       <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for section in main_sections %}
-        {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link gap-2 inline-flex items-center", unstyled=True) }}
+        {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link
+        gap-2 inline-flex items-center", unstyled=True) }}
         {% endfor %}
-        {{ link(text="Deals", href=url_for('product.deals'), class="main-nav__link gap-2 inline-flex items-center", icon="fas fa-tag", unstyled=True) }}
+        {{ link(text="Products", href=url_for('product.deals'), class="main-nav__link gap-2 inline-flex items-center",
+        icon="fas fa-tag", unstyled=True) }}
       </nav>
 
       <!-- Actions -->
@@ -55,7 +58,8 @@
 
         {% if is_authenticated %}
         <!-- Saved (Shortcut) -->
-        {{ button(href=url_for('interaction.saved_items'), variant="", class="btn--icon gap-2", icon="far fa-bookmark", attrs={"title": "Saved Items"}) }}
+        {{ button(href=url_for('interaction.saved_items'), variant="", class="btn--icon gap-2", icon="far fa-bookmark",
+        attrs={"title": "Saved Items"}) }}
         {% endif %}
 
         <!-- User -->
@@ -86,12 +90,15 @@
               <span class="user-email">{{ user_name or user_email }}</span>
             </div>
 
-            {{ link(text="Profile", href=url_for('user.profile'), class=item_class, icon="fas fa-id-card", unstyled=True) }}
+            {{ link(text="Profile", href=url_for('user.profile'), class=item_class, icon="fas fa-id-card",
+            unstyled=True) }}
 
-            {{ link(text="Saved Items", href=url_for('interaction.saved_items'), class=item_class, icon="far fa-bookmark", unstyled=True) }}
+            {{ link(text="Saved Items", href=url_for('interaction.saved_items'), class=item_class, icon="far
+            fa-bookmark", unstyled=True) }}
 
             {% if is_admin %}
-            {{ link(text="Admin Panel", href=url_for('admin.home'), class=item_class, icon="fas fa-shield-alt", unstyled=True) }}
+            {{ link(text="Admin Panel", href=url_for('admin.home'), class=item_class, icon="fas fa-shield-alt",
+            unstyled=True) }}
             {% endif %}
 
             <div class="dropdown-divider"></div>
@@ -104,11 +111,11 @@
               {% call form(variant="", form_action=url_for('user.switch_account', user_id=acc.id), class="switch-form")
               %}
               {% call button(type="submit", class=item_class ~ " switch-btn", unstyled=True) %}
-                <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
-                <div class="switch-details flex">
-                  <span class="switch-name">{{ acc.name }}</span>
-                  <span class="switch-email">{{ acc.email }}</span>
-                </div>
+              <span class="switch-avatar justify-center inline-flex items-center">{{ acc.avatar_letter }}</span>
+              <div class="switch-details flex">
+                <span class="switch-name">{{ acc.name }}</span>
+                <span class="switch-email">{{ acc.email }}</span>
+              </div>
               {% endcall %}
               {% endcall %}
               {% endif %}
@@ -116,7 +123,8 @@
             </div>
             {% endif %}
 
-            {{ link(text="Add Another Account", href=url_for('user.login', add_account=1), class=item_class, icon="fas fa-plus-circle", unstyled=True) }}
+            {{ link(text="Add Another Account", href=url_for('user.login', add_account=1), class=item_class, icon="fas
+            fa-plus-circle", unstyled=True) }}
 
             <div class="dropdown-divider"></div>
 
@@ -137,8 +145,10 @@
             {% endif %}
 
             {% else %}
-            {{ link(text="Login", href=url_for('user.login'), class=item_class, icon="fas fa-sign-in-alt", unstyled=True) }}
-            {{ link(text="Sign Up", href=url_for('user.register'), class=item_class, icon="fas fa-user-plus", unstyled=True) }}
+            {{ link(text="Login", href=url_for('user.login'), class=item_class, icon="fas fa-sign-in-alt",
+            unstyled=True) }}
+            {{ link(text="Sign Up", href=url_for('user.register'), class=item_class, icon="fas fa-user-plus",
+            unstyled=True) }}
             {% endif %}
           </div>
         </div>
@@ -164,7 +174,8 @@
         class="header-search__input",
         attrs={"autocomplete": "off", "aria-label": "Search contents and products"}
         ) }}
-        {{ button(type="button", class="header-search__clear justify-center inline-flex items-center", attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
+        {{ button(type="button", class="header-search__clear justify-center inline-flex items-center",
+        attrs={"aria-label": "Clear search", "tabindex": "-1"}, icon="fas fa-times", unstyled=True) }}
         {{ button(type="submit", variant="primary", class="header-search__submit", icon="fas fa-arrow-right",
         attrs={"aria-label": "Submit search"}) }}
       </div>
@@ -174,9 +185,11 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
-      {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link flex gap-3 items-center", unstyled=True) }}
+      {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link
+      flex gap-3 items-center", unstyled=True) }}
       {% endfor %}
-      {{ link(text="Deals", href=url_for('product.deals'), class="mobile-nav__link flex gap-3 items-center", icon="fas fa-tag", unstyled=True) }}
+      {{ link(text="Deals", href=url_for('product.deals'), class="mobile-nav__link flex gap-3 items-center", icon="fas
+      fa-tag", unstyled=True) }}
     </nav>
 
   </div>

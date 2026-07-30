@@ -90,3 +90,4 @@ class Author(db.Model):
         session.add(new_author)
         session.flush()
         return new_author
+

@@ -25,58 +25,43 @@
 </div>
 
 <div class="video-header flex flex-col">
-  <div class="video-header__badges flex flex-wrap items-center gap-3">
-    <div class="platform-badge flex items-center platform-badge--{{ video.platform }} gap-2">
-      <i class="fab fa-{{ video.platform }}"></i>
-      <span>{{ video.platform | title }}</span>
-    </div>
-    {{ badge(text=content.category.name, class="badge--category") }}
-    {% for topic in content.topics[:1] %}
-    {{ badge(text=topic.name, class="badge--topic", variant="secondary") }}
-    {% endfor %}
-  </div>
-
   <h1 class="video-header__title">{{ video.title }}</h1>
 
-  <div class="video-header__meta flex flex-wrap gap-4">
+  <div class="video-header__meta flex flex-wrap">
     {% if video.channel_name %}
-    <div class="meta-pill flex items-center gap-2">
+    <div class="meta-pill">
       <i class="fas fa-play-circle"></i>
       <span class="meta-pill__text">{{ video.channel_name }}</span>
     </div>
     {% endif %}
 
     {% if content.view_count %}
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill">
       <i class="fas fa-eye"></i>
       <span class="meta-pill__text">{{ "{:,}".format(content.view_count) }} views</span>
     </div>
     {% endif %}
 
     {% if content.video_comments %}
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill">
       <i class="far fa-comment"></i>
       <span class="meta-pill__text">{{ content.video_comments|length }} comments</span>
     </div>
     {% endif %}
 
-    <div class="meta-pill gap-2 flex items-center">
+    <div class="meta-pill">
       <i class="far fa-calendar-alt"></i>
       <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
     </div>
   </div>
 </div>
-
-<style>
-</style>
 {% endblock %}
 
 {% block base_image %}
-{# We use the content block for the player, base_image is bypassed #}
 {% endblock %}
 
 {% block base_content %}
-<div class="video-content">
+<div class="video-content flex flex-col gap-3">
   {% if video.description %}
   <div class="video-description-box">
     <h3 class="video-description-box__title">Description</h3>
@@ -87,7 +72,7 @@
   {% endif %}
 
   {% if content.topics or content.locations %}
-  <div class="video-metadata-tags mt-8 flex flex-wrap gap-2">
+  <div class="video-metadata-tags flex flex-wrap gap-2">
     {% for loc in content.locations %}
     {{ badge(text=loc.name, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
     {% endfor %}
@@ -99,18 +84,18 @@
 
   {% if content.video_comments %}
   {% from "components/ui/core.html" import button %}
-  <div class="video-comments-section mt-12">
-    <div class="flex items-center justify-between mb-4">
+  <div class="video-comments-section">
+    <div class="flex items-center justify-between">
       <h3 class="video-description-box__title flex items-center gap-2">
-        <i class="fab fa-youtube" style="color:var(--domain-primary);"></i>
-        Top YouTube Comments
+        <i class="fab fa-youtube yt-comments-icon"></i>
+        Top Comments
       </h3>
       {{ button(text="Show Comments", class="toggle-comments-btn", variant="outline", icon="fas fa-chevron-down",
       attrs={"onclick": "document.getElementById('yt-comments-container').classList.toggle('is-visible')"}) }}
     </div>
-    <div id="yt-comments-container" class="video-comments-list flex-col gap-4 mt-6">
+    <div id="yt-comments-container" class="video-comments-list flex-col gap-3">
       {% for comment in content.video_comments %}
-      <div class="yt-comment flex flex-col gap-2">
+      <div class="yt-comment flex flex-col gap-1">
         <div class="flex items-center justify-between">
           <span class="yt-comment__author">{{ comment.author }}</span>
           {% if comment.published_at %}
@@ -118,7 +103,7 @@
           {% endif %}
         </div>
         <p class="yt-comment__text">{{ comment.text|safe }}</p>
-        <div class="flex items-center gap-4 mt-2 yt-comment__meta">
+        <div class="flex items-center gap-3 yt-comment__meta">
           <span class="flex items-center gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes }}</span>
           {% if comment.replies > 0 %}
           <span class="flex items-center gap-1"><i class="fas fa-reply"></i> {{ comment.replies }}</span>
@@ -130,38 +115,6 @@
   </div>
   {% endif %}
 
-  {% if entity_carousel %}
-  {% from "components/ui/grid.html" import grid %}
-  <div class="recommendation-box recommendation-box--entity mt-10">
-    <h3 class="recommendation-box__title flex items-center">
-      <i class="fas fa-tag" style="color:var(--domain-primary);font-size:1.1rem;"></i>
-      {{ entity_carousel.title }}
-    </h3>
-    {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-  </div>
-  {% endif %}
-
-  {% if source_carousel %}
-  {% from "components/ui/grid.html" import grid %}
-  <div class="recommendation-box recommendation-box--source mt-12">
-    <h3 class="recommendation-box__title flex items-center">
-      <i class="far fa-newspaper" style="color:var(--domain-primary);font-size:1.1rem;"></i>
-      {{ source_carousel.title }}
-    </h3>
-    {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-  </div>
-  {% endif %}
-
-  {% if author_carousel %}
-  {% from "components/ui/grid.html" import grid %}
-  <div class="recommendation-box recommendation-box--author mt-12">
-    <h3 class="recommendation-box__title flex items-center">
-      <i class="far fa-user" style="color:var(--domain-primary);font-size:1.1rem;"></i>
-      {{ author_carousel.title }}
-    </h3>
-    {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-  </div>
-  {% endif %}
 </div>
 {% endblock %}
 

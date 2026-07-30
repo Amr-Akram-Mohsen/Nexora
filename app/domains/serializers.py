@@ -58,23 +58,85 @@ def serialize_target(obj, session=None):
                 normalized.append({"name": name, "slug": slug, "url": url})
         return normalized
 
+    def _serialize_authors(authors):
+        return [{
+                    "id": a.id,
+                    "name": a.name,
+                    "slug": a.slug,
+                    "url": a.url,
+                    "icon_url": a.icon_url,
+                    "is_agency": a.is_agency,
+                } for a in authors
+            ]
+
+    # def _serialize_sources(sources):
+    #     return [{
+    #                 "id": s.id,
+    #                 "url": s.url,
+    #                 "published_at": s.published_at,
+    #                 "source": {
+    #                     "id": s.source.id,
+    #                     "name": s.source.name,
+    #                     "slug": s.source.slug,
+    #                     "logo_url": s.source.logo_url,
+    #                 }
+    #             } for s in sources
+    #         ]
+
+    def _serialize_sources(sources):
+        return [{
+                    "name": s.source.name,
+                    "slug": s.source.slug,
+                    "url": s.url,
+                    "published_at": s.published_at,
+                    "logo_url": s.source.logo_url,
+                    "authority_score": s.source.authority_score,
+                } for s in sources
+            ]
+
     if type_name == "article":
+
+        # print(f"\n\n{type(obj.authors)}\n\n")
         # Derive is_content_scraped from status or content_html presence
         status = getattr(obj, "status", None)
         is_content_scraped = status in ("ready", "published", "complete") or bool(getattr(obj, "content_html", None))
         
         # Serialize primary source relation cleanly
-        primary_source_rel = getattr(obj, "primary_source", None)
-        primary_source = serialize_model(primary_source_rel.source) if primary_source_rel and primary_source_rel.source else None
+        rel = getattr(obj, "primary_source", None)
+        # primary_source = serialize_model(primary_source_rel.source) if primary_source_rel and primary_source_rel.source else None
+
+        # primary_source = {
+        #     "id": rel.id,
+        #     "url": rel.url,
+        #     "published_at": rel.published_at,
+
+        #     "source": {
+        #         "id": rel.source.id,
+        #         "name": rel.source.name,
+        #         "slug": rel.source.slug,
+        #         "logo_url": rel.source.logo_url,
+        #         "authority_score": rel.source.authority_score,
+        #     }
+        # }
+        primary_source = {
+            "name": rel.source.name,
+            "slug": rel.source.slug,
+            "url": rel.url,
+            "published_at": rel.published_at,
+            "logo_url": rel.source.logo_url,
+            "authority_score": rel.source.authority_score
+        }
         
+        serialized_authors = _serialize_authors(obj.authors)
         data.update(
             {
                 "source_name": obj.source_name,
                 "source_url": obj.source_url,
                 "read_time_minutes": obj.read_time_minutes,
                 "is_content_scraped": is_content_scraped,
-                "author": getattr(obj, "author", None),
-                "authors": _normalize_authors(getattr(obj, "authors", [])),
+                "author": serialized_authors[0] if serialized_authors else None,
+                "authors": _serialize_authors(obj.authors),
+                "sources": _serialize_sources(obj.article_sources),
                 "content_text": getattr(obj, "content_text", None),
                 "content_html": getattr(obj, "content_html", None),
                 "summary": getattr(obj, "summary", None),
@@ -123,3 +185,4 @@ def serialize_target(obj, session=None):
             data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
 
     return data
+

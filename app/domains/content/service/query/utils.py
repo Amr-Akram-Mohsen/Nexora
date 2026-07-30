@@ -24,7 +24,7 @@ def get_content_eager_loads(mode="default"):
         return CONTENT_EAGER_LOADS
     return CONTENT_EAGER_LOADS
 
-def build_content_stmt(active_only=True, published_only=True, eager_load="default"):
+def build_content_stmt(active_only=True, published_only=True, eager_load="default", extra_filters=None):
     """
     Constructs a base SQLAlchemy 2.0 select statement for the Content model.
     """
@@ -34,6 +34,8 @@ def build_content_stmt(active_only=True, published_only=True, eager_load="defaul
         stmt = stmt.where(Content.is_active == True)
     if published_only:
         stmt = stmt.where(Content.is_published == True)
+    if extra_filters:
+        stmt = stmt.where(*extra_filters)
     
 
     loads = get_content_eager_loads(eager_load)
