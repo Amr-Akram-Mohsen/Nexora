@@ -1,5 +1,6 @@
 {% from "content/features/content-image.html" import render_image_url %}
 {% macro content_snippet(products, snippet_title) %}
+{% if products and products|length > 0 %}
 <div class="snippet-contents__section">
   <h3 class="snippet__header">{{ snippet_title }}</h3>
   <div class="snippet-contents">
@@ -21,4 +22,5 @@
     {% endfor %}
   </div>
 </div>
+{% endif %}
 {% endmacro %}

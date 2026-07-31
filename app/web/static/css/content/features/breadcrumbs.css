@@ -65,8 +65,8 @@
 
 /* --- Current Page --- */
 .breadcrumb-current {
-  color: var(--foreground);
-  font-weight: var(--weight-bold);
+  color: var(--muted-foreground);
+  font-weight: var(--weight-md);
   text-transform: none;
   white-space: nowrap;
   overflow: hidden;

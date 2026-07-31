@@ -70,6 +70,9 @@
 
 .comment__replies-list {
   margin-top: 0.75rem;
+  border-left: 2px solid var(--border);
+  padding-left: 0.75rem;
+  margin-left: 0.5rem;
 }
 
 .comment__reply-form {
@@ -77,12 +80,12 @@
 }
 
 .comment--reply {
-  margin-left: 1.75rem;
+  margin-left: 0.5rem;
 }
 
 @media (min-width: 768px) {
   .comment--reply {
-    margin-left: 2.5rem;
+    margin-left: 0.75rem;
   }
 }
 

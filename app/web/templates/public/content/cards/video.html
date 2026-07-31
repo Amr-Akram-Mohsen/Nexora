@@ -14,9 +14,6 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
   {% if content.category %}
   {{ badge(text=content.category.name, class="badge--category", variant="secondary") }}
   {% endif %}
-  <span class="platform-icon platform-icon--youtube inline-flex-center">
-    <i class="fab fa-youtube"></i>
-  </span>
 </div>
 {% endblock %}
 
@@ -27,7 +24,6 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
     <i class="fas fa-play-circle card__meta-icon"></i>
     <span class="card__meta-text truncate">{{ video.channel_name }}</span>
   </div>
-  <span class="card__meta-dot" aria-hidden="true"></span>
   {% endif %}
 
   {% if content.video_comments %}
@@ -35,7 +31,6 @@ duration=video.duration if video.duration else None, platform=video.platform, wr
     <i class="far fa-comment card__meta-icon"></i>
     <span class="card__meta-text">{{ content.video_comments|length }}</span>
   </div>
-  <span class="card__meta-dot" aria-hidden="true"></span>
   {% endif %}
 
   <time class="card__date">

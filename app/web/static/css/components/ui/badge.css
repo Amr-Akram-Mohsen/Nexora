@@ -8,26 +8,25 @@
   gap: 0.35rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  /* Global component: prefer brand tokens; domain overrides via variants remain supported */
-  background-color: rgba(var(--domain-primary-rgb), var(--badge-opacity));
-  /* color: rgb(var(--domain-primary-rgb, var(--brand-blue-rgb))); */
+  /* Variant-based theming via theme-variants.css */
   color: var(--variant-color);
   background-color: var(--variant-bg);
   border: 1px solid rgba(var(--card-badge-rgb, var(--brand-blue-rgb)), 0.1);
-  transition: all 0.2s ease;
+  transition: all var(--duration-base) ease;
   white-space: nowrap;
 }
 
 .badge:hover {
-  background-color: rgba(var(--domain-primary-rgb), var(--badge-opacity-hover));
+  background-color: var(--variant-hover-bg, rgba(var(--domain-primary-rgb), var(--badge-opacity-hover)));
   transform: translateY(-1px);
 }
 
 .badge--entity,
 .badge--topic,
 .badge--category,
-.badge--location {
-  padding: 0 0.25rem;
+.badge--location,
+.badge--brand {
+  padding: 0 0.375rem;
 }
 
 .badge--xs {

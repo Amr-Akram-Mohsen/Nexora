@@ -28,14 +28,14 @@
 <nav class="breadcrumbs flex items-center {{ class }}" aria-label="Breadcrumb">
   <ul class="flex items-center">
     <li class="inline-flex items-center">
-      <a href="/" class="breadcrumb-link inline-flex items-center">
+      <a href="/" class="breadcrumb-link">
         <i class="fas fa-home"></i>
       </a>
       <i class="fa-solid fa-chevron-right"></i>
     </li>
     {% for path in paths %}
     <li class="inline-flex items-center">
-      <a href="{{ path.url }}" class="breadcrumb-link inline-flex items-center">
+      <a href="{{ path.url }}" class="breadcrumb-link">
         {{ path.label }}
       </a>
       <i class="fa-solid fa-chevron-right"></i>

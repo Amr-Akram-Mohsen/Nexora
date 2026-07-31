@@ -82,7 +82,7 @@
   </div>
   {% endif %}
 
-  {% if content.video_comments %}
+  {% if content.video_comments and content.video_comments|length > 0 %}
   {% from "components/ui/core.html" import button %}
   <div class="video-comments-section">
     <div class="flex items-center justify-between">

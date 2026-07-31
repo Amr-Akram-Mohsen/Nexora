@@ -69,30 +69,21 @@ def serialize_target(obj, session=None):
                 } for a in authors
             ]
 
-    # def _serialize_sources(sources):
-    #     return [{
-    #                 "id": s.id,
-    #                 "url": s.url,
-    #                 "published_at": s.published_at,
-    #                 "source": {
-    #                     "id": s.source.id,
-    #                     "name": s.source.name,
-    #                     "slug": s.source.slug,
-    #                     "logo_url": s.source.logo_url,
-    #                 }
-    #             } for s in sources
-    #         ]
-
     def _serialize_sources(sources):
-        return [{
+        if not sources:
+            return []
+        result = []
+        for s in sources:
+            if s and getattr(s, "source", None):
+                result.append({
                     "name": s.source.name,
                     "slug": s.source.slug,
                     "url": s.url,
-                    "published_at": s.published_at,
-                    "logo_url": s.source.logo_url,
-                    "authority_score": s.source.authority_score,
-                } for s in sources
-            ]
+                    "published_at": s.published_at.isoformat() if getattr(s, "published_at", None) else None,
+                    "logo_url": getattr(s.source, "logo_url", None),
+                    "authority_score": getattr(s.source, "authority_score", 0) or 0,
+                })
+        return result
 
     if type_name == "article":
 
@@ -103,29 +94,20 @@ def serialize_target(obj, session=None):
         
         # Serialize primary source relation cleanly
         rel = getattr(obj, "primary_source", None)
-        # primary_source = serialize_model(primary_source_rel.source) if primary_source_rel and primary_source_rel.source else None
+        if not rel and getattr(obj, "article_sources", None) and len(obj.article_sources) > 0:
+            rel = obj.article_sources[0]
 
-        # primary_source = {
-        #     "id": rel.id,
-        #     "url": rel.url,
-        #     "published_at": rel.published_at,
+        primary_source = None
+        if rel and getattr(rel, "source", None):
+            primary_source = {
+                "name": rel.source.name,
+                "slug": rel.source.slug,
+                "url": rel.url,
+                "published_at": rel.published_at.isoformat() if getattr(rel, "published_at", None) else None,
+                "logo_url": getattr(rel.source, "logo_url", None),
+                "authority_score": getattr(rel.source, "authority_score", 0) or 0
+            }
 
-        #     "source": {
-        #         "id": rel.source.id,
-        #         "name": rel.source.name,
-        #         "slug": rel.source.slug,
-        #         "logo_url": rel.source.logo_url,
-        #         "authority_score": rel.source.authority_score,
-        #     }
-        # }
-        primary_source = {
-            "name": rel.source.name,
-            "slug": rel.source.slug,
-            "url": rel.url,
-            "published_at": rel.published_at,
-            "logo_url": rel.source.logo_url,
-            "authority_score": rel.source.authority_score
-        }
         
         serialized_authors = _serialize_authors(obj.authors)
         data.update(

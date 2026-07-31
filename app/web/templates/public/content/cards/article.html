@@ -13,12 +13,9 @@
 <div class="card__meta-top flex flex-wrap items-center gap-1 justify-between">
   <div class="flex items-center gap-1">
     {% for b in product.display_badges %}
-      {{ badge(text=b.text, class=b.class, variant=b.variant, icon=b.icon) }}
+    {{ badge(text=b.text, class=b.class, variant=b.variant, icon=b.icon) }}
     {% endfor %}
   </div>
-  <span class="platform-icon inline-flex-center">
-    <i class="far fa-file-alt"></i>
-  </span>
 </div>
 {% endblock %}
 
@@ -28,20 +25,21 @@
     <i class="far fa-newspaper card__meta-icon"></i>
     <span class="card__meta-text truncate">
       {% if product.source %}
-        <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{ product.source.name }}</a>
-        {% if product.source_tier == "verified" %}
-          <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
-        {% elif product.source_tier == "trusted" %}
-          <i class="far fa-check-circle trusted-badge" title="Trusted Source" style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
-        {% endif %}
+      <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{
+        product.source.name }}</a>
+      {% if product.source_tier == "verified" %}
+      <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+      {% elif product.source_tier == "trusted" %}
+      <i class="far fa-check-circle trusted-badge" title="Trusted Source"
+        style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
+      {% endif %}
       {% else %}
-        Article
+      Article
       {% endif %}
     </span>
   </div>
 
   {% if product.published_at %}
-  <span class="card__meta-dot" aria-hidden="true"></span>
   <time class="card__date">
     {{ product.published_at | format_date('%b %d, %Y') }}
   </time>

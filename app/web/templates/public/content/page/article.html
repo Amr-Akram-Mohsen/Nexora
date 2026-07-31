@@ -49,12 +49,12 @@
       </div>
       {% endif %}
 
-      {% if content.source %}
+      {% set source_obj = article.primary_source or content.source %}
+      {% if source_obj %}
       <span class="meta-dot">·</span>
       <div class="meta-source">
         <i class="fas fa-newspaper"></i>
-        <a href="{{ url_for('content.source_page', source_slug=article.primary_source.slug) }}">{{
-          article.primary_source.name }}</a>
+        <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}">{{ source_obj.name }}</a>
         {% if content.source_tier == "verified" %}
         <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
         {% elif content.source_tier == "trusted" %}
@@ -114,130 +114,148 @@
 
   <div class="article-sources-box">
     <h3 class="article-section-title">Original Publication</h3>
-    <div class="article-sources-card flex flex-col gap-3">
+    <div class="article-sources-block flex flex-col gap-3">
 
-      <div class="flex items-center justify-between gap-4 flex-wrap">
-        <div class="flex flex-col gap-1">
-          {% if content.source %}
-          <div class="flex items-center gap-2">
-            <a href="{{ url_for('content.source_page', source_slug=article.primary_source.slug) }}"
-              class="cta-source-name">{{ article.primary_source.name }}</a>
-            {% if content.source_tier == "verified" %}
-            <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
-            {% elif content.source_tier == "trusted" %}
-            <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
-            {% endif %}
-          </div>
-          {% else %}
-          <span class="cta-source-name">Unknown Source</span>
-          {% endif %}
-
-          {% if article.primary_source and article.primary_source.published_at %}
-          <span class="cta-source-date">Originally published {{ article.primary_source.published_at | format_date('%b
-            %d, %Y') }}</span>
-          {% endif %}
-        </div>
-
-        <a href="{{ article.primary_source.url }}" target="_blank" rel="noopener nofollow">
-          {{ button(text="Read Original", variant="outline", icon="fas fa-arrow-up-right-from-square") }}
+      {% set source_obj = article.primary_source %}
+      {% if source_obj %}
+      <div class="flex items-center gap-4 flex-wrap">
+        {% set pub_url = (article.primary_source.url if article.primary_source else None) or article.url or content.url %}
+        {% if pub_url %}
+        {% set source_name = source_obj.name if source_obj else 'Source' %}
+        <a href="{{ pub_url }}" target="_blank" rel="noopener nofollow" class="cta-read-original inline-flex items-center gap-2">
+          Read original at {{ source_name }} <i class="fas fa-arrow-up-right-from-square"></i>
         </a>
+        {% endif %}
+        {% if article.primary_source and article.primary_source.published_at %}
+        <span class="cta-source-date">Published on {{ article.primary_source.published_at | format_date('%b %d, %Y') }}</span>
+        {% endif %}
       </div>
 
-      {% if article.alternative_source_relations|length > 0 %}
-      <div class="article-source-list flex flex-col gap-2">
-        <span class="article-source-list__label">Also reported by</span>
-        <div class="flex flex-wrap gap-2">
-          {% for rel in article.alternative_source_relations %}
+      {% if source_obj %}
+      <div class="cta-source-info flex items-center gap-2">
+        <span>See the source page for</span>
+        <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}"
+          class="cta-source-name">{{ source_obj.name }}</a>
+        {% if content.source_tier == "verified" %}
+        <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+        {% elif content.source_tier == "trusted" %}
+        <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+    {% endif %}
+
+    {% set primary_url = article.primary_source.url if article.primary_source else None %}
+    {% set primary_name = article.primary_source.name if article.primary_source else None %}
+    {% set alt_sources = [] %}
+    {% if article.sources %}
+    {% for s in article.sources %}
+    {% if s.url != primary_url and s.name != primary_name %}
+    {% set _ = alt_sources.append(s) %}
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if alt_sources and alt_sources|length > 0 %}
+    <div class="article-source-list">
+      <p class="article-source-list__label">Also reported by</p>
+      <ul class="flex flex-wrap gap-2">
+        {% for rel in alt_sources %}
+        <li class="article-source-item">
           <a href="{{ rel.url }}" class="badge variant--entity badge--entity" target="_blank" rel="noopener nofollow">
-            {{ rel.source.name }}
+            {{ rel.name }}
           </a>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
+        </li>
+        {% endfor %}
+      </ul>
     </div>
-  </div>
+    {% endif %}
 
-  {% if content.grouped_entities or content.attributes %}
-  <div class="article-semantic-metadata">
-    <h3 class="article-section-title">Related Entities</h3>
-    <div class="flex flex-col gap-3">
-      {% for type, entities in content.grouped_entities.items() %}
-      <div class="entity-group flex items-start gap-3 flex-wrap">
-        <h4 class="entity-group__title">{{ type }}</h4>
-        <div class="flex flex-wrap gap-1">
-          {% for entity in entities %}
-          {{ badge(text=entity.name, class="badge--entity", variant="entity",
-          href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
-          {% endfor %}
-        </div>
+  </div>
+</div>
+
+{% if content.grouped_entities or content.attributes %}
+<div class="article-semantic-metadata">
+  <h3 class="article-section-title">Related Entities</h3>
+  <div class="flex flex-col gap-3">
+    {% for type, entities in content.grouped_entities.items() %}
+    <div class="entity-group flex items-start gap-3 flex-wrap">
+      <h4 class="entity-group__title">{{ type }}</h4>
+      <div class="flex flex-wrap gap-1">
+        {% for entity in entities %}
+        {{ badge(text=entity.name, class="badge--entity", variant="entity",
+        href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
+        {% endfor %}
       </div>
-      {% endfor %}
+    </div>
+    {% endfor %}
 
-      {% if content.attributes %}
-      <div class="entity-group flex items-start gap-3 flex-wrap">
-        <h4 class="entity-group__title">Attributes</h4>
-        <div class="flex flex-wrap gap-1">
-          {% for attr in content.attributes %}
-          {{ badge(text=attr, class="badge--attribute", variant="secondary") }}
-          {% endfor %}
-        </div>
+    {% if content.attributes %}
+    <div class="entity-group flex items-start gap-3 flex-wrap">
+      <h4 class="entity-group__title">Attributes</h4>
+      <div class="flex flex-wrap gap-1">
+        {% for attr in content.attributes %}
+        {{ badge(text=attr, class="badge--attribute", variant="secondary") }}
+        {% endfor %}
       </div>
-      {% endif %}
     </div>
+    {% endif %}
   </div>
-  {% endif %}
+</div>
+{% endif %}
 
-  {% if event_carousel %}
-  <div class="recommendation-box recommendation-box--event">
-    <h3 class="recommendation-box__title flex items-center">
-      <i class="fas fa-bolt"></i>
-      Coverage of this Event
-    </h3>
-    <div class="event-summary-card">
-      <h4 class="event-title">{{ event_carousel.event.title }}</h4>
-      {% if event_carousel.event.summary %}
-      <p class="event-desc">{{ event_carousel.event.summary }}</p>
-      {% endif %}
-    </div>
-    {% from "components/ui/grid.html" import grid %}
-    {{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
+{% if event_carousel and event_carousel.get('items') and event_carousel.get('items')|length > 0 %}
+<div class="recommendation-box recommendation-box--event">
+  <h3 class="recommendation-box__title flex items-center">
+    <i class="fas fa-bolt"></i>
+    Coverage of this Event
+  </h3>
+  <div class="event-summary-card">
+    <h4 class="event-title">{{ event_carousel.event.title }}</h4>
+    {% if event_carousel.event.summary %}
+    <p class="event-desc">{{ event_carousel.event.summary }}</p>
+    {% endif %}
   </div>
-  {% endif %}
-
-  {% if entity_carousel %}
   {% from "components/ui/grid.html" import grid %}
-  <div class="recommendation-box recommendation-box--entity">
-    <h3 class="recommendation-box__title flex items-center">
-      <i class="fas fa-tag"></i>
-      More on This Topic
-    </h3>
-    {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-  </div>
-  {% endif %}
+  {{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
+</div>
+{% endif %}
+
+{% if entity_carousel and entity_carousel.get('items') and entity_carousel.get('items')|length > 0 %}
+{% from "components/ui/grid.html" import grid %}
+<div class="recommendation-box recommendation-box--entity">
+  <h3 class="recommendation-box__title flex items-center">
+    <i class="fas fa-tag"></i>
+    More on This Topic
+  </h3>
+  {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+</div>
+{% endif %}
 </div>
 {% endblock %}
 
 {# ── Author and Source Discovery Carousels ── #}
-{% if author_carousel and author_carousel['items']|length > 0 %}
+{% if author_carousel and author_carousel.get('items') and author_carousel.get('items')|length > 0 %}
 {% block author_carousel %}
 <div class="recommendation-box recommendation-box--author">
   <h3 class="recommendation-box__title flex items-center">
     <i class="fas fa-user-edit"></i>
-    More from {{ article.authors[0].name if article.authors else article.author }}
+    More from {{ article.authors[0].name if article.authors else (article.author or 'Author') }}
   </h3>
   {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 </div>
 {% endblock %}
 {% endif %}
 
-{% if source_carousel %}
+{% if source_carousel and source_carousel.get('items') and source_carousel.get('items')|length > 0 %}
 {% block source_carousel %}
 <div class="recommendation-box recommendation-box--source">
   <h3 class="recommendation-box__title flex items-center">
     <i class="fas fa-newspaper"></i>
-    More from {{ content.source.name }}
+    More from {{ content.source.name if content.source else (article.primary_source.name if article.primary_source else
+    'Source') }}
   </h3>
   {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 </div>

@@ -16,8 +16,7 @@
 }
 
 .sidebar-heading__label {
-  font-size: 0.725rem;
-  /* 11px premium uppercase title label */
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -26,18 +25,17 @@
 }
 
 .sidebar-heading__label i {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--muted-foreground);
   opacity: 0.85;
 }
 
 /* Filter Reset Actions */
 .sidebar-reset-link {
-  font-size: 0.75rem;
-  /* 12px active triggers */
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--domain-primary, var(--primary));
-  transition: opacity 0.15s ease;
+  transition: opacity var(--duration-fast) ease;
   text-decoration: none;
   gap: 0.35rem;
 }
@@ -90,8 +88,7 @@
 /* Section Header & Icons */
 
 .filter-section__title {
-  font-size: 0.75rem;
-  /* 12px clean labels */
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -99,7 +96,7 @@
 }
 
 .filter-section__title i {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--muted-foreground);
   opacity: 0.85;
 }
@@ -196,8 +193,8 @@ details[open] .filter-section__chevron {
 /* --- Sidebar Trending Now Section --- */
 .sidebar-trending {
   border-top: 1px solid var(--border);
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
+  padding-top: var(--space-7);
+  margin-top: var(--space-7);
 }
 .sidebar-trending__header {margin-bottom: 0.85rem;
 }
@@ -208,8 +205,7 @@ details[open] .filter-section__chevron {
 }
 
 .sidebar-trending__title {
-  font-size: 0.725rem;
-  /* 11px uppercase label */
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -221,11 +217,11 @@ details[open] .filter-section__chevron {
   gap: 0.65rem;
   padding: 0.45rem 0.6rem;
   border-radius: var(--radius-md);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--muted-foreground);
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) ease;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: var(--weight-md);
 }
 
 .sidebar-trending__link i {
@@ -255,12 +251,12 @@ details[open] .filter-section__chevron {
   gap: 0.35rem;
   margin-top: 0.5rem;
   padding: 0.35rem 0.6rem;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   color: var(--domain-primary, var(--primary));
   border-radius: var(--radius-md);
   text-decoration: none;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) ease;
 }
 
 .sidebar-trending__view-all i {
@@ -285,13 +281,12 @@ details[open] .filter-section__chevron {
   background: none;
   border: none;
   color: var(--domain-primary, var(--primary));
-  font-size: 0.75rem;
-  /* 12px triggers */
+  font-size: var(--text-xs);
   font-weight: 600;
   padding: 0.45rem 0.6rem;
   cursor: pointer;
   gap: 0.35rem;
-  transition: all 0.15s ease;
+  transition: all var(--duration-fast) ease;
   width: 100%;
   text-align: left;
   border-radius: var(--radius-md);

@@ -1,10 +1,12 @@
-
+.pagination {
+  margin-top: 1rem;
+}
 
 
 .pagination__btn:hover:not(.is-disabled) {
   background: var(--secondary);
-  border-color: rgba(var(--brand-blue-rgb), var(--alpha-strong));
-  color: rgb(var(--brand-blue-rgb));
+  border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
+  color: var(--domain-primary);
 }
 
 .pagination__btn.is-disabled {
@@ -20,16 +22,17 @@
 }
 
 .pagination__page.is-active {
-  background: rgb(var(--brand-blue-rgb));
+  background: var(--domain-primary);
   color: #fff;
   border-color: transparent;
   font-weight: var(--weight-bold);
-  box-shadow: 0 4px 10px rgba(var(--brand-blue-rgb), var(--alpha-strong));
+  box-shadow: 0 4px 10px rgba(var(--domain-primary-rgb), var(--alpha-strong));
 }
+
 .pagination__ellipsis {
   width: 2.25rem;
   height: 2.25rem;
-font-size: var(--text-sm);
+  font-size: var(--text-sm);
   color: var(--muted-foreground);
 }
 
@@ -38,7 +41,7 @@ font-size: var(--text-sm);
 .pagination__btn {
   width: 2.25rem;
   height: 2.25rem;
-border: 1px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--card);
   color: var(--foreground);
@@ -47,10 +50,11 @@ border: 1px solid var(--border);
   cursor: pointer;
   text-decoration: none;
 }
+
 .pagination__page {
   width: 2.25rem;
   height: 2.25rem;
-border: 1px solid transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-weight: var(--weight-md);
@@ -63,7 +67,7 @@ border: 1px solid transparent;
 @media (max-width: 480px) {
   .pagination__page,
 
-.pagination__btn {
+  .pagination__btn {
     width: 2rem;
     height: 2rem;
     font-size: var(--text-xs);

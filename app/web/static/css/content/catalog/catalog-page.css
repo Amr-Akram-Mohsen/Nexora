@@ -51,7 +51,7 @@ scrollbar-width: none;
 }
 
 .catalog-recommendations {
-  margin-top: 3rem;
+  margin-top: 2rem;
   border-top: 1px solid var(--border);
-  padding-top: 2rem;
+  padding-top: 1.5rem;
 }

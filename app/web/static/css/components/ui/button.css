@@ -34,7 +34,7 @@
   font-size: var(--text-sm);
 }
 
-/* --- Admin Button Variants (Migrated) --- */
+/* --- Admin & Specialty Button Variants --- */
 
 .admin-btn-primary,
 .admin-toolbar button {
@@ -43,16 +43,15 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
-  height: 36px;
-  box-sizing: border-box;
-  background: var(--brand-blue);
+  height: 2.25rem;
+  background: var(--domain-primary);
   color: white;
   border: none;
   border-radius: var(--radius-md);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all var(--duration-fast) ease;
   white-space: nowrap;
 }
 
@@ -69,8 +68,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  height: 36px;
-  box-sizing: border-box;
+  height: 2.25rem;
   background: var(--secondary);
   color: var(--foreground);
   border: 1px solid var(--border);
@@ -78,14 +76,14 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: all var(--duration-fast) ease;
   white-space: nowrap;
 }
 
 .admin-btn-secondary:hover,
 .dashboard-btn-secondary:hover {
   background: var(--accent);
-  border-color: rgba(var(--brand-blue-rgb), 0.2);
+  border-color: rgba(var(--domain-primary-rgb), 0.2);
 }
 
 .admin-btn-danger,
@@ -96,8 +94,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
-  height: 36px;
-  box-sizing: border-box;
+  height: 2.25rem;
   background: var(--brand-red);
   color: white;
   border: none;
@@ -105,7 +102,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--duration-fast) ease;
   white-space: nowrap;
 }
 
@@ -121,8 +118,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
-  height: 36px;
-  box-sizing: border-box;
+  height: 2.25rem;
   background: var(--brand-purple);
   color: white;
   border: none;
@@ -130,7 +126,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--duration-fast) ease;
   white-space: nowrap;
 }
 

@@ -67,7 +67,11 @@ SLOT: results
 {% endif %}
 {{ grid(results) }}
 
-{% if recommendations %}
+{# ── Listing Pagination (Directly below catalog results grid) ── #}
+{{ listing_pagination(pagination, get_page_url) }}
+
+{# ── Related / Recommendation Carousels (Below pagination) ── #}
+{% if recommendations and recommendations|length > 0 %}
 <div class="catalog-recommendations">
   {% for block in recommendations %}
   {% from "components/ui/section.html" import section %}
@@ -81,10 +85,9 @@ SLOT: results
 {% endif %}
 
 {# ═══════════════════════════════════════
-SLOT: footer (pagination)
+SLOT: footer
 ═══════════════════════════════════════ #}
 {% if slot == 'footer' %}
-{{ listing_pagination(pagination, get_page_url) }}
 {% endif %}
 
 {% else %}

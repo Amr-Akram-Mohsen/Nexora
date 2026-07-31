@@ -11,28 +11,26 @@
   width: 100px;
   height: 100px;
   background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
-  border-radius: 30px;
+  border-radius: var(--radius-2xl);
   margin-inline: auto;
   margin-bottom: 2rem;
   color: var(--domain-primary);
   font-size: 2.5rem;
-  /* alignment provided by template utilities */
 }
 
 .empty-state__pulse {
   position: absolute;
   inset: -10px;
   border: 2px solid rgba(var(--brand-blue-rgb), 0.1);
-  border-radius: 35px;
+  border-radius: var(--radius-2xl);
   animation: pulse-ring 2s infinite;
 }
 
 .empty-state__title {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--foreground);
   margin-bottom: 1rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .empty-state__message {
@@ -42,5 +40,5 @@
 }
 
 .empty-state__btn {
-  box-shadow: 0 10px 20px -5px rgba(var(--brand-blue-rgb), 0.3);
+  box-shadow: var(--shadow-md);
 }

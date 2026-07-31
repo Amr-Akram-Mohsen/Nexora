@@ -311,7 +311,16 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
     if target_obj and getattr(target_obj, "word_count", 0):
         reading_time = max(1, target_obj.word_count // 200)
         
-    authority = getattr(content_obj.source, 'authority_score', 0) if content_obj.source else 0
+    authority = 0
+    if content_obj.source and getattr(content_obj.source, 'authority_score', None) is not None:
+        authority = content_obj.source.authority_score or 0
+    elif target_obj and getattr(target_obj, 'primary_source', None):
+        ps_rel = getattr(target_obj, 'primary_source', None)
+        if ps_rel and getattr(ps_rel, 'source', None):
+            authority = getattr(ps_rel.source, 'authority_score', 0) or 0
+    elif target_obj and isinstance(target_obj, dict) and target_obj.get('primary_source'):
+        authority = target_obj['primary_source'].get('authority_score', 0) or 0
+
     source_tier = (
         "verified"   if authority >= 80 else
         "trusted"    if authority >= 60 else
@@ -381,3 +390,5 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         data["video_comments"] = video_comments
 
     return data
+
+
