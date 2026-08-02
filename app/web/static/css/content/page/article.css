@@ -155,9 +155,25 @@
 
 /* Rich Text */
 .article-rich-text {
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   line-height: 1.8;
   color: var(--foreground);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+
+.article-html p {
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+}
+
+.article-html img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  margin-block: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
   border-bottom: 1px solid var(--border);
 }
 

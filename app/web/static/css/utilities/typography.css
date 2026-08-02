@@ -72,3 +72,15 @@
   border-radius: var(--radius-sm);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
+
+/* Standardized metadata dot separator */
+.meta-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  opacity: 0.4;
+  font-size: 0.75em;
+  padding-inline: 0.25rem;
+  user-select: none;
+}

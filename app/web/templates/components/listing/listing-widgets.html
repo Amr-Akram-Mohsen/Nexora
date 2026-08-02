@@ -109,7 +109,8 @@
 
   {# Previous #}
   {% if pagination.has_prev %}
-    <a href="{{ get_page_url(pagination.prev_num) }}" class="pagination__btn pagination__btn--prev justify-center inline-flex items-center"
+    {% set prev_p = (pagination.prev_num if pagination.prev_num is defined and pagination.prev_num is not none else pagination.page - 1) %}
+    <a href="{{ get_page_url(prev_p) }}" class="pagination__btn pagination__btn--prev justify-center inline-flex items-center"
       aria-label="Previous page">
       <i class="fas fa-chevron-left"></i>
     </a>
@@ -134,7 +135,8 @@
 
   {# Next #}
   {% if pagination.has_next %}
-    <a href="{{ get_page_url(pagination.next_num) }}" class="pagination__btn pagination__btn--next justify-center inline-flex items-center"
+    {% set next_p = (pagination.next_num if pagination.next_num is defined and pagination.next_num is not none else pagination.page + 1) %}
+    <a href="{{ get_page_url(next_p) }}" class="pagination__btn pagination__btn--next justify-center inline-flex items-center"
       aria-label="Next page">
       <i class="fas fa-chevron-right"></i>
     </a>

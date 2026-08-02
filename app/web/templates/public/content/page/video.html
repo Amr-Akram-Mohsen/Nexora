@@ -85,28 +85,35 @@
   {% if content.video_comments and content.video_comments|length > 0 %}
   {% from "components/ui/core.html" import button %}
   <div class="video-comments-section">
-    <div class="flex items-center justify-between">
-      <h3 class="video-description-box__title flex items-center gap-2">
+    <div class="video-comments-header flex items-center justify-between">
+      <h3 class="video-comments-title flex items-center gap-2">
         <i class="fab fa-youtube yt-comments-icon"></i>
-        Top Comments
+        <span>Top YouTube Comments</span>
+        <span class="yt-comments-count">({{ content.video_comments|length }})</span>
       </h3>
-      {{ button(text="Show Comments", class="toggle-comments-btn", variant="outline", icon="fas fa-chevron-down",
-      attrs={"onclick": "document.getElementById('yt-comments-container').classList.toggle('is-visible')"}) }}
+      {% call button(class="toggle-comments-btn", variant="outline",
+      attrs={"onclick": "const c = document.getElementById('yt-comments-container'); c.classList.toggle('is-visible'); this.classList.toggle('is-active'); const t = this.querySelector('.toggle-comments-text'); if(t) t.textContent = c.classList.contains('is-visible') ? 'Hide Comments' : 'Show Comments';"}) %}
+      <span class="toggle-comments-text">Show Comments</span>
+      <i class="fas fa-chevron-down toggle-comments-icon"></i>
+      {% endcall %}
     </div>
-    <div id="yt-comments-container" class="video-comments-list flex-col gap-3">
+    <div id="yt-comments-container" class="video-comments-list">
       {% for comment in content.video_comments %}
-      <div class="yt-comment flex flex-col gap-1">
-        <div class="flex items-center justify-between">
-          <span class="yt-comment__author">{{ comment.author }}</span>
+      <div class="yt-comment flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <span class="yt-comment__author flex items-center gap-1.5">
+            <i class="far fa-user-circle yt-comment__avatar-icon"></i>
+            {{ comment.author }}
+          </span>
           {% if comment.published_at %}
           <span class="yt-comment__date">{{ comment.published_at | truncate(10, True, '') }}</span>
           {% endif %}
         </div>
         <p class="yt-comment__text">{{ comment.text|safe }}</p>
         <div class="flex items-center gap-3 yt-comment__meta">
-          <span class="flex items-center gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes }}</span>
+          <span class="yt-comment__stat flex items-center gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes }}</span>
           {% if comment.replies > 0 %}
-          <span class="flex items-center gap-1"><i class="fas fa-reply"></i> {{ comment.replies }}</span>
+          <span class="yt-comment__stat flex items-center gap-1"><i class="fas fa-reply"></i> {{ comment.replies }}</span>
           {% endif %}
         </div>
       </div>

@@ -230,7 +230,7 @@ body.dark-mode {
   /* Improved: Hover states */
   --border-rgb: 255, 255, 255;
   /* Improved: White at 10% opacity for visible dark-mode borders */
-  --input-background-rgb: 15, 15, 17;
+  --input-background-rgb: 18, 18, 22;
   /* Improved: Darker inputs for recessed depth */
   --muted-foreground: #a1a1aa;
   /* Zinc 400 */
@@ -254,8 +254,8 @@ body.dark-mode {
   --shadow-glow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 
   /* Semantic surface overrides for dark mode */
-  --surface-inset: rgba(255, 255, 255, 0.02);
-  --surface-overlay: rgba(255, 255, 255, 0.04);
+  --surface-inset: rgba(255, 255, 255, 0.035);
+  --surface-overlay: rgba(255, 255, 255, 0.05);
 
   --text-color-rgb: 255, 255, 255;
 }

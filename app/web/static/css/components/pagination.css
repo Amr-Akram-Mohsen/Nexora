@@ -2,11 +2,44 @@
   margin-top: 1rem;
 }
 
+/* Base Buttons & Pages */
+.pagination__btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+  cursor: pointer;
+  text-decoration: none;
+}
 
+.pagination__page {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-md);
+  color: var(--muted-foreground);
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Interactive States */
 .pagination__btn:hover:not(.is-disabled) {
   background: var(--secondary);
   border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
   color: var(--domain-primary);
+}
+
+.pagination__btn:focus-visible,
+.pagination__page:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .pagination__btn.is-disabled {
@@ -14,7 +47,6 @@
   cursor: not-allowed;
   pointer-events: none;
 }
-
 
 .pagination__page:hover:not(.is-active) {
   background: var(--secondary);
@@ -36,37 +68,8 @@
   color: var(--muted-foreground);
 }
 
-/* --- Pagination UI & Overrides --- */
-
-.pagination__btn {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--card);
-  color: var(--foreground);
-  font-size: var(--text-sm);
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.pagination__page {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-md);
-  color: var(--muted-foreground);
-  transition: background 0.2s, color 0.2s;
-  cursor: pointer;
-  text-decoration: none;
-}
-
 @media (max-width: 480px) {
   .pagination__page,
-
   .pagination__btn {
     width: 2rem;
     height: 2rem;

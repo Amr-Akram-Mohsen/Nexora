@@ -131,6 +131,8 @@ def _get_paginated_contents(
         "products": products, "page": pagination.page, "pages": pagination.pages,
         "total": pagination.total, "per_page": pagination.per_page,
         "has_next": pagination.has_next, "has_prev": pagination.has_prev,
+        "prev_num": getattr(pagination, "prev_num", pagination.page - 1 if pagination.has_prev else None),
+        "next_num": getattr(pagination, "next_num", pagination.page + 1 if pagination.has_next else None),
     }
 
 def get_filtered_contents(section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None):

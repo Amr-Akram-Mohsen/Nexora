@@ -1,45 +1,47 @@
 {% set like_count = content.like_count or 0 %}
 {% set comment_count = content.comment_count or 0 %}
-{% from"components/ui/core.html" import button %}
+{% from "components/ui/core.html" import button %}
 <div class="interaction-panel">
 
   <!-- Left actions -->
-  <div class="interaction-panel__actions flex items-center gap-2">
-    {% set v = 'outline' %}
-    {% set class = 'interaction-btn ' %}
-    {% set icon_class = ' interaction-icon' %}
+  <div class="interaction-panel__actions flex items-center justify-between gap-2 flex-wrap">
+    <div class="flex items-center gap-2 flex-wrap">
+      {% set v = 'outline' %}
+      {% set class = 'interaction-btn ' %}
+      {% set icon_class = ' interaction-icon' %}
 
-    <!-- Like -->
-    {{ button(variant=v, class=class ~ "react-btn",
-    icon="fa fa-heart" ~ icon_class, attrs={"data-reaction": "like"})
-    }}
+      <!-- Like -->
+      {{ button(text=like_count if like_count > 0 else '', variant=v, class=class ~ "react-btn react-btn--like",
+      icon="fa fa-heart" ~ icon_class, attrs={"data-reaction": "like", "aria-label": "Like"})
+      }}
 
-    <!-- Dislike -->
-    {{ button(variant=v, class=class ~ "react-btn",
-    icon="fa fa-thumbs-down" ~ icon_class, attrs={"data-reaction": "dislike"})
-    }}
+      <!-- Dislike -->
+      {{ button(variant=v, class=class ~ "react-btn react-btn--dislike",
+      icon="fa fa-thumbs-down" ~ icon_class, attrs={"data-reaction": "dislike", "aria-label": "Dislike"})
+      }}
 
-    <!-- Save / Watch Later -->
-    {% if content.object_type == 'video' %}
-    {{ button(variant=v, class=class ~ "save-btn",
-    icon="fa fa-clock" ~ icon_class, attrs={"data-collection": "Watch Later", "title": "Watch Later"})
-    }}
-    {% else %}
-    {{ button(variant=v, class=class ~ "save-btn",
-    icon="fa fa-bookmark" ~ icon_class, attrs={"title": "Save to Collection"})
-    }}
-    {% endif %}
+      <!-- Save / Watch Later -->
+      {% if content.object_type == 'video' %}
+      {{ button(variant=v, class=class ~ "save-btn",
+      icon="fa fa-clock" ~ icon_class, attrs={"data-collection": "Watch Later", "title": "Watch Later", "aria-label": "Watch Later"})
+      }}
+      {% else %}
+      {{ button(variant=v, class=class ~ "save-btn",
+      icon="fa fa-bookmark" ~ icon_class, attrs={"title": "Save to Collection", "aria-label": "Save to Collection"})
+      }}
+      {% endif %}
 
-    <!-- Share -->
-    {{ button(variant=v, class=class ~ "share-btn",
-    icon="fa fa-share-alt")
-    }}
+      <!-- Share -->
+      {{ button(variant=v, class=class ~ "share-btn",
+      icon="fa fa-share-alt", attrs={"aria-label": "Share"})
+      }}
+    </div>
 
-    <!-- Right side (comment count) -->
+    <!-- Right side (comment count toggle button) -->
     {% call button(text=comment_count ~ " comments",
     btn_span_class="comments-toggle-content",
     variant=v, icon="fa fa-comment",
-    class="interaction-panel__meta flex comments-toggle-btn gap-1",
+    class="interaction-panel__meta flex items-center comments-toggle-btn gap-1.5",
     )
     %}
     <i class="fa fa-chevron-down comments-toggle-icon"></i>
