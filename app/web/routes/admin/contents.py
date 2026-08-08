@@ -30,7 +30,7 @@ from app.application.analytics.admin import (
     get_admin_content_dashboard_stats,
     get_admin_pipeline_stats,
 )
-from app.domains.content.serializers import serialize_content_row
+from app.application.content.admin_serializers import serialize_content_row
 
 from app.application.content.admin import (
     delete_content_workflow,

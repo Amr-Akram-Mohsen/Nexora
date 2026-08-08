@@ -4,7 +4,7 @@ from app.domains.interaction.models import Comment, Reaction, View, Save, Share,
 from app.domains.user.models import User
 from app.domains.content.models import Content
 from app.domains.product.models import Product, ProductStoreLink, ProductVariant, Store
-from app.domains.interaction.serializers import (
+from app.application.interaction.admin_serializers import (
     _serialize_comment, _serialize_reaction, _serialize_save, _serialize_share
 )
 import math

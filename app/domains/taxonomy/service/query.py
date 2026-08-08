@@ -416,3 +416,26 @@ def paginate_taxonomy_entity(model, page, per_page, search="", status=None, heal
                 stmt = stmt.where(cond_content)
                 
     return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
+
+@cache.memoize(timeout=3600)
+def get_taxonomy_filters(section_slug, allowed_filters_tuple, category_slugs_tuple=None):
+    """
+    Aggregates and caches all filter options for a section in a single payload.
+    """
+    filter_options = {}
+    relationship_filters = ["category", "entity", "intent", "price_tier", "source", "event", "location", "author"]
+    
+    for f in relationship_filters:
+        if f in allowed_filters_tuple:
+            filter_options[f] = get_relationships_for_section(section_slug, f)
+            
+    if "type" in allowed_filters_tuple:
+        filter_options["type"] = get_types_for_section(section_slug)
+        
+    if "attributes" in allowed_filters_tuple:
+        filter_options["attributes"] = get_attributes_for_section(
+            section_slug, category_slugs=category_slugs_tuple
+        )
+        
+    return filter_options

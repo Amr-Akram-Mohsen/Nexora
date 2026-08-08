@@ -5,12 +5,14 @@ CONTENT_EAGER_LOADS = [
     selectinload(Content.content_entities),
     selectinload(Content.section),
     selectinload(Content.category),
+    selectinload(Content.locations),
 ]
 
 CONTENT_LIST_EAGER_LOADS = [
     selectinload(Content.content_entities),
     joinedload(Content.section),
     joinedload(Content.category),
+    selectinload(Content.locations),
 ]
 
 

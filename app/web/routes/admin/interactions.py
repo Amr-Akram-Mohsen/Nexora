@@ -35,7 +35,7 @@ from app.domains.user.models import User
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, or_
 from datetime import datetime
-from app.domains.interaction.serializers import (
+from app.application.interaction.admin_serializers import (
     map_comment_for_rows, map_reaction_for_rows, map_view_for_rows,
     map_click_for_rows, map_save_for_rows, map_share_for_rows
 )

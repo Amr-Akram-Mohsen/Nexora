@@ -13,7 +13,17 @@
 <div class="card__meta-top flex flex-wrap items-center gap-1 justify-between">
   <div class="flex items-center gap-1">
     {% for b in product.display_badges %}
-    {{ badge(text=b.text, class=b.class, variant=b.variant, icon=b.icon) }}
+      {% if b.type == 'category' %}
+        {{ badge(text=b.label, class="badge--category", variant="secondary") }}
+      {% elif b.type == 'location' %}
+        {{ badge(text=b.label, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
+      {% elif b.type == 'event' %}
+        {{ badge(text=b.label, class="badge--event", variant="primary", icon="fas fa-map-marker-alt") }}
+      {% elif b.type == 'brand' %}
+        {{ badge(text=b.label, class="badge--brand", variant="secondary", icon="fas fa-tag") }}
+      {% elif b.type == 'topic' %}
+        {{ badge(text=b.label, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
+      {% endif %}
     {% endfor %}
   </div>
 </div>
@@ -30,8 +40,7 @@
       {% if product.source_tier == "verified" %}
       <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
       {% elif product.source_tier == "trusted" %}
-      <i class="far fa-check-circle trusted-badge" title="Trusted Source"
-        style="color: var(--muted-foreground); margin-left: 0.25rem;"></i>
+      <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
       {% endif %}
       {% else %}
       Article

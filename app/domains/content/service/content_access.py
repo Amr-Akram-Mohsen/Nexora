@@ -24,7 +24,7 @@ def resolve(content, session=None):
     return resolve_content_object(content, session=session)
 
 
-def assign_target_to_contents(contents, include_linked_items=False, session=None, active_filters=None):
+def assign_target_to_contents(contents, include_linked_items=False, session=None, active_filters=None, mode="card"):
     if not contents:
         return contents
 
@@ -36,13 +36,18 @@ def assign_target_to_contents(contents, include_linked_items=False, session=None
         contents, type_attr="object_type", id_attr="object_id", session=session
     )
 
-    from app.domains.content.serializers import serialize_content
+    from app.domains.content.serializers import serialize_content_card, serialize_content_detail, serialize_content
 
     result = []
     # Assign targets back to content objects
     for c in contents:
         target_obj = targets_map.get((c.object_type, c.object_id))
-        result.append(serialize_content(c, target_obj, session, include_linked_items, active_filters=active_filters))
+        if mode == "detail":
+            result.append(serialize_content_detail(c, target_obj, session, include_linked_items, active_filters=active_filters))
+        elif mode == "card":
+            result.append(serialize_content_card(c, target_obj, session, include_linked_items, active_filters=active_filters))
+        else:
+            result.append(serialize_content(c, target_obj, session, include_linked_items, active_filters=active_filters))
 
     return result
 

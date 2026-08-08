@@ -46,7 +46,7 @@ def get_content_by_id(content_id, session=None):
     if not contents:
         return None
         
-    serialized = assign_target_to_contents(contents, include_linked_items=True, session=session)
+    serialized = assign_target_to_contents(contents, include_linked_items=True, session=session, mode="detail")
     return serialized[0] if serialized else None
 
 def get_latest_contents(limit=100, session=None):

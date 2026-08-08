@@ -201,4 +201,31 @@ def normalize_content_shaping(html: str | None, text: str | None) -> dict:
         "word_count": len(content_text.split()) if content_text else 0
     }
 
+def calculate_content_health_score(c, target, duplicate):
+    score = 0
+    if getattr(c, 'title', None): score += 10
+    
+    if getattr(c, 'preview_text', None) or getattr(target, 'description', None) or getattr(target, 'preview_text', None): 
+        score += 10
+        
+    if getattr(c, 'category', None) and getattr(c.category, 'slug', None) != 'uncategorized': 
+        score += 10
+        
+    has_topics = any(ce.entity.entity_type in ('topic', 'tag', 'concept') for ce in c.content_entities) if hasattr(c, 'content_entities') else False
+    has_brands = any(ce.entity.entity_type == 'brand' or ce.entity.origin == 'legacy_brand' for ce in c.content_entities) if hasattr(c, 'content_entities') else False
+    
+    if has_topics: score += 15
+    if has_brands: score += 15
+    if getattr(c, 'source_id', None): score += 10
+    if not duplicate: score += 5
+    
+    if getattr(c, 'object_type', None) == "article" and target:
+        if getattr(target, 'is_content_scraped', False): score += 10
+        if getattr(target, 'status', '') == 'complete': score += 10
+        if getattr(target, 'quality_score', 0) > 0: score += 5
+    elif getattr(c, 'object_type', None) in ("video", "post"):
+        score += 25
+        
+    return min(score, 100)
+
 

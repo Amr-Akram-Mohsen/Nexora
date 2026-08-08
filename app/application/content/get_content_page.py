@@ -56,8 +56,10 @@ def get_content_page_data(content_id):
     entity_carousel = None
     author_carousel = None
     source_carousel = None
+    event_carousel = None
     
     exclude_ids = tuple([content["id"]])
+    carousel_tasks = {}
 
     # 1. Entity Carousel (More About [Entity])
     top_entity = None
@@ -69,18 +71,9 @@ def get_content_page_data(content_id):
         entity_type = "topic"
         
     if top_entity:
-        items = get_carousel_contents_cached(
-            normalize_filters({entity_type: [top_entity["slug"]]}), 
-            exclude_ids_key=exclude_ids
-        )
-        if items:
-            entity_carousel = {
-                "title": f"More about {top_entity['name']}",
-                "items": items
-            }
+        carousel_tasks['entity'] = normalize_filters({entity_type: [top_entity["slug"]]})
 
     # 2. Source Carousel (More from [Source])
-    # Use content.source (from Content.source FK) first, fallback to article-level source_name
     source = content.get("source")
     if not source and content.get("target"):
         source_name = content["target"].get("source_name")
@@ -89,47 +82,69 @@ def get_content_page_data(content_id):
             slug = re.sub(r'[-\s]+', '-', re.sub(r'[^\w\s-]', '', source_name.lower())).strip('-')
             source = {"name": source_name, "slug": slug}
     if source and source.get("slug"):
-        items = get_carousel_contents_cached(
-            normalize_filters({"source": [source["slug"]]}),
-            exclude_ids_key=exclude_ids
-        )
-        if items:
-            source_carousel = {
-                "title": f"More from {source['name']}",
-                "items": items
-            }
+        carousel_tasks['source'] = normalize_filters({"source": [source["slug"]]})
 
     # 3. Author Carousel (More by [Author])
     authors = content.get("authors")
+    author_val = None
     if authors:
-        # Check if it's a list of dicts (authors relation) or just string/list of strings
         if isinstance(authors, list) and len(authors) > 0:
             author_val = authors[0].get("name") if isinstance(authors[0], dict) else authors[0]
             if author_val:
-                items = get_carousel_contents_cached(
-                    normalize_filters({"author": [author_val]}),
-                    exclude_ids_key=exclude_ids
-                )
-                if items:
-                    author_carousel = {
-                        "title": f"More by {author_val}",
-                        "items": items
-                    }
+                carousel_tasks['author'] = normalize_filters({"author": [author_val]})
 
     # 4. Developing Story Carousel (More on this Event)
-    event_carousel = None
     event = content.get("event")
     if event and event.get("external_uri"):
-        items = get_carousel_contents_cached(
-            normalize_filters({"event": [event["external_uri"]]}),
-            exclude_ids_key=exclude_ids
-        )
-        if items:
-            event_carousel = {
-                "title": "Developing Story",
-                "items": items,
-                "event": event
+        carousel_tasks['event'] = normalize_filters({"event": [event["external_uri"]]})
+
+    carousel_results = {}
+    if carousel_tasks:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        from flask import current_app
+        
+        # We need the real app object to pass context to threads
+        app = current_app._get_current_object()
+        
+        def _fetch_carousel(key, filters):
+            with app.app_context():
+                return key, get_carousel_contents_cached(filters, exclude_ids_key=exclude_ids)
+                
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            future_to_key = {
+                executor.submit(_fetch_carousel, k, v): k 
+                for k, v in carousel_tasks.items()
             }
+            for future in as_completed(future_to_key):
+                try:
+                    k, result = future.result()
+                    if result:
+                        carousel_results[k] = result
+                except Exception:
+                    pass
+
+    # Build final carousels
+    if carousel_results.get('entity'):
+        entity_carousel = {
+            "title": f"More about {top_entity['name']}",
+            "items": carousel_results['entity']
+        }
+    if carousel_results.get('source'):
+        source_carousel = {
+            "title": f"More from {source['name']}",
+            "items": carousel_results['source']
+        }
+    if carousel_results.get('author'):
+        author_carousel = {
+            "title": f"More by {author_val}",
+            "items": carousel_results['author']
+        }
+    if carousel_results.get('event'):
+        event_carousel = {
+            "title": "Developing Story",
+            "items": carousel_results['event'],
+            "event": event
+        }
 
     return {
         "content": content,

@@ -4,7 +4,7 @@ from app.domains.taxonomy.models import Category
 from app.domains.content.service.admin import retry_admin_pipeline, get_admin_content_inspect_raw
 from app.domains.interaction.service.scoring import get_content_engagement_score
 from app.domains.distribution.services import get_distribution_history
-from app.domains.content.serializers import serialize_content_inspect_dto
+from app.application.content.admin_serializers import serialize_content_inspect_dto
 from app.domains.content.service.command import execute_bulk_content_actions, delete_content_and_relations
 from app.application.content.editorial import assess_publishing_readiness
 

@@ -1,8 +1,6 @@
 from app.domains.taxonomy.service import (
     get_section_by_slug,
-    get_relationships_for_section,
-    get_types_for_section,
-    get_attributes_for_section,
+    get_taxonomy_filters,
 )
 from app.application.content.query_service import get_filtered_contents_cached
 from app.infrastructure.cache import normalize_filters
@@ -34,20 +32,17 @@ def get_feed_data(section_slug, active_filters, page=1):
         page=page,
     )
 
-    filter_options = {}
-    relationship_filters = ["category", "entity", "intent", "price_tier", "source", "event", "location", "author"]
-    
-    for f in relationship_filters:
-        if f in allowed_filters:
-            filter_options[f] = get_relationships_for_section(section_slug, f)
-            
-    if "type" in allowed_filters:
-        filter_options["type"] = get_types_for_section(section_slug)
-    if "attributes" in allowed_filters:
-        category_slugs = active_filters.get("category", [])
-        filter_options["attributes"] = get_attributes_for_section(
-            section_slug, category_slugs=category_slugs
-        )
+    category_slugs = active_filters.get("category", [])
+    if isinstance(category_slugs, list):
+        category_slugs = tuple(sorted(category_slugs))
+    elif isinstance(category_slugs, str):
+        category_slugs = (category_slugs,)
+        
+    filter_options = get_taxonomy_filters(
+        section_slug, 
+        tuple(allowed_filters or []), 
+        category_slugs
+    )
     has_results = len(pagination["products"]) > 0
     from app.application.recommendation.contextual import get_contextual_recommendations
     recommendation_blocks = get_contextual_recommendations(
