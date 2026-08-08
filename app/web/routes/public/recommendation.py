@@ -36,6 +36,7 @@ def search():
         return render_template(
             "search-results.html",
             search_results=results,
+            grouped_results=search_data.get("grouped_results"),
             query=q,
             active_type=search_data["active_type"],
             result_counts=search_data["result_counts"],

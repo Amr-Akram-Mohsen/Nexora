@@ -54,6 +54,19 @@ class Product(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey("brands.id"), nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now(), index=True)
+
+    # ── Ingestion lifecycle ──────────────────────────────────────────
+    # ingestion_status tracks where this product is in the pipeline:
+    #   pending → scraped → validated → ready → published → failed
+    ingestion_status = db.Column(db.String(30), nullable=False, default="pending", index=True)
+    # scrape_status records the outcome of the last scrape attempt:
+    #   "success" | "partial" | "failed" | "stale" | None (never scraped)
+    scrape_status = db.Column(db.String(30), nullable=True)
+    # UTC timestamp of the most recent successful or attempted scrape.
+    last_scraped_at = db.Column(db.DateTime, nullable=True)
+    # JSON list of error/warning messages from the last scrape attempt.
+    # Cleared on a successful scrape; populated on partial or failed scrapes.
+    scrape_errors = db.Column(db.JSON, nullable=True)
     
     like_count = db.Column(db.Integer, nullable=False, default=0)
     dislike_count = db.Column(db.Integer, nullable=False, default=0)
@@ -310,7 +323,9 @@ class Product(db.Model):
             "ix_products_search_vector",
             "search_vector",
             postgresql_using="gin"
-        )
+        ),
+        db.Index("ix_products_ingestion_status", "ingestion_status"),
+        db.Index("ix_products_scrape_staleness", "scrape_status", "last_scraped_at"),
     )
 
     def __repr__(self):

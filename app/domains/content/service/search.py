@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import func, select, case as sa_case
 from app.domains.content.models import Content
 from .content_access import assign_target_to_contents
 
@@ -137,10 +137,33 @@ def populate_content_search_fields(content, obj, object_type):
     # Expand common compound tech/product words so user searches match
     # e.g., if category is "smartwatches", we also want "smart watches" in the vector
     compounds_map = {
+        # Wearables
         "smartwatches": "smart watches smartwatch",
         "smartwatch": "smart watches smartwatch",
         "earbuds": "ear buds earbud",
         "earbud": "ear buds earbud",
+        "airpods": "air pods airpod earbuds wireless earphones",
+        "airpod": "air pods airpod earbuds wireless earphones",
+        # Audio
+        "noisecancelling": "noise cancelling noise-cancelling anc",
+        "noisecanceling": "noise cancelling noise-canceling anc",
+        # Mobile
+        "smartphone": "smart phone mobile phone handset",
+        "smartphones": "smart phones mobile phones handsets",
+        "iphone": "i phone apple iphone ios mobile",
+        "android": "android google mobile smartphone",
+        # Computers
+        "macbook": "mac book apple laptop macbook",
+        "ipad": "i pad apple tablet ipad",
+        "laptop": "laptop notebook computer portable",
+        # Gaming
+        "playstation": "play station sony ps5 ps4 gaming console",
+        "xbox": "xbox microsoft gaming console",
+        "nintendo": "nintendo switch gaming portable",
+        # General tech
+        "bluetooth": "bluetooth wireless bt",
+        "wifi": "wi-fi wifi wireless network",
+        "5g": "5g fifth generation mobile network",
     }
     
     extra_terms = []
@@ -230,14 +253,23 @@ def get_search_contents(
 
     from .query.options import CONTENT_LIST_EAGER_LOADS
 
-    search_query = func.websearch_to_tsquery(
-        "english",
-        query
-    )
+    # websearch_to_tsquery handles operators; falls back to plainto_tsquery
+    # at the SQL level to avoid empty-tsquery edge cases (e.g. bare "-").
+    web_q = func.websearch_to_tsquery("english", query)
+    plain_q = func.plainto_tsquery("english", query)
+    empty_q = func.to_tsquery("")
+    search_query = func.coalesce(func.nullif(web_q, empty_q), plain_q)
 
     rank = func.ts_rank_cd(
         Content.search_vector,
         search_query
+    )
+
+    # Title prefix-match boost: content whose title starts with the query
+    # surfaces above purely ts_rank-ranked results.
+    title_boost = sa_case(
+        (func.lower(Content.title).startswith(query.lower()), 0),
+        else_=1
     )
 
     stmt = (
@@ -249,6 +281,7 @@ def get_search_contents(
             Content.search_vector.op("@@")(search_query)
         )
         .order_by(
+            title_boost,
             rank.desc(),
             Content.view_count.desc(),
             Content.score.desc(),

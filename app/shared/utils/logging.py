@@ -299,3 +299,102 @@ def log_velocity_cooldown(
         base_hours,
         effective_hours,
     )
+
+
+# ---------------------------------------------------------------------------
+# Commercial Product Pipeline Logging
+# ---------------------------------------------------------------------------
+
+
+def log_commercial_discovery_start(logger: logging.Logger, source_type: str, category: str, page: int) -> None:
+    """Log the start of commercial product discovery."""
+    logger.info("[COMMERCIAL][DISCOVERY] start  source=%s  category=\"%s\"  page=%d", source_type, category, page)
+
+
+def log_commercial_discovery_success(logger: logging.Logger, source_type: str, category: str, count: int, page: int) -> None:
+    """Log successful commercial product discovery."""
+    logger.info("[COMMERCIAL][DISCOVERY] success  source=%s  category=\"%s\"  discovered=%d  page=%d", source_type, category, count, page)
+
+
+def log_commercial_enqueue(logger: logging.Logger, enqueued: int, duplicates: int) -> None:
+    """Log discovery queue batch summary."""
+    logger.info("[COMMERCIAL][QUEUE] enqueued=%d  duplicates=%d", enqueued, duplicates)
+
+
+def log_commercial_scrape_start(logger: logging.Logger, url: str) -> None:
+    """Log start of product page scraping in commercial pipeline."""
+    logger.info("[COMMERCIAL][SCRAPE] start  url=%s", url)
+
+
+def log_commercial_scrape_success(logger: logging.Logger, url: str, name: str, variants_count: int, images_count: int) -> None:
+    """Log successful product page scrape in commercial pipeline."""
+    logger.info("[COMMERCIAL][SCRAPE] success  variants=%d  images=%d  title=\"%s\"  url=%s", variants_count, images_count, (name or "")[:50], url)
+
+
+def log_commercial_scrape_failed(logger: logging.Logger, url: str, reason: str) -> None:
+    """Log failed product page scrape in commercial pipeline."""
+    logger.warning("[COMMERCIAL][SCRAPE] failed  reason=%s  url=%s", reason, url)
+
+
+def log_commercial_ingest_success(logger: logging.Logger, product_id: int, name: str, store_slug: str, price: Any, currency: str) -> None:
+    """Log successful insertion of product into database."""
+    logger.info("[COMMERCIAL][INGEST] inserted  product_id=%s  store=%s  price=%s %s  title=\"%s\"", product_id, store_slug, price, currency or "", (name or "")[:50])
+
+
+def log_commercial_pipeline_done(logger: logging.Logger, stats: dict) -> None:
+    """Log overall commercial pipeline completion stats."""
+    logger.info("[COMMERCIAL][PIPELINE] done  discovered=%d  enqueued=%d  duplicates=%d  scraped=%d  inserted=%d  failed=%d  skipped=%d",
+                stats.get("discovered", 0), stats.get("enqueued", 0), stats.get("duplicates", 0),
+                stats.get("scraped", 0), stats.get("inserted", 0), stats.get("failed", 0), stats.get("skipped", 0))
+
+
+# ---------------------------------------------------------------------------
+# Commercial Browser Lifecycle Logging
+# ---------------------------------------------------------------------------
+
+
+def log_commercial_browser_launch(logger: logging.Logger, profile_dir: str, channel: str) -> None:
+    """Log successful browser launch with profile and channel details."""
+    logger.info("[COMMERCIAL][BROWSER] launch  channel=%s  profile=%s", channel, profile_dir)
+
+
+def log_commercial_browser_profile_locked(logger: logging.Logger, profile_dir: str) -> None:
+    """Log when the Chrome profile directory is locked by a running Chrome process."""
+    logger.error(
+        "[COMMERCIAL][BROWSER] profile_locked  profile=%s  "
+        "action=RAISE  hint=\"Close Google Chrome completely before running the scraper.\"",
+        profile_dir,
+    )
+
+
+def log_commercial_browser_fallback(logger: logging.Logger, fallback_dir: str) -> None:
+    """Log when the scraper falls back to a secondary (non-default) Chrome profile directory."""
+    logger.warning(
+        "[COMMERCIAL][BROWSER] fallback  fallback_dir=%s  "
+        "note=\"Fallback profile has no Google account session or AliExpress cookies.\"",
+        fallback_dir,
+    )
+
+
+def log_commercial_page_navigate(logger: logging.Logger, url: str, wait_strategy: str) -> None:
+    """Log page navigation attempt with its wait strategy."""
+    logger.info("[COMMERCIAL][PAGE] navigate  strategy=%s  url=%s", wait_strategy, url)
+
+
+def log_commercial_page_ready(logger: logging.Logger, selector: str, elapsed_ms: float) -> None:
+    """Log when a key page element is confirmed present in DOM."""
+    logger.info("[COMMERCIAL][PAGE] ready  selector=%s  elapsed_ms=%.0f", selector, elapsed_ms)
+
+
+def log_commercial_captcha(logger: logging.Logger, url: str) -> None:
+    """Log captcha wall detection during scraping."""
+    logger.warning("[COMMERCIAL][SCRAPE] captcha_detected  url=%s", url)
+
+
+def log_commercial_retry(logger: logging.Logger, url: str, attempt: int, max_attempts: int, reason: str) -> None:
+    """Log a scrape retry event with attempt counter and reason."""
+    logger.warning(
+        "[COMMERCIAL][SCRAPE] retry  attempt=%d/%d  reason=%s  url=%s",
+        attempt, max_attempts, reason, url,
+    )
+

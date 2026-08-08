@@ -4,8 +4,12 @@ Normalized in-memory product structure.
 Raw source HTML  →  Parser  →  ParsedProduct  →  ProductInserter  →  Database
 
 These dataclasses are the shared contract between every source-specific
-parser (AliExpressParser, SheinParser, …) and the source-agnostic
-ProductInserter.  Nothing here is persisted directly.
+parser (AliExpressParser, NoonParser, AmazonParser, …) and the
+source-agnostic ProductInserter.  Nothing here is persisted directly.
+
+Discovery metadata (discovery_source, discovery_keyword, etc.) is purely
+informational — it is logged and stored in ProductDiscoveryQueue but is NOT
+written to the Product model, keeping the product domain clean.
 """
 from __future__ import annotations
 
@@ -29,6 +33,13 @@ class ParsedVariant:
     currency: Optional[str]
     is_default: bool = False
     image_urls: list[str] = field(default_factory=list)
+    # Populated by the browser scraper; None when using static HTML parsing.
+    sku: Optional[str] = None
+    # AliExpress internal SKU/SKU-col ID (from data-sku-col attribute).
+    # Used for combination URL construction and deduplication.
+    sku_id: Optional[str] = None
+    # Per-variant availability.  Defaults to "InStock" when not determinable.
+    availability: str = "InStock"
 
 
 @dataclass
@@ -64,3 +75,9 @@ class ParsedProduct:
     variants: list[ParsedVariant]
     specifications: list[ParsedSpecification]
     store_link: ParsedStoreLink
+    # ── Discovery provenance ─────────────────────────────────────────
+    # These fields are informational only.  They describe how this URL
+    # was discovered and are stored in ProductDiscoveryQueue, not in Product.
+    discovery_source: Optional[str] = None       # "category" | "search" | "manual" | "newsletter"
+    discovery_keyword: Optional[str] = None      # the search keyword that led here
+    discovery_category_path: Optional[str] = None  # e.g. "Electronics > Phones"

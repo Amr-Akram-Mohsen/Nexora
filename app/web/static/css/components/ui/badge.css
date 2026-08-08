@@ -25,6 +25,7 @@
 .badge--topic,
 .badge--category,
 .badge--location,
+.badge--event,
 .badge--brand {
   padding: 0 0.375rem;
 }

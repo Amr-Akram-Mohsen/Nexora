@@ -244,6 +244,17 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
         
     locations = content_obj.locations or []
     event = getattr(target_obj, "event", None) if target_obj else None
+    if event:
+        event = {
+            "external_uri": event.external_uri,
+            "title": event.title,
+            "summary": event.summary,
+            "event_date": event.event_date.isoformat() if event.event_date else None,
+            "image_url": event.image_url,
+            "event_type": event.event_type
+        }
+
+
     
     if locations:
         display_loc = locations[0]
@@ -262,8 +273,8 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
                     display_loc = loc
                     break
         display_badges.append({"text": display_loc.name, "class": "badge--location", "variant": "info", "icon": "fas fa-map-marker-alt"})
-    elif event:
-        display_badges.append({"text": event.title, "class": "badge--event", "variant": "primary", "icon": "fas fa-map-marker-alt"})
+    elif event and event.get("event_type"):
+        display_badges.append({"text": event["event_type"], "class": "badge--event", "variant": "primary", "icon": "fas fa-map-marker-alt"})
     else:
         entities = [e.entity for e in top_content_entities if e.entity]
         if entities:
@@ -347,17 +358,9 @@ def serialize_content(content_obj, target_obj=None, session=None, include_linked
                         "email": a.get("email", "")
                     })
 
-    event = None
-    if target_obj and getattr(target_obj, "event", None):
-        e = target_obj.event
-        event = {
-            "external_uri": e.external_uri,
-            "title": e.title,
-            "summary": e.summary,
-            "event_date": e.event_date.isoformat() if e.event_date else None,
-            "image_url": e.image_url,
-            "event_type": e.event_type
-        }
+    # event = None
+    # if target_obj and getattr(target_obj, "event", None):
+    #     e = target_obj.event
 
     media_images = []
     media_videos = []

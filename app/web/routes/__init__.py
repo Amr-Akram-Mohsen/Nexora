@@ -24,4 +24,5 @@ from .public import item_bp
 from .public import interaction_bp
 from .public import recommendation_bp
 from .public import system_bp
+from .public import suggestions_bp
 

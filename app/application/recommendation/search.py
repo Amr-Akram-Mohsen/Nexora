@@ -232,6 +232,41 @@ def build_result_counts(results):
     }
 
 
+def build_grouped_results(results: list[dict]) -> dict:
+    """
+    Partition a flat scored results list into content-type buckets.
+
+    Used by the template when ``active_type == 'all'`` to render
+    grouped sections (Products / Articles / Videos / Posts) instead
+    of a single interleaved list.
+
+    Returns a dict with:
+        products   – list of product results
+        articles   – list of article results
+        videos     – list of video results
+        posts      – list of post results
+    Each bucket is already in score-descending order (inherited from
+    the sorted ``results`` list).
+    """
+    grouped: dict[str, list] = {
+        "products": [],
+        "articles": [],
+        "videos": [],
+        "posts": [],
+    }
+    for row in results:
+        t = row.get("search_type")
+        if t == "product":
+            grouped["products"].append(row)
+        elif t == "article":
+            grouped["articles"].append(row)
+        elif t == "video":
+            grouped["videos"].append(row)
+        elif t == "post":
+            grouped["posts"].append(row)
+    return grouped
+
+
 def search_workflow(query, result_type="all"):
     normalized_query = normalize_search_query(query)
     active_type = result_type if result_type in SEARCH_TYPES else "all"
@@ -241,11 +276,15 @@ def search_workflow(query, result_type="all"):
     else:
         results = list(get_unified_search_results_cached(normalized_query))
 
+    filtered = _filter_results(results, active_type)
+    grouped_results = build_grouped_results(results) if active_type == "all" else None
+
     return {
         "query": query.strip() if query else "",
         "normalized_query": normalized_query,
         "active_type": active_type,
-        "results": _filter_results(results, active_type),
+        "results": filtered,
+        "grouped_results": grouped_results,
         "result_counts": build_result_counts(results),
         "intent": detect_search_intent(normalized_query),
         "search_types": SEARCH_TYPES,

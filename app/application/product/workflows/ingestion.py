@@ -164,3 +164,21 @@ def store_amazon_item(data: dict) -> Product | None:
         db.session.rollback()
         logger.exception(f"Error storing Amazon product {data['asin']}")
         return None
+
+
+def run_ingestion_for_url(
+    url: str,
+    source_type: str = "aliexpress",
+    *,
+    session=None,
+    dry_run: bool = False,
+) -> Product | None:
+    """
+    Entry point for single-URL ingestion workflow called by automated pipeline.
+    
+    Delegates to IngestionPipeline in Phase 4.
+    """
+    logger.info("[IngestionWorkflow] Triggering ingestion for %s (source=%s)", url, source_type)
+    # Stub for Phase 1/2: will be fully wired when IngestionPipeline is instantiated in Phase 4
+    return None
+

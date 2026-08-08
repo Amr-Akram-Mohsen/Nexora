@@ -20,7 +20,7 @@ from app import domains  # noqa: F401
 
 
 from app.domains.user.models import User
-
+from app.integrations.commercial.models import ProductDiscoveryQueue
 from app.web.routes import (
     user_bp,
     system_bp,
@@ -28,6 +28,7 @@ from app.web.routes import (
     item_bp,
     interaction_bp,
     recommendation_bp,
+    suggestions_bp,
     api_user_bp,
     api_content_bp,
     api_item_bp,
@@ -85,7 +86,7 @@ def setup_logging(app):
     class IngestionFilter(logging.Filter):
         def filter(self, record):
             msg = record.getMessage()
-            return "[FETCH]" in msg or ("[INGEST]" in msg and "[rescrape]" not in msg) or "[DISCOVERY]" in msg or "[BATCH]" in msg
+            return "[FETCH]" in msg or ("[INGEST]" in msg and "[rescrape]" not in msg) or "[DISCOVERY]" in msg or "[BATCH]" in msg or "[COMMERCIAL]" in msg
 
     ingest_h = RotatingFileHandler("logs/ingestion.log", **log_cfg)
     ingest_h.setFormatter(formatter)
@@ -96,14 +97,25 @@ def setup_logging(app):
     class EnrichmentFilter(logging.Filter):
         def filter(self, record):
             msg = record.getMessage()
-            return "[SCRAPE]" in msg or "[rescrape]" in msg
+            return "[SCRAPE]" in msg or "[rescrape]" in msg or "[COMMERCIAL]" in msg
 
     enrich_h = RotatingFileHandler("logs/enrichment.log", **log_cfg)
     enrich_h.setFormatter(formatter)
     enrich_h.setLevel(logging.INFO)
     enrich_h.addFilter(EnrichmentFilter())
 
-    # 3. Web Routes log
+    # 3. Commercial Pipeline log
+    class CommercialFilter(logging.Filter):
+        def filter(self, record):
+            msg = record.getMessage()
+            return "[COMMERCIAL]" in msg or "[DiscoveryQueue]" in msg or "commercial" in record.name
+
+    commercial_h = RotatingFileHandler("logs/commercial.log", **log_cfg)
+    commercial_h.setFormatter(formatter)
+    commercial_h.setLevel(logging.INFO)
+    commercial_h.addFilter(CommercialFilter())
+
+    # 4. Web Routes log
     class RouteFilter(logging.Filter):
         def filter(self, record):
             msg = record.getMessage()
@@ -114,7 +126,7 @@ def setup_logging(app):
     route_h.setLevel(logging.INFO)
     route_h.addFilter(RouteFilter())
 
-    # 4. Auth log
+    # 5. Auth log
     class AuthFilter(logging.Filter):
         def filter(self, record):
             return "[AUTH]" in record.getMessage()
@@ -127,7 +139,9 @@ def setup_logging(app):
     # Apply handlers to the 'app' logger (where our custom logs go)
     app_logger = logging.getLogger("app")
     app_logger.setLevel(logging.INFO)
-    app_logger.handlers = [ingest_h, enrich_h, route_h, auth_h]
+    app_logger.handlers = [ingest_h, enrich_h, commercial_h, route_h, auth_h]
+    app_logger.propagate = False
+
     app_logger.propagate = False
 
     # Apply route handler to Flask's logger (for request logs)
@@ -205,6 +219,7 @@ def create_app():
     app.register_blueprint(item_bp)
     app.register_blueprint(interaction_bp)
     app.register_blueprint(recommendation_bp)
+    app.register_blueprint(suggestions_bp)
 
     app.register_blueprint(api_content_bp)
     app.register_blueprint(api_item_bp)
