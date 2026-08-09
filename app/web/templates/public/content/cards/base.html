@@ -3,7 +3,7 @@
 {% block card_type %}{{ product.object_type }}{% endblock %}
 {% block card_id %}{{ product.id }}{% endblock %}
 {% block card_domain %}content{% endblock %}
-{% block card_link %}{{ url_for('content.content_page', content_id=product.id) }}{% endblock %}
+{% block card_link %}{{ url_for('content.content_page', content_slug=product.slug) }}{% endblock %}
 
 {% block title_text %}{{ product.target.title }}{% endblock %}
 
@@ -13,6 +13,6 @@
 
 {# Re-export the content variable for interactions-compact.html #}
 {% block interactions %}
-  {% set content = product %}
-  {% include "components/interactions/interactions-compact.html" %}
+{% set content = product %}
+{% include "components/interactions/interactions-compact.html" %}
 {% endblock %}

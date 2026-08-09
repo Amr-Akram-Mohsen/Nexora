@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model, serialize_target
-
+from slugify import slugify
 
 def _serialize_content_base(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     if not content_obj:
@@ -14,6 +14,7 @@ def _serialize_content_base(content_obj, target_obj=None, session=None, include_
 
     data = {
         "id": content_obj.id,
+        "slug": f"{content_obj.id}-{slugify(content_obj.title)}",
         "object_type": content_obj.object_type,
         "type": content_obj.object_type,
         "section_id": content_obj.section_id,

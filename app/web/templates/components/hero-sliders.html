@@ -15,7 +15,7 @@
               <p class="hero-slide__excerpt">
                 {{ slider.target.preview_text }}
               </p>
-              <a href="{{ url_for('content.content_page', content_id=slider.id) }}">
+              <a href="{{ url_for('content.content_page', content_slug=slider.slug) }}">
                 {{ button(text="Know more about this", class="hero-slide__btn") }}
               </a>
             </div>

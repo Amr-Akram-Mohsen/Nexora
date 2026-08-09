@@ -5,7 +5,7 @@
   <h3 class="snippet__header">{{ snippet_title }}</h3>
   <div class="snippet-contents">
     {% for product in products %}
-    <a href="{{ url_for('content.content_page', content_id=product.id) }}"
+    <a href="{{ url_for('content.content_page', content_slug=product.slug) }}"
       class="snippet-content" data-id="{{ product.id }}">
       {{ render_image_url(
       product.target.image_url,

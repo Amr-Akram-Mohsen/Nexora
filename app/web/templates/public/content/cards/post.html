@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block title %}
-<a href="{{ url_for('content.content_page', content_id=content.id) }}">
+<a href="{{ url_for('content.content_page', content_slug=content.slug) }}">
   <h3 class="card__title">{{ post.title }}</h3>
 </a>
 {% endblock %}

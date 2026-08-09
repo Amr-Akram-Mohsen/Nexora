@@ -1,4 +1,4 @@
-<a href="{{ url_for('content.content_page', content_id=product.id) }}"
+<a href="{{ url_for('content.content_page', content_slug=product.slug) }}"
     class="mini-card flex flex-col gap-1">
     {% if product.target and product.target.image_url %}
     <div class="mini-card__image">

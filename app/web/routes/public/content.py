@@ -91,13 +91,15 @@ def globe_data():
     
     return jsonify(get_globe_data_workflow())
 
-@bp.route("/contents/<int:content_id>")
-def content_page(content_id):
+@bp.route("/contents/<content_slug>")
+def content_page(content_slug):
     from app.application.content.get_content_page import (
         record_content_view,
         get_content_page_data,
     )
     from app.core.extensions import db
+
+    content_id = int(content_slug.split('-')[0])
 
     log_route_start(logger, f"/contents/{content_id}")
 
