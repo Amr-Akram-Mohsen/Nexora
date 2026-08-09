@@ -13,7 +13,7 @@ from flask import Blueprint, jsonify, request, render_template
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick
-from app.domains.interaction.service.query import (
+from app.domains.interaction.service.admin.analytics import (
     get_interactions_breakdown,
     get_reaction_stats,
     get_view_stats,
@@ -21,7 +21,7 @@ from app.domains.interaction.service.query import (
     get_share_stats,
     get_click_stats,
 )
-from app.domains.interaction.service.admin import (
+from app.domains.interaction.service.admin.admin import (
     get_admin_comments_page,
     delete_admin_comment,
     flag_admin_comment_as_spam,
@@ -35,7 +35,7 @@ from app.domains.user.models import User
 from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
 from sqlalchemy import select, func, or_
 from datetime import datetime
-from app.application.interaction.admin_serializers import (
+from app.domains.interaction.service.admin.serializers import (
     map_comment_for_rows, map_reaction_for_rows, map_view_for_rows,
     map_click_for_rows, map_save_for_rows, map_share_for_rows
 )
@@ -214,7 +214,7 @@ def comments_rows():
 @bp.route("/comments/<int:id>/inspect", methods=["GET"])
 def inspect_comment(id):
     """Return server-rendered HTML for the comment inspect modal body."""
-    from app.application.interaction.admin import get_comment_inspect_workflow
+    from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
     from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
     
     aggregated_data = get_comment_inspect_workflow(id)
@@ -229,7 +229,7 @@ def inspect_comment(id):
 @bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
 def inspect_clicks(link_id):
     """Return server-rendered HTML for recent clicks on a given store link."""
-    from app.application.interaction.admin import get_link_clicks_workflow
+    from app.domains.interaction.service.admin.inspect import get_link_clicks_workflow
     from app.web.routes.admin.builders.interaction_builder import build_link_clicks_view_model
     
     aggregated_data = get_link_clicks_workflow(link_id)
@@ -391,7 +391,7 @@ def clicks_stats():
 
 @bp.route("/analytics", methods=["GET"])
 def analytics_dashboard():
-    from app.domains.interaction.service.analytics import get_analytics_dashboard_data
+    from app.domains.interaction.service.admin.analytics import get_analytics_dashboard_data
     data = get_analytics_dashboard_data()
     data["top_saves_html"] = render_template("admin/interactions/partials/_top_saves.html", data=data.get("top_saves", []))
     return jsonify(data)

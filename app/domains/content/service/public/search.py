@@ -1,6 +1,6 @@
 from sqlalchemy import func, select, case as sa_case
 from app.domains.content.models import Content
-from .content_access import assign_target_to_contents
+from app.domains.content.service.content_access import assign_target_to_contents
 
 def build_content_search_vector(content, body_text=""):
     return (

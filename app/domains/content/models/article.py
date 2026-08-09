@@ -82,6 +82,10 @@ class Article(db.Model):
 
     # -------- Helpers --------
     @property
+    def is_content_scraped(self):
+        return self.status in ("ready", "published", "complete") or bool(self.content_html)
+
+    @property
     def read_time_minutes(self):
         # Use word_count if available, fallback to calculating from content_text
         if self.word_count:

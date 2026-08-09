@@ -11,7 +11,7 @@ Refactoring applied:
 """
 from flask import Blueprint, jsonify, request, render_template
 from app.domains.user.models import User
-from app.domains.user.service.admin import get_admin_users_paginated
+from app.domains.user.service.admin.admin import get_admin_users_paginated
 from app.application.user.admin import deactivate_user_workflow, activate_user_workflow, toggle_admin_user_workflow
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.core.extensions import db
@@ -26,7 +26,7 @@ bp = Blueprint("api_user", __name__, url_prefix="/admin/users")
 @bp.route("/stats", methods=["GET"])
 def users_stats():
     """Return JSON metrics for the users dashboard charts."""
-    from app.domains.user.service.analytics import get_user_dashboard_stats
+    from app.domains.user.service.admin.analytics import get_user_dashboard_stats
     return jsonify(get_user_dashboard_stats())
 
 
@@ -51,7 +51,7 @@ def list_users():
 
     products, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
-    from app.domains.user.serializers import serialize_user_row
+    from app.domains.user.service.admin.serializers import serialize_user_row
     serialized = []
     for u, score in products:
         serialized.append(serialize_user_row(u, score))
@@ -82,7 +82,7 @@ def activate_user(id):
 
 
 def _build_user_query(search, role, status, verified, subscription, provider, sort_by=None, sort_dir=None):
-    from app.domains.user.service.analytics import build_user_query as domain_build_user_query
+    from app.domains.user.service.admin.analytics import build_user_query as domain_build_user_query
     return domain_build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
 
 
@@ -101,7 +101,7 @@ def users_rows():
 
     products, total, pages, stats = _paginate_manual(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page)
 
-    from app.domains.user.serializers import serialize_user_row
+    from app.domains.user.service.admin.serializers import serialize_user_row
     users = []
     for u, score in products:
         users.append(serialize_user_row(u, score))

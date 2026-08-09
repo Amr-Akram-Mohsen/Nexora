@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, render_template, make_response
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.web.routes.admin.helpers import parse_pagination_params
-from app.domains.user.service.admin import get_admin_subscribers_paginated
+from app.domains.user.service.admin.admin import get_admin_subscribers_paginated
 from app.application.user.admin import delete_subscriber_workflow
 
 bp = Blueprint("api_subscribers", __name__, url_prefix="/admin/subscribers")

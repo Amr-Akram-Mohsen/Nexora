@@ -8,7 +8,7 @@ apply_admin_guard(bp)
 def list_sources():
     page, per_page = parse_pagination_params(default_per_page=20)
     search = request.args.get("search", "").strip()
-    from app.domains.taxonomy.service.admin_providers_source import get_admin_sources_page
+    from app.domains.taxonomy.service.admin.admin_providers_source import get_admin_sources_page
     pagination, serialized = get_admin_sources_page(page, per_page, search)
     return jsonify({
         "sources":  serialized,
@@ -20,14 +20,14 @@ def list_sources():
 
 @bp.route("/health_stats", methods=["GET"])
 def get_source_health_stats():
-    from app.domains.taxonomy.service.admin_providers_source import get_admin_source_health_stats
+    from app.domains.taxonomy.service.admin.admin_providers_source import get_admin_source_health_stats
     return jsonify(get_admin_source_health_stats())
 
 @bp.route("/rows", methods=["GET"])
 def sources_rows():
     page, per_page = parse_pagination_params(default_per_page=20)
     search = request.args.get("search", "").strip()
-    from app.domains.taxonomy.service.admin_providers_source import get_admin_sources_page
+    from app.domains.taxonomy.service.admin.admin_providers_source import get_admin_sources_page
     pagination, serialized = get_admin_sources_page(page, per_page, search)
     return render_admin_rows_response(
         serialized, "source",
@@ -49,7 +49,7 @@ def inspect_source(id):
 
 @bp.route("/quality-data", methods=["GET"])
 def get_sources_quality_data():
-    from app.domains.taxonomy.service.admin_providers_source import get_admin_sources_quality_data
+    from app.domains.taxonomy.service.admin.admin_providers_source import get_admin_sources_quality_data
     quality_leaderboard, scrape_leaderboard, freshness_index, word_count_data, yield_data = get_admin_sources_quality_data()
     
     quality_leaderboard_html = render_template("admin/providers/partials/_quality_leaderboard.html", data=quality_leaderboard[:15])

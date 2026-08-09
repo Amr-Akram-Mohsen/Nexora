@@ -37,32 +37,6 @@ def load_admin_content_relations(page_items, quality):
             
     return targets_map, duplicate_titles
 
-def delete_admin_content_and_relations(content: Content) -> None:
-    cid = content.id
-    db.session.execute(
-        Comment.__table__.delete().where(
-            (Comment.target_type == "content") & (Comment.target_id == cid)
-        )
-    )
-    db.session.execute(
-        Reaction.__table__.delete().where(
-            (Reaction.target_type == "content") & (Reaction.target_id == cid)
-        )
-    )
-    db.session.execute(
-        View.__table__.delete().where(
-            (View.target_type == "content") & (View.target_id == cid)
-        )
-    )
-
-    if content.object_type == "article":
-        db.session.execute(Article.__table__.delete().where(Article.id == content.object_id))
-    elif content.object_type == "video":
-        db.session.execute(Video.__table__.delete().where(Video.id == content.object_id))
-    elif content.object_type == "post":
-        db.session.execute(Post.__table__.delete().where(Post.id == content.object_id))
-
-    db.session.delete(content)
 
 def get_admin_content_metadata():
     from app.domains.taxonomy.service.query import get_taxonomy_mappings

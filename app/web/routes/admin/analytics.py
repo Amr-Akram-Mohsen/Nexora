@@ -11,5 +11,5 @@ apply_admin_guard(bp)
 
 @bp.route("/stats", methods=["GET"])
 def get_analytics_stats():
-    from app.domains.user.service.admin import get_admin_audience_analytics_stats
+    from app.domains.user.service.admin.admin import get_admin_audience_analytics_stats
     return jsonify(get_admin_audience_analytics_stats())

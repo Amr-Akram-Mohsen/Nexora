@@ -37,6 +37,14 @@ def deactivate_user(id: int, session=None) -> bool:
     session.flush()
     return True
 
+def delete_user(user, session=None) -> bool:
+    """Hard deletes the user from the database."""
+    if session is None:
+        session = db.session
+    session.delete(user)
+    session.flush()
+    return True
+
 
 def activate_user(id: int, session=None) -> bool:
     if session is None:

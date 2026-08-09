@@ -12,7 +12,7 @@ def list_stores():
     country = request.args.get("country")
     sync_staleness = request.args.get("sync_staleness")
     
-    from app.domains.product.service.admin_providers_store import get_admin_stores_page
+    from app.domains.product.service.admin.admin_providers_store import get_admin_stores_page
     pagination, serialized = get_admin_stores_page(page, per_page, search, network, country, sync_staleness)
     return jsonify({
         "stores":   serialized,
@@ -24,7 +24,7 @@ def list_stores():
 
 @bp.route("/health_stats", methods=["GET"])
 def get_store_health_stats():
-    from app.domains.product.service.admin_providers_store import get_admin_store_health_stats
+    from app.domains.product.service.admin.admin_providers_store import get_admin_store_health_stats
     stats = get_admin_store_health_stats()
     stats["oos_by_store_html"] = render_template("admin/product_intelligence/partials/_oos_dist.html", data=stats.pop("oos_by_store"))
     stats["top_stale_stores_html"] = render_template("admin/product_intelligence/partials/_stale_list.html", data=stats.pop("top_stale_stores"))
@@ -32,7 +32,7 @@ def get_store_health_stats():
 
 @bp.route("/coverage_stats", methods=["GET"])
 def get_store_coverage_stats():
-    from app.domains.product.service.admin_providers_store import get_admin_store_coverage_stats
+    from app.domains.product.service.admin.admin_providers_store import get_admin_store_coverage_stats
     category_coverage, commission_rates = get_admin_store_coverage_stats()
     
     category_coverage_html = render_template("admin/product_intelligence/partials/_cat_coverage.html", data=category_coverage)
@@ -45,14 +45,14 @@ def get_store_coverage_stats():
 
 @bp.route("/affiliate_stats", methods=["GET"])
 def get_store_affiliate_stats():
-    from app.domains.product.service.admin_providers_store import get_admin_store_affiliate_stats
+    from app.domains.product.service.admin.admin_providers_store import get_admin_store_affiliate_stats
     stats = get_admin_store_affiliate_stats()
     stats["commission_rate_ranking_html"] = render_template("admin/product_intelligence/partials/_comm_ranking.html", data=stats.pop("commission_rate_ranking"))
     return jsonify(stats)
 
 @bp.route("/pricing_stats", methods=["GET"])
 def get_store_pricing_stats():
-    from app.domains.product.service.admin_providers_store import get_admin_store_pricing_stats
+    from app.domains.product.service.admin.admin_providers_store import get_admin_store_pricing_stats
     stats = get_admin_store_pricing_stats()
     stats["discount_depth_ranking_html"] = render_template("admin/product_intelligence/partials/_discount_ranking.html", data=stats.pop("discount_depth_ranking"))
     stats["pricing_alerts_html"] = render_template("admin/product_intelligence/partials/_pricing_alerts.html", oos_items_count=stats.pop("all_oos_items_count"), high_null_price_stores=stats.pop("high_null_price_stores"))
@@ -66,7 +66,7 @@ def stores_rows():
     country = request.args.get("country")
     sync_staleness = request.args.get("sync_staleness")
     
-    from app.domains.product.service.admin_providers_store import get_admin_stores_page
+    from app.domains.product.service.admin.admin_providers_store import get_admin_stores_page
     pagination, serialized = get_admin_stores_page(page, per_page, search, network, country, sync_staleness)
     return render_admin_rows_response(
         serialized, "store",
@@ -76,7 +76,7 @@ def stores_rows():
 
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_store(id):
-    from app.domains.product.service.admin import get_admin_store_inspect_raw
+    from app.domains.product.service.admin.admin import get_admin_store_inspect_raw
     from app.domains.product.serializers import serialize_store_inspect_dto
     from app.web.routes.admin.builders.item_builder import build_store_inspect_view_model
     

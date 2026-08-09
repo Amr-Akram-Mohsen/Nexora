@@ -1,10 +1,10 @@
 from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.taxonomy.models import Category
-from app.domains.content.service.admin import retry_admin_pipeline, get_admin_content_inspect_raw
+from app.domains.content.service.admin.admin import retry_admin_pipeline, get_admin_content_inspect_raw
 from app.domains.interaction.service.scoring import get_content_engagement_score
 from app.domains.distribution.services import get_distribution_history
-from app.application.content.admin_serializers import serialize_content_inspect_dto
+from app.domains.content.service.admin.serializers import serialize_content_inspect_dto
 from app.domains.content.service.command import execute_bulk_content_actions, delete_content_and_relations
 from app.application.content.editorial import assess_publishing_readiness
 
@@ -38,6 +38,29 @@ def get_content_inspect_workflow(content_id: int) -> dict:
         "article_sources": article_sources_data,
         "publishing_readiness": readiness
     }
+
+def get_content_rows_workflow(args, page, per_page):
+    from app.domains.content.service.query.filtering import get_content_paginated
+    from app.domains.content.service.admin.admin import load_admin_content_relations
+    from app.domains.content.service.admin.serializers import serialize_content_row
+    
+    filters = args.to_dict() if hasattr(args, "to_dict") else dict(args)
+    pagination, quality = get_content_paginated(
+        filters=filters,
+        sort_by=filters.get("sort_by", "").strip(),
+        sort_dir=filters.get("sort_dir", "desc").strip(),
+        page=page,
+        per_page=per_page
+    )
+    
+    targets_map, duplicate_titles = load_admin_content_relations(pagination.items, quality)
+    
+    serialized = [
+        serialize_content_row(c, targets_map.get((c.object_type, c.object_id)), duplicate_titles)
+        for c in pagination.items
+    ]
+    
+    return serialized, pagination
 
 from app.shared.utils.admin_helpers import execute_admin_workflow, toggle_model_flag_workflow
 

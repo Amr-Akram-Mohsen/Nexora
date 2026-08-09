@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 
 
 def serialize_model(m):
@@ -9,6 +10,57 @@ def serialize_model(m):
         "slug": getattr(m, "slug", None),
     }
 
+
+def _normalize_authors(raw_authors):
+    def slugify(text):
+        if not text:
+            return ""
+        return re.sub(r'[-\s]+', '-', re.sub(r'[^\w\s-]', '', text.lower())).strip('-')
+        
+    if not raw_authors:
+        return []
+    if isinstance(raw_authors, str):
+        raw_authors = [raw_authors]
+    
+    normalized = []
+    for a in raw_authors:
+        if isinstance(a, str):
+            normalized.append({"name": a, "slug": slugify(a)})
+        elif isinstance(a, dict) and a.get("name"):
+            name = a["name"]
+            slug = slugify(name)
+            url = a.get("link") if a.get("link") else a.get("uri") if a.get("uri") else None
+            normalized.append({"name": name, "slug": slug, "url": url})
+    return normalized
+
+def _serialize_authors(authors):
+    if not authors:
+        return []
+    return [{
+                "id": a.id,
+                "name": a.name,
+                "slug": a.slug,
+                "url": a.url,
+                "icon_url": a.icon_url,
+                "is_agency": a.is_agency,
+            } for a in authors
+        ]
+
+def _serialize_sources(sources):
+    if not sources:
+        return []
+    result = []
+    for s in sources:
+        if s and getattr(s, "source", None):
+            result.append({
+                "name": s.source.name,
+                "slug": s.source.slug,
+                "url": s.url,
+                "published_at": s.published_at.isoformat() if getattr(s, "published_at", None) else None,
+                "logo_url": getattr(s.source, "logo_url", None),
+                "authority_score": getattr(s.source, "authority_score", 0) or 0,
+            })
+    return result
 
 def serialize_target(obj, session=None):
     """
@@ -32,66 +84,7 @@ def serialize_target(obj, session=None):
         or getattr(obj, "thumbnail_url", None),
     }
 
-    # ── Type-Specific Enrichment ─────────────────────────────────────
-    
-    def _normalize_authors(raw_authors):
-        import re
-        
-        def slugify(text):
-            if not text:
-                return ""
-            return re.sub(r'[-\s]+', '-', re.sub(r'[^\w\s-]', '', text.lower())).strip('-')
-            
-        if not raw_authors:
-            return []
-        if isinstance(raw_authors, str):
-            raw_authors = [raw_authors]
-        
-        normalized = []
-        for a in raw_authors:
-            if isinstance(a, str):
-                normalized.append({"name": a, "slug": slugify(a)})
-            elif isinstance(a, dict) and a.get("name"):
-                name = a["name"]
-                slug = slugify(name)
-                url = a.get("link") if a.get("link") else a.get("uri") if a.get("uri") else None
-                normalized.append({"name": name, "slug": slug, "url": url})
-        return normalized
-
-    def _serialize_authors(authors):
-        return [{
-                    "id": a.id,
-                    "name": a.name,
-                    "slug": a.slug,
-                    "url": a.url,
-                    "icon_url": a.icon_url,
-                    "is_agency": a.is_agency,
-                } for a in authors
-            ]
-
-    def _serialize_sources(sources):
-        if not sources:
-            return []
-        result = []
-        for s in sources:
-            if s and getattr(s, "source", None):
-                result.append({
-                    "name": s.source.name,
-                    "slug": s.source.slug,
-                    "url": s.url,
-                    "published_at": s.published_at.isoformat() if getattr(s, "published_at", None) else None,
-                    "logo_url": getattr(s.source, "logo_url", None),
-                    "authority_score": getattr(s.source, "authority_score", 0) or 0,
-                })
-        return result
-
     if type_name == "article":
-
-        # print(f"\n\n{type(obj.authors)}\n\n")
-        # Derive is_content_scraped from status or content_html presence
-        status = getattr(obj, "status", None)
-        is_content_scraped = status in ("ready", "published", "complete") or bool(getattr(obj, "content_html", None))
-        
         # Serialize primary source relation cleanly
         rel = getattr(obj, "primary_source", None)
         if not rel and getattr(obj, "article_sources", None) and len(obj.article_sources) > 0:
@@ -108,16 +101,15 @@ def serialize_target(obj, session=None):
                 "authority_score": getattr(rel.source, "authority_score", 0) or 0
             }
 
-        
         serialized_authors = _serialize_authors(obj.authors)
         data.update(
             {
                 "source_name": obj.source_name,
                 "source_url": obj.source_url,
                 "read_time_minutes": obj.read_time_minutes,
-                "is_content_scraped": is_content_scraped,
+                "is_content_scraped": getattr(obj, "is_content_scraped", False),
                 "author": serialized_authors[0] if serialized_authors else None,
-                "authors": _serialize_authors(obj.authors),
+                "authors": serialized_authors,
                 "sources": _serialize_sources(obj.article_sources),
                 "content_text": getattr(obj, "content_text", None),
                 "content_html": getattr(obj, "content_html", None),
@@ -167,4 +159,3 @@ def serialize_target(obj, session=None):
             data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
 
     return data
-

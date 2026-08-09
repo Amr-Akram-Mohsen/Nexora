@@ -86,36 +86,10 @@ def globe_data():
     Returns geographical data for the 3D globe visualization.
     Extracts locations from Events and Articles.
     """
-    from flask import jsonify, url_for
-    from app.core.extensions import db
-    from app.domains.taxonomy.models import Location
+    from flask import jsonify
+    from app.application.content.query_service import get_globe_data_workflow
     
-    locations = db.session.query(Location).filter(
-        Location.latitude.isnot(None),
-        Location.longitude.isnot(None)
-    ).all()
-    
-    data = []
-    for loc in locations:
-        content_count = len(loc.contents)
-        if content_count > 0:
-            # Determine intensity (size) by content count (cap at 1.5)
-            size = min(1.5, 0.1 + (content_count * 0.05))
-            
-            data.append({
-                "lat": loc.latitude,
-                "lng": loc.longitude,
-                "size": size,
-                "color": "#e11d48", # Nexora primary
-                "title": loc.name,
-                "content_count": content_count,
-                "url": url_for("content.sections", section_slug="news", location=loc.slug)
-            })
-            
-    # Sort by size descending and take top 150 to avoid clutter
-    data = sorted(data, key=lambda x: x["size"], reverse=True)[:150]
-            
-    return jsonify(data)
+    return jsonify(get_globe_data_workflow())
 
 @bp.route("/contents/<int:content_id>")
 def content_page(content_id):

@@ -5,7 +5,7 @@ from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Source
 from app.domains.product.models import Product
 from app.domains.user.models import User
-from app.domains.interaction.service.query import get_interactions_breakdown
+from app.domains.interaction.service.admin.analytics import get_interactions_breakdown
 from app.domains.interaction.models import Share
 
 def get_admin_top_contents():

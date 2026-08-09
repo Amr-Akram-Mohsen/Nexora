@@ -6,7 +6,7 @@ from app.domains.user.models import User, NewsletterSubscriber
 from app.shared.utils.admin_helpers import execute_paginated_query
 
 def get_admin_users_paginated(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page):
-    from app.domains.user.service.analytics import build_user_query as domain_build_user_query
+    from app.domains.user.service.admin.analytics import build_user_query as domain_build_user_query
     stmt, count_stmt = domain_build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
             
     stats = {
@@ -35,6 +35,34 @@ def get_admin_user_inspect_raw(id):
     ).where(User.id == id)
     user = db.session.scalar(stmt_user)
     return user
+
+def build_user_inspect_maps(user):
+    from app.domains.taxonomy.models import Category, Entity
+    entity_ids = set()
+    category_ids = set()
+    for ui in user.user_interests:
+        for score in ui.entity_scores:
+            if getattr(score, 'entity_id', None): entity_ids.add(score.entity_id)
+            if getattr(score, 'category_id', None): category_ids.add(score.category_id)
+            
+    entities = db.session.execute(select(Entity).where(Entity.id.in_(entity_ids))).scalars() if entity_ids else []
+    brands_map = {e.id: e.name for e in entities if e.entity_type == 'brand'}
+    topics_map = {e.id: e.name for e in entities if e.entity_type in ['topic', 'tag', 'concept']}
+    categories_map = {c.id: c.name for c in db.session.execute(select(Category).where(Category.id.in_(category_ids))).scalars()} if category_ids else {}
+
+    product_ids = {ui.target_id for ui in user.user_interests if ui.target_type == 'product'}
+    article_ids = {ui.target_id for ui in user.user_interests if ui.target_type in ('article', 'content')}
+    items_map = {}
+    articles_map = {}
+    if product_ids:
+        from app.domains.product.models import Product
+        items_map = {i.id: i.name for i in db.session.execute(select(Product).where(Product.id.in_(product_ids))).scalars()}
+    if article_ids:
+        from app.domains.content.models import Content
+        articles_map = {c.id: c.title for c in db.session.execute(select(Content).where(Content.id.in_(article_ids))).scalars()}
+
+    return brands_map, categories_map, topics_map, items_map, articles_map
+
 
 def get_admin_subscribers_paginated(search, status, has_user, page, per_page):
     stmt = select(NewsletterSubscriber).outerjoin(User, NewsletterSubscriber.user_id == User.id).order_by(NewsletterSubscriber.id.desc())

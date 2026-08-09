@@ -117,13 +117,7 @@ def link_article_sources(article, data, session=None) -> bool:
     return True
 
 
-def apply_relationships(content, data, session=None) -> dict:
-    if session is None:
-        session = db.session
-
-    updated_relationships = defaultdict(list)
-
-
+def _apply_facets_and_attributes(content, data, updated_relationships, session):
     # -------- Attributes --------
     facets_data = data.get("facets", {})
     if facets_data.get("attributes"):
@@ -158,135 +152,137 @@ def apply_relationships(content, data, session=None) -> dict:
             content.price_tier_id = p.id
             updated_relationships["facets"]["price_tier"] = p.slug
 
-    # -------- Entities, Events, and Article Categories (NewsAPI AI) --------
-    obj = resolve(content, session=session)
-    if obj:
-        if content.object_type == "article":
-            # Events
-            if data.get("er_event_data") or data.get("er_event_uri"):
-                event_data = data.get("er_event_data") or {}
-                event_uri = event_data.get("uri") or data.get("er_event_uri")
-                if event_uri:
-                    title_raw = event_data.get("title")
-                    title_str = title_raw.get("eng", str(title_raw)) if isinstance(title_raw, dict) else (title_raw or data.get("title"))
-                    
-                    sum_raw = event_data.get("summary")
-                    summary_str = sum_raw.get("eng", str(sum_raw)) if isinstance(sum_raw, dict) else sum_raw
-                    
-                    from datetime import datetime
-                    event_date_str = event_data.get("eventDate")
-                    event_date = datetime.fromisoformat(event_date_str.replace("Z", "+00:00")) if event_date_str else None
-                    
-                    event = Event.get_or_create(
-                        external_uri=event_uri, 
-                        session=session, 
-                        title=title_str,
-                        summary=summary_str,
-                        event_date=event_date,
-                        article_count=event_data.get("articleCount", 0),
-                        importance=event_data.get("importance"),
-                        image_url=event_data.get("image"),
-                        event_type=event_data.get("type")
-                    )
-                    if event and (obj.event_id is None or obj.event_id != event.id):
-                        obj.event_id = event.id
-                        updated_relationships["event"] = event.external_uri
+def _apply_events_and_categories(content, data, obj, updated_relationships, session):
+    if content.object_type != "article":
+        return
+        
+    # Events
+    if data.get("er_event_data") or data.get("er_event_uri"):
+        event_data = data.get("er_event_data") or {}
+        event_uri = event_data.get("uri") or data.get("er_event_uri")
+        if event_uri:
+            title_raw = event_data.get("title")
+            title_str = title_raw.get("eng", str(title_raw)) if isinstance(title_raw, dict) else (title_raw or data.get("title"))
+            
+            sum_raw = event_data.get("summary")
+            summary_str = sum_raw.get("eng", str(sum_raw)) if isinstance(sum_raw, dict) else sum_raw
+            
+            from datetime import datetime
+            event_date_str = event_data.get("eventDate")
+            event_date = datetime.fromisoformat(event_date_str.replace("Z", "+00:00")) if event_date_str else None
+            
+            event = Event.get_or_create(
+                external_uri=event_uri, 
+                session=session, 
+                title=title_str,
+                summary=summary_str,
+                event_date=event_date,
+                article_count=event_data.get("articleCount", 0),
+                importance=event_data.get("importance"),
+                image_url=event_data.get("image"),
+                event_type=event_data.get("type")
+            )
+            if event and (obj.event_id is None or obj.event_id != event.id):
+                obj.event_id = event.id
+                updated_relationships["event"] = event.external_uri
 
-            # Categories (Article Categories)
-            if data.get("er_categories"):
-                from app.domains.relationships import ArticleCategory
-                for cat_data in data["er_categories"]:
-                    cat_label = cat_data if isinstance(cat_data, str) else cat_data.get("name", cat_data.get("label", ""))
-                    wgt = 0.0
-                    if isinstance(cat_data, dict):
-                        wgt = float(cat_data.get("wgt", 0.0))
-                        
-                    if not cat_label: continue
-                    cat = Category.get_or_create_from_path(cat_label, session=session)
-                    if cat:
-                        existing_link = session.query(ArticleCategory).filter_by(
-                            article_id=obj.id, category_id=cat.id
-                        ).first()
-                        
-                        if existing_link:
-                            if existing_link.weight != wgt:
-                                existing_link.weight = wgt
-                        else:
-                            new_link = ArticleCategory(
-                                article=obj, 
-                                category=cat,
-                                weight=wgt
-                            )
-                            session.add(new_link)
-                            updated_relationships.setdefault("categories", []).append(cat.slug)
-
-            # Article Location
-            if data.get("er_location"):
-                loc_data = data["er_location"]
-                if isinstance(loc_data, dict):
-                    loc_label = (loc_data.get("label") or {}).get("eng")
-                    country_data = loc_data.get("country") or {}
-                    country_label = (country_data.get("label") or {}).get("eng")
-                    
-                    if loc_label:
-                        from app.domains.taxonomy.models import Location
-                        loc = Location.get_or_create(loc_label, session=session, country_name=country_label)
-                        if loc and loc not in content.locations:
-                            content.locations.append(loc)
-                            updated_relationships.setdefault("locations", []).append(loc.slug)
-
-        # Entities (Concepts) - Applies to ALL content types
-        if data.get("er_concepts"):
-            for concept in data["er_concepts"]:
-                if isinstance(concept, str):
-                    concept_uri = None
-                    concept_label = concept
-                    entity_type = "tag"
-                    score = 0
+    # Categories
+    if data.get("er_categories"):
+        from app.domains.relationships import ArticleCategory
+        for cat_data in data["er_categories"]:
+            cat_label = cat_data if isinstance(cat_data, str) else cat_data.get("name", cat_data.get("label", ""))
+            wgt = 0.0
+            if isinstance(cat_data, dict):
+                wgt = float(cat_data.get("wgt", 0.0))
+                
+            if not cat_label: continue
+            cat = Category.get_or_create_from_path(cat_label, session=session)
+            if cat:
+                existing_link = session.query(ArticleCategory).filter_by(
+                    article_id=obj.id, category_id=cat.id
+                ).first()
+                
+                if existing_link:
+                    if existing_link.weight != wgt:
+                        existing_link.weight = wgt
                 else:
-                    concept_uri = concept.get("uri")
-                    concept_label = concept.get("label", {}).get("eng", concept.get("label", "")) if isinstance(concept.get("label"), dict) else concept.get("label", "")
-                    entity_type = concept.get("type", "tag")
-                    score = concept.get("score", 0)
-
-                    if not concept_label: continue
-
-                    entity = Entity.get_or_create(
-                        name=concept_label, 
-                        session=session, 
-                        external_uri=concept_uri, 
-                        entity_type=entity_type,
-                        provider="event_registry",
-                        image_url=concept.get("image")
+                    new_link = ArticleCategory(
+                        article=obj, 
+                        category=cat,
+                        weight=wgt
                     )
-                    
-                    if entity:
-                        origin = "diffbot" if data.get("ingestion_method") == "diffbot" else "event_registry"
-                        ce = ContentEntity.get_or_create(
-                            content_id=content.id,
-                            entity_id=entity.id,
-                            session=session,
-                            origin=origin,
-                            relevance_score=score,
-                            confidence=score / 100.0 if score > 1 else score,
-                        )
-                        updated_relationships.setdefault("entities", []).append(entity.slug)
-                    # If this is a location, also populate the Locations model!
-                    if entity_type in ("location", "place", "loc"):
-                        from app.domains.taxonomy.models import Location
-                        location_data = concept.get("location") or {}
-                        country_data = location_data.get("country") or {}
-                        label_data = country_data.get("label") or {}
-                        country_label = label_data.get("eng")
-                        loc = Location.get_or_create(concept_label, session=session, country_name=country_label)
-                        if loc and loc not in content.locations:
-                            content.locations.append(loc)
-                            updated_relationships.setdefault("locations", []).append(loc.slug)
+                    session.add(new_link)
+                    updated_relationships.setdefault("categories", []).append(cat.slug)
 
-    # -------- Sources (ONLY for article) --------
+def _apply_entities_and_locations(content, data, updated_relationships, session):
+    # Article Location
+    if content.object_type == "article" and data.get("er_location"):
+        loc_data = data["er_location"]
+        if isinstance(loc_data, dict):
+            loc_label = (loc_data.get("label") or {}).get("eng")
+            country_data = loc_data.get("country") or {}
+            country_label = (country_data.get("label") or {}).get("eng")
+            
+            if loc_label:
+                from app.domains.taxonomy.models import Location
+                loc = Location.get_or_create(loc_label, session=session, country_name=country_label)
+                if loc and loc not in content.locations:
+                    content.locations.append(loc)
+                    updated_relationships.setdefault("locations", []).append(loc.slug)
+
+    # Entities (Concepts) - Applies to ALL content types
+    if data.get("er_concepts"):
+        for concept in data["er_concepts"]:
+            if isinstance(concept, str):
+                concept_uri = None
+                concept_label = concept
+                entity_type = "tag"
+                score = 0
+            else:
+                concept_uri = concept.get("uri")
+                concept_label = concept.get("label", {}).get("eng", concept.get("label", "")) if isinstance(concept.get("label"), dict) else concept.get("label", "")
+                entity_type = concept.get("type", "tag")
+                score = concept.get("score", 0)
+
+            if not concept_label: continue
+
+            entity = Entity.get_or_create(
+                name=concept_label, 
+                session=session, 
+                external_uri=concept_uri, 
+                entity_type=entity_type,
+                provider="event_registry",
+                image_url=concept.get("image")
+            )
+            
+            if entity:
+                origin = "diffbot" if data.get("ingestion_method") == "diffbot" else "event_registry"
+                ce = ContentEntity.get_or_create(
+                    content_id=content.id,
+                    entity_id=entity.id,
+                    session=session,
+                    origin=origin,
+                    relevance_score=score,
+                    confidence=score / 100.0 if score > 1 else score,
+                )
+                updated_relationships.setdefault("entities", []).append(entity.slug)
+            
+            # If this is a location, also populate the Locations model!
+            if entity_type in ("location", "place", "loc"):
+                from app.domains.taxonomy.models import Location
+                location_data = concept.get("location") or {}
+                country_data = location_data.get("country") or {}
+                label_data = country_data.get("label") or {}
+                country_label = label_data.get("eng")
+                loc = Location.get_or_create(concept_label, session=session, country_name=country_label)
+                if loc and loc not in content.locations:
+                    content.locations.append(loc)
+                    updated_relationships.setdefault("locations", []).append(loc.slug)
+
+def _apply_sources(content, data, obj, updated_relationships, session):
     if content.object_type == "article":
-        obj = resolve(content, session=session)
         if obj:
+            extended_metadata = data.get("extended_metadata", {})
             if not data.get("source_name") and "siteName" in extended_metadata:
                 data["source_name"] = extended_metadata["siteName"]
             if not data.get("url"):
@@ -317,6 +313,19 @@ def apply_relationships(content, data, session=None) -> dict:
             session.flush()
         content.source_id = source.id
         updated_relationships["sources"] = [slug]
+
+def apply_relationships(content, data, session=None) -> dict:
+    if session is None:
+        session = db.session
+
+    updated_relationships = defaultdict(list)
+    obj = resolve(content, session=session)
+
+    _apply_facets_and_attributes(content, data, updated_relationships, session)
+    if obj:
+        _apply_events_and_categories(content, data, obj, updated_relationships, session)
+    _apply_entities_and_locations(content, data, updated_relationships, session)
+    _apply_sources(content, data, obj, updated_relationships, session)
 
     return updated_relationships
 

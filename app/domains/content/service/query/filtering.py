@@ -59,7 +59,8 @@ def get_contents_render(
 def _get_paginated_contents(
     filters=None, allowed_filters=None, section_id=None,
     active_only=True, published_only=True,
-    sort_by=None, sort_dir=None, page=1, per_page=20, session=None, for_admin=False
+    sort_by=None, sort_dir=None, page=1, per_page=20, session=None, for_admin=False,
+    exclude_ids=None
 ):
     from sqlalchemy import select, or_, func
     from ...models import Content, Article
@@ -78,6 +79,9 @@ def _get_paginated_contents(
         stmt = stmt.where(Content.section_id == section_id)
         
     stmt = apply_content_filters(stmt, filters, allowed_filters=allowed_filters, session=session)
+    
+    if exclude_ids:
+        stmt = stmt.where(Content.id.notin_(list(exclude_ids)))
 
     quality = None
     if for_admin:
@@ -135,14 +139,15 @@ def _get_paginated_contents(
         "next_num": getattr(pagination, "next_num", pagination.page + 1 if pagination.has_next else None),
     }
 
-def get_filtered_contents(section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None):
+def get_filtered_contents(section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None, exclude_ids=None):
     """
     Handles complex filtering and pagination for section contents.
     """
     return _get_paginated_contents(
         filters=active_filters, allowed_filters=allowed_filters, section_id=section_id,
         active_only=True, published_only=True,
-        page=page, per_page=per_page, session=session, for_admin=False
+        page=page, per_page=per_page, session=session, for_admin=False,
+        exclude_ids=exclude_ids
     )
 
 

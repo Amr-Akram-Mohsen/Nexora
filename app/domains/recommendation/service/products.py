@@ -33,7 +33,7 @@ def get_items_for_content(
     from app.domains.content.models import Content
     from app.domains.product.service.utils import build_item_stmt, fetch_items
     from app.domains.product.serializers import serialize_item
-    from app.domains.recommendation.ranking import (
+    from app.domains.recommendation.service.ranking import (
         ItemScoreWeights,
         score_item_relevance,
     )

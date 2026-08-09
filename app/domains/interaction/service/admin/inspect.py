@@ -3,6 +3,7 @@ from sqlalchemy.orm import selectinload
 from app.core.extensions import db
 from app.domains.interaction.models import Comment, Reaction, ProductClick
 from app.domains.product.models import ProductStoreLink, Store, ProductVariant, Product
+from app.domains.interaction.service.admin.serializers import serialize_comment_inspect_dto, serialize_link_clicks_dto
 
 def get_comment_inspect_metrics(comment_id: int) -> dict:
     stmt = select(Comment).options(
@@ -82,3 +83,19 @@ def get_link_clicks_metrics(link_id: int) -> dict:
         "country_stats": country_stats,
         "referrer_stats": referrer_stats
     }
+
+def get_comment_inspect_workflow(comment_id: int):
+    metrics = get_comment_inspect_metrics(comment_id)
+    if not metrics:
+        return None
+        
+    dto = serialize_comment_inspect_dto(metrics)
+    return {"comment_dto": dto}
+
+def get_link_clicks_workflow(link_id: int):
+    metrics = get_link_clicks_metrics(link_id)
+    if not metrics:
+        return None
+        
+    dto = serialize_link_clicks_dto(metrics)
+    return {"link_clicks_dto": dto}

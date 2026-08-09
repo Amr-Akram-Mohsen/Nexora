@@ -12,7 +12,7 @@ from app.domains.content.models import Content
 from app.domains.product.models import Product
 from app.domains.analytics.taxonomy_intelligence import get_taxonomy_intelligence
 from app.domains.taxonomy.service.query import paginate_taxonomy_entity
-from app.domains.taxonomy.service.admin import (
+from app.domains.taxonomy.service.admin.admin import (
     get_admin_categories,
     get_admin_brands,
     get_admin_topics,
@@ -360,7 +360,7 @@ def attributes_rows():
 def taxonomy_duplicates():
     domain = request.args.get("type")
     
-    from app.domains.taxonomy.service.duplicates import DOMAIN_MAP, detect_taxonomy_duplicates
+    from app.domains.taxonomy.service.admin.duplicates import DOMAIN_MAP, detect_taxonomy_duplicates
     
     if domain not in DOMAIN_MAP:
         return jsonify({"error": "Invalid domain"}), 400
@@ -382,7 +382,7 @@ def taxonomy_merge():
     if not domain or not source_id or not target_id:
         return jsonify({"error": "Missing parameters"}), 400
         
-    from app.domains.taxonomy.service.duplicates import merge_taxonomy_entities
+    from app.domains.taxonomy.service.admin.duplicates import merge_taxonomy_entities
     try:
         merge_taxonomy_entities(domain, source_id, target_id)
         return jsonify({"success": True})
@@ -414,13 +414,13 @@ def taxonomy_analytics():
 
 @bp.route("/insights/suggestions", methods=["GET"])
 def insights_suggestions():
-    from app.domains.taxonomy.service.insights import get_taxonomy_insights_suggestions
+    from app.domains.taxonomy.service.admin.insights import get_taxonomy_insights_suggestions
     data = get_taxonomy_insights_suggestions()
     return render_template("admin/taxonomy/_insights_suggestions.html", data=data)
 
 @bp.route("/insights/coherence", methods=["GET"])
 def insights_coherence():
-    from app.domains.taxonomy.service.insights import get_taxonomy_insights_coherence
+    from app.domains.taxonomy.service.admin.insights import get_taxonomy_insights_coherence
     data = get_taxonomy_insights_coherence()
     return render_template("admin/taxonomy/_insights_coherence.html", data=data)
 

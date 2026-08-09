@@ -1,9 +1,9 @@
 from datetime import datetime
 from app.core.extensions import db
-from .models import UserInterest, UserEntityInterest
+from app.domains.recommendation.models import UserInterest, UserEntityInterest
 from app.domains.product.models import Product
 from app.domains.content.models import Article
-from .interest_weights import INTEREST_WEIGHTS
+from app.domains.recommendation.interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
 from sqlalchemy import select
 

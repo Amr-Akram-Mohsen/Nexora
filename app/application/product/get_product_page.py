@@ -62,3 +62,7 @@ def record_item_view(product_id, user, ip_address):
     )
     from app.core.extensions import db
     db.session.commit()
+
+def get_item_spec_groups_workflow(product_id):
+    from app.domains.product.service import get_item_spec_groups
+    return get_item_spec_groups(product_id)

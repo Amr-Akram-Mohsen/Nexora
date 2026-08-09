@@ -14,7 +14,7 @@ from app.domains.content.models import Content
 from app.domains.product.models import Product
 from app.domains.relationships import content_products
 from app.web.routes.admin.helpers import paginate_manual, render_admin_rows_response
-from app.domains.recommendation.service.admin import (
+from app.domains.recommendation.service.admin.admin import (
     get_recommendation_stats,
     fetch_admin_matches_page,
     get_admin_context_performance,

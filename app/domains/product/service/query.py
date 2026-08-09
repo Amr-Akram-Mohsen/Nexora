@@ -10,129 +10,6 @@ from .options import get_item_load_options, get_item_card_load_options
 from app.domains.product.serializers import serialize_item, serialize_item_detail
 
 
-def filter_items_by_country(query):
-    from app.shared.request import get_country
-
-    country = get_country()
-    if not country:
-        return query
-
-    return (
-        query.join(Product.variants)
-        .join(ProductVariant.store_links)
-        .join(Store)
-        .where(Store.country == country.upper())
-    )
-
-
-def _apply_catalog_sort(stmt, sort_type):
-    if sort_type == "price_low":
-        order = ProductVariant.price.asc()
-    elif sort_type == "price_high":
-        order = ProductVariant.price.desc()
-    elif sort_type == "popular":
-        return stmt.order_by(Product.view_count.desc(), Product.id.desc())
-    else:
-        return stmt.order_by(Product.created_at.desc(), Product.id.desc())
-
-    return stmt.order_by(order, Product.id.desc())
-
-
-@cache.memoize(timeout=300)
-def get_filtered_items(active_filters, page=1, per_page=24):
-    """
-    Handles complex filtering, joining, and sorting for the products catalog.
-    """
-    from .utils import build_item_stmt
-    from sqlalchemy import and_
-    
-    stmt = build_item_stmt(eager_load="card")
-
-    if active_filters.get("category"):
-        stmt = stmt.join(Product.category).where(
-            Category.slug.in_(active_filters["category"])
-        )
-    if active_filters.get("brand"):
-        stmt = stmt.join(Product.brand).where(Brand.slug.in_(active_filters["brand"]))
-    if active_filters.get("type"):
-        stmt = stmt.where(Product.product_type.in_(active_filters["type"]))
-
-    has_store_filter = bool(active_filters.get("store"))
-    min_p = safe_float(active_filters.get("min_price"))
-    max_p = safe_float(active_filters.get("max_price"))
-    has_price_filter = min_p is not None or max_p is not None
-    sort_type = active_filters.get("sort", "newest")
-    is_price_sort = sort_type in ["price_low", "price_high"]
-
-    if has_store_filter or has_price_filter or is_price_sort:
-        if is_price_sort:
-            stmt = stmt.join(ProductVariant, and_(ProductVariant.product_id == Product.id, ProductVariant.is_default == True))
-            if has_store_filter:
-                stmt = stmt.where(ProductVariant.store_links.any(
-                    ProductStoreLink.store.has(Store.slug.in_(active_filters["store"]))
-                ))
-            if min_p is not None:
-                stmt = stmt.where(ProductVariant.price >= min_p)
-            if max_p is not None:
-                stmt = stmt.where(ProductVariant.price <= max_p)
-        else:
-            variant_conds = []
-            if has_store_filter:
-                variant_conds.append(ProductVariant.store_links.any(
-                    ProductStoreLink.store.has(Store.slug.in_(active_filters["store"]))
-                ))
-            if min_p is not None:
-                variant_conds.append(ProductVariant.price >= min_p)
-            if max_p is not None:
-                variant_conds.append(ProductVariant.price <= max_p)
-                
-            if variant_conds:
-                stmt = stmt.where(Product.variants.any(and_(*variant_conds)))
-
-    stmt = _apply_catalog_sort(stmt, sort_type)
-
-    pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
-    return {
-        "products": [serialize_item(product) for product in pagination.items],
-        "page": pagination.page,
-        "pages": pagination.pages,
-        "total": pagination.total,
-        "has_next": pagination.has_next,
-        "has_prev": pagination.has_prev,
-        "prev_num": getattr(
-            pagination, "prev_num", pagination.page - 1 if pagination.has_prev else None
-        ),
-        "next_num": getattr(
-            pagination, "next_num", pagination.page + 1 if pagination.has_next else None
-        ),
-    }
-
-def set_default_variant(product, variant):
-    for v in product.variants:
-        v.is_default = False
-    variant.is_default = True
-
-
-def ensure_default_variant(product):
-    if not product.variants:
-        variant = ProductVariant(
-            product=product, title="Default", is_default=True, attributes={}
-        )
-        product.variants.append(variant)
-        return variant
-
-    if not any(v.is_default for v in product.variants):
-        product.variants[0].is_default = True
-
-
-def get_active_store_links(product):
-    return [
-        link
-        for variant in product.variants
-        for link in variant.store_links
-        if link.is_active
-    ]
-
 
 def count_items(session=None):
     from sqlalchemy import func
@@ -255,44 +132,7 @@ def get_item_spec_groups(product_id, session=None):
     return structured.get("groups") if structured else None
 
 
-@cache.memoize(timeout=600)
-def get_filtered_items_for_home(filter_type="recent", limit=10, exclude_ids=None, session=None):
-    from .utils import build_item_stmt, fetch_items
-    
-    stmt = build_item_stmt(eager_load="card")
 
-    if exclude_ids:
-        stmt = stmt.where(Product.id.notin_(list(exclude_ids)))
-
-    if filter_type == "deals":
-        stmt = (
-            stmt.join(Product.variants)
-            .where(ProductVariant.old_price > ProductVariant.price)
-            .distinct(Product.id)
-            .order_by(Product.id.desc())
-        )
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
-        if not products:
-            stmt = build_item_stmt(eager_load="card").order_by(Product.created_at.desc())
-            if exclude_ids:
-                stmt = stmt.where(Product.id.notin_(list(exclude_ids)))
-            if limit:
-                stmt = stmt.limit(limit)
-            products = fetch_items(stmt, session)
-    elif filter_type == "random":
-        stmt = stmt.order_by(db.func.random())
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
-    else:
-        stmt = stmt.order_by(Product.created_at.desc())
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
-
-    return [serialize_item(product) for product in products]
 
 @cache.memoize(timeout=3600)
 def get_distinct_stores(session=None):
@@ -388,72 +228,9 @@ def get_item_spec_groups(product_id, session=None):
     return structured.get("groups") if structured else None
 
 
-@cache.memoize(timeout=600)
-def get_filtered_items_for_home(filter_type="recent", limit=10, exclude_ids=None, session=None):
-    from .utils import build_item_stmt, fetch_items
-    
-    stmt = build_item_stmt(eager_load="card")
 
-    if exclude_ids:
-        stmt = stmt.where(Product.id.notin_(list(exclude_ids)))
 
-    if filter_type == "deals":
-        stmt = (
-            stmt.join(Product.variants)
-            .where(ProductVariant.old_price > ProductVariant.price)
-            .distinct(Product.id)
-            .order_by(Product.id.desc())
-        )
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
-        if not products:
-            stmt = build_item_stmt(eager_load="card").order_by(Product.created_at.desc())
-            if exclude_ids:
-                stmt = stmt.where(Product.id.notin_(list(exclude_ids)))
-            if limit:
-                stmt = stmt.limit(limit)
-            products = fetch_items(stmt, session)
-    elif filter_type == "random":
-        stmt = stmt.order_by(db.func.random())
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
-    else:
-        stmt = stmt.order_by(Product.created_at.desc())
-        if limit:
-            stmt = stmt.limit(limit)
-        products = fetch_items(stmt, session)
 
-    return [serialize_item(product) for product in products]
-
-def get_popular_items(
-    category_slugs: tuple | None = None,
-    brand_slugs: tuple | None = None,
-    limit: int = 6,
-    session=None
-) -> list[dict]:
-    from app.domains.product.models import Product
-    from app.domains.taxonomy.models import Category, Brand
-    from app.domains.product.service.utils import build_item_stmt, fetch_items
-    from app.domains.product.serializers import serialize_item
-    
-    if session is None:
-        from app.core.extensions import db
-        session = db.session
-    
-    stmt = build_item_stmt(eager_load="card")
-    if category_slugs:
-        stmt = stmt.join(Product.category).where(Category.slug.in_(list(category_slugs)))
-    if brand_slugs:
-        stmt = stmt.join(Product.brand).where(Brand.slug.in_(list(brand_slugs)))
-        
-    stmt = stmt.order_by(Product.view_count.desc(), Product.created_at.desc())
-    if limit:
-        stmt = stmt.limit(limit)
-        
-    products = fetch_items(stmt, session)
-    return [serialize_item(i) for i in products]
 
 def get_all_items_metadata(session=None):
     from sqlalchemy import select

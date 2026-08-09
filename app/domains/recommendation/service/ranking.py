@@ -5,7 +5,7 @@ Pure Python, no DB calls. Operates on model instances or serialized dicts.
 
 Usage example::
 
-    from app.domains.recommendation.ranking import ContentScoreWeights, score_content_relevance
+    from app.domains.recommendation.service.ranking import ContentScoreWeights, score_content_relevance
 
     weights = ContentScoreWeights()  # default weights
     score = score_content_relevance(candidate, reference, weights)

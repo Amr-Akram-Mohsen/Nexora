@@ -10,18 +10,16 @@ def track_view_workflow(target_id: int, target_type, user, ip: str) -> dict:
     db.session.commit()
     return result
 
-def track_impression_workflow(entity_type: str, entity_ids: list, context_id: str, user_id: int) -> bool:
-    success = track_recommendation_impression(entity_type, entity_ids, context_id, user_id)
+def _execute_tracking(operation, *args, **kwargs) -> bool:
+    success = operation(*args, **kwargs)
     if success:
         db.session.commit()
     else:
         db.session.rollback()
     return success
 
+def track_impression_workflow(entity_type: str, entity_ids: list, context_id: str, user_id: int) -> bool:
+    return _execute_tracking(track_recommendation_impression, entity_type, entity_ids, context_id, user_id)
+
 def track_click_workflow(entity_type: str, entity_id: int, context_id: str, user_id: int) -> bool:
-    success = track_recommendation_click(entity_type, entity_id, context_id, user_id)
-    if success:
-        db.session.commit()
-    else:
-        db.session.rollback()
-    return success
+    return _execute_tracking(track_recommendation_click, entity_type, entity_id, context_id, user_id)

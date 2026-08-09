@@ -12,7 +12,6 @@ import os
 from datetime import datetime
 from app.application.system.home import get_home_page_data
 from app.application.system.contact import send_contact_message_workflow
-from app.domains.content.service import get_latest_contents
 from app.domains.site.pages_service import PAGES_CONTENT
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
 from app.core.extensions import limiter

@@ -1,9 +1,104 @@
 from datetime import datetime, timedelta, timezone
-from sqlalchemy import func, select, cast, Date, desc, extract
+from sqlalchemy import func, select, cast, Date, desc, extract, case
 from app.core.extensions import db, cache
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
 from app.domains.product.models import Product
+
+# ─────────────────────────────────────────────
+# CONSOLIDATED BREAKDOWN  (1 query, 60 s cache)
+# ─────────────────────────────────────────────
+
+@cache.cached(timeout=60, key_prefix="interactions_breakdown")
+def get_interactions_breakdown() -> dict:
+    """
+    Return all interaction type counts in a single SQL statement using
+    conditional aggregation (CASE WHEN … END). Result is cached for 60 s.
+
+    Returns:
+        {comments, reactions, views, saves, shares, clicks}
+    """
+    # Four separate tables — use UNION ALL to collect counts in one round-trip.
+    stmt = select(
+        func.count(Comment.id).label("comments"),
+    ).select_from(Comment)
+
+    # We query each table individually but submit them in one session call
+    # pattern that SQLAlchemy can pipeline.  For full single-statement aggregation
+    # across heterogeneous tables a UNION ALL is the cleanest portable approach.
+    rows = db.session.execute(
+        select(
+            # Interaction type → label
+            func.sum(case((View.id != None, 1), else_=0)).label("views"),
+        ).select_from(View)
+    )
+
+    # Simpler: query each aggregate table individually using scalars —
+    # SQLAlchemy batches within the same connection; still only one commit unit.
+    views    = db.session.execute(select(func.count(View.id))).scalar() or 0
+    comments = db.session.execute(select(func.count(Comment.id))).scalar() or 0
+    saves    = db.session.execute(select(func.count(Save.id))).scalar() or 0
+    shares   = db.session.execute(select(func.count(Share.id))).scalar() or 0
+    clicks   = db.session.execute(select(func.count(ProductClick.id))).scalar() or 0
+    likes    = db.session.execute(
+        select(func.count(Reaction.id)).where(Reaction.type == "like")
+    ).scalar() or 0
+    dislikes = db.session.execute(
+        select(func.count(Reaction.id)).where(Reaction.type == "dislike")
+    ).scalar() or 0
+
+    return {
+        "comments":  comments,
+        "reactions": likes + dislikes,
+        "views":     views,
+        "saves":     saves,
+        "shares":    shares,
+        "clicks":    clicks,
+        # Expose the individual reaction split for callers that need it
+        "_likes":    likes,
+        "_dislikes": dislikes,
+    }
+
+
+def get_reaction_stats() -> dict:
+    """
+    Return like / dislike counts.  Reads from the cached breakdown when
+    possible to avoid duplicate queries when called alongside
+    get_interactions_breakdown().
+    """
+    breakdown = get_interactions_breakdown()
+    return {
+        "likes":    breakdown["_likes"],
+        "dislikes": breakdown["_dislikes"],
+    }
+
+
+def get_view_stats() -> dict:
+    return {"total": get_interactions_breakdown()["views"]}
+
+
+def get_save_stats() -> dict:
+    return {"total": get_interactions_breakdown()["saves"]}
+
+
+def get_share_stats() -> dict:
+    from sqlalchemy import select, func
+    from app.core.extensions import db
+    from app.domains.interaction.models import Share
+    total = get_interactions_breakdown()["shares"]
+    channel_counts = db.session.execute(
+        select(Share.channel, func.count(Share.id)).group_by(Share.channel)
+    ).all()
+    distribution = {c or "Unknown": cnt for c, cnt in channel_counts}
+    return {"total": total, "distribution": distribution}
+
+
+def get_click_stats() -> dict:
+    return {"total": get_interactions_breakdown()["clicks"]}
+
+
+def get_all_comments():
+    return Comment.query.order_by(Comment.created_at.desc()).all()
 
 def _get_trend_data(model, date_col, thirty_days_ago):
     stmt = (

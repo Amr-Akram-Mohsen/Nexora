@@ -97,17 +97,27 @@ def check_react_batch():
     if len(target_types) != len(target_ids):
         abort(400, "Mismatched parameters")
     
-    result = {}
+    from app.domains.interaction.service.query import check_user_reactions_batch
+    
+    targets_dict = {}
+    original_keys = {}
     for t_str, id_str in zip(target_types, target_ids):
         try:
             target_type = "comment" if t_str == "comment" else parse_target_type(t_str)
             target_id = int(id_str)
+            targets_dict.setdefault(target_type, []).append(target_id)
+            original_keys[(target_type, target_id)] = f"{t_str}:{id_str}"
         except (ValueError, TypeError):
             continue
-        
-        reaction = check_user_reaction(current_user.id, target_type, target_id)
-        if reaction:
-            result[f"{t_str}:{id_str}"] = reaction.type
+            
+    batch_results = check_user_reactions_batch(current_user.id, targets_dict)
+    
+    result = {}
+    for (t_type, t_id), reaction_type in batch_results.items():
+        original_key = original_keys.get((t_type, t_id))
+        if original_key:
+            result[original_key] = reaction_type
+            
     return jsonify(result)
 
 @bp.route("/check-save-batch")
@@ -118,16 +128,27 @@ def check_save_batch():
     if len(target_types) != len(target_ids):
         abort(400, "Mismatched parameters")
     
-    result = {}
+    from app.domains.interaction.service.query import check_user_saves_batch
+    
+    targets_dict = {}
+    original_keys = {}
     for t_str, id_str in zip(target_types, target_ids):
         try:
             target_type = parse_target_type(t_str)
             target_id = int(id_str)
+            targets_dict.setdefault(target_type, []).append(target_id)
+            original_keys[(target_type, target_id)] = f"{t_str}:{id_str}"
         except (ValueError, TypeError):
             continue
-        
-        if check_user_save(current_user.id, target_type, target_id):
-            result[f"{t_str}:{id_str}"] = True
+            
+    batch_results = check_user_saves_batch(current_user.id, targets_dict)
+    
+    result = {}
+    for (t_type, t_id), is_saved in batch_results.items():
+        original_key = original_keys.get((t_type, t_id))
+        if original_key and is_saved:
+            result[original_key] = True
+            
     return jsonify(result)
 
 @bp.route("/get-comments")
@@ -327,7 +348,7 @@ def rename_collection_route():
     if not old_name or not new_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
         
-    from app.domains.interaction.service.command import rename_collection
+    from app.domains.interaction.service.public.collections import rename_collection
     result = rename_collection(current_user, old_name, new_name)
     return jsonify(result), (200 if result.get("success") else 400)
 
@@ -342,7 +363,7 @@ def delete_collection_route():
     if not collection_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
         
-    from app.domains.interaction.service.command import delete_collection
+    from app.domains.interaction.service.public.collections import delete_collection
     result = delete_collection(current_user, collection_name, move_to_global)
     return jsonify(result), (200 if result.get("success") else 400)
 
@@ -365,6 +386,6 @@ def move_save_route():
     except ValueError:
         return jsonify({"success": False, "error": "Invalid target type"}), 400
         
-    from app.domains.interaction.service.command import move_save_collection
+    from app.domains.interaction.service.public.collections import move_save_collection
     result = move_save_collection(current_user, target_type_parsed, target_id, new_collection_name, old_collection_name)
     return jsonify(result), (200 if result.get("success") else 400)

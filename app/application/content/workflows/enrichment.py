@@ -98,7 +98,7 @@ def enrich_discovered_articles(limit: int = 50, force: bool = False) -> dict:
                     )
 
                 if content_rec:
-                    from app.domains.content.service.search import populate_content_search_fields
+                    from app.domains.content.service.public.search import populate_content_search_fields
                     from app.domains.content.service.command import recalculate_content_score
                     populate_content_search_fields(content_rec, article, "article")
                     recalculate_content_score(content_rec, article)

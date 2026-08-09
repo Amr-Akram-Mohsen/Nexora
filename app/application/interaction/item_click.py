@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from app.core.extensions import db
 from app.domains.product.models import ProductStoreLink
 from app.domains.interaction.models import ProductClick
-from app.domains.recommendation.interest_service import handle_interaction_interest
+from app.domains.recommendation.service.interest_service import handle_interaction_interest
 from sqlalchemy import select
 
 def record_item_click_workflow(link_id, user, ip_address, user_agent, referrer, country):

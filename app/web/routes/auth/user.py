@@ -544,9 +544,8 @@ def delete_account():
                 return redirect(url_for('user.profile'))
                 
         # Delete user
-        from app.core.extensions import db
-        db.session.delete(current_user)
-        db.session.commit()
+        from app.application.user.profile import delete_account_workflow
+        delete_account_workflow(current_user)
         
         logout_user()
         flash("Your account has been permanently deleted.", "success")

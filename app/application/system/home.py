@@ -33,7 +33,7 @@ from app.application.recommendation.query_service import (
     get_trending_items_cached,
     get_trending_brands_cached,
 )
-from app.domains.product.service import get_filtered_items_for_home
+from app.domains.product.service import get_filtered_products_for_home
 from app.infrastructure import cache
 
 
@@ -68,7 +68,7 @@ def get_home_page_data():
     hero_contents = filter_and_track(get_contents_render_cached(filter_values=("trends",), rows_count=10), seen_content_ids, limit=5)
 
     # ── Priority 2: High-Value Contextual (Deals) ─────────────────────────
-    top_deals = filter_and_track(get_filtered_items_for_home(filter_type="deals", limit=20), seen_product_ids, limit=10)
+    top_deals = filter_and_track(get_filtered_products_for_home(filter_type="deals", limit=20), seen_product_ids, limit=10)
 
     # ── Priority 3: Trending & Algorithmic ────────────────────────────────
     popular_this_week = filter_and_track(get_trending_contents_cached_v2(limit=24, days=7), seen_content_ids, limit=8)
@@ -84,7 +84,7 @@ def get_home_page_data():
     latest_reviews = filter_and_track(get_contents_render_cached(filter_values=("reviews",), rows_count=36), seen_content_ids, limit=24)
     tech_news = filter_and_track(get_contents_render_cached(filter_values=("news",), rows_count=36), seen_content_ids, limit=24)
     guides = filter_and_track(get_contents_render_cached(filter_values=("guides",), rows_count=36), seen_content_ids, limit=24)
-    recently_added = filter_and_track(get_filtered_items_for_home(filter_type="recent", limit=30), seen_product_ids, limit=10)
+    recently_added = filter_and_track(get_filtered_products_for_home(filter_type="recent", limit=30), seen_product_ids, limit=10)
 
     return {
         # ── Hero ───────────────────────────────────────────────────────────

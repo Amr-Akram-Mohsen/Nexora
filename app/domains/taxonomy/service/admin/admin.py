@@ -472,3 +472,152 @@ def get_admin_source_inspect_raw(id):
         category_counts, status_counts, eng_stats, fetch_health,
         primary_count, secondary_count, top_articles
     )
+
+def get_source_inspect_data(id):
+    from app.domains.taxonomy.service.admin.serializers import serialize_source_inspect_dto
+    
+    raw_tuple = get_admin_source_inspect_raw(id)
+    if not raw_tuple:
+        return None
+        
+    dto = serialize_source_inspect_dto(raw_tuple)
+    return {"source_dto": dto}
+
+def _build_taxonomy_rows(pagination, metrics_dict, count_mapping_func, has_items=False):
+    from app.domains.taxonomy.serializers import serialize_taxonomy
+    
+    serialized = []
+    for entity in pagination.items:
+        m = metrics_dict.get(entity.id, {})
+        counts = count_mapping_func(m)
+        
+        c_count = counts.get("content count", 0)
+        i_count = counts.get("product count", 0) if has_items else 0
+        
+        health_status = "ok"
+        if c_count == 0 and (not has_items or i_count == 0):
+            health_status = "unused"
+        elif hasattr(entity, "is_active") and not getattr(entity, "is_active", True) and (c_count > 0 or (has_items and i_count > 0)):
+            health_status = "inactive-linked"
+            
+        serialized.append(serialize_taxonomy(entity, counts=counts, health=health_status))
+        
+    return serialized, pagination
+
+def get_category_rows_data(page, per_page, search, status, health):
+    from app.domains.taxonomy.models import Category
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_category_metrics
+
+    pagination = paginate_taxonomy_entity(Category, page, per_page, search, status, health)
+    product_ids = [c.id for c in pagination.items]
+    metrics = get_category_metrics(product_ids)
+        
+    return _build_taxonomy_rows(
+        pagination, metrics, 
+        lambda m: {"content count": m.get("content_count", 0), "product count": m.get("item_count", 0)},
+        has_items=True
+    )
+
+def get_brand_rows_data(page, per_page, search, status, health):
+    from app.domains.taxonomy.models import Brand
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_brand_metrics
+
+    pagination = paginate_taxonomy_entity(Brand, page, per_page, search, status, health)
+    product_ids = [b.id for b in pagination.items]
+    metrics = get_brand_metrics(product_ids)
+        
+    return _build_taxonomy_rows(
+        pagination, metrics, 
+        lambda m: {"content count": m.get("content_count", 0), "product count": m.get("item_count", 0)},
+        has_items=True
+    )
+
+def get_topic_rows_data(page, per_page, search, status, health):
+    from app.domains.taxonomy.models import Entity
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_topic_metrics
+
+    extra_filter = Entity.entity_type.in_(['topic', 'tag', 'concept'])
+    pagination = paginate_taxonomy_entity(Entity, page, per_page, search, status, health, extra_filter=extra_filter)
+    product_ids = [t.id for t in pagination.items]
+    metrics = get_topic_metrics(product_ids)
+        
+    return _build_taxonomy_rows(
+        pagination, metrics, 
+        lambda m: {"content count": m.get("content_count", 0), "category spread": m.get("category_spread", 0)},
+        has_items=False
+    )
+
+def get_section_rows_data(page, per_page, search, status, health):
+    from app.domains.taxonomy.models import Section
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_section_metrics
+
+    pagination = paginate_taxonomy_entity(Section, page, per_page, search, status, health)
+    product_ids = [s.id for s in pagination.items]
+    metrics = get_section_metrics(product_ids)
+        
+    return _build_taxonomy_rows(
+        pagination, metrics, 
+        lambda m: {"content count": m.get("content_count", 0), "category count": m.get("category_spread", 0)},
+        has_items=False
+    )
+
+def get_attribute_rows_data(page, per_page, search, health):
+    from app.domains.taxonomy.models import AttributeFacet
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_attribute_metrics
+
+    pagination = paginate_taxonomy_entity(AttributeFacet, page, per_page, search, health=health)
+    product_ids = [a.id for a in pagination.items]
+    metrics = get_attribute_metrics(product_ids)
+        
+    serialized = []
+    for a in pagination.items:
+        m = metrics.get(a.id, {})
+        c_count = m.get("content_count", 0)
+        
+        health_status = "ok"
+        if c_count == 0:
+            health_status = "unused"
+            
+        data = {
+            "id": a.id,
+            "name": a.name,
+            "category": a.category.name if a.category else "Global",
+            "content count": str(c_count),
+            "health": health_status
+        }
+        serialized.append(data)
+
+    return serialized, pagination
+
+def get_facet_rows_data(model, field_id_name, page, per_page, search, health):
+    from app.domains.taxonomy.service.query import paginate_taxonomy_entity
+    from app.domains.taxonomy.service.admin.metrics import get_facet_metrics
+
+    pagination = paginate_taxonomy_entity(model, page, per_page, search, health=health, field_name=field_id_name)
+    product_ids = [a.id for a in pagination.items]
+    metrics = get_facet_metrics(product_ids, field_id_name)
+    
+    serialized = []
+    for a in pagination.items:
+        m = metrics.get(a.id, {})
+        c_count = m.get("content_count", 0)
+        
+        h_status = "ok"
+        if c_count == 0:
+            h_status = "unused"
+            
+        data = {
+            "id": a.id,
+            "name": a.name,
+            "content count": str(c_count),
+            "health": h_status
+        }
+        serialized.append(data)
+
+    return serialized, pagination
+

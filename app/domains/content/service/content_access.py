@@ -1,20 +1,11 @@
 from app.core.extensions import db
 from sqlalchemy import select, func, or_
 
-def get_model_map():
-    from ..models import Article, Video, Post
-
-    return {
-        "article": Article,
-        "video": Video,
-        "post": Post,
-    }
-
-
 def resolve_content_object(content, session=None):
     if session is None:
         session = db.session
-    model = get_model_map().get(content.object_type)
+    from app.shared.utils.orm_helpers import get_model_registry
+    model = get_model_registry().get(content.object_type)
     if not model:
         return None
     return session.get(model, content.object_id)
@@ -100,7 +91,8 @@ def get_or_create_content(
     session=None,
     **kwargs,
 ):
-    model = get_model_map().get(object_type)
+    from app.shared.utils.orm_helpers import get_model_registry
+    model = get_model_registry().get(object_type)
     if not model:
         return None, False
 

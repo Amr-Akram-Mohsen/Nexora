@@ -2,9 +2,8 @@ import logging
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for, abort
 from flask_login import current_user
 from app.application.product.get_catalog import get_catalog_data
-from app.application.product.get_product_page import get_item_page_data
+from app.application.product.get_product_page import get_item_page_data, get_item_spec_groups_workflow
 from app.application.product.compare_products import get_comparison_data
-from app.domains.product.service import get_item_spec_groups
 from app.shared.request import get_client_ip
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType
@@ -19,7 +18,7 @@ bp = Blueprint("product", __name__, template_folder=PUBLIC_TEMPLATES)
 
 @bp.route("/product/<int:product_id>/view_full_specs", methods=["POST"])
 def view_full_specs(product_id):
-    full_details = get_item_spec_groups(product_id)
+    full_details = get_item_spec_groups_workflow(product_id)
     if full_details is None:
         abort(404)
 

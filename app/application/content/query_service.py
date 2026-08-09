@@ -39,17 +39,38 @@ def get_carousel_contents_cached(active_filters_key, exclude_ids_key=None, limit
     active_filters = filters_from_normalized(active_filters_key)
     allowed_filters = list(active_filters.keys())
     
-    # We fetch limit + 1 just in case one item is excluded, 
-    # though it's better to fetch a few more if we have multiple exclusions.
-    # But since get_filtered_contents doesn't support exclude_ids yet, we filter post-query.
     res = domain_query.get_filtered_contents(
-        None, active_filters, allowed_filters, page=1, per_page=limit + 5
+        None, active_filters, allowed_filters, page=1, per_page=limit, exclude_ids=exclude_ids_key
     )
     
-    contents = res.get("products", []) # get_filtered_contents returns 'products' key
+    return res.get("products", [])
+
+
+@cache.memoize(timeout=3600)
+def get_globe_data_workflow():
+    from app.core.extensions import db
+    from app.domains.taxonomy.models import Location
+    from flask import url_for
     
-    if exclude_ids_key:
-        exclude_set = set(exclude_ids_key)
-        contents = [c for c in contents if c["id"] not in exclude_set]
-        
-    return contents[:limit]
+    locations = db.session.query(Location).filter(
+        Location.latitude.isnot(None),
+        Location.longitude.isnot(None)
+    ).all()
+    
+    data = []
+    for loc in locations:
+        content_count = len(loc.contents)
+        if content_count > 0:
+            size = min(1.5, 0.1 + (content_count * 0.05))
+            
+            data.append({
+                "lat": loc.latitude,
+                "lng": loc.longitude,
+                "size": size,
+                "color": "#e11d48",
+                "title": loc.name,
+                "content_count": content_count,
+                "url": url_for("content.sections", section_slug="news", location=loc.slug)
+            })
+            
+    return sorted(data, key=lambda x: x["size"], reverse=True)[:150]

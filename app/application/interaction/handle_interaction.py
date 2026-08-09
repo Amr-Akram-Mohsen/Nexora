@@ -2,7 +2,7 @@ from app.domains.interaction.service import react, save_item, post_comment, reco
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.content.models import Content
 from app.domains.product.service import get_item_by_id
-from app.domains.recommendation.interest_service import handle_interaction_interest, handle_comment_interaction
+from app.domains.recommendation.service.interest_service import handle_interaction_interest, handle_comment_interaction
 from app.shared.constants.core import TargetType
 from app.core.extensions import db
 

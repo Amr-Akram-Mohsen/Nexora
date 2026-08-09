@@ -9,6 +9,14 @@ from app.domains.content.service.query.filtering import get_contents_by_ids
 
 logger = logging.getLogger(__name__)
 
+def _attach_collection_names(serialized_items: list, saves: list):
+    """Helper to attach collection_name from saves to serialized items."""
+    saves_map = {s.target_id: s.collection_name for s in saves}
+    for item in serialized_items:
+        if item["id"] in saves_map:
+            item["collection_name"] = saves_map[item["id"]]
+    return serialized_items
+
 def get_saved_articles_workflow(user_id):
     """
     Retrieves and serializes all saved contents for a user.
@@ -19,7 +27,6 @@ def get_saved_articles_workflow(user_id):
         return []
     
     content_ids = [s.target_id for s in saves]
-    saves_map = {s.target_id: s for s in saves}
     
     # Load all contents with eager loads in a single query
     contents = get_contents_by_ids(content_ids, session=db.session)
@@ -31,13 +38,7 @@ def get_saved_articles_workflow(user_id):
     # Batch resolve polymorphic targets
     serialized = assign_target_to_contents(sorted_contents, session=db.session)
     
-    # Add collection_name
-    for product in serialized:
-        save_obj = saves_map.get(product["id"])
-        if save_obj:
-            product["collection_name"] = save_obj.collection_name
-            
-    return serialized
+    return _attach_collection_names(serialized, saves)
 
 def get_saved_products_workflow(user_id):
     """
@@ -49,15 +50,8 @@ def get_saved_products_workflow(user_id):
         return []
     
     product_ids = [s.target_id for s in saves]
-    saves_map = {s.target_id: s for s in saves}
     
     # Load all products and serialize with all card relations eager loaded
     serialized = get_items_by_ids(product_ids, serialize=True, load="card")
     
-    # Add collection_name
-    for product in serialized:
-        save_obj = saves_map.get(product["id"])
-        if save_obj:
-            product["collection_name"] = save_obj.collection_name
-            
-    return serialized
+    return _attach_collection_names(serialized, saves)

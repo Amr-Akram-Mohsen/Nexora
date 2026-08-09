@@ -7,7 +7,7 @@ from app.core.extensions import db
 from app.domains.content.models import Content
 from app.domains.product.models import Product
 from app.domains.relationships import content_products
-from app.domains.recommendation.ranking import score_content_item_link
+from app.domains.recommendation.service.ranking import score_content_item_link
 from app.domains.product.service.query import (
     get_candidate_items_for_content,
     get_items_for_matching,

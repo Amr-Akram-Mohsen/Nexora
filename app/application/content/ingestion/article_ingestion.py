@@ -1,6 +1,7 @@
 from app.domains.content.models import Article
 from .base import generic_ingest
 from app.shared.dto.ingestion import EnrichedItemDTO
+from app.domains.content.service.normalization import parse_date
 
 def calculate_enrichment_priority(data: dict) -> float:
     """
@@ -38,35 +39,30 @@ def calculate_enrichment_priority(data: dict) -> float:
     published_at = data.get("published_at")
     if published_at:
         import datetime
-        try:
-            if isinstance(published_at, str):
-                # basic ISO format parsing
-                if published_at.endswith('Z'):
-                    published_at = published_at[:-1] + '+00:00'
-                pub_date = datetime.datetime.fromisoformat(published_at)
-            else:
-                pub_date = published_at
-                
-            if isinstance(pub_date, datetime.datetime):
-                if pub_date.tzinfo is None:
-                    pub_date = pub_date.replace(tzinfo=datetime.timezone.utc)
-                now = datetime.datetime.now(datetime.timezone.utc)
-                age_hours = (now - pub_date).total_seconds() / 3600.0
-                if age_hours >= 0:
-                    freshness_boost = max(0.0, 1.0 - (age_hours / 48.0))
-                    priority += freshness_boost
-        except Exception:
-            pass
+        pub_date = parse_date(published_at)
+        if pub_date:
+            if pub_date.tzinfo is None:
+                pub_date = pub_date.replace(tzinfo=datetime.timezone.utc)
+            now = datetime.datetime.now(datetime.timezone.utc)
+            age_hours = (now - pub_date).total_seconds() / 3600.0
+            if age_hours >= 0:
+                freshness_boost = max(0.0, 1.0 - (age_hours / 48.0))
+                priority += freshness_boost
             
     return float(priority)
 
 
-def create_article_model(data):
+def _sync_authors(authors_data, existing_authors=None, session=None):
     from app.core.extensions import db
     from app.domains.content.models.author import Author
     
-    author_objs = []
-    authors_data = data.get("authors") or ([data.get("author")] if data.get("author") else [])
+    if session is None:
+        session = db.session
+        
+    if existing_authors is None:
+        existing_authors = []
+        
+    result_authors = list(existing_authors)
     
     for author_data in authors_data:
         if isinstance(author_data, str):
@@ -76,7 +72,7 @@ def create_article_model(data):
         if not name:
             continue
             
-        # Filter out junk author names like "See full bio"
+        # Filter out junk author names
         if name.strip().lower() in ("see full bio", "full bio", "author", "by"):
             continue
             
@@ -86,15 +82,22 @@ def create_article_model(data):
         is_agency = author_data.get("isAgency", False)
         
         author_obj = Author.get_or_create(
-            session=db.session,
+            session=session,
             name=name,
             uri=uri,
             url=url,
             type_val=type_val,
             is_agency=is_agency
         )
-        if author_obj and author_obj not in author_objs:
-            author_objs.append(author_obj)
+        if author_obj and author_obj not in result_authors:
+            result_authors.append(author_obj)
+            
+    return result_authors
+
+
+def create_article_model(data):
+    authors_data = data.get("authors") or ([data.get("author")] if data.get("author") else [])
+    author_objs = _sync_authors(authors_data)
 
     return Article(
         title=data.get("title"),
@@ -163,10 +166,8 @@ def process_diffbot_enrichment(article, diffbot_data, session):
                 prefix = norm_text_start[:len(norm_sum) + 100]
                 if len(prefix) > 20:
                     match = SequenceMatcher(None, norm_sum, prefix).find_longest_match(0, len(norm_sum), 0, len(prefix))
-                    # If the longest contiguous matching block is at least 80% of the summary length, consider it redundant
                     if match.size > len(norm_sum) * 0.8:
                         is_redundant = True
-                    # Also try ratio on the direct slice just in case
                     elif SequenceMatcher(None, norm_sum, norm_text_start[:len(norm_sum)]).ratio() > 0.85:
                         is_redundant = True
                     
@@ -181,8 +182,6 @@ def process_diffbot_enrichment(article, diffbot_data, session):
         article.videos = obj.get("videos", [])
 
     # 3. Handle Authors
-    from app.domains.content.models.author import Author
-    
     diffbot_authors_data = []
     if obj.get("authors"):
         diffbot_authors_data = obj.get("authors")
@@ -194,28 +193,7 @@ def process_diffbot_enrichment(article, diffbot_data, session):
             diffbot_authors_data = [author_val]
             
     if diffbot_authors_data:
-        existing_authors = article.authors or [] # Now a list of Author objects
-        
-        for new_a in diffbot_authors_data:
-            new_name = new_a.get("name", "") if isinstance(new_a, dict) else str(new_a)
-            if not new_name:
-                continue
-                
-            url = None
-            if isinstance(new_a, dict):
-                url = new_a.get("link") or new_a.get("authorUrl")
-                
-            # Use get_or_create which handles the alias resolution natively
-            author_obj = Author.get_or_create(
-                session=session,
-                name=new_name,
-                url=url
-            )
-            
-            if author_obj and author_obj not in existing_authors:
-                existing_authors.append(author_obj)
-                
-        article.authors = existing_authors
+        article.authors = _sync_authors(diffbot_authors_data, existing_authors=article.authors, session=session)
 
     # 4. Integrate Diffbot Tags (via ContentEntity)
     if "tags" in obj:
@@ -267,27 +245,10 @@ def update_article_model(obj, data):
         obj.word_count = data.get("word_count")
         changed = True
         
-    if data.get("authors") and not obj.authors:
-        from app.core.extensions import db
-        from app.domains.content.models.author import Author
-        author_objs = []
-        for author_data in data.get("authors"):
-            if isinstance(author_data, str):
-                author_data = {"name": author_data}
-            name = author_data.get("name")
-            if not name: continue
-            author_obj = Author.get_or_create(
-                session=db.session,
-                name=name,
-                uri=author_data.get("uri"),
-                url=author_data.get("link") or author_data.get("authorUrl") or author_data.get("url"),
-                type_val=author_data.get("type", "author"),
-                is_agency=author_data.get("isAgency", False)
-            )
-            if author_obj and author_obj not in author_objs:
-                author_objs.append(author_obj)
-        if author_objs:
-            obj.authors = author_objs
+    if data.get("authors"):
+        new_authors = _sync_authors(data.get("authors"), existing_authors=obj.authors)
+        if len(new_authors) > len(obj.authors or []):
+            obj.authors = new_authors
             changed = True
             
     if data.get("language") and not obj.language:
