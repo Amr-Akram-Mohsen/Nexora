@@ -171,8 +171,8 @@
 @media (max-width: 768px) {
 
     /* Layout grid maintains collapsed sidebar space on mobile */
-    .admin-layout {
-        grid-template-columns: 70px 1fr !important;
+    .admin-layout.sidebar-collapsed {
+        grid-template-columns: 70px 1fr;
     }
 
     /* Overlay sidebar when expanded on mobile (NOT .collapsed) */
@@ -184,7 +184,7 @@
         position: fixed;
         left: 0;
         top: 0;
-        width: 280px !important;
+        width: 280px;
         height: 100vh;
         z-index: 100;
         box-shadow: var(--shadow-lg);
@@ -193,10 +193,10 @@
     }
 
     /* Keep sidebar vertical sticky and collapsed to 70px when collapsed on mobile */
-    .admin-layout.collapsed .admin-sidebar {
+    .admin-layout.sidebar-collapsed .admin-sidebar {
         position: sticky;
         top: 0;
-        width: 70px !important;
+        width: 70px;
         height: 100vh;
         border-right: 1px solid var(--border);
         border-bottom: none;

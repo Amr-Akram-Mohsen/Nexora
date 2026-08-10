@@ -3,14 +3,16 @@
    Templates and scripts remain unchanged while imports resolve sequentially.
 --- */
 
-@import "./admin/layout/layout.css";
-@import "./admin/layout/header.css";
-@import "./admin/layout/navigation.css";
-@import "./admin/pages/dashboard.css";
-@import "./admin/pages/taxonomy.css";
-@import "./admin/components/tables.css";
-@import "./admin/components/forms.css";
-@import "./admin/components/modals.css";
-@import "./admin/pages/settings.css";
-@import "./admin/components/components.css";
-@import "./admin/components/inspect.css";
+@layer reset, vendor, tokens, base, layout, components, domains, utilities, admin;
+
+@import "./admin/layout/layout.css" layer(admin);
+@import "./admin/layout/header.css" layer(admin);
+@import "./admin/layout/navigation.css" layer(admin);
+@import "./admin/pages/dashboard.css" layer(admin);
+@import "./admin/pages/taxonomy.css" layer(admin);
+@import "./admin/components/tables.css" layer(admin);
+@import "./admin/components/forms.css" layer(admin);
+@import "./admin/components/modals.css" layer(admin);
+@import "./admin/pages/settings.css" layer(admin);
+@import "./admin/components/components.css" layer(admin);
+@import "./admin/components/inspect.css" layer(admin);

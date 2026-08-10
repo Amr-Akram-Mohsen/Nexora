@@ -39,7 +39,7 @@
 
 {% if slot == 'header' %}
 <div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
-  <div class="listing-summary flex">
+  <div class="listing-summary flex flex-col gap-1">
     <h1 class="listing-title">Your Reading History</h1>
     <p class="listing-count">
       <span class="listing-count__num" id="total-count">{{ history_items|length }}</span>

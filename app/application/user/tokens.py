@@ -59,7 +59,7 @@ def generate_reset_token(user) -> str:
     """
     payload = {
         'id':  user.id,
-        'pc':  str(user.password_changed_at),   # invalidates after any password change
+        'pc':  user.password_changed_at.timestamp() if user.password_changed_at else 0,
     }
     token = _serializer().dumps(payload, salt=_RESET_SALT)
     logger.debug("[AUTH] Generated reset token for user_id=%s", user.id)

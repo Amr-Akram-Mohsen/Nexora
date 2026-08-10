@@ -26,7 +26,7 @@
       <span>{{ post.platform | title }}</span>
     </div>
     {% if post.subreddit %}
-    {{ badge('r/' ~ post.subreddit, 'badge--topic') }}
+    {{ badge('r/' ~ post.subreddit) }}
     {% endif %}
     {{ badge(content.category.name, 'badge--category') }}
   </div>

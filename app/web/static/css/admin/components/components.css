@@ -82,9 +82,10 @@
     background: rgba(var(--destructive-rgb), 0.08);
 }
 
-.btn-text-subtle-danger {
-    background: transparent !important;
-    border: none !important;
+.ghost-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
     color: var(--muted-foreground);
     cursor: pointer;
     padding: 0.25rem 0.5rem;
@@ -92,8 +93,8 @@
     transition: color 0.15s ease;
 }
 
-.btn-text-subtle-danger:hover {
-    color: var(--brand-red) !important;
+.ghost-btn.danger:hover {
+    color: var(--brand-red);
 }
 
 .user-action-inspect {

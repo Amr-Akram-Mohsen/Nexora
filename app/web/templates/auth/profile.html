@@ -29,12 +29,13 @@
           <p class="profile-email">{{ current_user.email }}</p>
 
           <div class="profile-verification-status flex justify-center">
-            {% if current_user.is_verified %}
-            {{ badge("Verified Account", variant="success", icon="fas fa-check-circle", class="badge--verified") }}
-            {% else %}
-            {{ badge("Unverified Account", variant="danger", icon="fas fa-exclamation-circle",
-            class="badge--unverified") }}
-            {% endif %}
+            {% set v = current_user.is_verified %}
+            {{ badge(
+              "Verified Account" if v else "Unverified Account",
+              variant="success" if v else "danger",
+              icon="fas fa-check-circle" if v else "fas fa-exclamation-circle",
+              class="badge--verified" if v else "badge--unverified"
+            ) }}
           </div>
         </div>
 
@@ -49,6 +50,44 @@
             <span class="meta-value">{{ current_user.created_at | format_date('%Y-%m-%d') }}</span>
           </div>
         </div>
+
+        {% if multi_accounts and multi_accounts|length > 1 %}
+        <div class="mt-4 border-t pt-4 border-separator">
+          <h3 class="text-sm font-bold mb-3 text-muted-foreground uppercase tracking-wider">Linked Accounts</h3>
+          <div class="flex flex-col gap-2">
+            {% for acc in multi_accounts %}
+              {% if not acc.is_active %}
+                {% call form("user.switch_account", user_id=acc.id) %}
+                <button type="submit" class="w-full text-left flex items-center gap-3 p-2 border rounded-md hover:bg-[var(--surface-hover)] transition-colors border-separator cursor-pointer bg-transparent">
+                  <div class="profile-avatar flex-center flex justify-center items-center" style="width:2rem;height:2rem;font-size:0.8rem;">
+                    {{ acc.avatar_letter }}
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-sm text-[var(--text-color)]">{{ acc.name }}</span>
+                    <span class="text-xs text-muted-foreground">{{ acc.email }}</span>
+                  </div>
+                </button>
+                {% endcall %}
+              {% else %}
+                <div class="w-full text-left flex items-center gap-3 p-2 border rounded-md bg-[var(--brand-blue-transparent)] border-[var(--brand-blue)]">
+                  <div class="profile-avatar flex-center flex justify-center items-center" style="width:2rem;height:2rem;font-size:0.8rem;background:var(--brand-blue);color:white;">
+                    {{ acc.avatar_letter }}
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-sm text-[var(--brand-blue)]">{{ acc.name }} (Current)</span>
+                    <span class="text-xs text-[var(--brand-blue-hover)] opacity-80">{{ acc.email }}</span>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {{ button(href=url_for('user.login', add_account=1), text="Add Another Account", variant="outline", class="w-full mt-3 text-sm gap-2", icon="fas fa-plus") }}
+        </div>
+        {% else %}
+        <div class="mt-4 border-t pt-4 border-separator">
+          {{ button(href=url_for('user.login', add_account=1), text="Add Another Account", variant="outline", class="w-full text-sm gap-2", icon="fas fa-plus") }}
+        </div>
+        {% endif %}
         {% endcall %}
 
         {% if not current_user.is_verified and current_user.provider != 'google' %}
@@ -66,21 +105,38 @@
       <main class="profile-main">
 
         <!-- Card: Personal Information -->
-        {% call card(title="Personal Details", desc="Update your display name for public interactions.",
+        {% call card(title="Personal Details", desc="Update your display name and email address.",
         class="settings-card") %}
         {% call form(form_action=url_for('user.update_profile'), class="profile-form") %}
         {{ input(type="hidden", name="action", value="name", required=False) }}
 
-        <div class="profile-form-grid">
+        <div class="profile-form-grid mb-6">
           {% call field(label_text="Display Name", for_id="name", class="gap-2 flex") %}
           {{ input(name="name", id="name", value=current_user.name or '', placeholder="Enter your name") }}
           <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
           {% endcall %}
           <div class="form-actions">
-            {{ button(text="Save Changes", type="submit", variant="primary", class="gap-2") }}
+            {{ button(text="Save Name", type="submit", variant="primary", class="gap-2") }}
           </div>
         </div>
         {% endcall %}
+
+        {% if current_user.provider != 'google' %}
+        <div class="border-t border-separator my-6"></div>
+        {% call form(form_action=url_for('user.update_profile'), class="profile-form") %}
+        {{ input(type="hidden", name="action", value="email", required=False) }}
+
+        <div class="profile-form-grid">
+          {% call field(label_text="Email Address", for_id="email", class="gap-2 flex") %}
+          {{ input(name="email", id="email", type="email", value=current_user.email, placeholder="Enter new email", required=True) }}
+          <span class="form-description">Updating your email will require verification via a 6-digit code.</span>
+          {% endcall %}
+          <div class="form-actions">
+            {{ button(text="Update Email", type="submit", variant="primary", class="gap-2") }}
+          </div>
+        </div>
+        {% endcall %}
+        {% endif %}
         {% endcall %}
 
         <!-- Card: Newsletters -->

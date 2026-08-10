@@ -1,7 +1,7 @@
 /* --- Base Catalog/Listing Layout --- */
 
 .listing-page {
-  padding-top: 2rem;
+  padding-top: var(--space-10);
   padding-bottom: 5rem;
 }
 
@@ -12,7 +12,7 @@
   align-items: start;
   max-width: var(--container-max-width, 1400px);
   margin-inline: auto;
-  padding-inline: 1.5rem;
+  padding-inline: var(--space-9);
 }
 
 [data-domain-type="search"] .listing-layout {
@@ -32,12 +32,12 @@
 }
 
 .listing-sidebar__inner {
-  padding: 1.5rem;
+  padding: var(--space-9);
 }
 
 .sidebar-header {
   display: none;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--space-8);
 }
 
 .sidebar-header__title {
@@ -85,9 +85,6 @@
 
 /* --- Listing UI Components --- */
 
-.listing-header__inner {
-  display: flex;
-}
 
 .listing-title {
   font-size: var(--text-2xl);
@@ -97,10 +94,7 @@
   line-height: 1.2;
 }
 
-.listing-summary {
-  flex-direction: column;
-  gap: 0.2rem;
-}
+
 
 .listing-count {
   font-size: var(--text-sm);
@@ -120,19 +114,17 @@
 /* --- Listing Mobile Bar (Refined & Premium Card) --- */
 .listing-mobile-bar {
   display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
+  gap: var(--space-7);
+  padding: var(--space-5) var(--space-7);
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-9);
   box-shadow: var(--shadow-sm);
 }
 
 .filter-toggle-btn {
-  padding: 0.55rem 1rem;
+  padding: var(--space-4) var(--space-7);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   font-size: var(--text-sm);
@@ -176,7 +168,7 @@
 .filter-tag {
   background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   color: var(--domain-primary);
-  padding: 0.35rem 0.75rem;
+  padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
@@ -265,11 +257,11 @@
 }
 
 .listing-footer {
-  padding-top: 1rem;
+  padding-top: var(--space-7);
 }
 
 .listing-filters-active {
-  padding: 0.75rem 1rem;
+  padding: var(--space-5) var(--space-7);
   background: var(--secondary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
@@ -316,21 +308,21 @@
 
 @media (max-width: 768px) {
   .listing-page {
-    padding-top: 1.25rem;
+    padding-top: var(--space-8);
     padding-bottom: 3rem;
   }
 
   .listing-layout {
-    padding-inline: 1rem;
+    padding-inline: var(--space-7);
   }
 
   .listing-filters-active {
-    padding: 0.6rem 0.75rem;
+    padding: var(--space-4) var(--space-5);
   }
 }
 
 @media (max-width: 480px) {
   .listing-layout {
-    padding-inline: 0.75rem;
+    padding-inline: var(--space-5);
   }
 }

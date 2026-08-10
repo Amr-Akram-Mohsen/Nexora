@@ -1,7 +1,11 @@
 /* app/web/static/css/admin/pages/ingestion.css */
 
 .ingestion-hidden {
-    display: none !important;
+    display: none;
+}
+
+.ingestion-logs {
+    display: none;
 }
 
 .cache-helpers-view {

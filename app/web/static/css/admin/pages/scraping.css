@@ -1,7 +1,7 @@
 /* app/web/static/css/admin/pages/scraping.css */
 
 .scraping-hidden {
-    display: none !important;
+    display: none;
 }
 
 #task-status-container {

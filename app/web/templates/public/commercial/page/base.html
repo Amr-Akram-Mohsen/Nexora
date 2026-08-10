@@ -65,7 +65,7 @@ product
 
                 <h1 class="detail-page__title">{{ product.name }}</h1>
 
-                <div class="detail-page__meta flex items-center flex-wrap">
+                <div class="detail-page__meta flex items-center flex-wrap gap-2">
 
                     <div class="meta-product flex items-center">
                         {{ render_stars(product.rating or 0) }}
@@ -81,7 +81,7 @@ product
 
                 {# Price — immediately below rating for clear hierarchy #}
                 {% if product.default_variant %}
-                <div class="product-price-summary flex flex-wrap">
+                <div class="product-price-summary flex flex-wrap items-baseline gap-2">
                     <span class="current-price">
                         {{ product.default_variant.price }}
                         {{ product.default_variant.currency }}
@@ -96,7 +96,7 @@ product
                 {% if product.quick_details %}
                 <div class="product-quick-details">
                     {% for detail in product.quick_details[:6] %}
-                    <div class="quick-detail flex">
+                    <div class="quick-detail flex flex-col gap-sm">
                         <span class="quick-detail__label">{{ detail.label }}</span>
                         <span class="quick-detail__value">{{ detail.value }}</span>
                     </div>

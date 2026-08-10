@@ -23,8 +23,6 @@
     border-color 0.2s ease,
     background 0.2s ease,
     color 0.2s ease;
-  --lift-amount: -3px;
-  --lift-shadow: var(--shadow-md);
 }
 
 .brand-chip:hover {

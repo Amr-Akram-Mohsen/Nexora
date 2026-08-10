@@ -3,47 +3,49 @@
  * Modular Architecture - Cascade Verified
  */
 
-/* 1. Base - Variables & Fundamentals */
-@import "all.min.css";
-@import "base/variables.css";
-@import "base/reset.css";
-@import "base/typography.css";
-@import "base/domain-variables.css";
+@layer reset, vendor, tokens, base, layout, components, domains, utilities, admin;
 
-@import "components/theme-variants.css";
+/* 1. Base - Variables & Fundamentals */
+@import "all.min.css" layer(vendor);
+@import "base/variables.css" layer(tokens);
+@import "base/reset.css" layer(reset);
+@import "base/typography.css" layer(base);
+@import "base/domain-variables.css" layer(base);
+
+@import "components/theme-variants.css" layer(components);
 
 /* 2. Layout - Site Structure */
-@import "layout/header.css";
-@import "content/catalog/search.css";
-@import "layout/footer.css";
-@import "layout/grid.css";
-@import "layout/logo.css";
+@import "layout/header.css" layer(layout);
+@import "content/catalog/search.css" layer(domains);
+@import "layout/footer.css" layer(layout);
+@import "layout/grid.css" layer(layout);
+@import "layout/logo.css" layer(layout);
 
 /* 3. Components - Reusable UI Elements */
-@import "components/ui/button.css";
-@import "components/ui/form.css";
-@import "components/ui/badge.css";
-@import "components/ui/brand-chip.css";
-@import "components/newsletter.css";
+@import "components/ui/button.css" layer(components);
+@import "components/ui/form.css" layer(components);
+@import "components/ui/badge.css" layer(components);
+@import "components/ui/brand-chip.css" layer(components);
+@import "components/newsletter.css" layer(components);
 
-@import "components/interactions/interaction.css";
+@import "components/interactions/interaction.css" layer(components);
 
-@import "components/cards.css";
+@import "components/cards.css" layer(components);
 
-@import "content/cards/article.css";
-@import "content/cards/video.css";
-@import "content/cards/post.css";
-@import "content/features/content-image.css";
-@import "content/features/video-thumb.css";
+@import "content/cards/article.css" layer(domains);
+@import "content/cards/video.css" layer(domains);
+@import "content/cards/post.css" layer(domains);
+@import "content/features/content-image.css" layer(domains);
+@import "content/features/video-thumb.css" layer(domains);
 
-@import "commercial/catalog/compare.css";
-@import "commercial/features/rating.css";
+@import "commercial/catalog/compare.css" layer(domains);
+@import "commercial/features/rating.css" layer(domains);
 /* Features */
-@import "features/page/static-pages.css";
+@import "features/page/static-pages.css" layer(domains);
 
 /* 5. Utilities - Global Helpers */
-@import "utilities/alerts.css";
-@import "utilities/helpers.css";
-@import "utilities/animations.css";
-@import "utilities/flex.css";
-@import "utilities/typography.css";
+@import "utilities/alerts.css" layer(utilities);
+@import "utilities/helpers.css" layer(utilities);
+@import "utilities/animations.css" layer(utilities);
+@import "utilities/flex.css" layer(utilities);
+@import "utilities/typography.css" layer(utilities);

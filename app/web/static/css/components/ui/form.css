@@ -1,33 +1,45 @@
 
 
-.input {
+.input,
+.textarea {
+  width: 100%;
   min-width: 0;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-md);
+  background-color: var(--input-bg, var(--input-background));
+  border: 1px solid var(--input-border-color, var(--border));
+  color: var(--input-color, var(--foreground));
+  font-size: var(--text-base);
+  transition: color 0.2s, box-shadow 0.2s;
+}
+
+.input {
   height: 2.25rem;
-  /* h-9 */
   padding-block: 0.25rem;
-  /* py-1 px-3 */
+}
+
+.textarea {
+  min-height: 4rem;
+  padding-block: 0.5rem;
+  resize: none;
 }
 
 .input[type="file"] {
   height: 1.75rem;
-  /* file:h-7 */
   border: 0;
   background: transparent;
   font-size: var(--text-sm);
-  /* file:text-sm */
   font-weight: var(--weight-md);
 }
 
 .checkbox {
   width: 1rem;
-  /* size-4 */
   height: 1rem;
   border-radius: 4px;
   border: 1px solid var(--border);
   background-color: var(--input-background);
   color: var(--foreground);
   box-shadow: 0 0 0 0 rgba(var(--black-rgb), 0);
-  /* shadow-xs */
   transition: box-shadow 0.2s, background-color 0.2s;
 }
 
@@ -38,7 +50,6 @@
 
 .form-description {
   font-size: var(--text-sm);
-  /* text-sm */
   color: var(--muted-foreground);
 }
 
@@ -54,15 +65,13 @@
   position: relative;
 }
 
-/* (merged above) */
-
 .filter-item__link:hover .checkbox-box {
   border-color: rgba(var(--brand-blue-rgb), 0.5);
   box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), 0.08);
 }
-.label {/* gap-2 */
+
+.label {
   font-size: var(--text-sm);
-  /* text-sm */
   line-height: 1;
   font-weight: var(--weight-md);
   user-select: none;
@@ -70,26 +79,6 @@
 
 .label[data-error="true"] {
   color: var(--destructive);
-}
-
-/* --- Form UI & Overrides --- */
-
-.input,
-.textarea {
-  width: 100%;
-  padding-inline: 0.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--input-background);
-  color: var(--foreground);
-  font-size: var(--text-base);
-  transition: color 0.2s, box-shadow 0.2s;
-}
-
-.textarea {
-  min-height: 4rem;
-  padding-block: 0.5rem;
-  resize: none;
 }
 
 .form-row {

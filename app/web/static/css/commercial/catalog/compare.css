@@ -71,7 +71,7 @@
   height: 100px;
   background: var(--secondary);
   border-radius: var(--radius-lg);
-  padding: 0.5rem;
+  padding: var(--space-3);
   border: 1px solid var(--border);
   margin-bottom: 1rem;
 }
@@ -113,10 +113,7 @@
   margin-top: 0.5rem;
 }
 
-.compare-actions .btn {
-  width: 100%;
-  justify-content: center;
-}
+
 
 /* Feature category headers in table rows */
 .table-row-group {

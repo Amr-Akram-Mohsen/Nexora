@@ -17,27 +17,27 @@
 
 {% if slot == 'sidebar' %}
 <div class="sidebar-accent"></div>
-<div class="sidebar-heading flex items-center justify-between">
-  <span class="sidebar-heading__label flex items-center">
+<div class="sidebar-heading flex justify-between">
+  <span class="sidebar-heading__label flex gap-2">
     <i class="far fa-bookmark"></i> Library
   </span>
 </div>
 
 <div class="filter-sidebar">
   <div class="filter-section">
-    <h3 class="filter-section__title flex items-center gap-2">
+    <h3 class="filter-section__title flex gap-2">
       <i class="far fa-folder"></i> Collections
     </h3>
     <ul class="filter-list flex flex-col">
       <li class="filter-item is-active" id="filter-all">
-        {% call link(href="#all", class="filter-item__link flex items-center justify-between", unstyled=True) %}
+        {% call link(href="#all", class="filter-item__link flex justify-between", unstyled=True) %}
           <span>All Saved</span>
           <span class="filter-section__badge">{{ saved_items|length + saved_articles|length }}</span>
         {% endcall %}
       </li>
       {% for collection in collections %}
       <li class="filter-item">
-        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex items-center justify-between", unstyled=True) %}
+        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex justify-between", unstyled=True) %}
           <span>{{ collection }}</span>
         {% endcall %}
       </li>
@@ -48,8 +48,8 @@
 {% endif %}
 
 {% if slot == 'header' %}
-<div class="listing-header__inner flex-wrap gap-4 justify-between items-center">
-  <div class="listing-summary flex">
+<div class="listing-header__inner flex-wrap gap-4 flex justify-between">
+  <div class="listing-summary flex flex-col gap-1">
     <h1 class="listing-title">Your Saved Items</h1>
     <p class="listing-count">
       <span class="listing-count__num" id="total-count">{{ saved_articles|length + saved_items|length }}</span>

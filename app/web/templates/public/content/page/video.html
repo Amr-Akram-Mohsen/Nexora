@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block base_header %}
-<div class="video-content">
+<div class="video-player-wrapper-section">
   <div class="video-player-container">
     {{ render_video_thumbnail(video.thumbnail_url, video.title, video.url or video.external_id, platform=video.platform,
     wrapper_class='video-main-player') }}
@@ -29,27 +29,27 @@
 
   <div class="video-header__meta flex flex-wrap">
     {% if video.channel_name %}
-    <div class="meta-pill">
+    <div class="meta-pill inline-flex gap-sm">
       <i class="fas fa-play-circle"></i>
       <span class="meta-pill__text">{{ video.channel_name }}</span>
     </div>
     {% endif %}
 
     {% if content.view_count %}
-    <div class="meta-pill">
+    <div class="meta-pill inline-flex gap-sm">
       <i class="fas fa-eye"></i>
       <span class="meta-pill__text">{{ "{:,}".format(content.view_count) }} views</span>
     </div>
     {% endif %}
 
     {% if content.video_comments %}
-    <div class="meta-pill">
+    <div class="meta-pill inline-flex gap-sm">
       <i class="far fa-comment"></i>
       <span class="meta-pill__text">{{ content.video_comments|length }} comments</span>
     </div>
     {% endif %}
 
-    <div class="meta-pill">
+    <div class="meta-pill inline-flex gap-sm">
       <i class="far fa-calendar-alt"></i>
       <span class="meta-pill__text">{{ content.published_at | format_date('%b %d, %Y') }}</span>
     </div>
@@ -61,7 +61,7 @@
 {% endblock %}
 
 {% block base_content %}
-<div class="video-content flex flex-col gap-3">
+<div class="flex flex-col gap-3">
   {% if video.description %}
   <div class="video-description-box">
     <h3 class="video-description-box__title">Description</h3>
@@ -77,7 +77,7 @@
     {{ badge(text=loc.name, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
     {% endfor %}
     {% for topic in content.topics %}
-    {{ badge(text=topic.name, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
+    {{ badge(text=topic.name, variant="secondary", icon="fas fa-hashtag") }}
     {% endfor %}
   </div>
   {% endif %}
@@ -92,7 +92,9 @@
         <span class="yt-comments-count">({{ content.video_comments|length }})</span>
       </h3>
       {% call button(class="toggle-comments-btn", variant="outline",
-      attrs={"onclick": "const c = document.getElementById('yt-comments-container'); c.classList.toggle('is-visible'); this.classList.toggle('is-active'); const t = this.querySelector('.toggle-comments-text'); if(t) t.textContent = c.classList.contains('is-visible') ? 'Hide Comments' : 'Show Comments';"}) %}
+      attrs={"onclick": "const c = document.getElementById('yt-comments-container'); c.classList.toggle('is-visible');
+      this.classList.toggle('is-active'); const t = this.querySelector('.toggle-comments-text'); if(t) t.textContent =
+      c.classList.contains('is-visible') ? 'Hide Comments' : 'Show Comments';"}) %}
       <span class="toggle-comments-text">Show Comments</span>
       <i class="fas fa-chevron-down toggle-comments-icon"></i>
       {% endcall %}
@@ -101,19 +103,23 @@
       {% for comment in content.video_comments %}
       <div class="yt-comment flex flex-col gap-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="yt-comment__author flex items-center gap-1.5">
-            <i class="far fa-user-circle yt-comment__avatar-icon"></i>
-            {{ comment.author }}
-          </span>
+          <a href="{{ comment.author.url }}">
+            <span class="yt-comment__author flex gap-1.5">
+              <i class="far fa-user-circle yt-comment__avatar-icon"></i>
+              {{ comment.author.name }}
+            </span>
+          </a>
           {% if comment.published_at %}
           <span class="yt-comment__date">{{ comment.published_at | truncate(10, True, '') }}</span>
           {% endif %}
         </div>
         <p class="yt-comment__text">{{ comment.text|safe }}</p>
         <div class="flex items-center gap-3 yt-comment__meta">
-          <span class="yt-comment__stat flex items-center gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes }}</span>
+          <span class="yt-comment__stat flex gap-1"><i class="fas fa-thumbs-up"></i> {{ comment.likes
+            }}</span>
           {% if comment.replies > 0 %}
-          <span class="yt-comment__stat flex items-center gap-1"><i class="fas fa-reply"></i> {{ comment.replies }}</span>
+          <span class="yt-comment__stat flex gap-1"><i class="fas fa-reply"></i> {{ comment.replies
+            }}</span>
           {% endif %}
         </div>
       </div>

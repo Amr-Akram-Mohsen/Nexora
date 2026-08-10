@@ -37,9 +37,9 @@
 
 .inline-tooltip {
   position: absolute;
-  background: #fff8c2;
-  color: #333;
-  border: 1px solid #ccc;
+  background: var(--color-warning, #f59e0b);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border);
   padding: 0.3rem 0.6rem;
   border-radius: 0.25rem;
   font-size: var(--text-sm);

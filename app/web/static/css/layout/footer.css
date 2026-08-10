@@ -23,6 +23,7 @@ body.dark-mode .site-footer {
   padding: 1rem 0;
   /* tightened padding to resolve empty vertical space */
 }
+
 .footer-brand {
   font-weight: 700;
   background: linear-gradient(to right, var(--brand-blue), var(--brand-purple));
@@ -30,7 +31,7 @@ body.dark-mode .site-footer {
   color: transparent;
   margin-inline: 0.1rem;
   padding-bottom: 0.5rem;
-border-bottom: 1px dashed var(--border);
+  border-bottom: 1px dashed var(--border);
 }
 
 @media (min-width: 992px) {
@@ -38,6 +39,7 @@ border-bottom: 1px dashed var(--border);
     grid-template-columns: 3fr 2fr 2fr 3fr;
     gap: 2.5rem;
   }
+
   .footer-brand {
     border: none;
     padding-bottom: 0;
@@ -53,7 +55,7 @@ border-bottom: 1px dashed var(--border);
   padding: 0.5rem;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--brand-blue), var(--brand-purple));
-  color: white;
+  color: var(--primary-foreground);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -74,25 +76,24 @@ border-bottom: 1px dashed var(--border);
 }
 
 .facebook {
-    --icon-color: #1877F2;
+  --icon-color: var(--color-brand-facebook, #1877F2);
 }
 
 .instagram {
-    --icon-color: #E4405F;
-    /* or use a gradient, see below */
+  --icon-color: var(--color-brand-instagram, #E4405F);
 }
 
 .pinterest {
-    --icon-color: #BD081C;
+  --icon-color: var(--color-brand-pinterest, #BD081C);
 }
 
 .x,
 .tiktok {
-    --icon-color: #000000;
+  --icon-color: var(--color-brand-x, var(--foreground));
 }
 
 .youtube {
-    --icon-color: #FF0000;
+  --icon-color: var(--color-brand-youtube, #FF0000);
 }
 
 .footer-social {
@@ -104,7 +105,7 @@ border-bottom: 1px dashed var(--border);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid transparent;
-  
+
 }
 
 .footer-social i {
@@ -121,8 +122,7 @@ border-bottom: 1px dashed var(--border);
   transform: scale(1.1);
 }
 
-.footer-column {
-}
+
 /* --- Columns Typography --- */
 .footer-title {
   font-size: 0.875rem;
@@ -133,7 +133,9 @@ border-bottom: 1px dashed var(--border);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.footer-products {font-size: 0.75rem;
+
+.footer-products {
+  font-size: 0.75rem;
 }
 
 .footer-link {
@@ -171,10 +173,7 @@ border-bottom: 1px dashed var(--border);
 }
 
 /* --- Footer Contact --- */
-.footer-contact {
-  color: var(--muted-foreground);
-  margin-top: 0.5rem;
-}
+
 
 /* --- Trust Badges --- */
 .footer-trust {
@@ -187,23 +186,10 @@ border-bottom: 1px dashed var(--border);
 }
 
 /* --- New Additions --- */
-.footer-slogan {
-  font-weight: 700;
-  color: var(--foreground);
-  margin-top: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
 .footer-text {
   color: var(--muted-foreground);
   font-size: 0.875rem;
   line-height: 1.5;
-}
-
-.footer-email {
-  font-weight: 500;
-  text-transform: initial;
-  
 }
 
 .footer-newsletter__btn {

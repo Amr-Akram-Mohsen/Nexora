@@ -1,0 +1,47 @@
+{% extends "layout/base.html" %}
+{% block title %}Verify Code | Nexora{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/features/page/auth.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section class="auth-section flex-center">
+  <div class="auth-wrapper animate-fade-in">
+
+    <div class="auth-header text-center">
+      <h1 class="auth-title">{{ auth_title|default("Enter Code") }}</h1>
+      <p class="auth-text">{{ auth_text|default("Please enter the 6-digit code we sent to your email.") }}</p>
+    </div>
+
+    {% from "components/ui/core.html" import button, field, form, input, link %}
+                    
+    {% call form("auth-form", form_action=request.path, attrs={"id": "auth-form"}) %}
+      
+    {{ input(name="email", type="hidden", value=email) }}
+
+    {% call field(label_text="6-Digit Code", for_id="code") %}
+    {{ input(name="code", id="code", type="text",
+    placeholder="123456",
+    class="text-center font-bold tracking-widest text-lg",
+    attrs={"minlength": "6", "maxlength": "6", "autocomplete": "one-time-code", "pattern": "[0-9]*"},
+    required=True) }}
+    {% endcall %}
+
+    {{ button(text="Verify Code", type="submit", variant="primary", class="auth-btn w-full mt-4") }}
+
+    {% endcall %}
+
+    {% if show_resend %}
+    <div class="auth-footer text-center mt-8 flex flex-col items-center gap-2">
+      <span class="auth-status-text">Didn't receive a code?</span>
+      {% call form(resend_route, class="inline-block") %}
+      {{ input(type="hidden", name="email", value=email) }}
+      {{ button(text="Resend Code", type="submit", variant="primary", unstyled=True, class="redirect-link font-bold bg-transparent border-0 cursor-pointer p-0") }}
+      {% endcall %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

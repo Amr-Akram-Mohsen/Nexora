@@ -55,3 +55,12 @@ def get_saved_products_workflow(user_id):
     serialized = get_items_by_ids(product_ids, serialize=True, load="card")
     
     return _attach_collection_names(serialized, saves)
+
+def get_user_collection_counts_workflow(user_id):
+    """
+    Retrieves the count of saved items per collection for a user.
+    Uses a direct database aggregation query.
+    """
+    from app.domains.interaction.service.query import get_collection_counts_by_user
+    rows = get_collection_counts_by_user(user_id)
+    return [{"name": row.collection_name or "General", "count": row.count} for row in rows]

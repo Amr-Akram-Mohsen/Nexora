@@ -100,6 +100,13 @@ def get_saved_items(user_id, target_type):
             .filter_by(user_id=user_id, target_type="product")\
             .order_by(Save.created_at.desc()).all()
 
+def get_collection_counts_by_user(user_id):
+    from sqlalchemy import func
+    return db.session.query(
+        Save.collection_name,
+        func.count(Save.id).label('count')
+    ).filter(Save.user_id == user_id).group_by(Save.collection_name).all()
+
 
 def get_recent_views(user_id, limit=20):
     from sqlalchemy.orm import selectinload

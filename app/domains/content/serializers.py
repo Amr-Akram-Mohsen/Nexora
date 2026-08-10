@@ -186,7 +186,7 @@ def serialize_content_detail(content_obj, target_obj=None, session=None, include
     if content_obj.object_type == "video" and target_obj and hasattr(target_obj, "video_comments"):
         for c in target_obj.video_comments:
             video_comments.append({
-                "author": c.author_name,
+                "author": {"name": c.author_name, "url": f"https://youtube.com/{c.author_name}"},
                 "text": c.text,
                 "likes": c.like_count,
                 "replies": c.reply_count,

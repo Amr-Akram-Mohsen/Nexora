@@ -35,12 +35,11 @@ def send_confirmation_email(email: str, token: str, unsubscribe_token: str) -> b
 
 
 # ── Email verification (account) ──────────────────────────────────────────────
-def send_verification_email(email: str, token: str) -> bool:
-    verify_url = url_for('user.verify_email', token=token, _external=True)
-    logger.info("[AUTH] Generating email verification link for %s | url: %s", email, verify_url)
+def send_verification_email(email: str, code: str) -> bool:
+    logger.info("[AUTH] Generating email verification code for %s | code: %s", email, code)
     
-    html = _verification_html(verify_url, email)
-    text = f"Verify your email:\n{verify_url}\n\nThis link expires in 24 hours."
+    html = _verification_html(code, email)
+    text = f"Verify your email. Your code is: {code}\n\nThis code expires in 15 minutes."
     
     return send_email(
         subject="Verify your Nexora account",
@@ -51,14 +50,13 @@ def send_verification_email(email: str, token: str) -> bool:
 
 
 # ── Password reset ─────────────────────────────────────────────────────────────
-def send_password_reset_email(email: str, token: str) -> bool:
-    reset_url = url_for('user.reset_password', token=token, _external=True)
-    logger.info("[AUTH] Generating password reset link for %s | url: %s", email, reset_url)
+def send_password_reset_email(email: str, code: str) -> bool:
+    logger.info("[AUTH] Generating password reset code for %s | code: %s", email, code)
     
-    html = _reset_html(reset_url)
+    html = _reset_html(code)
     text = (
-        f"Reset your password here:\n{reset_url}\n\n"
-        "This link expires in 1 hour. If you did not request this, ignore this email."
+        f"Reset your password. Your code is: {code}\n\n"
+        "This code expires in 15 minutes. If you did not request this, ignore this email."
     )
     
     return send_email(
@@ -121,21 +119,25 @@ def _newsletter_html(confirm_url: str, unsub_url: str) -> str:
     return _base_email("Confirm your subscription", "One click to confirm", body)
 
 
-def _verification_html(verify_url: str, email: str) -> str:
+def _verification_html(code: str, email: str) -> str:
     body = f"""
       <h2 style="margin:0 0 12px;color:#111;font-size:22px;font-weight:700;">Verify your email 🔐</h2>
       <p style="color:#555;line-height:1.7;">Welcome to <strong>Nexora</strong>! Your account was created for
-      <strong>{email}</strong>. Click the button below to verify your email and activate your account.</p>
-      {_btn(verify_url, "✅ Verify My Email")}
-      <p style="margin-top:32px;font-size:13px;color:#9ca3af;">This link expires in 24 hours. If you did not create an account, ignore this email.</p>"""
+      <strong>{email}</strong>. Please enter the following 6-digit code to verify your email and activate your account.</p>
+      <div style="background:#f4f4f8;padding:20px;border-radius:8px;text-align:center;font-size:32px;font-weight:800;letter-spacing:4px;color:#3b82f6;margin:24px 0;">
+        {code}
+      </div>
+      <p style="margin-top:32px;font-size:13px;color:#9ca3af;">This code expires in 15 minutes. If you did not create an account, ignore this email.</p>"""
     return _base_email("Verify your Nexora account", "Activate your account", body)
 
 
-def _reset_html(reset_url: str) -> str:
+def _reset_html(code: str) -> str:
     body = f"""
       <h2 style="margin:0 0 12px;color:#111;font-size:22px;font-weight:700;">Reset your password 🔑</h2>
       <p style="color:#555;line-height:1.7;">We received a request to reset your <strong>Nexora</strong> password.
-      Click the button below to choose a new password. This link expires in <strong>1 hour</strong>.</p>
-      {_btn(reset_url, "🔑 Reset Password", "#8b5cf6")}
-      <p style="margin-top:32px;font-size:13px;color:#9ca3af;">If you did not request a password reset, you can safely ignore this email — your password will not change.</p>"""
+      Please enter the following 6-digit code to choose a new password.</p>
+      <div style="background:#f4f4f8;padding:20px;border-radius:8px;text-align:center;font-size:32px;font-weight:800;letter-spacing:4px;color:#8b5cf6;margin:24px 0;">
+        {code}
+      </div>
+      <p style="margin-top:32px;font-size:13px;color:#9ca3af;">This code expires in <strong>15 minutes</strong>. If you did not request a password reset, you can safely ignore this email — your password will not change.</p>"""
     return _base_email("Reset your Nexora password", "Secure password reset", body)

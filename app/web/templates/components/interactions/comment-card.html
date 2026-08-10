@@ -1,4 +1,4 @@
-{% set btn_class = "interaction-btn comment-action-btn" %}
+{% set btn_class = "interaction-btn gap-2 comment-action-btn" %}
 {% from "components/ui/core.html" import button, form, textarea %}
 
 <div class="comment{% if comment.parent_id %} comment--reply{% endif %}" data-type="{{ comment.target_type }}"

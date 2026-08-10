@@ -52,23 +52,36 @@
 
 {% macro badge(text="", class="", variant="primary", icon=None, href=None, attrs={}) %}
 {% set tag = "a" if href else "span" %}
+{% set base_class = "badge inline-flex items-center justify-center gap-1.5" %}
+{% set variant_class = (" variant--" ~ variant) if variant else "" %}
 <{{ tag }} {% if href %}href="{{ href }}" {% endif %}
-  class="badge{% if variant is not none %} variant--{{ variant }} badge--{{ variant }}{% endif %} {{ class }} inline-flex-center"
+  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}"
   {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
   {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}
   {%- if text -%}{{ text|safe }}{%- elif caller -%}{{ caller() }}{%- endif -%}
 </{{ tag }}>
 {% endmacro %}
 
-{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,
-unstyled=False, id=None) %}
+{% macro render_display_badges(badges, class="", variant="secondary") %}
+{% set badge_mappings = {
+  'category': {'icon': None},
+  'location': {'icon': 'fas fa-map-marker-alt'},
+  'event': {'icon': 'far fa-calendar-alt'},
+  'brand': {'icon': 'fas fa-tag'},
+  'topic': {'icon': 'fas fa-hashtag'}
+} %}
+{% for b in badges %}
+  {% set mapping = badge_mappings.get(b.type, {'icon': 'fas fa-tag'}) %}
+  {{ badge(text=b.label, class=class, variant=variant, icon=mapping.icon) }}
+{% endfor %}
+{% endmacro %}
+
+{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None, unstyled=False, id=None) %}
 {% set tag = "a" if href else "button" %}
-{% set base_class = "" if unstyled else "btn" %}
-{% set variant_class = "" if unstyled or variant is none else (" variant--" ~ variant ~ " btn--" ~ variant) %}
-{% set flex_class = "" if unstyled else " inline-flex-center" %}
+{% set base_class = "" if unstyled else "btn inline-flex items-center justify-center gap-2" %}
+{% set variant_class = "" if unstyled or variant is none else (" variant--" ~ variant) %}
 <{{ tag }} {% if href %}href="{{ href }}" {% else %}type="{{ type }}" {% endif %} {% if id %}id="{{ id }}" {% endif %}
-  class="{{ base_class }}{{ variant_class }} {{ class }}{{ flex_class }}" {% for key, value in attrs.items() %} {{ key
-  }}="{{ value }}" {% endfor %}>
+  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
   {% if icon %}
   <i class="{{ icon }}"></i>
   {% endif %}

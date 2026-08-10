@@ -5,30 +5,28 @@ from app.domains.user.service import (
     mark_user_verified,
     set_verification_sent,
 )
-from app.application.user.tokens import (
-    generate_verification_token,
-    validate_verification_token,
+from app.application.user.otp import (
+    generate_otp,
+    verify_otp,
 )
 from app.application.user.email_service import send_verification_email
 
 logger = logging.getLogger(__name__)
 
 
-def verify_user_email(token: str):
+def verify_user_email(email: str, code: str):
     """
-    Validates a signed verification token and marks the user as verified.
+    Validates an OTP and marks the user as verified.
 
     Returns: (user, None) on success.
-             (None, 'expired') if the 24-hour window has passed.
-             (None, 'invalid') if the token is malformed or tampered.
+             (None, 'invalid') if the code is invalid or expired.
     """
-    user_id, error = validate_verification_token(token)
-    if error:
-        return None, error
+    if not verify_otp(email, "register", code):
+        return None, 'invalid'
 
-    user = get_user_by_id(user_id)
+    user = get_user_by_email(email)
     if not user:
-        logger.warning("[AUTH] Verification token decoded user_id=%s but user not found", user_id)
+        logger.warning("[AUTH] OTP verified for %s but user not found", email)
         return None, 'invalid'
 
     if user.is_verified:
@@ -53,8 +51,8 @@ def resend_verification_email_workflow(email: str) -> bool:
     if not user or user.is_verified:
         return True  # Silent no-op for enumeration safety
 
-    token = generate_verification_token(user.id)
-    sent  = send_verification_email(email, token)
+    code = generate_otp(email, "register")
+    sent  = send_verification_email(email, code)
 
     if sent:
         set_verification_sent(user)

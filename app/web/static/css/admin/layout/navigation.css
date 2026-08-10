@@ -212,9 +212,9 @@
 .collapsed .nav-brand-name,
 .collapsed .nav-brand-badge,
 .collapsed .nav-title,
-.collapsed .nav-link-text {
-    display: none !important;
-}
+.collapsed  .sidebar-overlay {
+    display: none;
+  }
 
 .collapsed .nav-brand {
     padding: 1.25rem 0.5rem;

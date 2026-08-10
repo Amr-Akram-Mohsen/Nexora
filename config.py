@@ -50,7 +50,8 @@ class Config:
     REMEMBER_COOKIE_SECURE = True
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Lax"
-    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30  # 30 days (for remember-me)
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30  # 30 days
+    REMEMBER_COOKIE_DURATION = 60 * 60 * 24 * 30    # 30 days
 
     # ── Amazon PA-API 5.0 ─────────────────────────────────────────
     # Requires two Amazon Associates accounts:

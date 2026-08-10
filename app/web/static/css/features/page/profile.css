@@ -76,7 +76,7 @@
   height: 80px;
   background: var(--gradient-primary);
   border-radius: var(--radius-full);
-  color: #fff;
+  color: var(--primary-foreground);
   font-size: var(--text-2xl);
   font-weight: var(--weight-xbold);
   font-family: 'Outfit', sans-serif;
@@ -111,9 +111,9 @@
 }
 
 .badge.badge--unverified {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(var(--brand-orange-rgb), 0.1);
+  color: var(--brand-orange);
+  border: 1px solid rgba(var(--brand-orange-rgb), 0.2);
 }
 
 /* Sidebar Meta List */
@@ -143,7 +143,7 @@
 .verification-alert-card {
   padding: 1.5rem;
   margin-top: 1.5rem;
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--brand-orange);
 }
 
 .alert-card-title {
@@ -285,12 +285,12 @@
 
 /* --- Danger Zone --- */
 .danger-zone-card {
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(var(--brand-red-rgb), 0.3);
+  background: rgba(var(--brand-red-rgb), 0.05);
 }
 
 .danger-zone-title {
-  color: rgb(239, 68, 68);
+  color: var(--brand-red);
 }
 
 .danger-zone-desc {
@@ -298,8 +298,8 @@
 }
 
 .btn-danger {
-  background-color: rgb(239, 68, 68);
-  color: white;
+  background-color: var(--brand-red);
+  color: var(--primary-foreground);
 }
 
 /* --- Modals --- */

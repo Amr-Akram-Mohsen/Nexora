@@ -6,7 +6,7 @@ from app.domains.user.service import (
     link_newsletter_subscriber_to_user,
     set_verification_sent,
 )
-from app.application.user.tokens import generate_verification_token
+from app.application.user.otp import generate_otp
 from app.application.user.email_service import send_verification_email
 from app.application.interaction.newsletter import subscribe_workflow
 
@@ -46,9 +46,9 @@ def register_user_workflow(name: str, email: str, password: str, wants_newslette
             logger.info("[AUTH] Linking existing newsletter subscription to user_id=%s", user.id)
             link_newsletter_subscriber_to_user(subscriber, user.id)
 
-    # Generate stateless signed verification token and send email
-    token = generate_verification_token(user.id)
-    sent  = send_verification_email(email, token)
+    # Generate OTP code and send email
+    code = generate_otp(email, "register")
+    sent  = send_verification_email(email, code)
 
     if sent:
         set_verification_sent(user)

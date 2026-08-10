@@ -131,7 +131,7 @@
 }
 
 .grid-product-hidden {
-  display: none !important;
+  display: none;
 }
 
 /* Progressive Reveal Staggered Animation */

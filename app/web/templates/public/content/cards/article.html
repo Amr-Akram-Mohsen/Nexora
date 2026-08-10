@@ -1,6 +1,6 @@
 {% extends "content/cards/base.html" %}
 {% from "content/features/content-image.html" import render_image_url %}
-{% from "components/ui/core.html" import badge %}
+{% from "components/ui/core.html" import badge, render_display_badges %}
 
 {% set article = content.target %}
 
@@ -12,19 +12,7 @@
 <!-- Meta -->
 <div class="card__meta-top flex flex-wrap items-center gap-1 justify-between">
   <div class="flex items-center gap-1">
-    {% for b in product.display_badges %}
-      {% if b.type == 'category' %}
-        {{ badge(text=b.label, class="badge--category", variant="secondary") }}
-      {% elif b.type == 'location' %}
-        {{ badge(text=b.label, class="badge--location", variant="info", icon="fas fa-map-marker-alt") }}
-      {% elif b.type == 'event' %}
-        {{ badge(text=b.label, class="badge--event", variant="primary", icon="fas fa-map-marker-alt") }}
-      {% elif b.type == 'brand' %}
-        {{ badge(text=b.label, class="badge--brand", variant="secondary", icon="fas fa-tag") }}
-      {% elif b.type == 'topic' %}
-        {{ badge(text=b.label, class="badge--topic", variant="secondary", icon="fas fa-hashtag") }}
-      {% endif %}
-    {% endfor %}
+    {{ render_display_badges(product.display_badges) }}
   </div>
 </div>
 {% endblock %}
@@ -38,7 +26,7 @@
       <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{
         product.source.name }}</a>
       {% if product.source_tier == "verified" %}
-      <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
+      <i class="fas fa-check-circle" title="Verified Source"></i>
       {% elif product.source_tier == "trusted" %}
       <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
       {% endif %}

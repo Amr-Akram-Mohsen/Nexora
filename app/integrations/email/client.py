@@ -11,8 +11,9 @@ def send_email(subject: str, recipients: list[str], body: str, html: str = None,
     Returns True on success, False on failure or if mail is disabled.
     """
     if not current_app.config.get("MAIL_ENABLED", False):
-        logger.info("[AUTH] MAIL_ENABLED=False — skipping email to %s | subject: %s", recipients, subject)
-        return False
+        logger.info("[AUTH] MAIL_ENABLED=False — skipping actual SMTP for %s | subject: %s", recipients, subject)
+        logger.info("[AUTH] Email Body:\n%s", body)
+        return True
 
     msg = Message(
         subject=subject,

@@ -95,12 +95,10 @@
       <div class="auth-extras flex items-center justify-between">
         {# Newsletter checkbox (register) or Remember-me (login) — available to re-enable #}
         <div class="checkbox-group flex items-center gap-2">
-          {# Uncomment to re-enable:
           {% set check_name = "newsletter" if is_new_user else "remember" %}
           {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
           {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
           {{ label(check_text, check_name, class="auth-checkbox-label cursor-pointer") }}
-          #}
         </div>
         {% if not is_new_user %}
         {{ link(text="Forgot password?", href=url_for('user.forgot_password'), class="redirect-link") }}

@@ -146,7 +146,7 @@ def get_popular_items_cached(
     """
     Cached filter-aware query for popular products/deals matching active filters.
     """
-    from app.domains.product.service.query import get_popular_items
+    from app.domains.product.service.public.search import get_popular_items
     return get_popular_items(
         category_slugs=category_slugs,
         brand_slugs=brand_slugs,

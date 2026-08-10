@@ -13,9 +13,6 @@
 }
 
 .interaction-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
   height: 2.125rem;
   padding-inline: 0.75rem;
   font-size: var(--text-xs);
@@ -54,13 +51,13 @@
 /* Active states per reaction type */
 .interaction-btn.react-btn--like:hover i,
 .interaction-btn.is-active-like i {
-  color: #e11d48;
+  color: var(--brand-red);
 }
 
 .interaction-btn.is-active-like {
-  background: rgba(225, 29, 72, 0.1);
-  color: #e11d48;
-  border-color: rgba(225, 29, 72, 0.3);
+  background: rgba(var(--brand-red-rgb), 0.1);
+  color: var(--brand-red);
+  border-color: rgba(var(--brand-red-rgb), 0.3);
 }
 
 .interaction-btn.react-btn--dislike:hover i,
@@ -76,24 +73,24 @@
 
 .interaction-btn.save-btn:hover i,
 .interaction-btn.save-btn.active i {
-  color: #f59e0b;
+  color: var(--brand-orange);
 }
 
 .interaction-btn.save-btn.active {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(var(--brand-orange-rgb), 0.1);
+  color: var(--brand-orange);
+  border-color: rgba(var(--brand-orange-rgb), 0.3);
 }
 
 .interaction-btn.share-btn:hover i,
 .interaction-btn.share-btn.active i {
-  color: #10b981;
+  color: var(--brand-green);
 }
 
 .interaction-btn.share-btn.active {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(var(--brand-green-rgb), 0.1);
+  color: var(--brand-green);
+  border-color: rgba(var(--brand-green-rgb), 0.3);
 }
 
 /* Comments count meta button on the right */
@@ -130,10 +127,7 @@
 }
 
 .interaction-stat {
-  gap: 0.25rem;
   height: 1.5rem;
-  display: inline-flex;
-  align-items: center;
   color: var(--muted-foreground);
 }
 

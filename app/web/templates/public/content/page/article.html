@@ -34,7 +34,7 @@
     <div class="flex flex-wrap items-center gap-3">
 
       {% if article.authors %}
-      <div class="meta-author">
+      <div class="meta-author flex gap-sm flex-wrap">
         <i class="fas fa-user-edit"></i>
         <span>By
           {% for author in article.authors %}
@@ -52,28 +52,28 @@
       {% set source_obj = article.primary_source or content.source %}
       {% if source_obj %}
       <span class="meta-dot">·</span>
-      <div class="meta-source">
+      <div class="meta-source flex gap-sm flex-wrap">
         <i class="fas fa-newspaper"></i>
         <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}">{{ source_obj.name }}</a>
-        {% if content.source_tier == "verified" %}
-        <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
-        {% elif content.source_tier == "trusted" %}
-        <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
+        {% if content.source_tier in ['verified', 'trusted'] %}
+        {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle trusted-badge' %}
+        {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
+        <i class="{{ icon_class }}" title="{{ title }}"></i>
         {% endif %}
       </div>
       {% endif %}
 
       <span class="meta-dot">·</span>
 
-      <div class="meta-info">
-        <time class="meta-date">
+      <div class="meta-info flex gap-sm flex-wrap">
+        <time class="meta-date inline-flex gap-1">
           <i class="far fa-calendar-alt"></i>
           {{ content.published_at | format_date('%b %d, %Y') }}
         </time>
 
         {% if content.reading_time %}
         <span class="meta-dot">·</span>
-        <span class="meta-readtime">
+        <span class="meta-readtime inline-flex gap-1">
           <i class="far fa-clock"></i>
           {{ content.reading_time }} min read
         </span>
@@ -114,15 +114,14 @@
 
   <div class="article-sources-box">
     <h3 class="article-section-title">Original Publication</h3>
+    {% set source_obj = article.primary_source %}
+    {% if source_obj %}
     <div class="article-sources-block flex flex-col gap-3">
-
-      {% set source_obj = article.primary_source %}
-      {% if source_obj %}
       <div class="flex items-center gap-4 flex-wrap">
         {% set pub_url = (article.primary_source.url if article.primary_source else None) or article.url or content.url %}
         {% if pub_url %}
         {% set source_name = source_obj.name if source_obj else 'Source' %}
-        <a href="{{ pub_url }}" target="_blank" rel="noopener nofollow" class="cta-read-original inline-flex items-center gap-2">
+        <a href="{{ pub_url }}" target="_blank" rel="noopener nofollow" class="cta-read-original">
           Read original at {{ source_name }} <i class="fas fa-arrow-up-right-from-square"></i>
         </a>
         {% endif %}
@@ -131,19 +130,16 @@
         {% endif %}
       </div>
 
-      {% if source_obj %}
-      <div class="cta-source-info flex items-center gap-2">
+      <div class="cta-source-info flex gap-2">
         <span>See the source page for</span>
         <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}"
           class="cta-source-name">{{ source_obj.name }}</a>
-        {% if content.source_tier == "verified" %}
-        <i class="fas fa-check-circle verified-badge" title="Verified Source"></i>
-        {% elif content.source_tier == "trusted" %}
-        <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
+        {% if content.source_tier in ['verified', 'trusted'] %}
+        {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle trusted-badge' %}
+        {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
+        <i class="{{ icon_class }}" title="{{ title }}"></i>
         {% endif %}
       </div>
-      {% endif %}
-
     </div>
     {% endif %}
 
@@ -233,7 +229,6 @@
   {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 </div>
 {% endif %}
-</div>
 {% endblock %}
 
 {# ── Author and Source Discovery Carousels ── #}

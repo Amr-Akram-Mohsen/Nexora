@@ -71,7 +71,7 @@ def login():
                 if not user.is_verified and user.provider != 'google':
                     flash(
                         "Please verify your email before logging in. "
-                        "Check your inbox for the verification link.",
+                        "Check your inbox for the verification code.",
                         "warning",
                     )
                     log_route_success(logger, "/login", template="login.html")
@@ -225,16 +225,16 @@ def register():
             user, newsletter_msg, email_sent = register_user_workflow(sanitized_name, email, password, wants_newsletter)
 
             if not user:
-                flash(newsletter_msg or "An account with this email already exists.", "error")
-                log_route_success(logger, "/register", template="register.html")
-                return render_template('register.html')
+                flash("If the email is not registered, an account was created. Please check your email for the verification code.", "success")
+                log_route_success(logger, "/register", status=302)
+                return redirect(url_for('user.verify_code', email=email))
 
             if newsletter_msg:
                 flash(newsletter_msg, "info")
 
             if email_sent:
                 flash(
-                    "Account created! Please check your email to verify your account before logging in. 📧",
+                    "Account created! Please check your email for the verification code.",
                     "success",
                 )
             else:
@@ -243,7 +243,7 @@ def register():
                     "warning",
                 )
             log_route_success(logger, "/register", status=302)
-            return redirect(url_for('user.login'))
+            return redirect(url_for('user.verify_code', email=email))
 
         log_route_success(logger, "/register", template="register.html")
         return render_template('register.html')
@@ -255,34 +255,34 @@ def register():
 # ────────────────────────────────────────────────────────────────────
 # EMAIL VERIFICATION
 # ────────────────────────────────────────────────────────────────────
-@bp.route('/verify-email/<token>')
-def verify_email(token: str):
+@bp.route('/verify-code', methods=['GET', 'POST'])
+def verify_code():
     try:
-        log_route_start(logger, f"/verify-email/{token[:8]}...")
-        user, error = verify_user_email(token)
-
-        if error == 'expired':
-            flash(
-                "This verification link has expired (valid for 24 hours). "
-                "Please request a new one below.",
-                "warning",
-            )
-            log_route_success(logger, f"/verify-email/{token[:8]}...", status=302)
+        email = request.args.get('email') or request.form.get('email')
+        if not email:
             return redirect(url_for('user.login'))
+            
+        log_route_start(logger, "/verify-code")
+        if request.method == 'POST':
+            code = request.form.get('code', '').strip()
+            user, error = verify_user_email(email, code)
+            
+            if error == 'invalid':
+                flash("Invalid or expired code. Please try again or request a new one.", "error")
+                log_route_success(logger, "/verify-code", template="verify-code.html")
+                return render_template('verify-code.html', email=email, show_resend=True, resend_route='user.resend_verification')
 
-        if error == 'invalid':
-            flash("This verification link is invalid or has already been used.", "error")
-            log_route_success(logger, f"/verify-email/{token[:8]}...", status=302)
-            return redirect(url_for('user.login'))
-
-        session.clear()
-        login_user(user)
-        handle_successful_login(user)
-        flash("Your email has been verified! Welcome to Nexora 🎉", "success")
-        log_route_success(logger, f"/verify-email/{token[:8]}...", status=302)
-        return redirect(url_for('system.home'))
+            session.clear()
+            login_user(user)
+            handle_successful_login(user)
+            flash("Your email has been verified! Welcome to Nexora 🎉", "success")
+            log_route_success(logger, "/verify-code", status=302)
+            return redirect(url_for('system.home'))
+            
+        log_route_success(logger, "/verify-code", template="verify-code.html")
+        return render_template('verify-code.html', email=email, show_resend=True, resend_route='user.resend_verification')
     except Exception as e:
-        log_route_error(logger, f"/verify-email/{token[:8]}...", e)
+        log_route_error(logger, "/verify-code", e)
         raise
 
 
@@ -318,12 +318,11 @@ def forgot_password():
             email = request.form.get('email', '').strip().lower()
             request_password_reset(email)
             flash(
-                "If an account with that email exists, a password reset link has been sent. "
-                "The link expires in 1 hour.",
+                "If an account with that email exists, a password reset code has been sent.",
                 "info",
             )
             log_route_success(logger, "/forgot-password", status=302)
-            return redirect(url_for('user.login'))
+            return redirect(url_for('user.verify_reset_code', email=email))
         
         log_route_success(logger, "/forgot-password", template="forgot-password.html")
         return render_template('forgot-password.html')
@@ -331,43 +330,69 @@ def forgot_password():
         log_route_error(logger, "/forgot-password", e)
         raise
 
-
-@bp.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token: str):
+@bp.route('/verify-reset-code', methods=['GET', 'POST'])
+def verify_reset_code():
     try:
-        log_route_start(logger, f"/reset-password/{token[:8]}...")
+        email = request.args.get('email') or request.form.get('email')
+        if not email:
+            return redirect(url_for('user.forgot_password'))
+            
+        log_route_start(logger, "/verify-reset-code")
+        if request.method == 'POST':
+            code = request.form.get('code', '').strip()
+            from app.application.user.otp import verify_otp
+            if verify_otp(email, "reset", code):
+                session['reset_email'] = email
+                flash("Code verified. Please choose a new password.", "success")
+                return redirect(url_for('user.reset_password'))
+            else:
+                flash("Invalid or expired code.", "error")
+                
+        log_route_success(logger, "/verify-reset-code", template="verify-code.html")
+        return render_template('verify-code.html', email=email, show_resend=False, auth_title="Reset Code", auth_text="Enter the 6-digit code sent to your email to reset your password.")
+    except Exception as e:
+        log_route_error(logger, "/verify-reset-code", e)
+        raise
+
+@bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+    if not email:
+        flash("Unauthorized or expired session. Please start the reset process again.", "error")
+        return redirect(url_for('user.forgot_password'))
+        
+    try:
+        log_route_start(logger, "/reset-password")
         if request.method == 'POST':
             password = request.form.get('password', '')
             confirm  = request.form.get('confirm_password', '')
 
             if password != confirm:
                 flash("Passwords do not match.", "error")
-                log_route_success(logger, f"/reset-password/{token[:8]}...", template="reset-password.html")
-                return render_template('reset-password.html', token=token)
+                log_route_success(logger, "/reset-password", template="reset-password.html")
+                return render_template('reset-password.html')
 
             is_strong, pwd_err = validate_password_strength(password)
             if not is_strong:
                 flash(pwd_err, "error")
-                log_route_success(logger, f"/reset-password/{token[:8]}...", template="reset-password.html")
-                return render_template('reset-password.html', token=token)
+                log_route_success(logger, "/reset-password", template="reset-password.html")
+                return render_template('reset-password.html')
 
-            success, msg = reset_user_password(token, password)
+            success, msg = reset_user_password(email, password)
             if success:
+                session.pop('reset_email', None)
                 flash(msg, "success")
-                log_route_success(logger, f"/reset-password/{token[:8]}...", status=302)
+                log_route_success(logger, "/reset-password", status=302)
                 return redirect(url_for('user.login'))
             else:
                 flash(msg, "error")
-                log_route_success(logger, f"/reset-password/{token[:8]}...", status=302)
-                # Redirect expired/used tokens to forgot-password; invalid tokens back to login
-                if "expired" in msg.lower() or "already been used" in msg.lower():
-                    return redirect(url_for('user.forgot_password'))
-                return redirect(url_for('user.login'))
+                log_route_success(logger, "/reset-password", status=302)
+                return redirect(url_for('user.forgot_password'))
 
-        log_route_success(logger, f"/reset-password/{token[:8]}...", template="reset-password.html")
-        return render_template('reset-password.html', token=token)
+        log_route_success(logger, "/reset-password", template="reset-password.html")
+        return render_template('reset-password.html')
     except Exception as e:
-        log_route_error(logger, f"/reset-password/{token[:8]}...", e)
+        log_route_error(logger, "/reset-password", e)
         raise
 
 
@@ -456,16 +481,8 @@ def profile():
         subscriber = get_newsletter_subscriber_by_email(current_user.email)
         
         # Load collections
-        from app.application.interaction.get_saved import get_saved_articles_workflow, get_saved_products_workflow
-        saved_articles = get_saved_articles_workflow(current_user.id)
-        saved_items = get_saved_products_workflow(current_user.id)
-        
-        collections_map = {}
-        for product in saved_articles + saved_items:
-            c_name = product.get("collection_name", "General")
-            collections_map[c_name] = collections_map.get(c_name, 0) + 1
-            
-        collections = [{"name": k, "count": v} for k, v in collections_map.items()]
+        from app.application.interaction.get_saved import get_user_collection_counts_workflow
+        collections = get_user_collection_counts_workflow(current_user.id)
         collections.sort(key=lambda x: x["name"])
         
         log_route_success(logger, "/profile", template="profile.html")
@@ -526,11 +543,54 @@ def update_profile():
                     update_profile_password_workflow(current_user, new_pwd)
                     flash("Password changed successfully!", "success")
 
+        elif action == 'email':
+            new_email = request.form.get('email', '').strip().lower()
+            if not validate_email(new_email):
+                flash("Please enter a valid email address.", "error")
+            elif get_user_by_email(new_email):
+                flash("This email is already in use by another account.", "error")
+            else:
+                from app.application.user.otp import generate_otp
+                from app.application.user.email_service import send_verification_email
+                code = generate_otp(new_email, "update_email")
+                send_verification_email(new_email, code)
+                session['pending_email'] = new_email
+                flash("Please check your new email for a verification code.", "info")
+                return redirect(url_for('user.verify_update_email'))
+
         log_route_success(logger, "/update-profile", status=302)
         return redirect(url_for('user.profile'))
     except Exception as e:
         log_route_error(logger, "/update-profile", e)
         raise
+
+@bp.route('/verify-update-email', methods=['GET', 'POST'])
+@login_required
+def verify_update_email():
+    new_email = session.get('pending_email')
+    if not new_email:
+        return redirect(url_for('user.profile'))
+        
+    try:
+        log_route_start(logger, "/verify-update-email")
+        if request.method == 'POST':
+            code = request.form.get('code', '').strip()
+            from app.application.user.otp import verify_otp
+            if verify_otp(new_email, "update_email", code):
+                current_user.email = new_email
+                db.session.commit()
+                session.pop('pending_email', None)
+                flash("Your email has been successfully updated!", "success")
+                return redirect(url_for('user.profile'))
+            else:
+                flash("Invalid or expired code.", "error")
+                
+        log_route_success(logger, "/verify-update-email", template="verify-code.html")
+        return render_template('verify-code.html', email=new_email, show_resend=False, auth_title="Verify New Email", auth_text="Enter the 6-digit code sent to your new email address.")
+    except Exception as e:
+        log_route_error(logger, "/verify-update-email", e)
+        raise
+
 @bp.route('/delete-account', methods=['POST'])
 @login_required
 def delete_account():

@@ -153,6 +153,27 @@
   --interaction-bg: rgba(var(--foreground-rgb), 0.04);
   --interaction-bg-hover: rgba(var(--foreground-rgb), 0.08);
 
+  /* --- Z-Index Scale --- */
+  --z-hide: -1;
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-header: 50;
+  --z-dropdown: 200;
+  --z-overlay: 900;
+  --z-modal: 1000;
+  --z-toast: 9999;
+
+  /* --- Semantic & Brand Tokens --- */
+  --color-warning-rgb: 245, 158, 11;
+  --color-warning: rgb(var(--color-warning-rgb));
+  --color-info-rgb: 59, 130, 246;
+  --color-info: rgb(var(--color-info-rgb));
+  --color-brand-facebook: #1877F2;
+  --color-brand-instagram: #E4405F;
+  --color-brand-pinterest: #BD081C;
+  --color-brand-x: #000000;
+  --color-brand-youtube: #FF0000;
+
 }
 
 body.light-mode,
@@ -258,4 +279,6 @@ body.dark-mode {
   --surface-overlay: rgba(255, 255, 255, 0.05);
 
   --text-color-rgb: 255, 255, 255;
+  
+  --color-brand-x: #ffffff;
 }

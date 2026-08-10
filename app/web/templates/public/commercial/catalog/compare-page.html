@@ -15,7 +15,7 @@
         {% if products|length < 2 %} <div class="compare-empty flex-center flex-col">
             <i class="fas fa-balance-scale empty-icon"></i>
             <p>Not enough products to compare. Add at least two products.</p>
-            <a href="{{ url_for('product.deals') }}" class="btn btn--primary gap-2">Browse Products</a>
+            <a href="{{ url_for('product.deals') }}" class="btn variant--primary gap-2">Browse Products</a>
     </div>
     {% else %}
     <div class="compare-table-wrapper">
@@ -44,10 +44,10 @@
 
                             <div class="compare-actions flex flex-col gap-2">
                                 <a href="{{ url_for('product.item_page', product_id=product.id) }}"
-                                    class="btn btn--outline btn--sm gap-2">View Full Details</a>
+                                    class="btn variant--outline btn--sm gap-2">View Full Details</a>
                                 {% if best_link %}
                                 <a href="{{ best_link.affiliate_url }}" target="_blank" rel="noopener nofollow"
-                                    class="btn btn--primary btn--sm gap-2">Get Deal</a>
+                                    class="btn variant--primary btn--sm gap-2">Get Deal</a>
                                 {% endif %}
                             </div>
                         </div>

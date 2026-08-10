@@ -21,95 +21,89 @@
   transform: translateY(-1px);
 }
 
-.badge--entity,
-.badge--topic,
-.badge--category,
-.badge--location,
-.badge--event,
-.badge--brand {
-  padding: 0 0.375rem;
-}
-
 .badge--xs {
-  font-size: 9px;
-  padding: 0.2rem 0.5rem;
+  font-size: var(--text-2xs);
+  padding: var(--space-1) var(--space-2);
 }
 
 /* --- Status Badges (Migrated) --- */
 
 .status-badge {
-  font-size: 11px;
+  font-size: var(--text-2xs);
   font-weight: var(--weight-bold);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
   display: inline-block;
   line-height: 1.2;
+
+  background-color: var(--variant-bg, transparent);
+  color: var(--variant-color, inherit);
 }
 
 .status-badge.purple {
-  background: rgba(var(--brand-purple-rgb), 0.1);
-  color: var(--brand-purple);
+  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-purple);
 }
 
 .status-badge.user {
-  background: var(--secondary);
-  color: var(--muted-foreground);
+  --variant-bg: var(--secondary);
+  --variant-color: var(--muted-foreground);
 }
 
 .status-badge.active {
-  background: rgba(var(--brand-green-rgb), 0.1);
-  color: var(--brand-green-dark);
+  --variant-bg: rgba(var(--brand-green-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-green-dark);
 }
 
 .status-badge.inactive {
-  background: rgba(var(--destructive-rgb), 0.08);
-  color: var(--brand-red);
+  --variant-bg: rgba(var(--destructive-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-red);
 }
 
 /* Compact badge modifier */
 .badge-compact {
-  padding: 0.15rem 0.4rem;
+  padding: var(--space-1) var(--space-2);
   font-size: var(--text-xs);
 }
 
-/* Semantic color variants */
+/* Semantic color variants (consumes --variant-bg / --variant-color) */
 .badge-blue {
-  background: rgba(var(--brand-blue-rgb), 0.08);
-  color: var(--brand-blue);
+  --variant-bg: rgba(var(--brand-blue-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-blue);
 }
 
 .badge-purple {
-  background: rgba(var(--brand-purple-rgb), 0.08);
-  color: var(--brand-purple);
+  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-purple);
 }
 
 .badge-orange {
-  background: rgba(var(--brand-orange-rgb), 0.08);
-  color: var(--brand-orange);
+  --variant-bg: rgba(var(--brand-orange-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-orange);
 }
 
 .badge-green {
-  background: rgba(var(--brand-green-rgb), 0.1);
-  color: var(--brand-green-dark);
+  --variant-bg: rgba(var(--brand-green-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-green-dark);
 }
 
 .badge-indigo {
-  background: rgba(99, 102, 241, 0.08);
-  color: #6366f1;
+  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-purple);
 }
 
 .badge-pending {
-  background: rgba(var(--brand-purple-rgb), 0.1);
-  color: var(--brand-purple);
+  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-purple);
 }
 
 /* Smaller type compact variant */
 .badge-type-compact {
-  padding: 0.1rem 0.3rem;
-  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-2xs);
 }
 
 /* ── Semantic Variant Definitions ─────────────────────────────────────────── */
@@ -131,59 +125,19 @@
 }
 
 .variant--success {
-  --variant-bg: rgba(var(--brand-green-rgb), 0.1);
-  --variant-color: var(--brand-green-dark, #16a34a);
-  --variant-hover-bg: rgba(var(--brand-green-rgb), 0.15);
+  --variant-bg: rgba(var(--brand-green-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-green-dark);
+  --variant-border: rgba(var(--brand-green-rgb), 0.2);
 }
 
 .variant--danger {
-  --variant-bg: rgba(var(--destructive-rgb), 0.08);
-  --variant-color: var(--brand-red, #dc2626);
-  --variant-hover-bg: rgba(var(--destructive-rgb), 0.14);
+  --variant-bg: rgba(var(--destructive-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-red);
+  --variant-border: rgba(var(--destructive-rgb), 0.2);
 }
 
 .variant--info {
-  --variant-bg: rgba(var(--brand-blue-rgb), 0.08);
-  --variant-color: var(--brand-blue, #3b82f6);
-  --variant-hover-bg: rgba(var(--brand-blue-rgb), 0.14);
-}
-
-/* ── Semantic Badge Modifier Classes ──────────────────────────────────────── */
-/* Domain-specific badge types for content UI */
-
-.badge--category {
-  font-size: 10px;
-  letter-spacing: 0.05em;
-}
-
-.badge--event {
-  font-weight: var(--weight-bold);
-}
-
-.badge--topic {
-  letter-spacing: 0.03em;
-}
-
-.badge--location {
-  letter-spacing: 0.05em;
-  font-size: 10px;
-}
-
-.badge--author {
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.badge--sentiment {
-  letter-spacing: 0.03em;
-}
-
-/* ── Verified Source Badge ─────────────────────────────────────────── */
-.verified-badge {
-  color: var(--brand-blue, #3b82f6);
-  margin-left: 0.25rem;
-  font-size: 0.9em;
-  display: inline-flex;
-  align-items: center;
+  --variant-bg: rgba(var(--brand-blue-rgb), var(--badge-opacity));
+  --variant-color: var(--brand-blue);
+  --variant-border: rgba(var(--brand-blue-rgb), 0.2);
 }
