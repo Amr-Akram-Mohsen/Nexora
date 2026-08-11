@@ -9,7 +9,7 @@ class Video(db.Model):
 
     title = db.Column(db.String(300), nullable=False)
     description = db.Column(db.Text)
-    description_display_rule = db.Column(db.String(20), default='review')
+    description_display_rule = db.Column(db.String(20), default='review', nullable=False)
 
     external_id = db.Column(
         db.String(100),
@@ -46,16 +46,19 @@ class Video(db.Model):
 
     view_count = db.Column(
         db.BigInteger,
+        nullable=False,
         default=0
     )
 
     like_count = db.Column(
         db.BigInteger,
+        nullable=False,
         default=0
     )
 
     comments_count = db.Column(
         db.Integer,
+        nullable=False,
         default=0
     )
 
@@ -114,8 +117,8 @@ class VideoComment(db.Model):
     
     text = db.Column(db.Text, nullable=False)
     
-    like_count = db.Column(db.Integer, default=0)
-    reply_count = db.Column(db.Integer, default=0)
+    like_count = db.Column(db.Integer, nullable=False, default=0)
+    reply_count = db.Column(db.Integer, nullable=False, default=0)
     
     published_at = db.Column(db.DateTime, index=True)
     updated_at = db.Column(db.DateTime)

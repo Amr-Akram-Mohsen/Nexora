@@ -24,12 +24,12 @@ class LastAPIFetch(db.Model):
     last_modified = db.Column(db.String(100))
 
     # ── Source Health & Reliability ──────────────────────────────────
-    failure_count = db.Column(db.Integer, default=0)
-    consecutive_failures = db.Column(db.Integer, default=0)
-    success_count = db.Column(db.Integer, default=0)
+    failure_count = db.Column(db.Integer, default=0, nullable=False)
+    consecutive_failures = db.Column(db.Integer, default=0, nullable=False)
+    success_count = db.Column(db.Integer, default=0, nullable=False)
     last_failed_at = db.Column(db.DateTime)
     last_error = db.Column(db.Text)
-    is_active = db.Column(db.Boolean, default=True, index=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False, index=True)
 
 
     __table_args__ = (

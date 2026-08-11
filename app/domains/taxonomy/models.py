@@ -12,7 +12,7 @@ class Source(db.Model):
     slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
     domain = db.Column(db.String(255), unique=True, nullable=False, index=True)
     logo_url = db.Column(db.Text, nullable=True)
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     authority_score = db.Column(db.Integer, default=50, nullable=False)
 
     @staticmethod
@@ -53,8 +53,8 @@ class Section(db.Model):
     slug = db.Column(db.String(120), unique=True, nullable=False, index=True)
     description = db.Column(db.Text, nullable=True)
     allowed_filters = db.Column(db.JSON, nullable=True)
-    is_active = db.Column(db.Boolean, default=True)
-    sort_order = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
 
     @staticmethod
     def get_by_slug(slug, session):
@@ -72,9 +72,9 @@ class Brand(db.Model):
     normalized_name = db.Column(db.String(150), index=True)
     slug = db.Column(db.String(150), unique=True, nullable=False, index=True)
     industry = db.Column(db.String(50), index=True)
-    is_featured = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=True)
-    sort_order = db.Column(db.Integer, default=0)
+    is_featured = db.Column(db.Boolean, default=False, nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
 
     @staticmethod
     def get_by_slug(slug, session):
@@ -113,9 +113,9 @@ class Category(db.Model):
     parent_id = db.Column(
         db.Integer, db.ForeignKey("categories.id", ondelete="CASCADE"), nullable=True
     )
-    is_active = db.Column(db.Boolean, default=True)
-    sort_order = db.Column(db.Integer, default=0)
-    is_leaf = db.Column(db.Boolean, default=True, index=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    sort_order = db.Column(db.Integer, default=0, nullable=False)
+    is_leaf = db.Column(db.Boolean, default=True, nullable=False, index=True)
 
     @staticmethod
     def create(name: str, parent=None, is_leaf=True):

@@ -7,7 +7,7 @@ class UserInterest(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     target_type = db.Column(db.String(50), nullable=False)  # 'product' or 'article'
     target_id = db.Column(db.Integer, nullable=False)
-    interaction_count = db.Column(db.Integer, default=0)
+    interaction_count = db.Column(db.Integer, default=0, nullable=False)
     last_interaction_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     user = db.relationship("User", back_populates="user_interests")
@@ -25,7 +25,7 @@ class UserEntityInterest(db.Model):
     user_interest_id = db.Column(db.Integer, db.ForeignKey("user_interests.id", ondelete="CASCADE"), nullable=False)
     entity_id = db.Column(db.Integer, nullable=True)
     category_id = db.Column(db.Integer, nullable=True)
-    score = db.Column(db.Float, default=0.0)
+    score = db.Column(db.Float, default=0.0, nullable=False)
     
     user_interest = db.relationship("UserInterest", back_populates="entity_scores")
     

@@ -17,11 +17,12 @@ class Article(db.Model):
     content_html = db.Column(db.Text)
     word_count = db.Column(db.Integer)
 
-    quality_score = db.Column(db.Float, default=0.0)
+    quality_score = db.Column(db.Float, default=0.0, nullable=False)
     
     enrichment_priority = db.Column(
         db.Float, 
         default=0.0, 
+        nullable=False,
         index=True,
         comment="Priority score for enrichment worker. Calculated before enrichment."
     )

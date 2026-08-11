@@ -1,12 +1,13 @@
 from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model
+from app.domains.serialization_utils import compact_dict, safe_float, safe_isoformat, safe_attr
 
 def serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, avg_sync_age) -> Optional[Dict[str, Any]]:
     """Serializes a Store ORM model and its aggregated stats into a DTO."""
     if not store:
         return None
 
-    return {
+    return compact_dict({
         "id": store.id,
         "name": store.name,
         "slug": store.slug,
@@ -20,32 +21,32 @@ def serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, 
         "network_slug": store.network_slug,
         
         "product_count": product_count,
-        "active_links": getattr(stats, "active_links", 0) or 0,
-        "inactive_links": getattr(stats, "inactive_links", 0) or 0,
-        "total_links": getattr(stats, "total_links", 0) or 0,
-        "never_synced": getattr(stats, "never_synced", 0) or 0,
-        "stale_links": getattr(stats, "stale_links", 0) or 0,
-        "out_of_stock": getattr(stats, "out_of_stock", 0) or 0,
+        "active_links": safe_attr(stats, "active_links", 0),
+        "inactive_links": safe_attr(stats, "inactive_links", 0),
+        "total_links": safe_attr(stats, "total_links", 0),
+        "never_synced": safe_attr(stats, "never_synced", 0),
+        "stale_links": safe_attr(stats, "stale_links", 0),
+        "out_of_stock": safe_attr(stats, "out_of_stock", 0),
         
         "avg_sync_age": avg_sync_age,
-        "last_synced_at": stats.last_synced.isoformat() if stats and stats.last_synced else None,
+        "last_synced_at": safe_isoformat(stats, "last_synced"),
         
-        "program_count": getattr(stats, "program_count", 0) or 0,
-        "avg_commission": float(stats.avg_commission) if stats and stats.avg_commission is not None else None,
-        "max_commission": float(stats.max_commission) if stats and stats.max_commission is not None else None,
-        "with_commission": getattr(stats, "with_commission", 0) or 0,
-        "without_commission": getattr(stats, "without_commission", 0) or 0,
-        "with_tracking": getattr(stats, "with_tracking", 0) or 0,
+        "program_count": safe_attr(stats, "program_count", 0),
+        "avg_commission": safe_float(stats, "avg_commission"),
+        "max_commission": safe_float(stats, "max_commission"),
+        "with_commission": safe_attr(stats, "with_commission", 0),
+        "without_commission": safe_attr(stats, "without_commission", 0),
+        "with_tracking": safe_attr(stats, "with_tracking", 0),
         
-        "min_price": float(stats.min_price) if stats and stats.min_price is not None else None,
-        "avg_price": float(stats.avg_price) if stats and stats.avg_price is not None else None,
-        "max_price": float(stats.max_price) if stats and stats.max_price is not None else None,
-        "with_discount": getattr(stats, "with_discount", 0) or 0,
-        "avg_discount_pct": float(stats.avg_discount_pct) if stats and stats.avg_discount_pct is not None else None,
-        "null_price": getattr(stats, "null_price", 0) or 0,
+        "min_price": safe_float(stats, "min_price"),
+        "avg_price": safe_float(stats, "avg_price"),
+        "max_price": safe_float(stats, "max_price"),
+        "with_discount": safe_attr(stats, "with_discount", 0),
+        "avg_discount_pct": safe_float(stats, "avg_discount_pct"),
+        "null_price": safe_attr(stats, "null_price", 0),
         
         "currency_mix": currency_mix_list
-    }
+    })
 
 def _build_inspect_store_links(product):
     store_links_data = []
@@ -58,69 +59,69 @@ def _build_inspect_store_links(product):
             elif lnk.last_checked_at:
                 last_synced_dates.append(lnk.last_checked_at)
                 
-            store_links_data.append({
+            store_links_data.append(compact_dict({
                 "store_name": lnk.store.name if lnk.store else "—",
                 "affiliate_network": lnk.store.affiliate_network if lnk.store else "—",
                 "program_name": lnk.program_name or "—",
                 "affiliate_url": lnk.affiliate_url or "—",
                 "original_url": lnk.original_url or "—",
-                "price": float(lnk.price) if lnk.price is not None else None,
-                "old_price": float(lnk.old_price) if lnk.old_price is not None else None,
+                "price": safe_float(lnk, "price"),
+                "old_price": safe_float(lnk, "old_price"),
                 "currency": lnk.currency,
                 "availability": lnk.availability,
                 "is_active": lnk.is_active,
-                "last_synced_at": lnk.last_synced_at.isoformat() if lnk.last_synced_at else None,
-                "last_checked_at": lnk.last_checked_at.isoformat() if lnk.last_checked_at else None,
+                "last_synced_at": safe_isoformat(lnk, "last_synced_at"),
+                "last_checked_at": safe_isoformat(lnk, "last_checked_at"),
                 "merchant_category": lnk.merchant_category or "—",
                 "external_product_id": lnk.external_product_id or "—",
                 "metadata": lnk.network_metadata or {},
-                "commission_rate": float(lnk.commission_rate) if lnk.commission_rate is not None else None,
-            })
+                "commission_rate": safe_float(lnk, "commission_rate"),
+            }))
     return store_links_data, last_synced_dates
 
 def _build_inspect_variant_summary(product):
     variant_summary = []
     for v in product.variants:
-        variant_summary.append({
+        variant_summary.append(compact_dict({
             "id": v.id,
             "sku": v.sku,
             "is_default": v.is_default,
             "attributes": v.attributes,
-            "price": float(v.price) if v.price is not None else None,
-            "old_price": float(v.old_price) if v.old_price is not None else None,
+            "price": safe_float(v, "price"),
+            "old_price": safe_float(v, "old_price"),
             "currency": v.currency,
             "store_links_count": len(v.store_links),
             "images_count": len(v.images)
-        })
+        }))
     return variant_summary
 
 def _build_inspect_image_strip(product):
     image_strip = []
     for img in product.images:
-        image_strip.append({
+        image_strip.append(compact_dict({
             "id": img.id,
             "url": img.image_url,
             "is_primary": img.position == 0,
             "variant_id": img.variant_id,
             "position": img.position
-        })
+        }))
     return image_strip
 
 def _build_inspect_specifications(product):
-    return {
+    return compact_dict({
         "structured_details": product.structured_details,
         "quick_details": product.quick_details,
         "searchable_attributes": product.searchable_attributes,
         "specs_list": [{"key": s.category, "value": s.spec_json} for s in product.specifications]
-    }
+    })
 
 def _build_inspect_comments(product):
     return [
-        {
+        compact_dict({
             "user_name": c.user.name if getattr(c, "user", None) else f"User #{c.user_id}",
             "content": c.content,
-            "created_at": c.created_at.isoformat() if c.created_at else None
-        }
+            "created_at": safe_isoformat(c, "created_at")
+        })
         for c in product.comments
     ]
 
@@ -135,17 +136,17 @@ def serialize_item_inspect_dto(product) -> Optional[Dict[str, Any]]:
     specifications = _build_inspect_specifications(product)
     recent_comments = _build_inspect_comments(product)
 
-    return {
+    return compact_dict({
         "id": product.id,
         "name": product.name,
         "category_name": product.category.name if product.category else None,
         "brand_name": product.brand.name if product.brand else None,
         "source_name": product.source.name if getattr(product, "source", None) else None,
-        "created_at": product.created_at.isoformat() if product.created_at else None,
+        "created_at": safe_isoformat(product, "created_at"),
         
         "variants_count": len(product.variants),
         "store_count": len(store_links_data),
-        "min_price": float(product.min_price) if product.min_price is not None else None,
+        "min_price": safe_float(product, "min_price"),
         "variant_groups": product.variant_groups,
         
         "view_count": product.view_count or 0,
@@ -169,7 +170,7 @@ def serialize_item_inspect_dto(product) -> Optional[Dict[str, Any]]:
         "image_strip": image_strip,
         "specifications": specifications,
         "comments": recent_comments
-    }
+    })
 
 def serialize_asset_url(url):
     if not url:
@@ -202,21 +203,21 @@ def serialize_store_link(link):
         else None
     )
 
-    return {
+    return compact_dict({
         "id": link.id,
         # Template key
         "affiliate_url": link.affiliate_url,
         # JS key (purchase-options.js reads `link.url`)
         "url": link.affiliate_url,
-        "price": float(link.price) if link.price is not None else None,
-        "old_price": float(link.old_price) if link.old_price is not None else None,
+        "price": safe_float(link, "price"),
+        "old_price": safe_float(link, "old_price"),
         "currency": link.currency,
         # Nested store object (Jinja templates)
         "store": store_data,
         # Flat keys (purchase-options.js reads `link.name` / `link.logo`)
         "name": store.name if store else "",
         "logo": serialize_asset_url(store_logo),
-    }
+    })
 
 
 def serialize_store_links(links):
@@ -246,14 +247,14 @@ def serialize_item_variant(variant, product=None, include_variant_images=True):
             seen.add(url)
             merged_images.append(url)
 
-    return {
+    return compact_dict({
         "id": variant.id,
         "title": variant.title,
         "sku": variant.sku,
         "attributes": variant.attributes or {},
         "is_default": variant.is_default,
-        "price": float(variant.price) if variant.price is not None else 0.0,
-        "old_price": float(variant.old_price) if variant.old_price is not None else 0.0,
+        "price": safe_float(variant, "price", default=0.0),
+        "old_price": safe_float(variant, "old_price", default=0.0),
         "currency": variant.currency,
         "display_name": variant.display_name(),
         # Primary image URL (gallery main image on variant switch)
@@ -266,7 +267,7 @@ def serialize_item_variant(variant, product=None, include_variant_images=True):
             for img in variant_images
         ],
         "store_links": serialize_store_links(variant.store_links),
-    }
+    })
 
 
 def serialize_item(product, include_variant_images=False):
@@ -291,7 +292,7 @@ def serialize_item(product, include_variant_images=False):
         for v in product.variants
     ]
 
-    return {
+    return compact_dict({
         "id": product.id,
         "name": product.name,
         "slug": product.slug,
@@ -305,19 +306,15 @@ def serialize_item(product, include_variant_images=False):
         "comment_count": getattr(product, "comment_count", 0),
         # Single canonical image key
         "image_url": product.image_url,
-        "price": float(product.price) if product.price is not None else None,
-        "min_price": float(product.min_price) if product.min_price is not None else None,
+        "price": safe_float(product, "price"),
+        "min_price": safe_float(product, "min_price"),
         "has_variants": product.has_variants,
         "default_variant": (
             {
                 "id": default_variant.id,
                 "sku": getattr(default_variant, "sku", None),
                 "currency": getattr(default_variant, "currency", None),
-                "price": (
-                    float(default_variant.price)
-                    if default_variant.price is not None
-                    else None
-                ),
+                "price": safe_float(default_variant, "price"),
             }
             if default_variant
             else None
@@ -337,13 +334,13 @@ def serialize_item(product, include_variant_images=False):
         ],
         "rating": product.rating,
         "review_count": product.review_count,
-        "created_at": product.created_at.isoformat() if product.created_at else None,
+        "created_at": safe_isoformat(product.created_at),
         "badges": (
             product.pick_keys(product.searchable_attributes, ["badge", "tag"])
             if product.searchable_attributes
             else None
         ),
-    }
+    })
 
 
 def serialize_item_detail(product):
@@ -380,7 +377,7 @@ def serialize_item_detail(product):
             "full_details": groups if isinstance(groups, dict) else product.full_details,
         }
     )
-    return data
+    return compact_dict(data)
 
 def _calculate_item_completeness_score(product, price_info, store_info, has_image, has_specs):
     completeness_points = 0
@@ -406,6 +403,8 @@ def serialize_product_row(product, price_info, store_info, has_image, has_specs)
 
     sync_age_days = None
     last_synced_at = store_info.get("last_synced_at")
+    # safe_isoformat from dict is possible, but we don't need safe_isoformat if it's already an iso string from store_info.
+    # store_info might have a datetime object or a string. Wait, above store_info has iso strings.
     if last_synced_at:
         if last_synced_at.tzinfo is None:
             last_synced_at = last_synced_at.replace(tzinfo=timezone.utc)
@@ -413,7 +412,7 @@ def serialize_product_row(product, price_info, store_info, has_image, has_specs)
 
     completeness_score = _calculate_item_completeness_score(product, price_info, store_info, has_image, has_specs)
 
-    return {
+    return compact_dict({
         "id":          product.id,
         "name":        product.name,
         "slug":        product.slug,
@@ -428,12 +427,12 @@ def serialize_product_row(product, price_info, store_info, has_image, has_specs)
         "max_price":   price_max,
         "currency":    currency,
         "store_count": store_info.get("active_links", 0),
-        "last_synced_at": store_info.get("last_synced_at").isoformat() if store_info.get("last_synced_at") else None,
+        "last_synced_at": store_info.get("last_synced_at"), # already iso string
         "sync_age":    sync_age_days,
         "has_discount": store_info.get("has_discount", False),
         "health":      completeness_score,
         "click_count": product.click_count or 0,
         "view_count":  product.view_count or 0,
-        "created_at":  product.created_at.isoformat() if product.created_at else None,
-    }
+        "created_at":  safe_isoformat(product, "created_at"),
+    })
 

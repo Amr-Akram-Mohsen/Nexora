@@ -1,14 +1,15 @@
 from datetime import datetime
 import re
+from .serialization_utils import compact_dict, safe_isoformat, safe_attr
 
 
 def serialize_model(m):
     if not m:
         return None
-    return {
+    return compact_dict({
         "name": getattr(m, "name", None),
         "slug": getattr(m, "slug", None),
-    }
+    })
 
 
 def _normalize_authors(raw_authors):
@@ -36,15 +37,16 @@ def _normalize_authors(raw_authors):
 def _serialize_authors(authors):
     if not authors:
         return []
-    return [{
-                "id": a.id,
-                "name": a.name,
-                "slug": a.slug,
-                "url": a.url,
-                "icon_url": a.icon_url,
-                "is_agency": a.is_agency,
-            } for a in authors
-        ]
+    return [
+        compact_dict({
+            "id": a.id,
+            "name": a.name,
+            "slug": a.slug,
+            "url": a.url,
+            "icon_url": a.icon_url,
+            "is_agency": a.is_agency,
+        }) for a in authors
+    ]
 
 def _serialize_sources(sources):
     if not sources:
@@ -52,14 +54,14 @@ def _serialize_sources(sources):
     result = []
     for s in sources:
         if s and getattr(s, "source", None):
-            result.append({
+            result.append(compact_dict({
                 "name": s.source.name,
                 "slug": s.source.slug,
                 "url": s.url,
-                "published_at": s.published_at.isoformat() if getattr(s, "published_at", None) else None,
+                "published_at": safe_isoformat(s, "published_at"),
                 "logo_url": getattr(s.source, "logo_url", None),
                 "authority_score": getattr(s.source, "authority_score", 0) or 0,
-            })
+            }))
     return result
 
 def serialize_target(obj, session=None):
@@ -75,7 +77,7 @@ def serialize_target(obj, session=None):
 
     # Core fields common to most targets
     data = {
-        "id": getattr(obj, "id", None),
+        "id": obj.id,
         "type": type_name,
         "title": getattr(obj, "title", None) or getattr(obj, "name", None),
         "preview_text": getattr(obj, "preview_text", None),
@@ -92,14 +94,14 @@ def serialize_target(obj, session=None):
 
         primary_source = None
         if rel and getattr(rel, "source", None):
-            primary_source = {
+            primary_source = compact_dict({
                 "name": rel.source.name,
                 "slug": rel.source.slug,
                 "url": rel.url,
-                "published_at": rel.published_at.isoformat() if getattr(rel, "published_at", None) else None,
+                "published_at": safe_isoformat(rel, "published_at"),
                 "logo_url": getattr(rel.source, "logo_url", None),
                 "authority_score": getattr(rel.source, "authority_score", 0) or 0
-            }
+            })
 
         serialized_authors = _serialize_authors(obj.authors)
         data.update(
@@ -158,4 +160,4 @@ def serialize_target(obj, session=None):
             data["brand_name"] = item_data.get("brand", {}).get("name") if item_data.get("brand") else None
             data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
 
-    return data
+    return compact_dict(data)

@@ -9,7 +9,7 @@ class Author(db.Model):
     url = db.Column(db.Text, nullable=True)
     uri = db.Column(db.String(255), nullable=True) # Typically acts as an email/id
     type = db.Column(db.String(50), nullable=True)
-    is_agency = db.Column(db.Boolean, default=False)
+    is_agency = db.Column(db.Boolean, default=False, nullable=False)
     icon_url = db.Column(db.Text, nullable=True)
     aliases = db.Column(db.JSON, default=list)
 

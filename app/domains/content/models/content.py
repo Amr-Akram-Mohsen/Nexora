@@ -53,24 +53,24 @@ class Content(db.Model):
         nullable=True
     )
 
-    is_active = db.Column(db.Boolean, default=True)
-    is_published = db.Column(db.Boolean, default=False, index=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    is_published = db.Column(db.Boolean, default=False, nullable=False, index=True)
 
     like_count = db.Column(db.Integer, nullable=False, default=0)
     dislike_count = db.Column(db.Integer, nullable=False, default=0)
     share_count = db.Column(db.Integer, nullable=False, default=0)
     save_count = db.Column(db.Integer, nullable=False, default=0)
-    comment_count = db.Column(db.Integer, default=0)
-    view_count = db.Column(db.Integer, default=0)
+    comment_count = db.Column(db.Integer, nullable=False, default=0)
+    view_count = db.Column(db.Integer, nullable=False, default=0)
 
     # Optional (future-proofing)
-    score = db.Column(db.Float, default=0.0, index=True)
+    score = db.Column(db.Float, default=0.0, nullable=False, index=True)
     
     # Optional (future-proofing)
-    review_score = db.Column(db.Float, default=0.0, index=True)
+    review_score = db.Column(db.Float, default=0.0, nullable=False, index=True)
     
     # Optional (future-proofing)
-    review_count = db.Column(db.Integer, default=0, index=True)
+    review_count = db.Column(db.Integer, default=0, nullable=False, index=True)
 
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), nullable=True)
     section_id = db.Column(db.Integer, db.ForeignKey("sections.id"), nullable=False)

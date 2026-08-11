@@ -16,11 +16,11 @@ class Store(db.Model):
     affiliate_network = db.Column(db.String(100))
 
     network_slug = db.Column(db.String(100), nullable=True, index=True)
-    api_enabled = db.Column(db.Boolean, default=False)
-    feed_enabled = db.Column(db.Boolean, default=False)
+    api_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    feed_enabled = db.Column(db.Boolean, default=False, nullable=False)
 
     logo_url = db.Column(db.Text, nullable=True)
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     product_links = db.relationship(
         "ProductStoreLink", back_populates="store", cascade="all, delete-orphan"
@@ -72,9 +72,9 @@ class Product(db.Model):
     dislike_count = db.Column(db.Integer, nullable=False, default=0)
     share_count = db.Column(db.Integer, nullable=False, default=0)
     save_count = db.Column(db.Integer, nullable=False, default=0)
-    comment_count = db.Column(db.Integer, default=0)
-    view_count = db.Column(db.Integer, default=0)
-    click_count = db.Column(db.Integer, default=0)
+    comment_count = db.Column(db.Integer, nullable=False, default=0)
+    view_count = db.Column(db.Integer, nullable=False, default=0)
+    click_count = db.Column(db.Integer, nullable=False, default=0)
 
     searchable_attributes = db.Column(db.JSON)
 
@@ -341,7 +341,7 @@ class ProductVariant(db.Model):
     title = db.Column(db.String(200), nullable=True)
     sku = db.Column(db.String(100), unique=True, nullable=True)
     attributes = db.Column(db.JSON)
-    is_default = db.Column(db.Boolean, default=False)
+    is_default = db.Column(db.Boolean, default=False, nullable=False)
     price = db.Column(db.Numeric(10, 2), index=True)
     old_price = db.Column(db.Numeric(10, 2))
     currency = db.Column(db.String(3))
@@ -415,7 +415,7 @@ class ProductStoreLink(db.Model):
     currency = db.Column(db.String(3))
     availability = db.Column(db.String(32), index=True)
     last_checked_at = db.Column(db.DateTime)
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     variant = db.relationship("ProductVariant", back_populates="store_links")
@@ -441,7 +441,7 @@ class ProductImage(db.Model):
         db.Integer, db.ForeignKey("product_variants.id", ondelete="CASCADE"), nullable=True
     )
     image_url = db.Column(db.Text, nullable=False)
-    position = db.Column(db.Integer, default=0)
+    position = db.Column(db.Integer, default=0, nullable=False)
     product = db.relationship("Product", back_populates="images")
     variant = db.relationship("ProductVariant", back_populates="images")
 

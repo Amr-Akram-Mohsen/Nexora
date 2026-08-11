@@ -76,7 +76,7 @@ class NewsletterSubscriber(db.Model):
         db.ForeignKey('users.id', ondelete='SET NULL'),
         nullable=True
     )
-    is_confirmed = db.Column(db.Boolean, default=False)
+    is_confirmed = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     unsubscribed_at = db.Column(db.DateTime, nullable=True)
     confirmation_token = db.Column(db.String(255), nullable=True)
