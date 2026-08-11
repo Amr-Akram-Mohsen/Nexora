@@ -6,13 +6,12 @@ from app.shared.parsing import parse_target_type, parse_interaction_type
 from app.shared.request import get_client_ip
 from app.core.context import get_newsletter_context
 from app.application.interaction.newsletter import subscribe_workflow, confirm_subscription_workflow, unsubscribe_workflow
-from app.application.interaction.handle_interaction import handle_interaction_workflow
-from app.application.interaction.item_click import record_item_click_workflow
+from app.application.interaction.public import handle_interaction_workflow, record_item_click_workflow
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items
 from app.domains.content.service import get_content_by_id
 from app.domains.product.service import get_item_by_id
-from app.application.interaction.tracking import track_view_workflow, track_impression_workflow, track_click_workflow
+from app.application.interaction.public import track_view_workflow, track_impression_workflow, track_click_workflow
 from app.shared.utils.logging import log_route_start, log_route_success
 import logging
 
@@ -265,9 +264,10 @@ def handle_interaction():
 @bp.route('/saved')
 @login_required
 def saved_items():
-    from app.application.interaction.get_saved import (
+    from app.application.interaction.public import (
         get_saved_articles_workflow,
         get_saved_products_workflow,
+        get_user_collection_counts_workflow
     )
 
     log_route_start(logger, "/saved", user_id=current_user.id)

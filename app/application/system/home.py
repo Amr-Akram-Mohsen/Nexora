@@ -26,12 +26,16 @@ Section keys returned by ``get_home_page_data()``:
   ─────────────────
   trending_brands       — Brands ranked by content view-count (7-day window)
 """
-from app.application.content.query_service import get_contents_render_cached
-from app.application.recommendation.query_service import (
-    get_trending_contents_cached_v2,
-    get_editors_picks_cached,
-    get_trending_items_cached,
-    get_trending_brands_cached,
+from app.application.content.public import get_contents_render_cached
+from app.domains.recommendation.service.content import (
+    get_trending_contents_scored as get_trending_contents_cached_v2,
+    get_editors_picks as get_editors_picks_cached,
+)
+from app.domains.recommendation.service.products import (
+    get_trending_items as get_trending_items_cached,
+)
+from app.domains.taxonomy.service.query import (
+    get_trending_brands as get_trending_brands_cached,
 )
 from app.domains.product.service import get_filtered_products_for_home
 from app.infrastructure import cache

@@ -7,12 +7,12 @@
 
   <div class="interaction-stats flex">
 
-    <span class="interaction-stat flex items-center gap-1">
+    <span class="interaction-stat">
       <i class="fa-regular fa-eye"></i>
       <span>{{ view_count }}</span>
     </span>
 
-    <span class="interaction-stat flex items-center gap-1">
+    <span class="interaction-stat">
       <i class="fa-regular fa-comment"></i>
       <span>{{ comment_count }}</span>
     </span>
@@ -26,21 +26,24 @@
     variant=none,
     class="interaction-btn gap-2 save-btn",
     icon="fa-regular fa-clock interaction-icon",
-    attrs={"data-collection": "Watch Later", "title": "Watch Later"}
+    attrs={"data-collection": "Watch Later", "title": "Watch Later"},
+    unstyled=True
     ) }}
     {% else %}
     {{ button(
     variant=none,
     class="interaction-btn gap-2 save-btn",
     icon="fa-regular fa-bookmark interaction-icon",
-    attrs={"title": "Save to Collection"}
+    attrs={"title": "Save to Collection"},
+    unstyled=True
     ) }}
     {% endif %}
 
     {{ button(
     variant=none,
     class="interaction-btn gap-2 share-btn",
-    icon="fa-regular fa-share-from-square interaction-icon"
+    icon="fa-regular fa-share-from-square interaction-icon",
+    unstyled=True
     ) }}
 
   </div>

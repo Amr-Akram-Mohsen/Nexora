@@ -3,15 +3,19 @@ from flask import Blueprint, request, redirect, flash, render_template, current_
 from flask_login import login_user, logout_user, login_required, current_user
 from app.core.extensions import limiter, db
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
-from app.application.user.login import (
+from app.application.user.auth import (
     authenticate_user,
     check_login_lockout,
     record_failed_login,
     clear_failed_logins,
+    register_user_workflow,
+    verify_user_email, 
+    resend_verification_email_workflow,
+    request_password_reset, 
+    reset_user_password,
+    handle_successful_login, 
+    handle_google_oauth_login
 )
-from app.application.user.register import register_user_workflow
-from app.application.user.verify import verify_user_email, resend_verification_email_workflow
-from app.application.user.password import request_password_reset, reset_user_password
 from app.domains.user.service import (
     get_user_by_email,
     get_newsletter_subscriber_by_email,
@@ -21,7 +25,6 @@ from app.application.user.profile import (
     update_profile_name_workflow,
     update_profile_password_workflow,
 )
-from app.application.user.login import handle_successful_login, handle_google_oauth_login
 
 from app.shared.validators import validate_email, validate_password_strength
 from app.shared.sanitizer import sanitize_text
@@ -340,7 +343,7 @@ def verify_reset_code():
         log_route_start(logger, "/verify-reset-code")
         if request.method == 'POST':
             code = request.form.get('code', '').strip()
-            from app.application.user.otp import verify_otp
+            from app.application.user.auth import verify_otp
             if verify_otp(email, "reset", code):
                 session['reset_email'] = email
                 flash("Code verified. Please choose a new password.", "success")
@@ -481,7 +484,7 @@ def profile():
         subscriber = get_newsletter_subscriber_by_email(current_user.email)
         
         # Load collections
-        from app.application.interaction.get_saved import get_user_collection_counts_workflow
+        from app.application.interaction.public import get_user_collection_counts_workflow
         collections = get_user_collection_counts_workflow(current_user.id)
         collections.sort(key=lambda x: x["name"])
         
@@ -496,7 +499,7 @@ def profile():
 def history():
     try:
         log_route_start(logger, "/history")
-        from app.application.interaction.get_history import get_reading_history_workflow
+        from app.application.interaction.public import get_reading_history_workflow
         history_items = get_reading_history_workflow(current_user.id, limit=50)
         log_route_success(logger, "/history", template="history.html")
         return render_template('history.html', history_items=history_items)
@@ -550,7 +553,7 @@ def update_profile():
             elif get_user_by_email(new_email):
                 flash("This email is already in use by another account.", "error")
             else:
-                from app.application.user.otp import generate_otp
+                from app.application.user.auth import generate_otp
                 from app.application.user.email_service import send_verification_email
                 code = generate_otp(new_email, "update_email")
                 send_verification_email(new_email, code)
@@ -575,7 +578,7 @@ def verify_update_email():
         log_route_start(logger, "/verify-update-email")
         if request.method == 'POST':
             code = request.form.get('code', '').strip()
-            from app.application.user.otp import verify_otp
+            from app.application.user.auth import verify_otp
             if verify_otp(new_email, "update_email", code):
                 current_user.email = new_email
                 db.session.commit()

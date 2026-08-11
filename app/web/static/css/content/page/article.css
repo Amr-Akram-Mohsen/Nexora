@@ -36,7 +36,6 @@
   font-size: var(--text-sm);
   padding-top: 0.625rem;
   border-top: 1px solid var(--border);
-  gap: var(--space-2);
 }
 
 /* --- Meta Items --- */

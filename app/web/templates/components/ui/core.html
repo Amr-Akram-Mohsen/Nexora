@@ -67,7 +67,7 @@
 {% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,
 unstyled=False, id=None) %}
 {% set tag = "a" if href else "button" %}
-{% set base_class = "" if unstyled else "btn inline-flex-center gap-2" %}
+{% set base_class = "btn" if unstyled else "btn inline-flex-center gap-2" %}
 {% set variant_class = "" if unstyled or variant is none else (" variant--" ~ variant) %}
 <{{ tag }} {% if href %}href="{{ href }}" {% else %}type="{{ type }}" {% endif %} {% if id %}id="{{ id }}" {% endif %}
   class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{

@@ -1,9 +1,12 @@
 import logging
 from flask import Blueprint, request, render_template, jsonify, redirect, url_for, abort
 from flask_login import current_user
-from app.application.product.get_catalog import get_catalog_data
-from app.application.product.get_product_page import get_item_page_data, get_item_spec_groups_workflow
-from app.application.product.compare_products import get_comparison_data
+from app.application.product.public import (
+    get_catalog_data,
+    get_item_page_data,
+    get_item_spec_groups_workflow,
+    get_comparison_data
+)
 from app.shared.request import get_client_ip
 from app.domains.interaction.service import record_view
 from app.shared.constants.core import TargetType

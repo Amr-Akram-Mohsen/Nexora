@@ -7,7 +7,7 @@ Uses the same Flask-Caching backend as app.infrastructure.cache.memoize.
 
 def invalidate_item_page(product_id):
     """Drop cached static payload for one product detail page."""
-    from app.application.product.get_item_page import get_item_page_data
+    from app.application.product.public import get_item_page_data
 
     from app.core.extensions import cache
 

@@ -28,6 +28,7 @@
 .newsletter-icon {
   width: 3rem;
   height: 3rem;
+  line-height: 3rem;
   border-radius: var(--radius-full);
   color: var(--brand-blue);
   background: rgba(var(--brand-blue-rgb), 0.1);

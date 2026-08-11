@@ -236,7 +236,7 @@ def source_detail(id):
 
 @bp.route("/comments/<int:id>")
 def comment_detail(id):
-    from app.application.interaction.admin import get_comment_inspect_workflow
+    from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
     from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
     from flask import abort
     

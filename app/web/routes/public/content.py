@@ -1,7 +1,7 @@
 import logging
 from flask import Blueprint, request, render_template, abort
 from . import PUBLIC_TEMPLATES
-from app.application.content.get_feed import get_feed_data, get_source_feed_data
+from app.application.content.public import get_feed_data, get_source_feed_data
 from flask_login import current_user
 from app.shared.request import get_client_ip
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
@@ -87,15 +87,15 @@ def globe_data():
     Extracts locations from Events and Articles.
     """
     from flask import jsonify
-    from app.application.content.query_service import get_globe_data_workflow
+    from app.application.content.public import get_globe_data_workflow
     
     return jsonify(get_globe_data_workflow())
 
 @bp.route("/contents/<content_slug>")
 def content_page(content_slug):
-    from app.application.content.get_content_page import (
-        record_content_view,
+    from app.application.content.public import (
         get_content_page_data,
+        record_content_view
     )
     from app.core.extensions import db
 

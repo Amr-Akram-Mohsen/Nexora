@@ -30,60 +30,54 @@
   <p class="article-header__description">{{ content.display_preview }}</p>
   {% endif %}
 
-  <div class="article-header__meta flex flex-col gap-1">
+  <div class="article-header__meta flex flex-wrap items-center gap-3">
 
-    <div class="flex flex-wrap items-center gap-3">
-
-      {% if article.authors %}
-      <div class="meta-author flex gap-sm flex-wrap">
-        <i class="fas fa-user-edit"></i>
-        <span>By
-          {% for author in article.authors %}
-          {% if author.url %}
-          <a href="{{ author.url }}" target="_blank" rel="noopener nofollow">{{ author.name }}</a>
-          {% else %}
-          <span>{{ author.name }}</span>
-          {% endif %}
-          {% if not loop.last %}, {% endif %}
-          {% endfor %}
-        </span>
-      </div>
-      {% endif %}
-
-      {% set source_obj = article.primary_source or content.source %}
-      {% if source_obj %}
-      <span class="meta-dot">·</span>
-      <div class="meta-source flex gap-sm flex-wrap">
-        <i class="fas fa-newspaper"></i>
-        <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}">{{ source_obj.name }}</a>
-        {% if content.source_tier in ['verified', 'trusted'] %}
-        {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle trusted-badge' %}
-        {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
-        <i class="{{ icon_class }}" title="{{ title }}"></i>
+    {% if article.authors %}
+    <div class="meta-author flex gap-sm items-center">
+      <i class="fas fa-user-edit"></i>
+      <span>By
+        {% for author in article.authors %}
+        {% if author.url %}
+        <a href="{{ author.url }}" target="_blank" rel="noopener nofollow">{{ author.name }}</a>
+        {% else %}
+        <span>{{ author.name }}</span>
         {% endif %}
-      </div>
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </span>
+    </div>
+    {% endif %}
+
+    {% set source_obj = article.primary_source or content.source %}
+    {% if source_obj %}
+    <div class="meta-source flex gap-sm items-center">
+      <i class="fas fa-newspaper"></i>
+      <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}">{{ source_obj.name }}</a>
+      {% if content.source_tier in ['verified', 'trusted'] %}
+      {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle
+      trusted-badge' %}
+      {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
+      <i class="{{ icon_class }}" title="{{ title }}"></i>
       {% endif %}
+    </div>
+    {% endif %}
 
-      <span class="meta-dot">·</span>
+    <div class="meta-info flex items-center gap-5">
+      <time class="meta-date inline-flex-center gap-1">
+        <i class="far fa-calendar-alt"></i>
+        {{ content.published_at | format_date('%b %d, %Y') }}
+      </time>
 
-      <div class="meta-info flex gap-sm flex-wrap">
-        <time class="meta-date inline-flex gap-1">
-          <i class="far fa-calendar-alt"></i>
-          {{ content.published_at | format_date('%b %d, %Y') }}
-        </time>
-
-        {% if content.reading_time %}
-        <span class="meta-dot">·</span>
-        <span class="meta-readtime inline-flex gap-1">
-          <i class="far fa-clock"></i>
-          {{ content.reading_time }} min read
-        </span>
-        {% endif %}
-      </div>
-
+      {% if content.reading_time %}
+      <span class="meta-readtime inline-flex-center gap-1">
+        <i class="far fa-clock"></i>
+        {{ content.reading_time }} min read
+      </span>
+      {% endif %}
     </div>
 
   </div>
+
 </div>
 {% endblock %}
 
@@ -119,7 +113,8 @@
     {% if source_obj %}
     <div class="article-sources-block flex flex-col gap-3">
       <div class="flex items-center gap-4 flex-wrap">
-        {% set pub_url = (article.primary_source.url if article.primary_source else None) or article.url or content.url %}
+        {% set pub_url = (article.primary_source.url if article.primary_source else None) or article.url or content.url
+        %}
         {% if pub_url %}
         {% set source_name = source_obj.name if source_obj else 'Source' %}
         <a href="{{ pub_url }}" target="_blank" rel="noopener nofollow" class="cta-read-original">
@@ -127,16 +122,18 @@
         </a>
         {% endif %}
         {% if article.primary_source and article.primary_source.published_at %}
-        <span class="cta-source-date">Published on {{ article.primary_source.published_at | format_date('%b %d, %Y') }}</span>
+        <span class="cta-source-date">Published on {{ article.primary_source.published_at | format_date('%b %d, %Y')
+          }}</span>
         {% endif %}
       </div>
 
       <div class="cta-source-info flex gap-2">
         <span>See the source page for</span>
-        <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}"
-          class="cta-source-name">{{ source_obj.name }}</a>
+        <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}" class="cta-source-name">{{
+          source_obj.name }}</a>
         {% if content.source_tier in ['verified', 'trusted'] %}
-        {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle trusted-badge' %}
+        {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle
+        trusted-badge' %}
         {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
         <i class="{{ icon_class }}" title="{{ title }}"></i>
         {% endif %}
@@ -161,7 +158,8 @@
       <ul class="flex flex-wrap gap-2">
         {% for rel in alt_sources %}
         <li class="article-source-item">
-          {{ badge(text=rel.name, href=rel.url, variant="entity", attrs={"target": "_blank", "rel": "noopener nofollow"}) }}
+          {{ badge(text=rel.name, href=rel.url, variant="entity", attrs={"target": "_blank", "rel": "noopener
+          nofollow"}) }}
         </li>
         {% endfor %}
       </ul>
@@ -203,19 +201,19 @@
 
 {% if event_carousel and event_carousel.get('items') and event_carousel.get('items')|length > 0 %}
 {% call recommendation_box("Coverage of this Event", "fas fa-bolt", "event") %}
-  <div class="event-summary-card">
-    <h4 class="event-title">{{ event_carousel.event.title }}</h4>
-    {% if event_carousel.event.summary %}
-    <p class="event-desc">{{ event_carousel.event.summary }}</p>
-    {% endif %}
-  </div>
-  {{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
+<div class="event-summary-card">
+  <h4 class="event-title">{{ event_carousel.event.title }}</h4>
+  {% if event_carousel.event.summary %}
+  <p class="event-desc">{{ event_carousel.event.summary }}</p>
+  {% endif %}
+</div>
+{{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
 {% endcall %}
 {% endif %}
 
 {% if entity_carousel and entity_carousel.get('items') and entity_carousel.get('items')|length > 0 %}
 {% call recommendation_box("More on This Topic", "fas fa-tag", "entity") %}
-  {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+{{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 {% endcall %}
 {% endif %}
 {% endblock %}
@@ -223,16 +221,18 @@
 {# ── Author and Source Discovery Carousels ── #}
 {% if author_carousel and author_carousel.get('items') and author_carousel.get('items')|length > 0 %}
 {% block author_carousel %}
-{% call recommendation_box("More from " ~ (article.authors[0].name if article.authors else (article.author or 'Author')), "fas fa-user-edit", "author") %}
-  {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+{% call recommendation_box("More from " ~ (article.authors[0].name if article.authors else (article.author or
+'Author')), "fas fa-user-edit", "author") %}
+{{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 {% endcall %}
 {% endblock %}
 {% endif %}
 
 {% if source_carousel and source_carousel.get('items') and source_carousel.get('items')|length > 0 %}
 {% block source_carousel %}
-{% call recommendation_box("More from " ~ (content.source.name if content.source else (article.primary_source.name if article.primary_source else 'Source')), "fas fa-newspaper", "source") %}
-  {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
+{% call recommendation_box("More from " ~ (content.source.name if content.source else (article.primary_source.name if
+article.primary_source else 'Source')), "fas fa-newspaper", "source") %}
+{{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
 {% endcall %}
 {% endblock %}
 {% endif %}

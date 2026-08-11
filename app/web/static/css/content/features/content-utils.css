@@ -57,7 +57,6 @@
 .snippet-content__img {
   width: 72px;
   min-width: 72px;
-  height: 52px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   flex-shrink: 0;

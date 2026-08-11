@@ -15,7 +15,7 @@ import logging
 
 from flask import Blueprint, jsonify, request
 
-from app.application.recommendation.query_preprocessor import preprocess_query
+from app.domains.recommendation.service.query_preprocessor import preprocess_query
 from app.infrastructure import cache
 
 logger = logging.getLogger(__name__)

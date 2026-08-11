@@ -21,7 +21,7 @@ def register_commands(app):
 
     @app.cli.command("link-contents")
     def link_contents_command():
-        from app.application.recommendation.matcher import match_articles_to_items
+        from app.domains.recommendation.service.matcher import match_articles_to_items
 
         app.logger.info("Starting content-to-product matcher...")
         count = match_articles_to_items()

@@ -7,8 +7,8 @@ Uses the shared Flask-Caching backend through app.infrastructure.cache.
 
 def invalidate_content_page(content_id):
     """Drop cached static payloads for one content detail page."""
-    from app.application.content.get_content_page import get_content_page_static_data
-    from app.application.content.query_service import get_related_contents_cached
+    from app.application.content.public import get_content_page_static_data
+    from app.application.content.public import get_related_contents_cached
     from app.core.extensions import cache
 
     cache.delete_memoized(get_content_page_static_data, content_id)
@@ -17,15 +17,17 @@ def invalidate_content_page(content_id):
 
 def invalidate_content_listing_caches():
     """Drop cached homepage, feed, and trending content listings."""
-    from app.application.content.query_service import (
+    from app.application.content.public import (
         get_contents_render_cached,
         get_filtered_contents_cached,
+        get_carousel_contents_cached,
         get_trending_contents_cached,
     )
     from app.core.extensions import cache
 
     cache.delete("home_page_data")
     cache.delete_memoized(get_contents_render_cached)
+    cache.delete_memoized(get_carousel_contents_cached)
     cache.delete_memoized(get_filtered_contents_cached)
     cache.delete_memoized(get_trending_contents_cached)
 

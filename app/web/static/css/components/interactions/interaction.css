@@ -132,5 +132,6 @@
 
 .interaction-panel--compact .interaction-btn {
   height: 1.75rem;
+  line-height: 1.75rem;
   padding-inline: 0.5rem;
 }

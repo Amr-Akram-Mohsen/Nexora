@@ -49,7 +49,7 @@ def home():
     
     from flask_login import current_user
     if current_user.is_authenticated:
-        from app.application.interaction.get_history import get_reading_history_workflow
+        from app.application.interaction.public import get_reading_history_workflow
         from app.application.recommendation.personalization import get_personalized_feed_workflow
         data["recently_viewed"] = get_reading_history_workflow(current_user.id, limit=8)
         data["recommended_items"] = get_personalized_feed_workflow(current_user.id, limit=12)

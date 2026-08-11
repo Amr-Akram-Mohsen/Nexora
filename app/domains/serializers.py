@@ -7,8 +7,8 @@ def serialize_model(m):
     if not m:
         return None
     return compact_dict({
-        "name": getattr(m, "name", None),
-        "slug": getattr(m, "slug", None),
+        "name": m.name,
+        "slug": m.slug,
     })
 
 
@@ -53,14 +53,14 @@ def _serialize_sources(sources):
         return []
     result = []
     for s in sources:
-        if s and getattr(s, "source", None):
+        if s and s.source:
             result.append(compact_dict({
                 "name": s.source.name,
                 "slug": s.source.slug,
                 "url": s.url,
                 "published_at": safe_isoformat(s, "published_at"),
-                "logo_url": getattr(s.source, "logo_url", None),
-                "authority_score": getattr(s.source, "authority_score", 0) or 0,
+                "logo_url": s.source.logo_url if hasattr(s.source, "logo_url") else None,
+                "authority_score": s.source.authority_score or 0,
             }))
     return result
 
@@ -72,92 +72,95 @@ def serialize_target(obj, session=None):
     if not obj:
         return None
 
-    # Determine type name (e.g., 'article', 'video', 'post', 'product')
     type_name = obj.__class__.__name__.lower()
 
-    # Core fields common to most targets
     data = {
         "id": obj.id,
         "type": type_name,
-        "title": getattr(obj, "title", None) or getattr(obj, "name", None),
-        "preview_text": getattr(obj, "preview_text", None),
-        "url": getattr(obj, "url", None),
-        "image_url": getattr(obj, "image_url", None)
-        or getattr(obj, "thumbnail_url", None),
     }
 
-    if type_name == "article":
-        # Serialize primary source relation cleanly
-        rel = getattr(obj, "primary_source", None)
-        if not rel and getattr(obj, "article_sources", None) and len(obj.article_sources) > 0:
-            rel = obj.article_sources[0]
+    match type_name:
+        case "article":
+            rel = obj.primary_source if hasattr(obj, "primary_source") else None
+            if not rel and obj.article_sources:
+                rel = obj.article_sources[0]
 
-        primary_source = None
-        if rel and getattr(rel, "source", None):
-            primary_source = compact_dict({
-                "name": rel.source.name,
-                "slug": rel.source.slug,
-                "url": rel.url,
-                "published_at": safe_isoformat(rel, "published_at"),
-                "logo_url": getattr(rel.source, "logo_url", None),
-                "authority_score": getattr(rel.source, "authority_score", 0) or 0
-            })
+            primary_source = None
+            if rel and rel.source:
+                primary_source = compact_dict({
+                    "name": rel.source.name,
+                    "slug": rel.source.slug,
+                    "url": rel.url,
+                    "published_at": safe_isoformat(rel, "published_at"),
+                    "logo_url": rel.source.logo_url if hasattr(rel.source, "logo_url") else None,
+                    "authority_score": rel.source.authority_score or 0
+                })
 
-        serialized_authors = _serialize_authors(obj.authors)
-        data.update(
-            {
+            serialized_authors = _serialize_authors(obj.authors) if hasattr(obj, "authors") else []
+            data.update({
+                "title": obj.title,
+                "preview_text": obj.preview_text,
+                "url": obj.url,
+                "image_url": obj.image_url or obj.thumbnail_url if hasattr(obj, "thumbnail_url") else obj.image_url,
                 "source_name": obj.source_name,
                 "source_url": obj.source_url,
                 "read_time_minutes": obj.read_time_minutes,
-                "is_content_scraped": getattr(obj, "is_content_scraped", False),
+                "is_content_scraped": obj.is_content_scraped,
                 "author": serialized_authors[0] if serialized_authors else None,
                 "authors": serialized_authors,
                 "sources": _serialize_sources(obj.article_sources),
-                "content_text": getattr(obj, "content_text", None),
-                "content_html": getattr(obj, "content_html", None),
-                "summary": getattr(obj, "summary", None),
-                "body": getattr(obj, "body", None),
-                "description": getattr(obj, "description", None),
-                "word_count": getattr(obj, "word_count", 0),
-                "sentiment_score": getattr(obj, "sentiment_score", None),
-                "event": serialize_model(getattr(obj, "event", None)),
+                "content_text": obj.content_text,
+                "content_html": obj.content_html,
+                "summary": obj.summary,
+                "body": obj.body,
+                "description": obj.description,
+                "word_count": obj.word_count,
+                "sentiment_score": obj.sentiment_score,
+                "event": compact_dict({
+                    "title": obj.event.title,
+                    "external_uri": obj.event.external_uri,
+                    "event_date": safe_isoformat(obj.event, "event_date")
+                }) if hasattr(obj, "event") and obj.event else None,
                 "primary_source": primary_source,
-            }
-        )
+            })
 
-    elif type_name == "video":
-        data.update(
-            {
-                "platform": getattr(obj, "platform", "youtube"),
-                "external_id": getattr(obj, "external_id", None),
-                "channel_name": getattr(obj, "channel_name", "Unknown"),
-                "description": getattr(obj, "description", None),
-                "thumbnail_url": getattr(obj, "thumbnail_url", None),
-                "duration_seconds": getattr(obj, "duration_seconds", None),
-            }
-        )
+        case "video":
+            data.update({
+                "title": obj.title,
+                "preview_text": obj.description[:200] if obj.description else None,
+                "url": obj.url if hasattr(obj, "url") else None,
+                "image_url": obj.thumbnail_url,
+                "platform": obj.platform,
+                "external_id": obj.external_id,
+                "channel_name": obj.channel_name,
+                "description": obj.description,
+                "thumbnail_url": obj.thumbnail_url,
+                "duration_seconds": obj.duration_seconds,
+            })
 
-    elif type_name == "post":
-        data.update(
-            {
-                "platform": getattr(obj, "platform", "reddit"),
-                "external_id": getattr(obj, "external_id", None),
-                "author": getattr(obj, "author", "Unknown"),
-                "subreddit": getattr(obj, "subreddit", None),
-                "upvotes": getattr(obj, "upvotes", 0),
-                "body": getattr(obj, "body", None),
-            }
-        )
+        case "post":
+            data.update({
+                "title": obj.title,
+                "preview_text": obj.body[:200] if obj.body else None,
+                "url": obj.url if hasattr(obj, "url") else None,
+                "image_url": obj.image_url if hasattr(obj, "image_url") else None,
+                "platform": obj.platform,
+                "external_id": obj.external_id,
+                "author": obj.author,
+                "subreddit": obj.subreddit,
+                "upvotes": obj.upvotes,
+                "body": obj.body,
+            })
 
-    elif type_name == "product":
-        from app.domains.product.serializers import serialize_item
-        
-        item_data = serialize_item(obj)
-        if item_data:
-            data.update(item_data)
-            # Unify basic target keys from item_data
-            data["title"] = item_data.get("name")
-            data["brand_name"] = item_data.get("brand", {}).get("name") if item_data.get("brand") else None
-            data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
+        case "product":
+            from app.domains.product.serializers import serialize_item
+            
+            item_data = serialize_item(obj)
+            if item_data:
+                data.update(item_data)
+                data["title"] = item_data.get("name")
+                data["brand_name"] = item_data.get("brand", {}).get("name") if item_data.get("brand") else None
+                data["category_name"] = item_data.get("category", {}).get("name") if item_data.get("category") else None
+                data["image_url"] = item_data.get("image_url")
 
     return compact_dict(data)
