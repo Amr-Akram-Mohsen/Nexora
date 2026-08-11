@@ -7,10 +7,12 @@ from app.core.extensions import db
 from ..models import View, Reaction, Comment, Save, Share
 from app.domains.recommendation.service.sentiment import analyze_sentiment
 from app.shared.constants.core import TargetType
+
 @lru_cache
 def get_model_map():
     return {'content': Content, 'product': Product, 'comment': Comment}
 ALLOWED_COUNTER_COLUMNS = {'like_count', 'dislike_count', 'view_count', 'save_count', 'share_count', 'comment_count', 'click_count', 'replies_count'}
+
 def update_counter_atomic(db, model_class, model_id, column, action='inc', amount=1):
     if not hasattr(model_class, column):
         raise ValueError(f"{model_class.__name__} has no column '{column}'")
@@ -23,6 +25,7 @@ def update_counter_atomic(db, model_class, model_id, column, action='inc', amoun
         raise ValueError("action must be 'inc' or 'dec'")
     stmt = update(model_class).where(model_class.id == model_id).values({column_attr.key: expr})
     db.session.execute(stmt)
+
 def execute_counter_update(db, model_type: str, model_id: int, column: str, action: str='inc', amount: int=1):
     model_class = get_model_map().get(model_type)
     if not model_class:
@@ -36,10 +39,12 @@ def execute_counter_update(db, model_type: str, model_id: int, column: str, acti
     except Exception as e:
         db.rollback()
         raise e
+
 def viewer_filter(query, user, ip_address):
     if user:
         return query.filter(View.user_id == user.id)
     return query.filter(View.user_id.is_(None), View.ip_address == ip_address)
+
 def record_view(target_id, target_type, user=None, ip_address=None):
     if not user and (not ip_address):
         return {'success': False, 'error': "couldn't detect user"}
@@ -52,6 +57,7 @@ def record_view(target_id, target_type, user=None, ip_address=None):
     db.session.add(view)
     execute_counter_update(db=db, model_type=target_type, model_id=target_id, column='view_count')
     return {'success': True, 'status': 'viewed'}
+
 def react(user, target_type, target_id, reaction_type, target=None):
     if reaction_type not in ('like', 'dislike'):
         return {'success': False, 'error': 'Invalid reaction'}
@@ -69,6 +75,7 @@ def react(user, target_type, target_id, reaction_type, target=None):
         status = 'added'
     execute_counter_update(db, target_type, target_id, f'{reaction_type}_count', 'inc')
     return {'success': True, 'status': status, 'reaction_type': reaction_type}
+
 def save_item(user, target_type, target_id, collection_name=None):
     collection_name = (collection_name or 'General').strip().lower()
     existing = Save.query.filter_by(user_id=user.id, target_type=target_type, target_id=target_id, collection_name=collection_name).first()
@@ -82,11 +89,13 @@ def save_item(user, target_type, target_id, collection_name=None):
     action = 'inc' if status == 'saved' else 'dec'
     execute_counter_update(db=db, model_type=target_type, model_id=target_id, column='save_count', action=action)
     return {'success': True, 'status': status}
+
 def record_share(user, target_type, target_id, channel=None):
     share = Share(user_id=user.id, target_type=target_type, target_id=target_id, channel=(channel or 'web')[:50])
     db.session.add(share)
     execute_counter_update(db=db, model_type=target_type, model_id=target_id, column='share_count')
     return {'success': True, 'status': 'shared'}
+
 def post_comment(user, target_type, target_id, content, parent_id):
     from app.shared.sanitizer import sanitize_text
     sanitized_content = sanitize_text(content)

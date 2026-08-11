@@ -2,21 +2,25 @@ from sqlalchemy import select, or_, and_, func
 from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
 from app.shared.utils.admin_helpers import execute_paginated_query
+
 def get_admin_users_paginated(search, role, status, verified, subscription, provider, sort_by, sort_dir, page, per_page):
     from app.domains.user.service.admin.analytics import build_user_query as domain_build_user_query
     stmt, count_stmt = domain_build_user_query(search, role, status, verified, subscription, provider, sort_by, sort_dir)
     stats = {'active': db.session.scalar(count_stmt.where(User.is_active == True)) or 0, 'admins': db.session.scalar(count_stmt.where(User.is_admin == True)) or 0, 'verified': db.session.scalar(count_stmt.where(User.is_verified == True)) or 0, 'subscribed': db.session.scalar(count_stmt.outerjoin(NewsletterSubscriber, User.id == NewsletterSubscriber.user_id).where(NewsletterSubscriber.is_confirmed == True, NewsletterSubscriber.unsubscribed_at.is_(None))) or 0}
     products, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
     return (products, total, pages, stats)
+
 def toggle_admin_user(id):
     from app.shared.utils.admin_helpers import toggle_model_flag_workflow
     return toggle_model_flag_workflow(User, id, 'is_admin')
+
 def get_admin_user_inspect_raw(id):
     from sqlalchemy.orm import selectinload
     from app.domains.recommendation.models import UserInterest
     stmt_user = select(User).options(selectinload(User.user_interests).selectinload(UserInterest.entity_scores), selectinload(User.newsletter_subscription)).where(User.id == id)
     user = db.session.scalar(stmt_user)
     return user
+
 def build_user_inspect_maps(user):
     from app.domains.taxonomy.models import Category, Entity
     entity_ids = set()
@@ -42,6 +46,7 @@ def build_user_inspect_maps(user):
         from app.domains.content.models import Content
         articles_map = {c.id: c.title for c in db.session.execute(select(Content).where(Content.id.in_(article_ids))).scalars()}
     return (brands_map, categories_map, topics_map, items_map, articles_map)
+
 def get_admin_subscribers_paginated(search, status, has_user, page, per_page):
     stmt = select(NewsletterSubscriber).outerjoin(User, NewsletterSubscriber.user_id == User.id).order_by(NewsletterSubscriber.id.desc())
     count_stmt = select(func.count(NewsletterSubscriber.id))
@@ -65,6 +70,7 @@ def get_admin_subscribers_paginated(search, status, has_user, page, per_page):
     stats = {'total': db.session.scalar(count_stmt) or 0, 'confirmed': db.session.scalar(count_stmt.where(and_(NewsletterSubscriber.is_confirmed == True, NewsletterSubscriber.unsubscribed_at.is_(None)))) or 0, 'unconfirmed': db.session.scalar(count_stmt.where(NewsletterSubscriber.is_confirmed == False)) or 0, 'unsubscribed': db.session.scalar(count_stmt.where(NewsletterSubscriber.unsubscribed_at.isnot(None))) or 0, 'anonymous': db.session.scalar(count_stmt.where(NewsletterSubscriber.user_id.is_(None))) or 0}
     products, total, pages = execute_paginated_query(stmt, count_stmt, page, per_page)
     return ([i[0] for i in products], total, pages, stats)
+
 def get_admin_audience_analytics_stats():
     from app.domains.interaction.models import RecommendationImpression, RecommendationClick
     clicks = db.session.scalar(select(func.count(RecommendationClick.id))) or 0

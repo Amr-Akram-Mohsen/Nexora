@@ -16,6 +16,7 @@ class TaxonomyEnrichmentPort(Protocol):
     taxonomy assignments (category, topics, brands, facets).
     Does NOT perform scraping or network calls.
     """
+
     def __call__(self, enriched_data: Dict) -> Dict: ...
 
 class ClassificationPort(Protocol):
@@ -23,11 +24,14 @@ class ClassificationPort(Protocol):
 
 class QuotaPort(Protocol):
     def can_call(self) -> bool: ...
+
     def record_call(self) -> None: ...
 
 class CooldownPort(Protocol):
     def should_refetch(self, section: str, cache_key: str, hours: int) -> bool: ...
+
     def get_fetch_metadata(self, section: str, cache_key: str) -> Dict: ...
+
     def mark_fetched(
         self,
         section: str,
@@ -39,4 +43,5 @@ class CooldownPort(Protocol):
         last_modified: Optional[str] = None,
         had_results: bool = True,
     ) -> None: ...
+
     def mark_failed(self, section: str, cache_key: str, error: Exception, source: str = None) -> None: ...

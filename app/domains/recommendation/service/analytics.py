@@ -4,6 +4,7 @@ from app.shared.constants.core import TargetType
 from app.core.extensions import db
 from app.domains.product.models import Product, ProductVariant, ProductStoreLink
 from app.domains.interaction.models import ProductClick, View
+
 def get_item_analytics(product_id, session=None):
     session = session or db.session
     last_24h = datetime.utcnow() - timedelta(hours=24)
@@ -18,6 +19,7 @@ def get_item_analytics(product_id, session=None):
     ctr_24h = clicks_24h / views_24h if views_24h else 0
     ctr_all = clicks_all / views_all if views_all else 0
     return {'views_24h': views_24h, 'views_all': views_all, 'clicks_24h': clicks_24h, 'clicks_all': clicks_all, 'ctr_24h': round(ctr_24h, 4), 'ctr_all': round(ctr_all, 4)}
+
 def get_top_store_for_item(product_id, last_hours=24, session=None):
     session = session or db.session
     since = datetime.utcnow() - timedelta(hours=last_hours)

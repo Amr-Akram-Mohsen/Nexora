@@ -10,10 +10,12 @@ BATCH_SIZE = 100
 MIN_SCORE = 2
 MAX_LINKS_PER_ARTICLE = 5
 REPROCESS_AFTER = timedelta(days=7)
+
 def _tokenize(text: str) -> set[str]:
     text = text.lower()
     words = re.findall('[a-z0-9]+', text)
     return {w for w in words if len(w) >= 3}
+
 def _score_match(article_tokens: set[str], product: Product) -> int:
     score = 0
     item_name_lower = product.name.lower()
@@ -31,6 +33,7 @@ def _score_match(article_tokens: set[str], product: Product) -> int:
         keyword_hits = sum((1 for kw in model_keywords if kw in article_tokens))
         score += min(keyword_hits, 3)
     return score
+
 def match_articles_to_items(dry_run: bool=False, since: datetime | None=None) -> int:
     logger.info('[Matcher] Starting article-to-product matching (batch_size=%d, min_score=%d)…', BATCH_SIZE, MIN_SCORE)
     products = Product.query.options(*get_item_load_options('minimal')).all()

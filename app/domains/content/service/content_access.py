@@ -5,14 +5,17 @@ from app.domains.content.serializers import serialize_content_card, serialize_co
 from app.domains.serialization_utils import safe_attr
 from ..models import Content
 from app.domains.relationships import ArticleSource
+
 def resolve_content_object(content, session=None):
     session = session or db.session
     model = get_model_registry().get(content.object_type)
     if not model:
         return None
     return session.get(model, content.object_id)
+
 def resolve(content, session=None):
     return resolve_content_object(content, session=session)
+
 def assign_target_to_contents(contents, include_linked_items=False, session=None, active_filters=None, mode='card'):
     if not contents:
         return contents
@@ -28,6 +31,7 @@ def assign_target_to_contents(contents, include_linked_items=False, session=None
         else:
             result.append(serialize_content(c, target_obj, session, include_linked_items, active_filters=active_filters))
     return result
+
 def create_content(obj, object_type, published_at, session=None, **kwargs):
     session = session or db.session
     stmt = select(Content).where(Content.object_type == object_type, Content.object_id == obj.id)
@@ -46,6 +50,7 @@ def create_content(obj, object_type, published_at, session=None, **kwargs):
     session.add(content)
     session.flush()
     return (content, False)
+
 def get_or_create_content(object_type, external_id, obj_factory, title_fallback=None, url_fallback=None, session=None, **kwargs):
     model = get_model_registry().get(object_type)
     if not model:

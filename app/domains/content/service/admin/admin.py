@@ -6,6 +6,7 @@ from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Section, Source, IntentFacet, GenderFacet, PriceTierFacet
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.relationships import ArticleSource
+
 def load_admin_content_relations(page_items, quality):
     ids_by_type: dict[str, set] = {}
     for c in page_items:
@@ -27,6 +28,7 @@ def load_admin_content_relations(page_items, quality):
             dup_rows = db.session.execute(select(Content.title).where(Content.title.in_(titles)).group_by(Content.title).having(func.count(Content.id) > 1)).scalars().all()
             duplicate_titles = set(dup_rows)
     return (targets_map, duplicate_titles)
+
 def get_admin_content_metadata():
     from app.domains.taxonomy.service.query import get_taxonomy_mappings
     categories = get_taxonomy_mappings(Category)
@@ -39,6 +41,7 @@ def get_admin_content_metadata():
     price_tiers = get_taxonomy_mappings(PriceTierFacet)
     origins_rows = db.session.execute(select(Content.ingestion_origin).filter(Content.ingestion_origin.is_not(None)).distinct()).scalars().all()
     return {'categories': categories, 'sections': sections, 'sources': sources, 'topics': topics, 'brands': brands, 'intents': intents, 'genders': genders, 'price_tiers': price_tiers, 'origins': [{'slug': o, 'name': o} for o in origins_rows]}
+
 def get_admin_content_stats():
     total = db.session.query(func.count(Content.id)).scalar()
     published = db.session.query(func.count(Content.id)).filter(Content.is_published == True).scalar()
@@ -47,6 +50,7 @@ def get_admin_content_stats():
     no_topics = 0
     no_brands = 0
     return {'total': total, 'published': published, 'drafts': drafts, 'failed': failed, 'no_topics': no_topics, 'no_brands': no_brands}
+
 def retry_admin_pipeline(origin):
     query = db.session.query(Article).join(Content, Content.object_id == Article.id).filter(Content.object_type == 'article', Article.status == 'failed')
     if origin:
@@ -55,6 +59,7 @@ def retry_admin_pipeline(origin):
     for a in articles_to_retry:
         a.status = 'pending'
     return len(articles_to_retry)
+
 def get_admin_deduplication_groups():
     dup_titles = db.session.execute(select(Content.title, func.count(Content.id)).group_by(Content.title).having(func.count(Content.id) > 1).order_by(func.count(Content.id).desc()).limit(20)).all()
     groups = []
@@ -64,6 +69,7 @@ def get_admin_deduplication_groups():
         products = db.session.execute(select(Content).where(Content.title == title)).scalars().all()
         groups.append({'title': title, 'count': count, 'content_list': [{'id': i.id, 'type': i.object_type, 'published_at': i.published_at.isoformat() if i.published_at else None, 'source': i.source.name if i.source else 'None'} for i in products]})
     return groups
+
 def get_admin_content_inspect_raw(id):
     content = db.session.scalar(select(Content).options(joinedload(Content.category), joinedload(Content.section), joinedload(Content.source), joinedload(Content.gender), joinedload(Content.intent), joinedload(Content.price_tier), selectinload(Content.content_entities), selectinload(Content.linked_products), selectinload(Content.comments).joinedload(Comment.user)).where(Content.id == id))
     if not content:

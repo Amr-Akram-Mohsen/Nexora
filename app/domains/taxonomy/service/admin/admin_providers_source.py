@@ -6,24 +6,28 @@ from app.domains.content.models import Content, Article
 from app.domains.product.models import Product
 from app.domains.external.models import LastAPIFetch, APIUsage
 from app.domains.relationships import content_attributes, ArticleSource
+
 def _calculate_quality_tier(score):
     if score >= 70:
         return 'High'
     if score >= 40:
         return 'Medium'
     return 'Low'
+
 def _calculate_scrape_health(pct):
     if pct >= 90:
         return 'Healthy'
     if pct >= 50:
         return 'Warning'
     return 'Critical'
+
 def _calculate_freshness_severity(days_stale):
     if days_stale > 30:
         return 'Critical'
     if days_stale > 7:
         return 'Warning'
     return 'Healthy'
+
 def get_admin_sources_page(page, per_page, search):
     stmt = select(Source)
     if search:
@@ -65,6 +69,7 @@ def get_admin_sources_page(page, per_page, search):
         channels = channels_map.get(s.id, [])
         serialized.append({'id': s.id, 'logo_url': s.logo_url, 'name': s.name, 'domain': s.domain, 'tier': tier, 'channels': channels, 'freshness': freshness_days, 'content_count': content_count, 'engagement': engagement, 'status': status_val, 'slug': s.slug})
     return (pagination, serialized)
+
 def get_admin_source_health_stats():
     from datetime import datetime, timezone, timedelta
     now = datetime.now(timezone.utc)
@@ -94,6 +99,7 @@ def get_admin_source_health_stats():
         else:
             healthy += 1
     return {'total': len(sources), 'active': len(sources) - failed, 'healthy': healthy, 'warning': warning, 'failed': failed, 'silent': silent}
+
 def get_admin_sources_quality_data():
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc)

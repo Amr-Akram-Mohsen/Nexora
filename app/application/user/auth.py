@@ -9,17 +9,20 @@ from app.domains.user.service import get_active_user_by_email, get_user_by_email
 from app.application.interaction.newsletter import subscribe_workflow
 from app.application.user.email_service import send_password_reset_email, send_verification_email
 logger = logging.getLogger(__name__)
+
 def authenticate_user(email: str, password: str):
     user = get_active_user_by_email(email)
     if user and user.check_password(password):
         return user
     return None
+
 def check_login_lockout(email: str) -> tuple[bool, int]:
     lockout_key = f'login_lockout:{email}'
     locked = cache.get(lockout_key)
     if locked:
         return (True, 15)
     return (False, 0)
+
 def record_failed_login(email: str) -> int:
     attempts_key = f'login_attempts:{email}'
     lockout_key = f'login_lockout:{email}'
@@ -32,12 +35,15 @@ def record_failed_login(email: str) -> int:
     else:
         cache.set(attempts_key, attempts, timeout=window)
         return attempts
+
 def clear_failed_logins(email: str) -> None:
     cache.delete(f'login_attempts:{email}')
     cache.delete(f'login_lockout:{email}')
+
 def handle_successful_login(user) -> None:
     record_login(user)
     db.session.commit()
+
 def handle_google_oauth_login(user_info: dict):
     email = user_info.get('email')
     user = get_user_by_email(email)
@@ -58,12 +64,14 @@ def handle_google_oauth_login(user_info: dict):
     handle_successful_login(user)
     return user
 OTP_TIMEOUT = 900
+
 def generate_otp(email: str, intent: str) -> str:
     code = f'{random.randint(100000, 999999)}'
     key = f'otp:{intent}:{email}'
     cache.set(key, code, timeout=OTP_TIMEOUT)
     logger.info('[AUTH] Generated %s OTP for %s', intent, email)
     return code
+
 def verify_otp(email: str, intent: str, code: str) -> bool:
     if not code:
         return False
@@ -75,6 +83,7 @@ def verify_otp(email: str, intent: str, code: str) -> bool:
         return True
     logger.warning('[AUTH] Failed to verify %s OTP for %s', intent, email)
     return False
+
 def request_password_reset(email: str) -> bool:
     user = get_user_by_email(email)
     if user and user.provider != 'google':
@@ -86,6 +95,7 @@ def request_password_reset(email: str) -> bool:
             logger.warning('[AUTH] Password reset email FAILED for %s (user_id=%s)', email, user.id)
     db.session.commit()
     return True
+
 def reset_user_password(email: str, new_password: str) -> tuple[bool, str]:
     user = get_user_by_email(email)
     if not user:
@@ -94,6 +104,7 @@ def reset_user_password(email: str, new_password: str) -> tuple[bool, str]:
     db.session.commit()
     logger.info('[AUTH] Password successfully reset for user_id=%s', user.id)
     return (True, 'Password updated successfully!')
+
 def register_user_workflow(name: str, email: str, password: str, wants_newsletter: bool=False):
     logger.info('[AUTH] Registration workflow start for email: %s', email)
     if get_user_by_email(email):
@@ -124,12 +135,15 @@ _VERIFY_SALT = 'nexora-email-verify-v1'
 _RESET_SALT = 'nexora-password-reset-v1'
 VERIFY_MAX_AGE = 86400
 RESET_MAX_AGE = 3600
+
 def _serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(current_app.secret_key)
+
 def generate_verification_token(user_id: int) -> str:
     token = _serializer().dumps(user_id, salt=_VERIFY_SALT)
     logger.info('[AUTH] Generated verification token for user_id=%s', user_id)
     return token
+
 def validate_verification_token(token: str) -> tuple[int | None, str | None]:
     try:
         user_id = _serializer().loads(token, salt=_VERIFY_SALT, max_age=VERIFY_MAX_AGE)
@@ -140,11 +154,13 @@ def validate_verification_token(token: str) -> tuple[int | None, str | None]:
     except BadSignature:
         logger.warning('[AUTH] Invalid/tampered verification token')
         return (None, 'invalid')
+
 def generate_reset_token(user) -> str:
     payload = {'id': user.id, 'pc': user.password_changed_at.timestamp() if user.password_changed_at else 0}
     token = _serializer().dumps(payload, salt=_RESET_SALT)
     logger.debug('[AUTH] Generated reset token for user_id=%s', user.id)
     return token
+
 def validate_reset_token(token: str) -> tuple[dict | None, str | None]:
     try:
         payload = _serializer().loads(token, salt=_RESET_SALT, max_age=RESET_MAX_AGE)
@@ -155,6 +171,7 @@ def validate_reset_token(token: str) -> tuple[dict | None, str | None]:
     except BadSignature:
         logger.warning('[AUTH] Invalid/tampered password reset token')
         return (None, 'invalid')
+
 def verify_user_email(email: str, code: str):
     if not verify_otp(email, 'register', code):
         return (None, 'invalid')
@@ -169,6 +186,7 @@ def verify_user_email(email: str, code: str):
     db.session.commit()
     logger.info('[AUTH] Email verified for user_id=%s (%s)', user.id, user.email)
     return (user, None)
+
 def resend_verification_email_workflow(email: str) -> bool:
     user = get_user_by_email(email)
     if not user or user.is_verified:

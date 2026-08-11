@@ -1,4 +1,5 @@
 from typing import Optional, Dict, Any
+
 def serialize_match_inspect_dto(raw_tuple) -> Optional[Dict[str, Any]]:
     if not raw_tuple:
         return None
@@ -10,6 +11,7 @@ def serialize_match_inspect_dto(raw_tuple) -> Optional[Dict[str, Any]]:
         affiliate_ctr = f'{context_clicks / content.view_count * 100:.1f}%' if content.view_count and content.view_count > 0 else '0.0%'
         linked_items_data.append({'id': product.id, 'name': product.name or f'Product #{product.id}', 'type': product.product_type, 'clicks': f'{widget_clicks} ({widget_ctr} Widget) | {context_clicks} ({affiliate_ctr} Affiliate) | {product.click_count or 0} Total'})
     return {'content_id': content.id, 'title': content.title or '—', 'type': content.object_type, 'views_count': content.view_count or 0, 'widget_impressions': widget_impressions, 'unique_users_reached': unique_users, 'last_active': last_active, 'linked_items': linked_items_data}
+
 def serialize_user_interests_dto(raw_tuple) -> Optional[Dict[str, Any]]:
     if not raw_tuple:
         return None

@@ -1,4 +1,5 @@
 import re
+
 def assess_video_description(description: str | None) -> dict:
     if not description:
         return {'has_description': False, 'char_count': 0, 'word_count': 0, 'signals': [], 'promotional_signal_count': 0, 'confidence_score': 0.0, 'editorial_recommendation': 'display', 'recommendation_reason': 'No description provided.'}
@@ -57,6 +58,7 @@ def assess_video_description(description: str | None) -> dict:
         recommendation = 'hide'
         reason = 'High confidence of promotional or non-editorial content.'
     return {'has_description': True, 'char_count': char_count, 'word_count': word_count, 'signals': signals, 'promotional_signal_count': len(signals), 'confidence_score': round(score, 2), 'editorial_recommendation': recommendation, 'recommendation_reason': reason}
+
 def assess_article_extraction(target) -> dict:
     content_html = getattr(target, 'content_html', None) or ''
     content_text = getattr(target, 'content_text', None) or ''

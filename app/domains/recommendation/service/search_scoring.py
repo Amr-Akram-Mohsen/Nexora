@@ -8,10 +8,13 @@ TEXT_WEIGHT = 4.0
 POPULARITY_WEIGHT = 0.8
 FRESHNESS_WEIGHT = 0.6
 INTENT_WEIGHT = 1.2
+
 def normalize_search_query(query):
     return ' '.join((query or '').strip().lower().split())
+
 def tokenize_query(query):
     return re.findall('[a-z0-9]+', normalize_search_query(query))
+
 def detect_search_intent(query):
     normalized = normalize_search_query(query)
     tokens = set(tokenize_query(normalized))
@@ -24,14 +27,17 @@ def detect_search_intent(query):
         shopping_score += 2
         content_score += 1
     return {'content_score': content_score, 'shopping_score': shopping_score}
+
 def _value(obj, key, default=''):
     if not obj:
         return default
     if isinstance(obj, dict):
         return obj.get(key, default)
     return getattr(obj, key, default)
+
 def _joined_names(values):
     return ' '.join((str(_value(value, 'name', '')) for value in values or []))
+
 def _text_relevance(query, result):
     terms = tokenize_query(query)
     if not terms:
@@ -55,6 +61,7 @@ def _text_relevance(query, result):
         elif term in secondary:
             score += 0.6
     return score * TEXT_WEIGHT
+
 def _freshness_score(result):
     raw_date = result.get('published_at') or result.get('created_at')
     if not raw_date:
@@ -68,16 +75,19 @@ def _freshness_score(result):
         raw_date = raw_date.replace(tzinfo=timezone.utc)
     age_days = max((datetime.now(timezone.utc) - raw_date).days, 0)
     return FRESHNESS_WEIGHT / (1 + age_days / 30)
+
 def _popularity_score(result):
     signals = [result.get('view_count') or 0, result.get('comment_count') or 0, result.get('review_count') or 0, result.get('click_count') or 0]
     target = result.get('target') or {}
     signals.append(_value(target, 'upvotes', 0) or 0)
     return math.log1p(sum(signals)) * POPULARITY_WEIGHT
+
 def _intent_score(result, intent):
     result_type = result.get('search_type')
     if result_type == 'product':
         return intent['shopping_score'] * INTENT_WEIGHT
     return intent['content_score'] * INTENT_WEIGHT
+
 def attach_score(result, query, intent):
     scored = dict(result)
     scored['_search'] = {'score': _text_relevance(query, scored) + _popularity_score(scored) + _freshness_score(scored) + _intent_score(scored, intent), 'type': scored.get('search_type')}

@@ -1,4 +1,5 @@
 from app.core.extensions import db
+
 class Author(db.Model):
     __tablename__ = 'authors'
     id = db.Column(db.Integer, primary_key=True)
@@ -10,6 +11,7 @@ class Author(db.Model):
     is_agency = db.Column(db.Boolean, default=False, nullable=False)
     icon_url = db.Column(db.Text, nullable=True)
     aliases = db.Column(db.JSON, default=list)
+
     @classmethod
     def get_or_create(cls, session, name, uri=None, url=None, type_val=None, is_agency=False):
         from app.shared.utils.slug import generate_slug
@@ -30,6 +32,7 @@ class Author(db.Model):
             for p in potential_matches:
                 p_name = p.name.lower()
                 n_name = name.lower()
+
                 def is_valid_boundary(long_str, short_str):
                     if len(long_str) == len(short_str):
                         return True

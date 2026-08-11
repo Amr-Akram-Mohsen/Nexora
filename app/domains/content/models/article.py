@@ -1,6 +1,7 @@
 from app.core.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
 from app.domains.relationships import ArticleCategory
+
 class Article(db.Model):
     __tablename__ = 'articles'
     id = db.Column(db.Integer, primary_key=True)
@@ -32,9 +33,11 @@ class Article(db.Model):
     category_associations = db.relationship('ArticleCategory', back_populates='article', cascade='all, delete-orphan')
     from sqlalchemy.ext.associationproxy import association_proxy
     categories = association_proxy('category_associations', 'category', creator=lambda c: ArticleCategory(category=c))
+
     @property
     def is_content_scraped(self):
         return self.status in ('ready', 'published', 'complete') or bool(self.content_html)
+
     @property
     def read_time_minutes(self):
         if self.word_count:
@@ -42,12 +45,14 @@ class Article(db.Model):
         text = self.content_text or self.description or ''
         words = len(text.split())
         return max(1, words // 200)
+
     def update_primary_source(self):
         if not self.article_sources:
             self.primary_source_id = None
             return
         best = max(self.article_sources, key=lambda rel: (rel.source.authority_score if rel.source else 0, rel.published_at.timestamp() if rel.published_at else 0))
         self.primary_source_id = best.id
+
     @property
     def preferred_source(self):
         if self.primary_source:
@@ -55,27 +60,34 @@ class Article(db.Model):
         if not self.article_sources:
             return None
         return max(self.article_sources, key=lambda rel: (rel.source.authority_score if rel.source else 0, rel.published_at.timestamp() if rel.published_at else 0))
+
     @property
     def source_name(self):
         rel = self.preferred_source
         return rel.source.name if rel else 'Unknown'
+
     @property
     def source_url(self):
         rel = self.preferred_source
         return rel.url if rel else None
+
     @property
     def url(self):
         return self.source_url
+
     @property
     def alternative_source_relations(self):
         primary = self.preferred_source
         return [rel for rel in self.article_sources if rel != primary]
+
     @property
     def sorted_source_relations(self):
         return sorted(self.article_sources, key=lambda rel: (rel.source.authority_score if rel.source else 0, rel.published_at.timestamp() if rel.published_at else 0), reverse=True)
+
     @property
     def preview_text(self):
         return self.description or (self.content_text[:160] if self.content_text else None)
     __table_args__ = (db.CheckConstraint("status IN ('discovered', 'enriching', 'ready', 'published', 'failed', 'archived')", name='ck_articles_status_valid'),)
+
     def __repr__(self):
         return f"<Article {self.id} '{self.title[:30]}'>"

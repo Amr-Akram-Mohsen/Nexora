@@ -1,8 +1,10 @@
 from sqlalchemy import func, select, case as sa_case
 from app.domains.product.models import Product
 from app.domains.product.service import get_item_card_load_options
+
 def build_item_search_vector(product):
     return func.setweight(func.to_tsvector('english', func.coalesce(product.name, '')), 'A').op('||')(func.setweight(func.to_tsvector('english', func.coalesce(product.description, '')), 'B')).op('||')(func.setweight(func.to_tsvector('english', func.coalesce(product.search_text, '')), 'C'))
+
 def populate_item_search_fields(product):
     brand_name = product.brand.name if product.brand else ''
     category_name = product.category.name if product.category else ''
@@ -20,6 +22,7 @@ def populate_item_search_fields(product):
         spec_text = ' '.join(parts)
     product.search_text = ' '.join(filter(None, [product.name, product.description, brand_name, category_name, attribute_names, spec_text, product.product_type]))
     product.search_vector = build_item_search_vector(product)
+
 def get_search_items(query_str, limit=80):
     query_str = (query_str or '').strip()
     if not query_str:
@@ -34,6 +37,7 @@ def get_search_items(query_str, limit=80):
     if limit:
         stmt = stmt.limit(limit)
     return db.session.execute(stmt).scalars().all()
+
 def filter_items_by_country(query):
     from app.shared.request import get_country
     from app.domains.product.models import Product, ProductVariant, Store
@@ -41,6 +45,7 @@ def filter_items_by_country(query):
     if not country:
         return query
     return query.join(Product.variants).join(ProductVariant.store_links).join(Store).where(Store.country == country.upper())
+
 def _apply_catalog_sort(stmt, sort_type):
     from app.domains.product.models import Product, ProductVariant
     if sort_type == 'price_low':
@@ -54,6 +59,7 @@ def _apply_catalog_sort(stmt, sort_type):
     return stmt.order_by(order, Product.id.desc())
 from app.infrastructure.cache import cache
 from app.core.extensions import db
+
 @cache.memoize(timeout=300)
 def get_filtered_items(active_filters, page=1, per_page=24):
     from app.domains.product.service.utils import build_item_stmt
@@ -97,6 +103,7 @@ def get_filtered_items(active_filters, page=1, per_page=24):
     stmt = _apply_catalog_sort(stmt, sort_type)
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     return {'products': [serialize_item(product) for product in pagination.items], 'page': pagination.page, 'pages': pagination.pages, 'total': pagination.total, 'has_next': pagination.has_next, 'has_prev': pagination.has_prev, 'prev_num': getattr(pagination, 'prev_num', pagination.page - 1 if pagination.has_prev else None), 'next_num': getattr(pagination, 'next_num', pagination.page + 1 if pagination.has_next else None)}
+
 @cache.memoize(timeout=600)
 def _get_home_products_cached(filter_type='recent', buffer_limit=10):
     from app.domains.product.service.utils import build_item_stmt, fetch_items
@@ -107,23 +114,24 @@ def _get_home_products_cached(filter_type='recent', buffer_limit=10):
         stmt = stmt.join(Product.variants).where(ProductVariant.old_price > ProductVariant.price).distinct(Product.id).order_by(Product.id.desc())
         if buffer_limit:
             stmt = stmt.limit(buffer_limit)
-        products = fetch_items(stmt, db.session)
+        products = fetch_items(stmt)
         if not products:
             stmt = build_item_stmt(eager_load='card').order_by(Product.created_at.desc())
             if buffer_limit:
                 stmt = stmt.limit(buffer_limit)
-            products = fetch_items(stmt, db.session)
+            products = fetch_items(stmt)
     elif filter_type == 'random':
         stmt = stmt.order_by(db.func.random())
         if buffer_limit:
             stmt = stmt.limit(buffer_limit)
-        products = fetch_items(stmt, db.session)
+        products = fetch_items(stmt)
     else:
         stmt = stmt.order_by(Product.created_at.desc())
         if buffer_limit:
             stmt = stmt.limit(buffer_limit)
-        products = fetch_items(stmt, db.session)
+        products = fetch_items(stmt)
     return [serialize_item(product) for product in products]
+
 def get_filtered_products_for_home(filter_type='recent', limit=10, exclude_ids=None):
     exclude_ids = exclude_ids or []
     buffer_limit = limit + len(exclude_ids)
@@ -131,6 +139,7 @@ def get_filtered_products_for_home(filter_type='recent', limit=10, exclude_ids=N
     filtered = [p for p in all_products if p['id'] not in exclude_ids]
     return filtered[:limit]
 from app.infrastructure import cache
+
 @cache.memoize(timeout=300)
 def get_popular_items(category_slugs: tuple | None=None, brand_slugs: tuple | None=None, limit: int=6) -> list[dict]:
     from app.domains.product.models import Product
@@ -145,5 +154,5 @@ def get_popular_items(category_slugs: tuple | None=None, brand_slugs: tuple | No
     stmt = stmt.order_by(Product.view_count.desc(), Product.created_at.desc())
     if limit:
         stmt = stmt.limit(limit)
-    products = fetch_items(stmt, db.session)
+    products = fetch_items(stmt)
     return [serialize_item(i) for i in products]

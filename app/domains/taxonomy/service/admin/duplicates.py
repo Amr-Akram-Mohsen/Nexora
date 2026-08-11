@@ -5,6 +5,7 @@ from app.domains.taxonomy.models import Category, Brand, Entity, Section, Attrib
 from app.domains.content.models import Content
 from app.domains.product.models import Product
 DOMAIN_MAP = {'categories': Category, 'brands': Brand, 'topics': Entity, 'sections': Section, 'attributes': AttributeFacet}
+
 def detect_taxonomy_duplicates(domain: str, threshold: int=85):
     if domain not in DOMAIN_MAP:
         raise ValueError('Invalid domain')
@@ -28,6 +29,7 @@ def detect_taxonomy_duplicates(domain: str, threshold: int=85):
                 duplicates.append({'source': {'id': r2.id, 'name': r2.name}, 'target': {'id': r1.id, 'name': r1.name}, 'similarity': similarity})
     duplicates.sort(key=lambda x: x['similarity'], reverse=True)
     return duplicates[:50]
+
 def _merge_m2m(association, source_id, target_id, relation_col_name):
     rel_col = getattr(association.c, relation_col_name)
     content_col = association.c.content_id
@@ -37,6 +39,7 @@ def _merge_m2m(association, source_id, target_id, relation_col_name):
         if not exists:
             db.session.execute(association.insert().values(content_id=cid, **{relation_col_name: target_id}))
     db.session.execute(association.delete().where(rel_col == source_id))
+
 def merge_taxonomy_entities(domain: str, source_id: int, target_id: int):
     if domain not in DOMAIN_MAP:
         raise ValueError('Invalid domain')

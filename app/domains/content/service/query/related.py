@@ -5,6 +5,7 @@ from app.domains.content.models.article import Article
 from app.domains.taxonomy.models import Entity
 from app.domains.relationships import ContentEntity
 from .utils import build_content_stmt, build_ranked_content_stmt, fetch_serialized_contents
+
 def get_related_contents(content_id, limit=6, session=None):
     session = session or db.session
     ref_stmt = build_content_stmt(active_only=False, published_only=False, eager_load='default').where(Content.id == content_id)

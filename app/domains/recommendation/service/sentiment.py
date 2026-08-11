@@ -3,6 +3,7 @@ import logging
 import requests
 from flask import current_app
 logger = logging.getLogger(__name__)
+
 def analyze_sentiment(text: str):
     HF_API_URL = current_app.config.get('HF_API_URL')
     HF_TOKEN = current_app.config.get('HF_TOKEN')

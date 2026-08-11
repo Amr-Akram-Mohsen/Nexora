@@ -5,6 +5,7 @@ from app.domains.product.models import Product
 from app.domains.relationships import content_products
 from app.domains.interaction.models import RecommendationImpression, RecommendationClick
 from datetime import datetime, timedelta, timezone
+
 def get_recommendation_stats():
     total_matches = db.session.execute(select(func.count()).select_from(content_products)).scalar() or 0
     linked_contents = db.session.execute(select(func.count(func.distinct(content_products.c.content_id)))).scalar() or 0
@@ -16,6 +17,7 @@ def get_recommendation_stats():
     impressions_30d = db.session.execute(select(func.count()).select_from(RecommendationImpression).where(RecommendationImpression.created_at >= thirty_days_ago)).scalar() or 0
     clicks_30d = db.session.execute(select(func.count()).select_from(RecommendationClick).where(RecommendationClick.created_at >= thirty_days_ago)).scalar() or 0
     return {'total_matches': total_matches, 'linked_contents': linked_contents, 'linked_items': linked_items, 'total_impressions': total_impressions, 'total_clicks': total_clicks, 'overall_ctr': round(overall_ctr, 2), 'impressions_30d': impressions_30d, 'clicks_30d': clicks_30d}
+
 def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range=None):
     base_stmt = select(Content.id).join(content_products, Content.id == content_products.c.content_id)
     if search:
@@ -68,6 +70,7 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
                     last_active = last_impression.strftime('%Y-%m-%d %H:%M')
             serialized.append({'content_id': g['content_id'], 'content_title': g['content_title'], 'content_views': g['content_views'], 'widget_impressions': widget_impressions, 'widget_clicks': widget_clicks, 'widget_ctr': widget_ctr, 'last_active': last_active, 'linked_items_count': len(g['products']), 'products': [{'id': i.id, 'name': i.name or f'Product #{i.id}', 'type': i.product_type, 'clicks': i.click_count or 0} for i in g['products']]})
     return (total, pages, serialized)
+
 def get_admin_match_inspect_raw(content_id):
     from sqlalchemy.orm import selectinload
     content = db.session.execute(select(Content).options(selectinload(Content.linked_products)).where(Content.id == content_id)).scalar_one_or_none()
@@ -86,6 +89,7 @@ def get_admin_match_inspect_raw(content_id):
         widget_clicks = db.session.scalar(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == context_id_val).where(RecommendationClick.entity_id == str(i.id))) or 0
         linked_items_stats.append((i, context_clicks, widget_clicks))
     return (content, widget_impressions, unique_users, last_impression, linked_items_stats)
+
 def get_admin_context_performance():
     stmt = select(RecommendationImpression.context_id, RecommendationImpression.entity_type, func.count(RecommendationImpression.id).label('impressions'), func.coalesce(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == RecommendationImpression.context_id).scalar_subquery(), 0).label('clicks')).group_by(RecommendationImpression.context_id, RecommendationImpression.entity_type).order_by(func.count(RecommendationImpression.id).desc()).limit(10)
     rows = db.session.execute(stmt).all()
@@ -94,6 +98,7 @@ def get_admin_context_performance():
         ctr = r.clicks / r.impressions * 100 if r.impressions > 0 else 0
         results.append({'context_id': r.context_id, 'entity_type': r.entity_type, 'impressions': '{:,}'.format(r.impressions), 'clicks': '{:,}'.format(r.clicks), 'ctr': f'{ctr:.2f}%'})
     return results
+
 def get_admin_entity_performance():
     stmt = select(RecommendationClick.entity_id, RecommendationClick.entity_type, func.count(RecommendationClick.id).label('clicks')).group_by(RecommendationClick.entity_id, RecommendationClick.entity_type).order_by(func.count(RecommendationClick.id).desc()).limit(10)
     rows = db.session.execute(stmt).all()
@@ -111,6 +116,7 @@ def get_admin_entity_performance():
                     name = product.name
         results.append({'entity_id': r.entity_id, 'entity_name': name, 'entity_type': r.entity_type, 'clicks': '{:,}'.format(r.clicks)})
     return results
+
 def get_admin_recommendation_health():
     now = datetime.now(timezone.utc)
     last_impression = db.session.scalar(select(func.max(RecommendationImpression.created_at)))
@@ -136,6 +142,7 @@ def get_admin_recommendation_health():
     else:
         status = 'critical' if any((s['level'] == 'critical' for s in signals)) else 'warning'
     return {'status': status, 'signals': signals}
+
 def get_admin_recommendation_trend():
     thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
     imp_stmt = select(func.date(RecommendationImpression.created_at).label('day'), func.count(RecommendationImpression.id).label('count')).where(RecommendationImpression.created_at >= thirty_days_ago).group_by('day')
@@ -158,6 +165,7 @@ def get_admin_recommendation_trend():
     impressions = [data[d]['impressions'] for d in labels]
     clicks = [data[d]['clicks'] for d in labels]
     return {'labels': [d[5:] for d in labels], 'impressions': impressions, 'clicks': clicks}
+
 def get_admin_slot_analysis():
     clicks = db.session.execute(select(RecommendationClick).order_by(RecommendationClick.created_at.desc()).limit(1000)).scalars().all()
     impressions = db.session.execute(select(RecommendationImpression).order_by(RecommendationImpression.created_at.desc()).limit(3000)).scalars().all()
@@ -192,6 +200,7 @@ def get_admin_slot_analysis():
     labels = [f'Slot {i + 1}' for i in range(limit_slots)]
     data = [slot_counts.get(i, 0) for i in range(limit_slots)]
     return {'labels': labels, 'data': data}
+
 def get_admin_user_interests_raw(user_id):
     from app.domains.user.models import User
     from app.domains.recommendation.models import UserInterest, UserEntityInterest
@@ -201,6 +210,7 @@ def get_admin_user_interests_raw(user_id):
         return None
     scores = db.session.execute(select(UserEntityInterest.entity_id, UserEntityInterest.category_id, func.sum(UserEntityInterest.score).label('total_score')).join(UserInterest, UserEntityInterest.user_interest_id == UserInterest.id).where(UserInterest.user_id == user_id).group_by(UserEntityInterest.entity_id, UserEntityInterest.category_id).order_by(func.sum(UserEntityInterest.score).desc()).limit(5)).all()
     return (user, scores)
+
 def delete_admin_match(content_id, product_id):
     db.session.execute(content_products.delete().where(content_products.c.content_id == content_id, content_products.c.product_id == product_id))
     db.session.commit()

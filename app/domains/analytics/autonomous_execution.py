@@ -18,8 +18,10 @@ def save_execution_tasks(tasks):
 # ---------------------------------------------------------
 # Execution Adapters System
 # ---------------------------------------------------------
+
 class BasePlatformAdapter:
     """Interface / base class for platform execution adapters."""
+
     def execute(self, task):
         raise NotImplementedError("Platform execution not implemented.")
 
@@ -53,6 +55,7 @@ class BlogAdapter(BasePlatformAdapter):
 
 class DynamicPlatformAdapter(BasePlatformAdapter):
     """Fallback adapter for easily adding new platforms (e.g. TikTok, X)."""
+
     def __init__(self, platform_name):
         self.platform_name = platform_name.lower()
         
@@ -78,6 +81,7 @@ def get_adapter(platform_name):
 # ---------------------------------------------------------
 # Adapter Functions wrapper for backwards compatibility
 # ---------------------------------------------------------
+
 def execute_youtube_publish(task):
     return get_adapter("youtube").execute(task)
 
@@ -100,6 +104,7 @@ def execute_blog_publish(task):
 # ---------------------------------------------------------
 # Planning & Analytics Helpers
 # ---------------------------------------------------------
+
 def calculate_execution_confidence(opp_score, strat_acc, asset_match, hist_perf):
     """Centralized execution confidence calculation logic."""
     confidence = 0.4 * opp_score + 0.3 * strat_acc + 0.2 * asset_match + 0.1 * hist_perf
@@ -153,6 +158,7 @@ def determine_execution_mode(confidence, risk_factors):
 # ---------------------------------------------------------
 # Core Service Functions
 # ---------------------------------------------------------
+
 def generate_execution_plan(content_publishing_plan, content_asset_mapping, strategy_data):
     """
     Evaluates each scheduled task in the content publishing plan, calculates

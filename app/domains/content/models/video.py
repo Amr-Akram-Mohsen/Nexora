@@ -1,6 +1,7 @@
 from app.core.extensions import db
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime, timezone
+
 class Video(db.Model):
     __tablename__ = 'videos'
     id = db.Column(db.Integer, primary_key=True)
@@ -21,11 +22,14 @@ class Video(db.Model):
     video_comments = db.relationship('VideoComment', backref='video', cascade='all, delete-orphan', order_by='desc(VideoComment.like_count)')
     platform_metadata = db.Column(JSONB, nullable=True)
     __table_args__ = (db.UniqueConstraint('external_id', 'platform', name='uq_videos_external_platform'), db.Index('ix_videos_platform_published', 'platform', 'published_at'), db.Index('ix_videos_platform_creator', 'platform', 'creator'))
+
     @property
     def preview_text(self):
         return self.description
+
     def __repr__(self):
         return f'<Video {self.platform}:{self.external_id}>'
+
 class VideoComment(db.Model):
     __tablename__ = 'video_comments'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,5 +42,6 @@ class VideoComment(db.Model):
     reply_count = db.Column(db.Integer, nullable=False, default=0)
     published_at = db.Column(db.DateTime, index=True)
     updated_at = db.Column(db.DateTime)
+
     def __repr__(self):
         return f'<VideoComment {self.external_id}>'

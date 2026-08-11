@@ -4,9 +4,11 @@ from app.core.extensions import db
 from app.domains.content.models import Content, Article
 CONTENT_EAGER_LOADS = [selectinload(Content.content_entities), selectinload(Content.section), selectinload(Content.category), selectinload(Content.locations)]
 CONTENT_LIST_EAGER_LOADS = [selectinload(Content.content_entities), joinedload(Content.section), joinedload(Content.category), selectinload(Content.locations)]
+
 def get_content_detail_loads():
     from app.domains.product.models import Product, ProductVariant, ProductStoreLink
     return [*CONTENT_LIST_EAGER_LOADS, selectinload(Content.linked_products).joinedload(Product.brand), selectinload(Content.linked_products).joinedload(Product.category), selectinload(Content.linked_products).selectinload(Product.images), selectinload(Content.linked_products).selectinload(Product.variants).selectinload(ProductVariant.store_links).selectinload(ProductStoreLink.store)]
+
 def get_content_eager_loads(mode='default'):
     if mode is None or mode == 'none':
         return []
@@ -19,6 +21,7 @@ def get_content_eager_loads(mode='default'):
     if mode == 'default':
         return CONTENT_EAGER_LOADS
     return CONTENT_EAGER_LOADS
+
 def build_content_stmt(active_only=True, published_only=True, eager_load='default', extra_filters=None):
     stmt = select(Content)
     if active_only:
@@ -31,11 +34,13 @@ def build_content_stmt(active_only=True, published_only=True, eager_load='defaul
     if loads:
         stmt = stmt.options(*loads)
     return stmt
+
 def build_ranked_content_stmt(stmt, rank_expr, label_name='score'):
     stmt = stmt.add_columns(rank_expr.label(label_name))
     stmt = stmt.group_by(Content.id)
     stmt = stmt.order_by(rank_expr.desc(), Content.published_at.desc())
     return stmt
+
 def apply_column_filters(stmt, filter_by_columns, filter_values):
     from app.shared.utils.collections import my_zip
     from app.domains.taxonomy.models import Section
@@ -54,20 +59,25 @@ def apply_column_filters(stmt, filter_by_columns, filter_values):
     if filters:
         stmt = stmt.where(*filters)
     return stmt
+
 def fetch_contents(stmt, session=None):
     session = session or db.session
     return list(session.execute(stmt).scalars().all())
+
 def fetch_serialized_contents(stmt, session=None, include_linked_items=False):
     session = session or db.session
     contents = fetch_contents(stmt, session)
     from ..content_access import assign_target_to_contents
     return assign_target_to_contents(contents, include_linked_items=include_linked_items, session=session)
+
 def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
     from app.domains.taxonomy.models import Category, Brand, Entity, IntentFacet, PriceTierFacet, AttributeFacet, Section, Source, GenderFacet
     from app.domains.relationships import ContentEntity
     session = session or db.session
+
     def _is_allowed(key):
         return allowed_filters is None or key in allowed_filters
+
     def _normalize(val):
         if not val:
             return []
@@ -171,9 +181,11 @@ def apply_content_filters(stmt, filters, allowed_filters=None, session=None):
     if origin and _is_allowed('ingestion_origin'):
         stmt = stmt.where(Content.ingestion_origin == origin)
     return stmt
+
 def count_contents(session=None):
     session = session or db.session
     return session.execute(select(func.count(Content.id))).scalar() or 0
+
 def get_contents(search=None, source=None, rows_count=10, session=None):
     session = session or db.session
     stmt = build_content_stmt(active_only=False, published_only=False, eager_load='none')
@@ -183,6 +195,7 @@ def get_contents(search=None, source=None, rows_count=10, session=None):
     if rows_count:
         stmt = stmt.limit(rows_count)
     return fetch_contents(stmt, session)
+
 def get_content_by_id(content_id, session=None):
     from ..content_access import assign_target_to_contents
     session = session or db.session
@@ -193,6 +206,7 @@ def get_content_by_id(content_id, session=None):
         return None
     serialized = assign_target_to_contents(contents, include_linked_items=True, session=session, mode='detail')
     return serialized[0] if serialized else None
+
 def get_latest_contents(limit=100, session=None):
     session = session or db.session
     stmt = build_content_stmt(active_only=False, published_only=False, eager_load='none')
@@ -200,6 +214,7 @@ def get_latest_contents(limit=100, session=None):
     if limit:
         stmt = stmt.limit(limit)
     return fetch_contents(stmt, session)
+
 def get_unmatched_articles_query(cutoff, since=None, session=None):
     session = session or db.session
     article_q = session.query(Article).join(Content, (Content.object_type == 'article') & (Content.object_id == Article.id)).filter(or_(Article.last_matched_at.is_(None), Article.last_matched_at < cutoff))

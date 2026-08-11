@@ -4,13 +4,16 @@ from app.application.user.email_service import send_confirmation_email
 from app.core.extensions import db
 from app.domains.user.service import confirm_newsletter_subscriber, create_newsletter_subscriber, get_newsletter_subscriber_by_email, link_newsletter_subscriber_to_user, unsubscribe_newsletter_subscriber
 logger = logging.getLogger(__name__)
+
 def _normalize_email(email):
     return (email or '').strip().lower()
+
 def _send_confirmation(subscriber):
     sent = send_confirmation_email(subscriber.email, subscriber.confirmation_token, subscriber.unsubscribe_token)
     if not sent:
         logger.warning('Newsletter confirmation email was not sent', extra={'subscriber_id': subscriber.id, 'email': subscriber.email})
     return sent
+
 def subscribe_workflow(email, user_id=None):
     from app.shared.validators import validate_email
     email = _normalize_email(email)
@@ -57,8 +60,10 @@ def subscribe_workflow(email, user_id=None):
             db.session.commit()
     _send_confirmation(subscriber)
     return (True, 'Check your email to confirm your subscription.')
+
 def confirm_subscription_workflow(token):
     return confirm_newsletter_subscriber(token)
+
 def unsubscribe_workflow(user=None, token=None):
     if token:
         return unsubscribe_newsletter_subscriber(token=token)

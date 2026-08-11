@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from app.core.extensions import db
+
 class UserInterest(db.Model):
     __tablename__ = 'user_interests'
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +12,7 @@ class UserInterest(db.Model):
     user = db.relationship('User', back_populates='user_interests')
     entity_scores = db.relationship('UserEntityInterest', back_populates='user_interest', cascade='all, delete-orphan')
     __table_args__ = (db.UniqueConstraint('user_id', 'target_type', 'target_id', name='uq_user_target'), db.Index('ix_user_interest_user_target', 'user_id', 'target_type', 'target_id'), db.CheckConstraint("target_type IN ('product', 'article')", name='ck_target_type'))
+
 class UserEntityInterest(db.Model):
     __tablename__ = 'user_entity_interests'
     id = db.Column(db.Integer, primary_key=True)

@@ -1,4 +1,5 @@
 from app.domains.analytics import get_intent_opportunity_data, get_brand_opportunity_data, get_recommendation_performance_data, get_content_coverage_matrix, get_decision_intelligence_data
+
 def get_insights_workflow(time_frame: str):
     intent_opportunities = get_intent_opportunity_data()
     brand_opportunities = get_brand_opportunity_data()

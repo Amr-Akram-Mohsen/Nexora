@@ -3,6 +3,7 @@ from app.core.extensions import db
 from app.shared.sanitizer import sanitize_json
 from app.domains.relationships import content_products
 from sqlalchemy.dialects.postgresql import TSVECTOR
+
 class Store(db.Model):
     __tablename__ = 'stores'
     id = db.Column(db.Integer, primary_key=True)
@@ -20,6 +21,7 @@ class Store(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     product_links = db.relationship('ProductStoreLink', back_populates='store', cascade='all, delete-orphan')
 _VARIANT_ATTR_PRIORITY = {'color': 1, 'storage': 2, 'ram': 3, 'size': 4, 'volume': 5}
+
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,35 +57,44 @@ class Product(db.Model):
     reactions = db.relationship('Reaction', primaryjoin="and_(foreign(Reaction.target_id)==Product.id, Reaction.target_type=='product')", back_populates='product', viewonly=True, lazy='noload')
     comments = db.relationship('Comment', primaryjoin="and_(foreign(Comment.target_id)==Product.id, Comment.target_type=='product')", back_populates='product', viewonly=True, lazy='noload')
     views = db.relationship('View', primaryjoin="and_(foreign(View.target_id)==Product.id, View.target_type=='product')", back_populates='product', viewonly=True, lazy='noload')
+
     def set_default_variant(self):
         if not self.variants:
             return
         if not any((v.is_default for v in self.variants)):
             self.variants[0].is_default = True
+
     @property
     def title(self):
         return self.name
+
     @cached_property
     def image_url(self):
         return self.images[0].image_url if self.images else None
+
     @cached_property
     def default_variant(self):
         return next((v for v in self.variants if v.is_default), self.variants[0] if self.variants else None)
+
     @cached_property
     def price(self):
         return self.default_variant.price if self.default_variant else None
+
     @cached_property
     def min_price(self):
         prices = [v.price for v in self.variants if v.price is not None]
         return min(prices) if prices else None
+
     @property
     def has_variants(self):
         return len(self.variants) > 1
+
     @cached_property
     def store_links(self):
         if not self.default_variant:
             return []
         return [link for link in self.default_variant.store_links if link.is_active]
+
     @staticmethod
     def pick_keys(d, keys):
         if not isinstance(d, dict):
@@ -95,12 +106,15 @@ class Product(db.Model):
             if norm_key in norm_d and norm_d[norm_key] is not None:
                 result[key] = norm_d[norm_key]
         return result or None
+
     @staticmethod
     def get_specifications(result):
         return {k: v for k, v in result.items() if v}
+
     @property
     def full_details(self):
         return {spec.category: sanitize_json(spec.spec_json) for spec in self.specifications if isinstance(spec.spec_json, dict)}
+
     @cached_property
     def structured_details(self):
         data = self.full_details
@@ -112,6 +126,7 @@ class Product(db.Model):
         elif self.product_type == 'accessories':
             return {'materials': data.get('material_build', {}), 'dimensions': data.get('dimensions', {}), 'movement': data.get('movement', {}), 'quick_details': data.get('movement', {}), 'groups': data}
         return {'quick_details': data, 'groups': data}
+
     def get_product_schema(self, request_url):
         schema = {'@context': 'https://schema.org/', '@type': 'Product', 'name': self.name, 'description': self.description, 'brand': {'@type': 'Brand', 'name': self.brand.name if self.brand else 'Unknown'}, 'category': self.category.name if self.category else 'Unknown', 'url': request_url, 'sku': self.default_variant.sku if self.default_variant else None}
         if self.images:
@@ -122,9 +137,11 @@ class Product(db.Model):
                 offers.append({'@type': 'Offer', 'price': float(link.price), 'priceCurrency': link.currency, 'availability': f'https://schema.org/{link.availability or 'InStock'}', 'url': link.affiliate_url})
             schema['offers'] = offers
         return schema
+
     @cached_property
     def quick_details(self):
         return self._quick_details(self.structured_details.get('quick_details', {}))
+
     def _quick_details(self, details=None, parent=''):
         if not isinstance(details, dict):
             return []
@@ -137,6 +154,7 @@ class Product(db.Model):
             else:
                 rows.append({'group': parent, 'label': label, 'value': value})
         return rows
+
     @cached_property
     def variant_groups(self):
         groups: dict[str, set] = {}
@@ -146,8 +164,10 @@ class Product(db.Model):
                     groups.setdefault(key, set()).add(value)
         return dict(sorted({k: sorted(v) for k, v in groups.items()}.items(), key=lambda x: _VARIANT_ATTR_PRIORITY.get(x[0], 999)))
     __table_args__ = (db.Index('ix_products_slug', 'slug'), db.Index('ix_products_brand_category', 'brand_id', 'category_id'), db.Index('ix_products_type_created', 'product_type', 'created_at'), db.Index('ix_products_category_created', 'category_id', 'created_at'), db.Index('ix_products_search_vector', 'search_vector', postgresql_using='gin'), db.Index('ix_products_ingestion_status', 'ingestion_status'), db.Index('ix_products_scrape_staleness', 'scrape_status', 'last_scraped_at'))
+
     def __repr__(self):
         return f'<Product {self.name}>'
+
 class ProductVariant(db.Model):
     __tablename__ = 'product_variants'
     id = db.Column(db.Integer, primary_key=True)
@@ -163,10 +183,12 @@ class ProductVariant(db.Model):
     product = db.relationship('Product', back_populates='variants')
     images = db.relationship('ProductImage', back_populates='variant', cascade='all, delete-orphan')
     store_links = db.relationship('ProductStoreLink', back_populates='variant', cascade='all, delete-orphan', lazy='selectin')
+
     def normalize_attributes(self):
         if not self.attributes:
             return
         self.attributes = {str(k).lower().strip(): str(v).strip() for k, v in self.attributes.items()}
+
     def display_name(self):
         if self.title:
             return self.title
@@ -174,6 +196,7 @@ class ProductVariant(db.Model):
             return ' / '.join((f'{k.capitalize()}: {v}' for k, v in self.attributes.items()))
         return 'Default'
     __table_args__ = (db.Index('ix_product_variant_product', 'product_id'), db.Index('ix_product_variant_default', 'product_id', 'is_default'))
+
 class ProductStoreLink(db.Model):
     __tablename__ = 'product_store_links'
     id = db.Column(db.Integer, primary_key=True)
@@ -199,6 +222,7 @@ class ProductStoreLink(db.Model):
     variant = db.relationship('ProductVariant', back_populates='store_links')
     store = db.relationship('Store', back_populates='product_links')
     __table_args__ = (db.UniqueConstraint('variant_id', 'store_id', name='uq_product_variant_store'), db.Index('ix_product_store_price', 'price'), db.Index('ix_product_store_variant', 'variant_id'), db.Index('ix_product_store_store', 'store_id'), db.Index('ix_product_store_program', 'program_name'), db.Index('ix_product_store_external', 'external_product_id'))
+
 class ProductImage(db.Model):
     __tablename__ = 'product_images'
     id = db.Column(db.Integer, primary_key=True)
@@ -208,8 +232,10 @@ class ProductImage(db.Model):
     position = db.Column(db.Integer, default=0, nullable=False)
     product = db.relationship('Product', back_populates='images')
     variant = db.relationship('ProductVariant', back_populates='images')
+
     def __repr__(self):
         return f'<ProductImage {self.image_url}>'
+
 class ProductSpecification(db.Model):
     __tablename__ = 'product_specifications'
     id = db.Column(db.Integer, primary_key=True)
@@ -218,5 +244,6 @@ class ProductSpecification(db.Model):
     spec_json = db.Column(db.JSON)
     product = db.relationship('Product', back_populates='specifications')
     __table_args__ = (db.Index('ix_product_specs_product', 'product_id'),)
+
     def __repr__(self):
         return f'<ProductSpecification {self.category}>'

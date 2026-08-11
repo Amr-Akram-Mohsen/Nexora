@@ -156,6 +156,7 @@ def map_content_strategy_to_assets(content_strategy_data):
         blog_ideas = product.get("blog", [])
         
         # Pre-tokenize idea titles and check flags
+
         def prep_idea(idea_title):
             title_lower = idea_title.lower()
             return (
@@ -304,6 +305,7 @@ def map_content_strategy_to_assets(content_strategy_data):
             priority_justification = f"Low priority opportunity score ({score:.2f}). Create assets as secondary focus after addressing high priority gaps."
             
         # Helper to dynamically diagnose gap reasons
+
         def diagnose_gap_reason(platform, max_sim, has_other_match):
             if max_sim > 0.0 and max_sim < 0.40:
                 return "Low relevance match: database assets exist with similar keywords, but they lack the specific intent (comparison/review/guide) required by the content strategy."

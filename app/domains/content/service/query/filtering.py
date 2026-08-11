@@ -5,6 +5,7 @@ from app.domains.taxonomy.models import Category, Entity, Brand
 from app.domains.relationships import ContentEntity, content_products
 from .utils import build_content_stmt, apply_column_filters, apply_content_filters, fetch_serialized_contents, CONTENT_LIST_EAGER_LOADS
 from app.domains.content.service.content_access import assign_target_to_contents
+
 def get_contents_render(filter_by_columns: tuple=('section',), filter_values: tuple=(None,), rows_count=None, exclude_ids=None, session=None):
     session = session or db.session
     article_filter = and_(Content.object_type == 'article', exists(select(1).where(and_(Article.id == Content.object_id, Article.summary.is_not(None)))))
@@ -17,6 +18,7 @@ def get_contents_render(filter_by_columns: tuple=('section',), filter_values: tu
     if rows_count is not None:
         stmt = stmt.limit(rows_count)
     return fetch_serialized_contents(stmt, session)
+
 def _get_paginated_contents(filters=None, allowed_filters=None, section_id=None, active_only=True, published_only=True, sort_by=None, sort_dir=None, page=1, per_page=20, session=None, for_admin=False, exclude_ids=None):
     session = session or db.session
     if filters is None:
@@ -69,12 +71,15 @@ def _get_paginated_contents(filters=None, allowed_filters=None, section_id=None,
         return (pagination, quality)
     products = assign_target_to_contents(pagination.items, session, active_filters=filters)
     return {'products': products, 'page': pagination.page, 'pages': pagination.pages, 'total': pagination.total, 'per_page': pagination.per_page, 'has_next': pagination.has_next, 'has_prev': pagination.has_prev, 'prev_num': getattr(pagination, 'prev_num', pagination.page - 1 if pagination.has_prev else None), 'next_num': getattr(pagination, 'next_num', pagination.page + 1 if pagination.has_next else None)}
+
 def get_filtered_contents(section_id=None, active_filters=None, allowed_filters=None, page=1, per_page=24, session=None, exclude_ids=None):
     return _get_paginated_contents(filters=active_filters, allowed_filters=allowed_filters, section_id=section_id, active_only=True, published_only=True, page=page, per_page=per_page, session=session, for_admin=False, exclude_ids=exclude_ids)
+
 def get_all_contents_metadata(session=None):
     session = session or db.session
     stmt = select(Content.id, Content.ingested_at, Content.published_at)
     return session.execute(stmt).all()
+
 def get_candidate_contents_for_item(product, session=None):
     session = session or db.session
     conditions = []
@@ -93,6 +98,7 @@ def get_candidate_contents_for_item(product, session=None):
     stmt = stmt.options(*CONTENT_LIST_EAGER_LOADS)
     stmt = stmt.where(or_(*conditions)).order_by(Content.published_at.desc()).limit(1000)
     return session.execute(stmt).scalars().all()
+
 def get_contents_for_matching_batch(offset, batch_size, cutoff=None, cutoff_naive=None, session=None):
     session = session or db.session
     stmt = select(Content).where(Content.is_active == True)
@@ -100,23 +106,28 @@ def get_contents_for_matching_batch(offset, batch_size, cutoff=None, cutoff_naiv
         stmt = stmt.where(or_(Content.ingested_at >= cutoff, Content.ingested_at >= cutoff_naive))
     stmt = stmt.offset(offset).limit(batch_size)
     return session.execute(stmt).scalars().all()
+
 def get_existing_content_product_links_by_contents(content_ids, session=None):
     session = session or db.session
     stmt = select(content_products.c.content_id, content_products.c.product_id).where(content_products.c.content_id.in_(content_ids))
     return session.execute(stmt).all()
+
 def get_contents_by_ids(content_ids, session=None):
     session = session or db.session
     if not content_ids:
         return []
     stmt = select(Content).options(*CONTENT_LIST_EAGER_LOADS).where(Content.id.in_(content_ids))
     return session.execute(stmt).scalars().all()
+
 def get_unscraped_articles(limit, retry_threshold, session=None):
     session = session or db.session
     stmt = select(Article).join(Content, (Content.object_type == 'article') & (Content.object_id == Article.id) & Content.is_active).where((Article.status == 'discovered') | (Article.status == 'failed') & (Article.last_enrichment_attempt.is_(None) | (Article.last_enrichment_attempt < retry_threshold))).order_by(func.coalesce(Article.enrichment_priority, Article.quality_score).desc(), Content.published_at.desc()).limit(limit)
     return session.execute(stmt).scalars().all()
+
 def get_content_by_object(object_type, object_id, session=None):
     session = session or db.session
     stmt = select(Content).where(Content.object_type == object_type, Content.object_id == object_id)
     return session.execute(stmt).scalars().first()
+
 def get_content_paginated(filters, sort_by=None, sort_dir=None, page=1, per_page=20, session=None):
     return _get_paginated_contents(filters=filters, active_only=False, published_only=False, sort_by=sort_by, sort_dir=sort_dir, page=page, per_page=per_page, session=session, for_admin=True)

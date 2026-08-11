@@ -1,4 +1,5 @@
 from app.core.extensions import db
+
 class Event(db.Model):
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +12,7 @@ class Event(db.Model):
     importance = db.Column(db.Float, nullable=True)
     article_count = db.Column(db.Integer, default=0)
     last_updated = db.Column(db.DateTime, nullable=True)
+
     @staticmethod
     def get_or_create(external_uri, session, title=None, importance=None, image_url=None, event_type=None, summary=None, event_date=None, article_count=0, last_updated=None):
         if not external_uri:
@@ -36,6 +38,7 @@ class Event(db.Model):
             if last_updated:
                 event.last_updated = last_updated
         return event
+
     @staticmethod
     def get_by_uri(external_uri, session):
         if not external_uri:

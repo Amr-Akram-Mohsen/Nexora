@@ -7,6 +7,7 @@ from app.shared.constants.core import TargetType
 from app.domains.recommendation.service.products import get_contents_for_item as get_contents_for_item_cached
 from app.application.recommendation.contextual import get_contextual_recommendations
 from app.core.extensions import db
+
 def get_catalog_data(active_filters, page=1):
     canonical_filters = filters_from_normalized(normalize_filters(active_filters))
     pagination = get_filtered_items(canonical_filters, page=page)
@@ -14,6 +15,7 @@ def get_catalog_data(active_filters, page=1):
     has_results = len(pagination.get('products', [])) > 0
     recommendation_blocks = get_contextual_recommendations(active_filters, has_results, target_type='commercial')
     return {'products': pagination.get('products', []), 'pagination': pagination, 'filter_options': filter_options, 'recommendations': recommendation_blocks}
+
 @cache.memoize(timeout=1800)
 def get_item_page_data(product_id):
     raw_item = get_item_by_id(product_id, serialize=False, load='detail')
@@ -34,12 +36,15 @@ def get_item_page_data(product_id):
         elif c.get('object_type') == 'article':
             related_articles.append(c)
     return {'product': product, 'variant_data': product.get('variant_data', []), 'related_items': [serialize_item(i) for i in related], 'related_contents': related_contents, 'related_articles': related_articles, 'related_videos': related_videos, 'buying_guides': buying_guides}
+
 def record_item_view(product_id, user, ip_address):
     record_view(target_id=product_id, target_type=TargetType.PRODUCT, user=user, ip_address=ip_address)
     db.session.commit()
+
 def get_item_spec_groups_workflow(product_id):
     from app.domains.product.service import get_item_spec_groups
     return get_item_spec_groups(product_id)
+
 def get_comparison_data(product_ids):
     if not product_ids:
         return None

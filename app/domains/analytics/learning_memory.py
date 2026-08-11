@@ -71,6 +71,7 @@ def load_memory_layer():
     Returns a list of memory records for backward compatibility.
     Converts list-only structures (v1) to versioned structures (v2) on read.
     """
+
     def get_seed_data():
         return {
             "version": 2,

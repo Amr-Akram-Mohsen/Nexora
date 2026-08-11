@@ -11,6 +11,7 @@ from app.domains.relationships import ContentEntity, ArticleSource, ArticleCateg
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.serialization_utils import safe_attr
 from .content_access import resolve
+
 def sync_content_fields(content, obj, object_type: str) -> None:
     content.title = safe_attr(obj, 'title', '')
     content.preview_text = safe_attr(obj, 'preview_text', None)
@@ -18,6 +19,7 @@ def sync_content_fields(content, obj, object_type: str) -> None:
     match object_type:
         case 'article':
             content.is_published = safe_attr(obj, 'status') == 'published'
+
 def link_article_sources(article, data, session=None) -> bool:
     session = session or db.session
     source_name = data.get('source_name')
@@ -65,6 +67,7 @@ def link_article_sources(article, data, session=None) -> bool:
     session.flush()
     article.update_primary_source()
     return True
+
 def _apply_facets_and_attributes(content, data, updated_relationships, session):
     facets_data = data.get('facets', {})
     if facets_data.get('attributes'):
@@ -92,6 +95,7 @@ def _apply_facets_and_attributes(content, data, updated_relationships, session):
         if p and content.price_tier_id != p.id:
             content.price_tier_id = p.id
             updated_relationships['facets']['price_tier'] = p.slug
+
 def _apply_events_and_categories(content, data, obj, updated_relationships, session):
     if content.object_type != 'article':
         return
@@ -127,6 +131,7 @@ def _apply_events_and_categories(content, data, obj, updated_relationships, sess
                     new_link = ArticleCategory(article=obj, category=cat, weight=wgt)
                     session.add(new_link)
                     updated_relationships.setdefault('categories', []).append(cat.slug)
+
 def _apply_entities_and_locations(content, data, updated_relationships, session):
     if content.object_type == 'article' and data.get('er_location'):
         loc_data = data['er_location']
@@ -167,6 +172,7 @@ def _apply_entities_and_locations(content, data, updated_relationships, session)
                 if loc and loc not in content.locations:
                     content.locations.append(loc)
                     updated_relationships.setdefault('locations', []).append(loc.slug)
+
 def _apply_sources(content, data, obj, updated_relationships, session):
     if content.object_type == 'article':
         if obj:
@@ -192,6 +198,7 @@ def _apply_sources(content, data, obj, updated_relationships, session):
             session.flush()
         content.source_id = source.id
         updated_relationships['sources'] = [slug]
+
 def apply_relationships(content, data, session=None) -> dict:
     session = session or db.session
     updated_relationships = defaultdict(list)
@@ -202,6 +209,7 @@ def apply_relationships(content, data, session=None) -> dict:
     _apply_entities_and_locations(content, data, updated_relationships, session)
     _apply_sources(content, data, obj, updated_relationships, session)
     return updated_relationships
+
 def delete_content_and_relations(content: Content, session=None) -> None:
     session = session or db.session
     cid = content.id
@@ -211,6 +219,7 @@ def delete_content_and_relations(content: Content, session=None) -> None:
         case 'article':
             session.execute(Article.__table__.delete().where(Article.id == content.object_id))
     session.delete(content)
+
 def execute_bulk_content_actions(action, contents, category_id=None, session=None):
     session = session or db.session
     match action:
@@ -239,6 +248,7 @@ def execute_bulk_content_actions(action, contents, category_id=None, session=Non
                 delete_content_and_relations(c, session)
         case _:
             raise ValueError('Unsupported bulk action')
+
 def recalculate_content_score(content, target_obj, session=None):
     session = session or db.session
     quality_score = safe_attr(target_obj, 'quality_score', 0.0)

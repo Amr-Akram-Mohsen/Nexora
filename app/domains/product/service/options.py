@@ -1,9 +1,11 @@
 from functools import lru_cache
 from app.core.extensions import db
+
 @lru_cache(maxsize=1)
 def _item_models():
     from app.domains.product.models import Product, ProductVariant, ProductStoreLink
     return (Product, ProductVariant, ProductStoreLink)
+
 def get_item_load_options(profile='detail'):
     if profile is None or profile == 'none':
         return []
@@ -15,5 +17,6 @@ def get_item_load_options(profile='detail'):
     detail = [*card, db.selectinload(Product.specifications), db.selectinload(Product.variants).selectinload(ProductVariant.images)]
     profiles = {'minimal': minimal, 'card': card, 'detail': detail}
     return list(profiles.get(profile, detail))
+
 def get_item_card_load_options():
     return get_item_load_options('card')

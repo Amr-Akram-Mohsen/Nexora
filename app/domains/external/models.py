@@ -3,6 +3,7 @@ from app.core.extensions import db
 from datetime import datetime
 
 # ==================== LAST API FETCH ====================
+
 class LastAPIFetch(db.Model):
     """
     Tracks the last time we fetched a specific section+query combination
@@ -44,6 +45,7 @@ class LastAPIFetch(db.Model):
 
 
 # ==================== API USAGE ====================
+
 class APIUsage(db.Model):
     """
     Tracks how many requests we've made to each external API per day.

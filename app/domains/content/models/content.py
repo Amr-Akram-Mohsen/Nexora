@@ -3,6 +3,7 @@ from app.core.extensions import db
 from app.domains.relationships import content_products, content_attributes
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import TSVECTOR
+
 class Content(db.Model):
     __tablename__ = 'contents'
     id = db.Column(db.Integer, primary_key=True)
@@ -46,15 +47,18 @@ class Content(db.Model):
     comments = db.relationship('Comment', primaryjoin="and_(foreign(Comment.target_id)==Content.id, Comment.target_type=='content')", back_populates='content_target', viewonly=True, lazy='selectin')
     views = db.relationship('View', primaryjoin="and_(foreign(View.target_id)==Content.id, View.target_type=='content')", back_populates='content', viewonly=True, lazy='selectin')
     __table_args__ = (db.Index('ix_contents_published_at', 'published_at'), db.Index('ix_contents_active', 'is_active'), db.Index('ix_contents_view_count', 'view_count'), db.Index('ix_contents_score', 'score'), db.Index('ix_contents_review_score', 'review_score'), db.Index('ix_contents_review_count', 'review_count'), db.Index('ix_contents_section_id', 'section_id'), db.Index('ix_contents_category_id', 'category_id'), db.Index('ix_contents_category_published_at', 'category_id', 'published_at'), db.Index('ix_contents_gender_id', 'gender_id'), db.Index('ix_contents_intent_id', 'intent_id'), db.Index('ix_contents_price_tier_id', 'price_tier_id'), db.Index('ix_contents_source_id', 'source_id'), db.Index('ix_contents_category_intent_published_at', 'category_id', 'intent_id', 'published_at'), db.Index('ix_contents_section_published_at', 'section_id', 'published_at'), db.Index('ix_contents_active_published_at', 'is_active', 'published_at'), db.UniqueConstraint('object_type', 'object_id', name='uq_contents_object_type_id'), db.CheckConstraint("object_type IN ('article', 'video', 'post')", name='ck_contents_object_type_valid'), db.Index('ix_contents_search_vector', 'search_vector', postgresql_using='gin'), db.Index('ix_contents_title', 'title'))
+
     def link_product(self, product_obj) -> bool:
         if product_obj not in self.linked_products:
             self.linked_products.append(product_obj)
             return True
         return False
+
     def add_attribute(self, attr_obj) -> bool:
         if attr_obj not in self.attributes:
             self.attributes.append(attr_obj)
             return True
         return False
+
     def __repr__(self):
         return f'<Content {self.object_type}:{self.object_id}>'

@@ -3,6 +3,7 @@ from app.core.extensions import db
 from app.domains.product.models import Store, Product, ProductVariant, ProductStoreLink
 from app.domains.interaction.models import View, ProductClick
 from datetime import datetime, timezone, timedelta
+
 def _build_sync_cadence(recent_syncs, now):
     sync_cadence_map = {}
     for d in range(30):
@@ -14,6 +15,7 @@ def _build_sync_cadence(recent_syncs, now):
             if day_str in sync_cadence_map:
                 sync_cadence_map[day_str] += 1
     return [{'date': k, 'count': v} for k, v in sorted(sync_cadence_map.items())]
+
 def _calculate_store_sync_ages(store_syncs, now):
     store_age_map = {}
     for name, dt in store_syncs:
@@ -29,6 +31,7 @@ def _calculate_store_sync_ages(store_syncs, now):
         avg_sync_age_by_store.append({'name': name, 'avg_age_days': round(avg_age, 1)})
     avg_sync_age_by_store.sort(key=lambda x: x['avg_age_days'], reverse=True)
     return avg_sync_age_by_store
+
 def _build_price_staleness_grid(staleness_query, stale_date):
     staleness_map = {}
     for store_name, synced_at in staleness_query:
@@ -46,6 +49,7 @@ def _build_price_staleness_grid(staleness_query, stale_date):
     staleness_list = [{'name': k, 'fresh': v['fresh'], 'stale': v['stale'], 'total': v['fresh'] + v['stale']} for k, v in staleness_map.items()]
     staleness_list.sort(key=lambda x: x['total'], reverse=True)
     return staleness_list[:10]
+
 def get_admin_stores_page(page, per_page, search, network, country, sync_staleness):
     stmt = select(Store)
     if search:
@@ -113,6 +117,7 @@ def get_admin_stores_page(page, per_page, search, network, country, sync_stalene
             status_val = 'healthy'
         serialized.append({'id': st.id, 'name': st.name, 'website': st.website, 'affiliate_network': st.affiliate_network, 'product_count': product_count, 'clicks': clicks, 'ctr': ctr, 'active_links': oos_data['active_links'], 'sync_age': sync_age_days, 'oos_rate': oos_rate, 'avg_commission': float(avg_comm) if avg_comm is not None else None, 'status': status_val, 'slug': st.slug})
     return (pagination, serialized)
+
 def get_admin_store_health_stats():
     now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -141,12 +146,14 @@ def get_admin_store_health_stats():
     avg_sync_age_by_store = _calculate_store_sync_ages(store_syncs, now)
     top_stale_stores = avg_sync_age_by_store[:10]
     return {'total_links': total_links, 'active_links': active_links, 'synced_today': synced_today, 'synced_this_week': synced_this_week, 'never_synced': never_synced, 'out_of_stock': out_of_stock, 'oos_by_store': oos_by_store, 'checked_in_24h': checked_in_24h, 'deeplink_refreshed_30d': deeplink_refreshed_30d, 'never_checked': never_checked, 'never_had_deeplink': never_had_deeplink, 'availability_breakdown': availability_breakdown, 'sync_cadence': sync_cadence, 'avg_sync_age_by_store': avg_sync_age_by_store, 'top_stale_stores': top_stale_stores}
+
 def get_admin_store_coverage_stats():
     coverage_rows = db.session.execute(select(Store.name, func.count(func.distinct(Product.category_id))).join(ProductStoreLink, ProductStoreLink.store_id == Store.id).join(ProductVariant, ProductVariant.id == ProductStoreLink.variant_id).join(Product, Product.id == ProductVariant.product_id).group_by(Store.name).order_by(func.count(func.distinct(Product.category_id)).desc())).all()
     category_coverage = [{'name': r[0], 'count': r[1]} for r in coverage_rows]
     commission_rows = db.session.execute(select(Store.name, func.avg(ProductStoreLink.commission_rate)).join(ProductStoreLink, ProductStoreLink.store_id == Store.id).where(ProductStoreLink.commission_rate != None).group_by(Store.name).order_by(func.avg(ProductStoreLink.commission_rate).desc())).all()
     commission_rates = [{'name': r[0], 'avg_rate': round(float(r[1]), 2)} for r in commission_rows]
     return (category_coverage, commission_rates)
+
 def get_admin_store_affiliate_stats():
     now = datetime.now(timezone.utc)
     links_with_commission = db.session.scalar(select(func.count(ProductStoreLink.id)).where(ProductStoreLink.commission_rate != None)) or 0
@@ -169,6 +176,7 @@ def get_admin_store_affiliate_stats():
     never = db.session.scalar(select(func.count(ProductStoreLink.id)).where(ProductStoreLink.deeplink_generated_at == None)) or 0
     deeplink_freshness = {'Fresh (<7d)': fresh, 'Aging (7-30d)': aging, 'Stale (>30d)': stale, 'Never': never}
     return {'links_with_commission': links_with_commission, 'links_without_commission': links_without_commission, 'avg_commission_rate': avg_commission_rate, 'top_program': top_program, 'program_distribution': program_distribution, 'commission_rate_ranking': commission_rate_ranking, 'tracking_coverage': tracking_coverage, 'deeplink_freshness': deeplink_freshness}
+
 def get_admin_store_pricing_stats():
     now = datetime.now(timezone.utc)
     stale_date = now - timedelta(days=7)

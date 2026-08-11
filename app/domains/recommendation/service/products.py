@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from app.core.extensions import db
 from app.domains.product.models import Product
 from app.infrastructure import cache
+
 @cache.memoize(timeout=3600)
 def get_items_for_content(content_id: int, limit: int=8, exclude_ids: tuple | list=None, session=None) -> list[dict]:
     from app.domains.content.models import Content
@@ -38,13 +39,14 @@ def get_items_for_content(content_id: int, limit: int=8, exclude_ids: tuple | li
     else:
         return []
     stmt = stmt.limit(max(limit * 4, 40))
-    candidates = fetch_items(stmt, session)
+    candidates = fetch_items(stmt)
     if not candidates:
         return []
     weights = ItemScoreWeights()
     scored = [(product, score_item_relevance(product, reference, weights, directly_linked_ids)) for product in candidates]
     scored.sort(key=lambda x: x[1], reverse=True)
     return [serialize_item(product) for product, _ in scored[:limit]]
+
 @cache.memoize(timeout=600)
 def get_trending_items(limit: int=8, days: int=7, exclude_ids: tuple | list=None, session=None) -> list[dict]:
     from app.domains.product.service.utils import build_item_stmt, fetch_items
@@ -55,8 +57,9 @@ def get_trending_items(limit: int=8, days: int=7, exclude_ids: tuple | list=None
         stmt = stmt.where(Product.id.notin_(list(exclude_ids)))
     if limit:
         stmt = stmt.limit(limit)
-    products = fetch_items(stmt, session)
+    products = fetch_items(stmt)
     return [serialize_item(product) for product in products]
+
 @cache.memoize(timeout=600)
 def get_popular_items_by_brand(brand_id: int, limit: int=6, session=None) -> list[dict]:
     from app.domains.product.service.utils import build_item_stmt, fetch_items
@@ -65,8 +68,9 @@ def get_popular_items_by_brand(brand_id: int, limit: int=6, session=None) -> lis
     stmt = build_item_stmt(eager_load='card').where(Product.brand_id == brand_id).order_by(Product.view_count.desc(), Product.created_at.desc())
     if limit:
         stmt = stmt.limit(limit)
-    products = fetch_items(stmt, session)
+    products = fetch_items(stmt)
     return [serialize_item(product) for product in products]
+
 @cache.memoize(timeout=3600)
 def get_contents_for_item(product_id: int, limit: int=6, session=None) -> list[dict]:
     from sqlalchemy import or_

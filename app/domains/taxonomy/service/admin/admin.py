@@ -14,11 +14,13 @@ from app.domains.taxonomy.service.admin.serializers import serialize_source_insp
 from app.domains.taxonomy.serializers import serialize_taxonomy
 from app.domains.taxonomy.models import Source
 from app.domains.taxonomy.service.admin.metrics import get_category_metrics, get_brand_metrics, get_topic_metrics, get_section_metrics, get_attribute_metrics, get_facet_metrics
+
 def get_admin_categories(search=''):
     stmt = select(Category).order_by(Category.name.asc())
     if search:
         stmt = stmt.where(Category.name.ilike(f'%{search}%'))
     return db.session.execute(stmt).scalars().all()
+
 def create_admin_category(name, is_active=True):
     slug = generate_slug(name)
     if db.session.execute(select(Category).where(Category.slug == slug)).scalar_one_or_none():
@@ -26,6 +28,7 @@ def create_admin_category(name, is_active=True):
     cat = Category(name=name, slug=slug, is_active=is_active)
     db.session.add(cat)
     return cat
+
 def update_admin_category(cat_id, data):
     cat = db.session.get(Category, cat_id)
     if not cat:
@@ -38,16 +41,19 @@ def update_admin_category(cat_id, data):
     if 'sort_order' in data:
         cat.sort_order = int(data['sort_order'])
     return cat
+
 def delete_admin_category(cat_id):
     cat = db.session.get(Category, cat_id)
     if cat:
         db.session.delete(cat)
     return cat
+
 def get_admin_brands(search=''):
     stmt = select(Brand).order_by(Brand.name.asc())
     if search:
         stmt = stmt.where(Brand.name.ilike(f'%{search}%'))
     return db.session.execute(stmt).scalars().all()
+
 def create_admin_brand(name, industry=None, is_active=True):
     slug = generate_slug(name)
     if db.session.execute(select(Brand).where(Brand.slug == slug)).scalar_one_or_none():
@@ -55,6 +61,7 @@ def create_admin_brand(name, industry=None, is_active=True):
     brand = Brand(name=name, slug=slug, industry=industry, is_active=is_active)
     db.session.add(brand)
     return brand
+
 def update_admin_brand(brand_id, data):
     brand = db.session.get(Brand, brand_id)
     if not brand:
@@ -69,16 +76,19 @@ def update_admin_brand(brand_id, data):
     if 'sort_order' in data:
         brand.sort_order = int(data['sort_order'])
     return brand
+
 def delete_admin_brand(brand_id):
     brand = db.session.get(Brand, brand_id)
     if brand:
         db.session.delete(brand)
     return brand
+
 def get_admin_topics(search=''):
     stmt = select(Entity).where(Entity.entity_type.in_(['topic', 'tag', 'concept'])).order_by(Entity.name.asc())
     if search:
         stmt = stmt.where(Entity.name.ilike(f'%{search}%'))
     return db.session.execute(stmt).scalars().all()
+
 def create_admin_topic(name, is_active=True):
     slug = generate_slug(name)
     if db.session.execute(select(Entity).where(Entity.slug == slug)).scalar_one_or_none():
@@ -86,6 +96,7 @@ def create_admin_topic(name, is_active=True):
     topic = Entity(name=name, slug=slug, entity_type='topic')
     db.session.add(topic)
     return topic
+
 def update_admin_topic(topic_id, data):
     topic = db.session.get(Entity, topic_id)
     if not topic:
@@ -94,16 +105,19 @@ def update_admin_topic(topic_id, data):
         topic.name = data['name'].strip()
         topic.slug = generate_slug(topic.name)
     return topic
+
 def delete_admin_topic(topic_id):
     topic = db.session.get(Entity, topic_id)
     if topic:
         db.session.delete(topic)
     return topic
+
 def get_admin_sections(search=''):
     stmt = select(Section).order_by(Section.name.asc())
     if search:
         stmt = stmt.where(Section.name.ilike(f'%{search}%'))
     return db.session.execute(stmt).scalars().all()
+
 def update_admin_section(section_id, data):
     section = db.session.get(Section, section_id)
     if not section:
@@ -115,11 +129,13 @@ def update_admin_section(section_id, data):
     if 'sort_order' in data:
         section.sort_order = int(data['sort_order'])
     return section
+
 def get_admin_attributes(search=''):
     stmt = select(AttributeFacet).order_by(AttributeFacet.name.asc())
     if search:
         stmt = stmt.where(AttributeFacet.name.ilike(f'%{search}%'))
     return db.session.execute(stmt).scalars().all()
+
 def create_admin_attribute(name, category_id=None):
     slug = generate_slug(name)
     if db.session.execute(select(AttributeFacet).where(AttributeFacet.slug == slug)).scalar_one_or_none():
@@ -130,6 +146,7 @@ def create_admin_attribute(name, category_id=None):
     attr = AttributeFacet(name=name, slug=slug, category_id=category_id)
     db.session.add(attr)
     return attr
+
 def update_admin_attribute(attr_id, data):
     attr = db.session.get(AttributeFacet, attr_id)
     if not attr:
@@ -146,11 +163,13 @@ def update_admin_attribute(attr_id, data):
         else:
             attr.category_id = None
     return attr
+
 def delete_admin_attribute(attr_id):
     attr = db.session.get(AttributeFacet, attr_id)
     if attr:
         db.session.delete(attr)
     return attr
+
 def get_admin_taxonomy_analytics():
     total_content = db.session.scalar(select(func.count(Content.id))) or 0
     missing_category = db.session.scalar(select(func.count(Content.id)).where(Content.category_id == None)) or 0
@@ -167,10 +186,13 @@ def get_admin_taxonomy_analytics():
             orphan_query = orphan_query.where(cond2)
         orphans += db.session.scalar(orphan_query) or 0
     return {'content_coverage': {'total_content': total_content, 'missing_category': missing_category, 'missing_section': missing_section, 'missing_brand': missing_brand, 'category_coverage_pct': round((total_content - missing_category) / total_content * 100 if total_content else 0, 1), 'section_coverage_pct': round((total_content - missing_section) / total_content * 100 if total_content else 0, 1), 'brand_coverage_pct': round(content_with_brands / total_content * 100 if total_content else 0, 1)}, 'health': {'total_entities': total_entities, 'orphan_entities': orphans, 'orphan_pct': round(orphans / total_entities * 100 if total_entities else 0, 1)}}
+
 def get_admin_entity_or_404(model, entity_id):
     return db.session.get(model, entity_id)
+
 def get_admin_taxonomy_related_metadata(entity, entity_type):
     data = {}
+
     def _format_breakdown_and_engagement(type_breakdown, engagement):
         type_strs = [f'{count} {type_.capitalize()}{('s' if count != 1 else '')}' for type_, count in type_breakdown]
         data['content types'] = ', '.join(type_strs) if type_strs else '—'
@@ -234,6 +256,7 @@ def get_admin_taxonomy_related_metadata(entity, entity_type):
         _format_breakdown_and_engagement(type_breakdown, engagement)
     data['_top_contents'] = top_contents
     return data
+
 def get_admin_source_metadata(source):
     article_count = db.session.scalar(select(func.count()).select_from(Content).where(Content.source_id == source.id)) or 0
     analytics = db.session.query(func.avg(Article.quality_score), func.avg(Article.word_count), func.count(Article.id).filter(Article.is_content_scraped == True), func.min(Content.published_at), func.max(Content.published_at)).select_from(Content).join(Article, Content.object_id == Article.id).filter(Content.source_id == source.id, Content.object_type == 'article').first()
@@ -244,6 +267,7 @@ def get_admin_source_metadata(source):
     date_min = analytics[3].strftime('%Y-%m-%d') if analytics and analytics[3] else '—'
     date_max = analytics[4].strftime('%Y-%m-%d') if analytics and analytics[4] else '—'
     return {'id': f'#{source.id}', 'name': source.name, 'slug': source.slug, 'domain': source.domain, 'authority score': str(source.authority_score), 'status': source.is_active, 'avg quality score': str(avg_quality), 'avg word count': str(avg_words), 'scrape coverage': f'{scrape_cov}%', 'published date range': f'{date_min} to {date_max}', 'article count': str(article_count)}
+
 def get_admin_source_inspect_raw(id):
     source = db.session.get(Source, id)
     if not source:
@@ -260,12 +284,14 @@ def get_admin_source_inspect_raw(id):
     secondary_count = db.session.scalar(select(func.count(ArticleSource.id)).where(ArticleSource.source_id == id)) or 0
     top_articles = db.session.execute(select(Content.id, Content.title, Content.view_count).where(Content.source_id == id).where(Content.object_type == 'article').order_by(Content.view_count.desc()).limit(5)).all()
     return (source, content_count, analytics, type_counts, channel_counts, category_counts, status_counts, eng_stats, fetch_health, primary_count, secondary_count, top_articles)
+
 def get_source_inspect_data(id):
     raw_tuple = get_admin_source_inspect_raw(id)
     if not raw_tuple:
         return None
     dto = serialize_source_inspect_dto(raw_tuple)
     return {'source_dto': dto}
+
 def _build_taxonomy_rows(pagination, metrics_dict, count_mapping_func, has_items=False):
     serialized = []
     for entity in pagination.items:
@@ -280,27 +306,32 @@ def _build_taxonomy_rows(pagination, metrics_dict, count_mapping_func, has_items
             health_status = 'inactive-linked'
         serialized.append(serialize_taxonomy(entity, counts=counts, health=health_status))
     return (serialized, pagination)
+
 def get_category_rows_data(page, per_page, search, status, health):
     pagination = paginate_taxonomy_entity(Category, page, per_page, search, status, health)
     product_ids = [c.id for c in pagination.items]
     metrics = get_category_metrics(product_ids)
     return _build_taxonomy_rows(pagination, metrics, lambda m: {'content count': m.get('content_count', 0), 'product count': m.get('item_count', 0)}, has_items=True)
+
 def get_brand_rows_data(page, per_page, search, status, health):
     pagination = paginate_taxonomy_entity(Brand, page, per_page, search, status, health)
     product_ids = [b.id for b in pagination.items]
     metrics = get_brand_metrics(product_ids)
     return _build_taxonomy_rows(pagination, metrics, lambda m: {'content count': m.get('content_count', 0), 'product count': m.get('item_count', 0)}, has_items=True)
+
 def get_topic_rows_data(page, per_page, search, status, health):
     extra_filter = Entity.entity_type.in_(['topic', 'tag', 'concept'])
     pagination = paginate_taxonomy_entity(Entity, page, per_page, search, status, health, extra_filter=extra_filter)
     product_ids = [t.id for t in pagination.items]
     metrics = get_topic_metrics(product_ids)
     return _build_taxonomy_rows(pagination, metrics, lambda m: {'content count': m.get('content_count', 0), 'category spread': m.get('category_spread', 0)}, has_items=False)
+
 def get_section_rows_data(page, per_page, search, status, health):
     pagination = paginate_taxonomy_entity(Section, page, per_page, search, status, health)
     product_ids = [s.id for s in pagination.items]
     metrics = get_section_metrics(product_ids)
     return _build_taxonomy_rows(pagination, metrics, lambda m: {'content count': m.get('content_count', 0), 'category count': m.get('category_spread', 0)}, has_items=False)
+
 def get_attribute_rows_data(page, per_page, search, health):
     pagination = paginate_taxonomy_entity(AttributeFacet, page, per_page, search, health=health)
     product_ids = [a.id for a in pagination.items]
@@ -315,6 +346,7 @@ def get_attribute_rows_data(page, per_page, search, health):
         data = {'id': a.id, 'name': a.name, 'category': a.category.name if a.category else 'Global', 'content count': str(c_count), 'health': health_status}
         serialized.append(data)
     return (serialized, pagination)
+
 def get_facet_rows_data(model, field_id_name, page, per_page, search, health):
     pagination = paginate_taxonomy_entity(model, page, per_page, search, health=health, field_name=field_id_name)
     product_ids = [a.id for a in pagination.items]

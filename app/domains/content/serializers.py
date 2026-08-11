@@ -2,6 +2,7 @@ from typing import Optional, Dict, Any
 from app.domains.serializers import serialize_model, serialize_target
 from slugify import slugify
 from app.domains.serialization_utils import compact_dict, safe_isoformat, safe_attr
+
 def _serialize_content_base(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     if not content_obj:
         return None
@@ -40,11 +41,13 @@ def _serialize_content_base(content_obj, target_obj=None, session=None, include_
     data['authors'] = authors
     data['event'] = event
     return (compact_dict(data), top_content_entities)
+
 def serialize_content_card(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     if not content_obj:
         return None
     data, _ = _serialize_content_base(content_obj, target_obj, session, include_linked_items, active_filters)
     return data
+
 def serialize_content_detail(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     if not content_obj:
         return None
@@ -68,5 +71,6 @@ def serialize_content_detail(content_obj, target_obj=None, session=None, include
     if video_comments:
         data['video_comments'] = video_comments
     return compact_dict(data)
+
 def serialize_content(content_obj, target_obj=None, session=None, include_linked_items=False, active_filters=None):
     return serialize_content_detail(content_obj, target_obj, session, include_linked_items, active_filters)

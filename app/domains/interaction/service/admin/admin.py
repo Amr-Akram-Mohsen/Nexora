@@ -8,12 +8,15 @@ from app.domains.interaction.service.admin.serializers import _serialize_comment
 import math
 from datetime import date, datetime
 from app.shared.utils.orm_helpers import resolve_polymorphic_titles, resolve_users
+
 def _load_interaction_context(products):
     users = resolve_users(products)
     titles_map = resolve_polymorphic_titles(products)
     return (users, titles_map)
+
 def _load_target_titles(products, type_attr='target_type', id_attr='target_id'):
     return resolve_polymorphic_titles(products, type_attr, id_attr)
+
 def get_admin_comments_page(page, per_page, sentiment, target_type, search, user_search, start_date, end_date):
     stmt = select(Comment).order_by(Comment.id.desc())
     if user_search:
@@ -40,6 +43,7 @@ def get_admin_comments_page(page, per_page, sentiment, target_type, search, user
     users, titles_map = _load_interaction_context(pagination.items)
     serialized = [_serialize_comment(c, users, titles_map) for c in pagination.items]
     return (pagination, serialized)
+
 def delete_admin_comment(id):
     comment = db.session.get(Comment, id)
     if not comment:
@@ -47,6 +51,7 @@ def delete_admin_comment(id):
     db.session.delete(comment)
     db.session.commit()
     return True
+
 def flag_admin_comment_as_spam(id):
     comment = db.session.get(Comment, id)
     if not comment:
@@ -54,6 +59,7 @@ def flag_admin_comment_as_spam(id):
     comment.sentiment = 'spam'
     db.session.commit()
     return True
+
 def get_admin_reactions_page(page, per_page, reaction_type, target, user_search):
     stmt = select(Reaction).order_by(Reaction.id.desc())
     if reaction_type:
@@ -69,6 +75,7 @@ def get_admin_reactions_page(page, per_page, reaction_type, target, user_search)
     users, titles_map = _load_interaction_context(pagination.items)
     serialized = [_serialize_reaction(r, users, titles_map) for r in pagination.items]
     return (pagination, serialized)
+
 def get_admin_views_page(page, per_page, target, start_date, end_date):
     stmt = select(View.target_type, View.target_id, func.count(View.id).label('view_count'), func.sum(case((View.user_id.isnot(None), 1), else_=0)).label('auth_views'), func.sum(case((View.user_id.is_(None), 1), else_=0)).label('anon_views'), func.max(View.created_at).label('latest_view')).select_from(View)
     stmt = stmt.outerjoin(Content, (View.target_id == Content.id) & (View.target_type == 'content'))
@@ -97,6 +104,7 @@ def get_admin_views_page(page, per_page, target, start_date, end_date):
         result_items.append(row_dict)
     pages = math.ceil(total / per_page) if per_page > 0 else 1
     return {'products': result_items, 'page': page, 'pages': pages, 'total': total, 'per_page': per_page}
+
 def get_admin_clicks_page(page, per_page, target, destination):
     stmt = select(ProductStoreLink.id.label('link_id'), ProductStoreLink.affiliate_url, Store.name.label('store_name'), Product.id.label('product_id'), Product.name.label('item_name'), func.count(ProductClick.id).label('click_count'), func.max(ProductClick.created_at).label('latest_click')).select_from(ProductClick).join(ProductStoreLink, ProductClick.product_store_link_id == ProductStoreLink.id).join(Store, ProductStoreLink.store_id == Store.id).join(ProductVariant, ProductStoreLink.variant_id == ProductVariant.id).join(Product, ProductVariant.product_id == Product.id)
     if target:
@@ -112,6 +120,7 @@ def get_admin_clicks_page(page, per_page, target, destination):
     products = db.session.execute(paginated_stmt).all()
     pages = math.ceil(total / per_page) if per_page > 0 else 1
     return {'products': products, 'page': page, 'pages': pages, 'total': total, 'per_page': per_page}
+
 def get_admin_saves_page(page, per_page, target, user_search):
     stmt = select(Save).order_by(Save.id.desc())
     stmt = stmt.outerjoin(Content, (Save.target_id == Content.id) & (Save.target_type == 'content'))
@@ -125,6 +134,7 @@ def get_admin_saves_page(page, per_page, target, user_search):
     users, titles_map = _load_interaction_context(pagination.items)
     serialized = [_serialize_save(s, users, titles_map) for s in pagination.items]
     return (pagination, serialized)
+
 def get_admin_shares_page(page, per_page, target, user_search):
     stmt = select(Share).order_by(Share.id.desc())
     stmt = stmt.outerjoin(Content, (Share.target_id == Content.id) & (Share.target_type == 'content'))

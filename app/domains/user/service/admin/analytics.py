@@ -4,6 +4,7 @@ from app.core.extensions import db
 from app.domains.user.models import User, NewsletterSubscriber
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 ENGAGEMENT_WEIGHTS = {'views': 1, 'clicks': 2, 'saves': 3, 'reactions': 2, 'comments': 4, 'shares': 3}
+
 def get_user_dashboard_stats():
     role_dist = db.session.execute(select(User.is_admin, func.count(User.id)).group_by(User.is_admin)).all()
     roles = {'Admins': sum((c for is_admin, c in role_dist if is_admin)), 'Users': sum((c for is_admin, c in role_dist if not is_admin))}
@@ -23,6 +24,7 @@ def get_user_dashboard_stats():
     from app.domains.user.service.tiers import TIER_THRESHOLDS
     tiers = {f'{TIER_THRESHOLDS[0][1]} ({TIER_THRESHOLDS[0][0]}+)': sum((1 for s in scores if s >= TIER_THRESHOLDS[0][0])), f'{TIER_THRESHOLDS[1][1]} ({TIER_THRESHOLDS[1][0]}+)': sum((1 for s in scores if TIER_THRESHOLDS[1][0] <= s < TIER_THRESHOLDS[0][0])), f'{TIER_THRESHOLDS[2][1]} ({TIER_THRESHOLDS[2][0]}+)': sum((1 for s in scores if TIER_THRESHOLDS[2][0] <= s < TIER_THRESHOLDS[1][0])), f'{TIER_THRESHOLDS[3][1]} (1-{TIER_THRESHOLDS[2][0] - 1})': sum((1 for s in scores if 0 < s < TIER_THRESHOLDS[2][0])), 'Inactive (0)': sum((1 for s in scores if s == 0))}
     return {'roles': roles, 'providers': providers, 'growth': growth, 'engagement_tiers': tiers}
+
 def build_user_query(search, role, status, verified, subscription, provider, sort_by=None, sort_dir=None):
     views_sub = select(View.user_id, func.count(View.id).label('cnt')).where(View.user_id.isnot(None)).group_by(View.user_id).subquery()
     clicks_sub = select(ProductClick.user_id, func.count(ProductClick.id).label('cnt')).where(ProductClick.user_id.isnot(None)).group_by(ProductClick.user_id).subquery()
@@ -69,6 +71,7 @@ def build_user_query(search, role, status, verified, subscription, provider, sor
         stmt = stmt.where(sub_filter)
         count_stmt = count_stmt.where(sub_filter)
     return (stmt, count_stmt)
+
 def get_user_analytics_metrics(id: int):
     stmt_metrics = select(select(func.count(View.id)).where(View.user_id == id).scalar_subquery(), select(func.count(ProductClick.id)).where(ProductClick.user_id == id).scalar_subquery(), select(func.count(Save.id)).where(Save.user_id == id).scalar_subquery(), select(func.count(Reaction.id)).where(Reaction.user_id == id).scalar_subquery(), select(func.count(Comment.id)).where(Comment.user_id == id).scalar_subquery(), select(func.count(Share.id)).where(Share.user_id == id).scalar_subquery())
     views_count, clicks_count, saves_count, reactions_count, comments_count, shares_count = db.session.execute(stmt_metrics).first()
@@ -102,6 +105,7 @@ def get_user_analytics_metrics(id: int):
                 break
     recent_activity_summary = '—'
     activities = []
+
     def get_title(obj):
         target = getattr(obj, 'target', None)
         return getattr(target, 'title', getattr(target, 'name', 'Unknown Product'))

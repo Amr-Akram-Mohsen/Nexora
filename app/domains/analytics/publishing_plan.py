@@ -209,6 +209,7 @@ def generate_content_publishing_plan(mapped_content_data):
             weekly_plan[2]["tasks"].extend(tasks)
             
     # Sort tasks in each column to render chronologically by day
+
     def get_task_day(task):
         try:
             return int(task["entity"].split(" ")[1])

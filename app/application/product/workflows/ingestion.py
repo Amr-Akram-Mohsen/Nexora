@@ -5,6 +5,7 @@ from app.domains.product.models import Product, ProductVariant, ProductImage, Pr
 from app.domains.taxonomy.models import Brand, Category
 logger = logging.getLogger(__name__)
 DEFAULT_ITEM_TYPE = 'technology'
+
 def get_or_create_brand(name: str) -> Brand:
     slug = slugify(name)
     brand = Brand.query.filter_by(slug=slug).first()
@@ -13,6 +14,7 @@ def get_or_create_brand(name: str) -> Brand:
         db.session.add(brand)
         db.session.flush()
     return brand
+
 def get_or_create_category(slug: str) -> Category:
     cat = Category.query.filter_by(slug=slug).first()
     if not cat:
@@ -21,6 +23,7 @@ def get_or_create_category(slug: str) -> Category:
         db.session.add(cat)
         db.session.flush()
     return cat
+
 def get_amazon_store(country: str) -> Store:
     slug = f'amazon-{country.lower()}'
     store = Store.query.filter_by(slug=slug).first()
@@ -29,6 +32,7 @@ def get_amazon_store(country: str) -> Store:
         db.session.add(store)
         db.session.flush()
     return store
+
 def store_amazon_item(data: dict) -> Product | None:
     brand_name = data.get('brand_name') or 'Unknown'
     brand = get_or_create_brand(brand_name)
@@ -87,6 +91,7 @@ def store_amazon_item(data: dict) -> Product | None:
         db.session.rollback()
         logger.exception(f'Error storing Amazon product {data['asin']}')
         return None
+
 def run_ingestion_for_url(url: str, source_type: str='aliexpress', *, session=None, dry_run: bool=False) -> Product | None:
     logger.info('[IngestionWorkflow] Triggering ingestion for %s (source=%s)', url, source_type)
     return None

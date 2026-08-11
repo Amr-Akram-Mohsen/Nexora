@@ -76,6 +76,7 @@ def get_content_page_data(content_id):
     
     if tasks:
         app = current_app._get_current_object()
+
         def _fetch(k, f):
             with app.app_context(): return k, get_carousel_contents_cached(f, exclude_ids_key=tuple([content["id"]]))
         with ThreadPoolExecutor(max_workers=4) as executor:
@@ -98,6 +99,7 @@ def record_content_view(content_id, user, ip_address):
 
 def get_feed_data(section_slug, active_filters, page=1):
     if section_slug == "all":
+
         class MockSection: id, name, slug, allowed_filters = None, "All Content", "all", ["category", "entity", "intent", "price_tier", "type", "attributes", "source", "event", "author", "location"]
         section = MockSection()
     elif not (section := get_section_by_slug(section_slug)): return None

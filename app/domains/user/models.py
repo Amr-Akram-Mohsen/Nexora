@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from datetime import datetime, timezone
 import secrets
 from app.core.extensions import db
+
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -27,13 +28,17 @@ class User(db.Model, UserMixin):
     shares = db.relationship('Share', back_populates='user', cascade='all, delete-orphan')
     user_interests = db.relationship('UserInterest', back_populates='user', cascade='all, delete-orphan')
     product_clicks = db.relationship('ProductClick', back_populates='user')
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     __table_args__ = (db.CheckConstraint('(google_id IS NULL AND provider IS NULL) OR (google_id IS NOT NULL AND provider IS NOT NULL)', name='ck_google_user'),)
+
     def __repr__(self):
         return f'<User {self.email}>'
+
 class NewsletterSubscriber(db.Model):
     __tablename__ = 'newsletter_subscribers'
     id = db.Column(db.Integer, primary_key=True)
@@ -45,14 +50,18 @@ class NewsletterSubscriber(db.Model):
     confirmation_token = db.Column(db.String(255), nullable=True)
     unsubscribe_token = db.Column(db.String(255), nullable=True)
     user = db.relationship('User', back_populates='newsletter_subscription')
+
     def generate_tokens(self):
         self.confirmation_token = secrets.token_urlsafe(32)
         self.unsubscribe_token = secrets.token_urlsafe(32)
+
     @property
     def is_active(self):
         return self.is_confirmed and self.unsubscribed_at is None
+
     def __repr__(self):
         return f'<NewsletterSubscriber {self.email}>'
+
 class ContactMessage(db.Model):
     __tablename__ = 'contact_messages'
     id = db.Column(db.Integer, primary_key=True)

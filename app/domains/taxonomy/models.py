@@ -1,6 +1,7 @@
 from app.core.extensions import db
 from app.shared.utils.slug import generate_slug, normalize_name
 from app.domains.relationships import content_attributes
+
 class Source(db.Model):
     __tablename__ = 'sources'
     id = db.Column(db.Integer, primary_key=True)
@@ -11,12 +12,15 @@ class Source(db.Model):
     logo_url = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     authority_score = db.Column(db.Integer, default=50, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Source).filter_by(slug=slug).first()
+
     @staticmethod
     def get_by_domain(domain, session):
         return session.query(Source).filter_by(domain=domain).first()
+
     @staticmethod
     def get_or_create(name, domain, session):
         if not domain or not name:
@@ -29,8 +33,10 @@ class Source(db.Model):
             session.flush()
         return source
     article_sources = db.relationship('ArticleSource', back_populates='source')
+
     def __repr__(self):
         return f'<Source {self.name}>'
+
 class Section(db.Model):
     __tablename__ = 'sections'
     id = db.Column(db.Integer, primary_key=True)
@@ -40,12 +46,15 @@ class Section(db.Model):
     allowed_filters = db.Column(db.JSON, nullable=True)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     sort_order = db.Column(db.Integer, default=0, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Section).filter_by(slug=slug).first()
     contents = db.relationship('Content', back_populates='section')
+
     def __repr__(self):
         return f"<Section id={self.id} name='{self.name}'>"
+
 class Brand(db.Model):
     __tablename__ = 'brands'
     id = db.Column(db.Integer, primary_key=True)
@@ -56,9 +65,11 @@ class Brand(db.Model):
     is_featured = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     sort_order = db.Column(db.Integer, default=0, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Brand).filter_by(slug=slug).first()
+
     @staticmethod
     def get_or_create(name, session, industry=None):
         if not name:
@@ -71,8 +82,10 @@ class Brand(db.Model):
             session.flush()
         return brand
     products = db.relationship('Product', back_populates='brand')
+
     def __repr__(self):
         return f'<Brand {self.slug}>'
+
 class Category(db.Model):
     __tablename__ = 'categories'
     id = db.Column(db.Integer, primary_key=True)
@@ -84,12 +97,15 @@ class Category(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     sort_order = db.Column(db.Integer, default=0, nullable=False)
     is_leaf = db.Column(db.Boolean, default=True, nullable=False, index=True)
+
     @staticmethod
     def create(name: str, parent=None, is_leaf=True):
         return Category(name=name, slug=generate_slug(name), normalized_name=normalize_name(name), parent=parent, is_leaf=is_leaf)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Category).filter_by(slug=slug).first()
+
     @staticmethod
     def get_or_create(name: str, session, parent=None, is_leaf=True):
         if not name:
@@ -101,6 +117,7 @@ class Category(db.Model):
             session.add(category)
             session.flush()
         return category
+
     @staticmethod
     def get_or_create_from_path(path: str, session):
         if not path:
@@ -125,25 +142,31 @@ class Category(db.Model):
     contents = db.relationship('Content', back_populates='category')
     products = db.relationship('Product', back_populates='category')
     article_associations = db.relationship('ArticleCategory', back_populates='category', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f'<Category {self.slug}>'
+
 class GenderFacet(db.Model):
     __tablename__ = 'gender_facets'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     slug = db.Column(db.String(50), unique=True, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(GenderFacet).filter_by(slug=slug).first()
     contents = db.relationship('Content', back_populates='gender')
+
 class IntentFacet(db.Model):
     __tablename__ = 'intent_facets'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     slug = db.Column(db.String(80), unique=True, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(IntentFacet).filter_by(slug=slug).first()
+
     @staticmethod
     def get_or_create(name, session):
         if not name:
@@ -156,14 +179,17 @@ class IntentFacet(db.Model):
             session.flush()
         return intent
     contents = db.relationship('Content', back_populates='intent')
+
 class PriceTierFacet(db.Model):
     __tablename__ = 'price_tier_facets'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     slug = db.Column(db.String(50), unique=True, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(PriceTierFacet).filter_by(slug=slug).first()
+
     @staticmethod
     def get_or_create(name, session):
         if not name:
@@ -176,14 +202,17 @@ class PriceTierFacet(db.Model):
             session.flush()
         return price_tier
     contents = db.relationship('Content', back_populates='price_tier')
+
 class AttributeFacet(db.Model):
     __tablename__ = 'attributes'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     slug = db.Column(db.String(80), unique=True, nullable=False)
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(AttributeFacet).filter_by(slug=slug).first()
+
     @staticmethod
     def get_or_create(name, session, category_id=None):
         if not name:
@@ -198,6 +227,7 @@ class AttributeFacet(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
     category = db.relationship('Category')
     contents = db.relationship('Content', secondary=content_attributes, back_populates='attributes')
+
 class Entity(db.Model):
     __tablename__ = 'entities'
     id = db.Column(db.Integer, primary_key=True)
@@ -212,6 +242,7 @@ class Entity(db.Model):
     wikidata_id = db.Column(db.String(50), nullable=True, index=True)
     wikipedia_url = db.Column(db.Text, nullable=True)
     content_entities = db.relationship('ContentEntity', back_populates='entity')
+
     @staticmethod
     def get_or_create(name, session, external_uri=None, entity_type=None, provider=None, image_url=None):
         if not name:
@@ -238,14 +269,17 @@ class Entity(db.Model):
             if image_url and (not entity.image_url):
                 entity.image_url = image_url
         return entity
+
     @staticmethod
     def get_by_slug(slug, session):
         return session.query(Entity).filter_by(slug=slug).first()
+
     @staticmethod
     def get_by_uri(external_uri, session):
         if not external_uri:
             return None
         return session.query(Entity).filter_by(external_uri=external_uri).first()
+
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
@@ -255,6 +289,7 @@ class Location(db.Model):
     country_name = db.Column(db.String(150))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+
     @staticmethod
     def get_or_create(name, session, country_code=None, country_name=None):
         if not name:

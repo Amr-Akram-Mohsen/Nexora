@@ -3,8 +3,10 @@ from app.domains.content.models import Content
 from app.domains.content.service.content_access import assign_target_to_contents
 from app.domains.content.service.query.utils import CONTENT_LIST_EAGER_LOADS
 from app.core.extensions import db
+
 def build_content_search_vector(content, body_text=''):
     return func.setweight(func.to_tsvector('english', func.coalesce(content.title, '')), 'A').op('||')(func.setweight(func.to_tsvector('english', func.coalesce(content.preview_text, '')), 'B')).op('||')(func.setweight(func.to_tsvector('english', func.coalesce(content.search_text, '')), 'C')).op('||')(func.setweight(func.to_tsvector('english', func.coalesce(body_text, '')), 'D'))
+
 def populate_content_search_fields(content, obj, object_type):
     target_fields_map = {'video': ['channel_name'], 'post': ['author', 'subreddit'], 'article': ['author', 'source_name']}
     source = ' '.join(filter(None, [getattr(obj, field, '') for field in target_fields_map.get(object_type, [])]))
@@ -34,6 +36,7 @@ def populate_content_search_fields(content, obj, object_type):
         search_str += ' ' + ' '.join(extra_terms)
     content.search_text = search_str
     content.search_vector = build_content_search_vector(content, body_text=body_text)
+
 def get_search_contents(query, limit=80, session=None):
     session = session or db.session
     query = (query or '').strip()

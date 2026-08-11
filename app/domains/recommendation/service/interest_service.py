@@ -6,6 +6,7 @@ from app.domains.content.models import Article
 from app.domains.recommendation.interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
 from sqlalchemy import select
+
 def extract_entities_from_target(target):
     if isinstance(target, Product):
         return [{'brand_id': target.brand_id, 'category_id': target.category_id}]
@@ -18,6 +19,7 @@ def extract_entities_from_target(target):
             entities.append({'brand_id': brand.id})
         return entities
     return []
+
 def update_user_interest(*, user_id, target_type, target_id, action, increment_interaction=False, entities=None, session=None):
     session = session or db.session
     entities = entities or {}
@@ -38,6 +40,7 @@ def update_user_interest(*, user_id, target_type, target_id, action, increment_i
             entity_interest.score += weight
         else:
             session.add(UserEntityInterest(user_interest_id=user_interest.id, score=weight, **entities))
+
 def handle_interaction_interest(user, target, action, session=None):
     if not user or not target:
         return
@@ -45,6 +48,7 @@ def handle_interaction_interest(user, target, action, session=None):
     update_user_interest(user_id=user.id, target_type=target_type, target_id=target.id, action=action, increment_interaction=True, session=session)
     for entity in extract_entities_from_target(target):
         update_user_interest(user_id=user.id, target_type=target_type, target_id=target.id, action=action, entities=entity, session=session)
+
 def handle_comment_interaction(user, target, comment_sentiment, session=None):
     if not user or not target:
         return

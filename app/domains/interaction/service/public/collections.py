@@ -1,6 +1,7 @@
 from app.core.extensions import db
 from app.domains.interaction.models import Save
 from app.domains.interaction.service.command import execute_counter_update
+
 def rename_collection(user, old_name: str, new_name: str):
     old_name = old_name.strip().lower()
     new_name = new_name.strip().lower()
@@ -15,6 +16,7 @@ def rename_collection(user, old_name: str, new_name: str):
             save.collection_name = new_name
     db.session.commit()
     return {'success': True}
+
 def delete_collection(user, collection_name: str, move_to_global: bool=False):
     collection_name = collection_name.strip().lower()
     saves = Save.query.filter_by(user_id=user.id, collection_name=collection_name).all()
@@ -30,6 +32,7 @@ def delete_collection(user, collection_name: str, move_to_global: bool=False):
             execute_counter_update(db=db, model_type=save.target_type, model_id=save.target_id, column='save_count', action='dec')
     db.session.commit()
     return {'success': True}
+
 def move_save_collection(user, target_type: str, target_id: int, new_collection_name: str, old_collection_name: str=None):
     new_collection_name = (new_collection_name or 'general').strip().lower()
     query = Save.query.filter_by(user_id=user.id, target_type=target_type, target_id=target_id)

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.domains.content.models import Content
     from app.domains.product.models import Product
+
 @dataclass
 class ContentScoreWeights:
     topic_match: float = 3.0
@@ -15,12 +16,14 @@ class ContentScoreWeights:
     recency: float = 0.8
     popularity: float = 0.4
     trending: float = 0.3
+
 @dataclass
 class ItemScoreWeights:
     brand_match: float = 3.0
     category_match: float = 2.0
     direct_link: float = 5.0
     popularity: float = 0.4
+
 def _recency_decay(published_at: datetime | None, half_life_days: float=30.0) -> float:
     if not published_at:
         return 0.0
@@ -28,8 +31,10 @@ def _recency_decay(published_at: datetime | None, half_life_days: float=30.0) ->
         published_at = published_at.replace(tzinfo=timezone.utc)
     age_days = max((datetime.now(timezone.utc) - published_at).days, 0)
     return math.exp(-math.log(2) * age_days / half_life_days)
+
 def _log_popularity(view_count: int | None) -> float:
     return math.log1p(max(view_count or 0, 0))
+
 def score_content_relevance(candidate: 'Content', reference: 'Content', weights: ContentScoreWeights | None=None) -> float:
     if weights is None:
         weights = ContentScoreWeights()
@@ -49,6 +54,7 @@ def score_content_relevance(candidate: 'Content', reference: 'Content', weights:
     score += weights.recency * _recency_decay(candidate.published_at)
     score += weights.popularity * _log_popularity(candidate.view_count)
     return score
+
 def score_item_relevance(product: 'Product', reference_content: 'Content', weights: ItemScoreWeights | None=None, directly_linked_ids: set[int] | None=None) -> float:
     if weights is None:
         weights = ItemScoreWeights()
@@ -62,6 +68,7 @@ def score_item_relevance(product: 'Product', reference_content: 'Content', weigh
         score += weights.category_match
     score += weights.popularity * _log_popularity(product.view_count)
     return score
+
 @dataclass
 class ContentItemLinkWeights:
     category_match: float = 3.0
@@ -70,6 +77,7 @@ class ContentItemLinkWeights:
     brand_name_in_title: float = 2.0
     topic_match: float = 1.5
     text_overlap: float = 2.5
+
 def score_content_item_link(content: 'Content', product: 'Product', weights: ContentItemLinkWeights | None=None) -> float:
     if weights is None:
         weights = ContentItemLinkWeights()

@@ -13,8 +13,10 @@ ENABLE_LIVE_EXECUTION = False
 # ---------------------------------------------------------
 # Reusable Governance Policies
 # ---------------------------------------------------------
+
 class BaseGovernancePolicy:
     """Base interface for governance audit/compliance checks."""
+
     def evaluate(self, task, context):
         """Returns tuple (is_valid: bool, error_reason: str or None)"""
         raise NotImplementedError()
@@ -73,6 +75,7 @@ GOVERNANCE_POLICIES = [
 # ---------------------------------------------------------
 # Helper Functions
 # ---------------------------------------------------------
+
 def parse_scheduled_time(reason):
     """Parses week schedule name from task reasoning strings."""
     reason_lower = (reason or "").lower()
@@ -133,6 +136,7 @@ def evaluate_governance_policies(task, context):
 # ---------------------------------------------------------
 # Core Service Functions
 # ---------------------------------------------------------
+
 def generate_execution_governance_layer(execution_plan, asset_mapping, strategy_data):
     """
     Implements a production-safe control and risk classification layer over

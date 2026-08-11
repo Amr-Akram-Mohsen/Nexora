@@ -4,6 +4,7 @@ from app.core.extensions import db, cache
 from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick, RecommendationImpression, RecommendationClick
 from app.domains.content.models import Content
 from app.domains.product.models import Product
+
 @cache.cached(timeout=60, key_prefix='interactions_breakdown')
 def get_interactions_breakdown() -> dict:
     stmt = select(func.count(Comment.id).label('comments')).select_from(Comment)
@@ -16,13 +17,17 @@ def get_interactions_breakdown() -> dict:
     likes = db.session.execute(select(func.count(Reaction.id)).where(Reaction.type == 'like')).scalar() or 0
     dislikes = db.session.execute(select(func.count(Reaction.id)).where(Reaction.type == 'dislike')).scalar() or 0
     return {'comments': comments, 'reactions': likes + dislikes, 'views': views, 'saves': saves, 'shares': shares, 'clicks': clicks, '_likes': likes, '_dislikes': dislikes}
+
 def get_reaction_stats() -> dict:
     breakdown = get_interactions_breakdown()
     return {'likes': breakdown['_likes'], 'dislikes': breakdown['_dislikes']}
+
 def get_view_stats() -> dict:
     return {'total': get_interactions_breakdown()['views']}
+
 def get_save_stats() -> dict:
     return {'total': get_interactions_breakdown()['saves']}
+
 def get_share_stats() -> dict:
     from sqlalchemy import select, func
     from app.core.extensions import db
@@ -31,22 +36,28 @@ def get_share_stats() -> dict:
     channel_counts = db.session.execute(select(Share.channel, func.count(Share.id)).group_by(Share.channel)).all()
     distribution = {c or 'Unknown': cnt for c, cnt in channel_counts}
     return {'total': total, 'distribution': distribution}
+
 def get_click_stats() -> dict:
     return {'total': get_interactions_breakdown()['clicks']}
+
 def get_all_comments():
     return Comment.query.order_by(Comment.created_at.desc()).all()
+
 def _get_trend_data(model, date_col, thirty_days_ago):
     stmt = select(cast(date_col, Date).label('date'), func.count().label('count')).where(date_col >= thirty_days_ago).group_by(cast(date_col, Date))
     return {r.date.isoformat(): r.count for r in db.session.execute(stmt)}
+
 def _get_delta_data(model, date_col, fourteen_days_ago, seven_days_ago):
     current_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= seven_days_ago)) or 0
     prev_7 = db.session.scalar(select(func.count()).select_from(model).where(date_col >= fourteen_days_ago, date_col < seven_days_ago)) or 0
     if prev_7 == 0:
         return {'current': current_7, 'prev': prev_7, 'delta': 100 if current_7 > 0 else 0}
     return {'current': current_7, 'prev': prev_7, 'delta': round((current_7 - prev_7) / prev_7 * 100, 1)}
+
 def _get_hour_counts_data(model, date_col, thirty_days_ago):
     stmt = select(cast(extract('hour', date_col), db.Integer).label('hour'), func.count().label('cnt')).where(date_col >= thirty_days_ago).group_by('hour')
     return {r.hour: r.cnt for r in db.session.execute(stmt)}
+
 @cache.cached(timeout=300, key_prefix='interactions_analytics_dashboard')
 def get_analytics_dashboard_data() -> dict:
     now = datetime.now(timezone.utc)
@@ -81,6 +92,7 @@ def get_analytics_dashboard_data() -> dict:
     target_type_rows = db.session.execute(select(Reaction.target_type, func.count(Reaction.id)).group_by(Reaction.target_type)).all()
     reaction_targets = {r[0]: r[1] for r in target_type_rows}
     return {'trends': trends, 'deltas': deltas, 'sentiment_dist': sentiment_dist, 'spam_trend': spam_trend, 'recs_kpi': {'impressions': total_recs_impressions, 'clicks': total_recs_clicks, 'ctr': recs_ctr}, 'top_saves': top_saves, 'country_dist': country_dist, 'reaction_targets': reaction_targets, 'moderation_workload': get_moderation_workload_data(), 'heatmap': get_hourly_engagement_heatmap()}
+
 @cache.cached(timeout=300, key_prefix='interactions_moderation_workload')
 def get_moderation_workload_data() -> dict:
     now = datetime.now(timezone.utc)
@@ -89,6 +101,7 @@ def get_moderation_workload_data() -> dict:
     daily_flagged = db.session.scalar(select(func.count()).select_from(Comment).where(Comment.created_at >= one_day_ago, Comment.sentiment.in_(['spam', 'negative']))) or 0
     pending_triage = db.session.scalar(select(func.count()).select_from(Comment).where(Comment.sentiment.in_(['spam', 'negative']))) or 0
     return {'daily_new': daily_new, 'daily_flagged': daily_flagged, 'pending_triage': pending_triage}
+
 @cache.cached(timeout=600, key_prefix='interactions_hourly_heatmap')
 def get_hourly_engagement_heatmap() -> list:
     now = datetime.now(timezone.utc)

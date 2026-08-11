@@ -13,6 +13,7 @@ def serialize_model(m):
 
 
 def _normalize_authors(raw_authors):
+
     def slugify(text):
         if not text:
             return ""

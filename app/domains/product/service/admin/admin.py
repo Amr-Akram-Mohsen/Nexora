@@ -6,12 +6,14 @@ from app.domains.product.models import Product, ProductVariant, ProductStoreLink
 from app.domains.taxonomy.models import Category, Brand, Source
 from app.domains.interaction.models import Comment
 from app.domains.taxonomy.service.query import get_taxonomy_mappings
+
 def get_admin_item_meta():
     categories = get_taxonomy_mappings(Category, used_in_model=Product, used_in_column=Product.category_id)
     brands = get_taxonomy_mappings(Brand, used_in_model=Product, used_in_column=Product.brand_id)
     sources = get_taxonomy_mappings(Source, used_in_model=Product, used_in_column=Product.source_id)
     product_types = db.session.execute(select(Product.product_type).distinct().order_by(Product.product_type)).scalars().all()
     return {'categories': categories, 'brands': brands, 'product_types': [t for t in product_types if t], 'sources': sources}
+
 def get_admin_item_health_stats():
     from sqlalchemy import case
     stats = db.session.execute(select(func.count(func.distinct(Product.id)).label('total_items'), func.count(func.distinct(case((Product.brand_id.isnot(None), Product.id), else_=None))).label('branded_items'), func.count(func.distinct(ProductImage.product_id)).label('items_with_images')).select_from(Product).outerjoin(ProductImage, ProductImage.product_id == Product.id)).first()
@@ -33,6 +35,7 @@ def get_admin_item_health_stats():
         like_rate = round(r.like_count / r.view_count * 100, 1) if r.view_count else 0
         top_engagement_items.append({'id': r.id, 'name': r.name, 'ctr': ctr, 'save_rate': save_rate, 'like_rate': like_rate})
     return {'total_items': total_items, 'branded_items': branded_items, 'items_with_images': items_with_images, 'items_with_links': items_with_links, 'stale_sync_items': stale_sync_items, 'product_type_distribution': product_type_distribution, 'top_engagement_items': top_engagement_items}
+
 def load_admin_item_aggregates(page_ids):
     min_price_rows = db.session.execute(select(ProductVariant.product_id, func.min(ProductVariant.price).label('min_price'), func.max(ProductVariant.price).label('max_price'), ProductVariant.currency).where(ProductVariant.product_id.in_(page_ids), ProductVariant.price != None).group_by(ProductVariant.product_id, ProductVariant.currency).order_by(ProductVariant.product_id, func.min(ProductVariant.price))).all()
     min_price_map: dict[int, dict] = {}
@@ -46,6 +49,7 @@ def load_admin_item_aggregates(page_ids):
     spec_rows = db.session.execute(select(ProductSpecification.product_id, func.count(ProductSpecification.id).label('spec_count')).where(ProductSpecification.product_id.in_(page_ids)).group_by(ProductSpecification.product_id)).all()
     spec_info_map = {r.product_id: int(r.spec_count) > 0 for r in spec_rows}
     return (min_price_map, store_info_map, image_info_map, spec_info_map)
+
 def build_admin_items_query(args, sort_col, sort_dir):
     search = args.get('search', '').strip()
     brand_slug = args.get('brand')
@@ -92,14 +96,18 @@ def build_admin_items_query(args, sort_col, sort_dir):
     else:
         stmt = stmt.order_by(sort_col.asc() if sort_dir == 'asc' else sort_col.desc())
     return stmt
+
 def get_admin_items_page(args, sort_col, sort_dir, page, per_page):
     stmt = build_admin_items_query(args, sort_col, sort_dir)
     return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
+
 def get_admin_item(id):
     return db.session.get(Product, id)
+
 def get_admin_item_inspect_raw(id):
     product = db.session.scalar(select(Product).options(joinedload(Product.category), joinedload(Product.brand), joinedload(Product.source), selectinload(Product.variants).selectinload(ProductVariant.store_links).joinedload(ProductStoreLink.store), selectinload(Product.linked_contents), selectinload(Product.images), selectinload(Product.specifications), selectinload(Product.comments).joinedload(Comment.user)).where(Product.id == id))
     return product
+
 def get_admin_store_inspect_raw(id):
     from sqlalchemy import select, func, case
     from datetime import datetime, timezone, timedelta

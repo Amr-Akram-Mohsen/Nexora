@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timezone
 SEARCH_TYPES = ('all', 'articles', 'posts', 'videos', 'products')
 from app.domains.recommendation.service.search_scoring import detect_search_intent, attach_score
+
 def get_unified_search_results_cached(normalized_query):
     from app.infrastructure import cache
     from app.domains.content.service import get_search_contents
@@ -25,6 +26,7 @@ def get_unified_search_results_cached(normalized_query):
     results = sorted(content_results + product_results, key=lambda row: row.get('_search', {}).get('score', 0), reverse=True)
     cache.set(cache_key, results, timeout=120)
     return results
+
 def _filter_results(results, result_type):
     match result_type:
         case 'all':
@@ -39,8 +41,10 @@ def _filter_results(results, result_type):
             return [row for row in results if row.get('search_type') == 'product']
         case _:
             return results
+
 def build_result_counts(results):
     return {'all': len(results), 'articles': sum((1 for row in results if row.get('search_type') == 'article')), 'posts': sum((1 for row in results if row.get('search_type') == 'post')), 'videos': sum((1 for row in results if row.get('search_type') == 'video')), 'products': sum((1 for row in results if row.get('search_type') == 'product'))}
+
 def build_grouped_results(results: list[dict]) -> dict:
     grouped: dict[str, list] = {'products': [], 'articles': [], 'videos': [], 'posts': []}
     for row in results:
@@ -54,6 +58,7 @@ def build_grouped_results(results: list[dict]) -> dict:
             case 'post':
                 grouped['posts'].append(row)
     return grouped
+
 def search_workflow(query, result_type='all'):
     normalized_query = ' '.join((query or '').strip().lower().split())
     active_type = result_type if result_type in SEARCH_TYPES else 'all'
