@@ -251,7 +251,7 @@ def get_search_contents(
     if not query:
         return []
 
-    from .query.options import CONTENT_LIST_EAGER_LOADS
+    from ..query.options import CONTENT_LIST_EAGER_LOADS
 
     # websearch_to_tsquery handles operators; falls back to plainto_tsquery
     # at the SQL level to avoid empty-tsquery edge cases (e.g. bare "-").
