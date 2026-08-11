@@ -2,7 +2,8 @@
 .variant--primary {
   --variant-bg: var(--primary);
   --variant-color: var(--primary-foreground);
-  --variant-hover-bg: rgba(var(--primary-rgb), var(--variant-bg-hover-opacity));
+  --variant-bg-hover-opacity: 0.8;
+  --variant-hover-bg: rgba(var(--domain-primary-rgb), var(--variant-bg-hover-opacity));
 }
 
 .variant--outline,

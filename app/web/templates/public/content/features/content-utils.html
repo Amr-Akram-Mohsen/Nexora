@@ -1,21 +1,21 @@
 {% from "content/features/content-image.html" import render_image_url %}
-{% macro content_snippet(products, snippet_title) %}
-{% if products and products|length > 0 %}
+{% macro content_snippet(contents, snippet_title) %}
+{% if contents and contents|length > 0 %}
 <div class="snippet-contents__section">
   <h3 class="snippet__header">{{ snippet_title }}</h3>
   <div class="snippet-contents">
-    {% for product in products %}
-    <a href="{{ url_for('content.content_page', content_slug=product.slug) }}"
-      class="snippet-content" data-id="{{ product.id }}">
+    {% for content in contents %}
+    <a href="{{ url_for('content.content_page', content_slug=content.slug) }}"
+      class="snippet-content" data-id="{{ content.id }}">
       {{ render_image_url(
-      product.target.image_url,
-      product.target.title,
+      content.target.image_url,
+      content.target.title,
       'snippet-content__img')
       }}
       <div class="snippet-content__content">
-        <h4 class="snippet-content__title">{{ product.target.title }}</h4>
-        {% if product.published_at %}
-        <span class="snippet-content__meta">{{ product.published_at | format_date('%b %d, %Y') }}</span>
+        <h4 class="snippet-content__title">{{ content.target.title }}</h4>
+        {% if content.published_at %}
+        <span class="snippet-content__meta">{{ content.published_at | format_date('%b %d, %Y') }}</span>
         {% endif %}
       </div>
     </a>

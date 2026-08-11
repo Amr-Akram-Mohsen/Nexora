@@ -20,21 +20,9 @@
 
   --alpha-ghost: 0.03;
   --alpha-subtle: 0.05;
-  --alpha-subtle-alt: 0.06;
-  --alpha-muted: 0.08;
   --alpha-soft: 0.1;
   --alpha-medium: 0.15;
-  --alpha-soft-hover: 0.18;
-  --alpha-low: 0.2;
-  --alpha-low-strong: 0.25;
   --alpha-strong: 0.3;
-  --alpha-accent: 0.35;
-  --alpha-medium-strong: 0.4;
-  --alpha-bold: 0.5;
-  --alpha-stronger: 0.6;
-  --alpha-heavy: 0.7;
-  --alpha-intense: 0.85;
-  --alpha-max: 0.95;
 
   /* Domain Tokens (Thematic Interface) */
   --domain-primary-rgb: var(--brand-blue-rgb);
@@ -64,6 +52,7 @@
   --weight-md: 500;
   --weight-bold: 600;
   --weight-xbold: 700;
+  --weight-display: 800;
 
   /* Text sizes */
   --text-xs: 0.75rem;
@@ -85,10 +74,7 @@
   --radius-xl: calc(var(--radius) + 0.25rem);
   --radius-2xl: calc(var(--radius) + 0.5rem);
   --radius-full: 999px;
-  /* Semantic Radius Aliases */
-  --radius-container: var(--radius-xl);
-  --radius-control: var(--radius-md);
-  --radius-badge: var(--radius-full);
+
 
   /* Focus */
   --ring-size: 3px;

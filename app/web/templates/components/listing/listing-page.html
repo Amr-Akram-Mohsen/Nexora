@@ -14,7 +14,8 @@
         <div class="sidebar-header flex items-center justify-between">
           <span class="sidebar-header__title">Filters</span>
           {% from "components/ui/core.html" import button %}
-          {{ button(id="sidebarClose", class="sidebar-close-btn btn--icon", attrs={"aria-label": "Close filters"}, icon="fas fa-times", unstyled=True) }}
+          {{ button(id="sidebarClose", class="sidebar-close-btn btn--icon", attrs={"aria-label": "Close filters"},
+          icon="fas fa-times", unstyled=True) }}
         </div>
         {{ caller('sidebar') }}
       </div>

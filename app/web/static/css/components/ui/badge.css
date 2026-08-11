@@ -90,15 +90,6 @@
   --variant-color: var(--brand-green-dark);
 }
 
-.badge-indigo {
-  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
-  --variant-color: var(--brand-purple);
-}
-
-.badge-pending {
-  --variant-bg: rgba(var(--brand-purple-rgb), var(--badge-opacity));
-  --variant-color: var(--brand-purple);
-}
 
 /* Smaller type compact variant */
 .badge-type-compact {
@@ -140,4 +131,10 @@
   --variant-bg: rgba(var(--brand-blue-rgb), var(--badge-opacity));
   --variant-color: var(--brand-blue);
   --variant-border: rgba(var(--brand-blue-rgb), 0.2);
+}
+
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }

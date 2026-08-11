@@ -34,7 +34,7 @@
 /* --- Responsive Overrides for Saved Items Page --- */
 
 .collection-group .section-title {
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -45,7 +45,7 @@
 
 .saved-collection-title {
   font-size: 1.1rem;
-  color: var(--text-secondary);
+  color: var(--muted-foreground);
 }
 
 /* Move Collection Select */
@@ -57,11 +57,11 @@
 .move-item-select {
   appearance: none;
   background: transparent;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0.2rem 1.5rem 0.2rem 0.5rem;
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--muted-foreground);
   cursor: pointer;
 }
 
@@ -72,5 +72,5 @@
   transform: translateY(-50%);
   font-size: 0.6rem;
   pointer-events: none;
-  color: var(--text-muted);
+  color: var(--muted-foreground);
 }

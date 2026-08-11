@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 from app.application.system.home import get_home_page_data
 from app.application.system.contact import send_contact_message_workflow
-from app.domains.site.pages_service import PAGES_CONTENT
+
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
 from app.core.extensions import limiter
 from . import PUBLIC_TEMPLATES
@@ -54,19 +54,17 @@ def home():
         data["recently_viewed"] = get_reading_history_workflow(current_user.id, limit=8)
         data["recommended_items"] = get_personalized_feed_workflow(current_user.id, limit=12)
         
-    log_route_success(logger, "/", template="index.html")
-    return render_template("index.html", **data)
+    log_route_success(logger, "/", template="public/index.html")
+    return render_template("public/index.html", **data)
 
 @bp.route("/about")
 def about():
-    return render_template("about.html", cover_cards=PAGES_CONTENT.get("about", []))
+    return render_template("about.html")
 
 
 @bp.route("/contact")
 def contact():
-    return render_template(
-        "contact.html", contact_cards=PAGES_CONTENT.get("contact", [])
-    )
+    return render_template("contact.html")
 
 
 @bp.route("/contact", methods=["POST"])
@@ -86,17 +84,17 @@ def send_contact_message():
 
 @bp.route("/privacy")
 def privacy():
-    return render_template("privacy.html", content=PAGES_CONTENT.get("privacy"))
+    return render_template("privacy.html")
 
 
 @bp.route("/terms")
 def terms():
-    return render_template("terms.html", content=PAGES_CONTENT.get("terms"))
+    return render_template("terms.html")
 
 
 @bp.route("/affiliate")
 def affiliate():
-    return render_template("affiliate.html", content=PAGES_CONTENT.get("affiliate"))
+    return render_template("affiliate.html")
 
 @bp.route("/newsletter")
 def newsletter():

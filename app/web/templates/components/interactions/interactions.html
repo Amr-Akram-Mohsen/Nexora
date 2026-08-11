@@ -23,7 +23,8 @@
       <!-- Save / Watch Later -->
       {% if content.object_type == 'video' %}
       {{ button(variant=v, class=class ~ "save-btn",
-      icon="fa fa-clock" ~ icon_class, attrs={"data-collection": "Watch Later", "title": "Watch Later", "aria-label": "Watch Later"})
+      icon="fa fa-clock" ~ icon_class, attrs={"data-collection": "Watch Later", "title": "Watch Later", "aria-label":
+      "Watch Later"})
       }}
       {% else %}
       {{ button(variant=v, class=class ~ "save-btn",

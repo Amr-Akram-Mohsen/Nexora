@@ -52,36 +52,26 @@
 
 {% macro badge(text="", class="", variant="primary", icon=None, href=None, attrs={}) %}
 {% set tag = "a" if href else "span" %}
-{% set base_class = "badge inline-flex items-center justify-center gap-1.5" %}
+{% set base_class = "badge inline-flex items-center justify-center gap-1" %}
 {% set variant_class = (" variant--" ~ variant) if variant else "" %}
 <{{ tag }} {% if href %}href="{{ href }}" {% endif %}
-  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}"
-  {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {%- endfor %}>
+  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{
+  key }}="{{ value }}" {%- endfor %}>
   {%- if icon -%}<i class="{{ icon }}"></i> {%- endif -%}
   {%- if text -%}{{ text|safe }}{%- elif caller -%}{{ caller() }}{%- endif -%}
 </{{ tag }}>
 {% endmacro %}
 
-{% macro render_display_badges(badges, class="", variant="secondary") %}
-{% set badge_mappings = {
-  'category': {'icon': None},
-  'location': {'icon': 'fas fa-map-marker-alt'},
-  'event': {'icon': 'far fa-calendar-alt'},
-  'brand': {'icon': 'fas fa-tag'},
-  'topic': {'icon': 'fas fa-hashtag'}
-} %}
-{% for b in badges %}
-  {% set mapping = badge_mappings.get(b.type, {'icon': 'fas fa-tag'}) %}
-  {{ badge(text=b.label, class=class, variant=variant, icon=mapping.icon) }}
-{% endfor %}
-{% endmacro %}
 
-{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None, unstyled=False, id=None) %}
+
+{% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,
+unstyled=False, id=None) %}
 {% set tag = "a" if href else "button" %}
-{% set base_class = "" if unstyled else "btn inline-flex items-center justify-center gap-2" %}
+{% set base_class = "" if unstyled else "btn inline-flex-center gap-2" %}
 {% set variant_class = "" if unstyled or variant is none else (" variant--" ~ variant) %}
 <{{ tag }} {% if href %}href="{{ href }}" {% else %}type="{{ type }}" {% endif %} {% if id %}id="{{ id }}" {% endif %}
-  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}" {% endfor %}>
+  class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{
+  key }}="{{ value }}" {% endfor %}>
   {% if icon %}
   <i class="{{ icon }}"></i>
   {% endif %}
@@ -156,7 +146,7 @@ else ''
 
 {% macro input(name="", type="text", id=None, value="", placeholder="", class="", required=True, attrs={}) %}
 {% set type_variant_class =
-'checkbox inline-flex-center'
+'checkbox'
 if type == 'checkbox' else 'input flex'
 %}
 <input type="{{ type }}" name="{{ name }}" id="{{ id or name }}" value="{{ value }}" placeholder="{{ placeholder }}" {%

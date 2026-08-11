@@ -1,4 +1,5 @@
-<article class="card {% block card_class %}{% endblock %}" data-type="{% block card_type %}{% endblock %}" data-id="{% block card_id %}{% endblock %}" data-domain-type="{% block card_domain %}{% endblock %}">
+<article class="card {% block card_class %}{% endblock %}" data-type="{% block card_type %}{% endblock %}"
+  data-id="{% block card_id %}{% endblock %}" data-domain-type="{% block card_domain %}{% endblock %}">
   {% block header %}
   <a href="{% block card_link %}{% endblock %}" class="card__img-link" tabindex="-1" aria-hidden="true">
     <div class="card__img-wrapper">
@@ -13,21 +14,21 @@
     <div class="card__meta-top flex items-center gap-2 justify-between">
       {% block meta_top %}{% endblock %}
     </div>
-    
+
     {% block title %}
     <a href="{% block title_link %}{{ self.card_link() }}{% endblock %}">
       <h3 class="card__title {% block title_class %}{% endblock %}">{% block title_text %}{% endblock %}</h3>
     </a>
     {% endblock %}
-    
+
     {% block description %}{% endblock %}
-    
+
     <div class="card__meta-bottom flex items-center gap-3 justify-between">
       {% block meta_bottom %}{% endblock %}
     </div>
 
     {% block interactions %}
-      {% include "components/interactions/interactions-compact.html" %}
+    {% include "components/interactions/interactions-compact.html" %}
     {% endblock %}
 
     {% block actions %}{% endblock %}

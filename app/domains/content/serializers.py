@@ -47,11 +47,6 @@ def _serialize_content_base(content_obj, target_obj=None, session=None, include_
     elif target_obj and getattr(target_obj, "content_text", None):
         display_preview = target_obj.content_text[:200] + "..." if len(target_obj.content_text) > 200 else target_obj.content_text
         
-    display_badges = []
-    if content_obj.category and content_obj.category.slug != "uncategorized":
-        display_badges.append({"type": "category", "label": content_obj.category.name, "slug": content_obj.category.slug})
-        
-    locations = content_obj.locations or []
     event = getattr(target_obj, "event", None) if target_obj else None
     if event:
         event = {
@@ -62,47 +57,6 @@ def _serialize_content_base(content_obj, target_obj=None, session=None, include_
             "image_url": getattr(event, "image_url", None),
             "event_type": getattr(event, "event_type", None)
         }
-
-    if locations:
-        display_loc = locations[0]
-        if active_filters:
-            req_locs = []
-            if "location" in active_filters:
-                r_loc = active_filters["location"]
-                req_locs.extend(r_loc if isinstance(r_loc, list) else [r_loc])
-            if "entity" in active_filters:
-                r_ent = active_filters["entity"]
-                req_locs.extend(r_ent if isinstance(r_ent, list) else [r_ent])
-                
-            loc_slugs = [s.lower() for s in req_locs if s]
-            for loc in locations:
-                if loc.slug.lower() in loc_slugs:
-                    display_loc = loc
-                    break
-        display_badges.append({"type": "location", "label": display_loc.name, "slug": display_loc.slug})
-    elif event and event.get("event_type"):
-        display_badges.append({"type": "event", "label": event["event_type"], "slug": None})
-    else:
-        entities = [e.entity for e in top_content_entities if e.entity]
-        if entities:
-            def find_active_entity(valid_types):
-                if active_filters and "entity" in active_filters:
-                    req_ents = active_filters["entity"]
-                    if isinstance(req_ents, str):
-                        req_ents = [req_ents]
-                    ent_slugs = [s.lower() for s in req_ents if s]
-                    for e in entities:
-                        if e.entity_type in valid_types and e.slug.lower() in ent_slugs:
-                            return e
-                return next((e for e in entities if e.entity_type in valid_types), None)
-
-            brand = find_active_entity(("brand", "organization"))
-            topic = find_active_entity(("topic", "tag", "concept", "person"))
-            
-            if brand:
-                display_badges.append({"type": "brand", "label": brand.name, "slug": brand.slug})
-            elif topic:
-                display_badges.append({"type": "topic", "label": topic.name, "slug": topic.slug})
 
     reading_time = None
     if target_obj and getattr(target_obj, "word_count", 0):
@@ -131,7 +85,6 @@ def _serialize_content_base(content_obj, target_obj=None, session=None, include_
         authors = [{"name": aa.author.name, "slug": aa.author.slug} for aa in target_obj.article_authors if aa.author]
 
     data["display_preview"] = display_preview
-    data["display_badges"] = display_badges
     data["reading_time"] = reading_time
     data["is_verified_source"] = is_verified_source
     data["source_tier"] = source_tier

@@ -69,6 +69,7 @@
 }
 
 @media (max-width: 480px) {
+
   .pagination__page,
   .pagination__btn {
     width: 2rem;

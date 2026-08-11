@@ -42,22 +42,25 @@
   justify-content: center;
 }
 
+/* Semantic gaps mapping to the custom --space-* scale defined in variables.css */
 .gap-sm {
-  gap: 0.375rem;
+  gap: var(--space-2); /* 0.375rem */
 }
 
 .gap-md {
-  gap: 1.25rem;
-}
-
-.gap-lg {
-  gap: 1.75rem;
+  gap: var(--space-8); /* 1.25rem */
 }
 
 .flex-1 {
   flex: 1;
 }
 
+/* 
+ * Numeric Gap Scale
+ * NOTE: This scale uses a Tailwind-compatible scale (0.25rem increments)
+ * and intentionally diverges from the custom --space-* scale for generic 
+ * layout utilities.
+ */
 .gap-1 {
   gap: 0.25rem;
 }

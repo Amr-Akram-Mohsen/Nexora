@@ -12,15 +12,6 @@
   }
 }
 
-/* --- Section Formatting --- */
-.section {
-  /* margin-bottom: 4.5rem; */
-}
-
-.section+.section {
-  /* margin-top: 4.5rem; */
-}
-
 .section__header {
   margin-bottom: 1.75rem;
   /* perfect balanced spacing above grid cards */
@@ -30,7 +21,7 @@
 .section__header .title {
   font-size: 1.5rem;
   /* 24px - perfect readable header scale */
-  font-weight: 800;
+  font-weight: var(--weight-display);
   /* strong premium weight */
   line-height: 1.2;
   color: var(--foreground);
@@ -162,7 +153,7 @@
   padding: .9rem 1.4rem;
 
   border: 1px solid var(--toggle-border);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 
   background: var(--toggle-bg);
   color: var(--toggle-text);
@@ -188,7 +179,7 @@
 .section-toggle:hover {
   transform: translateY(-2px);
 
-  border-color: var(--accent-color);
+  border-color: var(--accent);
 
   box-shadow:
     0 10px 25px rgba(0, 0, 0, .08),
@@ -200,7 +191,7 @@
 }
 
 .section-toggle:focus-visible {
-  outline: 2px solid var(--accent-color);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 

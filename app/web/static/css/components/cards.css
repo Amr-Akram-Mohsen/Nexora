@@ -124,8 +124,12 @@
 }
 
 .card__footer-product,
-.card__meta-product {
+.card__meta-product,
+.card__meta-group {
   min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .card__footer-product i,
@@ -370,8 +374,4 @@
   background-color: var(--domain-primary);
   color: var(--primary-foreground);
   border-color: var(--domain-primary);
-}
-
-.card__meta-bottom {
-  /* consolidated above */
 }

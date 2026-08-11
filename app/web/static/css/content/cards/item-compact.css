@@ -1,6 +1,6 @@
 /* --- Inline Product Card (Compact Vertical) --- */
 
-.inline-product-card {flex-direction: column;
+.inline-item-card {flex-direction: column;
 background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -10,14 +10,14 @@ background: var(--card);
   /* text-decoration: none; */
 }
 
-.inline-product-card:hover {
+.inline-item-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: rgba(var(--domain-primary-rgb), var(--alpha-medium));
   background: rgba(var(--domain-primary-rgb), var(--alpha-ghost));
 }
 
-.inline-product__image {
+.inline-item__image {
   overflow: hidden;
   width: calc(100% + 1rem);
   translate: -0.5rem;
@@ -25,7 +25,7 @@ background: var(--card);
   flex-shrink: 0;
 }
 
-.inline-product__image img {
+.inline-item__image img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -33,16 +33,16 @@ background: var(--card);
   transition: transform 0.5s ease;
 }
 
-.inline-product-card:hover .inline-product__image img {
+.inline-item-card:hover .inline-item__image img {
   transform: scale(1.08);
 }
-.inline-product__info {flex-direction: column;
+.inline-item__info {flex-direction: column;
   gap: 0.1rem;
   min-width: 0;
   width: 100%;
 }
 
-.inline-product__title {
+.inline-item__title {
   font-weight: var(--weight-bold);
   font-size: var(--text-xs);
   color: var(--foreground);
@@ -50,7 +50,7 @@ background: var(--card);
   line-height: 1.2;
 }
 
-.inline-product__price {
+.inline-item__price {
   font-weight: var(--weight-bold);
   color: var(--domain-primary);
   font-size: 0.7rem;

@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block image_overlays %}
-  {{ badge('Product', 'badge--card-type') }}
+  {{ badge('Product', variant='secondary') }}
   {# Compare toggle #}
   {{ button(class="compare-toggle-btn", attrs={"data-id": product.id, "data-name": product.name, "title": "Add to compare", "aria-label": "Add " ~ product.name ~ " to compare"}, icon="fas fa-balance-scale", unstyled=True) }}
   {# Discount badge #}

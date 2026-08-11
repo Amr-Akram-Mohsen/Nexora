@@ -4,15 +4,16 @@
 {# Mobile filter toggle button #}
 <div class="listing-mobile-bar flex items-center justify-between">
   {% from "components/ui/core.html" import button %}
-  {% call button(id="filterToggleBtn", class="filter-toggle-btn gap-2", attrs={"aria-label": "Open filters"}, icon="fas fa-sliders-h", unstyled=True) %}
-    <span>Filters</span>
-    {% set active_count = namespace(n=0) %}
-    {% for k, v in active_filters.items() if k not in ['sort'] %}
-      {% if v %}{% set active_count.n = active_count.n + 1 %}{% endif %}
-    {% endfor %}
-    {% if active_count.n > 0 %}
-      <span class="filter-toggle-badge justify-center inline-flex items-center">{{ active_count.n }}</span>
-    {% endif %}
+  {% call button(id="filterToggleBtn", class="filter-toggle-btn gap-2", attrs={"aria-label": "Open filters"}, icon="fas
+  fa-sliders-h", unstyled=True) %}
+  <span>Filters</span>
+  {% set active_count = namespace(n=0) %}
+  {% for k, v in active_filters.items() if k not in ['sort'] %}
+  {% if v %}{% set active_count.n = active_count.n + 1 %}{% endif %}
+  {% endfor %}
+  {% if active_count.n > 0 %}
+  <span class="filter-toggle-badge justify-center inline-flex items-center">{{ active_count.n }}</span>
+  {% endif %}
   {% endcall %}
 
   {# Inline sort (mobile) #}
@@ -40,9 +41,12 @@
     <div class="sort-select-wrapper flex items-center">
       <i class="fas fa-sort sort-select-icon"></i>
       <select id="sort-select" class="sort-select" aria-label="Sort results">
-        <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First</option>
-        <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest First</option>
-        <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular</option>
+        <option value="{{ get_sort_url('newest') }}" {{ 'selected' if active_filters.sort=='newest' }}>Newest First
+        </option>
+        <option value="{{ get_sort_url('oldest') }}" {{ 'selected' if active_filters.sort=='oldest' }}>Oldest First
+        </option>
+        <option value="{{ get_sort_url('popular') }}" {{ 'selected' if active_filters.sort=='popular' }}>Most Popular
+        </option>
       </select>
     </div>
   </div>
@@ -53,52 +57,53 @@
 {% macro active_filter_chips(active_filters, get_filter_url, reset_url) %}
 {% set has_filters = namespace(value=false) %}
 {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
-  {% if values %}{% set has_filters.value = true %}{% endif %}
+{% if values %}{% set has_filters.value = true %}{% endif %}
 {% endfor %}
 {# Also count price as active #}
 {% if active_filters.min_price or active_filters.max_price %}
-  {% set has_filters.value = true %}
+{% set has_filters.value = true %}
 {% endif %}
 
 {% if has_filters.value %}
-  <span class="active-label">
-    <i class="fas fa-filter"></i> Active:
+<span class="active-label">
+  <i class="fas fa-filter"></i> Active:
+</span>
+
+{# Regular filter chips #}
+{% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
+{% if values %}
+{% set vals = values if values is iterable and values is not string else [values] %}
+{% for val in vals %}
+<div class="filter-tag items-center gap-2 inline-flex">
+  <span>{{ val | replace('-', ' ') | title }}</span>
+  <a href="{{ get_filter_url(filter_name, val, multi=True) }}"
+    class="remove-tag justify-center inline-flex items-center" aria-label="Remove {{ val }} filter">&times;</a>
+</div>
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{# Price range chip #}
+{% if active_filters.min_price or active_filters.max_price %}
+<div class="filter-tag filter-tag--price items-center gap-2 inline-flex">
+  <i class="fas fa-dollar-sign" style="font-size:9px;opacity:.8;"></i>
+  <span>
+    {%- if active_filters.min_price and active_filters.max_price -%}
+    {{ active_filters.min_price }}–{{ active_filters.max_price }}
+    {%- elif active_filters.min_price -%}
+    From {{ active_filters.min_price }}
+    {%- else -%}
+    Up to {{ active_filters.max_price }}
+    {%- endif -%}
   </span>
+  <a href="{{ reset_url }}" class="remove-tag justify-center inline-flex items-center"
+    aria-label="Remove price filter">&times;</a>
+</div>
+{% endif %}
 
-  {# Regular filter chips #}
-  {% for filter_name, values in active_filters.items() if filter_name not in ['sort', 'min_price', 'max_price'] %}
-    {% if values %}
-      {% set vals = values if values is iterable and values is not string else [values] %}
-      {% for val in vals %}
-        <div class="filter-tag flex items-center gap-2 inline-flex">
-          <span>{{ val | replace('-', ' ') | title }}</span>
-          <a href="{{ get_filter_url(filter_name, val, multi=True) }}" class="remove-tag justify-center inline-flex items-center"
-            aria-label="Remove {{ val }} filter">&times;</a>
-        </div>
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
-
-  {# Price range chip #}
-  {% if active_filters.min_price or active_filters.max_price %}
-    <div class="filter-tag filter-tag--price flex items-center gap-2 inline-flex">
-      <i class="fas fa-dollar-sign" style="font-size:9px;opacity:.8;"></i>
-      <span>
-        {%- if active_filters.min_price and active_filters.max_price -%}
-          {{ active_filters.min_price }}–{{ active_filters.max_price }}
-        {%- elif active_filters.min_price -%}
-          From {{ active_filters.min_price }}
-        {%- else -%}
-          Up to {{ active_filters.max_price }}
-        {%- endif -%}
-      </span>
-      <a href="{{ reset_url }}" class="remove-tag justify-center inline-flex items-center" aria-label="Remove price filter">&times;</a>
-    </div>
-  {% endif %}
-
-  <a href="{{ reset_url }}" class="clear-all-link" aria-label="Clear all filters">
-    <i class="fas fa-times-circle"></i> Clear All
-  </a>
+<a href="{{ reset_url }}" class="clear-all-link" aria-label="Clear all filters">
+  <i class="fas fa-times-circle"></i> Clear All
+</a>
 {% endif %}
 {% endmacro %}
 
@@ -109,41 +114,45 @@
 
   {# Previous #}
   {% if pagination.has_prev %}
-    {% set prev_p = (pagination.prev_num if pagination.prev_num is defined and pagination.prev_num is not none else pagination.page - 1) %}
-    <a href="{{ get_page_url(prev_p) }}" class="pagination__btn pagination__btn--prev justify-center inline-flex items-center"
-      aria-label="Previous page">
-      <i class="fas fa-chevron-left"></i>
-    </a>
+  {% set prev_p = (pagination.prev_num if pagination.prev_num is defined and pagination.prev_num is not none else
+  pagination.page - 1) %}
+  <a href="{{ get_page_url(prev_p) }}"
+    class="pagination__btn pagination__btn--prev justify-center inline-flex items-center" aria-label="Previous page">
+    <i class="fas fa-chevron-left"></i>
+  </a>
   {% else %}
-    <span class="pagination__btn pagination__btn--prev is-disabled justify-center inline-flex items-center" aria-disabled="true">
-      <i class="fas fa-chevron-left"></i>
-    </span>
+  <span class="pagination__btn pagination__btn--prev is-disabled justify-center inline-flex items-center"
+    aria-disabled="true">
+    <i class="fas fa-chevron-left"></i>
+  </span>
   {% endif %}
 
   {# Page numbers #}
   <div class="pagination__pages flex items-center gap-1">
     {% for p in range(1, pagination.pages + 1) %}
-      {% if p == pagination.page %}
-        <span class="pagination__page is-active justify-center inline-flex items-center" aria-current="page">{{ p }}</span>
-      {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %}
-        <a href="{{ get_page_url(p) }}" class="pagination__page justify-center inline-flex items-center">{{ p }}</a>
+    {% if p == pagination.page %}
+    <span class="pagination__page is-active justify-center inline-flex items-center" aria-current="page">{{ p }}</span>
+    {% elif p == 1 or p == pagination.pages or (p >= pagination.page - 2 and p <= pagination.page + 2) %} <a
+      href="{{ get_page_url(p) }}" class="pagination__page justify-center inline-flex items-center">{{ p }}</a>
       {% elif p == pagination.page - 3 or p == pagination.page + 3 %}
-        <span class="pagination__ellipsis justify-center inline-flex items-center">…</span>
+      <span class="pagination__ellipsis justify-center inline-flex items-center">…</span>
       {% endif %}
-    {% endfor %}
+      {% endfor %}
   </div>
 
   {# Next #}
   {% if pagination.has_next %}
-    {% set next_p = (pagination.next_num if pagination.next_num is defined and pagination.next_num is not none else pagination.page + 1) %}
-    <a href="{{ get_page_url(next_p) }}" class="pagination__btn pagination__btn--next justify-center inline-flex items-center"
-      aria-label="Next page">
-      <i class="fas fa-chevron-right"></i>
-    </a>
+  {% set next_p = (pagination.next_num if pagination.next_num is defined and pagination.next_num is not none else
+  pagination.page + 1) %}
+  <a href="{{ get_page_url(next_p) }}"
+    class="pagination__btn pagination__btn--next justify-center inline-flex items-center" aria-label="Next page">
+    <i class="fas fa-chevron-right"></i>
+  </a>
   {% else %}
-    <span class="pagination__btn pagination__btn--next is-disabled justify-center inline-flex items-center" aria-disabled="true">
-      <i class="fas fa-chevron-right"></i>
-    </span>
+  <span class="pagination__btn pagination__btn--next is-disabled justify-center inline-flex items-center"
+    aria-disabled="true">
+    <i class="fas fa-chevron-right"></i>
+  </span>
   {% endif %}
 
 </nav>

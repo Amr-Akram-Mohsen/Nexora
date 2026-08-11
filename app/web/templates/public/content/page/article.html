@@ -6,6 +6,7 @@
 {% from "content/features/content-image.html" import render_image_url %}
 {% from "components/ui/core.html" import badge, button %}
 {% from "components/ui/grid.html" import grid %}
+{% from "components/ui/recommendation.html" import recommendation_box %}
 
 {% block title %}Nexora | {{ article.title }}{% endblock %}
 
@@ -160,9 +161,7 @@
       <ul class="flex flex-wrap gap-2">
         {% for rel in alt_sources %}
         <li class="article-source-item">
-          <a href="{{ rel.url }}" class="badge variant--entity badge--entity" target="_blank" rel="noopener nofollow">
-            {{ rel.name }}
-          </a>
+          {{ badge(text=rel.name, href=rel.url, variant="entity", attrs={"target": "_blank", "rel": "noopener nofollow"}) }}
         </li>
         {% endfor %}
       </ul>
@@ -179,7 +178,7 @@
     {% for type, entities in content.grouped_entities.items() %}
     <div class="entity-group flex items-start gap-3 flex-wrap">
       <h4 class="entity-group__title">{{ type }}</h4>
-      <div class="flex flex-wrap gap-1">
+      <div class="badge-group">
         {% for entity in entities %}
         {{ badge(text=entity.name, class="badge--entity", variant="entity",
         href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
@@ -191,7 +190,7 @@
     {% if content.attributes %}
     <div class="entity-group flex items-start gap-3 flex-wrap">
       <h4 class="entity-group__title">Attributes</h4>
-      <div class="flex flex-wrap gap-1">
+      <div class="badge-group">
         {% for attr in content.attributes %}
         {{ badge(text=attr, class="badge--attribute", variant="secondary") }}
         {% endfor %}
@@ -203,57 +202,38 @@
 {% endif %}
 
 {% if event_carousel and event_carousel.get('items') and event_carousel.get('items')|length > 0 %}
-<div class="recommendation-box recommendation-box--event">
-  <h3 class="recommendation-box__title flex items-center">
-    <i class="fas fa-bolt"></i>
-    Coverage of this Event
-  </h3>
+{% call recommendation_box("Coverage of this Event", "fas fa-bolt", "event") %}
   <div class="event-summary-card">
     <h4 class="event-title">{{ event_carousel.event.title }}</h4>
     {% if event_carousel.event.summary %}
     <p class="event-desc">{{ event_carousel.event.summary }}</p>
     {% endif %}
   </div>
-  {% from "components/ui/grid.html" import grid %}
   {{ grid(event_carousel.items, target_type='content', carousel=true, card_type='mini') }}
-</div>
+{% endcall %}
 {% endif %}
 
 {% if entity_carousel and entity_carousel.get('items') and entity_carousel.get('items')|length > 0 %}
-{% from "components/ui/grid.html" import grid %}
-<div class="recommendation-box recommendation-box--entity">
-  <h3 class="recommendation-box__title flex items-center">
-    <i class="fas fa-tag"></i>
-    More on This Topic
-  </h3>
+{% call recommendation_box("More on This Topic", "fas fa-tag", "entity") %}
   {{ grid(entity_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-</div>
+{% endcall %}
 {% endif %}
 {% endblock %}
 
 {# ── Author and Source Discovery Carousels ── #}
 {% if author_carousel and author_carousel.get('items') and author_carousel.get('items')|length > 0 %}
 {% block author_carousel %}
-<div class="recommendation-box recommendation-box--author">
-  <h3 class="recommendation-box__title flex items-center">
-    <i class="fas fa-user-edit"></i>
-    More from {{ article.authors[0].name if article.authors else (article.author or 'Author') }}
-  </h3>
+{% call recommendation_box("More from " ~ (article.authors[0].name if article.authors else (article.author or 'Author')), "fas fa-user-edit", "author") %}
   {{ grid(author_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-</div>
+{% endcall %}
 {% endblock %}
 {% endif %}
 
 {% if source_carousel and source_carousel.get('items') and source_carousel.get('items')|length > 0 %}
 {% block source_carousel %}
-<div class="recommendation-box recommendation-box--source">
-  <h3 class="recommendation-box__title flex items-center">
-    <i class="fas fa-newspaper"></i>
-    More from {{ content.source.name if content.source else (article.primary_source.name if article.primary_source else
-    'Source') }}
-  </h3>
+{% call recommendation_box("More from " ~ (content.source.name if content.source else (article.primary_source.name if article.primary_source else 'Source')), "fas fa-newspaper", "source") %}
   {{ grid(source_carousel['items'], target_type='content', carousel=true, card_type='mini') }}
-</div>
+{% endcall %}
 {% endblock %}
 {% endif %}
 

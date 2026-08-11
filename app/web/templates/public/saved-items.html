@@ -30,14 +30,14 @@
     </h3>
     <ul class="filter-list flex flex-col">
       <li class="filter-item is-active" id="filter-all">
-        {% call link(href="#all", class="filter-item__link flex justify-between", unstyled=True) %}
+        {% call link(href="#all", class="filter-item__link", unstyled=True) %}
           <span>All Saved</span>
           <span class="filter-section__badge">{{ saved_items|length + saved_articles|length }}</span>
         {% endcall %}
       </li>
       {% for collection in collections %}
       <li class="filter-item">
-        {% call link(href="#collection-" ~ loop.index, class="filter-item__link flex justify-between", unstyled=True) %}
+        {% call link(href="#collection-" ~ loop.index, class="filter-item__link", unstyled=True) %}
           <span>{{ collection }}</span>
         {% endcall %}
       </li>
@@ -70,7 +70,7 @@
   {% set coll_articles = saved_articles | selectattr('collection_name', 'equalto', collection) | list %}
   {% set coll_items = saved_items | selectattr('collection_name', 'equalto', collection) | list %}
   <div class="collection-group flex flex-col gap-8" id="collection-{{ loop.index }}">
-    <h2 class="section-title text-2xl font-bold">
+    <h2 class="section-title">
       <i class="far fa-folder"></i> {{ collection }}
     </h2>
     
@@ -79,7 +79,7 @@
       <section class="saved-collection flex flex-col gap-4" data-domain-type="commercial">
         <h3 class="saved-collection-title flex justify-between items-center">
           <span>Products</span>
-          <span class="count-badge text-sm">({{ coll_items|length }})</span>
+          {{ badge('(' ~ coll_items|length ~ ')', class='count-badge', variant='secondary') }}
         </h3>
         {{ grid(coll_items, "commercial") }}
       </section>
@@ -89,7 +89,7 @@
       <section class="saved-collection flex flex-col gap-4" data-domain-type="content">
         <h3 class="saved-collection-title flex justify-between items-center">
           <span>Articles</span>
-          <span class="count-badge text-sm">({{ coll_articles|length }})</span>
+          {{ badge('(' ~ coll_articles|length ~ ')', class='count-badge', variant='secondary') }}
         </h3>
         {{ grid(coll_articles) }}
       </section>

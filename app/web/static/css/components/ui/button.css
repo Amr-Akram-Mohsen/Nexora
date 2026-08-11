@@ -3,7 +3,7 @@
   font-size: var(--text-sm);
   border-radius: var(--radius-md);
   --variant-bg-hover-opacity: 0.8;
-  
+
   /* Integrated from theme-variants */
   background-color: var(--variant-bg, transparent);
   color: var(--variant-color, inherit);
@@ -78,7 +78,7 @@
   cursor: pointer;
   transition: all var(--duration-fast) ease;
   white-space: nowrap;
-  
+
   /* CSS Variable API */
   background: var(--btn-bg, transparent);
   color: var(--btn-color, inherit);
@@ -126,5 +126,5 @@
 .btn-purple {
   --btn-bg: var(--brand-purple);
   --btn-color: var(--primary-foreground);
-  --btn-hover-bg: rgba(var(--brand-purple-rgb), var(--alpha-intense, 0.85));
+  --btn-hover-bg: rgba(var(--brand-purple-rgb), 0.85);
 }

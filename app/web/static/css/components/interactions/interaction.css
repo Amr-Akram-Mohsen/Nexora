@@ -1,4 +1,3 @@
-
 /* --- Interaction Panel Container --- */
 .interaction-panel {
   width: 100%;
@@ -35,7 +34,7 @@
 }
 
 .interaction-btn i {
-  font-size: 0.9em;
+  font-size: 0.9rem;
   transition: transform var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 

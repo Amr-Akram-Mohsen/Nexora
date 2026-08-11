@@ -53,8 +53,8 @@
 
 .sidebar-promo {
   background: linear-gradient(135deg,
-      rgba(var(--domain-primary-rgb), var(--alpha-muted)),
-      rgba(var(--domain-secondary-rgb), var(--alpha-muted)));
+      rgba(var(--domain-primary-rgb), var(--alpha-ghost)),
+      rgba(var(--domain-secondary-rgb), var(--alpha-ghost)));
   border: 1px solid rgba(var(--domain-primary-rgb), var(--alpha-medium));
 }
 

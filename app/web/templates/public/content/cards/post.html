@@ -1,5 +1,6 @@
 {% extends "content/cards/base.html" %}
 {% from "components/ui/core.html" import badge %}
+{% from "components/cards/meta-row.html" import card_meta_row %}
 
 {% set post = content.target %}
 
@@ -32,11 +33,8 @@
 {% endblock %}
 
 {% block meta_bottom %}
-<div class="card__meta-group flex items-center gap-2">
-  <div class="card__meta-product flex items-center gap-2">
-    <i class="far fa-user card__meta-icon"></i>
-    <span class="card__meta-text truncate">{{ post.author or 'Unknown' }}</span>
-  </div>
+<div class="card__meta-group">
+  {{ card_meta_row("far fa-user", post.author or 'Unknown') }}
 
   <span class="card__meta-dot" aria-hidden="true"></span>
 
@@ -46,9 +44,6 @@
 </div>
 
 {% if post.upvotes %}
-<div class="card__meta-product flex items-center gap-2">
-  <i class="fas fa-arrow-up card__meta-icon"></i>
-  <span class="card__meta-text">{{ post.upvotes }}</span>
-</div>
+  {{ card_meta_row("fas fa-arrow-up", post.upvotes) }}
 {% endif %}
 {% endblock %}

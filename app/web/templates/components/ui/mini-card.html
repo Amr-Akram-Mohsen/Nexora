@@ -1,18 +1,17 @@
-<a href="{{ url_for('content.content_page', content_slug=product.slug) }}"
-    class="mini-card flex flex-col gap-1">
-    {% if product.target and product.target.image_url %}
+<a href="{{ url_for('content.content_page', content_slug=item.slug) }}" class="mini-card flex flex-col gap-1">
+    {% if item.target and item.target.image_url %}
     <div class="mini-card__image">
-        <img src="{{ product.target.image_url }}" alt="{{ product.target.title }}" loading="lazy">
+        <img src="{{ item.target.image_url }}" alt="{{ item.target.title }}" loading="lazy">
     </div>
     {% endif %}
     <div class="mini-card__content">
-        <h4 class="mini-card__title" title="{{ product.target.title }}">{{ product.target.title }}</h4>
+        <h4 class="mini-card__title" title="{{ item.target.title }}">{{ item.target.title }}</h4>
         <div class="mini-card__meta flex items-center gap-1 flex-wrap">
-            {% if product.source %}
-            <span class="mini-card__source">{{ product.source.name }}</span>
+            {% if item.source %}
+            <span class="mini-card__source">{{ item.source.name }}</span>
             <span class="mini-card__dot flex-shrink-0"></span>
             {% endif %}
-            <time class="mini-card__date">{{ product.published_at | format_date('%b %d') }}</time>
+            <time class="mini-card__date">{{ item.published_at | format_date('%b %d') }}</time>
         </div>
     </div>
 </a>

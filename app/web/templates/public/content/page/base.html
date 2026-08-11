@@ -7,6 +7,7 @@
 
 {% from "components/ui/core.html" import button %}
 {% from "content/features/content-utils.html" import content_snippet %}
+{% from "components/ui/recommendation.html" import recommendation_box %}
 
 {% block content %}
 <section class="detail-page" data-id="{{ content.id }}" data-type="{{ content.object_type }}"
@@ -20,9 +21,7 @@
         {% include "content/features/breadcrumbs.html" %}
       </div>
       <div class="detail-page__back-wrapper">
-        <a href="/">
-          {{ button(text="Back", variant="ghost", class="btn-back", icon="fas fa-arrow-left") }}
-        </a>
+        {{ button(text="Back", variant="ghost", href="/", class="btn-back", icon="fas fa-arrow-left") }}
       </div>
     </div>
 
@@ -40,18 +39,14 @@
 
         {# ── Products Mentioned In Article (directly linked via matcher) ── #}
         {% if content.linked_items and content.linked_items|length > 0 %}
-        {% from "content/cards/product-compact.html" import render_item_compact_card %}
-        <div class="recommendation-box recommendation-box--linked">
-          <h3 class="recommendation-box__title flex items-center">
-            <i class="fas fa-box"></i>
-            Products Mentioned
-          </h3>
+        {% from "content/cards/item-compact.html" import render_item_compact_card %}
+        {% call recommendation_box("Products Mentioned", "fas fa-box", "linked") %}
           <div class="recommendation-box__grid">
-            {% for product in content.linked_items %}
-            {{ render_item_compact_card(product) }}
+            {% for item in content.linked_items %}
+            {{ render_item_compact_card(item) }}
             {% endfor %}
           </div>
-        </div>
+        {% endcall %}
         {% endif %}
 
         {% from "components/ui/grid.html" import grid %}
@@ -62,17 +57,12 @@
         {% set linked_ids = content.linked_items | map(attribute='id') | list if content.linked_items else [] %}
         {% set extra_items = matched_items | selectattr('id', 'ne', -1) | list %}
         {% if extra_items and extra_items|length > 0 %}
-        <div class="recommendation-box recommendation-box--matched" data-recommendation-container="shop_product"
-          data-entity-ids="{{ matched_items[:6] | map(attribute='id') | list | tojson | safe }}">
-          <h3 class="recommendation-box__title flex items-center">
-            <i class="fas fa-shopping-bag"></i>
-            Shop Related Products
-          </h3>
+        {% call recommendation_box("Shop Related Products", "fas fa-shopping-bag", "matched", attrs={"data-recommendation-container": "shop_product", "data-entity-ids": matched_items[:6] | map(attribute='id') | list | tojson}) %}
           {{ grid(matched_items[:6], target_type='commercial') }}
           <a href="{{ url_for('product.deals') }}" class="recommendation-box__more">
             {{ button(text="Browse All Deals", variant="ghost", icon="fas fa-arrow-right") }}
           </a>
-        </div>
+        {% endcall %}
         {% endif %}
         {% endif %}
 

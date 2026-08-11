@@ -1,18 +1,17 @@
 {% extends "components/cards/base-card.html" %}
 
-{% block card_type %}{{ product.object_type }}{% endblock %}
-{% block card_id %}{{ product.id }}{% endblock %}
+{% block card_type %}{{ content.object_type }}{% endblock %}
+{% block card_id %}{{ content.id }}{% endblock %}
 {% block card_domain %}content{% endblock %}
-{% block card_link %}{{ url_for('content.content_page', content_slug=product.slug) }}{% endblock %}
+{% block card_link %}{{ url_for('content.content_page', content_slug=content.slug) }}{% endblock %}
 
-{% block title_text %}{{ product.target.title }}{% endblock %}
+{% block title_text %}{{ content.target.title }}{% endblock %}
 
 {% block description %}
-<p class="card__excerpt">{{ product.display_preview or product.target.preview_text or '' }}</p>
+<p class="card__excerpt">{{ content.display_preview or content.target.preview_text or '' }}</p>
 {% endblock %}
 
 {# Re-export the content variable for interactions-compact.html #}
 {% block interactions %}
-{% set content = product %}
 {% include "components/interactions/interactions-compact.html" %}
 {% endblock %}

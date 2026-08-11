@@ -1,6 +1,7 @@
 {% extends "content/cards/base.html" %}
 {% from "content/features/content-image.html" import render_image_url %}
-{% from "components/ui/core.html" import badge, render_display_badges %}
+{% from "components/ui/core.html" import badge %}
+{% from "components/cards/meta-row.html" import card_meta_row %}
 
 {% set article = content.target %}
 
@@ -12,41 +13,44 @@
 <!-- Meta -->
 <div class="card__meta-top flex flex-wrap items-center gap-1 justify-between">
   <div class="flex items-center gap-1">
-    {{ render_display_badges(product.display_badges) }}
+    {% if content.locations and content.locations|length > 0 %}
+      {{ badge(text=content.locations[0].name, icon="fas fa-map-marker-alt") }}
+    {% elif content.event and content.event.event_type %}
+      {{ badge(text=content.event.event_type, icon="far fa-calendar-alt") }}
+    {% elif content.category and content.category.slug != 'uncategorized' %}
+      {{ badge(text=content.category.name, class="badge--category") }}
+    {% endif %}
   </div>
 </div>
 {% endblock %}
 
 {% block meta_bottom %}
-<div class="card__meta-group flex items-center gap-2">
-  <div class="card__meta-product flex items-center gap-2">
-    <i class="far fa-newspaper card__meta-icon"></i>
-    <span class="card__meta-text truncate">
-      {% if product.source %}
-      <a href="{{ url_for('content.source_page', source_slug=product.source.slug) }}" class="hover:underline">{{
-        product.source.name }}</a>
-      {% if product.source_tier == "verified" %}
+<div class="card__meta-group">
+  {% call card_meta_row("far fa-newspaper") %}
+      {% if content.source %}
+      <a href="{{ url_for('content.source_page', source_slug=content.source.slug) }}">{{
+        content.source.name }}</a>
+      {% if content.source_tier == "verified" %}
       <i class="fas fa-check-circle" title="Verified Source"></i>
-      {% elif product.source_tier == "trusted" %}
+      {% elif content.source_tier == "trusted" %}
       <i class="far fa-check-circle trusted-badge" title="Trusted Source"></i>
       {% endif %}
       {% else %}
       Article
       {% endif %}
-    </span>
-  </div>
+  {% endcall %}
 
-  {% if product.published_at %}
+  {% if content.published_at %}
   <time class="card__date">
-    {{ product.published_at | format_date('%b %d, %Y') }}
+    {{ content.published_at | format_date('%b %d, %Y') }}
   </time>
   {% endif %}
 </div>
 
-{% if product.reading_time %}
+{% if content.reading_time %}
 <span class="card__read-time">
   <i class="far fa-clock"></i>
-  {{ product.reading_time }} min
+  {{ content.reading_time }} min
 </span>
 {% endif %}
 {% endblock %}

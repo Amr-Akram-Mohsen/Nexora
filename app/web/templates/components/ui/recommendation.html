@@ -1,0 +1,9 @@
+{% macro recommendation_box(title, icon, type, attrs={}) %}
+<div class="recommendation-box recommendation-box--{{ type }}" {% for key, value in attrs.items() %} {{ key }}="{{ value }}"{% endfor %}>
+  <h3 class="recommendation-box__title">
+    <i class="{{ icon }}"></i>
+    {{ title }}
+  </h3>
+  {{ caller() }}
+</div>
+{% endmacro %}

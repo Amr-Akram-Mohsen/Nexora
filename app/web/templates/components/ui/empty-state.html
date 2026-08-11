@@ -1,4 +1,6 @@
+{% from "components/ui/core.html" import button %}
 {% macro empty_state(title="No results found", message="We couldn't find what you're looking for. Try adjusting your
+
 filters or search keywords.", icon="fa-search-minus", action_text=None, action_url=None) %}
 <div class="empty-state flex-center flex-col gap-4">
     <div class="empty-state__icon-wrapper flex-center">
@@ -8,9 +10,8 @@ filters or search keywords.", icon="fa-search-minus", action_text=None, action_u
     <h2 class="empty-state__title">{{ title }}</h2>
     <p class="empty-state__message">{{ message }}</p>
     {% if action_text and action_url %}
-    <a href="{{ action_url }}" class="btn variant--primary empty-state__btn gap-2">
-        {{ action_text }}
-    </a>
+    {{ button(text=action_text, href=action_url, variant='primary', class='empty-state__btn', icon='fas fa-arrow-right',
+    attrs={'style': 'margin-left: auto;'}) }}
     {% endif %}
 </div>
 

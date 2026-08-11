@@ -23,7 +23,7 @@
 /* Page-level title — used on detail pages */
 .page-title {
   font-size: var(--text-page-title);
-  font-weight: 800;
+  font-weight: var(--weight-display);
   line-height: 1.15;
   letter-spacing: -0.025em;
   color: var(--foreground);
@@ -49,12 +49,7 @@
   font-size: var(--text-sm);
 }
 
-/* Single-line ellipsis truncation */
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
 
 /* Keyboard shortcut keycap badge */
 .kbd {

@@ -4,8 +4,8 @@
 {% block description %}Subscribe to the Nexora newsletter for technology news, product reviews, platform updates, and curated discoveries.{% endblock %}
 
 {% block content %}
-<section class="newsletter-page">
-  <div class="container">
+{% from "components/page.html" import page %}
+{% call page(class_name="newsletter-page") %}
     <header class="newsletter-page-hero">
       <p class="newsletter-page-kicker">Nexora Newsletter</p>
       <h1>Useful tech updates without inbox clutter</h1>
@@ -67,6 +67,5 @@
         </ul>
       </section>
     </div>
-  </div>
-</section>
+{% endcall %}
 {% endblock %}

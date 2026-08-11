@@ -1,0 +1,8 @@
+{% macro card_meta_row(icon, text="", class="") %}
+<div class="card__meta-product{{ ' ' ~ class if class else '' }}">
+  <i class="{{ icon }} card__meta-icon"></i>
+  <span class="card__meta-text truncate">
+    {% if caller is defined %}{{ caller() }}{% else %}{{ text }}{% endif %}
+  </span>
+</div>
+{% endmacro %}

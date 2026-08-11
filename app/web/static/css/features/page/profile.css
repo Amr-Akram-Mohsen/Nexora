@@ -59,7 +59,7 @@
 }
 
 .profile-card.glass {
-  background: rgba(var(--card-rgb), var(--alpha-heavy));
+  background: rgba(var(--card-rgb), 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -111,7 +111,7 @@
 }
 
 .badge.badge--unverified {
-  background: rgba(var(--brand-orange-rgb), 0.1);
+  background: rgba(var(--brand-orange-rgb), var(--badge-opacity));
   color: var(--brand-orange);
   border: 1px solid rgba(var(--brand-orange-rgb), 0.2);
 }
@@ -279,7 +279,7 @@
 
 /* --- Collections Management --- */
 .collection-manage-product {
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
   background: rgba(var(--background-rgb), 0.5);
 }
 
@@ -294,7 +294,7 @@
 }
 
 .danger-zone-desc {
-  color: var(--text-secondary);
+  color: var(--muted-foreground);
 }
 
 .btn-danger {
