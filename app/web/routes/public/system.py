@@ -40,8 +40,11 @@ def set_country():
     return response
 
 
-@bp.route("/")
+@bp.route("/", methods=["GET", "HEAD"])
 def home():
+    if request.method == "HEAD":
+        return "", 200
+        
     log_route_start(logger, "/")
     data = get_home_page_data()
     data.setdefault("sections", [])

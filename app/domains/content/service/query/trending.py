@@ -13,19 +13,21 @@ def get_trending_contents(
 limit=6, days=7, section_ids=None, object_type=None, exclude_ids=None, session=None):
     session = session or db.session
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-    stmt = build_content_stmt(active_only=True, published_only=True, eager_load='default')
-    stmt = stmt.join(View, (View.target_type == TargetType.CONTENT) & (View.target_id == Content.id))
-    stmt = stmt.where(View.created_at >= cutoff)
+    
+    # Use a simplified fast query for trending to avoid 30s timeouts on cold boot
+    stmt = build_content_stmt(active_only=True, published_only=True, eager_load='list')
+    stmt = stmt.where(Content.published_at >= cutoff)
+    
     if exclude_ids:
         stmt = stmt.where(Content.id.notin_(list(exclude_ids)))
     if object_type:
         stmt = stmt.where(Content.object_type == object_type)
     if section_ids:
         stmt = stmt.join(Content.section).where(Section.id.in_(section_ids))
-    epoch_diff = func.extract('epoch', func.now() - View.created_at)
-    decay_factor = func.exp(-epoch_diff / 172800.0)
-    trending_score = func.sum(decay_factor)
-    stmt = build_ranked_content_stmt(stmt, trending_score, 'trending_score')
+        
+    # Sort by the pre-aggregated view_count instead of live calculating exponential decay on the View table
+    stmt = stmt.order_by(Content.view_count.desc(), Content.published_at.desc())
+    
     if limit:
         stmt = stmt.limit(limit)
     return fetch_serialized_contents(stmt, session)
