@@ -547,7 +547,7 @@ def _enrich_facets(
 # Entity Enrichment (Brands & Topics)
 # ---------------------------------------------------------------------------
 
-def _enrich_entities(title: str, description: str, existing_concepts: list) -> list:
+def enrich_entities(title: str, description: str, existing_concepts: list) -> list:
     """
     Scans the text for known brands and topics (from TAXONOMY) and appends them
     to the er_concepts list if they are found. Uses exact word-boundary matching.
@@ -609,3 +609,6 @@ def _enrich_entities(title: str, description: str, existing_concepts: list) -> l
                 existing_labels.add(topic_name.lower())
 
     return concepts
+
+
+_enrich_entities = enrich_entities

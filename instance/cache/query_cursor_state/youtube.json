@@ -1,9 +1,9 @@
 {
   "reviews": {
-    "technology:tablets": 8,
-    "technology:smartwatches": 2,
-    "technology:earbuds": 4,
-    "technology:headphones": 4,
+    "technology:tablets": 3,
+    "technology:smartwatches": 5,
+    "technology:earbuds": 6,
+    "technology:headphones": 6,
     "perfumes:niche-artisanal": 8,
     "perfumes:oud-oriental": 1,
     "perfumes:designer-fragrances": 2,
@@ -14,11 +14,11 @@
     "accessories:sneakers": 6,
     "accessories:wallets": 0,
     "accessories:mechanical-keyboards": 2,
-    "technology:cameras": 2,
-    "technology:pc-components": 4,
-    "technology:gaming-consoles": 7,
-    "technology:smartphones": 7,
-    "technology:laptops": 4
+    "technology:cameras": 4,
+    "technology:pc-components": 6,
+    "technology:gaming-consoles": 1,
+    "technology:smartphones": 1,
+    "technology:laptops": 1
   },
   "news": {
     "perfumes:niche-artisanal": 2,
@@ -36,15 +36,15 @@
     "accessories:sneakers": 9,
     "accessories:wallets": 6,
     "accessories:mechanical-keyboards": 10,
-    "technology:smartphones": 3,
-    "technology:laptops": 2,
-    "technology:tablets": 1,
-    "technology:smartwatches": 0,
-    "technology:earbuds": 5,
-    "technology:headphones": 6,
-    "technology:cameras": 5,
-    "technology:pc-components": 5,
-    "technology:gaming-consoles": 2
+    "technology:smartphones": 6,
+    "technology:laptops": 5,
+    "technology:tablets": 4,
+    "technology:smartwatches": 3,
+    "technology:earbuds": 7,
+    "technology:headphones": 8,
+    "technology:cameras": 7,
+    "technology:pc-components": 7,
+    "technology:gaming-consoles": 5
   },
   "trends": {
     "perfumes:niche-artisanal": 3,

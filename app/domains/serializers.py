@@ -1,15 +1,6 @@
 from datetime import datetime
 import re
-from .serialization_utils import compact_dict, safe_isoformat, safe_attr
-
-
-def serialize_model(m):
-    if not m:
-        return None
-    return compact_dict({
-        "name": m.name,
-        "slug": m.slug,
-    })
+from .serialization_utils import compact_dict, safe_isoformat, safe_attr, serialize_model
 
 
 def _normalize_authors(raw_authors):

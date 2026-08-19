@@ -15,7 +15,7 @@ from app.application.system.contact import send_contact_message_workflow
 
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
 from app.core.extensions import limiter
-from . import PUBLIC_TEMPLATES
+from app.web.routes.constants import PUBLIC_TEMPLATES
 
 logger = logging.getLogger(__name__)
 

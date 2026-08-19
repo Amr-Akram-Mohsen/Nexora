@@ -8,7 +8,7 @@ from app.shared.utils.logging import log_route_error, log_route_start, log_route
 
 logger = logging.getLogger(__name__)
 
-from . import PUBLIC_TEMPLATES
+from app.web.routes.constants import PUBLIC_TEMPLATES
 
 bp = Blueprint("recommendation", __name__, template_folder=PUBLIC_TEMPLATES)
 

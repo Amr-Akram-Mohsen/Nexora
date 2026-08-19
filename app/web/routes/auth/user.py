@@ -40,7 +40,7 @@ def is_safe_url(target: str) -> bool:
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
-from . import AUTH_TEMPLATES
+from app.web.routes.constants import AUTH_TEMPLATES
 
 bp = Blueprint("user", __name__, template_folder=AUTH_TEMPLATES)
 

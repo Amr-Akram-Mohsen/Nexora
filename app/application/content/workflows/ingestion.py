@@ -11,7 +11,6 @@ from ..ingestion.services import (
     CooldownService,
     ClassificationService,
 )
-from ..ingestion.ports import FetcherPort
 from ..ingestion import ingest_content
 from app.integrations.content.exceptions import (
     PipelineFatalError,
@@ -434,7 +433,7 @@ class IngestionWorkflow:
         session,
         object_type: str,
         # source_filter: str,
-        fetcher: FetcherPort,
+        fetcher,
         section: str,
         category: str,
         q_obj: dict,

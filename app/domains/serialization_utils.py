@@ -61,3 +61,14 @@ def safe_isoformat(obj: Any, attr_name: str) -> Optional[str]:
         return val.isoformat()
     except AttributeError:
         return None
+
+
+def serialize_model(m: Any) -> Optional[Dict[str, Any]]:
+    """Serializes model name and slug cleanly."""
+    if not m:
+        return None
+    return compact_dict({
+        "name": getattr(m, "name", None),
+        "slug": getattr(m, "slug", None),
+    })
+

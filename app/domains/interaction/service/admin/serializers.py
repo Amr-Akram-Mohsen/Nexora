@@ -29,12 +29,12 @@ def serialize_link_clicks_dto(metrics_dict: dict) -> Optional[Dict[str, Any]]:
     latest_click = metrics_dict.get('latest_click')
     return {'store_name': link_data['store_name'], 'item_name': link_data['item_name'], 'total_clicks': metrics_dict.get('total_clicks', 0), 'latest_click': latest_click.isoformat() if latest_click else None, 'country_stats': countries, 'referrer_stats': referrers}
 
-def _serialize_comment(c, users, titles_map):
+def serialize_comment(c, users, titles_map):
     user = users.get(c.user_id)
     target_title = titles_map.get((c.target_type, c.target_id))
     return {'id': c.id, 'content': c.content, 'preview': c.content[:120] + ('…' if len(c.content) > 120 else ''), 'user_id': c.user_id, 'user_name': user['name'] if user else f'User #{c.user_id}', 'user_email': user['email'] if user else None, 'parent_id': c.parent_id, 'sentiment': c.sentiment or 'neutral', 'confidence': c.confidence, 'target_type': c.target_type, 'target_id': c.target_id, 'like_count': c.like_count, 'dislike_count': c.dislike_count, 'replies_count': c.replies_count, 'replies': c.replies, 'target_title': target_title or f'{c.target_type.capitalize()} #{c.target_id}', 'created_at': c.created_at.isoformat() if c.created_at else None}
 
-def _serialize_reaction(r, users, titles_map):
+def serialize_reaction(r, users, titles_map):
     user = users.get(r.user_id)
     target_title = titles_map.get((r.target_type, r.target_id))
     if r.target_type == 'content':
@@ -45,15 +45,21 @@ def _serialize_reaction(r, users, titles_map):
         icon = '💬 Comment'
     return {'id': r.id, 'type': r.type, 'user_id': r.user_id, 'username': user['name'] if user else f'User #{r.user_id}', 'user_email': user['email'] if user else None, 'target_type': r.target_type, 'target_icon': icon, 'target_id': r.target_id, 'target_title': target_title or f'{r.target_type.capitalize()} #{r.target_id}', 'created_at': r.created_at.isoformat() if r.created_at else None}
 
-def _serialize_save(s, users, titles_map):
+def serialize_save(s, users, titles_map):
     user = users.get(s.user_id)
     target_title = titles_map.get((s.target_type, s.target_id))
     return {'id': s.id, 'user_id': s.user_id, 'user_name': user['name'] if user else f'User #{s.user_id}', 'user_email': user['email'] if user else None, 'target_type': s.target_type, 'target_id': s.target_id, 'target_title': target_title or f'{s.target_type.capitalize()} #{s.target_id}', 'created_at': s.created_at.isoformat() if s.created_at else None}
 
-def _serialize_share(s, users, titles_map):
+def serialize_share(s, users, titles_map):
     user = users.get(s.user_id)
     target_title = titles_map.get((s.target_type, s.target_id))
     return {'id': s.id, 'user_id': s.user_id, 'user_name': user['name'] if user else f'User #{s.user_id}', 'user_email': user['email'] if user else None, 'target_type': s.target_type, 'target_id': s.target_id, 'target_title': target_title or f'{s.target_type.capitalize()} #{s.target_id}', 'channel': s.channel or '—', 'created_at': s.created_at.isoformat() if s.created_at else None}
+
+
+_serialize_comment = serialize_comment
+_serialize_reaction = serialize_reaction
+_serialize_save = serialize_save
+_serialize_share = serialize_share
 
 def map_comment_for_rows(c):
     return {'id': c['id'], 'title': c['target_title'], 'target_type': c['target_type'], 'preview': c['preview'], 'sentiment': c['sentiment'], 'like_count': c['like_count'], 'dislike_count': c['dislike_count'], 'replies_count': c['replies_count'], 'is_reply': bool(c['parent_id']), 'created_at': c['created_at'][:10] if c['created_at'] else '—', 'username': c['user_name']}

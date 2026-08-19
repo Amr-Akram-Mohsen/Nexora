@@ -72,3 +72,21 @@ def format_featured(is_featured: bool) -> str:
         ``"featured"`` when *is_featured* is truthy, ``"standard"`` otherwise.
     """
     return "featured" if is_featured else "standard"
+
+
+def intcomma(value) -> str:
+    """Format an integer with commas (e.g. 1000 -> 1,000)."""
+    try:
+        return f"{int(value):,}"
+    except (ValueError, TypeError):
+        return str(value) if value is not None else ""
+
+
+def duration_min(seconds) -> str:
+    """Format seconds into MM:SS."""
+    try:
+        s = int(seconds)
+        return f"{s // 60}:{s % 60:02d}"
+    except (ValueError, TypeError):
+        return str(seconds) if seconds is not None else ""
+

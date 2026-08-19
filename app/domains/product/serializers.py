@@ -1,6 +1,5 @@
 from typing import Optional, Dict, Any
-from app.domains.serializers import serialize_model
-from app.domains.serialization_utils import compact_dict, safe_float, safe_isoformat, safe_attr
+from app.domains.serialization_utils import compact_dict, safe_float, safe_isoformat, safe_attr, serialize_model
 
 def serialize_store_inspect_dto(store, stats, product_count, currency_mix_list, avg_sync_age) -> Optional[Dict[str, Any]]:
     if not store:

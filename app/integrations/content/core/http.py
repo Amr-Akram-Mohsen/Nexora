@@ -5,7 +5,7 @@ from urllib3.util.retry import Retry
 _session = None
 
 
-def _get_session():
+def get_http_session() -> requests.Session:
     global _session
     if _session is None:
         _session = requests.Session()
@@ -25,3 +25,8 @@ def _get_session():
         )
         _session.mount("https://", adapter)
     return _session
+
+
+get_session = get_http_session
+_get_session = get_http_session
+

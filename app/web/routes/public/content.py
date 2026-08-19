@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, request, render_template, abort
-from . import PUBLIC_TEMPLATES
+from app.web.routes.constants import PUBLIC_TEMPLATES
 from app.application.content.public import get_feed_data, get_source_feed_data
 from flask_login import current_user
 from app.shared.request import get_client_ip

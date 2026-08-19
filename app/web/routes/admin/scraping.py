@@ -29,11 +29,12 @@ def run_scraping():
         description=f"Scraping up to {limit} articles"
     )
 
-    def _background_scrape(t_id, lmt):
-        from app.core.factory import create_app
+    from flask import current_app
+    app_obj = current_app._get_current_object()
+
+    def _background_scrape(app_instance, t_id, lmt):
         # We need an app context to run DB queries
-        app = create_app()
-        with app.app_context():
+        with app_instance.app_context():
             tracker.update_status(t_id, "running", progress=10)
             try:
                 results = enrich_discovered_articles(limit=lmt)
@@ -41,7 +42,7 @@ def run_scraping():
             except Exception as e:
                 tracker.update_status(t_id, "failed", error=str(e))
 
-    thread = threading.Thread(target=_background_scrape, args=(task_id, limit))
+    thread = threading.Thread(target=_background_scrape, args=(app_obj, task_id, limit))
     thread.daemon = True
     thread.start()
 

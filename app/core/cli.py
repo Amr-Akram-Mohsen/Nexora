@@ -1,5 +1,5 @@
 # app/core/cli.py
-from app.integrations.content.fetcher_runners.all_contents import (
+from app.integrations.content.runners import (
     run_youtube_fetch,
     run_content_fetch,
     run_newsapi_ai_fetch
@@ -27,13 +27,7 @@ def register_commands(app):
         count = match_articles_to_items()
         app.logger.info("Matcher complete! Created %d new links.", count)
 
-    @app.cli.command("seed-noon-stores")
-    def seed_noon_stores_command():
-        """Seed Noon/Namshi store records for ArabClicks affiliate network."""
-        from app.integrations.ecommerce.core.noon import seed_arabclicks_stores
 
-        created = seed_arabclicks_stores()
-        app.logger.info("Done! %d new ArabClicks stores seeded.", created)
 
 
 
@@ -126,7 +120,7 @@ def register_commands(app):
         """Retroactively extracts and assigns Brands & Topics to existing videos."""
         from app.domains.content.models import Video, Content
         from app.core.extensions import db
-        from app.integrations.content.enrichment.taxonomy_enrichment import _enrich_entities
+        from app.integrations.content.enrichment.taxonomy_enrichment import enrich_entities
         from app.domains.content.service.command import apply_relationships
 
         app.logger.info("Starting taxonomy enrichment for existing videos...")
@@ -135,7 +129,7 @@ def register_commands(app):
 
         for video in videos:
             # Extract entities using the new keyword extractor
-            concepts = _enrich_entities(video.title or "", video.description or "", [])
+            concepts = enrich_entities(video.title or "", video.description or "", [])
             if not concepts:
                 continue
 
@@ -165,3 +159,94 @@ def register_commands(app):
                 time.sleep(60)
         except (KeyboardInterrupt, SystemExit):
             app.logger.info("Scheduler stopping...")
+
+    @app.cli.command("geocode-locations")
+    def geocode_locations_command():
+        """Geocodes locations missing coordinates via Nominatim."""
+        import requests
+        import time
+        from app.core.extensions import db
+        from app.domains.taxonomy.models import Location
+
+        locations = Location.query.filter((Location.latitude == None) | (Location.longitude == None)).all()
+        total = len(locations)
+        if total == 0:
+            app.logger.info("All locations are already geocoded.")
+            return
+
+        app.logger.info("Starting geocoding for %d locations...", total)
+        headers = {"User-Agent": "Nexora/1.0 (contact@nexora.com)"}
+        success = 0
+        failed = 0
+
+        for i, loc in enumerate(locations):
+            query = f"{loc.name}"
+            if loc.country_name and loc.country_name.lower() not in query.lower():
+                query = f"{loc.name}, {loc.country_name}"
+
+            try:
+                url = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(query)}&format=json&limit=1"
+                response = requests.get(url, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    if data and len(data) > 0:
+                        loc.latitude = float(data[0]["lat"])
+                        loc.longitude = float(data[0]["lon"])
+                        success += 1
+                    else:
+                        failed += 1
+                else:
+                    failed += 1
+            except Exception as e:
+                app.logger.error("Error geocoding %s: %s", loc.name, e)
+                failed += 1
+
+            if i % 50 == 0:
+                db.session.commit()
+            time.sleep(1)
+
+        db.session.commit()
+        app.logger.info("Geocoding complete. Success: %d, Failed: %d", success, failed)
+
+    @app.cli.command("seed-mock-coordinates")
+    def seed_mock_coordinates_command():
+        """Seeds rough coordinates for testing the globe/maps visualization."""
+        import random
+        from app.core.extensions import db
+        from app.domains.taxonomy.models import Location
+
+        known_locs = {
+            "united states": (37.0902, -95.7129),
+            "uk": (55.3781, -3.4360),
+            "london": (51.5074, -0.1278),
+            "paris": (48.8566, 2.3522),
+            "france": (46.2276, 2.2137),
+            "germany": (51.1657, 10.4515),
+            "japan": (36.2048, 138.2529),
+            "tokyo": (35.6762, 139.6503),
+            "india": (20.5937, 78.9629),
+            "china": (35.8617, 104.1954),
+            "australia": (-25.2744, 133.7751),
+            "canada": (56.1304, -106.3468),
+            "brazil": (-14.2350, -51.9253),
+            "russia": (61.5240, 105.3188),
+            "egypt": (26.8206, 30.8025),
+            "south africa": (-30.5595, 22.9375),
+        }
+
+        locations = Location.query.all()
+        count = 0
+        for loc in locations:
+            name_lower = loc.name.lower()
+            if name_lower in known_locs:
+                loc.latitude = known_locs[name_lower][0]
+                loc.longitude = known_locs[name_lower][1]
+                count += 1
+            elif random.random() < 0.1:
+                loc.latitude = random.uniform(-60, 60)
+                loc.longitude = random.uniform(-180, 180)
+                count += 1
+
+        db.session.commit()
+        app.logger.info("Mocked %d coordinates for testing.", count)
+

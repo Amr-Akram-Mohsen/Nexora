@@ -1,5 +1,3 @@
-from pathlib import Path
-
-AUTH_TEMPLATES = str(Path(__file__).resolve().parent.parent.parent / "templates" / "auth")
-
+from app.web.routes.constants import AUTH_TEMPLATES
 from .user import bp as user_bp
+

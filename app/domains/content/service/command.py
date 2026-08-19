@@ -10,7 +10,63 @@ from ...taxonomy.models import AttributeFacet, GenderFacet, IntentFacet, PriceTi
 from app.domains.relationships import ContentEntity, ArticleSource, ArticleCategory
 from app.domains.interaction.models import Comment, Reaction, View
 from app.domains.serialization_utils import safe_attr
+from app.shared.utils.orm_helpers import get_model_registry
 from .content_access import resolve
+
+def create_content(obj, object_type, published_at, session=None, **kwargs):
+    session = session or db.session
+    stmt = select(Content).where(Content.object_type == object_type, Content.object_id == obj.id)
+    existing = session.execute(stmt).scalars().first()
+    if existing:
+        changed = False
+        if existing.published_at != published_at:
+            existing.published_at = published_at
+            changed = True
+        for k, v in kwargs.items():
+            if getattr(existing, k) != v:
+                setattr(existing, k, v)
+                changed = True
+        return (existing, changed)
+    content = Content(object_type=object_type, object_id=obj.id, published_at=published_at, title=safe_attr(obj, 'title', ''), preview_text=safe_attr(obj, 'preview_text', ''), **kwargs)
+    session.add(content)
+    session.flush()
+    return (content, False)
+
+def get_or_create_content(object_type, external_id, obj_factory, title_fallback=None, url_fallback=None, session=None, **kwargs):
+    model = get_model_registry().get(object_type)
+    if not model:
+        return (None, False)
+    session = session or db.session
+    obj = None
+    is_new = False
+    if external_id and hasattr(model, 'external_id'):
+        stmt = select(model).where(model.external_id == external_id)
+        obj = session.execute(stmt).scalars().first()
+    if not obj and url_fallback:
+        canonical_url = kwargs.get('canonical_url')
+        if object_type == 'article':
+            urls_to_check = [u for u in (url_fallback, canonical_url) if u]
+            if urls_to_check:
+                stmt_url = select(ArticleSource).where(ArticleSource.url.in_(urls_to_check))
+                res = session.execute(stmt_url).scalars().first()
+                if res:
+                    obj = session.get(model, res.article_id)
+                elif canonical_url:
+                    stmt_art = select(model).where(model.canonical_url == canonical_url)
+                    obj = session.execute(stmt_art).scalars().first()
+        elif hasattr(model, 'url'):
+            stmt_url = select(model).where(model.url == url_fallback)
+            obj = session.execute(stmt_url).scalars().first()
+    if not obj and title_fallback and hasattr(model, 'title'):
+        normalized_title = title_fallback.lower().strip()
+        stmt_title = select(model).where(func.lower(model.title) == normalized_title)
+        obj = session.execute(stmt_title).scalars().first()
+    if not obj:
+        obj = obj_factory()
+        session.add(obj)
+        session.flush()
+        is_new = True
+    return (obj, is_new)
 
 def sync_content_fields(content, obj, object_type: str) -> None:
     content.title = safe_attr(obj, 'title', '')
@@ -19,6 +75,7 @@ def sync_content_fields(content, obj, object_type: str) -> None:
     match object_type:
         case 'article':
             content.is_published = safe_attr(obj, 'status') == 'published'
+
 
 def link_article_sources(article, data, session=None) -> bool:
     session = session or db.session

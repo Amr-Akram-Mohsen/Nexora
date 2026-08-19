@@ -2,8 +2,9 @@ from sqlalchemy import select, or_, func
 from sqlalchemy.orm import joinedload, selectinload
 from app.core.extensions import db
 from app.domains.content.models import Content, Article
-CONTENT_EAGER_LOADS = [selectinload(Content.content_entities), selectinload(Content.section), selectinload(Content.category), selectinload(Content.locations)]
-CONTENT_LIST_EAGER_LOADS = [selectinload(Content.content_entities), joinedload(Content.section), joinedload(Content.category), selectinload(Content.locations)]
+from app.domains.relationships import ContentEntity
+CONTENT_EAGER_LOADS = [selectinload(Content.content_entities).joinedload(ContentEntity.entity), selectinload(Content.section), selectinload(Content.category), selectinload(Content.locations)]
+CONTENT_LIST_EAGER_LOADS = [selectinload(Content.content_entities).joinedload(ContentEntity.entity), joinedload(Content.section), joinedload(Content.category), selectinload(Content.locations)]
 
 def get_content_detail_loads():
     from app.domains.product.models import Product, ProductVariant, ProductStoreLink

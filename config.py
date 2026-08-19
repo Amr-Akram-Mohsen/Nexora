@@ -30,8 +30,6 @@ class Config:
     HF_TOKEN = os.environ.get("HF_TOKEN")
 
     # ── Article / News APIs ───────────────────────────────────────
-    NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
-    GNEWS_API_KEY = os.environ.get("GNEWS_API_KEY")
     YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
     NEWSAPI_AI_API_KEY = os.environ.get("NEWSAPI_AI_API_KEY")
     DIFFBOT_API_KEY = os.environ.get("DIFFBOT_API_KEY")
@@ -39,10 +37,6 @@ class Config:
     FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY")
     JINA_AI_API_KEY = os.environ.get("JINA_AI_API_KEY")
 
-    # ── Reddit API ────────────────────────────────────────────────
-    # Create an app at: https://www.reddit.com/prefs/apps  (type: "script")
-    REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID")
-    REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
 
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "True").lower() == "true"
     SESSION_COOKIE_SAMESITE = "Lax"
@@ -53,19 +47,6 @@ class Config:
     PERMANENT_SESSION_LIFETIME = 60 * 60 * 24 * 30  # 30 days
     REMEMBER_COOKIE_DURATION = 60 * 60 * 24 * 30    # 30 days
 
-    # ── Amazon PA-API 5.0 ─────────────────────────────────────────
-    # Requires two Amazon Associates accounts:
-    #   SA → https://affiliate-program.amazon.sa
-    #   AE → https://affiliate-program.amazon.ae
-    # Keys come from AWS IAM, linked to your Associates account.
-    AMAZON_ACCESS_KEY = os.environ.get("AMAZON_ACCESS_KEY")
-    AMAZON_SECRET_KEY = os.environ.get("AMAZON_SECRET_KEY")
-    AMAZON_ASSOCIATE_TAG_SA = os.environ.get("AMAZON_ASSOCIATE_TAG_SA", "nexora-sa-21")
-    AMAZON_ASSOCIATE_TAG_AE = os.environ.get("AMAZON_ASSOCIATE_TAG_AE", "nexora-ae-21")
-
-    # ── ArabClicks (Noon & other regional stores) ─────────────────
-    # Sign up at: https://www.arabclicks.com
-    ARABCLICKS_PUBLISHER_ID = os.environ.get("ARABCLICKS_PUBLISHER_ID")
 
     # ── Cache Configuration ───────────────────────────────────────
     CACHE_TYPE = os.environ.get("CACHE_TYPE", "SimpleCache")

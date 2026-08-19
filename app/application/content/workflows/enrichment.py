@@ -22,7 +22,7 @@ def enrich_discovered_articles(limit: int = 50, force: bool = False) -> dict:
     """
     from datetime import datetime, timedelta
     from app.domains.content.service.query.filtering import get_unscraped_articles, get_content_by_object
-    from app.application.content.ingestion.article_ingestion import process_diffbot_enrichment
+    from app.application.content.ingestion import process_diffbot_enrichment
     from app.application.content.ingestion.scraper_pipeline import fetch_and_clean_diffbot
 
     retry_threshold = datetime.utcnow() + timedelta(days=365) if force else datetime.utcnow() - timedelta(hours=24)

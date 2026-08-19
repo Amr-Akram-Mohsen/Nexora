@@ -33,7 +33,8 @@ def build_user_query(search, role, status, verified, subscription, provider, sor
     comments_sub = select(Comment.user_id, func.count(Comment.id).label('cnt')).group_by(Comment.user_id).subquery()
     shares_sub = select(Share.user_id, func.count(Share.id).label('cnt')).group_by(Share.user_id).subquery()
     engagement_score_expr = func.coalesce(views_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['views'] + func.coalesce(clicks_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['clicks'] + func.coalesce(saves_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['saves'] + func.coalesce(reactions_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['reactions'] + func.coalesce(comments_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['comments'] + func.coalesce(shares_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['shares']
-    stmt = select(User, engagement_score_expr.label('engagement_score')).outerjoin(views_sub, User.id == views_sub.c.user_id).outerjoin(clicks_sub, User.id == clicks_sub.c.user_id).outerjoin(saves_sub, User.id == saves_sub.c.user_id).outerjoin(reactions_sub, User.id == reactions_sub.c.user_id).outerjoin(comments_sub, User.id == comments_sub.c.user_id).outerjoin(shares_sub, User.id == shares_sub.c.user_id)
+    from sqlalchemy.orm import selectinload
+    stmt = select(User, engagement_score_expr.label('engagement_score')).options(selectinload(User.newsletter_subscription)).outerjoin(views_sub, User.id == views_sub.c.user_id).outerjoin(clicks_sub, User.id == clicks_sub.c.user_id).outerjoin(saves_sub, User.id == saves_sub.c.user_id).outerjoin(reactions_sub, User.id == reactions_sub.c.user_id).outerjoin(comments_sub, User.id == comments_sub.c.user_id).outerjoin(shares_sub, User.id == shares_sub.c.user_id)
     if sort_by == 'engagement_score':
         stmt = stmt.order_by(engagement_score_expr.desc() if sort_dir == 'desc' else engagement_score_expr.asc())
     elif sort_by == 'joined':

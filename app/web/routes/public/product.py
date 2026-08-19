@@ -14,7 +14,7 @@ from app.shared.utils.logging import log_route_start, log_route_success, log_rou
 
 logger = logging.getLogger(__name__)
 
-from . import PUBLIC_TEMPLATES
+from app.web.routes.constants import PUBLIC_TEMPLATES
 
 bp = Blueprint("product", __name__, template_folder=PUBLIC_TEMPLATES)
 

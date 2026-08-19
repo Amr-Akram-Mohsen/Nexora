@@ -8,7 +8,7 @@ from app.shared.utils.logging import (
     log_integration_error,
     log_integration_warning,
 )
-from .http import _get_session
+from .http import get_http_session
 from .fetch_engine import safe_get_json, safe_post_json
 from .fetchers_mappers import map_newsapi_ai, map_youtube
 from ..exceptions import PipelineQuotaExceededError

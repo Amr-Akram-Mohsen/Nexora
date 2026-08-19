@@ -1,15 +1,22 @@
-from .article_ingestion import ingest_article
-from .video_ingestion import ingest_video
-from .post_ingestion import ingest_post
+"""
+Content ingestion package exports.
+"""
+from .ingestors import (
+    ingest_content,
+    ingest_article,
+    ingest_video,
+    ingest_post,
+    process_diffbot_enrichment,
+    resolve_taxonomy,
+    generic_ingest,
+)
 
-def ingest_content(session, *, object_type, raw_data):
-    if object_type == "article":
-        return ingest_article(session, raw_data)
-
-    elif object_type == "video":
-        return ingest_video(session, raw_data)
-
-    elif object_type == "post":
-        return ingest_post(session, raw_data)
-
-    return None
+__all__ = [
+    "ingest_content",
+    "ingest_article",
+    "ingest_video",
+    "ingest_post",
+    "process_diffbot_enrichment",
+    "resolve_taxonomy",
+    "generic_ingest",
+]

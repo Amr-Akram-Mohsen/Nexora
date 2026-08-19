@@ -54,7 +54,7 @@ def init_scheduler(app):
     # ── NewsAPI AI: every 4 hours ───────────────────────────────────
     _scheduler.add_job(
         func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_newsapi_ai_fetch"
+            app, "app.integrations.content.runners.run_newsapi_ai_fetch"
         ),
         trigger=IntervalTrigger(hours=4),
         id="fetch_newsapi_ai",
@@ -65,7 +65,7 @@ def init_scheduler(app):
     # 10,000 units/day = 100 searches. 3h × 8 runs × 10 searches = 80. ✓
     _scheduler.add_job(
         func=lambda: _run_in_context(
-            app, "app.integrations.content.fetcher_runners.all_contents.run_youtube_fetch"
+            app, "app.integrations.content.runners.run_youtube_fetch"
         ),
         trigger=IntervalTrigger(hours=3),
         id="fetch_youtube",

@@ -77,59 +77,6 @@ def get_item_spec_groups(product_id):
     structured = product.structured_details
     return structured.get('groups') if structured else None
 
-@cache.memoize(timeout=3600)
-def get_distinct_stores():
-    from ..models import Store
-    stmt = select(Store.slug, Store.name).join(ProductStoreLink).join(ProductVariant).join(Product).distinct().order_by(Store.name)
-    rows = db.session.execute(stmt).mappings().all()
-    return [dict(row) for row in rows]
-
-@cache.memoize(timeout=3600)
-def get_distinct_product_types():
-    stmt = select(Product.product_type).distinct().order_by(Product.product_type)
-    rows = db.session.execute(stmt).scalars().all()
-    return [t for t in rows if t]
-
-def get_item_by_id(product_id, serialize=False, load='detail'):
-    from .utils import build_item_stmt, fetch_item
-    stmt = build_item_stmt(eager_load=load).where(Product.id == product_id)
-    product = fetch_item(stmt)
-    if not product:
-        return None
-    if serialize:
-        return serialize_item_detail(product) if load == 'detail' else serialize_item(product)
-    return product
-
-def get_items_by_ids(product_ids, serialize=False, load='detail'):
-    from .utils import build_item_stmt, fetch_items
-    if not product_ids:
-        return []
-    stmt = build_item_stmt(eager_load=load).where(Product.id.in_(product_ids))
-    products = fetch_items(stmt)
-    if serialize:
-        fn = serialize_item_detail if load == 'detail' else serialize_item
-        return [fn(product) for product in products]
-    return products
-
-def get_related_items(product, limit=8):
-    from .utils import build_item_stmt, fetch_items
-    if not product:
-        return []
-    stmt = build_item_stmt(eager_load='card').where(Product.id != product.id, Product.category_id == product.category_id)
-    if product.brand_id:
-        stmt = stmt.order_by(db.case((Product.brand_id == product.brand_id, 0), else_=1), Product.created_at.desc())
-    else:
-        stmt = stmt.order_by(Product.created_at.desc())
-    if limit:
-        stmt = stmt.limit(limit)
-    return fetch_items(stmt)
-
-def get_item_spec_groups(product_id):
-    product = get_item_by_id(product_id, load='detail', session=db.session)
-    if not product:
-        return None
-    structured = product.structured_details
-    return structured.get('groups') if structured else None
 
 def get_all_items_metadata():
     from sqlalchemy import select

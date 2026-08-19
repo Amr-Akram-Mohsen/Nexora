@@ -1,6 +1,5 @@
-from pathlib import Path
+from app.web.routes.constants import PUBLIC_TEMPLATES
 
-PUBLIC_TEMPLATES = str(Path(__file__).resolve().parent.parent.parent / "templates" / "public")
 
 from .system import bp as system_bp
 from .content import bp as content_bp

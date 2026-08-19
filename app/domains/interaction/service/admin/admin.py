@@ -4,7 +4,7 @@ from app.domains.interaction.models import Comment, Reaction, View, Save, Share,
 from app.domains.user.models import User
 from app.domains.content.models import Content
 from app.domains.product.models import Product, ProductStoreLink, ProductVariant, Store
-from app.domains.interaction.service.admin.serializers import _serialize_comment, _serialize_reaction, _serialize_save, _serialize_share
+from app.domains.interaction.service.admin.serializers import serialize_comment, serialize_reaction, serialize_save, serialize_share
 import math
 from datetime import date, datetime
 from app.shared.utils.orm_helpers import resolve_polymorphic_titles, resolve_users
@@ -41,7 +41,7 @@ def get_admin_comments_page(page, per_page, sentiment, target_type, search, user
             pass
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, titles_map = _load_interaction_context(pagination.items)
-    serialized = [_serialize_comment(c, users, titles_map) for c in pagination.items]
+    serialized = [serialize_comment(c, users, titles_map) for c in pagination.items]
     return (pagination, serialized)
 
 def delete_admin_comment(id):
@@ -73,7 +73,7 @@ def get_admin_reactions_page(page, per_page, reaction_type, target, user_search)
         stmt = stmt.where(or_(User.name.ilike(f'%{user_search}%'), User.email.ilike(f'%{user_search}%')))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, titles_map = _load_interaction_context(pagination.items)
-    serialized = [_serialize_reaction(r, users, titles_map) for r in pagination.items]
+    serialized = [serialize_reaction(r, users, titles_map) for r in pagination.items]
     return (pagination, serialized)
 
 def get_admin_views_page(page, per_page, target, start_date, end_date):
@@ -132,7 +132,7 @@ def get_admin_saves_page(page, per_page, target, user_search):
         stmt = stmt.where(or_(User.name.ilike(f'%{user_search}%'), User.email.ilike(f'%{user_search}%')))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, titles_map = _load_interaction_context(pagination.items)
-    serialized = [_serialize_save(s, users, titles_map) for s in pagination.items]
+    serialized = [serialize_save(s, users, titles_map) for s in pagination.items]
     return (pagination, serialized)
 
 def get_admin_shares_page(page, per_page, target, user_search):
@@ -146,5 +146,5 @@ def get_admin_shares_page(page, per_page, target, user_search):
         stmt = stmt.where(or_(User.name.ilike(f'%{user_search}%'), User.email.ilike(f'%{user_search}%')))
     pagination = db.paginate(stmt, page=page, per_page=per_page, error_out=False)
     users, titles_map = _load_interaction_context(pagination.items)
-    serialized = [_serialize_share(s, users, titles_map) for s in pagination.items]
+    serialized = [serialize_share(s, users, titles_map) for s in pagination.items]
     return (pagination, serialized)

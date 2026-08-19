@@ -35,7 +35,7 @@ def invalidate_content_listing_caches():
 def invalidate_content_filter_options():
     """Drop cached section filter option queries."""
     from app.domains.taxonomy.service.query import (
-        _cached_attributes_for_section,
+        get_cached_attributes_for_section,
         get_relationships_for_section,
         get_types_for_section,
     )
@@ -43,7 +43,7 @@ def invalidate_content_filter_options():
 
     cache.delete_memoized(get_relationships_for_section)
     cache.delete_memoized(get_types_for_section)
-    cache.delete_memoized(_cached_attributes_for_section)
+    cache.delete_memoized(get_cached_attributes_for_section)
 
 
 def invalidate_content_after_write(content_id=None):

@@ -21,32 +21,60 @@ from app import domains  # noqa: F401
 
 from app.domains.user.models import User
 from app.integrations.commercial.models import ProductDiscoveryQueue
-from app.web.routes import (
-    user_bp,
-    system_bp,
-    content_bp,
-    item_bp,
-    interaction_bp,
-    recommendation_bp,
-    suggestions_bp,
-    api_user_bp,
-    api_content_bp,
-    api_item_bp,
-    api_interaction_bp,
-    api_dashboard_bp,
-    api_ingestion_bp,
-    api_system_bp,
-    api_taxonomy_bp,
-    api_recommendation_bp,
-    api_source_bp,
-    api_store_bp,
-    api_insights_bp,
-    api_distribution_bp,
-    api_subscribers_bp,
-    api_analytics_bp,
-    api_scraping_bp,
-    api_admin_bp
-)
+def _register_blueprints(app: Flask):
+    from app.web.routes import (
+        user_bp,
+        system_bp,
+        content_bp,
+        item_bp,
+        interaction_bp,
+        recommendation_bp,
+        suggestions_bp,
+        api_user_bp,
+        api_content_bp,
+        api_item_bp,
+        api_interaction_bp,
+        api_dashboard_bp,
+        api_ingestion_bp,
+        api_system_bp,
+        api_taxonomy_bp,
+        api_recommendation_bp,
+        api_source_bp,
+        api_store_bp,
+        api_insights_bp,
+        api_distribution_bp,
+        api_subscribers_bp,
+        api_analytics_bp,
+        api_scraping_bp,
+        api_admin_bp,
+    )
+
+    app.register_blueprint(system_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(content_bp)
+    app.register_blueprint(item_bp)
+    app.register_blueprint(interaction_bp)
+    app.register_blueprint(recommendation_bp)
+    app.register_blueprint(suggestions_bp)
+
+    app.register_blueprint(api_content_bp)
+    app.register_blueprint(api_item_bp)
+    app.register_blueprint(api_user_bp)
+    app.register_blueprint(api_interaction_bp)
+    app.register_blueprint(api_dashboard_bp)
+    app.register_blueprint(api_ingestion_bp)
+    app.register_blueprint(api_system_bp)
+    app.register_blueprint(api_taxonomy_bp)
+    app.register_blueprint(api_recommendation_bp)
+    app.register_blueprint(api_source_bp)
+    app.register_blueprint(api_store_bp)
+    app.register_blueprint(api_insights_bp)
+    app.register_blueprint(api_distribution_bp)
+    app.register_blueprint(api_subscribers_bp)
+    app.register_blueprint(api_analytics_bp)
+    app.register_blueprint(api_scraping_bp)
+    app.register_blueprint(api_admin_bp)
+
 
 load_dotenv()
 
@@ -213,31 +241,7 @@ def create_app():
     def load_user(user_id):
         return db.session.get(User, int(user_id))
 
-    app.register_blueprint(system_bp)
-    app.register_blueprint(user_bp)
-    app.register_blueprint(content_bp)
-    app.register_blueprint(item_bp)
-    app.register_blueprint(interaction_bp)
-    app.register_blueprint(recommendation_bp)
-    app.register_blueprint(suggestions_bp)
-
-    app.register_blueprint(api_content_bp)
-    app.register_blueprint(api_item_bp)
-    app.register_blueprint(api_user_bp)
-    app.register_blueprint(api_interaction_bp)
-    app.register_blueprint(api_dashboard_bp)
-    app.register_blueprint(api_ingestion_bp)
-    app.register_blueprint(api_system_bp)
-    app.register_blueprint(api_taxonomy_bp)
-    app.register_blueprint(api_recommendation_bp)
-    app.register_blueprint(api_source_bp)
-    app.register_blueprint(api_store_bp)
-    app.register_blueprint(api_insights_bp)
-    app.register_blueprint(api_distribution_bp)
-    app.register_blueprint(api_subscribers_bp)
-    app.register_blueprint(api_analytics_bp)
-    app.register_blueprint(api_scraping_bp)
-    app.register_blueprint(api_admin_bp)
+    _register_blueprints(app)
 
     @app.before_request
     def check_maintenance():

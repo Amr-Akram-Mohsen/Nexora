@@ -261,13 +261,10 @@ class AliExpressParser(BaseParser):
         # 2. Parse Review Count independently
         reviews_tag = soup.find(class_=re.compile(r"\breviewer--reviews\b")) or soup.find(attrs={"data-pl": "reviews-count"})
         if reviews_tag:
-            from app.integrations.commercial.aliexpress.utils import _BARE_NUM_RE
-            m = _BARE_NUM_RE.search(_get_tag_text_or_title(reviews_tag).replace(",", ""))
-            if m:
-                try:
-                    review_count = int(m.group(1).replace(",", ""))
-                except ValueError:
-                    pass
+            from app.integrations.commercial.aliexpress.utils import extract_first_number
+            parsed_count = extract_first_number(_get_tag_text_or_title(reviews_tag))
+            if parsed_count is not None:
+                review_count = parsed_count
 
         return rating, review_count
 

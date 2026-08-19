@@ -17,7 +17,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from . import PUBLIC_TEMPLATES
+from app.web.routes.constants import PUBLIC_TEMPLATES
 
 bp = Blueprint("interaction", __name__, template_folder=PUBLIC_TEMPLATES)
 

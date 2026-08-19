@@ -1,6 +1,6 @@
 from sqlalchemy import func, select, case as sa_case
 from app.domains.product.models import Product
-from app.domains.product.service import get_item_card_load_options
+from app.domains.product.service.options import get_item_card_load_options
 
 def build_item_search_vector(product):
     return func.setweight(func.to_tsvector('english', func.coalesce(product.name, '')), 'A').op('||')(func.setweight(func.to_tsvector('english', func.coalesce(product.description, '')), 'B')).op('||')(func.setweight(func.to_tsvector('english', func.coalesce(product.search_text, '')), 'C'))
@@ -105,7 +105,7 @@ def get_filtered_items(active_filters, page=1, per_page=24):
     return {'products': [serialize_item(product) for product in pagination.items], 'page': pagination.page, 'pages': pagination.pages, 'total': pagination.total, 'has_next': pagination.has_next, 'has_prev': pagination.has_prev, 'prev_num': getattr(pagination, 'prev_num', pagination.page - 1 if pagination.has_prev else None), 'next_num': getattr(pagination, 'next_num', pagination.page + 1 if pagination.has_next else None)}
 
 @cache.memoize(timeout=600)
-def _get_home_products_cached(filter_type='recent', buffer_limit=10):
+def get_home_products_cached(filter_type='recent', buffer_limit=10):
     from app.domains.product.service.utils import build_item_stmt, fetch_items
     from app.domains.product.models import Product, ProductVariant
     from app.domains.product.serializers import serialize_item
@@ -132,10 +132,13 @@ def _get_home_products_cached(filter_type='recent', buffer_limit=10):
         products = fetch_items(stmt)
     return [serialize_item(product) for product in products]
 
+
+_get_home_products_cached = get_home_products_cached
+
 def get_filtered_products_for_home(filter_type='recent', limit=10, exclude_ids=None):
     exclude_ids = exclude_ids or []
     buffer_limit = limit + len(exclude_ids)
-    all_products = _get_home_products_cached(filter_type, buffer_limit)
+    all_products = get_home_products_cached(filter_type, buffer_limit)
     filtered = [p for p in all_products if p['id'] not in exclude_ids]
     return filtered[:limit]
 from app.infrastructure import cache

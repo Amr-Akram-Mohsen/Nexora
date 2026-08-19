@@ -29,7 +29,7 @@ def _today_count(api_name: str) -> int:
     return rec.request_count if rec else 0
 
 
-def _record_call(api_name: str, units: int = 1):
+def record_api_call(api_name: str, units: int = 1):
     today = date.today()
     rec = APIUsage.query.filter_by(date=today, api_name=api_name).first()
     if rec:
@@ -37,6 +37,9 @@ def _record_call(api_name: str, units: int = 1):
     else:
         db.session.add(APIUsage(date=today, request_count=units, api_name=api_name))
     db.session.commit()
+
+
+_record_call = record_api_call
 
 
 # ── Public helpers — one per API ──────────────────────────────────

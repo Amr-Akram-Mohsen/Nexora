@@ -158,10 +158,10 @@ def get_attributes_for_section(section_slug, category_slugs=None, limit=20, sess
             category_slugs = tuple(sorted([s for s in category_slugs if s]))
     else:
         category_slugs = None
-    return _cached_attributes_for_section(section_slug, category_slugs, limit, session)
+    return get_cached_attributes_for_section(section_slug, category_slugs, limit, session)
 
 @cache.memoize(timeout=3600)
-def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit, session=None):
+def get_cached_attributes_for_section(section_slug, category_slugs_tuple, limit, session=None):
     stmt = select(*build_filter_projection(AttributeFacet)).join(AttributeFacet.contents)
     if category_slugs_tuple:
         session = session or db.session
@@ -177,6 +177,10 @@ def _cached_attributes_for_section(section_slug, category_slugs_tuple, limit, se
         stmt = stmt.where(AttributeFacet.category_id.in_(list(category_ids)))
     stmt = apply_content_section_filters(stmt=stmt, model=AttributeFacet, section_slug=section_slug, limit=limit)
     return execute_mapped_query(stmt, session)
+
+
+_cached_attributes_for_section = get_cached_attributes_for_section
+
 
 def paginate_taxonomy_entity(model, page, per_page, search='', status=None, health=None, field_name=None, extra_filter=None):
     stmt = select(model).order_by(model.name.asc())
