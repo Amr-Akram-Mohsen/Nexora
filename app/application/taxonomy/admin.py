@@ -1,10 +1,26 @@
-from sqlalchemy import select, func, cast
 from app.core.extensions import db
-from app.domains.relationships import ArticleSource
-from app.domains.taxonomy.models import Source
-from app.domains.content.models import Content, Article
-from app.domains.external.models import LastAPIFetch
-from app.domains.taxonomy.service.admin.admin import create_admin_category as domain_create_category, update_admin_category as domain_update_category, delete_admin_category as domain_delete_category, create_admin_brand as domain_create_brand, update_admin_brand as domain_update_brand, delete_admin_brand as domain_delete_brand, create_admin_topic as domain_create_topic, update_admin_topic as domain_update_topic, delete_admin_topic as domain_delete_topic, update_admin_section as domain_update_section, create_admin_attribute as domain_create_attribute, update_admin_attribute as domain_update_attribute, delete_admin_attribute as domain_delete_attribute, get_source_inspect_data, get_category_rows_data, get_brand_rows_data, get_topic_rows_data, get_section_rows_data, get_attribute_rows_data, get_facet_rows_data
+from app.domains.taxonomy.service.admin.admin import (
+    create_admin_category as domain_create_category,
+    update_admin_category as domain_update_category,
+    delete_admin_category as domain_delete_category,
+    create_admin_brand as domain_create_brand,
+    update_admin_brand as domain_update_brand,
+    delete_admin_brand as domain_delete_brand,
+    create_admin_topic as domain_create_topic,
+    update_admin_topic as domain_update_topic,
+    delete_admin_topic as domain_delete_topic,
+    update_admin_section as domain_update_section,
+    create_admin_attribute as domain_create_attribute,
+    update_admin_attribute as domain_update_attribute,
+    delete_admin_attribute as domain_delete_attribute,
+    get_source_inspect_data,
+    get_category_rows_data,
+    get_brand_rows_data,
+    get_topic_rows_data,
+    get_section_rows_data,
+    get_attribute_rows_data,
+    get_facet_rows_data,
+)
 from app.domains.taxonomy.service.admin.insights import apply_taxonomy_insight
 from app.shared.utils.admin_helpers import execute_admin_workflow
 

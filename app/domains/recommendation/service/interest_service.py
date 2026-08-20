@@ -3,9 +3,18 @@ from app.core.extensions import db
 from app.domains.recommendation.models import UserInterest, UserEntityInterest
 from app.domains.product.models import Product
 from app.domains.content.models import Article
-from app.domains.recommendation.interest_weights import INTEREST_WEIGHTS
 from app.shared.constants.core import TargetType
 from sqlalchemy import select
+
+INTEREST_WEIGHTS = {
+    'view': 0,
+    'product_click': 0.5,
+    'like': 1.0,
+    'dislike': -0.7,
+    'comment': 0.4,
+    'comment_positive': 1.2,
+    'comment_negative': -1.0,
+}
 
 def extract_entities_from_target(target):
     if isinstance(target, Product):

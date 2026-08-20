@@ -6,8 +6,16 @@ from app.shared.constants.core import TargetType
 from app.domains.interaction.models import ProductClick
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.domains.interaction.service.query import get_recent_views, get_saved_items, get_collection_counts_by_user
-from app.domains.interaction.service import react, save_item, post_comment, record_share, get_comment_by_id, record_view
-from app.domains.interaction.service.tracking import track_recommendation_impression, track_recommendation_click
+from app.domains.interaction.service import (
+    react,
+    save_item,
+    post_comment,
+    record_share,
+    get_comment_by_id,
+    record_view,
+    track_recommendation_impression,
+    track_recommendation_click,
+)
 from app.domains.product.service.query import get_items_by_ids
 from app.domains.product.models import ProductStoreLink
 from app.domains.product.service import get_item_by_id

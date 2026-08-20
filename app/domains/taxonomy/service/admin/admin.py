@@ -10,8 +10,7 @@ from app.domains.content.models import Article
 from app.domains.product.models import ProductVariant, ProductImage
 from app.domains.relationships import content_products
 from app.domains.taxonomy.service.query import get_taxonomy_content_stats, paginate_taxonomy_entity
-from app.domains.taxonomy.service.admin.serializers import serialize_source_inspect_dto
-from app.domains.taxonomy.serializers import serialize_taxonomy
+from app.domains.taxonomy.serializers import serialize_taxonomy, serialize_source_inspect_dto
 from app.domains.taxonomy.models import Source
 from app.domains.taxonomy.service.admin.metrics import get_category_metrics, get_brand_metrics, get_topic_metrics, get_section_metrics, get_attribute_metrics, get_facet_metrics
 

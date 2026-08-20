@@ -1,6 +1,7 @@
 def unlink_match_workflow(content_id, product_id):
-    from app.domains.recommendation.service.admin.command import delete_match
-    return delete_match(content_id, product_id)
+    from app.domains.recommendation.service.admin.admin import delete_admin_match
+    return delete_admin_match(content_id, product_id)
+
 
 def get_match_inspect_workflow(content_id: int):
     from app.domains.recommendation.service.admin.admin import get_admin_match_inspect_raw

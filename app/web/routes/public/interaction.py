@@ -348,7 +348,7 @@ def rename_collection_route():
     if not old_name or not new_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
         
-    from app.domains.interaction.service.public.collections import rename_collection
+    from app.domains.interaction.service.command import rename_collection
     result = rename_collection(current_user, old_name, new_name)
     return jsonify(result), (200 if result.get("success") else 400)
 
@@ -363,7 +363,7 @@ def delete_collection_route():
     if not collection_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
         
-    from app.domains.interaction.service.public.collections import delete_collection
+    from app.domains.interaction.service.command import delete_collection
     result = delete_collection(current_user, collection_name, move_to_global)
     return jsonify(result), (200 if result.get("success") else 400)
 
@@ -386,6 +386,6 @@ def move_save_route():
     except ValueError:
         return jsonify({"success": False, "error": "Invalid target type"}), 400
         
-    from app.domains.interaction.service.public.collections import move_save_collection
+    from app.domains.interaction.service.command import move_save_collection
     result = move_save_collection(current_user, target_type_parsed, target_id, new_collection_name, old_collection_name)
     return jsonify(result), (200 if result.get("success") else 400)
