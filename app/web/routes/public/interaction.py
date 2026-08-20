@@ -1,24 +1,40 @@
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, abort, current_app
+"""
+Public user interactions, newsletter subscriptions, comments, reactions, and saves routes.
+"""
+import logging
+from flask import (
+    Blueprint,
+    request,
+    jsonify,
+    render_template,
+    current_app,
+    flash,
+    redirect,
+    url_for,
+    abort,
+)
 from flask_login import current_user, login_required
-from app.core.extensions import limiter, db, csrf
-from app.shared.constants.core import TargetType
+from app.core.extensions import limiter, csrf
 from app.shared.parsing import parse_target_type, parse_interaction_type
 from app.shared.request import get_client_ip
 from app.core.context import get_newsletter_context
-from app.application.interaction.newsletter import subscribe_workflow, confirm_subscription_workflow, unsubscribe_workflow
-from app.application.interaction.public import handle_interaction_workflow, record_item_click_workflow
+from app.application.interaction.newsletter import (
+    subscribe_workflow,
+    confirm_subscription_workflow,
+    unsubscribe_workflow,
+)
+from app.application.interaction.public import (
+    handle_interaction_workflow,
+    record_item_click_workflow,
+    track_view_workflow,
+    track_impression_workflow,
+    track_click_workflow,
+)
 from app.domains.interaction.constants import INTERACTION_TYPE
-from app.domains.interaction.service import check_user_reaction, check_user_save, get_saved_items
-from app.domains.content.service import get_content_by_id
-from app.domains.product.service import get_item_by_id
-from app.application.interaction.public import track_view_workflow, track_impression_workflow, track_click_workflow
 from app.shared.utils.logging import log_route_start, log_route_success
-import logging
-
-logger = logging.getLogger(__name__)
-
 from app.web.routes.constants import PUBLIC_TEMPLATES
 
+logger = logging.getLogger(__name__)
 bp = Blueprint("interaction", __name__, template_folder=PUBLIC_TEMPLATES)
 
 
@@ -61,6 +77,7 @@ def subscribe():
     success, message = subscribe_workflow(email, user_id)
     return _newsletter_response(success, message, email=email, status_code=400 if not success else 200)
 
+
 @bp.route('/confirm-subscription/<token>')
 def confirm_subscription(token):
     if confirm_subscription_workflow(token):
@@ -68,6 +85,7 @@ def confirm_subscription(token):
     else:
         flash("Invalid or expired confirmation link.", "error")
     return redirect(url_for('system.newsletter'))
+
 
 @bp.route('/unsubscribe-auth', methods=['POST'])
 @login_required
@@ -80,6 +98,7 @@ def unsubscribe_auth():
         status_code=400 if not success else 200,
     )
 
+
 @bp.route('/unsubscribe/<token>')
 def unsubscribe_token(token):
     if unsubscribe_workflow(token=token):
@@ -88,6 +107,7 @@ def unsubscribe_token(token):
         flash("Invalid unsubscribe link.", "error")
     return redirect(url_for('system.newsletter'))
 
+
 @bp.route("/check-react-batch")
 @login_required
 def check_react_batch():
@@ -95,9 +115,9 @@ def check_react_batch():
     target_ids = request.args.getlist("id")
     if len(target_types) != len(target_ids):
         abort(400, "Mismatched parameters")
-    
+
     from app.domains.interaction.service.query import check_user_reactions_batch
-    
+
     targets_dict = {}
     original_keys = {}
     for t_str, id_str in zip(target_types, target_ids):
@@ -108,16 +128,17 @@ def check_react_batch():
             original_keys[(target_type, target_id)] = f"{t_str}:{id_str}"
         except (ValueError, TypeError):
             continue
-            
+
     batch_results = check_user_reactions_batch(current_user.id, targets_dict)
-    
+
     result = {}
     for (t_type, t_id), reaction_type in batch_results.items():
         original_key = original_keys.get((t_type, t_id))
         if original_key:
             result[original_key] = reaction_type
-            
+
     return jsonify(result)
+
 
 @bp.route("/check-save-batch")
 @login_required
@@ -126,9 +147,9 @@ def check_save_batch():
     target_ids = request.args.getlist("id")
     if len(target_types) != len(target_ids):
         abort(400, "Mismatched parameters")
-    
+
     from app.domains.interaction.service.query import check_user_saves_batch
-    
+
     targets_dict = {}
     original_keys = {}
     for t_str, id_str in zip(target_types, target_ids):
@@ -139,16 +160,17 @@ def check_save_batch():
             original_keys[(target_type, target_id)] = f"{t_str}:{id_str}"
         except (ValueError, TypeError):
             continue
-            
+
     batch_results = check_user_saves_batch(current_user.id, targets_dict)
-    
+
     result = {}
     for (t_type, t_id), is_saved in batch_results.items():
         original_key = original_keys.get((t_type, t_id))
         if original_key and is_saved:
             result[original_key] = True
-            
+
     return jsonify(result)
+
 
 @bp.route("/get-comments")
 def get_comments():
@@ -157,12 +179,12 @@ def get_comments():
         target_id = int(request.args.get("id"))
     except (ValueError, TypeError):
         abort(400, "Invalid parameters")
-    
+
     parent_id = request.args.get("parent_id", type=int)
-    
+
     from app.domains.interaction.service import get_comments_for_target
     comments = get_comments_for_target(target_type, target_id, parent_id)
-    
+
     comments_html = "".join(
         render_template(
             'components/interactions/comment-card.html',
@@ -170,14 +192,15 @@ def get_comments():
             is_reply=parent_id is not None
         ) for c in comments
     )
-    
+
     return comments_html
+
 
 @bp.route("/product-click/<int:link_id>", methods=["POST"])
 def item_click(link_id):
     user = current_user if current_user.is_authenticated else None
     ip_address = request.remote_addr if not (user and user.is_authenticated) else None
-    
+
     redirect_url = record_item_click_workflow(
         link_id,
         user,
@@ -186,11 +209,12 @@ def item_click(link_id):
         request.referrer,
         request.headers.get("CF-IPCountry")
     )
-    
+
     if not redirect_url:
         abort(404)
-        
+
     return jsonify({"redirect_url": redirect_url})
+
 
 @bp.route("/view", methods=["POST"])
 def add_view():
@@ -199,21 +223,13 @@ def add_view():
         target_id = int(request.form.get("id"))
     except (ValueError, TypeError):
         abort(400, "Invalid parameters")
-        
+
     user = current_user if current_user.is_authenticated else None
     ip = None if user else get_client_ip()
-    
-    target = None
-    if target_type == TargetType.ARTICLE:
-        target = get_content_by_id(target_id)
-    else:
-        target = get_item_by_id(target_id, load="minimal")
-        
-    if not target:
-        abort(404)
-        
+
     result = track_view_workflow(target_id, target_type, user, ip)
     return jsonify(result)
+
 
 @bp.route("/handle-interaction", methods=["POST"])
 @login_required
@@ -261,26 +277,26 @@ def handle_interaction():
         current_app.logger.exception("Interaction failed")
         return jsonify({"success": False, "error": "Interaction failed"}), 500
 
+
 @bp.route('/saved')
 @login_required
 def saved_items():
     from app.application.interaction.public import (
         get_saved_articles_workflow,
         get_saved_products_workflow,
-        get_user_collection_counts_workflow
     )
 
     log_route_start(logger, "/saved", user_id=current_user.id)
-    
+
     saved_articles = get_saved_articles_workflow(current_user.id)
     saved_items = get_saved_products_workflow(current_user.id)
-    
+
     # Extract collections
     collections = set()
     for product in saved_articles + saved_items:
         if product.get("collection_name"):
             collections.add(product["collection_name"])
-    
+
     collections = sorted(list(collections))
 
     log_route_success(
@@ -303,14 +319,13 @@ def track_impression():
     entity_type = data.get("entity_type")
     context_id = data.get("context_id")
     entity_ids = data.get("entity_ids", [])
-    
+
     if not entity_type or not entity_ids:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
-        
+
     user_id = current_user.id if current_user.is_authenticated else None
-    
     success = track_impression_workflow(entity_type, entity_ids, context_id, user_id)
-    
+
     if success:
         return jsonify({"success": True})
     else:
@@ -324,18 +339,18 @@ def track_click():
     entity_type = data.get("entity_type")
     entity_id = data.get("entity_id")
     context_id = data.get("context_id")
-    
+
     if not entity_type or not entity_id:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
-        
+
     user_id = current_user.id if current_user.is_authenticated else None
-    
     success = track_click_workflow(entity_type, entity_id, context_id, user_id)
-    
+
     if success:
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": "Failed to track click"}), 500
+
 
 @bp.route("/collection/rename", methods=["POST"])
 @login_required
@@ -344,13 +359,14 @@ def rename_collection_route():
     data = request.get_json() or {}
     old_name = data.get("old_name")
     new_name = data.get("new_name")
-    
+
     if not old_name or not new_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
-        
+
     from app.domains.interaction.service.command import rename_collection
     result = rename_collection(current_user, old_name, new_name)
     return jsonify(result), (200 if result.get("success") else 400)
+
 
 @bp.route("/collection/delete", methods=["POST"])
 @login_required
@@ -359,13 +375,14 @@ def delete_collection_route():
     data = request.get_json() or {}
     collection_name = data.get("collection_name")
     move_to_global = data.get("move_to_global", False)
-    
+
     if not collection_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
-        
+
     from app.domains.interaction.service.command import delete_collection
     result = delete_collection(current_user, collection_name, move_to_global)
     return jsonify(result), (200 if result.get("success") else 400)
+
 
 @bp.route("/save/move", methods=["POST"])
 @login_required
@@ -376,16 +393,17 @@ def move_save_route():
     target_id = data.get("target_id")
     new_collection_name = data.get("new_collection_name")
     old_collection_name = data.get("old_collection_name")
-    
+
     if not target_type or not target_id or not new_collection_name:
         return jsonify({"success": False, "error": "Missing parameters"}), 400
-        
+
     try:
         from app.shared.parsing import parse_target_type
         target_type_parsed = parse_target_type(target_type)
     except ValueError:
         return jsonify({"success": False, "error": "Invalid target type"}), 400
-        
+
     from app.domains.interaction.service.command import move_save_collection
     result = move_save_collection(current_user, target_type_parsed, target_id, new_collection_name, old_collection_name)
     return jsonify(result), (200 if result.get("success") else 400)
+

@@ -69,7 +69,7 @@ label[data-disabled="true"] * {
 
 ::selection {
   background-color: var(--primary, var(--brand-blue-dark));
-  color: #fff;
+  color: var(--outline);
 }
 
 /* --- Table & List Helpers --- */
@@ -91,7 +91,7 @@ label[data-disabled="true"] * {
 
 .clear-all-link:hover {
   color: var(--brand-red);
-  background: rgba(239, 68, 68, var(--alpha-ghost));
+  background: rgba(var(--brand-red-rgb), var(--alpha-ghost));
 }
 
 /* --- Interactive Utilities --- */

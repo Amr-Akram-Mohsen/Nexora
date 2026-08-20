@@ -134,19 +134,16 @@ function initVideoPlayerEnhancements() {
         // 101 or 150 means the owner disabled playback outside of YouTube
         if (event.data === 101 || event.data === 150) {
             const wrapper = document.querySelector('.video-player-wrapper');
-            const iframe = wrapper.querySelector('iframe');
+            const iframe = wrapper?.querySelector('iframe');
             if (wrapper && iframe) {
                 const videoUrl = iframe.src.replace('embed/', 'watch?v=').split('?')[0];
-                wrapper.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full w-full bg-black text-center p-6 absolute inset-0 z-50">
-                        <i class="fab fa-youtube text-red-600 mb-4" style="font-size: 3rem;"></i>
-                        <h3 class="text-white text-xl font-bold mb-2">Playback Disabled</h3>
-                        <p class="text-gray-400 mb-6 max-w-md">The owner of this video has disabled playback on other websites. Don't worry, you can still watch it directly on YouTube!</p>
-                        <a href="${videoUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="background: #ef4444; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">
-                            Watch on YouTube
-                        </a>
-                    </div>
-                `;
+                const template = document.getElementById('video-error-template');
+                if (template) {
+                    const clone = template.content.cloneNode(true);
+                    const link = clone.querySelector('.video-error-link');
+                    if (link) link.href = videoUrl;
+                    wrapper.replaceChildren(clone);
+                }
             }
         }
     }
@@ -184,48 +181,54 @@ function initVideoPlayerEnhancements() {
         const topVideos = uniqueVideos.slice(0, 4);
         if (topVideos.length === 0) return;
         
-        // The first one is the auto-play target
         const nextVideoUrl = topVideos[0].url;
 
-        let gridHtml = topVideos.map(v => `
-            <a href="${v.url}" style="display: flex; flex-direction: column; text-decoration: none; text-align: left; background: rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.1);" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                ${v.thumb ? `<img src="${v.thumb}" style="width: 100%; aspect-ratio: 16/9; object-fit: cover;">` : '<div style="width:100%; aspect-ratio:16/9; background:#222;"></div>'}
-                <div style="padding: 10px;">
-                    <p style="color: white; font-size: 0.9rem; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${v.title}</p>
-                </div>
-            </a>
-        `).join('');
+        const overlayTemplate = document.getElementById('video-upnext-template');
+        const itemTemplate = document.getElementById('video-upnext-item-template');
+        if (!overlayTemplate) return;
 
-        // Overlay UI with 10 second timeout
-        wrapper.insertAdjacentHTML('beforeend', `
-            <div class="up-next-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-products: center; justify-content: center; z-index: 50; padding: 20px; box-sizing: border-box;">
-                <div class="flex justify-between w-full" style="max-width: 800px; display: flex; justify-content: space-between; align-products: center; margin-bottom: 20px;">
-                    <h3 style="color: white; font-size: 1.2rem; margin: 0;">Up Next in <span id="up-next-timer">10</span>s</h3>
-                    <button class="cancel-up-next-btn" style="background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem;"><i class="fas fa-times"></i> Cancel</button>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; max-width: 800px;">
-                    ${gridHtml}
-                </div>
-            </div>
-        `);
-        
+        const overlayClone = overlayTemplate.content.cloneNode(true);
+        const grid = overlayClone.querySelector('.up-next-grid');
+
+        topVideos.forEach(v => {
+            if (itemTemplate && grid) {
+                const itemClone = itemTemplate.content.cloneNode(true);
+                const itemLink = itemClone.querySelector('.up-next-card');
+                if (itemLink) itemLink.href = v.url;
+                const img = itemClone.querySelector('.up-next-card__thumb');
+                const placeholder = itemClone.querySelector('.up-next-card__placeholder');
+                if (v.thumb && img) {
+                    img.src = v.thumb;
+                    img.alt = v.title;
+                    if (placeholder) placeholder.remove();
+                } else if (img) {
+                    img.remove();
+                }
+                const titleEl = itemClone.querySelector('.up-next-card__title');
+                if (titleEl) titleEl.textContent = v.title;
+                grid.appendChild(itemClone);
+            }
+        });
+
+        wrapper.appendChild(overlayClone);
+
+        const overlay = wrapper.querySelector('.up-next-overlay');
+        const cancelBtn = overlay?.querySelector('.cancel-up-next-btn');
         let cancelled = false;
         let timeLeft = 10;
-        
-        wrapper.querySelector('.cancel-up-next-btn').addEventListener('click', () => {
+
+        cancelBtn?.addEventListener('click', () => {
             cancelled = true;
-            const overlay = wrapper.querySelector('.up-next-overlay');
-            if (overlay) overlay.remove();
+            overlay?.remove();
         });
-        
+
         const timerInterval = setInterval(() => {
             if (cancelled) {
                 clearInterval(timerInterval);
                 return;
             }
             timeLeft--;
-            const timerEl = wrapper.querySelector('#up-next-timer');
+            const timerEl = overlay?.querySelector('#up-next-timer');
             if (timerEl) timerEl.textContent = timeLeft;
             
             if (timeLeft <= 0) {

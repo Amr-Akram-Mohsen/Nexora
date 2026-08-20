@@ -1,0 +1,18 @@
+{# _tab_insights.html #}
+{% from "admin/components/ui/panels.html" import admin_tab_panel %}
+
+{% call admin_tab_panel("insights", is_active=true) %}
+<div>
+  <h3><i class="fa-solid fa-robot"></i> Automated Tagging Suggestions</h3>
+  <div id="insights-suggestions-container" class="dashboard-widget-card">
+    <div>Loading suggestions...</div>
+  </div>
+</div>
+
+<div>
+  <h3><i class="fa-solid fa-triangle-exclamation"></i> Cross-Domain Coherence</h3>
+  <div id="insights-coherence-container" class="dashboard-widget-card">
+    <div>Loading coherence checks...</div>
+  </div>
+</div>
+{% endcall %}

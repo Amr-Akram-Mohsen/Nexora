@@ -1,0 +1,14 @@
+{# _trending_brands_strip.html #}
+{% from "components/ui/core.html" import badge %}
+
+<div class="brands-strip flex flex-wrap">
+  {% for brand in trending_brands %}
+  <a href="{{ url_for('content.sections', section_slug='reviews') }}?brand={{ brand.slug }}"
+    class="brand-chip hover-lift" aria-label="Browse {{ brand.name }} content">
+    <span class="brand-chip__name">{{ brand.name }}</span>
+    {% if brand.recent_views %}
+    {{ badge(brand.recent_views | int | string + ' views', variant='secondary', class='brand-chip__views badge--xs') }}
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>

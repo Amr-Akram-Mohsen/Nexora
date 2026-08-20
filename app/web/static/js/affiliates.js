@@ -7,7 +7,8 @@ async function handleAffiliateClick(li) {
     const linkId = li.dataset.linkId;
 
     try {
-        const res = await fetch(`/product-click/${linkId}`, {
+        const prefix = window.APP?.urls?.productClickPrefix || "/product-click";
+        const res = await fetch(`${prefix}/${linkId}`, {
             method: "POST",
             headers: { "X-Requested-With": "XMLHttpRequest" }
         });

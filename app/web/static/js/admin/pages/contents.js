@@ -4,7 +4,7 @@
   'use strict';
 
   // Page-level State Management
-  window.contentsController = null;
+  let contentsController = null;
   let selectedIds = new Set();
   let categoriesList = [];
 
@@ -30,8 +30,8 @@
           no_topics: "stat-no-topics",
           no_brands: "stat-no-brands"
         };
-        if (window.contentsController) {
-          window.contentsController.updateStatsUI(stats, mapping);
+        if (contentsController) {
+          contentsController.updateStatsUI(stats, mapping);
         }
 
         const total = (stats.published || 0) + (stats.drafts || 0) + (stats.failed || 0);
@@ -147,12 +147,12 @@
         applyContentsUrlFilters();
 
         // Once metadata is ready, init contents controller
-        window.contentsController.init();
+        contentsController.init();
       })
       .catch((err) => {
         console.error("Could not load filters metadata:", err);
         showToast("Error loading catalog metadata filters.", "error");
-        window.contentsController.init(); // Fallback
+        contentsController.init(); // Fallback
       });
   }
 
@@ -196,7 +196,7 @@
           showToast(res.message || "Content safely deleted.", "success");
           selectedIds.delete(parseInt(id, 10));
           updateBulkToolbar();
-          window.contentsController.load(window.contentsController.currentPage);
+          contentsController.load(contentsController.currentPage);
           loadStats();
         } else {
           showToast("Failed to delete content.", "error");
@@ -244,7 +244,7 @@
               document.getElementById("bulk-category-select").value = "";
               document.getElementById("bulk-category-select").classList.add("is-hidden");
               updateBulkToolbar();
-              window.contentsController.load(window.contentsController.currentPage);
+              contentsController.load(contentsController.currentPage);
               loadStats();
             } else {
               showToast((res && res.error) || "Bulk action failed.", "error");
@@ -293,7 +293,7 @@
         if (res && res.success) {
           showToast("Category quick-updated successfully.", "success");
           hideQuickCategoryModal();
-          window.contentsController.load(window.contentsController.currentPage);
+          contentsController.load(contentsController.currentPage);
           loadStats();
         } else {
           showToast((res && res.error) || "Recategorization failed.", "error");
@@ -313,7 +313,7 @@
       .then((res) => {
         if (res && res.success) {
           showToast(res.message, "success");
-          window.contentsController.load(window.contentsController.currentPage);
+          contentsController.load(contentsController.currentPage);
           loadStats();
         } else {
           showToast((res && res.error) || "Failed to toggle status.", "error");
@@ -388,7 +388,7 @@
       document.getElementById("sort-dir").value = "desc";
       selectedIds.clear();
       updateBulkToolbar();
-      window.contentsController.load(1);
+      contentsController.load(1);
     });
 
     // Select All binding
@@ -503,7 +503,7 @@
   }
 
   // Define Controller Configuration
-  window.contentsController = new AdminListController({
+  contentsController = new AdminListController({
     domain: "contents",
     endpoint: "/admin/contents/",
     rowsEndpoint: "/admin/contents/rows",

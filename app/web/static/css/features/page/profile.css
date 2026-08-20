@@ -261,6 +261,11 @@
   margin-top: 1.5rem;
 }
 
+#password-toggle-btn.active i,
+.accordion-arrow.is-open {
+  transform: rotate(180deg);
+}
+
 .form-row-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -279,8 +284,116 @@
 
 /* --- Collections Management --- */
 .collection-manage-product {
+  padding: 1rem;
   border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   background: rgba(var(--background-rgb), 0.5);
+}
+
+.collection-name-display {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--foreground);
+}
+
+.collection-count-display {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.collections-empty-state {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--muted-foreground);
+}
+
+.collections-empty-icon {
+  font-size: 1.875rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+/* --- Linked Accounts Section --- */
+.profile-linked-accounts-header {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.profile-linked-accounts-title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  margin-bottom: 0.75rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.account-switcher-btn {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.account-switcher-btn:hover {
+  background: var(--accent);
+}
+
+.account-switcher-active {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--brand-blue);
+  border-radius: var(--radius-md);
+  padding: 0.5rem;
+  background: rgba(var(--brand-blue-rgb), var(--alpha-soft));
+}
+
+.profile-avatar--mini {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.8rem;
+}
+
+.profile-avatar--mini-active {
+  background: var(--brand-blue);
+  color: var(--outline);
+}
+
+.account-switcher-name {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  color: var(--foreground);
+}
+
+.account-switcher-name--active {
+  color: var(--brand-blue);
+}
+
+.account-switcher-email {
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+}
+
+.account-switcher-email--active {
+  color: var(--brand-blue);
+  opacity: 0.8;
+}
+
+.btn-add-account {
+  width: 100%;
+  margin-top: 0.75rem;
+  font-size: var(--text-sm);
+}
+
+.delete-account-warning {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
 }
 
 /* --- Danger Zone --- */
@@ -310,7 +423,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-dark-50);
   z-index: 1000;
   justify-content: center;
   align-items: center;

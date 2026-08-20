@@ -1,6 +1,6 @@
 .platform-icon--reddit {
-  color: #ff4500;
-  background: rgba(255, 69, 0, 0.05);
+  color: var(--color-brand-reddit);
+  background: rgba(var(--color-brand-reddit-rgb), var(--alpha-subtle));
 }
 
 [data-type="post"] {

@@ -28,7 +28,8 @@ async function initAllSaves() {
     }
 
     try {
-        const res = await fetch(`/check-save-batch?${params.toString()}`);
+        const endpoint = window.APP?.urls?.checkSaveBatch || "/check-save-batch";
+        const res = await fetch(`${endpoint}?${params.toString()}`);
         if (!res.ok) return;
 
         const data = await res.json();
@@ -55,11 +56,12 @@ function updateSavedHeaderCount() {
 
     if (!totalCountEl || !collectionsContainer) return;
     
-    const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
-    const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card').length;
+    const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card, [data-domain-type="commercial"] [data-saveable-card]').length;
+    const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card, [data-domain-type="content"] [data-saveable-card]').length;
+    const total = numItems + numArticles;
 
-    totalCountEl.textContent = numProducts + numArticles;
-    if (totalCountLabel) totalCountLabel.textContent = (numProducts + numArticles) === 1 ? 'product' : 'products';
+    totalCountEl.textContent = total;
+    if (totalCountLabel) totalCountLabel.textContent = total === 1 ? 'product' : 'products';
 }
 
 function setSavedActiveFilter(activeId) {
@@ -129,9 +131,9 @@ function initSavedItemsPage() {
 
     // MutationObserver to sync counts and sidebar filters dynamically on card removal (unsave)
     const observer = new MutationObserver(function(mutations) {
-        const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card').length;
-        const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card').length;
-        const totalCount = numProducts + numArticles;
+        const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card, [data-domain-type="commercial"] [data-saveable-card]').length;
+        const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card, [data-domain-type="content"] [data-saveable-card]').length;
+        const totalCount = numItems + numArticles;
 
         // Update header count based on current view
         updateSavedHeaderCount();
@@ -158,78 +160,77 @@ function initMoveToCollection() {
     
     const collectionElements = document.querySelectorAll('.filter-item:not(#filter-all) .filter-item__link span:first-child');
     const collections = Array.from(collectionElements).map(el => el.textContent.trim());
+
+    // Show server-rendered move-collection wrappers and populate options once
+    document.querySelectorAll('.move-collection-wrapper').forEach(wrapper => {
+        wrapper.classList.remove('is-hidden');
+        const select = wrapper.querySelector('.move-item-select');
+        if (select && select.options.length <= 1) {
+            collections.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                select.appendChild(opt);
+            });
+            const globalOpt = document.createElement('option');
+            globalOpt.value = 'general';
+            globalOpt.textContent = 'Global';
+            select.appendChild(globalOpt);
+        }
+    });
+}
+
+async function handleMoveCollectionChange(e) {
+    const select = e.target.closest('.move-item-select');
+    if (!select) return false;
     
+    const newCollection = select.value;
+    if (!newCollection) return false;
+    
+    const card = select.closest('.card, [data-saveable-card]');
+    const panel = select.closest('.interaction-panel');
+    if (!panel) return false;
+    
+    const targetType = panel.dataset.type;
+    const targetId = panel.dataset.id;
+    const currentCollection = card?.closest('.collection-group')?.querySelector('.section-title')?.textContent.trim() || 'General';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || document.querySelector('input[name="csrf_token"]')?.value;
 
-    document.querySelectorAll('.card').forEach(card => {
-        const panel = card.querySelector('.interaction-panel');
-        if (!panel) return;
-        
-        const targetType = panel.dataset.type;
-        const targetId = panel.dataset.id;
-        
-        const currentCollection = card.closest('.collection-group')?.querySelector('.section-title')?.textContent.trim() || 'General';
-        const actions = panel.querySelector('.interaction-panel__actions');
-        if (!actions) return;
-        
-        // Prevent double injection
-        if (actions.querySelector('.move-collection-wrapper')) return;
-        
-        let optionsHtml = `<option value="" disabled selected>Move</option>`;
-        collections.forEach(c => {
-            optionsHtml += `<option value="${c}">${c}</option>`;
+    try {
+        const endpoint = window.APP?.urls?.moveSave || "/save/move";
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                target_type: targetType,
+                target_id: targetId,
+                new_collection_name: newCollection,
+                old_collection_name: currentCollection
+            })
         });
-        optionsHtml += `<option value="general">Global</option>`;
         
-        const selectHtml = `
-            <div class="move-collection-wrapper">
-                <select class="move-item-select" aria-label="Move to collection">
-                    ${optionsHtml}
-                </select>
-                <i class="fas fa-chevron-down move-item-select-icon"></i>
-            </div>
-        `;
-        actions.insertAdjacentHTML('afterbegin', selectHtml);
-        
-        actions.querySelector('.move-item-select').addEventListener('change', async (e) => {
-            const newCollection = e.target.value;
-            if (!newCollection) return;
-            
-            try {
-                const res = await fetch("/save/move", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({
-                        target_type: targetType,
-                        target_id: targetId,
-                        new_collection_name: newCollection,
-                        old_collection_name: currentCollection
-                    })
-                });
-                
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    if (typeof showToast === 'function') {
-                        showToast('Product moved successfully', 'success');
-                    }
-                    setTimeout(() => window.location.reload(), 800);
-                } else {
-                    if (typeof showToast === 'function') {
-                        showToast(data.error || 'Failed to move product.', 'error');
-                    } else {
-                        alert(data.error || 'Failed to move product.');
-                    }
-                    e.target.value = ""; // Reset
-                }
-            } catch(err) {
-                console.error(err);
-                if (typeof showToast === 'function') {
-                    showToast('An error occurred.', 'error');
-                }
+        const data = await res.json();
+        if (res.ok && data.success) {
+            if (typeof showToast === 'function') {
+                showToast('Product moved successfully', 'success');
             }
-        });
-    });
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            if (typeof showToast === 'function') {
+                showToast(data.error || 'Failed to move product.', 'error');
+            } else {
+                alert(data.error || 'Failed to move product.');
+            }
+            select.value = ""; // Reset
+        }
+    } catch(err) {
+        console.error(err);
+        if (typeof showToast === 'function') {
+            showToast('An error occurred.', 'error');
+        }
+    }
+    return true;
 }

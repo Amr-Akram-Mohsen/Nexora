@@ -1,0 +1,33 @@
+{# _product_specs.html #}
+{% from "components/ui/core.html" import button %}
+
+{% if product.quick_details and product.quick_details|length > 0 %}
+<div class="detail-page__specs">
+
+    <div class="product-details-card">
+
+        <h3 class="product-details-card__title flex items-center">
+            <span class="product-details-card__bar"></span>
+            {% block details_title %}
+            Product Details
+            {% endblock %}
+        </h3>
+
+        {% set full_details = product.structured_details.get('groups') if product.structured_details else None %}
+
+        {% if full_details %}
+        <div class="product-details-card__items flex flex-col gap-3">
+            {% from "commercial/features/render-details.html" import render_details %}
+            {{ render_details(full_details) }}
+        </div>
+
+        {% call button(type="button", id="toggle-specs-btn", class="product-details-inline-toggle flex-center gap-2 justify-center items-center", attrs={"aria-expanded": "false"}, unstyled=True) %}
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            Show More
+        {% endcall %}
+        {% endif %}
+
+    </div>
+
+</div>
+{% endif %}

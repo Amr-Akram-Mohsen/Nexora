@@ -1,0 +1,18 @@
+{# _tab_sections.html #}
+{% from "admin/components/ui/panels.html" import admin_tab_panel %}
+{% from "admin/components/ui/tables.html" import admin_crud_table %}
+{% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
+{% from "components/ui/core.html" import button %}
+
+{% call admin_tab_panel("sections") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("section-search", "Search sections…") }}
+  {{ admin_filter_select("section-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
+  {{ admin_filter_select("section-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
+  {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "sections"}, variant=none) }}
+</div>
+{% endcall %}
+{{ admin_crud_table(tables['sections'], "Loading sections…", "loading-height-md") }}
+{% endcall %}

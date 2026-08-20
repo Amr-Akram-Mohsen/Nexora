@@ -50,7 +50,9 @@
 
   /* Text weight */
   --weight-md: 500;
+  --weight-medium: 500;
   --weight-bold: 600;
+  --weight-semibold: 600;
   --weight-xbold: 700;
   --weight-display: 800;
 
@@ -154,6 +156,8 @@
   --color-warning: rgb(var(--color-warning-rgb));
   --color-info-rgb: 59, 130, 246;
   --color-info: rgb(var(--color-info-rgb));
+  --color-brand-reddit-rgb: 255, 69, 0;
+  --color-brand-reddit: rgb(var(--color-brand-reddit-rgb));
   --color-brand-facebook: #1877F2;
   --color-brand-instagram: #E4405F;
   --color-brand-pinterest: #BD081C;

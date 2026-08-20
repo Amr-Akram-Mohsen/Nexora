@@ -49,5 +49,6 @@ scraper_tests/
 helpers/
 scripts/
 migrations/
+scratch/
 
 local_backup.dump

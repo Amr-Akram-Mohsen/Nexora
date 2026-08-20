@@ -1,7 +1,7 @@
 {% extends "admin/layout/admin_base.html" %}
 {% from "admin/components/ui/panels.html" import admin_page_header %}
 {% from "admin/components/ui/tables.html" import standard_table %}
-{% from "components/ui/core.html" import badge %}
+{% from "components/ui/core.html" import badge, stat_card %}
 
 {% block title %}Content Analytics Dashboard — Nexora Admin{% endblock %}
 {% block content_class %}admin-content-fluid{% endblock %}
@@ -16,36 +16,12 @@
 
 {# ── KPI Stats Grid ── #}
 <div class="dashboard-stats-grid">
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Total Content</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.total }}</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-database"></i></div>
-  </div>
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Published</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.published }}</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-check-circle"></i></div>
-  </div>
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Drafts &amp; Review</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.drafts }}</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-edit"></i></div>
-  </div>
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Enrichment Failed</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.failed }}</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-times-circle"></i></div>
-  </div>
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Unclassified</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.no_tax }}</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-tags"></i></div>
-  </div>
-  <div class="dashboard-stat-card">
-    <div class="dashboard-stat-label">Scrape Coverage</div>
-    <div class="dashboard-stat-value">{{ stats.kpi.scrape_coverage }}%</div>
-    <div class="dashboard-stat-icon flex items-center justify-center"><i class="fas fa-spider"></i></div>
-  </div>
+  {{ stat_card("Total Content", value_text=stats.kpi.total, icon="fas fa-database", class="card", inner_class="dashboard-stat-card flex flex-col") }}
+  {{ stat_card("Published", value_text=stats.kpi.published, icon="fas fa-check-circle", class="card", inner_class="dashboard-stat-card flex flex-col") }}
+  {{ stat_card("Drafts & Review", value_text=stats.kpi.drafts, icon="fas fa-edit", class="card", inner_class="dashboard-stat-card flex flex-col") }}
+  {{ stat_card("Enrichment Failed", value_text=stats.kpi.failed, icon="fas fa-times-circle", class="card", inner_class="dashboard-stat-card flex flex-col") }}
+  {{ stat_card("Unclassified", value_text=stats.kpi.no_tax, icon="fas fa-tags", class="card", inner_class="dashboard-stat-card flex flex-col") }}
+  {{ stat_card("Scrape Coverage", value_text=(stats.kpi.scrape_coverage ~ "%"), icon="fas fa-spider", class="card", inner_class="dashboard-stat-card flex flex-col") }}
 </div>
 
 {# ── Row 1: Charts ── #}

@@ -4,7 +4,8 @@ async function handleCountryChange(e) {
 
     const country = e.target.value || "";
 
-    await fetch("/set-country", {
+    const endpoint = window.APP?.urls?.setCountry || "/set-country";
+    await fetch(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

@@ -1,13 +1,3 @@
-{% set meta = product.structured_details.get('meta') %}
-
-{% if meta %}
-<div class="perfume-meta flex flex-wrap">
-
-  {% for key, value in meta.items() %}
-  <span class="badge">
-    {{ key.replace('_', ' ') }}: {{ value }}
-  </span>
-  {% endfor %}
-
-</div>
-{% endif %}
+{% from "commercial/features/render-structured-block.html" import render_structured_badges %}
+{% set meta = product.structured_details.get('meta') if product.structured_details else None %}
+{{ render_structured_badges(meta, wrapper_class="perfume-meta flex flex-wrap", show_key=True) }}

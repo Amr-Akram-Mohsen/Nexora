@@ -1,0 +1,29 @@
+{# _tab_attributes.html #}
+{% from "admin/components/ui/panels.html" import admin_tab_panel %}
+{% from "admin/components/ui/tables.html" import admin_crud_table %}
+{% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
+{% from "components/ui/core.html" import button, input %}
+
+{% call admin_tab_panel("attributes") %}
+<div class="admin-inline-form" id="attribute-create-form">
+  <h3 class="admin-inline-form-title">Add New Attribute</h3>
+  <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
+    {{ input(type="text", id="new-attribute-name", placeholder="Attribute name…", class="dashboard-filter-input admin-inline-input", required=False) }}
+    <div class="admin-inline-slug-preview flex items-center">
+      Slug: <code id="new-attribute-slug-preview">—</code>
+    </div>
+    {{ button(text="+ Add Attribute", class="admin-btn-primary", attrs={"id": "create-attribute-btn"}, variant=none) }}
+  </div>
+</div>
+
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("attribute-search", "Search attributes…") }}
+  {{ admin_filter_select("attribute-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
+  {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "attributes"}, variant=none) }}
+</div>
+{% endcall %}
+
+{{ admin_crud_table(tables['attributes'], "Loading attributes…", "loading-height-md") }}
+{% endcall %}

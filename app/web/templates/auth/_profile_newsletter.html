@@ -1,0 +1,41 @@
+{# _profile_newsletter.html #}
+{% from "components/ui/core.html" import button, card, form, input %}
+
+{% call card(title="Email Preferences", desc="Manage your email communications and digest updates.", class="settings-card") %}
+<div class="newsletter-settings-box" data-newsletter data-newsletter-placement="profile">
+  {% if subscriber and subscriber.is_active %}
+  <div class="newsletter-status-product flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+      <p class="newsletter-status-subtitle">You are currently receiving reviews, deals, and tech updates.</p>
+    </div>
+    {% call form("interaction.unsubscribe_auth", attrs={"data-newsletter-form": "", "data-newsletter-placement": "profile"}) %}
+    {{ input(type="hidden", name="newsletter_placement", value="profile", required=False) }}
+    {{ input(type="hidden", name="newsletter_title", value="Weekly Digest Ingestion", required=False) }}
+    {{ input(type="hidden", name="newsletter_description", value="Manage your Nexora newsletter subscription.", required=False) }}
+    {{ button(text="Unsubscribe", type="submit", variant="outline", class="btn--xs gap-2") }}
+    {% endcall %}
+  </div>
+  {% else %}
+  <div class="newsletter-status-product flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <p class="newsletter-status-title">Weekly Digest Ingestion</p>
+      <p class="newsletter-status-subtitle">
+        {% if subscriber and subscriber.unsubscribed_at is none %}
+        Check your email to confirm your subscription.
+        {% else %}
+        Stay updated with Saudi Arabia & UAE tech reviews, deals, and insights.
+        {% endif %}
+      </p>
+    </div>
+    {% call form("interaction.subscribe", attrs={"data-newsletter-form": "", "data-newsletter-placement": "profile"}) %}
+    {{ input(type="hidden", name="newsletter_placement", value="profile", required=False) }}
+    {{ input(type="hidden", name="newsletter_title", value="Weekly Digest Ingestion", required=False) }}
+    {{ input(type="hidden", name="newsletter_description", value="Manage your Nexora newsletter subscription.", required=False) }}
+    {% set btn_text = "Resend confirmation" if subscriber and subscriber.unsubscribed_at is none else "Subscribe" %}
+    {{ button(text=btn_text, type="submit", variant="primary", class="btn--xs gap-2") }}
+    {% endcall %}
+  </div>
+  {% endif %}
+</div>
+{% endcall %}

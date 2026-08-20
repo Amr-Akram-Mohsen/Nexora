@@ -1,0 +1,35 @@
+{# _profile_account.html #}
+{% from "components/ui/core.html" import button, card, field, form, input %}
+
+{% call card(title="Personal Details", desc="Update your display name and email address.", class="settings-card") %}
+{% call form(form_action=url_for('user.update_profile'), class="profile-form") %}
+{{ input(type="hidden", name="action", value="name", required=False) }}
+
+<div class="profile-form-grid">
+  {% call field(label_text="Display Name", for_id="name", class="gap-2 flex") %}
+  {{ input(name="name", id="name", value=current_user.name or '', placeholder="Enter your name") }}
+  <span class="form-description">This name will be displayed alongside your comments and reviews.</span>
+  {% endcall %}
+  <div class="form-actions">
+    {{ button(text="Save Name", type="submit", variant="primary", class="gap-2") }}
+  </div>
+</div>
+{% endcall %}
+
+{% if current_user.provider != 'google' %}
+<div class="border-t-separator"></div>
+{% call form(form_action=url_for('user.update_profile'), class="profile-form") %}
+{{ input(type="hidden", name="action", value="email", required=False) }}
+
+<div class="profile-form-grid">
+  {% call field(label_text="Email Address", for_id="email", class="gap-2 flex") %}
+  {{ input(name="email", id="email", type="email", value=current_user.email, placeholder="Enter new email", required=True) }}
+  <span class="form-description">Updating your email will require verification via a 6-digit code.</span>
+  {% endcall %}
+  <div class="form-actions">
+    {{ button(text="Update Email", type="submit", variant="primary", class="gap-2") }}
+  </div>
+</div>
+{% endcall %}
+{% endif %}
+{% endcall %}

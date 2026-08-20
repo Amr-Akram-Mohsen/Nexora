@@ -24,7 +24,7 @@ a.clickable-card {
     cursor: pointer;
 }
 
-a.clickable-card:hover .dashboard-stat-card {
+a.clickable-card:hover > .dashboard-stat-card {
     box-shadow: var(--shadow-md);
 }
 
@@ -716,4 +716,8 @@ a.clickable-card:hover .dashboard-stat-value {
 .activity-meta {
     color: var(--muted-foreground);
     margin-top: 0.25rem;
+}
+
+.taxonomy-stats-bar {
+    margin-bottom: 1rem;
 }

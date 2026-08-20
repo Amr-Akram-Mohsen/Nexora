@@ -50,7 +50,26 @@
 
   {% block app_data %}
   <script>
-    window.APP = JSON.parse('{{ {"isAuthenticated": is_authenticated, "userEmail": user_email} | tojson | safe }}');
+    window.APP = {
+      isAuthenticated: {{ is_authenticated | tojson }},
+      userEmail: {{ user_email | tojson }},
+      searchQuery: {{ query | default('', true) | tojson }},
+      urls: {
+        interaction: {{ url_for('interaction.handle_interaction') | tojson }},
+        checkSaveBatch: {{ url_for('interaction.check_save_batch') | tojson }},
+        checkReactBatch: {{ url_for('interaction.check_react_batch') | tojson }},
+        getComments: {{ url_for('interaction.get_comments') | tojson }},
+        contact: {{ url_for('system.contact') | tojson }},
+        trackImpression: {{ url_for('interaction.track_impression') | tojson }},
+        trackClick: {{ url_for('interaction.track_click') | tojson }},
+        view: {{ url_for('interaction.add_view') | tojson }},
+        moveSave: {{ url_for('interaction.move_save_route') | tojson }},
+        renameCollection: {{ url_for('interaction.rename_collection_route') | tojson }},
+        deleteCollection: {{ url_for('interaction.delete_collection_route') | tojson }},
+        setCountry: {{ url_for('system.set_country') | tojson }},
+        productClickPrefix: {{ url_for('interaction.item_click', link_id=0).replace('/0', '') | tojson }}
+      }
+    };
   </script>
   {% endblock %}
   <!-- Core JavaScript files -->
@@ -104,6 +123,7 @@
   <script src="{{ url_for('static', filename='js/features/theme.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/features/navigation.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/features/search.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/catalog-sort.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/features/location.js') }}" defer></script>
 
   <script src="{{ url_for('static', filename='js/features/password.js') }}" defer></script>
@@ -120,6 +140,7 @@
   <script src="{{ url_for('static', filename='js/features/comments.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/features/interactions.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/features/progressive-reveal.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/features/video-lazy.js') }}" defer></script>
 
   <script src="{{ url_for('static', filename='js/commercial/features/gallery.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/commercial/features/specifications-dialog.js') }}" defer></script>
@@ -138,6 +159,9 @@
   <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
   {{ button(id="back-to-top", class="back-to-top is-hidden", attrs={"aria-label": "Go to top"}, icon="fas
   fa-chevron-up", unstyled=True) }}
+
+  <!-- Collection Popover Template -->
+  {% include "components/ui/_collection_popover.html" %}
 
   <!-- Floating Compare Bar (hidden by default) -->
   <div id="compare-floating-bar" class="compare-bar flex items-center justify-between" style="display: none;">

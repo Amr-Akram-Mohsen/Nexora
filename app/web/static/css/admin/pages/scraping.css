@@ -9,7 +9,7 @@
 }
 
 .task-progress-wrapper {
-    background: var(--bg-secondary);
+    background: var(--secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 1.25rem;
@@ -33,30 +33,30 @@
     text-transform: uppercase;
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
-    background: rgba(var(--brand-blue-rgb), 0.1);
+    background: rgba(var(--brand-blue-rgb), var(--alpha-soft));
     color: var(--brand-blue);
 }
 
 .task-status-badge.status-running {
-    background: rgba(var(--brand-purple-rgb), 0.1);
+    background: rgba(var(--brand-purple-rgb), var(--alpha-soft));
     color: var(--brand-purple);
 }
 
 .task-status-badge.status-completed {
-    background: rgba(var(--brand-green-rgb), 0.1);
+    background: rgba(var(--brand-green-rgb), var(--alpha-soft));
     color: var(--brand-green);
 }
 
 .task-status-badge.status-failed {
-    background: rgba(var(--brand-red-rgb), 0.1);
+    background: rgba(var(--brand-red-rgb), var(--alpha-soft));
     color: var(--brand-red);
 }
 
 .progress-bar-bg {
     width: 100%;
     height: 6px;
-    background: rgba(var(--foreground-rgb), 0.1);
-    border-radius: 3px;
+    background: rgba(var(--foreground-rgb), var(--alpha-soft));
+    border-radius: var(--radius-sm);
     overflow: hidden;
     margin-bottom: 0.5rem;
 }
@@ -64,7 +64,7 @@
 .progress-bar-fill {
     height: 100%;
     background: var(--brand-blue);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     transition: width 0.3s ease;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .scraping-stat-card {
-    background: var(--bg-secondary);
+    background: var(--secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 1rem;
@@ -107,7 +107,7 @@
     font-size: var(--text-xs);
     color: var(--muted-foreground);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
 }
 
@@ -132,7 +132,7 @@
     align-items: flex-start;
     gap: 0.75rem;
     padding: 0.75rem;
-    background: var(--bg-secondary);
+    background: var(--secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
 }

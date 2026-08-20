@@ -102,11 +102,4 @@ icon="fa-search-minus"
 {% endif %}
 
 {% endcall %}
-
-{% if query %}
-<script>
-  window.SEARCH_QUERY = {{ query | tojson | safe }};
-</script>
-{% endif %}
-
 {% endblock %}

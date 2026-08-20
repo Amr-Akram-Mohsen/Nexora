@@ -1,14 +1,3 @@
-{% set dims = product.structured_details.get('dimensions') %}
-
-{% if dims %}
-<div class="size-guide">
-  <h4>Size Guide</h4>
-
-  {% for key, value in dims.items() %}
-  <div>
-    {{ key.replace('_', ' ') | title }}: {{ value }}
-  </div>
-  {% endfor %}
-
-</div>
-{% endif %}
+{% from "commercial/features/render-structured-block.html" import render_structured_key_values %}
+{% set dims = product.structured_details.get('dimensions') if product.structured_details else None %}
+{{ render_structured_key_values(dims, wrapper_class="size-guide", title="Size Guide") }}

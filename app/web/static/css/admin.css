@@ -9,7 +9,8 @@
 @import "./admin/layout/header.css" layer(admin);
 @import "./admin/layout/navigation.css" layer(admin);
 @import "./admin/pages/dashboard.css" layer(admin);
-@import "./admin/pages/taxonomy.css" layer(admin);
+@import "./admin/pages/ingestion.css" layer(admin);
+@import "./admin/pages/scraping.css" layer(admin);
 @import "./admin/components/tables.css" layer(admin);
 @import "./admin/components/forms.css" layer(admin);
 @import "./admin/components/modals.css" layer(admin);

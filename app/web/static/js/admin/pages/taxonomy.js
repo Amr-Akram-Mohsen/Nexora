@@ -61,10 +61,14 @@
       .catch(err => console.error("Error loading taxonomy stats:", err));
   }
 
-  window.categoriesController = null;
-  window.brandsController = null;
-  window.topicsController = null;
-  window.sectionsController = null;
+  let categoriesController = null;
+  let brandsController = null;
+  let topicsController = null;
+  let sectionsController = null;
+  let attributesController = null;
+  let genderFacetsController = null;
+  let intentFacetsController = null;
+  let priceTierFacetsController = null;
 
   // ── Slug helper (mirrors Python's generate_slug) ─────────────
   function slugify(str) {
@@ -82,14 +86,14 @@
   }
 
   const controllers = {
-    'categories': () => window.categoriesController,
-    'brands': () => window.brandsController,
-    'topics': () => window.topicsController,
-    'sections': () => window.sectionsController,
-    'attributes': () => window.attributesController,
-    'gender_facets': () => window.genderFacetsController,
-    'intent_facets': () => window.intentFacetsController,
-    'price_tier_facets': () => window.priceTierFacetsController
+    'categories': () => categoriesController,
+    'brands': () => brandsController,
+    'topics': () => topicsController,
+    'sections': () => sectionsController,
+    'attributes': () => attributesController,
+    'gender_facets': () => genderFacetsController,
+    'intent_facets': () => intentFacetsController,
+    'price_tier_facets': () => priceTierFacetsController
   };
 
   function loadTab(tab) {
@@ -119,7 +123,7 @@
         showToast(`Category "${name}" created.`, 'success');
         nameInput.value = '';
         document.getElementById('new-category-slug-preview').textContent = '—';
-        window.categoriesController.load(1);
+        categoriesController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -129,7 +133,7 @@
       if (btn) btn.disabled = true;
       window.api.delete(`/admin/taxonomy/categories/${id}`)
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); window.categoriesController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); categoriesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -141,7 +145,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Category ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        window.categoriesController.load(1);
+        categoriesController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -159,7 +163,7 @@
         document.getElementById('new-brand-name').value = '';
         document.getElementById('new-brand-industry').value = '';
         document.getElementById('new-brand-slug-preview').textContent = '—';
-        window.brandsController.load(1);
+        brandsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -169,7 +173,7 @@
       if (btn) btn.disabled = true;
       window.api.delete(`/admin/taxonomy/brands/${id}`)
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); window.brandsController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); brandsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -181,7 +185,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Brand ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        window.brandsController.load(1);
+        brandsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -197,7 +201,7 @@
         showToast(`Topic "${name}" created.`, 'success');
         document.getElementById('new-topic-name').value = '';
         document.getElementById('new-topic-slug-preview').textContent = '—';
-        window.topicsController.load(1);
+        topicsController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -207,7 +211,7 @@
       if (btn) btn.disabled = true;
       window.api.delete(`/admin/taxonomy/topics/${id}`)
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); window.topicsController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); topicsController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -219,7 +223,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Topic ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        window.topicsController.load(1);
+        topicsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -230,7 +234,7 @@
       .then(d => {
         if (d.error) { showToast(d.error, 'error'); el.checked = !isActive; return; }
         showToast(`Section ${isActive ? 'activated' : 'deactivated'}.`, 'success');
-        window.sectionsController.load(1);
+        sectionsController.load(1);
       })
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
@@ -246,7 +250,7 @@
         showToast(`Attribute "${name}" created.`, 'success');
         document.getElementById('new-attribute-name').value = '';
         document.getElementById('new-attribute-slug-preview').textContent = '—';
-        window.attributesController.load(1);
+        attributesController.load(1);
       })
       .catch(() => showToast('Create failed.', 'error'));
   }
@@ -256,7 +260,7 @@
       if (btn) btn.disabled = true;
       window.api.delete(`/admin/taxonomy/attributes/${id}`)
         .then(d => {
-          if (d.success) { showToast(d.message, 'success'); window.attributesController.load(1); }
+          if (d.success) { showToast(d.message, 'success'); attributesController.load(1); }
           else { showToast(d.error, 'error'); if (btn) btn.disabled = false; }
         })
         .catch(() => { showToast('Delete failed.', 'error'); if (btn) btn.disabled = false; });
@@ -333,8 +337,10 @@
           showToast(`Successfully merged!`, 'success');
           openDuplicatesModal(domain); // reload duplicates
           // Reload the relevant table
-          if (window[`${domain}Controller`]) {
-            window[`${domain}Controller`].load(window[`${domain}Controller`].currentPage);
+          const getCtrl = controllers[domain];
+          if (getCtrl) {
+            const ctrl = getCtrl();
+            if (ctrl) ctrl.load(ctrl.currentPage);
           }
         }
       })
@@ -392,7 +398,7 @@
 
   // ── Init ─────────────────────────────────
   function init() {
-    window.categoriesController = new AdminListController({
+    categoriesController = new AdminListController({
       domain: 'categories',
       endpoint: '/admin/taxonomy/categories',
       rowsEndpoint: '/admin/taxonomy/categories/rows',
@@ -401,7 +407,7 @@
       autoInit: false
     });
 
-    window.brandsController = new AdminListController({
+    brandsController = new AdminListController({
       domain: 'brands',
       endpoint: '/admin/taxonomy/brands',
       rowsEndpoint: '/admin/taxonomy/brands/rows',
@@ -410,7 +416,7 @@
       autoInit: false
     });
 
-    window.topicsController = new AdminListController({
+    topicsController = new AdminListController({
       domain: 'topics',
       endpoint: '/admin/taxonomy/topics',
       rowsEndpoint: '/admin/taxonomy/topics/rows',
@@ -419,7 +425,7 @@
       autoInit: false
     });
 
-    window.sectionsController = new AdminListController({
+    sectionsController = new AdminListController({
       domain: 'sections',
       endpoint: '/admin/taxonomy/sections',
       rowsEndpoint: '/admin/taxonomy/sections/rows',
@@ -428,7 +434,7 @@
       autoInit: false
     });
 
-    window.attributesController = new AdminListController({
+    attributesController = new AdminListController({
       domain: 'attributes',
       endpoint: '/admin/taxonomy/attributes',
       rowsEndpoint: '/admin/taxonomy/attributes/rows',
@@ -437,7 +443,7 @@
       autoInit: false
     });
 
-    window.genderFacetsController = new AdminListController({
+    genderFacetsController = new AdminListController({
       domain: 'gender_facets',
       endpoint: '/admin/taxonomy/gender_facets',
       rowsEndpoint: '/admin/taxonomy/gender_facets/rows',
@@ -446,7 +452,7 @@
       autoInit: false
     });
 
-    window.intentFacetsController = new AdminListController({
+    intentFacetsController = new AdminListController({
       domain: 'intent_facets',
       endpoint: '/admin/taxonomy/intent_facets',
       rowsEndpoint: '/admin/taxonomy/intent_facets/rows',
@@ -455,7 +461,7 @@
       autoInit: false
     });
 
-    window.priceTierFacetsController = new AdminListController({
+    priceTierFacetsController = new AdminListController({
       domain: 'price_tier_facets',
       endpoint: '/admin/taxonomy/price_tier_facets',
       rowsEndpoint: '/admin/taxonomy/price_tier_facets/rows',
@@ -477,7 +483,7 @@
     loadInsights();
 
     // Load categories tab if needed
-    window.categoriesController.init();
+    categoriesController.init();
     loadedTabs.add('categories');
   }
 

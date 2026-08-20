@@ -9,10 +9,10 @@
 }
 
 .cache-helpers-view {
-    font-size: 12px;
-    background: var(--bg-secondary);
-    padding: 10px;
-    border-radius: 4px;
+    font-size: var(--text-xs);
+    background: var(--secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-sm);
     max-height: 400px;
     overflow-y: auto;
     overflow-x: auto;
@@ -22,25 +22,25 @@
     width: 100%;
     text-align: left;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: var(--space-4);
 }
 
 .ingestion-query-table th,
 .ingestion-query-table td {
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--border);
 }
 
 .ingestion-query-code {
-    background: var(--bg-secondary);
-    padding: 2px 4px;
-    border-radius: 4px;
+    background: var(--secondary);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
 }
 
 .ingestion-status-success {
-    color: var(--success);
+    color: var(--brand-green);
 }
 
 .ingestion-status-danger {
-    color: var(--danger);
+    color: var(--brand-red);
 }

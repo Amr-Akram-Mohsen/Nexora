@@ -1,22 +1,22 @@
 // ── Password visibility toggle ─────────────────────────────────────────────────
+function togglePasswordVisibility(btn) {
+    const wrapper = btn.closest(".password-wrapper");
+    const input = wrapper?.querySelector("input");
+    if (!input) return;
+
+    const isHidden = input.type === "password";
+    input.type = isHidden ? "text" : "password";
+
+    const icon = btn.querySelector("i");
+    if (icon) {
+        icon.classList.toggle("fa-eye", !isHidden);
+        icon.classList.toggle("fa-eye-slash", isHidden);
+    }
+    btn.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+}
+
 function initPasswordToggles() {
-    document.querySelectorAll(".password-toggle").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const wrapper = btn.closest(".password-wrapper");
-            const input = wrapper?.querySelector("input");
-            if (!input) return;
-
-            const isHidden = input.type === "password";
-            input.type = isHidden ? "text" : "password";
-
-            const icon = btn.querySelector("i");
-            if (icon) {
-                icon.classList.toggle("fa-eye", !isHidden);
-                icon.classList.toggle("fa-eye-slash", isHidden);
-            }
-            btn.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
-        });
-    });
+    // Retained as a no-op for backward compatibility since handlePasswordClick handles this via delegation
 }
 
 
@@ -100,19 +100,13 @@ function initConfirmMatch() {
 
 function togglePasswordForm() {
     const collapsible = document.getElementById('password-collapsible');
-    const arrow = document.getElementById('accordion-arrow');
+    const arrow = document.getElementById('accordion-arrow') || document.querySelector('#password-toggle-btn i');
     const btn = document.getElementById('password-toggle-btn');
-    if (!collapsible || !arrow || !btn) return;
+    if (!collapsible) return;
 
-    if (collapsible.classList.contains('collapsed')) {
-      collapsible.classList.remove('collapsed');
-      arrow.style.transform = 'rotate(180deg)';
-      btn.classList.add('active');
-    } else {
-      collapsible.classList.add('collapsed');
-      arrow.style.transform = 'rotate(0deg)';
-      btn.classList.remove('active');
-    }
+    const isCollapsed = collapsible.classList.toggle('collapsed');
+    arrow?.classList.toggle('is-open', !isCollapsed);
+    btn?.classList.toggle('active', !isCollapsed);
 }
 
 function handlePasswordClick(e) {
@@ -121,34 +115,44 @@ function handlePasswordClick(e) {
         togglePasswordForm();
         return true;
     }
+
+    const pwdToggle = e.target.closest('.password-toggle, [data-action="toggle-password"]');
+    if (pwdToggle) {
+        togglePasswordVisibility(pwdToggle);
+        return true;
+    }
+
     return false;
 }
 
-function initProfileForms() {
-    const forms = document.querySelectorAll('.ajax-form, .profile-form');
-    forms.forEach(form => {
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.classList.add('is-loading');
+async function handleProfileFormSubmit(e) {
+    const form = e.target.closest('.ajax-form, .profile-form');
+    if (!form) return false;
 
-        try {
-          const response = await fetch(form.action, {
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.classList.add('is-loading');
+
+    try {
+        const response = await fetch(form.action, {
             method: 'POST',
             body: new FormData(form),
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
-          });
-          const result = await response.json();
-          if (result.success) {
+        });
+        const result = await response.json();
+        if (result.success) {
             window.location.reload();
-          } else {
+        } else {
             alert(result.error || "Update failed");
-          }
-        } catch (err) {
-          console.error(err);
-        } finally {
-          if (btn) btn.classList.remove('is-loading');
         }
-      });
-    });
+    } catch (err) {
+        console.error(err);
+    } finally {
+        if (btn) btn.classList.remove('is-loading');
+    }
+    return true;
+}
+
+function initProfileForms() {
+    // Retained for backward compatibility since handleProfileFormSubmit handles this via global submit delegation
 }

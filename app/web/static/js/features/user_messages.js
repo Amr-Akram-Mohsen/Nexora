@@ -3,7 +3,8 @@ async function handleUserMessages(form) {
     const btn = form.querySelector('button[type="submit"]');
     setLoading(btn, true);
 
-    const res = await fetch("/contact", {
+    const endpoint = form.action || window.APP?.urls?.contact || "/contact";
+    const res = await fetch(endpoint, {
         method: "POST",
         body: formData
     });

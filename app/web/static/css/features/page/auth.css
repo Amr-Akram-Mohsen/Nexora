@@ -321,3 +321,18 @@
 .resend-alert__btn {
   font-size: 0.75rem;
 }
+
+/* --- Verification Code Input --- */
+.auth-code-input {
+  text-align: center;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.25em;
+  font-size: var(--text-lg);
+}
+
+.auth-resend-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}

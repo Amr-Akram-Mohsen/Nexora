@@ -50,9 +50,9 @@
 </nav>
 {% endmacro %}
 
-{% macro badge(text="", class="", variant="primary", icon=None, href=None, attrs={}) %}
+{% macro badge(text="", class="", variant="primary", icon=None, href=None, attrs={}, unstyled=False) %}
 {% set tag = "a" if href else "span" %}
-{% set base_class = "badge inline-flex items-center justify-center gap-1" %}
+{% set base_class = "badge" if unstyled else "badge inline-flex items-center justify-center gap-1" %}
 {% set variant_class = (" variant--" ~ variant) if variant else "" %}
 <{{ tag }} {% if href %}href="{{ href }}" {% endif %}
   class="{{ base_class }}{{ variant_class }}{{ ' ' ~ class if class else '' }}" {% for key, value in attrs.items() %} {{

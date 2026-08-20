@@ -21,6 +21,13 @@
 
   <div class="interaction-panel__actions interaction-panel__actions--compact flex items-center gap-2">
 
+    <div class="move-collection-wrapper is-hidden" data-move-collection>
+      <select class="move-item-select" aria-label="Move to collection">
+        <option value="" disabled selected>Move</option>
+      </select>
+      <i class="fas fa-chevron-down move-item-select-icon"></i>
+    </div>
+
     {% if content.object_type == 'video' %}
     {{ button(
     variant=none,

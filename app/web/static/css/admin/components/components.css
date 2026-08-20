@@ -270,3 +270,23 @@ body.dark-mode .bulk-actions-toolbar {
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
 }
+
+/* --- Admin Semantic Layout & Spacing Primitives --- */
+
+.admin-row-item {
+    padding: var(--space-3);
+}
+
+.admin-card-body {
+    padding: var(--space-7);
+}
+
+.admin-section-body {
+    padding: var(--space-9);
+}
+
+.admin-distribution-row {
+    border: 1px solid var(--border);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+}

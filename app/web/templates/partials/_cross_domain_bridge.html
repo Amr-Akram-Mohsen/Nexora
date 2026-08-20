@@ -1,0 +1,20 @@
+{# _cross_domain_bridge.html #}
+{% from "components/ui/core.html" import button %}
+
+<div class="cross-domain-bridge" aria-label="Shop editorial picks">
+  <div class="cross-domain-bridge__inner flex items-center justify-between flex-wrap gap-8">
+    <div class="cross-domain-bridge__text flex flex-col gap-2">
+      <span class="cross-domain-bridge__eyebrow inline-flex items-center">
+        <i class="fas fa-link" aria-hidden="true"></i>
+        From Articles to Products
+      </span>
+      <h2 class="cross-domain-bridge__title">Shop What You Read</h2>
+      <p class="cross-domain-bridge__desc">
+        Every review and article is matched to hand-picked deals — find the products behind the stories.
+      </p>
+    </div>
+    <a href="{{ url_for('product.deals') }}" class="cross-domain-bridge__cta">
+      {{ button(text="Browse All Deals", variant="primary", icon="fas fa-arrow-right") }}
+    </a>
+  </div>
+</div>

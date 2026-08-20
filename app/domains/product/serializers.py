@@ -134,3 +134,42 @@ def serialize_product_row(product, price_info, store_info, has_image, has_specs)
         sync_age_days = (now - last_synced_at).days
     completeness_score = _calculate_item_completeness_score(product, price_info, store_info, has_image, has_specs)
     return compact_dict({'id': product.id, 'name': product.name, 'slug': product.slug, 'image_url': product.image_url if has_image else None, 'brand': product.brand.name if product.brand else '—', 'brand_slug': product.brand.slug if product.brand else None, 'category': product.category.name if product.category else '—', 'category_slug': product.category.slug if product.category else None, 'category_name': product.category.name if product.category else None, 'brand_name': product.brand.name if product.brand else None, 'min_price': price_min, 'max_price': price_max, 'currency': currency, 'store_count': store_info.get('active_links', 0), 'last_synced_at': store_info.get('last_synced_at'), 'sync_age': sync_age_days, 'has_discount': store_info.get('has_discount', False), 'health': completeness_score, 'click_count': product.click_count or 0, 'view_count': product.view_count or 0, 'created_at': safe_isoformat(product, 'created_at')})
+
+
+def serialize_item_detail_modal(product):
+    if not product:
+        return None
+    store_links_data = []
+    for v in product.variants:
+        for lnk in v.store_links:
+            store_links_data.append({
+                'store_name': lnk.store.name if lnk.store else '—',
+                'affiliate_network': lnk.store.affiliate_network if lnk.store else '—',
+                'program_name': lnk.program_name or '—',
+                'affiliate_url': lnk.affiliate_url or '—',
+                'original_url': lnk.original_url or '—',
+                'price': float(lnk.price) if lnk.price is not None else None,
+                'currency': lnk.currency,
+                'availability': lnk.availability,
+                'is_active': lnk.is_active,
+                'metadata': lnk.network_metadata or {},
+            })
+    prices = [p['price'] for p in store_links_data if p['price'] is not None and p['is_active']]
+    price_spread = None
+    if prices:
+        min_p = min(prices)
+        max_p = max(prices)
+        delta_pct = (max_p - min_p) / min_p * 100 if min_p > 0 else 0
+        price_spread = {'min': round(min_p, 2), 'max': round(max_p, 2), 'delta_percentage': round(delta_pct, 1)}
+    return {
+        'id': product.id,
+        'name': product.name,
+        'product_type': product.product_type or '—',
+        'brand': product.brand.name if product.brand else '—',
+        'category': product.category.name if product.category else '—',
+        'source_name': product.source.name if product.source else '—',
+        'source_slug': product.source.slug if product.source else None,
+        'source_type': product.source_type or '—',
+        'store_links': store_links_data,
+        'price_spread': price_spread,
+    }

@@ -1,7 +1,11 @@
+"""
+User authentication, OAuth, registration, password recovery, and profile routes.
+"""
 import logging
+from urllib.parse import urlparse, urljoin
 from flask import Blueprint, request, redirect, flash, render_template, current_app, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
-from app.core.extensions import limiter, db
+from app.core.extensions import limiter
 from app.shared.utils.logging import log_route_start, log_route_success, log_route_error
 from app.application.user.auth import (
     authenticate_user,
@@ -9,45 +13,38 @@ from app.application.user.auth import (
     record_failed_login,
     clear_failed_logins,
     register_user_workflow,
-    verify_user_email, 
+    verify_user_email,
     resend_verification_email_workflow,
-    request_password_reset, 
+    request_password_reset,
     reset_user_password,
-    handle_successful_login, 
-    handle_google_oauth_login
+    handle_successful_login,
+    handle_google_oauth_login,
 )
-from app.domains.user.service import (
-    get_user_by_email,
-    get_newsletter_subscriber_by_email,
-    get_user_by_id,
-)
+from app.domains.user.service import get_user_by_id
 from app.application.user.profile import (
     update_profile_name_workflow,
     update_profile_password_workflow,
+    update_profile_email_workflow,
+    delete_account_workflow,
 )
-
 from app.shared.validators import validate_email, validate_password_strength
 from app.shared.sanitizer import sanitize_text
-import secrets
-from urllib.parse import urlparse, urljoin
+from app.web.routes.constants import AUTH_TEMPLATES
 
 logger = logging.getLogger(__name__)
 
 
 def is_safe_url(target: str) -> bool:
-    ref_url  = urlparse(request.host_url)
+    ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 
-from app.web.routes.constants import AUTH_TEMPLATES
-
 bp = Blueprint("user", __name__, template_folder=AUTH_TEMPLATES)
 
 
-# ────────────────────────────────────────────────────────────────────
-# LOGIN
-# ────────────────────────────────────────────────────────────────────
+# Login
+
 @bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("10 per minute")
 def login():
@@ -57,7 +54,7 @@ def login():
     try:
         log_route_start(logger, "/login")
         if request.method == 'POST':
-            email    = request.form.get('email', '').strip().lower()
+            email = request.form.get('email', '').strip().lower()
             password = request.form.get('password', '')
             remember = request.form.get('remember') == 'on'
 
@@ -93,7 +90,7 @@ def login():
                 login_user(user, remember=remember)
                 if remember:
                     session.permanent = True
-                
+
                 session['multi_accounts'] = existing_accounts
 
                 handle_successful_login(user)
@@ -109,7 +106,7 @@ def login():
                 log_route_success(logger, "/login", status=302)
                 return redirect(next_page)
 
-            attempts  = record_failed_login(email)
+            attempts = record_failed_login(email)
             remaining = max(0, 5 - (attempts or 0))
             if remaining > 0:
                 flash(
@@ -126,16 +123,15 @@ def login():
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# GOOGLE OAUTH
-# ────────────────────────────────────────────────────────────────────
+# Google OAuth
+
 @bp.route('/auth/google/login')
 def google_login():
     try:
         log_route_start(logger, "/auth/google/login")
         if request.args.get('add_account'):
             session['add_account_flow'] = True
-            
+
         redirect_uri = url_for('user.google_authorize', _external=True)
         log_route_success(logger, "/auth/google/login", status=302)
         return current_app.google.authorize_redirect(redirect_uri, prompt='select_account')
@@ -149,7 +145,7 @@ def google_authorize():
     try:
         log_route_start(logger, "/auth/google/authorize")
         try:
-            token     = current_app.google.authorize_access_token()
+            token = current_app.google.authorize_access_token()
             user_info = current_app.google.parse_id_token(token, nonce=None)
         except Exception as e:
             logger.error("[AUTH] Google OAuth error: %s", e)
@@ -165,10 +161,9 @@ def google_authorize():
 
         user = handle_google_oauth_login(user_info)
 
-
         existing_accounts = session.get('multi_accounts', [])
         is_add_account = session.pop('add_account_flow', False)
-        
+
         if is_add_account and current_user.is_authenticated and current_user.id not in existing_accounts:
             existing_accounts.append(current_user.id)
 
@@ -177,7 +172,7 @@ def google_authorize():
 
         if user.id not in existing_accounts:
             existing_accounts.append(user.id)
-            
+
         session['multi_accounts'] = existing_accounts
         flash("Signed in with Google!", "success")
         log_route_success(logger, "/auth/google/authorize", status=302)
@@ -187,9 +182,8 @@ def google_authorize():
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# REGISTER
-# ────────────────────────────────────────────────────────────────────
+# Registration
+
 @bp.route('/register', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def register():
@@ -199,10 +193,10 @@ def register():
     try:
         log_route_start(logger, "/register")
         if request.method == 'POST':
-            name             = request.form.get('name', '').strip()
-            email            = request.form.get('email', '').strip().lower()
-            password         = request.form.get('password', '')
-            confirm          = request.form.get('confirm_password', '')
+            name = request.form.get('name', '').strip()
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
+            confirm = request.form.get('confirm_password', '')
             wants_newsletter = request.form.get('newsletter') == 'on'
 
             sanitized_name = sanitize_text(name)
@@ -255,21 +249,20 @@ def register():
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# EMAIL VERIFICATION
-# ────────────────────────────────────────────────────────────────────
+# Email Verification
+
 @bp.route('/verify-code', methods=['GET', 'POST'])
 def verify_code():
     try:
         email = request.args.get('email') or request.form.get('email')
         if not email:
             return redirect(url_for('user.login'))
-            
+
         log_route_start(logger, "/verify-code")
         if request.method == 'POST':
             code = request.form.get('code', '').strip()
             user, error = verify_user_email(email, code)
-            
+
             if error == 'invalid':
                 flash("Invalid or expired code. Please try again or request a new one.", "error")
                 log_route_success(logger, "/verify-code", template="verify-code.html")
@@ -281,7 +274,7 @@ def verify_code():
             flash("Your email has been verified! Welcome to Nexora 🎉", "success")
             log_route_success(logger, "/verify-code", status=302)
             return redirect(url_for('system.home'))
-            
+
         log_route_success(logger, "/verify-code", template="verify-code.html")
         return render_template('verify-code.html', email=email, show_resend=True, resend_route='user.resend_verification')
     except Exception as e:
@@ -309,9 +302,8 @@ def resend_verification():
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# FORGOT / RESET PASSWORD
-# ────────────────────────────────────────────────────────────────────
+# Password Reset
+
 @bp.route('/forgot-password', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def forgot_password():
@@ -326,12 +318,13 @@ def forgot_password():
             )
             log_route_success(logger, "/forgot-password", status=302)
             return redirect(url_for('user.verify_reset_code', email=email))
-        
+
         log_route_success(logger, "/forgot-password", template="forgot-password.html")
         return render_template('forgot-password.html')
     except Exception as e:
         log_route_error(logger, "/forgot-password", e)
         raise
+
 
 @bp.route('/verify-reset-code', methods=['GET', 'POST'])
 def verify_reset_code():
@@ -339,7 +332,7 @@ def verify_reset_code():
         email = request.args.get('email') or request.form.get('email')
         if not email:
             return redirect(url_for('user.forgot_password'))
-            
+
         log_route_start(logger, "/verify-reset-code")
         if request.method == 'POST':
             code = request.form.get('code', '').strip()
@@ -350,12 +343,13 @@ def verify_reset_code():
                 return redirect(url_for('user.reset_password'))
             else:
                 flash("Invalid or expired code.", "error")
-                
+
         log_route_success(logger, "/verify-reset-code", template="verify-code.html")
         return render_template('verify-code.html', email=email, show_resend=False, auth_title="Reset Code", auth_text="Enter the 6-digit code sent to your email to reset your password.")
     except Exception as e:
         log_route_error(logger, "/verify-reset-code", e)
         raise
+
 
 @bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
@@ -363,12 +357,12 @@ def reset_password():
     if not email:
         flash("Unauthorized or expired session. Please start the reset process again.", "error")
         return redirect(url_for('user.forgot_password'))
-        
+
     try:
         log_route_start(logger, "/reset-password")
         if request.method == 'POST':
             password = request.form.get('password', '')
-            confirm  = request.form.get('confirm_password', '')
+            confirm = request.form.get('confirm_password', '')
 
             if password != confirm:
                 flash("Passwords do not match.", "error")
@@ -399,21 +393,20 @@ def reset_password():
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# LOGOUT
-# ────────────────────────────────────────────────────────────────────
+# Logout & Multi-Account Switching
+
 @bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
     try:
         log_route_start(logger, "/logout")
-        
+
         existing_accounts = session.get('multi_accounts', [])
         if current_user.id in existing_accounts:
             existing_accounts.remove(current_user.id)
-            
+
         logout_user()
-        
+
         if existing_accounts:
             next_user_id = existing_accounts[0]
             next_user = get_user_by_id(next_user_id)
@@ -432,6 +425,7 @@ def logout():
         log_route_error(logger, "/logout", e)
         raise
 
+
 @bp.route('/logout-all', methods=['POST'])
 @login_required
 def logout_all():
@@ -446,13 +440,14 @@ def logout_all():
         log_route_error(logger, "/logout-all", e)
         raise
 
+
 @bp.route('/switch-account/<int:user_id>', methods=['POST'])
 @login_required
 def switch_account(user_id):
     try:
         log_route_start(logger, f"/switch-account/{user_id}")
         existing_accounts = session.get('multi_accounts', [])
-        
+
         if user_id in existing_accounts:
             target_user = get_user_by_id(user_id)
             if target_user:
@@ -465,7 +460,7 @@ def switch_account(user_id):
                 flash("Account not found. It may have been deleted.", "error")
         else:
             flash("Unauthorized account switch.", "error")
-            
+
         log_route_success(logger, f"/switch-account/{user_id}", status=302)
         return redirect(request.referrer or url_for('system.home'))
     except Exception as e:
@@ -473,26 +468,27 @@ def switch_account(user_id):
         raise
 
 
-# ────────────────────────────────────────────────────────────────────
-# PROFILE
-# ────────────────────────────────────────────────────────────────────
+# Profile & Account Management
+
 @bp.route('/profile')
 @login_required
 def profile():
     try:
         log_route_start(logger, "/profile")
+        from app.domains.user.service import get_newsletter_subscriber_by_email
         subscriber = get_newsletter_subscriber_by_email(current_user.email)
-        
+
         # Load collections
         from app.application.interaction.public import get_user_collection_counts_workflow
         collections = get_user_collection_counts_workflow(current_user.id)
         collections.sort(key=lambda x: x["name"])
-        
+
         log_route_success(logger, "/profile", template="profile.html")
         return render_template('profile.html', subscriber=subscriber, collections=collections)
     except Exception as e:
         log_route_error(logger, "/profile", e)
         raise
+
 
 @bp.route('/history')
 @login_required
@@ -531,7 +527,7 @@ def update_profile():
                 return redirect(url_for('user.profile'))
 
             current_pwd = request.form.get('current_password', '')
-            new_pwd     = request.form.get('new_password', '')
+            new_pwd = request.form.get('new_password', '')
             confirm_pwd = request.form.get('confirm_new_password', '')
 
             if not current_user.check_password(current_pwd):
@@ -550,16 +546,18 @@ def update_profile():
             new_email = request.form.get('email', '').strip().lower()
             if not validate_email(new_email):
                 flash("Please enter a valid email address.", "error")
-            elif get_user_by_email(new_email):
-                flash("This email is already in use by another account.", "error")
             else:
-                from app.application.user.auth import generate_otp
-                from app.application.user.email_service import send_verification_email
-                code = generate_otp(new_email, "update_email")
-                send_verification_email(new_email, code)
-                session['pending_email'] = new_email
-                flash("Please check your new email for a verification code.", "info")
-                return redirect(url_for('user.verify_update_email'))
+                from app.domains.user.service import get_user_by_email
+                if get_user_by_email(new_email):
+                    flash("This email is already in use by another account.", "error")
+                else:
+                    from app.application.user.auth import generate_otp
+                    from app.application.user.email_service import send_verification_email
+                    code = generate_otp(new_email, "update_email")
+                    send_verification_email(new_email, code)
+                    session['pending_email'] = new_email
+                    flash("Please check your new email for a verification code.", "info")
+                    return redirect(url_for('user.verify_update_email'))
 
         log_route_success(logger, "/update-profile", status=302)
         return redirect(url_for('user.profile'))
@@ -567,32 +565,33 @@ def update_profile():
         log_route_error(logger, "/update-profile", e)
         raise
 
+
 @bp.route('/verify-update-email', methods=['GET', 'POST'])
 @login_required
 def verify_update_email():
     new_email = session.get('pending_email')
     if not new_email:
         return redirect(url_for('user.profile'))
-        
+
     try:
         log_route_start(logger, "/verify-update-email")
         if request.method == 'POST':
             code = request.form.get('code', '').strip()
             from app.application.user.auth import verify_otp
             if verify_otp(new_email, "update_email", code):
-                current_user.email = new_email
-                db.session.commit()
+                update_profile_email_workflow(current_user, new_email)
                 session.pop('pending_email', None)
                 flash("Your email has been successfully updated!", "success")
                 return redirect(url_for('user.profile'))
             else:
                 flash("Invalid or expired code.", "error")
-                
+
         log_route_success(logger, "/verify-update-email", template="verify-code.html")
         return render_template('verify-code.html', email=new_email, show_resend=False, auth_title="Verify New Email", auth_text="Enter the 6-digit code sent to your new email address.")
     except Exception as e:
         log_route_error(logger, "/verify-update-email", e)
         raise
+
 
 @bp.route('/delete-account', methods=['POST'])
 @login_required
@@ -600,16 +599,15 @@ def delete_account():
     try:
         log_route_start(logger, "/delete-account")
         password = request.form.get('password')
-        
+
         if current_user.provider != 'google':
             if not password or not current_user.check_password(password):
                 flash("Incorrect password. Account deletion failed.", "error")
                 return redirect(url_for('user.profile'))
-                
+
         # Delete user
-        from app.application.user.profile import delete_account_workflow
         delete_account_workflow(current_user)
-        
+
         logout_user()
         flash("Your account has been permanently deleted.", "success")
         log_route_success(logger, "/delete-account", status=302)
@@ -618,3 +616,4 @@ def delete_account():
         log_route_error(logger, "/delete-account", e)
         flash("An error occurred during account deletion.", "error")
         return redirect(url_for('user.profile'))
+

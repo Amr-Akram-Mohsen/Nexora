@@ -160,23 +160,18 @@
 {% endmacro %}
 
 
-{% macro listing_sort_script() %}
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Desktop sort
-    const sortSelect = document.getElementById('sort-select');
-    if (sortSelect) {
-      sortSelect.addEventListener('change', function () {
-        window.location.href = this.value;
-      });
-    }
-    // Mobile sort
-    const sortSelectMobile = document.getElementById('sort-select-mobile');
-    if (sortSelectMobile) {
-      sortSelectMobile.addEventListener('change', function () {
-        window.location.href = this.value;
-      });
-    }
-  });
-</script>
+{% macro catalog_recommendations(recommendations, default_target_type='content') %}
+{% if recommendations and recommendations|length > 0 %}
+{% from "components/ui/section.html" import section %}
+{% from "components/ui/grid.html" import grid %}
+<div class="catalog-recommendations">
+  {% for block in recommendations %}
+  {% call section(block['title'], more_url=false) %}
+  {% set block_target_type = 'commercial' if block.get('type') in ['product', 'item'] else default_target_type %}
+  {{ grid(block['products'], target_type=block_target_type, carousel=true) }}
+  {% endcall %}
+  {% endfor %}
+</div>
+{% endif %}
 {% endmacro %}
+

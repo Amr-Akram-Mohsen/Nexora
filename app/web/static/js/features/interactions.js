@@ -37,7 +37,8 @@ async function submitUserInteraction(
             }
         }
 
-        const res = await fetch("/handle-interaction", {
+        const endpoint = window.APP?.urls?.interaction || "/handle-interaction";
+        const res = await fetch(endpoint, {
             method: "POST",
             body: fd
         });
@@ -59,7 +60,7 @@ async function submitUserInteraction(
 
             // Special behavior for Saved Items page: remove card if unsaved
             if (result.status === 'unsaved' && window.location.pathname.includes('/saved')) {
-                const card = targetItem.closest('.card, .article-card, .product-card');
+                const card = targetItem.closest('[data-saveable-card], .card');
                 if (card) {
                     card.style.opacity = '0';
                     card.style.transform = 'scale(0.95)';
@@ -126,45 +127,25 @@ function promptCollectionName(targetBtn) {
         const existing = document.getElementById('collection-popover');
         if (existing) existing.remove();
 
-        const popover = document.createElement('div');
-        popover.id = 'collection-popover';
-        
-        const isDark = document.body.classList.contains('dark') || document.documentElement.classList.contains('dark');
-        const bgColor = isDark ? '#1e293b' : '#ffffff';
-        const borderColor = isDark ? '#334155' : '#e2e8f0';
-        const textColor = isDark ? '#f8fafc' : '#0f172a';
-        const inputBg = isDark ? '#0f172a' : '#f8fafc';
-        
-        popover.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: ${textColor};">Save to Collection</label>
-                <input type="text" id="collection-input" placeholder="general" value="general" 
-                    style="padding: 8px; border: 1px solid ${borderColor}; border-radius: 6px; font-size: 0.85rem; outline: none; background: ${inputBg}; color: ${textColor}; transition: border-color 0.2s;">
-                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px;">
-                    <button type="button" id="collection-cancel" style="padding: 6px 12px; font-size: 0.75rem; font-weight: 500; border: 1px solid ${borderColor}; background: transparent; border-radius: 6px; cursor: pointer; color: ${textColor};">Cancel</button>
-                    <button type="button" id="collection-confirm" style="padding: 6px 12px; font-size: 0.75rem; font-weight: 500; border: none; background: var(--accent-primary, #2563eb); color: #fff; border-radius: 6px; cursor: pointer;">Save</button>
+        const template = document.getElementById('collection-popover-template');
+        let popover;
+        if (template) {
+            const clone = template.content.cloneNode(true);
+            popover = clone.querySelector('#collection-popover') || clone.firstElementChild;
+        } else {
+            popover = document.createElement('div');
+            popover.id = 'collection-popover';
+            popover.className = 'collection-popover';
+            popover.innerHTML = `
+                <div class="collection-popover__content flex flex-col">
+                    <label id="collection-popover-title" class="collection-popover__label" for="collection-input">Save to Collection</label>
+                    <input type="text" id="collection-input" class="collection-popover__input" placeholder="general" value="general">
+                    <div class="collection-popover__actions flex justify-end">
+                        <button type="button" id="collection-cancel" class="btn btn--outline btn--sm">Cancel</button>
+                        <button type="button" id="collection-confirm" class="btn btn--default btn--sm">Save</button>
+                    </div>
                 </div>
-            </div>
-        `;
-
-        Object.assign(popover.style, {
-            position: 'absolute',
-            zIndex: '9999',
-            background: bgColor,
-            border: `1px solid ${borderColor}`,
-            borderRadius: '12px',
-            padding: '16px',
-            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-            width: '240px',
-            animation: 'fadeIn 0.2s ease-out'
-        });
-
-        // Add a small animation style if not exists
-        if (!document.getElementById('popover-style')) {
-            const style = document.createElement('style');
-            style.id = 'popover-style';
-            style.textContent = '@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } } #collection-input:focus { border-color: var(--accent-primary, #2563eb) !important; }';
-            document.head.appendChild(style);
+            `;
         }
 
         document.body.appendChild(popover);
@@ -185,12 +166,14 @@ function promptCollectionName(targetBtn) {
         popover.style.left = `${left}px`;
 
         const input = popover.querySelector('#collection-input');
-        input.focus();
-        input.select();
+        if (input) {
+            input.focus();
+            input.select();
+        }
 
         let resolved = false;
         
-        let cleanup = (val) => {
+        const cleanup = (val) => {
             if (!resolved) {
                 resolved = true;
                 popover.remove();
@@ -198,10 +181,10 @@ function promptCollectionName(targetBtn) {
             }
         };
 
-        popover.querySelector('#collection-cancel').addEventListener('click', () => cleanup(null));
-        popover.querySelector('#collection-confirm').addEventListener('click', () => cleanup(input.value));
+        popover.querySelector('#collection-cancel')?.addEventListener('click', () => cleanup(null));
+        popover.querySelector('#collection-confirm')?.addEventListener('click', () => cleanup(input ? input.value : null));
         
-        input.addEventListener('keydown', (e) => {
+        input?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 cleanup(input.value);
@@ -221,7 +204,7 @@ function promptCollectionName(targetBtn) {
             cleanup = (val) => {
                 document.removeEventListener('click', onClickOutside);
                 originalCleanup(val);
-            }
+            };
         }, 10);
     });
 }

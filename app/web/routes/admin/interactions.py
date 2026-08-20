@@ -1,18 +1,12 @@
-# app/admin/interactions.py
 """
 Admin interaction management endpoints.
-
-Refactoring applied:
-- Global @admin_required guard via before_request (R-01).
-- Interaction stats endpoint reads from the 60-second cached
-  get_interactions_breakdown() instead of issuing 8 independent queries (R-03).
-- All queries use modern select() style (R-07).
-- Shared pagination helpers from app.web.routes.admin.helpers (R-18, R-21).
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.web.routes.admin.helpers import apply_admin_guard
-from app.core.extensions import db
-from app.domains.interaction.models import Comment, Reaction, View, Save, Share, ProductClick
+from app.web.routes.admin.helpers import (
+    apply_admin_guard,
+    parse_pagination_params,
+    render_admin_rows_response,
+)
 from app.domains.interaction.service.admin.analytics import (
     get_interactions_breakdown,
     get_reaction_stats,
@@ -29,47 +23,43 @@ from app.domains.interaction.service.admin.admin import (
     get_admin_views_page,
     get_admin_clicks_page,
     get_admin_saves_page,
-    get_admin_shares_page
+    get_admin_shares_page,
 )
-from app.domains.user.models import User
-from app.web.routes.admin.helpers import parse_pagination_params, render_admin_rows_response
-from sqlalchemy import select, func, or_
-from datetime import datetime
 from app.domains.interaction.service.admin.serializers import (
-    map_comment_for_rows, map_reaction_for_rows, map_view_for_rows,
-    map_click_for_rows, map_save_for_rows, map_share_for_rows
+    map_comment_for_rows,
+    map_reaction_for_rows,
+    map_view_for_rows,
+    map_click_for_rows,
+    map_save_for_rows,
+    map_share_for_rows,
 )
 
 bp = Blueprint("api_interaction", __name__, url_prefix="/admin/interactions")
-
-
 apply_admin_guard(bp)
 
 
-# ─────────────────────────────────────────────
-# COMMENTS
-# ─────────────────────────────────────────────
+# Comments
 
 @bp.route("/comments", methods=["GET"])
 def list_comments():
     """Paginated, enriched comment listing with user and target info."""
     page, per_page = parse_pagination_params(default_per_page=25)
-    sentiment   = request.args.get("sentiment", "").strip()
+    sentiment = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
-    search      = request.args.get("search", "").strip()
+    search = request.args.get("search", "").strip()
     user_search = request.args.get("comments_user", request.args.get("user", "")).strip()
-    start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
-    end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
+    start_date = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
+    end_date = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     pagination, serialized = get_admin_comments_page(
         page, per_page, sentiment, target_type, search, user_search, start_date, end_date
     )
 
     return jsonify({
-        "products":    serialized,
-        "page":     pagination.page,
-        "pages":    pagination.pages,
-        "total":    pagination.total,
+        "products": serialized,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
         "per_page": pagination.per_page,
     })
 
@@ -81,6 +71,7 @@ def delete_comment(id):
         return jsonify({"success": True, "message": "Comment deleted."})
     return jsonify({"error": "Comment not found"}), 404
 
+
 @bp.route("/comments/<int:id>/flag", methods=["POST"])
 def flag_comment(id):
     """Flag a comment as spam by marking its sentiment."""
@@ -89,9 +80,7 @@ def flag_comment(id):
     return jsonify({"error": "Comment not found"}), 404
 
 
-# ─────────────────────────────────────────────
-# REACTIONS
-# ─────────────────────────────────────────────
+# Reactions
 
 @bp.route("/reactions", methods=["GET"])
 def list_reactions():
@@ -106,10 +95,10 @@ def list_reactions():
     )
 
     return jsonify({
-        "products":    serialized,
-        "page":     pagination.page,
-        "pages":    pagination.pages,
-        "total":    pagination.total,
+        "products": serialized,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
         "per_page": pagination.per_page,
     })
 
@@ -135,7 +124,6 @@ def list_clicks():
     return jsonify(get_admin_clicks_page(page, per_page, target, destination))
 
 
-
 @bp.route("/saves", methods=["GET"])
 def list_saves():
     """Paginated list of saves with user and target details."""
@@ -148,10 +136,10 @@ def list_saves():
     )
 
     return jsonify({
-        "products":    serialized,
-        "page":     pagination.page,
-        "pages":    pagination.pages,
-        "total":    pagination.total,
+        "products": serialized,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
         "per_page": pagination.per_page,
     })
 
@@ -168,34 +156,26 @@ def list_shares():
     )
 
     return jsonify({
-        "products":    serialized,
-        "page":     pagination.page,
-        "pages":    pagination.pages,
-        "total":    pagination.total,
+        "products": serialized,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "total": pagination.total,
         "per_page": pagination.per_page,
     })
 
 
-# ─────────────────────────────────────────────
-# HTML PARTIAL ROWS + INSPECT ENDPOINTS
-# ─────────────────────────────────────────────
-
-
-
-
-
-
+# HTML Partial Rows & Inspect Endpoints
 
 @bp.route("/comments/rows", methods=["GET"])
 def comments_rows():
     """Return server-rendered HTML rows partial for comments AJAX injection."""
     page, per_page = parse_pagination_params(default_per_page=25)
-    sentiment   = request.args.get("sentiment", "").strip()
+    sentiment = request.args.get("sentiment", "").strip()
     target_type = request.args.get("target_type", "").strip()
-    search      = request.args.get("search", "").strip()
+    search = request.args.get("search", "").strip()
     user_search = request.args.get("comments_user", request.args.get("user", "")).strip()
-    start_date  = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
-    end_date    = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
+    start_date = request.args.get("comments_start_date", request.args.get("start_date", "")).strip()
+    end_date = request.args.get("comments_end_date", request.args.get("end_date", "")).strip()
 
     pagination, serialized = get_admin_comments_page(
         page, per_page, sentiment, target_type, search, user_search, start_date, end_date
@@ -210,37 +190,32 @@ def comments_rows():
     )
 
 
-
 @bp.route("/comments/<int:id>/inspect", methods=["GET"])
 def inspect_comment(id):
     """Return server-rendered HTML for the comment inspect modal body."""
     from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
     from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
-    
+
     aggregated_data = get_comment_inspect_workflow(id)
     if not aggregated_data:
         return "Comment not found.", 404
-        
+
     data = build_comment_inspect_view_model(aggregated_data)
-    return render_template(
-        "admin/components/_inspect.html",
-        **data
-    )
+    return render_template("admin/components/_inspect.html", **data)
+
+
 @bp.route("/clicks/<int:link_id>/inspect", methods=["GET"])
 def inspect_clicks(link_id):
     """Return server-rendered HTML for recent clicks on a given store link."""
     from app.domains.interaction.service.admin.inspect import get_link_clicks_workflow
     from app.web.routes.admin.builders.interaction_builder import build_link_clicks_view_model
-    
+
     aggregated_data = get_link_clicks_workflow(link_id)
     if not aggregated_data:
-         return "Link data not found.", 404
+        return "Link data not found.", 404
 
     data = build_link_clicks_view_model(aggregated_data)
-    return render_template(
-        "admin/components/_inspect.html",
-        **data
-    )
+    return render_template("admin/components/_inspect.html", **data)
 
 
 @bp.route("/reactions/rows", methods=["GET"])
@@ -248,7 +223,7 @@ def reactions_rows():
     """Return server-rendered HTML rows partial for reactions AJAX injection."""
     page, per_page = parse_pagination_params(default_per_page=25)
     reaction_type = request.args.get("reactions_type", "").strip()
-    search        = request.args.get("search", "").strip()
+    search = request.args.get("search", "").strip()
     user_search = request.args.get("reactions_user", request.args.get("user", "")).strip()
 
     pagination, serialized = get_admin_reactions_page(
@@ -270,8 +245,8 @@ def views_rows():
     """Return server-rendered HTML rows partial for views AJAX injection."""
     page, per_page = parse_pagination_params(default_per_page=25)
     start_date = request.args.get("views_start_date", "").strip()
-    end_date   = request.args.get("views_end_date", "").strip()
-    search     = request.args.get("search", "").strip()
+    end_date = request.args.get("views_end_date", "").strip()
+    search = request.args.get("search", "").strip()
 
     data = get_admin_views_page(page, per_page, search, start_date, end_date)
 
@@ -320,6 +295,7 @@ def saves_rows():
         hide_action_column=True
     )
 
+
 @bp.route("/shares/rows", methods=["GET"])
 def shares_rows():
     """Return server-rendered HTML rows partial for shares AJAX injection."""
@@ -341,9 +317,7 @@ def shares_rows():
     )
 
 
-# ─────────────────────────────────────────────
-# STATS (read from 60s cache — R-03)
-# ─────────────────────────────────────────────
+# Stats
 
 @bp.route("/stats", methods=["GET"])
 def interactions_stats():
@@ -352,15 +326,15 @@ def interactions_stats():
     total = sum(v for k, v in breakdown.items() if not k.startswith("_"))
 
     return jsonify({
-        "comments":   breakdown.get("comments", 0),
-        "reactions":  breakdown.get("reactions", 0),
-        "views":      breakdown.get("views", 0),
-        "saves":      breakdown.get("saves", 0),
-        "shares":     breakdown.get("shares", 0),
+        "comments": breakdown.get("comments", 0),
+        "reactions": breakdown.get("reactions", 0),
+        "views": breakdown.get("views", 0),
+        "saves": breakdown.get("saves", 0),
+        "shares": breakdown.get("shares", 0),
         "item_clicks": breakdown.get("clicks", 0),
-        "likes":      breakdown.get("_likes", 0),
-        "dislikes":   breakdown.get("_dislikes", 0),
-        "total":      total,
+        "likes": breakdown.get("_likes", 0),
+        "dislikes": breakdown.get("_dislikes", 0),
+        "total": total,
     })
 
 
@@ -395,3 +369,4 @@ def analytics_dashboard():
     data = get_analytics_dashboard_data()
     data["top_saves_html"] = render_template("admin/interactions/partials/_top_saves.html", data=data.get("top_saves", []))
     return jsonify(data)
+

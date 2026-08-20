@@ -163,9 +163,10 @@ function initListingSidebar() {
 
 function initSearchHighlighting() {
     // Initial Search Highlighting
-    if (window.SEARCH_QUERY) {
+    const query = window.APP?.searchQuery || window.SEARCH_QUERY;
+    if (query) {
         const cards = document.querySelectorAll('.card__title, .card__excerpt, .product-card__name, .product-card__description');
-        const escapedQuery = String(window.SEARCH_QUERY).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const escapedQuery = String(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`(${escapedQuery})`, 'gi');
         cards.forEach(card => {
             const walk = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);

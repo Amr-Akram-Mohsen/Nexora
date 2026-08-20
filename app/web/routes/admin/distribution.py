@@ -1,12 +1,9 @@
-# app/admin/distribution.py
-import time
-from datetime import datetime, timezone, timedelta
+"""
+Admin content distribution and publishing workflow endpoints.
+"""
 from flask import Blueprint, jsonify, request, render_template
 from app.web.routes.admin.helpers import apply_admin_guard
-from app.core.extensions import db
-from sqlalchemy import select, desc
 from app.web.routes.admin.insights import get_cached, set_cached, invalidate_cache
-from app.domains.shared_lookups import get_platform_icon, get_source_title
 from app.domains.analytics import (
     get_decision_intelligence_data,
     get_intent_opportunity_data,
@@ -18,16 +15,15 @@ from app.domains.analytics import (
     generate_content_publishing_plan,
     evaluate_content_performance_feedback,
     generate_execution_plan,
-    generate_execution_governance_layer
+    generate_execution_governance_layer,
 )
 
 bp = Blueprint("api_distribution", __name__, url_prefix="/admin/distribution")
-
-
 apply_admin_guard(bp)
 
 
 @bp.route("/publishing-plan", methods=["GET"])
+
 def get_publishing_plan():
     time_frame = request.args.get("time_frame", "7_days")
     if time_frame not in ["today", "7_days", "30_days", "all_time"]:

@@ -1,7 +1,6 @@
 from app.core.extensions import db
 
-# ==================== ASSOCIATION TABLES ====================
-
+# Association table for content geographic tagging
 content_locations = db.Table(
     "content_locations",
     db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
@@ -10,20 +9,24 @@ content_locations = db.Table(
     db.Index("ix_content_locations_content", "content_id"),
 )
 
+
 class ArticleCategory(db.Model):
+    """Associates an article with weighted categories."""
     __tablename__ = "article_categories"
     article_id = db.Column(db.Integer, db.ForeignKey("articles.id"), primary_key=True)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.id"), primary_key=True)
     weight = db.Column(db.Float, default=0.0)
-    
+
     article = db.relationship("Article", back_populates="category_associations")
     category = db.relationship("Category", back_populates="article_associations")
-    
+
     __table_args__ = (
         db.Index("ix_article_categories_category", "category_id"),
         db.Index("ix_article_categories_article", "article_id"),
     )
 
+
+# Association table linking articles to authors
 article_authors = db.Table(
     "article_authors",
     db.Column("article_id", db.Integer, db.ForeignKey("articles.id"), primary_key=True),
@@ -32,18 +35,16 @@ article_authors = db.Table(
     db.Index("ix_article_authors_article", "article_id"),
 )
 
+
 class ContentEntity(db.Model):
+    """Associates content with taxonomy entities (brands, topics, concepts)."""
     __tablename__ = "content_entities"
     content_id = db.Column(db.Integer, db.ForeignKey("contents.id"), primary_key=True)
     entity_id = db.Column(db.Integer, db.ForeignKey("entities.id"), primary_key=True)
     relevance_score = db.Column(db.Float, default=0.0)
-    
-    # NEW fields
     origin = db.Column(db.String(30), nullable=True, index=True)
-    # Values: 'event_registry' | 'diffbot' | 'youtube' | 'brand_legacy' | 'manual' | 'ai'
     confidence = db.Column(db.Float, nullable=True)
-    # Provider-assigned confidence (0.0–1.0), NULL if unknown
-    
+
     content = db.relationship("Content", back_populates="content_entities")
     entity = db.relationship("Entity", back_populates="content_entities")
 
@@ -70,8 +71,7 @@ class ContentEntity(db.Model):
         return existing
 
 
-
-# Links a review/content directly to the product(s) it covers
+# Direct links between editorial content and reviewed products
 content_products = db.Table(
     "content_products",
     db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
@@ -80,33 +80,25 @@ content_products = db.Table(
     db.Index("ix_content_products_product", "product_id"),
 )
 
-
+# Association table linking content to generic attributes
 content_attributes = db.Table(
     "content_attributes",
     db.Column("content_id", db.Integer, db.ForeignKey("contents.id"), primary_key=True),
-    db.Column(
-        "attribute_id", db.Integer, db.ForeignKey("attributes.id"), primary_key=True
-    ),
+    db.Column("attribute_id", db.Integer, db.ForeignKey("attributes.id"), primary_key=True),
     db.Index("ix_content_attributes_attribute", "attribute_id"),
     db.Index("ix_content_attributes_content", "content_id"),
 )
 
+
 class ArticleSource(db.Model):
+    """Tracks source attribution and syndicated URLs for articles."""
     __tablename__ = "article_sources"
 
     id = db.Column(db.Integer, primary_key=True)
-
     article_id = db.Column(db.Integer, db.ForeignKey("articles.id"), nullable=False)
-
     source_id = db.Column(db.Integer, db.ForeignKey("sources.id"), nullable=False)
-
     url = db.Column(db.Text, unique=True, nullable=False)
-
     published_at = db.Column(db.DateTime, nullable=True, index=True)
 
-    article = db.relationship(
-        "Article", back_populates="article_sources", foreign_keys=[article_id]
-    )
-
+    article = db.relationship("Article", back_populates="article_sources", foreign_keys=[article_id])
     source = db.relationship("Source", back_populates="article_sources")
-

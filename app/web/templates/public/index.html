@@ -38,7 +38,8 @@
   ] %}
 
   {% for s in core_sections if s.cards %}
-  {% call section(s.section_title, s.section) %}
+  {% set section_href = url_for('product.deals') if s.section in ('deals', 'recent') else url_for('content.sections', section_slug=s.section) %}
+  {% call section(s.section_title, href=section_href) %}
   {{ grid(s.cards, target_type=s.get('target_type', 'content'), carousel=s.get('carousel', false)) }}
   {% endcall %}
   {% endfor %}
@@ -75,26 +76,7 @@
   Shown after a cross-domain "Shop What You Read" bridge strip.
   #}
   {% if featured_products %}
-
-  {# ── Cross-domain bridge strip ── #}
-  <div class="cross-domain-bridge" aria-label="Shop editorial picks">
-    <div class="cross-domain-bridge__inner flex items-center justify-between flex-wrap gap-8">
-      <div class="cross-domain-bridge__text flex flex-col gap-2">
-        <span class="cross-domain-bridge__eyebrow inline-flex items-center">
-          <i class="fas fa-link" aria-hidden="true"></i>
-          From Articles to Products
-        </span>
-        <h2 class="cross-domain-bridge__title">Shop What You Read</h2>
-        <p class="cross-domain-bridge__desc">
-          Every review and article is matched to hand-picked deals — find the products behind the stories.
-        </p>
-      </div>
-      <a href="{{ url_for('product.deals') }}" class="cross-domain-bridge__cta">
-        {% from "components/ui/core.html" import button %}
-        {{ button(text="Browse All Deals", variant="primary", icon="fas fa-arrow-right") }}
-      </a>
-    </div>
-  </div>
+  {% include "partials/_cross_domain_bridge.html" %}
 
   {% call section("Featured Products", more_url=false) %}
   {{ grid(featured_products, target_type='commercial', carousel=true) }}
@@ -116,18 +98,7 @@
   #}
   {% if trending_brands %}
   {% call section("Trending Brands", more_url=false) %}
-  <div class="brands-strip flex flex-wrap">
-    {% for brand in trending_brands %}
-    <a href="{{ url_for('content.sections', section_slug='reviews') }}?brand={{ brand.slug }}"
-      class="brand-chip hover-lift" aria-label="Browse {{ brand.name }} content">
-      <span class="brand-chip__name">{{ brand.name }}</span>
-      {% if brand.recent_views %}
-      {{ badge(brand.recent_views | int | string + ' views', variant='secondary', class='brand-chip__views badge--xs')
-      }}
-      {% endif %}
-    </a>
-    {% endfor %}
-  </div>
+  {% include "partials/_trending_brands_strip.html" %}
   {% endcall %}
   {% endif %}
 

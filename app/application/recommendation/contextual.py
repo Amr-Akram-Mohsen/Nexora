@@ -1,5 +1,5 @@
 from app.domains.content.service.query.trending import get_popular_contents as get_popular_contents_cached
-from app.domains.product.service.public.search import get_popular_items as get_popular_items_cached
+from app.domains.product.service.search import get_popular_items as get_popular_items_cached
 
 def get_contextual_recommendations(active_filters, has_results, section=None, target_type='content'):
     category_slugs = active_filters.get('category', [])

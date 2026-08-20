@@ -1,0 +1,53 @@
+{# _product_header.html #}
+{% from "components/ui/core.html" import badge %}
+{% from "commercial/features/rating.html" import render_stars %}
+
+<div class="detail-page__header">
+
+    <div class="detail-page__badges flex flex-wrap items-center gap-3">
+        {{ badge(product.category.name, 'badge--category') if product.category else '' }}
+        {{ badge(product.brand.name, 'badge--brand') if product.brand else '' }}
+    </div>
+
+    <h1 class="detail-page__title">{{ product.name }}</h1>
+
+    <div class="detail-page__meta flex items-center flex-wrap gap-2">
+
+        <div class="meta-product flex items-center">
+            {{ render_stars(product.rating or 0) }}
+        </div>
+
+        <span class="product-rating">({{ product.rating or 0 }})</span>
+
+        <span class="product-reviews-count">
+            {{ product.review_count or 0 }} reviews
+        </span>
+
+    </div>
+
+    {# Price — immediately below rating for clear hierarchy #}
+    {% if product.default_variant %}
+    <div class="product-price-summary flex flex-wrap items-baseline gap-2">
+        <span class="current-price">
+            {{ product.default_variant.price }}
+            {{ product.default_variant.currency }}
+        </span>
+        {% if product.default_variant.old_price %}
+        <span class="old-price">{{ product.default_variant.old_price }}</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# Quick details — key specs at a glance #}
+    {% if product.quick_details %}
+    <div class="product-quick-details">
+        {% for detail in product.quick_details[:6] %}
+        <div class="quick-detail flex flex-col gap-sm">
+            <span class="quick-detail__label">{{ detail.label }}</span>
+            <span class="quick-detail__value">{{ detail.value }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>

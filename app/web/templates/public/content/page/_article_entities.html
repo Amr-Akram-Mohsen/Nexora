@@ -1,0 +1,32 @@
+{# _article_entities.html #}
+{% from "components/ui/core.html" import badge %}
+
+{% if content.grouped_entities or content.attributes %}
+<div class="article-semantic-metadata">
+  <h3 class="article-section-title">Related Entities</h3>
+  <div class="flex flex-col gap-3">
+    {% for type, entities in content.grouped_entities.items() %}
+    <div class="entity-group flex items-start gap-3 flex-wrap">
+      <h4 class="entity-group__title">{{ type }}</h4>
+      <div class="badge-group">
+        {% for entity in entities %}
+        {{ badge(text=entity.name, class="badge--entity", variant="entity",
+        href=url_for('content.sections', section_slug='all', entity=entity.slug)) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% if content.attributes %}
+    <div class="entity-group flex items-start gap-3 flex-wrap">
+      <h4 class="entity-group__title">Attributes</h4>
+      <div class="badge-group">
+        {% for attr in content.attributes %}
+        {{ badge(text=attr, class="badge--attribute", variant="secondary") }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

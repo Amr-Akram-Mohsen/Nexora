@@ -21,7 +21,7 @@ def get_user_dashboard_stats():
     engagement_score_expr = func.coalesce(views_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['views'] + func.coalesce(clicks_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['clicks'] + func.coalesce(saves_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['saves'] + func.coalesce(reactions_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['reactions'] + func.coalesce(comments_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['comments'] + func.coalesce(shares_sub.c.cnt, 0) * ENGAGEMENT_WEIGHTS['shares']
     stmt = select(engagement_score_expr.label('score')).select_from(User).outerjoin(views_sub, User.id == views_sub.c.user_id).outerjoin(clicks_sub, User.id == clicks_sub.c.user_id).outerjoin(saves_sub, User.id == saves_sub.c.user_id).outerjoin(reactions_sub, User.id == reactions_sub.c.user_id).outerjoin(comments_sub, User.id == comments_sub.c.user_id).outerjoin(shares_sub, User.id == shares_sub.c.user_id)
     scores = db.session.execute(stmt).scalars().all()
-    from app.domains.user.service.tiers import TIER_THRESHOLDS
+    from app.domains.user.serializers import TIER_THRESHOLDS
     tiers = {f'{TIER_THRESHOLDS[0][1]} ({TIER_THRESHOLDS[0][0]}+)': sum((1 for s in scores if s >= TIER_THRESHOLDS[0][0])), f'{TIER_THRESHOLDS[1][1]} ({TIER_THRESHOLDS[1][0]}+)': sum((1 for s in scores if TIER_THRESHOLDS[1][0] <= s < TIER_THRESHOLDS[0][0])), f'{TIER_THRESHOLDS[2][1]} ({TIER_THRESHOLDS[2][0]}+)': sum((1 for s in scores if TIER_THRESHOLDS[2][0] <= s < TIER_THRESHOLDS[1][0])), f'{TIER_THRESHOLDS[3][1]} (1-{TIER_THRESHOLDS[2][0] - 1})': sum((1 for s in scores if 0 < s < TIER_THRESHOLDS[2][0])), 'Inactive (0)': sum((1 for s in scores if s == 0))}
     return {'roles': roles, 'providers': providers, 'growth': growth, 'engagement_tiers': tiers}
 
@@ -94,7 +94,7 @@ def get_user_analytics_metrics(id: int):
     latest_reaction = db.session.scalar(select(Reaction).where(Reaction.user_id == id).order_by(Reaction.created_at.desc()).limit(1))
     latest_share = db.session.scalar(select(Share).where(Share.user_id == id).order_by(Share.created_at.desc()).limit(1))
     latest_click = db.session.scalar(select(ProductClick).where(ProductClick.user_id == id).order_by(ProductClick.created_at.desc()).limit(1))
-    from app.domains.user.service.tiers import score_to_tier
+    from app.domains.user.serializers import score_to_tier
     engagement_tier = score_to_tier(engagement_score)
     counts_dict = {'Commenter': comments_count, 'Saver': saves_count, 'Sharer': shares_count, 'Clicker': clicks_count, 'Viewer': views_count}
     max_count = max(counts_dict.values()) if any(counts_dict.values()) else 0

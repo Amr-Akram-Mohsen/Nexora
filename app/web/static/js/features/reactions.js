@@ -18,20 +18,11 @@ function updateReactionUI(targetItem, reactionType, status) {
         .react-btn.active`
         );
 
-    // if (status === 'added' || status === 'changed') {
-    //     targetBtn.classList.replace('btn--outline', 'btn--default');
-    // }
-
     targetBtn.classList.toggle('active', status === 'added' || status === 'changed');
-    // targetBtn.classList.toggle('active', status !== 'removed');    
 
     if (status === 'changed' && activeBtn && activeBtn !== targetBtn) {
         activeBtn.classList.remove('active');
     }
-
-    // if (status === 'changed') {
-    //     activeBtn.classList.replace('btn--default', 'btn--outline');
-    // }
 
     if (targetItem.hasAttribute('data-comment-id')) {
         if (status === 'added') {
@@ -83,7 +74,8 @@ async function initAllReactions() {
     }
 
     try {
-        const data = await window.api.get(`/check-react-batch?${params.toString()}`);
+        const endpoint = window.APP?.urls?.checkReactBatch || "/check-react-batch";
+        const data = await window.api.get(`${endpoint}?${params.toString()}`);
         if (!data) return;
 
         buttons.forEach(btn => {

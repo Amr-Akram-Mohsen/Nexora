@@ -1,0 +1,59 @@
+{# _article_header.html #}
+<div class="article-header flex flex-col gap-1">
+
+  <h1 class="article-header__title">
+    {{ article.title }}
+  </h1>
+
+  {% if content.display_preview %}
+  <p class="article-header__description">{{ content.display_preview }}</p>
+  {% endif %}
+
+  <div class="article-header__meta flex flex-wrap items-center gap-3">
+
+    {% if article.authors %}
+    <div class="meta-author flex gap-sm items-center">
+      <i class="fas fa-user-edit"></i>
+      <span>By
+        {% for author in article.authors %}
+        {% if author.url %}
+        <a href="{{ author.url }}" target="_blank" rel="noopener nofollow">{{ author.name }}</a>
+        {% else %}
+        <span>{{ author.name }}</span>
+        {% endif %}
+        {% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </span>
+    </div>
+    {% endif %}
+
+    {% set source_obj = article.primary_source or content.source %}
+    {% if source_obj %}
+    <div class="meta-source flex gap-sm items-center">
+      <i class="fas fa-newspaper"></i>
+      <a href="{{ url_for('content.source_page', source_slug=source_obj.slug) }}">{{ source_obj.name }}</a>
+      {% if content.source_tier in ['verified', 'trusted'] %}
+      {% set icon_class = 'fas fa-check-circle' if content.source_tier == 'verified' else 'far fa-check-circle trusted-badge' %}
+      {% set title = 'Verified Source' if content.source_tier == 'verified' else 'Trusted Source' %}
+      <i class="{{ icon_class }}" title="{{ title }}"></i>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="meta-info flex items-center gap-5">
+      <time class="meta-date inline-flex-center gap-1">
+        <i class="far fa-calendar-alt"></i>
+        {{ content.published_at | format_date('%b %d, %Y') }}
+      </time>
+
+      {% if content.reading_time %}
+      <span class="meta-readtime inline-flex-center gap-1">
+        <i class="far fa-clock"></i>
+        {{ content.reading_time }} min read
+      </span>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>

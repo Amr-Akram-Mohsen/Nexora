@@ -1,28 +1,41 @@
-from flask import render_template, Blueprint
+"""
+Admin portal page routes and inspect view dispatchers.
+"""
+from flask import render_template, Blueprint, abort
 from app.web.routes.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
 from app.web.routes.admin.helpers import apply_admin_guard
+from app.application.analytics.admin import get_admin_dashboard_stats_data
 
-bp = Blueprint(
-    "admin",
-    __name__,
-    url_prefix="/admin"
+from app.application.content.admin import get_content_inspect_workflow
+from app.application.product.admin import (
+    get_item_inspect_workflow,
+    get_store_inspect_workflow,
 )
+from app.application.user.admin import get_user_inspect_workflow
+from app.application.taxonomy.admin import get_source_inspect_workflow
+from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
+from app.web.routes.admin.builders.content_builder import build_content_inspect_view_model
+from app.web.routes.admin.builders.item_builder import (
+    build_item_inspect_view_model,
+    build_store_inspect_view_model,
+)
+from app.web.routes.admin.builders.user_builder import build_user_inspect_view_model
+from app.web.routes.admin.builders.taxonomy_builder import build_source_inspect_view_model
+from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
 
+bp = Blueprint("admin", __name__, url_prefix="/admin")
 apply_admin_guard(bp)
 
-from app.application.analytics.admin import get_admin_dashboard_stats_data
 
 @bp.route("/")
 def home():
     stats_data = get_admin_dashboard_stats_data()
     return render_template(
-        "admin/overview/overview.html", 
-        title="Overview", 
+        "admin/overview/overview.html",
+        title="Overview",
         domain="home",
-        stats=stats_data
+        stats=stats_data,
     )
-
-
 
 
 @bp.route("/distribution")
@@ -31,9 +44,8 @@ def dashboard_distribution():
         "admin/distribution/distribution.html",
         title="Distribution & Publishing",
         domain="distribution",
-        tables=INSIGHTS_TABLES
+        tables=INSIGHTS_TABLES,
     )
-
 
 
 @bp.route("/contents")
@@ -55,12 +67,13 @@ def dashboard_items():
         table=CRUD_TABLES["products"],
     )
 
+
 @bp.route("/products/dashboard")
 def dashboard_items_analytics():
     return render_template(
         "admin/product_intelligence/items_dashboard.html",
         title="Products Intelligence Dashboard",
-        domain="items_dashboard"
+        domain="items_dashboard",
     )
 
 
@@ -73,20 +86,22 @@ def dashboard_sources():
         table=CRUD_TABLES["sources"],
     )
 
+
 @bp.route("/ingestions")
 def dashboard_ingestions():
     return render_template(
         "admin/acquisition/ingestions.html",
         title="Ingestion Channels",
-        domain="ingestions"
+        domain="ingestions",
     )
+
 
 @bp.route("/sources/quality")
 def dashboard_sources_quality():
     return render_template(
         "admin/acquisition/quality.html",
         title="Quality & Freshness",
-        domain="sources_quality"
+        domain="sources_quality",
     )
 
 
@@ -96,15 +111,16 @@ def dashboard_stores():
         "admin/product_intelligence/stores.html",
         title="Stores Management",
         domain="stores",
-        table=CRUD_TABLES["stores"]        
+        table=CRUD_TABLES["stores"],
     )
+
 
 @bp.route("/stores/dashboard")
 def dashboard_stores_analytics():
     return render_template(
         "admin/product_intelligence/stores_dashboard.html",
         title="Stores & Commercial Intelligence",
-        domain="stores_dashboard"
+        domain="stores_dashboard",
     )
 
 
@@ -127,6 +143,7 @@ def dashboard_users():
         table=CRUD_TABLES["users"],
     )
 
+
 @bp.route("/subscribers")
 def dashboard_subscribers():
     return render_template(
@@ -135,8 +152,6 @@ def dashboard_subscribers():
         domain="subscribers",
         table=CRUD_TABLES.get("subscribers", {}),
     )
-
-
 
 
 @bp.route("/interactions")
@@ -166,85 +181,59 @@ def settings():
 
 @bp.route("/contents/<int:id>")
 def content_detail(id):
-    from app.application.content.admin import get_content_inspect_workflow
-    from app.web.routes.admin.builders.content_builder import build_content_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_content_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_content_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Content {id}", domain="contents", **data)
 
 
 @bp.route("/products/<int:id>")
 def item_detail(id):
-    from app.application.product.admin import get_item_inspect_workflow
-    from app.web.routes.admin.builders.item_builder import build_item_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_item_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_item_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Product {id}", domain="products", **data)
 
 
 @bp.route("/users/<int:id>")
 def user_detail(id):
-    from app.application.user.admin import get_user_inspect_workflow
-    from app.web.routes.admin.builders.user_builder import build_user_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_user_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_user_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"User {id}", domain="users", **data)
 
 
 @bp.route("/stores/<int:id>")
 def store_detail(id):
-    from app.application.product.admin import get_store_inspect_workflow
-    from app.web.routes.admin.builders.item_builder import build_store_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_store_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_store_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Store Details {id}", domain="stores", **data)
 
 
 @bp.route("/sources/<int:id>")
 def source_detail(id):
-    from app.application.taxonomy.admin import get_source_inspect_workflow
-    from app.web.routes.admin.builders.taxonomy_builder import build_source_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_source_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_source_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Source Details {id}", domain="sources", **data)
 
 
 @bp.route("/comments/<int:id>")
 def comment_detail(id):
-    from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
-    from app.web.routes.admin.builders.interaction_builder import build_comment_inspect_view_model
-    from flask import abort
-    
     aggregated_data = get_comment_inspect_workflow(id)
     if not aggregated_data:
         abort(404)
-        
+
     data = build_comment_inspect_view_model(aggregated_data)
     return render_template("admin/components/_inspect.html", title=f"Comment Details {id}", domain="comments", **data)
-
-

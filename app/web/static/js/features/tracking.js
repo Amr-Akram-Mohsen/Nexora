@@ -31,7 +31,8 @@ function sendView(targetType, targetId) {
     fd.append("target_type", targetType);
     fd.append("target_id", targetId);
 
-    fetch("/view", { method: "POST", body: fd })
+    const endpoint = window.APP?.urls?.view || "/view";
+    fetch(endpoint, { method: "POST", body: fd })
         .catch(() => {});
 }
 
@@ -64,7 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 timestamp: new Date().toISOString()
             };
 
-            fetch("/track/impression", {
+            const endpoint = window.APP?.urls?.trackImpression || "/track/impression";
+            fetch(endpoint, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -99,7 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         timestamp: new Date().toISOString()
                     };
 
-                    fetch("/track/click", {
+                    const endpoint = window.APP?.urls?.trackClick || "/track/click";
+                    fetch(endpoint, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"

@@ -131,6 +131,40 @@
 </div>
 {% endblock %}
 
+{% block additional_content %}
+{{ super() }}
+<template id="video-error-template">
+  <div class="video-error-overlay">
+    <i class="fab fa-youtube video-error-icon"></i>
+    <h3 class="video-error-title">Playback Disabled</h3>
+    <p class="video-error-message">The owner of this video has disabled playback on other websites. Don't worry, you can still watch it directly on YouTube!</p>
+    <a href="#" target="_blank" rel="noopener noreferrer" class="video-error-link">
+      Watch on YouTube
+    </a>
+  </div>
+</template>
+
+<template id="video-upnext-template">
+  <div class="up-next-overlay">
+    <div class="up-next-header">
+      <h3 class="up-next-title">Up Next in <span id="up-next-timer">10</span>s</h3>
+      <button type="button" class="cancel-up-next-btn"><i class="fas fa-times"></i> Cancel</button>
+    </div>
+    <div class="up-next-grid"></div>
+  </div>
+</template>
+
+<template id="video-upnext-item-template">
+  <a href="#" class="up-next-card">
+    <img src="" alt="" class="up-next-card__thumb">
+    <div class="up-next-card__placeholder"></div>
+    <div class="up-next-card__body">
+      <p class="up-next-card__title"></p>
+    </div>
+  </a>
+</template>
+{% endblock %}
+
 {% block scripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/features/video-sticky.js') }}" defer></script>

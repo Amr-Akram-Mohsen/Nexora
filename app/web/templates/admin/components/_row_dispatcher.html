@@ -1,0 +1,27 @@
+{# _row_dispatcher.html #}
+{% from "admin/components/ui/actions.html" import action_group, action_button, action_cell, inspect_btn_cell %}
+{% from "components/ui/core.html" import badge, button %}
+
+{% macro render_row(row, domain_type=none, domain_target_type=none, hide_action_column=false) %}
+<tr id="{{ domain_type }}-row">
+  {% if domain_type == "content" %}
+  {% include "admin/content_library/_content_row.html" %}
+  {% elif domain_type == "product" %}
+  {% include "admin/product_intelligence/_product_row.html" %}
+  {% elif domain_type == "user" %}
+  {% include "admin/audience/_user_row.html" %}
+  {% elif domain_type == "comment" %}
+  {% include "admin/interactions/_comment_row.html" %}
+  {% elif domain_type == "source" %}
+  {% include "admin/acquisition/_source_row.html" %}
+  {% elif domain_type == "store" %}
+  {% include "admin/acquisition/_store_row.html" %}
+  {% elif domain_type == "rec" %}
+  {% include "admin/components/rows/_rec_row.html" %}
+  {% elif domain_type == "ingestion_log" %}
+  {% include "admin/components/rows/_ingestion_log_row.html" %}
+  {% else %}
+  {% include "admin/components/rows/_generic_row.html" %}
+  {% endif %}
+</tr>
+{% endmacro %}

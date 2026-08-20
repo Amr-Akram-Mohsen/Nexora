@@ -11,12 +11,12 @@
 .alert {
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: var(--weight-md);
+  font-size: var(--text-sm);
   /* Explicit text color - overridden per category if needed */
   color: var(--primary-foreground);
   box-shadow: var(--shadow-md);
-  border-left: 0.25rem solid rgba(0, 0, 0, 0.15);
+  border-left: 0.25rem solid rgba(var(--black-rgb), var(--alpha-medium));
   cursor: default;
   animation: slideInRight 0.3s ease-out;
   pointer-events: all;
@@ -29,7 +29,7 @@
   color: inherit;
   opacity: 0.85;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
@@ -44,21 +44,21 @@
 /* Category backgrounds */
 .alert-success {
   background-color: var(--brand-green);
-  border-left-color: rgba(0, 0, 0, 0.2);
+  border-left-color: rgba(var(--black-rgb), var(--alpha-strong));
 }
 
 .alert-error {
-  background-color: var(--brand-red, #ef4444);
+  background-color: var(--brand-red);
   color: var(--primary-foreground);
-  border-left-color: rgba(0, 0, 0, 0.2);
+  border-left-color: rgba(var(--black-rgb), var(--alpha-strong));
 }
 
 .alert-warning {
-  background-color: var(--color-warning, #f59e0b);
-  border-left-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--color-warning);
+  border-left-color: rgba(var(--black-rgb), var(--alpha-strong));
 }
 
 .alert-info {
   background-color: var(--brand-blue);
-  border-left-color: rgba(0, 0, 0, 0.2);
+  border-left-color: rgba(var(--black-rgb), var(--alpha-strong));
 }

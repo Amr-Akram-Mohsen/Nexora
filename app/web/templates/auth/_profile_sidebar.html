@@ -1,0 +1,83 @@
+{# _profile_sidebar.html #}
+{% from "components/ui/core.html" import badge, button, card, form, input %}
+
+<aside class="profile-sidebar">
+  {% call card(class="profile-user-card") %}
+  <div class="profile-user-info flex flex-col items-center">
+    <div class="profile-avatar flex-center flex justify-center items-center">
+      {{ current_user.name[0]|upper if current_user.name else current_user.email[0]|upper }}
+    </div>
+    <h2 class="profile-name">{{ current_user.name or "Nexora Member" }}</h2>
+    <p class="profile-email">{{ current_user.email }}</p>
+
+    <div class="profile-verification-status flex justify-center">
+      {% set v = current_user.is_verified %}
+      {{ badge(
+        "Verified Account" if v else "Unverified Account",
+        variant="success" if v else "danger",
+        icon="fas fa-check-circle" if v else "fas fa-exclamation-circle",
+        class="badge--verified" if v else "badge--unverified"
+      ) }}
+    </div>
+  </div>
+
+  <div class="profile-meta-list">
+    <div class="meta-product flex items-center justify-between">
+      <span class="meta-label">Provider</span>
+      <span class="meta-value capitalize">{{ current_user.provider or 'Local' }}</span>
+    </div>
+
+    <div class="meta-product flex items-center justify-between">
+      <span class="meta-label">Member Since</span>
+      <span class="meta-value">{{ current_user.created_at | format_date('%Y-%m-%d') }}</span>
+    </div>
+  </div>
+
+  {% if multi_accounts and multi_accounts|length > 1 %}
+  <div class="profile-linked-accounts-header">
+    <h3 class="profile-linked-accounts-title">Linked Accounts</h3>
+    <div class="flex flex-col gap-2">
+      {% for acc in multi_accounts %}
+        {% if not acc.is_active %}
+          {% call form("user.switch_account", user_id=acc.id) %}
+          <button type="submit" class="account-switcher-btn flex items-center gap-3">
+            <div class="profile-avatar profile-avatar--mini flex-center flex justify-center items-center">
+              {{ acc.avatar_letter }}
+            </div>
+            <div class="flex flex-col">
+              <span class="account-switcher-name">{{ acc.name }}</span>
+              <span class="account-switcher-email">{{ acc.email }}</span>
+            </div>
+          </button>
+          {% endcall %}
+        {% else %}
+          <div class="account-switcher-active flex items-center gap-3">
+            <div class="profile-avatar profile-avatar--mini profile-avatar--mini-active flex-center flex justify-center items-center">
+              {{ acc.avatar_letter }}
+            </div>
+            <div class="flex flex-col">
+              <span class="account-switcher-name account-switcher-name--active">{{ acc.name }} (Current)</span>
+              <span class="account-switcher-email account-switcher-email--active">{{ acc.email }}</span>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {{ button(href=url_for('user.login', add_account=1), text="Add Another Account", variant="outline", class="btn-add-account gap-2", icon="fas fa-plus") }}
+  </div>
+  {% else %}
+  <div class="profile-linked-accounts-header">
+    {{ button(href=url_for('user.login', add_account=1), text="Add Another Account", variant="outline", class="btn-add-account gap-2", icon="fas fa-plus") }}
+  </div>
+  {% endif %}
+  {% endcall %}
+
+  {% if not current_user.is_verified and current_user.provider != 'google' %}
+  {% call card(title="Verify Your Email", desc="Please verify your account to access all features. We've sent a verification link to your email.", class="verification-alert-card") %}
+  {% call form("user.resend_verification") %}
+  {{ input(type="hidden", name="email", value=current_user.email, required=False) }}
+  {{ button(text="Resend Link", type="submit", variant="primary", class="w-full text-center gap-2") }}
+  {% endcall %}
+  {% endcall %}
+  {% endif %}
+</aside>

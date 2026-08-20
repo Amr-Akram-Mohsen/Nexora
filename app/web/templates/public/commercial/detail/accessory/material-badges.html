@@ -1,13 +1,3 @@
-{% set materials = product.structured_details.get('materials') %}
-
-{% if materials %}
-<div class="material-badges flex flex-wrap">
-
-  {% for key, value in materials.items() %}
-  <span class="badge">
-    {{ value }}
-  </span>
-  {% endfor %}
-
-</div>
-{% endif %}
+{% from "commercial/features/render-structured-block.html" import render_structured_badges %}
+{% set materials = product.structured_details.get('materials') if product.structured_details else None %}
+{{ render_structured_badges(materials, wrapper_class="material-badges flex flex-wrap") }}

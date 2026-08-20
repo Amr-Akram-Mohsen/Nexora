@@ -1,2 +1,57 @@
-from .query import *
-from .command import *
+from .query import (
+    count_users,
+    get_users,
+    get_user_by_id,
+    get_user_by_email,
+    get_active_user_by_email,
+    get_newsletter_subscriber_by_email,
+)
+from .command import (
+    create_user,
+    deactivate_user,
+    delete_user,
+    activate_user,
+    mark_user_verified,
+    set_verification_sent,
+    record_login,
+    mark_password_changed,
+    reset_password,
+    update_user_name,
+    update_user_password,
+    create_newsletter_subscriber,
+    link_newsletter_subscriber_to_user,
+    confirm_newsletter_subscriber,
+    unsubscribe_newsletter_subscriber,
+    create_contact_message,
+)
+from app.domains.user.serializers import (
+    score_to_tier,
+    TIER_THRESHOLDS,
+)
+
+__all__ = [
+    'count_users',
+    'get_users',
+    'get_user_by_id',
+    'get_user_by_email',
+    'get_active_user_by_email',
+    'get_newsletter_subscriber_by_email',
+    'create_user',
+    'deactivate_user',
+    'delete_user',
+    'activate_user',
+    'mark_user_verified',
+    'set_verification_sent',
+    'record_login',
+    'mark_password_changed',
+    'reset_password',
+    'update_user_name',
+    'update_user_password',
+    'create_newsletter_subscriber',
+    'link_newsletter_subscriber_to_user',
+    'confirm_newsletter_subscriber',
+    'unsubscribe_newsletter_subscriber',
+    'create_contact_message',
+    'score_to_tier',
+    'TIER_THRESHOLDS',
+]

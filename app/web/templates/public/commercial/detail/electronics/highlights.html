@@ -1,14 +1,3 @@
-{% set highlights = product.structured_details.get('highlights') %}
-
-{% if highlights %}
-<div class="product-highlights flex flex-wrap">
-
-  {% for key, value in highlights.items() %}
-  <div class="highlight-product">
-    <span class="highlight-label">{{ key.replace('_', ' ') }}</span>
-    <span class="highlight-value">{{ value }}</span>
-  </div>
-  {% endfor %}
-
-</div>
-{% endif %}
+{% from "commercial/features/render-structured-block.html" import render_structured_key_values %}
+{% set highlights = product.structured_details.get('highlights') if product.structured_details else None %}
+{{ render_structured_key_values(highlights, wrapper_class="product-highlights flex flex-wrap", item_class="highlight-product") }}

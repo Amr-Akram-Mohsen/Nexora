@@ -32,6 +32,8 @@ function handleGlobalClicks(e) {
     if (typeof handleSavedItemsFilterClick === "function" && handleSavedItemsFilterClick(e)) return;
     if (typeof handleProgressiveRevealClick === "function" && handleProgressiveRevealClick(e)) return;
     if (typeof handlePasswordClick === "function" && handlePasswordClick(e)) return;
+    if (typeof handleProfileClick === "function" && handleProfileClick(e)) return;
+    if (typeof handleLazyVideoClick === "function" && handleLazyVideoClick(e)) return;
 }
 
 
@@ -41,12 +43,16 @@ function handleGlobalSubmits(e) {
     if (handleNewsletterSubmit(e)) return;
 
     if (handleContactSubmit(e)) return;
+
+    if (typeof handleProfileFormSubmit === "function" && handleProfileFormSubmit(e)) return;
 }
 
 function handleGlobalChanges(e) {
-    if (handleCountryChange(e)) return;
+    if (typeof handleCountryChange === 'function' && handleCountryChange(e)) return;
 
-    if (handleSortChange(e)) return;
+    if (typeof handleSortChange === 'function' && handleSortChange(e)) return;
+
+    if (typeof handleMoveCollectionChange === 'function' && handleMoveCollectionChange(e)) return;
 }
 
 function handleSelectText(e) {

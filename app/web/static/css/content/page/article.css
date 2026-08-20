@@ -206,7 +206,7 @@
 
 .cta-read-original:hover {
   background: var(--domain-primary);
-  color: #ffffff;
+  color: var(--outline);
   border-color: var(--domain-primary);
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);

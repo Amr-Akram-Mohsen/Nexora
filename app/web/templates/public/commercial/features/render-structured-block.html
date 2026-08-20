@@ -1,0 +1,28 @@
+{# render-structured-block.html #}
+{% from "components/ui/core.html" import badge %}
+
+{% macro render_structured_badges(data, wrapper_class="flex flex-wrap gap-2", show_key=false, badge_class="") %}
+{% if data %}
+<div class="{{ wrapper_class }}">
+  {% for key, value in data.items() if value %}
+  <span class="badge {{ badge_class }}">
+    {% if show_key %}{{ key.replace('_', ' ') }}: {% endif %}{{ value }}
+  </span>
+  {% endfor %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_structured_key_values(data, wrapper_class="product-highlights flex flex-wrap", item_class="highlight-product", title=None) %}
+{% if data %}
+<div class="{{ wrapper_class }}">
+  {% if title %}<h4>{{ title }}</h4>{% endif %}
+  {% for key, value in data.items() if value %}
+  <div class="{{ item_class }}">
+    <span class="highlight-label">{{ key.replace('_', ' ') | title }}:</span>
+    <span class="highlight-value">{{ value }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endmacro %}

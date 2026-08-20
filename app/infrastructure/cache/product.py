@@ -16,7 +16,7 @@ def invalidate_item_page(product_id):
 
 def invalidate_item_catalog_caches():
     """Drop cached catalog / home product listings (all filter variants)."""
-    from app.domains.product.service.public.search import (
+    from app.domains.product.service.search import (
         get_filtered_items,
         get_home_products_cached,
     )

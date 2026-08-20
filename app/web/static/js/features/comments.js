@@ -52,7 +52,8 @@ async function showComments(btn) {
     if (wrapper.dataset.loaded === "true") return;
 
     try {
-        const res = await fetch(`/get-comments?${params.toString()}`);
+        const endpoint = window.APP?.urls?.getComments || "/get-comments";
+        const res = await fetch(`${endpoint}?${params.toString()}`);
 
         if (!res.ok) {
             showInlineTooltip(btn, "Could not load comments");

@@ -1,0 +1,35 @@
+{# _profile_collections.html #}
+{% from "components/ui/core.html" import button %}
+
+<div class="card glass settings-card">
+  <div class="card-header flex items-center justify-between">
+    <div>
+      <h3 class="card-section-title">Saved Collections</h3>
+      <p class="card-section-desc">Manage your saved collections across the platform.</p>
+    </div>
+    {{ button(href=url_for('interaction.saved_items'), variant="outline", class="btn--icon gap-2", icon="fas fa-external-link-alt", attrs={"aria-label": "View All Saved Items", "title": "View Saved Items"}) }}
+  </div>
+
+  <div class="card-body collections-list flex flex-col gap-4">
+    {% if collections %}
+    {% for collection in collections %}
+    <div class="collection-manage-product flex items-center justify-between">
+      <div class="collection-info flex flex-col gap-1">
+        <span class="collection-name-display">{{ collection.name }}</span>
+        <span class="collection-count-display">{{ collection.count }} products</span>
+      </div>
+
+      <div class="collection-actions flex items-center gap-2">
+        {{ button(text="Rename", type="button", variant="ghost", class="text-sm btn-rename-collection", icon="fas fa-edit", attrs={"data-collection": collection.name, "data-action": "rename-collection"}) }}
+        {{ button(text="Delete", type="button", variant="ghost", class="text-sm text-red-500 hover:bg-red-50 btn-delete-collection", icon="fas fa-trash", attrs={"data-collection": collection.name, "data-action": "delete-collection"}) }}
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="collections-empty-state">
+      <i class="far fa-folder-open collections-empty-icon"></i>
+      <p>You haven't created any collections yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>

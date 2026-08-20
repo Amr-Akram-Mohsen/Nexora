@@ -1,13 +1,10 @@
 {% extends "admin/layout/admin_base.html" %}
-{% from "admin/components/ui/panels.html" import admin_page_header, admin_tab_panel %}
-{% from "admin/components/ui/pagination.html" import admin_paginator %}
-{% from "admin/components/ui/tables.html" import admin_crud_table %}
+{% from "admin/components/ui/panels.html" import admin_page_header %}
 {% from "admin/components/ui/tabs.html" import admin_tab_navigation %}
-{% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
 {% from "admin/components/ui/inspect.html" import admin_inspect_modal %}
-{% from "components/ui/core.html" import button, input, badge %}
-{% from "admin/components/ui/forms.html" import admin_filter_select %}
+{% from "components/ui/core.html" import badge %}
 {% from "components/ui/modal.html" import modal %}
+
 {% set header_title = "Taxonomy Management" %}
 {% block title %}Taxonomy Management — Nexora Admin{% endblock %}
 
@@ -46,171 +43,13 @@
 
 {# Restrict width so it doesn't stretch 100% on large monitors #}
 <div class="admin-constrained-form-area">
-
-  {# ── Insights Tab ───────────────────────────────────────── #}
-  {% call admin_tab_panel("insights", is_active=true) %}
-  <div>
-    <h3><i class="fa-solid fa-robot"></i> Automated Tagging Suggestions</h3>
-    <div id="insights-suggestions-container" class="dashboard-widget-card">
-      <div>Loading suggestions...</div>
-    </div>
-  </div>
-
-  <div>
-    <h3><i class="fa-solid fa-triangle-exclamation"></i> Cross-Domain Coherence</h3>
-    <div id="insights-coherence-container" class="dashboard-widget-card">
-      <div>Loading coherence checks...</div>
-    </div>
-  </div>
-  {% endcall %}
-
-  {# ── Categories Tab ───────────────────────────────────────── #}
-  {% call admin_tab_panel("categories") %}
-  {# Create Form #}
-  <div class="admin-inline-form" id="category-create-form">
-    <h3 class="admin-inline-form-title">Add New Category</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      {{ input(type="text", id="new-category-name", placeholder="Category name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-category-slug-preview">—</code>
-      </div>
-      {{ button(text="+ Add Category", class="admin-btn-primary", attrs={"id": "create-category-btn"}, variant=none) }}
-    </div>
-  </div>
-
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("category-search", "Search categories…") }}
-    {{ admin_filter_select("category-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
-    {{ admin_filter_select("category-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-    {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "categories"}, variant=none) }}
-  </div>
-  {% endcall %}
-
-  {{ admin_crud_table(tables['categories'], "Loading categories…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Brands Tab ───────────────────────────────────────────── #}
-  {% call admin_tab_panel("brands") %}
-  <div class="admin-inline-form" id="brand-create-form">
-    <h3 class="admin-inline-form-title">Add New Brand</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      {{ input(type="text", id="new-brand-name", placeholder="Brand name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      {{ input(type="text", id="new-brand-industry", placeholder="Industry (optional)…", class="dashboard-filter-input admin-inline-input admin-inline-input-sm", required=False) }}
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-brand-slug-preview">—</code>
-      </div>
-      {{ button(text="+ Add Brand", class="admin-btn-primary", attrs={"id": "create-brand-btn"}, variant=none) }}
-    </div>
-  </div>
-
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("brand-search", "Search brands…") }}
-    {{ admin_filter_select("brand-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
-    {{ admin_filter_select("brand-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-    {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "brands"}, variant=none) }}
-  </div>
-  {% endcall %}
-
-  {{ admin_crud_table(tables['brands'], "Loading brands…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Topics Tab ───────────────────────────────────────────── #}
-  {% call admin_tab_panel("topics") %}
-  <div class="admin-inline-form" id="topic-create-form">
-    <h3 class="admin-inline-form-title">Add New Topic</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      {{ input(type="text", id="new-topic-name", placeholder="Topic name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-topic-slug-preview">—</code>
-      </div>
-      {{ button(text="+ Add Topic", class="admin-btn-primary", attrs={"id": "create-topic-btn"}, variant=none) }}
-    </div>
-  </div>
-
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("topic-search", "Search topics…") }}
-    {{ admin_filter_select("topic-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
-    {{ admin_filter_select("topic-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-    {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "topics"}, variant=none) }}
-  </div>
-  {% endcall %}
-
-  {{ admin_crud_table(tables['topics'], "Loading topics…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Sections Tab ─────────────────────────────────────────── #}
-  {% call admin_tab_panel("sections") %}
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("section-search", "Search sections…") }}
-    {{ admin_filter_select("section-filter-status", name=none, options=[("1", "Active"), ("0", "Inactive")], default_val="", default_text="Status: All", extra_class="admin-inline-input") }}
-    {{ admin_filter_select("section-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)"), ("inactive-linked", "Inactive Linked")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-    {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "sections"}, variant=none) }}
-  </div>
-  {% endcall %}
-  {{ admin_crud_table(tables['sections'], "Loading sections…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Attributes Tab ───────────────────────────────────────── #}
-  {% call admin_tab_panel("attributes") %}
-  <div class="admin-inline-form" id="attribute-create-form">
-    <h3 class="admin-inline-form-title">Add New Attribute</h3>
-    <div class="admin-inline-form-row flex items-center flex-wrap gap-3">
-      {{ input(type="text", id="new-attribute-name", placeholder="Attribute name…", class="dashboard-filter-input admin-inline-input", required=False) }}
-      <div class="admin-inline-slug-preview flex items-center">
-        Slug: <code id="new-attribute-slug-preview">—</code>
-      </div>
-      {{ button(text="+ Add Attribute", class="admin-btn-primary", attrs={"id": "create-attribute-btn"}, variant=none) }}
-    </div>
-  </div>
-
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("attribute-search", "Search attributes…") }}
-    {{ admin_filter_select("attribute-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-    {{ button(text="Find Duplicates", icon="fa-solid fa-magnifying-glass", class="admin-btn-secondary ml-auto", attrs={"data-action": "find-duplicates", "data-domain": "attributes"}, variant=none) }}
-  </div>
-  {% endcall %}
-
-  {{ admin_crud_table(tables['attributes'], "Loading attributes…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Gender Facets Tab ────────────────────────────────────── #}
-  {% call admin_tab_panel("gender_facets") %}
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("gender-facet-search", "Search gender facets…") }}
-    {{ admin_filter_select("gender_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-  </div>
-  {% endcall %}
-  {{ admin_crud_table(tables["gender_facets"], "Loading gender facets…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Intent Facets Tab ────────────────────────────────────── #}
-  {% call admin_tab_panel("intent_facets") %}
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("intent-facet-search", "Search intent facets…") }}
-    {{ admin_filter_select("intent_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-  </div>
-  {% endcall %}
-  {{ admin_crud_table(tables["intent_facets"], "Loading intent facets…", "loading-height-md") }}
-  {% endcall %}
-
-  {# ── Price Tier Facets Tab ────────────────────────────────── #}
-  {% call admin_tab_panel("price_tier_facets") %}
-  {% call admin_toolbar_section() %}
-  <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
-    {{ admin_search_input("price-tier-facet-search", "Search price tier facets…") }}
-    {{ admin_filter_select("price_tier_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
-  </div>
-  {% endcall %}
-  {{ admin_crud_table(tables["price_tier_facets"], "Loading price tier facets…", "loading-height-md") }}
-  {% endcall %}
-
+  {% include "admin/taxonomy/_tab_insights.html" %}
+  {% include "admin/taxonomy/_tab_categories.html" %}
+  {% include "admin/taxonomy/_tab_brands.html" %}
+  {% include "admin/taxonomy/_tab_topics.html" %}
+  {% include "admin/taxonomy/_tab_sections.html" %}
+  {% include "admin/taxonomy/_tab_attributes.html" %}
+  {% include "admin/taxonomy/_tab_facets.html" %}
 </div>{# End max-width wrapper #}
 
 {# Inspect Modals #}

@@ -1,0 +1,38 @@
+{# _tab_facets.html #}
+{% from "admin/components/ui/panels.html" import admin_tab_panel %}
+{% from "admin/components/ui/tables.html" import admin_crud_table %}
+{% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
+{% from "admin/components/ui/forms.html" import admin_filter_select %}
+
+{# ── Gender Facets Tab ── #}
+{% call admin_tab_panel("gender_facets") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("gender-facet-search", "Search gender facets…") }}
+  {{ admin_filter_select("gender_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
+</div>
+{% endcall %}
+{{ admin_crud_table(tables["gender_facets"], "Loading gender facets…", "loading-height-md") }}
+{% endcall %}
+
+{# ── Intent Facets Tab ── #}
+{% call admin_tab_panel("intent_facets") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("intent-facet-search", "Search intent facets…") }}
+  {{ admin_filter_select("intent_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
+</div>
+{% endcall %}
+{{ admin_crud_table(tables["intent_facets"], "Loading intent facets…", "loading-height-md") }}
+{% endcall %}
+
+{# ── Price Tier Facets Tab ── #}
+{% call admin_tab_panel("price_tier_facets") %}
+{% call admin_toolbar_section() %}
+<div class="admin-toolbar-row flex items-center flex-wrap gap-3">
+  {{ admin_search_input("price-tier-facet-search", "Search price tier facets…") }}
+  {{ admin_filter_select("price_tier_facet-filter-health", name=none, options=[("ok", "OK"), ("unused", "Unused (Orphan)")], default_val="", default_text="Health: All", extra_class="admin-inline-input") }}
+</div>
+{% endcall %}
+{{ admin_crud_table(tables["price_tier_facets"], "Loading price tier facets…", "loading-height-md") }}
+{% endcall %}

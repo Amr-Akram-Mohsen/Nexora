@@ -1,0 +1,37 @@
+{# _profile_security.html #}
+{% from "components/ui/core.html" import button, field, form, input %}
+
+{% if current_user.provider != 'google' %}
+<div class="card glass settings-card">
+  <div class="card-header flex items-center justify-between" data-action="toggle-password-form">
+    <div>
+      <h3 class="card-section-title">Security & Password</h3>
+      <p class="card-section-desc">Change your password to ensure your account security.</p>
+    </div>
+    {{ button(variant="ghost", class="btn--icon gap-2", attrs={"id": "password-toggle-btn", "aria-label": "Toggle Password Form"}, icon="fas fa-chevron-down transition-transform duration-300", btn_span_class="hidden") }}
+  </div>
+  <div class="card-body password-form-collapsible collapsed" id="password-collapsible">
+    {% call form("user.update_profile", attrs={"id": "password-form"}, class="profile-form border-t-separator") %}
+    {{ input(type="hidden", name="action", value="password", required=False) }}
+
+    <div class="form-row-grid">
+      {% call field(label_text="Current Password", for_id="current_password", class="full-width gap-2 flex") %}
+      {{ input(type="password", id="current_password", name="current_password", required=True, placeholder="Enter your current password") }}
+      {% endcall %}
+
+      {% call field(label_text="New Password", for_id="new_password", class="gap-2 flex") %}
+      {{ input(type="password", id="new_password", name="new_password", required=True, placeholder="Enter new password (min. 8 chars)", attrs={"minlength": "8"}) }}
+      {% endcall %}
+
+      {% call field(label_text="Confirm New Password", for_id="confirm_new_password", class="gap-2 flex") %}
+      {{ input(type="password", id="confirm_new_password", name="confirm_new_password", required=True, placeholder="Confirm your new password", attrs={"minlength": "8"}) }}
+      {% endcall %}
+    </div>
+
+    <div class="form-actions flex justify-end">
+      {{ button(text="Update Password", type="submit", variant="primary", class="gap-2") }}
+    </div>
+    {% endcall %}
+  </div>
+</div>
+{% endif %}

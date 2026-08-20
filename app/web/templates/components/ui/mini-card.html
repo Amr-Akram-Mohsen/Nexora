@@ -1,17 +1,23 @@
-<a href="{{ url_for('content.content_page', content_slug=item.slug) }}" class="mini-card flex flex-col gap-1">
-    {% if item.target and item.target.image_url %}
+{% set target_href = item.href or item.url or (url_for('content.content_page', content_slug=item.slug) if item.slug else '#') %}
+{% set item_title = item.title or (item.target.title if item.target else '') %}
+{% set item_image = item.image_url or (item.target.image_url if item.target else None) %}
+
+<a href="{{ target_href }}" class="mini-card flex flex-col gap-1">
+    {% if item_image %}
     <div class="mini-card__image">
-        <img src="{{ item.target.image_url }}" alt="{{ item.target.title }}" loading="lazy">
+        <img src="{{ item_image }}" alt="{{ item_title }}" loading="lazy">
     </div>
     {% endif %}
     <div class="mini-card__content">
-        <h4 class="mini-card__title" title="{{ item.target.title }}">{{ item.target.title }}</h4>
+        <h4 class="mini-card__title" title="{{ item_title }}">{{ item_title }}</h4>
         <div class="mini-card__meta flex items-center gap-1 flex-wrap">
             {% if item.source %}
-            <span class="mini-card__source">{{ item.source.name }}</span>
+            <span class="mini-card__source">{{ item.source.name if item.source is mapping or item.source.name is defined else item.source }}</span>
             <span class="mini-card__dot flex-shrink-0"></span>
             {% endif %}
+            {% if item.published_at %}
             <time class="mini-card__date">{{ item.published_at | format_date('%b %d') }}</time>
+            {% endif %}
         </div>
     </div>
 </a>

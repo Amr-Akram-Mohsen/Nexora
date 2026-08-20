@@ -1,6 +1,6 @@
 from app.application.interaction.public import get_reading_history_workflow, get_saved_articles_workflow, get_saved_products_workflow
 from app.domains.content.service.query.trending import get_popular_contents
-from app.domains.product.service.public.search import get_popular_items
+from app.domains.product.service.search import get_popular_items
 from app.core.extensions import db
 
 def get_personalized_feed_workflow(user_id, limit=12):
