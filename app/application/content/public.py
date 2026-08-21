@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import current_app
 from app.core.extensions import db
 from app.infrastructure import cache

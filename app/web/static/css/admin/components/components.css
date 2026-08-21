@@ -271,3 +271,46 @@ body.dark-mode .bulk-actions-toolbar {
     padding: var(--space-3);
     border-radius: var(--radius-md);
 }
+
+.top-saves-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.top-saves-item {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.top-saves-item:last-child {
+    border-bottom: none;
+}
+
+.top-saves-name {
+    font-size: var(--text-sm);
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: var(--space-4);
+}
+
+.top-saves-icon {
+    margin-right: var(--space-1);
+}
+
+.top-saves-count {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--brand-blue);
+    flex-shrink: 0;
+}
+
+.top-saves-empty {
+    font-size: var(--text-sm);
+    color: var(--muted-foreground);
+    margin: 0;
+    padding: var(--space-3) 0;
+}
+

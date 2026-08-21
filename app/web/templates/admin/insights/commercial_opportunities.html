@@ -12,8 +12,8 @@
 <div class="insights-section">
     <div class="insights-double-grid">
         {% call admin_panel("Commercial Coverage Matrix", "Demand vs Actual Article Coverage") %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
                 <thead>
                     <tr>
                         <th class="col-entity">Category / Topic</th>
@@ -23,15 +23,15 @@
                     </tr>
                 </thead>
                 <tbody hx-get="{{ url_for('api_insights.widget_coverage_matrix') }}" hx-trigger="load">
-                    <tr><td colspan="4" class="text-center text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+                    <tr><td colspan="4" class="table-state-cell"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
                 </tbody>
             </table>
         </div>
         {% endcall %}
 
         {% call admin_panel("Brand Expansion Opportunities", "Untapped Brands with High Engagement") %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
                 <thead>
                     <tr>
                         <th class="col-entity">Brand</th>
@@ -41,7 +41,7 @@
                     </tr>
                 </thead>
                 <tbody hx-get="{{ url_for('api_insights.widget_brand_opportunities') }}" hx-trigger="load">
-                    <tr><td colspan="4" class="text-center text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+                    <tr><td colspan="4" class="table-state-cell"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -52,43 +52,29 @@
 <h2 class="insight-group-title flex items-center gap-3">
     <i class="fa-solid fa-cart-shopping"></i> Asset & Product Mapping
 </h2>
-<div class="insights-section card bg-card border border-border radius-md mb-4">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+<div class="insights-section insights-card">
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
             <thead>
                 <tr>
                     <th class="col-entity">Entity / Type</th>
                     <th class="col-metric">Opportunity Score</th>
                     <th class="col-asset-count">Existing Assets</th>
                     <th class="col-gap-count">Identified Gaps</th>
-                    <th class="col-actions text-end">Details</th>
+                    <th class="col-actions">Details</th>
                 </tr>
             </thead>
             <tbody hx-get="{{ url_for('api_insights.widget_asset_mapping') }}" hx-trigger="load">
-                <tr><td colspan="5" class="text-center text-muted p-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
+                <tr><td colspan="5" class="table-state-cell"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 {% endblock %}
 
-{% block custom_scripts %}
+{% block admin_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/core/chartHelper.js') }}"></script>
-<script>
-    document.addEventListener("click", function(e) {
-        if(e.target.closest('.asset-mapping-details-toggle')) {
-            const btn = e.target.closest('.asset-mapping-details-toggle');
-            const row = btn.closest('tr');
-            const detailsRow = row.nextElementSibling;
-            if(detailsRow && detailsRow.classList.contains('asset-mapping-details-row')) {
-                const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-                btn.setAttribute('aria-expanded', !isExpanded);
-                detailsRow.style.display = isExpanded ? 'none' : 'table-row';
-                btn.querySelector('i').style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
-            }
-        }
-    });
-</script>
 {% endblock %}
+

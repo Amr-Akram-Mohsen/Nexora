@@ -91,7 +91,9 @@ function handleSearchClick(e) {
     if (!searchToggleBtn) return false;
 
     const siteHeader = searchToggleBtn.closest('.site-header');
-    const searchPanel = siteHeader.querySelector('.header-search');
+    const searchPanel = siteHeader?.querySelector('.header-search') || document.getElementById('header-search-panel');
+    if (!searchPanel) return false;
+
     const isActive = searchPanel.classList.toggle('active');
     searchToggleBtn.setAttribute('aria-expanded', String(isActive));
     if (isActive) {
@@ -145,14 +147,14 @@ function initListingSidebar() {
     const openBtn = document.getElementById('filterToggleBtn');
 
     function openSidebar() {
-      if (sidebar) sidebar.classList.add('is-open');
-      if (overlay) overlay.classList.add('is-visible');
-      document.body.style.overflow = 'hidden';
+        if (sidebar) sidebar.classList.add('is-open');
+        if (overlay) overlay.classList.add('is-visible');
+        document.body.style.overflow = 'hidden';
     }
     function closeSidebar() {
-      if (sidebar) sidebar.classList.remove('is-open');
-      if (overlay) overlay.classList.remove('is-visible');
-      document.body.style.overflow = '';
+        if (sidebar) sidebar.classList.remove('is-open');
+        if (overlay) overlay.classList.remove('is-visible');
+        document.body.style.overflow = '';
     }
 
     if (openBtn) openBtn.addEventListener('click', openSidebar);

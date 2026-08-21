@@ -53,11 +53,12 @@
         attrs={"minlength": "8", "autocomplete": "new-password" if is_new_user else "current-password"},
         required=True
         ) }}
-        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
+        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show
+        password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
 
       {% if is_new_user %}
-      <div class="password-strength" style="display:none;">
+      <div class="password-strength is-hidden">
         <div class="password-strength-bar flex gap-1">
           <div class="strength-segment"></div>
           <div class="strength-segment"></div>
@@ -79,7 +80,8 @@
         attrs={"autocomplete": "new-password"},
         required=True
         ) }}
-        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
+        {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show
+        password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
       <span class="confirm-match"></span>
       {% endcall %}
@@ -90,8 +92,8 @@
         <div class="checkbox-group flex items-center gap-2">
           {% set check_name = "newsletter" if is_new_user else "remember" %}
           {% set check_text = "Get tech deals in your inbox" if is_new_user else "Keep me signed in" %}
-          {{ input(name=check_name, id=check_name, type="checkbox", class="w-4 h-4") }}
-          {{ label(check_text, check_name, class="auth-checkbox-label cursor-pointer") }}
+          {{ input(name=check_name, id=check_name, type="checkbox", class="auth-checkbox") }}
+          {{ label(check_text, check_name, class="auth-checkbox-label") }}
         </div>
         {% if not is_new_user %}
         {{ link(text="Forgot password?", href=url_for('user.forgot_password'), class="redirect-link") }}
@@ -103,8 +105,9 @@
       <div class="resend-alert">
         <p class="field-hint resend-alert__hint">Haven't received the verification email?</p>
         {% call form("user.resend_verification") %}
-          <input type="hidden" name="email" value="{{ email }}">
-          {{ button(text="Resend Verification Email", type="submit", variant="outline", class="resend-alert__btn gap-2") }}
+        <input type="hidden" name="email" value="{{ email }}">
+        {{ button(text="Resend Verification Email", type="submit", variant="outline", class="resend-alert__btn gap-2")
+        }}
         {% endcall %}
       </div>
       {% endif %}

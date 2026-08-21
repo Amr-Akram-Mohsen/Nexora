@@ -12,3 +12,5 @@
 @import "./admin/pages/settings.css" layer(admin);
 @import "./admin/components/components.css" layer(admin);
 @import "./admin/components/inspect.css" layer(admin);
+@import "./admin/pages/insights.css" layer(admin);
+

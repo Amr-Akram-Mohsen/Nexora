@@ -6,18 +6,28 @@ function handleNavigationClick(e) {
 }
 
 function handleUserDropdown(e) {
-    const user = e.target.closest(".nav-user");
-    if (!user) return false;
-    document.querySelectorAll(".nav-user")
-        .forEach(el => {
-            if (el !== user) el.classList.remove("active");
+    const userToggle = e.target.closest('.user-toggle');
+    const navUser = e.target.closest('.nav-user');
+
+    if (userToggle) {
+        const parentUser = userToggle.closest('.nav-user');
+        document.querySelectorAll('.nav-user.active').forEach(el => {
+            if (el !== parentUser) el.classList.remove('active');
         });
-
-    if (user) {
-        user.classList.toggle("active");
+        if (parentUser) {
+            parentUser.classList.toggle('active');
+        }
+        return true;
     }
-    return true;
 
+    if (!navUser) {
+        // Outside click - dismiss all active dropdowns
+        document.querySelectorAll('.nav-user.active').forEach(el => {
+            el.classList.remove('active');
+        });
+    }
+
+    return false;
 }
 
 function handleMobileMenu(e) {

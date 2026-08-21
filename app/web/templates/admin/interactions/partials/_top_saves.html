@@ -1,13 +1,14 @@
 {% if data %}
-  <ul class="divide-y">
+  <ul class="top-saves-list">
     {% for s in data %}
       {% set icon = '📄' if s.target_type == 'content' else '📦' %}
-      <li class="py-2 flex justify-between" style="border-bottom: 1px solid var(--border);">
-        <span class="truncate pr-4">{{ icon }} {{ s.name }}</span>
-        <span class="font-semibold" style="color: var(--brand-blue);">{{ s.count }}</span>
+      <li class="top-saves-item flex items-center justify-between">
+        <span class="top-saves-name"><span class="top-saves-icon">{{ icon }}</span>{{ s.name }}</span>
+        <span class="top-saves-count">{{ s.count }}</span>
       </li>
     {% endfor %}
   </ul>
 {% else %}
-  <p class="text-muted">No saves recorded.</p>
+  <p class="top-saves-empty">No saves recorded.</p>
 {% endif %}
+

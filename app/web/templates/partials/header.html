@@ -5,17 +5,17 @@
   <div class="container">
     <div class="header flex items-center justify-between">
 
-      {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2",
+      {% call link(href="/", class="logo flex items-center site-logo",
       unstyled=True) %}
       {% include "logos/nexora-logo.html" %}
       {% endcall %}
 
-      <nav class="main-nav md:flex items-center">
+      <nav class="main-nav items-center">
         {% for section in main_sections %}
         {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link
-        gap-2 inline-flex items-center", unstyled=True) }}
+        inline-flex items-center", unstyled=True) }}
         {% endfor %}
-        {{ link(text="Products", href=url_for('product.deals'), class="main-nav__link gap-2 inline-flex items-center",
+        {{ link(text="Products", href=url_for('product.deals'), class="main-nav__link gap-1 inline-flex items-center",
         icon="fas fa-tag", unstyled=True) }}
       </nav>
 

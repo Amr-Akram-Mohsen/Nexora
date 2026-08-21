@@ -10,12 +10,12 @@
     page_description
 ) }}
 <div class="insights-section">
-    <div class="user-analytics-dashboard grid grid-cols-3 gap-4">
+    <div class="user-analytics-dashboard insights-triple-grid">
 
         {% call admin_panel("Recommendation Receptivity", "System-wide CTR for algorithmic recommendations") %}
         <div>
-            <div id="receptivity-ctr" class="text-4xl font-bold text-[var(--brand-purple)]">—%</div>
-            <div class="text-muted small mt-2">
+            <div id="receptivity-ctr" class="insight-kpi-value insight-kpi-value--purple">—%</div>
+            <div class="insight-kpi-subtext">
                 <span id="receptivity-clicks">—</span> Clicks / <span id="receptivity-impressions">—</span> Impressions
             </div>
         </div>
@@ -23,8 +23,8 @@
 
         {% call admin_panel("Churn Risk", "Inactive accounts registered > 30 days ago") %}
         <div>
-            <div id="churn-risk-count" class="text-4xl font-bold text-[var(--brand-red)]">—</div>
-            <div class="text-muted small mt-2">Users at risk of churn</div>
+            <div id="churn-risk-count" class="insight-kpi-value insight-kpi-value--red">—</div>
+            <div class="insight-kpi-subtext">Users at risk of churn</div>
         </div>
         {% endcall %}
 
@@ -87,27 +87,10 @@
 </div>
 {% endblock %}
 
-{% block custom_scripts %}
+{% block admin_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/core/chartHelper.js') }}"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Hydrate the receptivity stats
-        window.api.get('/admin/analytics/stats')
-        .then(data => {
-            const receptivityCtr = document.getElementById('receptivity-ctr');
-            if (receptivityCtr) receptivityCtr.textContent = data.receptivity_ctr + '%';
-
-            const receptivityClicks = document.getElementById('receptivity-clicks');
-            if (receptivityClicks) receptivityClicks.textContent = parseInt(data.recommendation_clicks).toLocaleString();
-
-            const receptivityImpressions = document.getElementById('receptivity-impressions');
-            if (receptivityImpressions) receptivityImpressions.textContent = parseInt(data.recommendation_impressions).toLocaleString();
-
-            const churnRiskCount = document.getElementById('churn-risk-count');
-            if (churnRiskCount) churnRiskCount.textContent = parseInt(data.churn_risk_count).toLocaleString();
-        }).catch(err => console.log('Mocking data until hooked up', err));
-    });
-</script>
+<script src="{{ url_for('static', filename='js/admin/pages/insights/audienceReceptivity.js') }}"></script>
 {% endblock %}
+

@@ -269,7 +269,24 @@
     margin-left: 0.5rem;
 }
 
+.table-cell-truncate {
+    display: inline-block;
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.table-state-cell {
+    text-align: center;
+    color: var(--muted-foreground);
+    padding: var(--space-8);
+    font-size: var(--text-sm);
+}
+
 .table {
     margin-bottom: 0;
     vertical-align: middle;
 }
+

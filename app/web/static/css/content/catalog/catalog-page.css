@@ -2,7 +2,6 @@
 @import "../../layout/sidebar-layout.css";
 @import "../../components/sort.css";
 @import "../../components/pagination.css";
-@import "../features/content-sidebar.css";
 @import "../../components/ui/empty-state.css";
 
 @media (max-width: 1024px) {

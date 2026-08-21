@@ -5,25 +5,33 @@
     {% set color = colors[loop.index0 % colors | length] %}
     {% set typeName = product.type | capitalize %}
 
-    <div class="flex items-center w-full gap-3 py-1 {% if product.type != 'Uncategorized' %}dist-row-link hover-bg-subtle rounded-md px-2 transition-colors cursor-pointer{% endif %}"
-         {% if product.type != 'Uncategorized' %}onclick="window.location.href='/admin/products?product_type={{ product.type | urlencode }}'"{% endif %}>
-      <div class="overview-breakdown-icon" style="color: {{ color }};">
+    {% if product.type != 'Uncategorized' %}
+    <a href="/admin/products?product_type={{ product.type | urlencode }}" class="overview-breakdown-row overview-breakdown-row--clickable flex items-center gap-3" style="--icon-color: {{ color }};">
+    {% else %}
+    <div class="overview-breakdown-row flex items-center gap-3" style="--icon-color: {{ color }};">
+    {% endif %}
+      <div class="overview-breakdown-icon">
         <i class="fa-solid fa-cube"></i>
       </div>
-      <div class="overview-breakdown-label truncate flex-1 font-medium" title="{{ typeName }}">
+      <div class="overview-breakdown-label" title="{{ typeName }}">
         {{ typeName }}
       </div>
-      <div class="overview-breakdown-bar-track flex-1 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
-        <div class="overview-breakdown-bar h-full rounded-full" style="width: {{ pct }}%; background-color: {{ color }};"></div>
+      <div class="overview-breakdown-bar-track flex-1">
+        <div class="overview-breakdown-bar" style="--seg-width: {{ pct }}%; --bar-color: {{ color }};"></div>
       </div>
-      <div class="overview-breakdown-val w-12 text-right font-semibold">
+      <div class="overview-breakdown-val">
         {{ "{:,}".format(product.count) }}
       </div>
-      <div class="overview-breakdown-pct w-12 text-right text-muted text-xs">
+      <div class="overview-breakdown-pct">
         {{ pct }}%
       </div>
+    {% if product.type != 'Uncategorized' %}
+    </a>
+    {% else %}
     </div>
+    {% endif %}
   {% endfor %}
 {% else %}
-  <div class="text-muted text-sm py-2">No type distribution data available.</div>
+  <div class="overview-empty">No type distribution data available.</div>
 {% endif %}
+

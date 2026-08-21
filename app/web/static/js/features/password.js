@@ -62,11 +62,11 @@ function initPasswordStrength() {
     pwdInput.addEventListener("input", () => {
         const val = pwdInput.value;
         const strength = getPasswordStrength(val);
-        meter.style.display = val.length > 0 ? "block" : "none";
+        meter.classList.toggle("is-hidden", val.length === 0);
         updateStrengthMeter(strength);
     });
 
-    meter.style.display = "none";
+    meter.classList.add("is-hidden");
 }
 
 function initConfirmMatch() {

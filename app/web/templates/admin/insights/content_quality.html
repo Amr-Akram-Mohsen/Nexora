@@ -13,11 +13,11 @@
 <div class="insights-section">
     <div class="insights-double-grid">
         {% call admin_panel("Markdown & Structure Health (Mocked)", "Overall syntactical and block health of content") %}
-        <div class="grid grid-cols-2 gap-4">
+        <div class="insights-health-grid">
             <div>
                 <canvas id="markdownHealthChart" data-chart="doughnut" data-chart-payload="markdown-health-data"></canvas>
             </div>
-            <div class="flex flex-col justify-center gap-2 text-sm text-muted">
+            <div class="insights-legend flex flex-col justify-center gap-2">
                 <div>{{ badge(text="85%", class="status-badge badge-success", variant=none) }} Valid Markdown</div>
                 <div>{{ badge(text="12%", class="status-badge badge-warning", variant=none) }} Missing H2/H3 Tags</div>
                 <div>{{ badge(text="3%", class="status-badge badge-danger", variant=none) }} Broken Image Links</div>
@@ -56,17 +56,17 @@
     <i class="fa-solid fa-bullseye"></i> Strategy Accuracy & Feedback
 </h2>
 <div class="insights-section">
-
-    <div class="card bg-card border border-border radius-md mb-4 p-4">
+    <div class="insights-card">
         <div hx-get="{{ url_for('api_insights.widget_performance_feedback') }}" hx-trigger="load">
-            <div class="text-center text-muted p-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading Strategy Performance...</div>
+            <div class="insights-loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading Strategy Performance...</div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-{% block custom_scripts %}
+{% block admin_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
 <script src="{{ url_for('static', filename='js/admin/core/chartHelper.js') }}"></script>
 {% endblock %}
+

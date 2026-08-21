@@ -1,30 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
-    initApp();
-    initUserInteractions();
-    initUserAuth();
-
+    // Attach global delegation handlers first to ensure UI interactivity
     document.addEventListener("click", handleGlobalClicks);
     document.addEventListener("submit", handleGlobalSubmits);
     document.addEventListener("change", handleGlobalChanges);
+
+    initApp();
+    initUserInteractions();
+    initUserAuth();
 });
 
 window.addEventListener("pageshow", initUserInteractions);
 
 function initApp() {
-    initHeroSlider();
-    initTheme();
-    initHeaderScroll();
-    initSearch();
-    initSearchHighlighting();
+    if (typeof initHeroSlider === "function") initHeroSlider();
+    if (typeof initTheme === "function") initTheme();
+    if (typeof initHeaderScroll === "function") initHeaderScroll();
+    if (typeof initSearch === "function") initSearch();
+    if (typeof initSearchHighlighting === "function") initSearchHighlighting();
 
-    applyMode();
-    initFlashMessages();
+    if (typeof applyMode === "function") applyMode();
+    if (typeof initFlashMessages === "function") initFlashMessages();
     if (typeof initProgressiveReveal === "function") initProgressiveReveal();
 }
 
 // Run on page load and when coming back via back/forward buttons
 function initUserInteractions() {
-    if (isAuthenticated) {
+    if (window.APP?.isAuthenticated) {
         if (typeof initAllReactions === "function") initAllReactions();
         if (typeof initAllSaves === "function") initAllSaves();
         if (typeof initSavedItemsPage === "function") initSavedItemsPage();

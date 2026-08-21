@@ -2,7 +2,7 @@
 {% from "admin/components/ui/actions.html" import action_cell, inspect_btn_cell %}
 <td data-field="title">{{ row.title }}</td>
 <td data-field="type">{{ badge(row.target_type|title, variant="secondary") }}</td>
-<td data-field="preview"><span class="truncate" title="{{ row.preview }}">{{ row.preview }}</span></td>
+<td data-field="preview"><span class="table-cell-truncate" title="{{ row.preview }}">{{ row.preview }}</span></td>
 <td data-field="sentiment">
   {% set sentiment = row.sentiment %}
   {% if sentiment == "positive" %}{{ badge(sentiment|title, variant="success") }}
