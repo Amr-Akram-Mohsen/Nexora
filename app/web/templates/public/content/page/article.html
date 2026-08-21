@@ -73,7 +73,6 @@
 {% endif %}
 {% endblock %}
 
-{# ── Author and Source Discovery Carousels ── #}
 {% if author_carousel and author_carousel.get('items') and author_carousel.get('items')|length > 0 %}
 {% block author_carousel %}
 {% call recommendation_box("More from " ~ (article.authors[0].name if article.authors else (article.author or 'Author')), "fas fa-user-edit", "author") %}

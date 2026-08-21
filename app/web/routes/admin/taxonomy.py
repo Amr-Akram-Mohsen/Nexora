@@ -1,7 +1,5 @@
-"""
-Admin taxonomy management endpoints.
-"""
 from flask import Blueprint, jsonify, request, render_template
+from app.core.extensions import db
 from app.web.routes.admin.helpers import (
     apply_admin_guard,
     parse_pagination_params,
@@ -21,36 +19,37 @@ from app.domains.taxonomy.models import (
 )
 from app.domains.taxonomy.service.admin.admin import (
     get_admin_categories,
+    create_admin_category,
+    update_admin_category,
+    delete_admin_category,
     get_admin_brands,
+    create_admin_brand,
+    update_admin_brand,
+    delete_admin_brand,
     get_admin_topics,
+    create_admin_topic,
+    update_admin_topic,
+    delete_admin_topic,
     get_admin_sections,
+    update_admin_section,
     get_admin_attributes,
+    create_admin_attribute,
+    update_admin_attribute,
+    delete_admin_attribute,
     get_admin_taxonomy_analytics,
     get_admin_entity_or_404,
     get_admin_taxonomy_related_metadata,
     get_admin_source_metadata,
+    get_category_rows_data,
+    get_brand_rows_data,
+    get_topic_rows_data,
+    get_section_rows_data,
+    get_attribute_rows_data,
+    get_facet_rows_data,
 )
 from app.application.taxonomy.admin import (
-    create_admin_category,
-    update_admin_category,
-    delete_admin_category,
-    create_admin_brand,
-    update_admin_brand,
-    delete_admin_brand,
-    create_admin_topic,
-    update_admin_topic,
-    delete_admin_topic,
-    update_admin_section,
-    create_admin_attribute,
-    update_admin_attribute,
-    delete_admin_attribute,
+    merge_taxonomy_entities_workflow,
     apply_taxonomy_insight_workflow,
-    get_category_rows_workflow,
-    get_brand_rows_workflow,
-    get_topic_rows_workflow,
-    get_section_rows_workflow,
-    get_attribute_rows_workflow,
-    get_facet_rows_workflow,
 )
 from app.domains.taxonomy.serializers import (
     serialize_category,
@@ -103,10 +102,11 @@ def create_category():
         return jsonify({"error": "Name is required"}), 400
     try:
         cat = create_admin_category(name, data.get("is_active", True))
+        db.session.commit()
         return jsonify(serialize_category(cat)), 201
     except ValueError as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 409
-
 
 @bp.route("/categories/<int:id>", methods=["PATCH"])
 def update_category(id):
@@ -114,14 +114,15 @@ def update_category(id):
     cat = update_admin_category(id, data)
     if not cat:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify(serialize_category(cat))
-
 
 @bp.route("/categories/<int:id>", methods=["DELETE"])
 def delete_category(id):
     cat = delete_admin_category(id)
     if not cat:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify({"success": True, "message": f"Category '{cat.name}' deleted."})
 
 
@@ -142,10 +143,11 @@ def create_brand():
         return jsonify({"error": "Name is required"}), 400
     try:
         brand = create_admin_brand(name, data.get("industry"), data.get("is_active", True))
+        db.session.commit()
         return jsonify(serialize_brand(brand)), 201
     except ValueError as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 409
-
 
 @bp.route("/brands/<int:id>", methods=["PATCH"])
 def update_brand(id):
@@ -153,14 +155,15 @@ def update_brand(id):
     brand = update_admin_brand(id, data)
     if not brand:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify(serialize_brand(brand))
-
 
 @bp.route("/brands/<int:id>", methods=["DELETE"])
 def delete_brand(id):
     brand = delete_admin_brand(id)
     if not brand:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify({"success": True, "message": f"Brand '{brand.name}' deleted."})
 
 
@@ -181,10 +184,11 @@ def create_topic():
         return jsonify({"error": "Name is required"}), 400
     try:
         topic = create_admin_topic(name, data.get("is_active", True))
+        db.session.commit()
         return jsonify(serialize_topic(topic)), 201
     except ValueError as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 409
-
 
 @bp.route("/topics/<int:id>", methods=["PATCH"])
 def update_topic(id):
@@ -192,16 +196,16 @@ def update_topic(id):
     topic = update_admin_topic(id, data)
     if not topic:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify(serialize_topic(topic))
-
 
 @bp.route("/topics/<int:id>", methods=["DELETE"])
 def delete_topic(id):
     topic = delete_admin_topic(id)
     if not topic:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify({"success": True, "message": f"Topic '{topic.name}' deleted."})
-
 
 # Sections
 
@@ -211,13 +215,13 @@ def list_sections():
     sections = get_admin_sections(search)
     return jsonify([serialize_section(s) for s in sections])
 
-
 @bp.route("/sections/<int:id>", methods=["PATCH"])
 def update_section(id):
     data = request.get_json() or {}
     section = update_admin_section(id, data)
     if not section:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify(serialize_section(section))
 
 
@@ -231,12 +235,11 @@ def categories_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    serialized, pagination = get_category_rows_workflow(page, per_page, search, status, health)
+    serialized, pagination = get_category_rows_data(page, per_page, search, status, health)
     return render_admin_rows_response(
         serialized, "category",
         total=pagination.total, pages=pagination.pages, page=pagination.page
     )
-
 
 @bp.route("/brands/rows", methods=["GET"])
 def brands_rows():
@@ -246,12 +249,11 @@ def brands_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    serialized, pagination = get_brand_rows_workflow(page, per_page, search, status, health)
+    serialized, pagination = get_brand_rows_data(page, per_page, search, status, health)
     return render_admin_rows_response(
         serialized, "brand",
         total=pagination.total, pages=pagination.pages, page=pagination.page
     )
-
 
 @bp.route("/topics/rows", methods=["GET"])
 def topics_rows():
@@ -261,12 +263,11 @@ def topics_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    serialized, pagination = get_topic_rows_workflow(page, per_page, search, status, health)
+    serialized, pagination = get_topic_rows_data(page, per_page, search, status, health)
     return render_admin_rows_response(
         serialized, "topic",
         total=pagination.total, pages=pagination.pages, page=pagination.page
     )
-
 
 @bp.route("/sections/rows", methods=["GET"])
 def sections_rows():
@@ -276,7 +277,7 @@ def sections_rows():
     status = request.args.get("status")
     health = request.args.get("health")
 
-    serialized, pagination = get_section_rows_workflow(page, per_page, search, status, health)
+    serialized, pagination = get_section_rows_data(page, per_page, search, status, health)
     return render_admin_rows_response(
         serialized, "section",
         total=pagination.total, pages=pagination.pages, page=pagination.page
@@ -300,10 +301,11 @@ def create_attribute():
         return jsonify({"error": "Name is required"}), 400
     try:
         attr = create_admin_attribute(name, data.get("category_id"))
+        db.session.commit()
         return jsonify(serialize_attribute(attr)), 201
     except ValueError as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 400
-
 
 @bp.route("/attributes/<int:id>", methods=["PATCH"])
 def update_attribute(id):
@@ -312,18 +314,19 @@ def update_attribute(id):
         attr = update_admin_attribute(id, data)
         if not attr:
             return jsonify({"error": "Not found"}), 404
+        db.session.commit()
         return jsonify(serialize_attribute(attr))
     except ValueError as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 400
-
 
 @bp.route("/attributes/<int:id>", methods=["DELETE"])
 def delete_attribute(id):
     attr = delete_admin_attribute(id)
     if not attr:
         return jsonify({"error": "Not found"}), 404
+    db.session.commit()
     return jsonify({"success": True, "message": f"Attribute '{attr.name}' deleted."})
-
 
 @bp.route("/attributes/rows", methods=["GET"])
 def attributes_rows():
@@ -331,12 +334,11 @@ def attributes_rows():
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    serialized, pagination = get_attribute_rows_workflow(page, per_page, search, health)
+    serialized, pagination = get_attribute_rows_data(page, per_page, search, health)
     return render_admin_rows_response(
         serialized, "attribute",
         total=pagination.total, pages=pagination.pages, page=pagination.page
     )
-
 
 # Duplicates Detection & Merging
 
@@ -354,7 +356,6 @@ def taxonomy_duplicates():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-
 @bp.route("/merge", methods=["POST"])
 def taxonomy_merge():
     data = request.json or {}
@@ -365,9 +366,8 @@ def taxonomy_merge():
     if not domain or not source_id or not target_id:
         return jsonify({"error": "Missing parameters"}), 400
 
-    from app.domains.taxonomy.service.admin.duplicates import merge_taxonomy_entities
     try:
-        merge_taxonomy_entities(domain, source_id, target_id)
+        merge_taxonomy_entities_workflow(domain, source_id, target_id)
         return jsonify({"success": True})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
@@ -433,7 +433,7 @@ def _get_facet_rows(model, domain_type, field_id_name):
     search = request.args.get("search", "").strip()
     health = request.args.get("health")
 
-    serialized, pagination = get_facet_rows_workflow(model, field_id_name, page, per_page, search, health)
+    serialized, pagination = get_facet_rows_data(model, field_id_name, page, per_page, search, health)
     return render_admin_rows_response(
         serialized, domain_type,
         total=pagination.total, pages=pagination.pages, page=pagination.page

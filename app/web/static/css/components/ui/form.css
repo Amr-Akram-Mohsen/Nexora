@@ -51,7 +51,6 @@
   color: var(--muted-foreground);
 }
 
-/* Core checkbox box styles (canonical) */
 .checkbox-box {
   width: 16px;
   height: 16px;

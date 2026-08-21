@@ -1,8 +1,7 @@
 /* ── Article Content Styles (Generated from DB / Diffbot) ─────────────────── */
 
-/* Base Wrapper */
 .article-html {
-  font-size: 1rem; /* Professional sizing */
+  font-size: 1rem;
   line-height: 1.8;
   color: rgba(var(--foreground-rgb), 0.9);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
@@ -76,7 +75,6 @@
   100% { background-position: -200% 0; }
 }
 
-/* Image Captions */
 .article-html figcaption {
   margin-top: 0.375rem;
   font-size: 0.9rem;
@@ -189,7 +187,7 @@
   font-size: 0.95rem;
 }
 
-.article-html th, 
+.article-html th,
 .article-html td {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--border);

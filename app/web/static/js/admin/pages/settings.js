@@ -19,16 +19,12 @@
     bindLogFilters();
   }
 
-  // ==============================
   // SYSTEM INFO
-  // ==============================
   function loadSystemInfo() {
     fetchAndInjectHtml('/admin/system/widget/info', 'system-info', 'Loading system info...');
   }
 
-  // ==============================
   // CACHE CONTROLS
-  // ==============================
   function bindCacheControls() {
     const btn = document.getElementById("clear-cache-btn");
     if (!btn) return;
@@ -51,9 +47,7 @@
     });
   }
 
-  // ==============================
   // MAINTENANCE MODE
-  // ==============================
   function bindMaintenanceMode() {
     const toggle = document.getElementById("maintenance-toggle");
     const hint = document.getElementById("maintenance-status-hint");
@@ -102,9 +96,7 @@
     });
   }
 
-  // ==============================
   // DANGER ZONE
-  // ==============================
   function bindDangerZone() {
     const resetBtn = document.getElementById("reset-system-btn");
     if (!resetBtn) return;
@@ -134,16 +126,12 @@
     });
   }
 
-  // ==============================
   // INTEGRATIONS
-  // ==============================
   function loadIntegrationsStatus() {
     fetchAndInjectHtml('/admin/system/widget/integrations', 'integrations-monitor', 'Loading status...');
   }
 
-  // ==============================
   // INGESTION LOGS & FILTERS
-  // ==============================
   let currentLogFilter = 'all';
 
   function loadIngestionLogs() {
@@ -182,9 +170,7 @@
     activeBtn.classList.add("active");
   }
 
-  // ==============================
   // TOAST
-  // ==============================
   function showSettingsToast(msg, type = "success") {
     showToast(msg, type);
   }

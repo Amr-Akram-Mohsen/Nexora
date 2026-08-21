@@ -17,7 +17,7 @@ function initInsights() {
       const timeframe = timeframeSelect.value;
       setSelectedEntity(null);
       updateFilterUI();
-      
+
       loadMainWidgets(timeframe)
         .then(() => {
           renderAllWidgets();
@@ -34,7 +34,7 @@ function initInsights() {
       const timeframe = timeframeSelect ? timeframeSelect.value : "7_days";
       setSelectedEntity(null);
       updateFilterUI();
-      
+
       fetch(`/admin/insights/recompute?layer=all&time_frame=${timeframe}`, { method: 'POST' })
         .then(() => loadMainWidgets(timeframe))
         .then(() => {
@@ -97,7 +97,7 @@ export function toggleEntityFilter(entity) {
   } else {
     setSelectedEntity(entity);
   }
-  
+
   updateFilterUI();
   renderAllWidgets();
 }
@@ -120,7 +120,7 @@ export function renderAllWidgets() {
   renderContentStrategy();
   renderContentAssetMapping();
   renderContentPerformanceFeedback();
-  
+
   const timeframeSelect = document.getElementById("timeframe-select");
   const timeframe = timeframeSelect ? timeframeSelect.value : "7_days";
   renderAcquisitionSources(timeframe);

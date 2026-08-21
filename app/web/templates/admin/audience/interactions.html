@@ -18,12 +18,10 @@
 "Review user comments, reactions, and engagement metrics"
 ) }}
 
-{# Interaction Stats Row #}
 <div id="interactions-stats-row" class="dashboard-stats-grid">
   {{ spinner("Loading stats…", "system-loading full-width-card") }}
 </div>
 
-{# Analytics Overview Section #}
 {% call admin_padded_panel("Analytics Overview (30 Days)", id="analytics-overview", icon="fa-solid fa-chart-line", actions='<span class="overview-panel-sub" id="recs-ctr-badge"></span>') %}
   <div class="gap-4">
     <div class="chart-container card">
@@ -42,7 +40,6 @@
   </div>
 {% endcall %}
 
-{# Tab Navigation #}
 {{ admin_tab_navigation("interactions", [
 {"id": "comments", "label": 'Comments', "icon": "fa-solid fa-comments", "active": true},
 {"id": "reactions", "label": 'Reactions', "icon": "fa-solid fa-thumbs-up"},
@@ -52,7 +49,6 @@
 {"id": "shares", "label": 'Shares', "icon": "fa-solid fa-link"}
 ]) }}
 
-{# ── Comments Tab ─────────────────────────────────────────── #}
 {% call admin_tab_panel("comments", is_active=true) %}
 
 <div class="dashboard-stats-grid" id="moderation-stats-panel">
@@ -86,7 +82,6 @@
 {{ admin_paginator(domain="comments", per_page_options=[25, 50], current_per_page=25) }}
 {% endcall %}
 
-{# ── Reactions Tab ────────────────────────────────────────── #}
 {% call admin_tab_panel("reactions") %}
 <div class="admin-tab-panel-body">
   {% call admin_toolbar_section() %}
@@ -105,7 +100,6 @@
 </div>
 {% endcall %}
 
-{# ── Views Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("views") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -127,7 +121,6 @@
 {{ admin_paginator(domain="views", per_page_options=[25, 50], current_per_page=25) }}
 {% endcall %}
 
-{# ── Clicks Tab ───────────────────────────────────────────── #}
 {% call admin_tab_panel("clicks") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -142,7 +135,6 @@
 {{ admin_paginator(domain="clicks", per_page_options=[25, 50], current_per_page=25) }}
 {% endcall %}
 
-{# ── Saves Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("saves") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -157,7 +149,6 @@
 {{ admin_paginator(domain="saves", per_page_options=[25, 50], current_per_page=25) }}
 {% endcall %}
 
-{# ── Shares Tab ────────────────────────────────────────────── #}
 {% call admin_tab_panel("shares") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">

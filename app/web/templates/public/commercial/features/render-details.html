@@ -6,7 +6,6 @@
 
 {% if value is mapping %}
 
-{# Nested mapping → render as a titled group #}
 <div class="product-details-group">
   <div class="product-details-group__items">
     {{ render_details(value, counter) }}
@@ -15,7 +14,6 @@
 
 {% elif value is sequence and value is not string %}
 
-{# Sequence value → bulleted list inside a group #}
 <div class="product-details-group">
   <h4 class="product-details-group__title">
     {{ key.replace('_',' ') | title }}
@@ -29,7 +27,6 @@
 
 {% else %}
 
-{# Scalar key→value pair: two-tone row #}
 {% set counter.value = counter.value + 1 %}
 {% set hidden_class = " product-detail-product--hidden" if counter.value > 6 else "" %}
 
@@ -48,7 +45,6 @@
 
 {% elif details is not mapping and details is not sequence %}
 
-{# Plain scalar — just print the value #}
 <span class="product-detail-scalar">{{ details }}</span>
 
 {% endif %}

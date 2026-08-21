@@ -1,5 +1,5 @@
 {% from "components/ui/core.html" import link, badge %}
-<!-- Summary Metrics Bar -->
+
 <div class="publishing-summary-bar flex flex-wrap gap-6 items-center" id="execution-plan-summary">
   <div class="publishing-summary-product gap-2 flex items-center"><i class="fa-solid fa-robot"></i> Auto-Execute Queue: {{ badge(text=auto_execute|length, class="status-badge") }}</div>
   <div class="publishing-summary-product gap-2 flex items-center"><i class="fa-solid fa-circle-question"></i> Needs Review Queue: {{ badge(text=needs_review|length, class="status-badge") }}</div>
@@ -34,7 +34,7 @@
               <h4 class="kanban-task-title">{{ task.entity }}</h4>
               <p class="kanban-task-meta">Confidence Score: <strong >{{ (task.confidence_score * 100)|round|int }}%</strong></p>
               <div class="kanban-task-reason">{{ task.reason }}</div>
-              
+
               {% if task.risk_factors %}
                 <div class="kanban-task-risk flex gap-1">
                   {% for r in task.risk_factors %}

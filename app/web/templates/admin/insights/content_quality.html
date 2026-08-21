@@ -56,7 +56,7 @@
     <i class="fa-solid fa-bullseye"></i> Strategy Accuracy & Feedback
 </h2>
 <div class="insights-section">
-    <!-- Loaded dynamically from insights.py -->
+
     <div class="card bg-card border border-border radius-md mb-4 p-4">
         <div hx-get="{{ url_for('api_insights.widget_performance_feedback') }}" hx-trigger="load">
             <div class="text-center text-muted p-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading Strategy Performance...</div>
@@ -64,8 +64,6 @@
     </div>
 </div>
 {% endblock %}
-
-
 
 {% block custom_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -61,13 +61,44 @@ def retry_admin_pipeline(origin):
     return len(articles_to_retry)
 
 def get_admin_deduplication_groups():
-    dup_titles = db.session.execute(select(Content.title, func.count(Content.id)).group_by(Content.title).having(func.count(Content.id) > 1).order_by(func.count(Content.id).desc()).limit(20)).all()
+    from collections import defaultdict
+    dup_titles_rows = db.session.execute(
+        select(Content.title, func.count(Content.id))
+        .where(Content.title.is_not(None), Content.title != '')
+        .group_by(Content.title)
+        .having(func.count(Content.id) > 1)
+        .order_by(func.count(Content.id).desc())
+        .limit(20)
+    ).all()
+
+    if not dup_titles_rows:
+        return []
+
+    title_counts = {title: count for title, count in dup_titles_rows if title}
+    titles_list = list(title_counts.keys())
+
+    contents = db.session.execute(
+        select(Content)
+        .options(joinedload(Content.source))
+        .where(Content.title.in_(titles_list))
+    ).scalars().all()
+
+    items_by_title = defaultdict(list)
+    for i in contents:
+        items_by_title[i.title].append({
+            'id': i.id,
+            'type': i.object_type,
+            'published_at': i.published_at.isoformat() if i.published_at else None,
+            'source': i.source.name if i.source else 'None'
+        })
+
     groups = []
-    for title, count in dup_titles:
-        if not title:
-            continue
-        products = db.session.execute(select(Content).where(Content.title == title)).scalars().all()
-        groups.append({'title': title, 'count': count, 'content_list': [{'id': i.id, 'type': i.object_type, 'published_at': i.published_at.isoformat() if i.published_at else None, 'source': i.source.name if i.source else 'None'} for i in products]})
+    for title in titles_list:
+        groups.append({
+            'title': title,
+            'count': title_counts[title],
+            'content_list': items_by_title.get(title, [])
+        })
     return groups
 
 def get_admin_content_inspect_raw(id):

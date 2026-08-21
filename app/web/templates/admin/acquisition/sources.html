@@ -6,19 +6,15 @@
 {% block crud_stats %}
 {% from "components/ui/core.html" import stat_card %}
 <div class="dashboard-stats-grid" id="sources-health-dashboard">
-  <!-- Total Sources -->
+
   {{ stat_card("Total Sources", value_id="stats-total-sources", icon="fa-solid fa-tower-broadcast", meta_text="active providers", meta_id="stats-active-sources", class="card clickable-card") }}
 
-  <!-- Healthy Sources -->
   {{ stat_card("Healthy", value_id="stats-healthy", icon="fa-solid fa-check-circle", meta_text="active content", class="card clickable-card") }}
 
-  <!-- Warning Sources -->
   {{ stat_card("Warning", value_id="stats-warning", icon="fa-solid fa-triangle-exclamation", meta_text="stale or empty", class="card clickable-card") }}
 
-  <!-- Failed/Inactive -->
   {{ stat_card("Failed / Inactive", value_id="stats-failed", icon="fa-solid fa-circle-xmark", meta_text="disabled configs", class="card clickable-card") }}
 
-  <!-- Silent Sources -->
   {{ stat_card("Silent (>7d)", value_id="stats-silent", icon="fa-solid fa-moon", meta_text="no recent content", class="card clickable-card") }}
 </div>
 {% endblock %}
@@ -27,7 +23,7 @@
 {% call admin_toolbar_section() %}
   <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
     {{ admin_search_input("sources-search", "Search by name, slug, or domain…") }}
-    <!-- Placeholder for new filters -->
+
     {{ admin_reset_button("clear-sources-filters-btn", "Reset") }}
   </div>
 {% endcall %}

@@ -28,15 +28,12 @@ controls.",
 actions=header_actions
 ) }}
 
-<!-- Overview KPIs Section -->
 <div class="insights-section" id="distribution-overview-kpis-container">
   {{ spinner("Loading distribution overview metrics...") }}
 </div>
 
-<!-- Health Alerts Section -->
 <div id="distribution-health-alerts-wrapper"></div>
 
-<!-- Action Queue Section -->
 <div class="overview-top-grid insights-section">
   {% call admin_table_panel('Tactical Action Queue', "Immediate tactical actions
   including content recycles, updates, and creation drafts.", icon="fa-solid fa-bolt") %}
@@ -53,35 +50,29 @@ actions=header_actions
   {% endcall %}
 </div>
 
-<!-- Publishing Plan Calendar -->
 <div class="insights-section">
   {% include "admin/distribution/_publishing_plan.html" %}
 </div>
 
-<!-- Social Platforms Distribution Tracking -->
 <div class="insights-section">
   {% include "admin/distribution/_social_distribution.html" %}
 </div>
 
-<!-- Section 1.99: Autonomous Execution Panel -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-robot"></i> Autonomous Execution Panel
 </h2>
 <div class="insights-section">
   {% include "admin/distribution/_autonomous_execution.html" %}
 </div>
 
-<!-- Section 1.995: Execution Governance Panel -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-shield-halved"></i> Execution Governance
   Panel</h2>
 <div class="insights-section">
   {% include "admin/distribution/_governance.html" %}
 </div>
 
-<!-- Phase 3: Distribution Analytics -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-chart-pie"></i> Distribution Analytics
 </h2>
 
-<!-- Platform Performance -->
 <div class="insights-section">
   {% call admin_table_panel("Platform Performance", "Aggregate engagement and reach metrics across all social
   platforms.", actions='') %}
@@ -91,7 +82,6 @@ actions=header_actions
   {% endcall %}
 </div>
 
-<!-- Asset Coverage -->
 <div class="insights-section">
   <div id="coverage-analytics-container">
     {{ spinner("Loading asset coverage data...") }}

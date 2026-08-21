@@ -15,7 +15,6 @@ function initSearch() {
         btn.classList.toggle('is-visible', input.value.trim().length > 0);
     }
 
-    // Initialize state on load
     if (headerInput && headerClearBtn) {
         toggleClearButton(headerInput, headerClearBtn);
         headerInput.addEventListener('input', () => toggleClearButton(headerInput, headerClearBtn));
@@ -118,7 +117,7 @@ function handleSortChange(e) {
 function handleMoreFiltersClick(e) {
     const btn = e.target.closest('[data-action="toggle-more-filters"]');
     if (!btn) return false;
-    
+
     const section = btn.closest('.filter-section');
     const extras = section.querySelectorAll('.filter-item--extra');
     const isExpanded = btn.getAttribute('aria-expanded') === 'true';
@@ -128,14 +127,14 @@ function handleMoreFiltersClick(e) {
     });
 
     btn.setAttribute('aria-expanded', !isExpanded);
-    
+
     // Avoid string construction
     btn.replaceChildren();
     const icon = document.createElement('i');
     icon.className = isExpanded ? 'fas fa-plus' : 'fas fa-minus';
     btn.appendChild(icon);
     btn.appendChild(document.createTextNode(isExpanded ? ` Show more (+${extras.length})` : ' Show less'));
-    
+
     return true;
 }
 
@@ -162,7 +161,6 @@ function initListingSidebar() {
 }
 
 function initSearchHighlighting() {
-    // Initial Search Highlighting
     const query = window.APP?.searchQuery || window.SEARCH_QUERY;
     if (query) {
         const cards = document.querySelectorAll('.card__title, .card__excerpt, .product-card__name, .product-card__description');
@@ -190,7 +188,7 @@ function initSearchHighlighting() {
                     mark.textContent = match[0];
                     fragment.appendChild(mark);
                     lastIndex = regex.lastIndex;
-                    if (!regex.global) break; 
+                    if (!regex.global) break;
                 }
                 if (lastIndex < node.nodeValue.length) {
                     fragment.appendChild(document.createTextNode(node.nodeValue.substring(lastIndex)));

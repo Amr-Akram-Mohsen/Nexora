@@ -41,7 +41,6 @@
   opacity: 1;
 }
 
-/* Category backgrounds */
 .alert-success {
   background-color: var(--brand-green);
   border-left-color: rgba(var(--black-rgb), var(--alpha-strong));

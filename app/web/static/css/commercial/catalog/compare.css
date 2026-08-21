@@ -1,5 +1,3 @@
-/* --- Comparisons --- */
-
 .compare-page {
   padding-top: 2rem;
   padding-bottom: 4rem;
@@ -28,7 +26,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Compare Table Page Styling Refinement */
 .compare-table-wrapper {
   background: var(--card);
   border: 1px solid var(--border);
@@ -113,9 +110,6 @@
   margin-top: 0.5rem;
 }
 
-
-
-/* Feature category headers in table rows */
 .table-row-group {
   background: rgba(var(--domain-primary-rgb), var(--alpha-subtle));
   font-weight: var(--weight-bold);
@@ -146,7 +140,6 @@
   opacity: 0.5;
 }
 
-/* Floating Compare Bar */
 .compare-bar {
   position: fixed;
   bottom: 2rem;
@@ -169,7 +162,6 @@
   }
 }
 
-
 .compare-bar__clear {
   color: var(--muted-foreground);
   background: transparent;
@@ -184,5 +176,3 @@
 .compare-bar__clear:hover {
   color: var(--domain-primary);
 }
-
-

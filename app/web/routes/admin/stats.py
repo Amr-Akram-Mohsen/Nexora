@@ -3,7 +3,7 @@ Admin dashboard statistics and top-list endpoints.
 """
 from flask import Blueprint, jsonify
 from app.web.routes.admin.helpers import apply_admin_guard
-from app.application.analytics.admin import (
+from app.domains.analytics.service.admin import (
     get_admin_dashboard_stats_data,
     get_admin_top_contents,
     get_admin_top_items,

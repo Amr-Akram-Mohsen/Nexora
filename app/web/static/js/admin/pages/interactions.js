@@ -1,31 +1,26 @@
-// ==============================
 // ADMIN — INTERACTIONS / MODERATION
 // Refactored: HTML partial mode — no renderRow, no JS HTML building
-// ==============================
 
 (function () {
   'use strict';
 
-  window.commentsController = null;
-  window.reactionsController = null;
-  window.viewsController = null;
-  window.clicksController = null;
-  window.savesController = null;
-  window.sharesController = null;
+  const controllers = {
+    comments: null,
+    reactions: null,
+    views: null,
+    clicks: null,
+    saves: null,
+    shares: null
+  };
 
-  // ── Tab switching ───────────────────────
   function initTabs() {
     initAdminTabs('interactions-tabs', tabName => {
-      if (tabName === 'reactions') window.reactionsController.load(1);
-      else if (tabName === 'comments') window.commentsController.load(1);
-      else if (tabName === 'views') window.viewsController.load(1);
-      else if (tabName === 'clicks') window.clicksController.load(1);
-      else if (tabName === 'saves') window.savesController.load(1);
-      else if (tabName === 'shares') window.sharesController.load(1);
+      if (controllers[tabName]) {
+        controllers[tabName].load(1);
+      }
     });
   }
 
-  // ── Stats Row ───────────────────────────
   function loadStatsRow() {
     return window.api.get('/admin/interactions/stats')
       .then(data => {
@@ -36,7 +31,7 @@
 
         const template = document.getElementById('interactions-stat-card-template');
         if (!template) return;
-        
+
         const cards = [
           { key: 'comments', icon: '💬', label: 'Comments', value: data.comments },
           { key: 'likes', icon: '👍', label: 'Likes',    value: data.likes    },
@@ -75,7 +70,6 @@
     }
   }
 
-  // ── Analytics Overview ──────────────────
   let engagementChart, sentimentChart, countryChart, reactionChart, heatmapChart;
 
   function loadAnalyticsOverview() {
@@ -90,9 +84,9 @@
             ctrBadge.appendChild(document.createTextNode('Recommendations CTR: '));
             ctrBadge.appendChild(b);
         }
-        
+
         updateStatsDeltas(data.deltas);
-        
+
         const modPanel = document.getElementById('moderation-stats-panel');
         if (modPanel) {
             modPanel.style.display = '';
@@ -112,10 +106,10 @@
     cards.forEach(card => {
       const key = card.dataset.statKey;
       if (!key || key === 'likes' || key === 'dislikes') return; // no delta for these specifically
-      
+
       let lookupKey = key;
       if (key === 'item_clicks') lookupKey = 'clicks';
-      
+
       const d = deltas[lookupKey];
       if (d) {
         const span = document.createElement('span');
@@ -143,34 +137,27 @@
     container.innerHTML = html;
   }
 
-
-
   function drawSentimentChart(sentimentDist) {
     const labels = Object.keys(sentimentDist);
     const data = Object.values(sentimentDist);
     const colors = labels.map(l => l === 'positive' ? '#4CAF50' : l === 'negative' ? '#F44336' : l === 'spam' ? '#FF9800' : '#9E9E9E');
 
-    window.nexoraCharts.render('sentimentSpamChart', 'doughnut', 
+    window.nexoraCharts.render('sentimentSpamChart', 'doughnut',
       { labels, datasets: [{ data, backgroundColor: colors }] },
       { plugins: { legend: { position: 'right' }, title: { display: true, text: 'Comment Sentiment', color: '#ccc' } } }
     );
   }
 
-
-
   function drawReactionChart(reactionTargets) {
     const labels = Object.keys(reactionTargets);
     const data = Object.values(reactionTargets);
 
-    window.nexoraCharts.render('reactionTargetChart', 'pie', 
+    window.nexoraCharts.render('reactionTargetChart', 'pie',
       { labels, datasets: [{ data, backgroundColor: ['#00BCD4', '#E91E63', '#FFC107'] }] },
       { plugins: { legend: { position: 'right' }, title: { display: true, text: 'Reactions by Target Type', color: '#ccc' } } }
     );
   }
 
-
-
-  // ── Comment Moderation Actions ───────────
   function deleteComment(id, btn, modal) {
     showModal(
       'Delete Comment',
@@ -210,8 +197,6 @@
       .catch(() => { if (btn) btn.disabled = false; });
   }
 
-
-
   function applyInteractionsUrlFilters() {
     if (typeof applyUrlFilters !== "function") return;
     const params = getUrlQueryParams();
@@ -242,9 +227,8 @@
     });
   }
 
-  // ── Init ─────────────────────────────────
   function init() {
-    window.commentsController = new AdminListController({
+    controllers.comments = new AdminListController({
       domain: 'comments',
       endpoint: '/admin/interactions/comments',
       rowsEndpoint: '/admin/interactions/comments/rows',
@@ -254,7 +238,7 @@
       autoInit: false
     });
 
-    window.reactionsController = new AdminListController({
+    controllers.reactions = new AdminListController({
       domain: 'reactions',
       endpoint: '/admin/interactions/reactions',
       rowsEndpoint: '/admin/interactions/reactions/rows',
@@ -264,7 +248,7 @@
       autoInit: false
     });
 
-    window.viewsController = new AdminListController({
+    controllers.views = new AdminListController({
       domain: 'views',
       endpoint: '/admin/interactions/views',
       rowsEndpoint: '/admin/interactions/views/rows',
@@ -274,7 +258,7 @@
       autoInit: false
     });
 
-    window.clicksController = new AdminListController({
+    controllers.clicks = new AdminListController({
       domain: 'clicks',
       endpoint: '/admin/interactions/clicks',
       rowsEndpoint: '/admin/interactions/clicks/rows',
@@ -284,7 +268,7 @@
       autoInit: false
     });
 
-    window.savesController = new AdminListController({
+    controllers.saves = new AdminListController({
       domain: 'saves',
       endpoint: '/admin/interactions/saves',
       rowsEndpoint: '/admin/interactions/saves/rows',
@@ -294,7 +278,7 @@
       autoInit: false
     });
 
-    window.sharesController = new AdminListController({
+    controllers.shares = new AdminListController({
       domain: 'shares',
       endpoint: '/admin/interactions/shares',
       rowsEndpoint: '/admin/interactions/shares/rows',
@@ -309,27 +293,17 @@
     loadInteractionBreakdown();
     applyInteractionsUrlFilters();
 
-    window.commentsController.bindEvents();
-    window.reactionsController.bindEvents();
-    window.viewsController.bindEvents();
-    window.clicksController.bindEvents();
-    window.savesController.bindEvents();
-    window.sharesController.bindEvents();
+    Object.values(controllers).forEach(c => {
+      if (c && typeof c.bindEvents === 'function') c.bindEvents();
+    });
 
     const params = typeof getUrlQueryParams === "function" ? getUrlQueryParams() : {};
     const activeTab = params.tab || 'comments';
     const tabBtn = document.querySelector(`#interactions-tabs .admin-tab-btn[data-tab="${activeTab}"]`);
     if (tabBtn) {
       if (tabBtn.classList.contains("active")) {
-        // Tab is already active visually, just load the data
-        if (activeTab === 'reactions') window.reactionsController.load(1);
-        else if (activeTab === 'comments') window.commentsController.load(1);
-        else if (activeTab === 'views') window.viewsController.load(1);
-        else if (activeTab === 'clicks') window.clicksController.load(1);
-        else if (activeTab === 'saves') window.savesController.load(1);
-        else if (activeTab === 'shares') window.sharesController.load(1);
+        if (controllers[activeTab]) controllers[activeTab].load(1);
       } else {
-        // Tab is not active, simulate click to switch visuals and trigger load
         tabBtn.click();
       }
     }

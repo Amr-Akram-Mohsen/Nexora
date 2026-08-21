@@ -1,5 +1,4 @@
 function trackImpression(el) {
-    // Example payload
     const payload = {
         target_type: el.dataset.type,
         target_id: el.dataset.id,
@@ -24,7 +23,6 @@ function initCardViews() {
         observer.observe(card);
     });
 }
-// VIEW Article / Product
 
 function sendView(targetType, targetId) {
     const fd = new FormData();
@@ -36,17 +34,12 @@ function sendView(targetType, targetId) {
         .catch(() => {});
 }
 
-// ── RECOMMENDATION TRACKING SYSTEM ──
-
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Identify the current page context ID
     const detailPage = document.querySelector('.detail-page');
     const contextId = detailPage ? detailPage.dataset.id : null;
 
-    // 2. Track recommendation block impressions
     const containers = document.querySelectorAll('[data-recommendation-container]');
-    
-    // Track each recommendation widget rendering
+
     containers.forEach(container => {
         const entityType = container.dataset.recommendationContainer;
         let entityIds = [];
@@ -82,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // 3. Track recommendation click events
         container.addEventListener("click", (e) => {
             // Check if the clicked target is inside an interactive element that is not the main link (like compare/save/reactions buttons)
             if (e.target.closest('button, .interactions-compact, .interactions, .alert')) {

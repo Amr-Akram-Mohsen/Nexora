@@ -1,5 +1,4 @@
 const { isAuthenticated, userEmail } = window.APP;
-// ── Auth guard (existing — preserved) ─────────────────────────────────────────
 function ensureAuthenticated(event, btn, message) {
     if (!isAuthenticated) {
         event.preventDefault();
@@ -9,7 +8,6 @@ function ensureAuthenticated(event, btn, message) {
     return true;
 }
 
-// ── Auth form loading state ────────────────────────────────────────────────────
 function initAuthFormLoading() {
     const form = document.getElementById("auth-form");
     if (!form) return;
@@ -27,5 +25,3 @@ function handleAuthClick(e) {
     if (url) window.location.href = url;
     return true;
 }
-
-

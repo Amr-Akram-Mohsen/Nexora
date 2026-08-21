@@ -1,4 +1,3 @@
-
 async function handleAffiliateClick(li) {
     if (li.classList.contains("is-loading")) return;
 

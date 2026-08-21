@@ -19,7 +19,7 @@
         <strong>Confidence Score: </strong> {{ (quality.confidence_score * 100)|int }}% promotional
       </div>
     </div>
-    
+
     <div class="editorial-section">
       <strong class="editorial-subtitle">Detection Signals:</strong>
       <ul class="editorial-signal-list">
@@ -40,7 +40,7 @@
         {% endif %}
       </ul>
     </div>
-    
+
     <details class="inspect-accordion">
       <summary>
         <div class="flex items-center gap-2"><i class="fas fa-align-left"></i> Description Preview</div>
@@ -66,7 +66,7 @@
       {% endif %}
       {{ badge(assessment.extraction_health | title, class="status-badge", variant=health_variant) }}
     </div>
-    
+
     <div class="editorial-section">
       <strong class="editorial-subtitle">Content Statistics</strong>
       {% call inspect_metric_grid() %}
@@ -75,7 +75,7 @@
         {{ inspect_metric_item(assessment.block_summary.total_blocks, "Blocks") }}
       {% endcall %}
     </div>
-    
+
     <div class="editorial-section">
       <strong class="editorial-subtitle">Document Structure</strong>
       <div class="editorial-metrics-grid flex gap-4">
@@ -87,7 +87,7 @@
         <div><strong>Tables:</strong> {{ assessment.block_summary.table_count }}</div>
       </div>
     </div>
-    
+
     {% if assessment.warnings %}
     <div class="editorial-section">
       <strong class="editorial-subtitle">⚠ Editorial Warnings ({{ assessment.warnings | length }})</strong>
@@ -127,7 +127,7 @@
         <strong>Score: </strong> {{ readiness.readiness_score }} / 100
       </div>
     </div>
-    
+
     <div class="editorial-section">
       <strong class="editorial-subtitle">Checklist:</strong>
       <ul class="editorial-signal-list">
@@ -146,7 +146,7 @@
         {% endfor %}
       </ul>
     </div>
-    
+
     {% if readiness.blocking_issues %}
     <div class="editorial-blocking-issues">
       <strong class="editorial-blocking-title"><i class="fas fa-minus-circle"></i> Blocking Issues:</strong>

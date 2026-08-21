@@ -1,11 +1,10 @@
 {% from "admin/components/ui/panels.html" import admin_panel %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 
-<!-- Left Side: Strategy Accuracy & Failures -->
 {% call admin_panel('<i class="fa-solid fa-brain"></i> Strategy Accuracy & Failures', "Platform-weighted accuracy index and root-cause diagnoses of
 underperforming assets.") %}
 <div class="accuracy-panel-body flex gap-6">
-    <!-- Strategy Accuracy Widget -->
+
     <div class="insights-accuracy-card gap-5 flex justify-between items-center">
         <div>
             <h4 class="insights-accuracy-title">Strategy Accuracy Index</h4>
@@ -17,7 +16,6 @@ underperforming assets.") %}
         </div>
     </div>
 
-    <!-- Failures List -->
     <div>
         <h4 class="quality-score-header gap-2 flex items-center">
             <i class="fas fa-exclamation-triangle"></i> Failure Diagnostics & Recommendations
@@ -47,7 +45,6 @@ underperforming assets.") %}
 </div>
 {% endcall %}
 
-<!-- Right Side: Evaluations list -->
 {% call admin_panel('<i class="fa-solid fa-clipboard-list"></i> Content Evaluations Inventory', "Comparing actual CTR, engagement rate, and conversion rate with
 baseline expectations.") %}
 <div class="insights-table-scroll panel-body-padded">

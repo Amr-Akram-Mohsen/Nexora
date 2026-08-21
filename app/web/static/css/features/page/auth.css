@@ -1,5 +1,3 @@
-/* --- Premium Minimalist Auth Layout --- */
-
 .auth-section {
   min-height: calc(100vh - var(--header-height, 80px));
   padding: 4rem 1.5rem;
@@ -16,7 +14,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* --- Auth Header --- */
 .auth-header {
   margin-bottom: 2.25rem;
 }
@@ -39,10 +36,6 @@
   line-height: 1.5;
 }
 
-/* --- Auth Form Spacing --- */
-
-
-
 .auth-btn {
   height: 2.75rem;
   font-weight: var(--weight-bold);
@@ -53,7 +46,6 @@
   position: relative;
 }
 
-/* Loading state for submit button */
 .auth-btn.is-loading {
   pointer-events: none;
   opacity: 0.7;
@@ -73,7 +65,6 @@
   vertical-align: middle;
 }
 
-/* --- Vertical Field Spacing & Labels --- */
 .field-wrapper {
   gap: 0.45rem;
   width: 100%;
@@ -88,7 +79,6 @@
   line-height: 1;
 }
 
-/* --- Input Fields Styles Override (High-Fidelity) --- */
 .field-wrapper input {
   height: 2.5rem;
   padding: 0.55rem 0.75rem;
@@ -114,7 +104,6 @@
   opacity: 0.6;
 }
 
-/* Field error state */
 .field-wrapper.has-error input {
   border-color: var(--destructive);
   box-shadow: 0 0 0 2px rgba(var(--destructive-rgb, 239, 68, 68), 0.1);
@@ -125,8 +114,6 @@
   color: var(--muted-foreground);
   margin-top: 0.35rem;
 }
-
-/* --- Password Input Wrapper --- */
 
 .password-wrapper {
   position: relative;
@@ -162,7 +149,6 @@
   outline-offset: 2px;
 }
 
-/* --- Password Strength Meter --- */
 .password-strength {
   margin-top: 0.5rem;
 }
@@ -188,7 +174,6 @@
   transition: color 0.25s ease;
 }
 
-/* --- Confirm Match Indicator --- */
 .confirm-match {
   font-size: 0.75rem;
   margin-top: 0.3rem;
@@ -201,8 +186,6 @@
 .confirm-match.visible {
   display: flex;
 }
-
-/* --- Social login Button --- */
 
 .google-auth-btn {
   height: 2.75rem;
@@ -227,7 +210,6 @@
   color: var(--domain-primary, var(--primary));
 }
 
-/* --- Crisp Auth Divider --- */
 .auth-divider {
   position: relative;
   text-align: center;
@@ -257,7 +239,6 @@
   z-index: 1;
 }
 
-/* --- Redirect Links --- */
 .redirect-link {
   font-size: 0.8125rem;
   color: var(--domain-primary, var(--primary));
@@ -275,7 +256,6 @@
   font-weight: 700;
 }
 
-/* --- High-Fidelity Professional Auth Footer --- */
 .auth-footer {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -304,7 +284,6 @@
   text-decoration: underline;
 }
 
-/* --- Alert / Resend Box --- */
 .resend-alert {
   margin-top: 1.25rem;
   padding: 1rem;
@@ -322,7 +301,6 @@
   font-size: 0.75rem;
 }
 
-/* --- Verification Code Input --- */
 .auth-code-input {
   text-align: center;
   font-weight: var(--weight-bold);

@@ -117,7 +117,6 @@
 </div>
 {% endmacro %}
 
-
 {% macro admin_inspect_metrics_table(fields) %}
 <div class="admin-table-wrapper">
   {% set metric_headers = fields | map(attribute="label") | list %}
@@ -132,7 +131,6 @@
   {% endcall %}
 </div>
 {% endmacro %}
-
 
 {% macro admin_inspect_section_table(section_name, fields) %}
 {% set lower_name = section_name|lower %}

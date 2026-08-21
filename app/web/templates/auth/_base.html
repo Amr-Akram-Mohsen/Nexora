@@ -15,10 +15,9 @@
     </div>
 
     {% from "components/ui/core.html" import button, field, form, input, label, link %}
-                    
+
     <div class="auth-methods">
 
-      {# ── Google OAuth ── #}
       {% set google_url = url_for('user.google_login') %}
       {{ button(
       text="Continue with Google",
@@ -31,17 +30,14 @@
 
       <div class="auth-divider"><span>or</span></div>
 
-      {# ── Main Form ── #}
       {% call form("auth-form", attrs={"id": "auth-form"}) %}
 
-      {# Full Name — register only #}
       {% if is_new_user %}
       {% call field(label_text="Full Name", for_id="name") %}
       {{ input(name="name", id="name", placeholder="e.g. John Doe", required=True) }}
       {% endcall %}
       {% endif %}
 
-      {# Email #}
       {% call field(label_text="Email Address", for_id="email") %}
       {{ input(name="email", id="email", type="email",
       placeholder="you@example.com",
@@ -49,7 +45,6 @@
       required=True) }}
       {% endcall %}
 
-      {# Password with visibility toggle #}
       {% call field(label_text="Password", for_id="password") %}
       <div class="password-wrapper flex items-center">
         {{ input(
@@ -60,7 +55,7 @@
         ) }}
         {{ button(type="button", class="password-toggle justify-center items-center", attrs={"aria-label": "Show password"}, icon="fa-regular fa-eye", unstyled=True) }}
       </div>
-      {# Strength meter — register only #}
+
       {% if is_new_user %}
       <div class="password-strength" style="display:none;">
         <div class="password-strength-bar flex gap-1">
@@ -75,7 +70,6 @@
       {% endif %}
       {% endcall %}
 
-      {# Confirm Password — register only #}
       {% if is_new_user %}
       {% call field(label_text="Confirm Password", for_id="confirm_password") %}
       <div class="password-wrapper flex items-center">
@@ -91,7 +85,6 @@
       {% endcall %}
       {% endif %}
 
-      {# Extras row: remember-me / forgot-password #}
       <div class="auth-extras flex items-center justify-between">
         {# Newsletter checkbox (register) or Remember-me (login) — available to re-enable #}
         <div class="checkbox-group flex items-center gap-2">

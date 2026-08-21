@@ -47,7 +47,7 @@
 
 {% block crud_summary %}
 {% call admin_summary_bar(domain ~ "-count", "Subscribers", summary_id=domain ~ "-summary") %}
-  <div class="flex items-center gap-4 text-sm text-muted">
+  <div class="flex items-center gap-4 admin-summary-meta">
     <span id="summary-confirmed-count">Confirmed: —</span>
     <span id="summary-anonymous-count">Anonymous: —</span>
   </div>

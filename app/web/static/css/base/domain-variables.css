@@ -6,7 +6,6 @@
 [data-domain-type="commercial"] {
   --domain-primary-rgb: var(--brand-green-rgb);
   --domain-secondary-rgb: var(--brand-teal-rgb);
-
   /* Type specific mappings for product domain */
   --type-electronics-rgb: var(--brand-blue-rgb);
   --type-perfume-rgb: var(--brand-purple-rgb);
@@ -17,7 +16,6 @@
   --domain-primary: rgb(var(--domain-primary-rgb));
   --domain-secondary: rgb(var(--domain-secondary-rgb));
   --gradient-primary: linear-gradient(135deg, var(--domain-primary) 0%, var(--domain-secondary) 100%);
-
   /* Semantic tokens that components should use */
   --accent-rgb: var(--domain-primary-rgb);
 }

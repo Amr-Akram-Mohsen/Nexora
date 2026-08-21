@@ -44,9 +44,10 @@ def match_articles_to_items(dry_run: bool=False, since: datetime | None=None) ->
     total_links = 0
     page = 0
     while True:
+        from sqlalchemy.orm import selectinload
         from app.domains.content.service.query.utils import get_unmatched_articles_query
         cutoff = datetime.utcnow() - REPROCESS_AFTER
-        article_q = get_unmatched_articles_query(cutoff=cutoff, since=since, session=db.session)
+        article_q = get_unmatched_articles_query(cutoff=cutoff, since=since, session=db.session).options(selectinload(Article.linked_products))
         batch = article_q.offset(page * BATCH_SIZE).limit(BATCH_SIZE).all()
         if not batch:
             break

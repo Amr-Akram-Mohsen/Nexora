@@ -1,7 +1,6 @@
 {# _product_related.html #}
 {% from "components/ui/grid.html" import grid %}
 
-{# ── Related Items ── #}
 {% if related_items %}
 <section class="section recommendation-section recommendation-section--products" id="related-products"
     data-recommendation-container="related_product"
@@ -13,11 +12,9 @@
 </section>
 {% endif %}
 
-{# ── Related Content — Articles, Videos, and Buying Guides ── #}
 {% if related_articles or related_videos or buying_guides %}
 <section class="section recommendation-section recommendation-section--content" id="related-content">
 
-    {# ── Related Articles ── #}
     {% if related_articles %}
     <div class="recommendation-group" data-recommendation-container="related_content"
         data-entity-ids="{{ related_articles[:3] | map(attribute='id') | list | tojson | safe }}">
@@ -33,7 +30,6 @@
     </div>
     {% endif %}
 
-    {# ── Related Videos ── #}
     {% if related_videos %}
     <div class="recommendation-group" data-recommendation-container="related_content"
         data-entity-ids="{{ related_videos[:3] | map(attribute='id') | list | tojson | safe }}">
@@ -49,7 +45,6 @@
     </div>
     {% endif %}
 
-    {# ── Buying Guides ── #}
     {% if buying_guides %}
     <div class="recommendation-group" data-recommendation-container="related_content"
         data-entity-ids="{{ buying_guides[:3] | map(attribute='id') | list | tojson | safe }}">

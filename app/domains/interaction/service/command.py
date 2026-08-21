@@ -163,34 +163,69 @@ def post_comment(user, target_type, target_id, content, parent_id):
 
 
 def rename_collection(user, old_name: str, new_name: str):
+    from sqlalchemy import select
     old_name = old_name.strip().lower()
     new_name = new_name.strip().lower()
     if not new_name or old_name == new_name:
         return {'success': False, 'error': 'Invalid collection name'}
     saves = Save.query.filter_by(user_id=user.id, collection_name=old_name).all()
-    for save in saves:
-        existing = Save.query.filter_by(user_id=user.id, target_type=save.target_type, target_id=save.target_id, collection_name=new_name).first()
-        if existing:
-            db.session.delete(save)
-        else:
-            save.collection_name = new_name
+    if not saves:
+        return {'success': True}
+
+    existing_new_keys = set(
+        db.session.execute(
+            select(Save.target_type, Save.target_id)
+            .where(Save.user_id == user.id, Save.collection_name == new_name)
+        ).all()
+    )
+    conflicting_ids = [
+        s.id for s in saves if (s.target_type, s.target_id) in existing_new_keys
+    ]
+    if conflicting_ids:
+        db.session.execute(
+            Save.__table__.delete().where(Save.id.in_(conflicting_ids))
+        )
+    db.session.execute(
+        update(Save)
+        .where(Save.user_id == user.id, Save.collection_name == old_name)
+        .values(collection_name=new_name)
+    )
     db.session.commit()
     return {'success': True}
 
 
 def delete_collection(user, collection_name: str, move_to_global: bool = False):
+    from sqlalchemy import select
     collection_name = collection_name.strip().lower()
     saves = Save.query.filter_by(user_id=user.id, collection_name=collection_name).all()
-    for save in saves:
-        if move_to_global:
-            existing = Save.query.filter_by(user_id=user.id, target_type=save.target_type, target_id=save.target_id, collection_name='general').first()
-            if existing:
-                db.session.delete(save)
-            else:
-                save.collection_name = 'general'
-        else:
-            db.session.delete(save)
-            execute_counter_update(db=db, model_type=save.target_type, model_id=save.target_id, column='save_count', action='dec')
+    if not saves:
+        return {'success': True}
+
+    if move_to_global:
+        existing_general = set(
+            db.session.execute(
+                select(Save.target_type, Save.target_id)
+                .where(Save.user_id == user.id, Save.collection_name == 'general')
+            ).all()
+        )
+        conflicting_ids = [
+            s.id for s in saves if (s.target_type, s.target_id) in existing_general
+        ]
+        if conflicting_ids:
+            db.session.execute(
+                Save.__table__.delete().where(Save.id.in_(conflicting_ids))
+            )
+        db.session.execute(
+            update(Save)
+            .where(Save.user_id == user.id, Save.collection_name == collection_name)
+            .values(collection_name='general')
+        )
+    else:
+        for s in saves:
+            execute_counter_update(db=db, model_type=s.target_type, model_id=s.target_id, column='save_count', action='dec')
+        db.session.execute(
+            Save.__table__.delete().where(Save.user_id == user.id, Save.collection_name == collection_name)
+        )
     db.session.commit()
     return {'success': True}
 

@@ -1,5 +1,3 @@
-/* --- Confirm Dialog & Modal System --- */
-
 .dashboard-modal-overlay {
     position: fixed;
     inset: 0;
@@ -84,7 +82,6 @@
     border-radius: 10px;
 }
 
-/* --- Large Modal Variant (used by inspect views) --- */
 .dashboard-modal-content.modal-content-lg {
     max-width: 800px;
 }
@@ -93,8 +90,6 @@
     width: 100%;
     margin-bottom: 1rem;
 }
-
-/* --- Toast Notifications --- */
 
 .settings-toast {
     position: fixed;
@@ -127,8 +122,6 @@
     }
 }
 
-/* --- Metadata / Provider Inspect Dialog --- */
-
 .inspect-details-group {
     gap: 1rem;
     text-align: left;
@@ -157,10 +150,6 @@
     margin: 0.75rem 0;
 }
 
-/* --- Inspect Badge Variants (use status-badge as base where possible) --- */
-
-
-
 .inspect-brand-purple {
     font-weight: var(--weight-bold);
     color: var(--brand-purple);
@@ -175,8 +164,6 @@
     font-size: var(--text-xs);
 }
 
-/* --- Store Cards in Product Inspector --- */
-
 .inspect-store-card {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
@@ -184,7 +171,6 @@
     margin-bottom: 0.625rem;
     background: var(--card);
 }
-
 
 .inspect-store-card-name {
     font-size: var(--text-sm);
@@ -309,7 +295,6 @@
     margin-top: 0.25rem;
 }
 
-/* --- Inspect Image Strip --- */
 .inspect-image-card {
     position: relative;
     border: 1px solid var(--border);
@@ -340,7 +325,6 @@
     color: var(--muted-foreground);
 }
 
-/* --- Variant Summary Card List --- */
 .variant-list {
     display: flex;
     flex-direction: column;
@@ -486,24 +470,20 @@
     .variant-list-header {
         display: none;
     }
-
     .variant-list-row {
         grid-template-columns: 1fr;
         gap: 0.75rem;
         padding: 1rem;
     }
-
     .v-col {
         align-items: flex-start;
         text-align: left;
     }
-
     .variant-stats-group {
         justify-content: flex-start;
     }
 }
 
-/* --- Specifications Panel --- */
 .inspect-spec-section-title {
     font-size: var(--text-sm);
     font-weight: var(--weight-bold);
@@ -571,7 +551,6 @@
     font-weight: var(--weight-bold);
 }
 
-/* --- Structured JSON Tree --- */
 .inspect-json-tree-container {
     margin-top: 0.5rem;
     display: flex;
@@ -652,7 +631,6 @@
     margin-bottom: 0.25rem;
 }
 
-/* --- Accordions --- */
 .inspect-accordion {
     background: var(--card);
     border: 1px solid var(--border);

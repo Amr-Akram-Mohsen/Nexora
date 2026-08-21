@@ -10,13 +10,13 @@ export function renderSocialDistribution() {
   const status = document.getElementById("dist-filter-status")?.value || "";
   const type = document.getElementById("dist-filter-type")?.value || "";
   const platform = document.getElementById("dist-filter-platform")?.value || "";
-  
+
   let url = `/admin/distribution/widget/social-distribution`;
   const params = new URLSearchParams();
   if (status) params.append("status", status);
   if (type) params.append("source_type", type);
   if (platform) params.append("platform", platform);
-  
+
   if (params.toString()) {
       url += `?${params.toString()}`;
   }
@@ -31,7 +31,7 @@ export function initSocialDistributionFilters() {
     const statusSelect = document.getElementById("dist-filter-status");
     const typeSelect = document.getElementById("dist-filter-type");
     const platformSelect = document.getElementById("dist-filter-platform");
-    
+
     if (statusSelect) statusSelect.addEventListener("change", renderSocialDistribution);
     if (typeSelect) typeSelect.addEventListener("change", renderSocialDistribution);
     if (platformSelect) platformSelect.addEventListener("change", renderSocialDistribution);
@@ -41,20 +41,20 @@ export function initSocialDistributionFilters() {
 function viewDistributionDraft(postId, sourceType, sourceId, platform) {
     const modalContent = document.getElementById("distribution-draft-content");
     if (!modalContent) return;
-    
+
     // Show loading state
     modalContent.replaceChildren();
     const loadDiv = document.createElement('div');
     loadDiv.className = 'py-5 text-center';
     renderSpinner(loadDiv, "Loading post details...");
     modalContent.appendChild(loadDiv);
-    
+
     // Open modal using Nexora architecture
     const modalEl = document.getElementById('distributionDraftModal');
     if (modalEl) {
         modalEl.classList.add('active');
     }
-    
+
     // Fetch or generate draft
     fetchAndInjectHtml("/admin/distribution/social-distribution/generate", "distribution-draft-content", "Loading post details...", null, {
         method: "POST",
@@ -84,18 +84,17 @@ function publishDistributionPost(postId) {
     const urlEl = document.getElementById("distribution-external-url");
     const text = textEl ? textEl.value : "";
     const url = urlEl ? urlEl.value : "";
-    
+
     window.api.post(`/admin/distribution/social-distribution/${postId}/publish`, {
         text: text,
         external_url: url
     })
     .then(data => {
-        // Hide modal using Nexora architecture
         const modalEl = document.getElementById('distributionDraftModal');
         if (modalEl) {
             modalEl.classList.remove('active');
         }
-        
+
         // Refresh table
         renderSocialDistribution();
     })
@@ -106,7 +105,7 @@ document.addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const { action, id, sourceType, sourceId, platform, url, target, loadingMsg, colspan } = btn.dataset;
-    
+
     if (action === 'view-distribution-draft') {
         viewDistributionDraft(id, sourceType, sourceId, platform);
     } else if (action === 'publish-distribution-post') {

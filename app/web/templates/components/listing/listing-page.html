@@ -1,16 +1,14 @@
 {% macro listing_page(class_name="",domain_type="", include_sidebar=True) %}
 <section class="listing-page {{ class_name }}" data-domain-type="{{ domain_type }}">
 
-  {# ── Mobile filter drawer overlay ── #}
   <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
   <div class="listing-layout">
 
-    {# ── Left Sidebar ── #}
     {% if include_sidebar %}
     <aside class="listing-sidebar" id="listingSidebar" aria-label="Filters">
       <div class="listing-sidebar__inner">
-        {# Sidebar header (mobile close) #}
+
         <div class="sidebar-header flex items-center justify-between">
           <span class="sidebar-header__title">Filters</span>
           {% from "components/ui/core.html" import button %}
@@ -21,15 +19,13 @@
       </div>
     </aside>
     {% endif %}
-    {# ── Main Results Area ── #}
+
     <main class="listing-main flex flex-col gap-6">
 
-      {# ── Listing Header: title + sort ── #}
       <header class="listing-header flex flex-col gap-4">
         {{ caller('header') }}
       </header>
 
-      {# ── Active Filter Chips ── #}
       {% set active_filter_content = caller('active_filters') %}
       {% if active_filter_content and active_filter_content | trim %}
       <div class="listing-filters-active flex flex-wrap items-center gap-2" role="region" aria-label="Active filters">
@@ -37,12 +33,10 @@
       </div>
       {% endif %}
 
-      {# ── Results Grid ── #}
       <div class="listing-results" role="region" aria-label="Results">
         {{ caller('results') }}
       </div>
 
-      {# ── Footer / Pagination ── #}
       {% set footer_content = caller('footer') %}
       {% if footer_content and footer_content | trim %}
       <footer class="listing-footer">
@@ -52,8 +46,7 @@
 
     </main>
 
-  </div>{# end .listing-layout #}
+  </div>
 </section>
-
 
 {% endmacro %}

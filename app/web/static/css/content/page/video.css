@@ -1,17 +1,14 @@
 @import "style.css";
 
-/* --- YouTube Icon Color --- */
 .yt-comments-icon {
   color: var(--domain-primary);
 }
 
-/* --- Video Header --- */
 .video-header {
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
-/* --- Platform Badge --- */
 .platform-badge {
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
@@ -24,7 +21,6 @@
   border: 1px solid var(--border);
 }
 
-/* --- Video Title --- */
 .video-header__title {
   font-size: clamp(1.25rem, 3vw, 1.875rem);
   font-weight: 700;
@@ -34,7 +30,6 @@
   letter-spacing: -0.02em;
 }
 
-/* --- Meta Pills --- */
 .video-header__meta {
   gap: 0;
   padding-top: 0.5rem;
@@ -62,7 +57,6 @@
   flex-shrink: 0;
 }
 
-/* --- Video Player --- */
 .video-player-container {
   width: 100%;
   border-radius: var(--radius-xl);
@@ -101,7 +95,6 @@
   color: var(--muted-foreground);
 }
 
-/* --- Timestamp Link --- */
 .video-timestamp-link {
   color: var(--domain-primary);
   background: rgba(var(--domain-primary-rgb), 0.08);
@@ -120,7 +113,6 @@
   background: rgba(var(--domain-primary-rgb), 0.16);
 }
 
-/* --- Metadata Tags --- */
 .video-metadata-tags {
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
@@ -179,7 +171,6 @@
     transform: translateY(120%) scale(0.85);
     opacity: 0;
   }
-
   to {
     transform: translateY(0) scale(1);
     opacity: 1;
@@ -223,7 +214,6 @@
   }
 }
 
-/* --- Comments Section --- */
 .video-comments-section {
   width: 100%;
   margin-top: 1.25rem;
@@ -302,7 +292,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- YouTube Comment Cards --- */
 .yt-comment {
   background: var(--surface-inset);
   border-radius: var(--radius-lg);
@@ -362,7 +351,6 @@
   font-size: 0.85em;
 }
 
-/* --- Video Error Overlay --- */
 .video-error-overlay {
   position: absolute;
   inset: 0;
@@ -412,7 +400,6 @@
   opacity: 0.9;
 }
 
-/* --- Up Next Overlay --- */
 .up-next-overlay {
   position: absolute;
   inset: 0;

@@ -7,20 +7,15 @@ status" %}
 {% block crud_stats %}
 {% from "components/ui/core.html" import stat_card %}
 <div class="dashboard-stats-grid" id="stores-health-dashboard">
-  <!-- Total Active Links -->
+
   {{ stat_card("Active Links", value_id="stats-active-links", icon="fa-solid fa-link", meta_text="total recorded links", meta_id="stats-total-links") }}
 
-  <!-- Synced Today -->
   {{ stat_card("Synced Today", value_id="stats-synced-today", icon="fa-solid fa-bolt", meta_text="prices/availability") }}
 
-  <!-- Checked Today -->
   {{ stat_card("Checked Today", value_id="stats-checked-today", icon="fa-solid fa-check-double", meta_text="verifications in 24h") }}
 
-  <!-- Fresh Deeplinks -->
   {{ stat_card("Fresh Deeplinks", value_id="stats-deeplinks-fresh", icon="fa-solid fa-link", meta_text="refreshed in 30d") }}
 </div>
-
-
 
 {% endblock %}
 

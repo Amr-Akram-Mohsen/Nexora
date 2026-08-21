@@ -1,4 +1,3 @@
-<!-- _social_distribution_rows.html -->
 {% from "components/ui/core.html" import button, badge %}
 {% if summary_stats %}
 <div class="distribution-summary-bar flex gap-4">
@@ -107,9 +106,9 @@
         {% else %}
         {{ button(text="Previous", class="admin-btn-secondary admin-btn-sm btn-disabled", attrs={"disabled": "disabled"}, variant=none) }}
         {% endif %}
-        
+
         <span class="pagination-page-indicator">Page {{ pagination.page }} of {{ pagination.pages }}</span>
-        
+
         {% if pagination.has_next %}
         {{ button(text="Next", class="admin-btn-secondary admin-btn-sm", attrs={"data-action": "fetch-and-inject-html", "data-url": "/admin/distribution/widget/social-distribution?page=" ~ pagination.next_num, "data-target": "social-distribution-table-body", "data-loading-msg": "Loading distribution history...", "data-colspan": "7"}, variant=none) }}
         {% else %}

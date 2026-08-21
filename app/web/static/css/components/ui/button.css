@@ -1,10 +1,7 @@
 .btn {
-  /* text-sm */
   font-size: var(--text-sm);
   border-radius: var(--radius-md);
   --variant-bg-hover-opacity: 0.8;
-
-  /* Integrated from theme-variants */
   background-color: var(--variant-bg, transparent);
   color: var(--variant-color, inherit);
   border: 1px solid var(--variant-border, transparent);
@@ -28,7 +25,6 @@
   position: relative;
   pointer-events: none;
   color: transparent;
-  /* Hides the original text */
 }
 
 .btn.is-loading::after {
@@ -67,7 +63,6 @@
   font-size: var(--text-sm);
 }
 
-/* --- Base properties for Admin & Specialty Buttons --- */
 :is(.admin-btn-primary, .admin-btn-secondary, .admin-btn-danger, .btn-purple, .admin-toolbar button, .dashboard-btn-secondary, .dashboard-btn-danger, .dashboard-delete-btn) {
   gap: var(--space-3);
   padding: var(--space-3) var(--space-8);
@@ -78,8 +73,6 @@
   cursor: pointer;
   transition: all var(--duration-fast) ease;
   white-space: nowrap;
-
-  /* CSS Variable API */
   background: var(--btn-bg, transparent);
   color: var(--btn-color, inherit);
   border: var(--btn-border, none);
@@ -94,8 +87,6 @@
   opacity: var(--btn-hover-opacity, var(--btn-opacity, 1));
   box-shadow: var(--btn-hover-shadow, var(--btn-shadow, none));
 }
-
-/* --- Specific Variant Overrides --- */
 
 .admin-btn-primary,
 .admin-toolbar button {

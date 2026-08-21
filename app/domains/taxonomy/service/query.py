@@ -183,7 +183,12 @@ _cached_attributes_for_section = get_cached_attributes_for_section
 
 
 def paginate_taxonomy_entity(model, page, per_page, search='', status=None, health=None, field_name=None, extra_filter=None):
+    from sqlalchemy.orm import selectinload
     stmt = select(model).order_by(model.name.asc())
+    if model == Category:
+        stmt = stmt.options(selectinload(Category.parent), selectinload(Category.children))
+    elif model == AttributeFacet:
+        stmt = stmt.options(selectinload(AttributeFacet.category))
     if extra_filter is not None:
         stmt = stmt.where(extra_filter)
     if search:

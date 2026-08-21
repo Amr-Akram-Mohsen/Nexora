@@ -20,8 +20,8 @@
       </div>
 
       <div class="collection-actions flex items-center gap-2">
-        {{ button(text="Rename", type="button", variant="ghost", class="text-sm btn-rename-collection", icon="fas fa-edit", attrs={"data-collection": collection.name, "data-action": "rename-collection"}) }}
-        {{ button(text="Delete", type="button", variant="ghost", class="text-sm text-red-500 hover:bg-red-50 btn-delete-collection", icon="fas fa-trash", attrs={"data-collection": collection.name, "data-action": "delete-collection"}) }}
+        {{ button(text="Rename", type="button", variant="ghost", class="btn--sm btn-rename-collection", icon="fas fa-edit", attrs={"data-collection": collection.name, "data-action": "rename-collection"}) }}
+        {{ button(text="Delete", type="button", variant="ghost", class="btn--sm btn--danger btn-delete-collection", icon="fas fa-trash", attrs={"data-collection": collection.name, "data-action": "delete-collection"}) }}
       </div>
     </div>
     {% endfor %}

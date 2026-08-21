@@ -20,12 +20,11 @@ from app.application.user.auth import (
     handle_successful_login,
     handle_google_oauth_login,
 )
-from app.domains.user.service import get_user_by_id
-from app.application.user.profile import (
-    update_profile_name_workflow,
-    update_profile_password_workflow,
-    update_profile_email_workflow,
-    delete_account_workflow,
+from app.domains.user.service import (
+    get_user_by_id,
+    update_user_name,
+    update_user_password,
+    delete_user,
 )
 from app.shared.validators import validate_email, validate_password_strength
 from app.shared.sanitizer import sanitize_text
@@ -479,8 +478,8 @@ def profile():
         subscriber = get_newsletter_subscriber_by_email(current_user.email)
 
         # Load collections
-        from app.application.interaction.public import get_user_collection_counts_workflow
-        collections = get_user_collection_counts_workflow(current_user.id)
+        from app.domains.interaction.service.query import get_user_collections_list
+        collections = get_user_collections_list(current_user.id)
         collections.sort(key=lambda x: x["name"])
 
         log_route_success(logger, "/profile", template="profile.html")
@@ -517,7 +516,9 @@ def update_profile():
             if not sanitized_name:
                 flash("Display name cannot be empty.", "error")
             else:
-                update_profile_name_workflow(current_user, sanitized_name)
+                from app.core.extensions import db
+                update_user_name(current_user, sanitized_name)
+                db.session.commit()
                 flash("Display name updated.", "success")
 
         elif action == 'password':
@@ -539,7 +540,9 @@ def update_profile():
                 if not is_strong:
                     flash(pwd_err, "error")
                 else:
-                    update_profile_password_workflow(current_user, new_pwd)
+                    from app.core.extensions import db
+                    update_user_password(current_user, new_pwd)
+                    db.session.commit()
                     flash("Password changed successfully!", "success")
 
         elif action == 'email':
@@ -579,7 +582,9 @@ def verify_update_email():
             code = request.form.get('code', '').strip()
             from app.application.user.auth import verify_otp
             if verify_otp(new_email, "update_email", code):
-                update_profile_email_workflow(current_user, new_email)
+                from app.core.extensions import db
+                current_user.email = new_email
+                db.session.commit()
                 session.pop('pending_email', None)
                 flash("Your email has been successfully updated!", "success")
                 return redirect(url_for('user.profile'))
@@ -606,7 +611,9 @@ def delete_account():
                 return redirect(url_for('user.profile'))
 
         # Delete user
-        delete_account_workflow(current_user)
+        from app.core.extensions import db
+        delete_user(current_user)
+        db.session.commit()
 
         logout_user()
         flash("Your account has been permanently deleted.", "success")

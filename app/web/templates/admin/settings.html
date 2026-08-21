@@ -12,20 +12,17 @@
 
 <div class="settings-grid">
 
-  <!-- System Info -->
   {% call admin_settings_card("System Info", "Live system status and version", 'fa-solid fa-desktop') %}
     <div id="system-info">
       {{ spinner("Loading…") }}
     </div>
   {% endcall %}
 
-  <!-- Cache Controls -->
   {% call admin_settings_card("Cache", "Invalidate server-side cache", 'fa-solid fa-server') %}
     {{ button(text="Clear Cache", class="admin-btn-primary settings-action-btn gap-2 items-center", attrs={"id": "clear-cache-btn"}, variant=none) }}
     <p class="hint">Clears server cache. First request after clearing may be slower.</p>
   {% endcall %}
 
-  <!-- Maintenance Mode -->
   {% call admin_settings_card("Maintenance Mode", "Take the site offline for maintenance", 'fa-solid fa-wrench') %}
     <label class="settings-toggle-row flex items-center justify-between gap-4">
       <span class="settings-toggle-label">Enable maintenance mode</span>
@@ -38,7 +35,6 @@
     <p class="hint" id="maintenance-status-hint">Maintenance mode is currently <strong>disabled</strong>.</p>
   {% endcall %}
 
-  <!-- Integrations Monitor -->
   {% set int_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"/><path d="M12 14v7"/><path d="M12 3v7"/><path d="M4 12h3"/><path d="M17 12h3"/></svg>' %}
   {% call admin_settings_card("Integrations", "External API source health & activity", int_icon, id="integrations") %}
     <div id="integrations-monitor" class="integrations-monitor-list">
@@ -49,7 +45,6 @@
     </p>
   {% endcall %}
 
-  <!-- Ingestion Log -->
   {% set log_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' %}
   {% call admin_settings_card("Ingestion Log", "Recent API fetch events", log_icon, id="ingestion-log-card") %}
     <div class="settings-tabs-wrapper flex gap-1">
@@ -62,7 +57,6 @@
     </div>
   {% endcall %}
 
-  <!-- Danger Zone -->
   {% set danger_icon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>' %}
   {% call admin_settings_card("Danger Zone", "Irreversible destructive operations", danger_icon, is_danger=True) %}
     <div class="settings-danger-row flex items-center justify-between flex-wrap gap-4">

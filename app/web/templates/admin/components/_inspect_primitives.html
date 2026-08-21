@@ -121,7 +121,7 @@
   </div>
   <div class="inspect-store-card-grid">
     <div class="inspect-store-card-product"><strong>Published At</strong> <span>{{ post.publish_date }}</span></div>
-    <div class="inspect-store-card-product"><strong>Engagement</strong> 
+    <div class="inspect-store-card-product"><strong>Engagement</strong>
       <span class="flex gap-2">
         <span><i class="bi bi-eye"></i> {{ post.views }}</span>
         <span><i class="bi bi-heart"></i> {{ post.likes }}</span>
@@ -263,7 +263,7 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if specs.quick_details %}
   <div>
     <div class="inspect-spec-section-title">Specifications</div>
@@ -277,11 +277,11 @@
     </div>
   </div>
   {% endif %}
-  
+
   {% if specs.structured_details or specs.specs_list %}
   <div>
     <div class="inspect-spec-section-title">Developer & Raw Data</div>
-    
+
     {% if specs.structured_details %}
     <details class="inspect-accordion">
       <summary>
@@ -292,7 +292,7 @@
       </div>
     </details>
     {% endif %}
-  
+
     {% if specs.specs_list %}
     <details class="inspect-accordion">
       <summary>

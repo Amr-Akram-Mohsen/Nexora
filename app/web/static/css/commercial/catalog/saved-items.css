@@ -3,7 +3,6 @@
 .saved-collections {width: 100%;
 }
 
-
 .saved-collection .section-title {
   font-size: var(--text-xl);
   font-weight: var(--weight-xbold);
@@ -31,8 +30,6 @@
   transform: translateY(-1px);
 }
 
-/* --- Responsive Overrides for Saved Items Page --- */
-
 .collection-group .section-title {
   border-bottom: 1px solid var(--border);
   padding-bottom: 0.5rem;
@@ -48,7 +45,6 @@
   color: var(--muted-foreground);
 }
 
-/* Move Collection Select */
 .move-collection-wrapper {
   position: relative;
   margin-right: 0.5rem;

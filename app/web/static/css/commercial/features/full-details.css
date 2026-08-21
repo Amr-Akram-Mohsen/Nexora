@@ -137,7 +137,6 @@
   word-break: break-word;
 }
 
-/* Plain scalar */
 .product-detail-scalar {
   font-size: var(--text-sm);
   color: var(--foreground);
@@ -174,7 +173,6 @@ letter-spacing: 0.01em;
   transform: translateY(0);
 }
 
-/* Chevron rotation when expanded */
 .product-details-inline-toggle[aria-expanded="true"] .fa-chevron-down {
   transform: rotate(180deg);
 }

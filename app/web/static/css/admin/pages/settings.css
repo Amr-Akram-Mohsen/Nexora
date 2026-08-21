@@ -1,5 +1,3 @@
-/* --- Settings Cards & Grid Layout --- */
-
 .settings-grid {
   display: grid;
   gap: var(--card-gap, 1.5rem);
@@ -64,8 +62,6 @@
   overflow-y: auto;
 }
 
-/* --- Toggle Switches --- */
-
 .settings-toggle-row {
   cursor: pointer;
   padding: 0.625rem 0;
@@ -123,8 +119,6 @@
   transform: translateX(18px);
 }
 
-/* --- System Info Widgets --- */
-
 .system-info-list {
   list-style: none;
   padding: 0;
@@ -149,8 +143,6 @@
 .system-info-value {
   color: var(--foreground);
 }
-
-/* --- Icon Wrapper Accent Styling --- */
 
 .settings-card-icon-wrapper {
   width: 40px;
@@ -240,8 +232,6 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* --- Tabs inside Settings / Log Widgets --- */
-
 .settings-tabs-wrapper {
   border-bottom: 1px solid var(--border);
   padding: 0 1.25rem;
@@ -271,8 +261,6 @@
   border-bottom-color: var(--brand-blue);
 }
 
-/* --- Danger Zone Layout --- */
-
 .danger-zone-card {
   border: 1px solid rgba(var(--destructive-rgb), 0.25);
 }
@@ -296,16 +284,12 @@
   max-width: 480px;
 }
 
-
 @media (max-width: 768px) {
-
   .settings-danger-row {
     flex-direction: column;
     align-items: flex-start;
   }
 }
-
-/* --- Utilities (Migrated) --- */
 
 .settings-card-header {
   align-items: flex-start;

@@ -23,12 +23,12 @@
         </div>
         {% endfor %}
       </div>
-      <!-- Navigation -->
+
       {{ button(icon="fas fa-chevron-left", variant="secondary",
       class="hero-slider__arrow hero-slider__arrow--prev btn--icon")}}
       {{ button(icon="fas fa-chevron-right", variant="secondary",
       class="hero-slider__arrow hero-slider__arrow--next btn--icon")}}
-      <!-- Dots -->
+
       <div class="hero-slider__dots flex gap-2">
         {% for i in range(hero_sliders|length) %}
         {% call button(class="hero-slider__dot" ~ (" active" if loop.first else ""), attrs={"data-slide": i,

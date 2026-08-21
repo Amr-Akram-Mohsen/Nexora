@@ -1,4 +1,3 @@
-
 async function handleCountryChange(e) {
     if (!e.target.classList.contains("country-toggle")) return false;
 

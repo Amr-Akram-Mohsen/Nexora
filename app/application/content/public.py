@@ -1,5 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from flask import current_app, url_for
+from flask import current_app
 from app.core.extensions import db
 from app.infrastructure import cache
 from app.infrastructure.cache import filters_from_normalized, normalize_filters
@@ -39,11 +38,33 @@ def get_carousel_contents_cached(active_filters_key, exclude_ids_key=None, limit
 
 @cache.memoize(timeout=3600)
 def get_globe_data_workflow():
-    locations = db.session.query(Location).filter(Location.latitude.isnot(None), Location.longitude.isnot(None)).all()
+    from sqlalchemy import func, select
+    from app.domains.content.models import Content
+
+    stmt = (
+        select(Location, func.count(Content.id).label("content_count"))
+        .join(Location.contents)
+        .where(
+            Location.latitude.is_not(None),
+            Location.longitude.is_not(None),
+            Content.is_active == True,
+            Content.is_published == True
+        )
+        .group_by(Location.id)
+        .having(func.count(Content.id) > 0)
+    )
+    results = db.session.execute(stmt).all()
+
     data = []
-    for loc in locations:
-        if (count := len(loc.contents)) > 0:
-            data.append({"lat": loc.latitude, "lng": loc.longitude, "size": min(1.5, 0.1 + (count * 0.05)), "color": "#e11d48", "title": loc.name, "content_count": count, "url": url_for("content.sections", section_slug="news", location=loc.slug)})
+    for loc, count in results:
+        data.append({
+            "lat": loc.latitude,
+            "lng": loc.longitude,
+            "size": round(min(1.5, 0.1 + (count * 0.05)), 3),
+            "title": loc.name,
+            "slug": loc.slug,
+            "content_count": count
+        })
     return sorted(data, key=lambda x: x["size"], reverse=True)[:150]
 
 @cache.memoize(timeout=1800)
@@ -112,4 +133,12 @@ def get_feed_data(section_slug, active_filters, page=1):
 def get_source_feed_data(source_slug, page=1):
     if not (source := db.session.query(Source).filter_by(slug=source_slug).first()): return None
     pagination = get_filtered_contents_cached(None, normalize_filters({"source": [source_slug]}), ("source",), page=page)
-    return {"source": serialize_model(source), "contents": pagination["products"], "pagination": pagination, "allowed_filters": [], "filter_options": {}, "recommendations": []}
+    return {
+        "source": serialize_model(source),
+        "section": {"name": source.name or "Source", "slug": "sources"},
+        "contents": pagination["products"],
+        "pagination": pagination,
+        "allowed_filters": [],
+        "filter_options": {},
+        "recommendations": []
+    }

@@ -54,21 +54,52 @@ def fetch_admin_matches_page(page, per_page, search, entity_type=None, ctr_range
             grouped[content.id] = {'content_id': content.id, 'content_title': content.title or f'Content #{content.id}', 'content_views': content.view_count or 0, 'object_type': content.object_type, 'object_id': content.object_id, 'products': []}
         grouped[content.id]['products'].append(product)
     serialized = []
-    for cid in content_ids:
-        if cid in grouped:
-            g = grouped[cid]
-            context_id_val = f'{g['object_type']}/{g['object_id']}'
-            widget_impressions = db.session.scalar(select(func.count(RecommendationImpression.id)).where(RecommendationImpression.context_id == context_id_val)) or 0
-            widget_clicks = db.session.scalar(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == context_id_val)) or 0
-            widget_ctr = round(widget_clicks / widget_impressions * 100, 1) if widget_impressions > 0 else 0.0
-            last_impression = db.session.scalar(select(func.max(RecommendationImpression.created_at)).where(RecommendationImpression.context_id == context_id_val))
-            last_active = 'Never'
-            if last_impression:
-                if isinstance(last_impression, str):
-                    last_active = last_impression[:16]
-                else:
-                    last_active = last_impression.strftime('%Y-%m-%d %H:%M')
-            serialized.append({'content_id': g['content_id'], 'content_title': g['content_title'], 'content_views': g['content_views'], 'widget_impressions': widget_impressions, 'widget_clicks': widget_clicks, 'widget_ctr': widget_ctr, 'last_active': last_active, 'linked_items_count': len(g['products']), 'products': [{'id': i.id, 'name': i.name or f'Product #{i.id}', 'type': i.product_type, 'clicks': i.click_count or 0} for i in g['products']]})
+    if content_ids:
+        context_ids = [f"{grouped[cid]['object_type']}/{grouped[cid]['object_id']}" for cid in content_ids if cid in grouped]
+        
+        imp_stats_rows = db.session.execute(
+            select(
+                RecommendationImpression.context_id,
+                func.count(RecommendationImpression.id).label('count'),
+                func.max(RecommendationImpression.created_at).label('last_created')
+            ).where(RecommendationImpression.context_id.in_(context_ids)).group_by(RecommendationImpression.context_id)
+        ).all()
+        imp_map = {r[0]: (r[1], r[2]) for r in imp_stats_rows}
+
+        click_stats_rows = db.session.execute(
+            select(
+                RecommendationClick.context_id,
+                func.count(RecommendationClick.id).label('count')
+            ).where(RecommendationClick.context_id.in_(context_ids)).group_by(RecommendationClick.context_id)
+        ).all()
+        click_map = {r[0]: r[1] for r in click_stats_rows}
+
+        for cid in content_ids:
+            if cid in grouped:
+                g = grouped[cid]
+                context_id_val = f"{g['object_type']}/{g['object_id']}"
+                imp_tuple = imp_map.get(context_id_val, (0, None))
+                widget_impressions = imp_tuple[0]
+                last_impression = imp_tuple[1]
+                widget_clicks = click_map.get(context_id_val, 0)
+                widget_ctr = round(widget_clicks / widget_impressions * 100, 1) if widget_impressions > 0 else 0.0
+                last_active = 'Never'
+                if last_impression:
+                    if isinstance(last_impression, str):
+                        last_active = last_impression[:16]
+                    else:
+                        last_active = last_impression.strftime('%Y-%m-%d %H:%M')
+                serialized.append({
+                    'content_id': g['content_id'],
+                    'content_title': g['content_title'],
+                    'content_views': g['content_views'],
+                    'widget_impressions': widget_impressions,
+                    'widget_clicks': widget_clicks,
+                    'widget_ctr': widget_ctr,
+                    'last_active': last_active,
+                    'linked_items_count': len(g['products']),
+                    'products': [{'id': i.id, 'name': i.name or f'Product #{i.id}', 'type': i.product_type, 'clicks': i.click_count or 0} for i in g['products']]
+                })
     return (total, pages, serialized)
 
 def get_admin_match_inspect_raw(content_id):
@@ -83,38 +114,103 @@ def get_admin_match_inspect_raw(content_id):
     widget_impressions = db.session.scalar(select(func.count(RecommendationImpression.id)).where(RecommendationImpression.context_id == context_id_val)) or 0
     unique_users = db.session.scalar(select(func.count(func.distinct(RecommendationImpression.user_id))).where(RecommendationImpression.context_id == context_id_val).where(RecommendationImpression.user_id.isnot(None))) or 0
     last_impression = db.session.scalar(select(func.max(RecommendationImpression.created_at)).where(RecommendationImpression.context_id == context_id_val))
+    
+    product_ids = [i.id for i in content.linked_products]
+    str_product_ids = [str(pid) for pid in product_ids]
+    
+    widget_clicks_map = dict(
+        db.session.execute(
+            select(RecommendationClick.entity_id, func.count(RecommendationClick.id))
+            .where(RecommendationClick.context_id == context_id_val)
+            .where(RecommendationClick.entity_id.in_(str_product_ids))
+            .group_by(RecommendationClick.entity_id)
+        ).all()
+    ) if str_product_ids else {}
+
+    context_clicks_map = dict(
+        db.session.execute(
+            select(ProductVariant.product_id, func.count(ProductClick.id))
+            .join(ProductStoreLink, ProductClick.product_store_link_id == ProductStoreLink.id)
+            .join(ProductVariant, ProductStoreLink.variant_id == ProductVariant.id)
+            .where(ProductVariant.product_id.in_(product_ids))
+            .where(ProductClick.referrer.ilike(referrer_pattern))
+            .group_by(ProductVariant.product_id)
+        ).all()
+    ) if product_ids else {}
+
     linked_items_stats = []
     for i in content.linked_products:
-        context_clicks = db.session.scalar(select(func.count(ProductClick.id)).join(ProductStoreLink, ProductClick.product_store_link_id == ProductStoreLink.id).join(ProductVariant, ProductStoreLink.variant_id == ProductVariant.id).where(ProductVariant.product_id == i.id).where(ProductClick.referrer.ilike(referrer_pattern))) or 0
-        widget_clicks = db.session.scalar(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == context_id_val).where(RecommendationClick.entity_id == str(i.id))) or 0
+        context_clicks = context_clicks_map.get(i.id, 0)
+        widget_clicks = widget_clicks_map.get(str(i.id), 0)
         linked_items_stats.append((i, context_clicks, widget_clicks))
     return (content, widget_impressions, unique_users, last_impression, linked_items_stats)
 
+def get_admin_match_inspect_data(content_id: int):
+    raw_tuple = get_admin_match_inspect_raw(content_id)
+    if not raw_tuple:
+        return None
+    from app.domains.recommendation.service.admin.serializers import serialize_match_inspect_dto
+    dto = serialize_match_inspect_dto(raw_tuple)
+    return {'match_dto': dto}
+
 def get_admin_context_performance():
-    stmt = select(RecommendationImpression.context_id, RecommendationImpression.entity_type, func.count(RecommendationImpression.id).label('impressions'), func.coalesce(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == RecommendationImpression.context_id).scalar_subquery(), 0).label('clicks')).group_by(RecommendationImpression.context_id, RecommendationImpression.entity_type).order_by(func.count(RecommendationImpression.id).desc()).limit(10)
+    stmt = select(
+        RecommendationImpression.context_id,
+        RecommendationImpression.entity_type,
+        func.count(RecommendationImpression.id).label('impressions'),
+        func.coalesce(select(func.count(RecommendationClick.id)).where(RecommendationClick.context_id == RecommendationImpression.context_id).scalar_subquery(), 0).label('clicks')
+    ).group_by(RecommendationImpression.context_id, RecommendationImpression.entity_type).order_by(func.count(RecommendationImpression.id).desc()).limit(10)
     rows = db.session.execute(stmt).all()
     results = []
     for r in rows:
-        ctr = r.clicks / r.impressions * 100 if r.impressions > 0 else 0
-        results.append({'context_id': r.context_id, 'entity_type': r.entity_type, 'impressions': '{:,}'.format(r.impressions), 'clicks': '{:,}'.format(r.clicks), 'ctr': f'{ctr:.2f}%'})
+        ctr = round(r.clicks / r.impressions * 100, 2) if r.impressions > 0 else 0.0
+        results.append({
+            'context_id': r.context_id,
+            'entity_type': r.entity_type,
+            'impressions': int(r.impressions),
+            'clicks': int(r.clicks),
+            'ctr': ctr
+        })
     return results
 
 def get_admin_entity_performance():
-    stmt = select(RecommendationClick.entity_id, RecommendationClick.entity_type, func.count(RecommendationClick.id).label('clicks')).group_by(RecommendationClick.entity_id, RecommendationClick.entity_type).order_by(func.count(RecommendationClick.id).desc()).limit(10)
+    stmt = select(
+        RecommendationClick.entity_id,
+        RecommendationClick.entity_type,
+        func.count(RecommendationClick.id).label('clicks')
+    ).group_by(RecommendationClick.entity_id, RecommendationClick.entity_type).order_by(func.count(RecommendationClick.id).desc()).limit(10)
     rows = db.session.execute(stmt).all()
+
+    content_ids = [int(r.entity_id) for r in rows if r.entity_type == 'related_content' and str(r.entity_id).isdigit()]
+    product_ids = [int(r.entity_id) for r in rows if r.entity_type != 'related_content' and str(r.entity_id).isdigit()]
+
+    content_map = {
+        c.id: c.title for c in db.session.execute(
+            select(Content.id, Content.title).where(Content.id.in_(content_ids))
+        ).all()
+    } if content_ids else {}
+
+    product_map = {
+        p.id: p.name for p in db.session.execute(
+            select(Product.id, Product.name).where(Product.id.in_(product_ids))
+        ).all()
+    } if product_ids else {}
+
     results = []
     for r in rows:
         name = f'Entity #{r.entity_id}'
         if str(r.entity_id).isdigit():
+            eid = int(r.entity_id)
             if r.entity_type == 'related_content':
-                content = db.session.get(Content, int(r.entity_id))
-                if content:
-                    name = content.title
+                name = content_map.get(eid, name)
             else:
-                product = db.session.get(Product, int(r.entity_id))
-                if product:
-                    name = product.name
-        results.append({'entity_id': r.entity_id, 'entity_name': name, 'entity_type': r.entity_type, 'clicks': '{:,}'.format(r.clicks)})
+                name = product_map.get(eid, name)
+        results.append({
+            'entity_id': r.entity_id,
+            'entity_name': name,
+            'entity_type': r.entity_type,
+            'clicks': int(r.clicks)
+        })
     return results
 
 def get_admin_recommendation_health():
@@ -210,6 +306,14 @@ def get_admin_user_interests_raw(user_id):
         return None
     scores = db.session.execute(select(UserEntityInterest.entity_id, UserEntityInterest.category_id, func.sum(UserEntityInterest.score).label('total_score')).join(UserInterest, UserEntityInterest.user_interest_id == UserInterest.id).where(UserInterest.user_id == user_id).group_by(UserEntityInterest.entity_id, UserEntityInterest.category_id).order_by(func.sum(UserEntityInterest.score).desc()).limit(5)).all()
     return (user, scores)
+
+def get_admin_user_interests_data(user_id: int):
+    raw_tuple = get_admin_user_interests_raw(user_id)
+    if not raw_tuple:
+        return None
+    from app.domains.recommendation.service.admin.serializers import serialize_user_interests_dto
+    dto = serialize_user_interests_dto(raw_tuple)
+    return {'user_interests_dto': dto}
 
 def delete_admin_match(content_id, product_id):
     db.session.execute(content_products.delete().where(content_products.c.content_id == content_id, content_products.c.product_id == product_id))

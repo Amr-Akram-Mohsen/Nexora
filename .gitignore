@@ -52,3 +52,5 @@ migrations/
 scratch/
 
 local_backup.dump
+
+PROJECT_RULES.md

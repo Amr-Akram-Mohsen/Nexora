@@ -153,8 +153,6 @@
   font-weight: 500;
 }
 
-
-/* Platform Icons */
 .platform-icon {
   width: 32px;
   height: 32px;
@@ -170,9 +168,7 @@
   border-color: rgba(var(--card-color-rgb), 0.2);
 }
 
-/* --- Mobile Layout Refinements --- */
 @media (max-width: 768px) {
-
   .card__date,
   .card__meta-dot,
   .card__read-time {
@@ -184,7 +180,6 @@
   --card-aspect-ratio: 16 / 9;
 }
 
-/* Image overlays & indicators */
 .card__img-overlay {
   position: absolute;
   inset: 0;
@@ -222,7 +217,6 @@
   background: var(--background);
 }
 
-/* Discount Badge */
 .card__discount-badge {
   position: absolute;
   bottom: 0.75rem;
@@ -237,7 +231,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Compare Toggle Button */
 .compare-toggle-btn {
   position: absolute;
   top: 0.75rem;
@@ -277,7 +270,6 @@
   border-color: var(--domain-primary);
 }
 
-
 .product-name {
   font-size: var(--text-base);
   font-weight: var(--weight-bold);
@@ -287,8 +279,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* Star rating on card */
 
 .card__rating {
   color: var(--domain-primary);

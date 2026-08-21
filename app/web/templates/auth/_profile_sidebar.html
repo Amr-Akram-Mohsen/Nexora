@@ -76,7 +76,7 @@
   {% call card(title="Verify Your Email", desc="Please verify your account to access all features. We've sent a verification link to your email.", class="verification-alert-card") %}
   {% call form("user.resend_verification") %}
   {{ input(type="hidden", name="email", value=current_user.email, required=False) }}
-  {{ button(text="Resend Link", type="submit", variant="primary", class="w-full text-center gap-2") }}
+  {{ button(text="Resend Link", type="submit", variant="primary", class="btn--block gap-2") }}
   {% endcall %}
   {% endcall %}
   {% endif %}

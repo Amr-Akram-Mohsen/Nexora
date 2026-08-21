@@ -12,24 +12,21 @@
 <section class="profile-section">
   <div class="profile-container container">
 
-    <!-- Profile Page Header -->
     <div class="profile-page-header">
       <h1 class="profile-page-title">Profile Settings</h1>
       <p class="profile-page-subtitle">Manage your personal details, security preferences, and subscription options.</p>
     </div>
 
     <div class="profile-grid">
-      <!-- Sidebar: User Summary & Verification -->
+
       {% include "auth/_profile_sidebar.html" %}
 
-      <!-- Main Content Area -->
       <main class="profile-main">
         {% include "auth/_profile_account.html" %}
         {% include "auth/_profile_newsletter.html" %}
         {% include "auth/_profile_security.html" %}
         {% include "auth/_profile_collections.html" %}
 
-        <!-- Card: Danger Zone -->
         {% call card(title="Danger Zone", desc="Permanently delete your account and all associated data. This action cannot be undone.", class="settings-card danger-zone-card") %}
         {{ button(text="Delete Account", type="button", variant="danger", class="btn-danger gap-2", icon="fas fa-exclamation-triangle", attrs={"onclick": "document.getElementById('delete-account-modal').classList.add('active');"}) }}
         {% endcall %}
@@ -38,7 +35,6 @@
   </div>
 </section>
 
-<!-- Delete Account Modal -->
 {% call modal("delete-account-modal", title="Delete Account", icon="fas fa-exclamation-triangle", class="border-red-500") %}
 <p class="delete-account-warning">Are you sure you want to delete your account? This will erase all your reviews, saved products, and settings. This cannot be undone.</p>
 

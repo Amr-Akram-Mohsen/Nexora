@@ -1,5 +1,3 @@
-/* --- Premium Minimalist Footer Layout --- */
-
 .site-footer {
   border-top: 1px solid var(--border);
   background: rgba(var(--muted-rgb), 0.2);
@@ -39,7 +37,6 @@ body.dark-mode .site-footer {
     grid-template-columns: 3fr 2fr 2fr 3fr;
     gap: 2.5rem;
   }
-
   .footer-brand {
     border: none;
     padding-bottom: 0;
@@ -66,11 +63,9 @@ body.dark-mode .site-footer {
 .footer-description {
   font-size: 0.875rem;
   color: var(--muted-foreground);
-  /* margin-bottom: 1.75rem; */
   line-height: 1.6;
 }
 
-/* --- Social Icons Capsule --- */
 .footer-socials {
   gap: 0.65rem;
 }
@@ -105,7 +100,6 @@ body.dark-mode .site-footer {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid transparent;
-
 }
 
 .footer-social i {
@@ -122,11 +116,8 @@ body.dark-mode .site-footer {
   transform: scale(1.1);
 }
 
-
-/* --- Columns Typography --- */
 .footer-title {
   font-size: 0.875rem;
-  /* 14px titles */
   font-weight: var(--weight-md);
   color: var(--foreground);
   margin-bottom: .25rem;
@@ -149,15 +140,12 @@ body.dark-mode .site-footer {
 .footer-link:hover {
   color: var(--foreground);
   transform: translateX(4px);
-  /* elegant horizontal shift on hover */
 }
 
-/* --- Brand Logo Group Interaction --- */
 .group:hover .footer-logo__icon {
   transform: scale(1.06);
 }
 
-/* --- Bottom Separator --- */
 .footer-bottom {
   padding: 1.5rem 0 1rem;
   margin-top: 1.5rem;
@@ -166,16 +154,11 @@ body.dark-mode .site-footer {
 
 .footer-copy {
   font-size: 0.8125rem;
-  /* 13px copyright */
   color: var(--muted-foreground);
   line-height: 1.5;
   margin: 0;
 }
 
-/* --- Footer Contact --- */
-
-
-/* --- Trust Badges --- */
 .footer-trust {
   color: var(--muted-foreground);
   font-size: 0.875rem;
@@ -185,7 +168,6 @@ body.dark-mode .site-footer {
   display: inline-flex;
 }
 
-/* --- New Additions --- */
 .footer-text {
   color: var(--muted-foreground);
   font-size: 0.875rem;

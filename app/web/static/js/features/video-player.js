@@ -4,13 +4,13 @@ function initVideoPlayerEnhancements() {
     if (descBox) {
         // Regex for HH:MM:SS or MM:SS (with optional brackets like [01:23] or just 01:23)
         const timeRegex = /(?:\[|\b)((?:[0-5]?\d:)?(?:[0-5]?\d):(?:[0-5]\d))(?:\]|\b)/g;
-        
+
         let hasTimestamps = false;
         let originalHtml = descBox.innerHTML;
-        
+
         const replacedHtml = originalHtml.replace(timeRegex, (match, timeStr) => {
             hasTimestamps = true;
-            
+
             // Calculate total seconds
             const parts = timeStr.split(':').map(n => parseInt(n, 10));
             let totalSeconds = 0;
@@ -19,10 +19,10 @@ function initVideoPlayerEnhancements() {
             } else if (parts.length === 2) {
                 totalSeconds = parts[0] * 60 + parts[1];
             }
-            
+
             return `<a href="#" class="video-timestamp-link" data-time="${totalSeconds}">${match}</a>`;
         });
-        
+
         if (hasTimestamps) {
             descBox.innerHTML = replacedHtml;
         }
@@ -35,17 +35,17 @@ function initVideoPlayerEnhancements() {
 
         e.preventDefault();
         const time = parseInt(timestampLink.dataset.time, 10);
-        
+
         const playerContainer = document.querySelector('.video-main-player');
         if (!playerContainer) return;
 
         let iframe = playerContainer.querySelector('iframe');
-        
+
         if (!iframe) {
             // Iframe doesn't exist yet, simulate play button click first
             const playBtn = playerContainer.querySelector('[data-action="lazy-play"]');
             if (playBtn) playBtn.click();
-            
+
             // Wait a brief moment for the iframe to be injected and ready
             setTimeout(() => {
                 iframe = playerContainer.querySelector('iframe');
@@ -54,7 +54,7 @@ function initVideoPlayerEnhancements() {
         } else {
             // Iframe exists, seek immediately
             seekIframe(iframe, time);
-            
+
             // Scroll to video if it's out of view and not sticky
             if (!playerContainer.classList.contains('is-sticky')) {
                 playerContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -69,7 +69,7 @@ function initVideoPlayerEnhancements() {
             "func": "seekTo",
             "args": [time, true]
         }), "*");
-        
+
         // Ensure it's playing
         iframe.contentWindow.postMessage(JSON.stringify({
             "event": "command",
@@ -109,9 +109,9 @@ function initVideoPlayerEnhancements() {
                 });
             });
         });
-        
+
         observer.observe(playerContainer, { childList: true, subtree: true });
-        
+
         // In case it already exists
         const existingIframe = playerContainer.querySelector('iframe');
         if (existingIframe) {
@@ -155,32 +155,32 @@ function initVideoPlayerEnhancements() {
         // Find related content links from the sidebar
         const sidebar = document.querySelector('.detail-page__sidebar');
         if (!sidebar) return;
-        
+
         const relatedLinks = Array.from(sidebar.querySelectorAll('a[href*="/contents/"]'));
         if (relatedLinks.length === 0) return;
-        
+
         // Deduplicate and gather up to 4 videos
         const uniqueVideos = [];
         const seenUrls = new Set();
-        
+
         relatedLinks.forEach(link => {
             if (seenUrls.has(link.href)) return;
             seenUrls.add(link.href);
-            
+
             let title = "Related Video";
             const titleElement = link.querySelector('.card__title, .product-card__title, h4, h3, .content-snippet__title');
             if (titleElement) title = titleElement.textContent.trim();
-            
+
             let thumb = "";
             const img = link.querySelector('img');
             if (img) thumb = img.src;
-            
+
             uniqueVideos.push({ url: link.href, title, thumb });
         });
-        
+
         const topVideos = uniqueVideos.slice(0, 4);
         if (topVideos.length === 0) return;
-        
+
         const nextVideoUrl = topVideos[0].url;
 
         const overlayTemplate = document.getElementById('video-upnext-template');
@@ -230,7 +230,7 @@ function initVideoPlayerEnhancements() {
             timeLeft--;
             const timerEl = overlay?.querySelector('#up-next-timer');
             if (timerEl) timerEl.textContent = timeLeft;
-            
+
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 window.location.href = nextVideoUrl;

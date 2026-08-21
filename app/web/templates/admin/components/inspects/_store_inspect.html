@@ -8,7 +8,7 @@
 {% block admin_content %}
 
 {% call inspect_page_shell("Store Details", url_for('admin.dashboard_stores'), "Back to Providers", title) %}
-      
+
       {% if inspect_table and inspect_table is mapping %}
       {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}

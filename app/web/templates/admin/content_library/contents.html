@@ -9,7 +9,7 @@
 
 {% block crud_filters %}
 {% call admin_toolbar_section() %}
-{# Row 1: Search & Basic Filters #}
+
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_search_input("content-search", "Search title or ID…") }}
   {{ admin_filter_select("filter-type", None, [("article", "Articles"), ("video", "Videos"), ("post", "Posts")],
@@ -30,7 +30,6 @@
   extra_class="filter-select-product") }}
 </div>
 
-{# Row 2: Ingest Details & Compliance #}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   {{ admin_filter_select("filter-source", None, [], default_val="", default_text="All Sources / Platforms",
   extra_class="filter-select-product") }}
@@ -54,7 +53,6 @@
   ], default_val="", default_text="All Health Statuses", extra_class="filter-select-warning") }}
 </div>
 
-{# Row 3: Date Filters & Sorting #}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
   <span class="filter-label-xs">Date Range:</span>
   {{ admin_filter_select("filter-date-type", None, [("published_at", "Published At"), ("ingested_at", "Ingested At")],
@@ -87,7 +85,7 @@
 {% endblock %}
 
 {% block crud_actions %}
-{# Bulk Actions Toolbar (hidden by default) #}
+
 <div id="bulk-actions-toolbar" class="bulk-actions-toolbar flex justify-between items-center is-hidden">
   <div class="flex items-center gap-2">
     <span><i class="fa-solid fa-bolt"></i></span>

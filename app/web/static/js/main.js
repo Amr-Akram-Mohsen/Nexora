@@ -12,7 +12,7 @@ function handleGlobalClicks(e) {
     if (handleCommentsClick(e)) return;
 
     if (handleFilterClick(e)) return;
-    
+
     if (typeof handleMoreFiltersClick === "function" && handleMoreFiltersClick(e)) return;
 
     if (handleSelectText(e)) return;
@@ -35,7 +35,6 @@ function handleGlobalClicks(e) {
     if (typeof handleProfileClick === "function" && handleProfileClick(e)) return;
     if (typeof handleLazyVideoClick === "function" && handleLazyVideoClick(e)) return;
 }
-
 
 function handleGlobalSubmits(e) {
     if (handleCommentSubmit(e)) return;

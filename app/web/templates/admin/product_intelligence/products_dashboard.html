@@ -10,11 +10,10 @@
     "Monitor catalog breakdown, engagement metrics, and product distribution."
 ) }}
 
-<!-- Product Type Distribution Panel -->
 <div class="overview-top-grid">
   {% call admin_padded_panel("Catalog Breakdown by Product Type", "Distribution of products across different categories", actions='<i class="fa-solid fa-chart-pie"></i>') %}
     <div id="stats-type-distribution" class="overview-breakdown-grid flex gap-2">
-      <!-- JS will inject progress bars here -->
+
       <div><i class="fa-solid fa-circle-notch fa-spin"></i> Loading distribution...</div>
     </div>
   {% endcall %}

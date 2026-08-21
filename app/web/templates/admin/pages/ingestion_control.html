@@ -16,7 +16,6 @@
 
 <div class="settings-grid">
 
-  <!-- Manual Trigger Panel -->
   {% call admin_settings_card("Trigger Ingestion", "Run or dry-run an API fetch", 'fa-solid fa-play') %}
     <form id="ingestion-form" class="flex flex-col gap-4">
       <div class="form-group">
@@ -68,18 +67,17 @@
         </span>
       </label>
 
-      <div class="flex justify-end gap-2 mt-4">
+      <div class="flex justify-end gap-2">
         {{ button(text="Execute", class="admin-btn-primary", attrs={"id": "trigger-btn", "type": "submit"}, variant=none) }}
       </div>
     </form>
-    
-    <div id="task-status-container" class="mt-4 ingestion-hidden">
+
+    <div id="task-status-container" class="ingestion-hidden flex flex-col gap-2">
         <p><strong>Status:</strong> <span id="task-status-text">Pending...</span></p>
-        <div id="task-result-container" class="mt-2"></div>
+        <div id="task-result-container"></div>
     </div>
   {% endcall %}
 
-  <!-- Cache Helpers Dashboard -->
   {% call admin_settings_card("Cache Helpers", "Current Rotation & Cursor States", 'fa-solid fa-database') %}
     <div id="cache-helpers-container">
       {{ spinner("Loading cache state...") }}
@@ -88,7 +86,6 @@
 
 </div>
 
-<!-- HTML Templates for JavaScript Cloning -->
 <template id="cache-helpers-template">
     <pre class="cache-helpers-view"></pre>
 </template>

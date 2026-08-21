@@ -43,7 +43,6 @@ product
 
     <div class="container">
 
-        {# ══ Breadcrumbs — full width top row ══ #}
         <div class="detail-page__top flex items-center justify-between gap-6">
             <div class="detail-page__breadcrumbs-wrapper flex items-center">
                 {% include "commercial/features/breadcrumbs.html" %}
@@ -53,7 +52,6 @@ product
         {# ══ Main (display:contents on desktop — children participate directly in grid) ══ #}
         <div class="detail-page__main">
 
-            {# ── Right column: title, badges, rating, price, quick-details ── #}
             {% include "commercial/page/_product_header.html" %}
 
             {# Variants + purchase options — below header in right column #}
@@ -70,12 +68,10 @@ product
                 {% endif %}
             </div>
 
-            {# ── Left-column top: gallery (always left, always above specs) ── #}
             <div class="detail-page__image">
                 {{ item_gallery(product) }}
             </div>
 
-            {# ── Left-column bottom: specifications (always below gallery) ── #}
             {% include "commercial/page/_product_specs.html" %}
 
             {# ── Left-column body: description + category blocks ── #}
@@ -112,16 +108,13 @@ product
                 </div>
             </div>
 
-            {# ── Interactions + comments — full-width row below content ── #}
             <div class="detail-page__extra">
                 {% include "components/interactions/interactions.html" %}
                 {% include "components/interactions/comments.html" %}
             </div>
 
         </div>
-        {# end .detail-page__main #}
 
-        {# ── Related Items & Content ── #}
         {% include "commercial/page/_product_related.html" %}
 
     </div>

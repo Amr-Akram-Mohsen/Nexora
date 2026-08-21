@@ -1,5 +1,3 @@
-
-// ── Inline Tooltip (existing — preserved) ────────────────────────────────────
 function showInlineTooltip(targetEl, message, duration = 2000) {
     const msg = document.getElementById("inline-tooltip");
     if (!msg || !targetEl) return;
@@ -23,16 +21,12 @@ function showInlineTooltip(targetEl, message, duration = 2000) {
 }
 
 function initFlashMessages() {
-    // ------------------------------
     // Global messages (top-right)
-    // ------------------------------
     // Timers have been intentionally removed per user request.
     // Flash messages now persist until dismissed manually.
 }
 
-// ------------------------------
 // Manual close for global messages
-// ------------------------------
 function closeFlashMsg(btn) {
     const alert = btn.parentElement;
     alert.style.transition = 'opacity 0.3s ease, transform 0.3s ease';

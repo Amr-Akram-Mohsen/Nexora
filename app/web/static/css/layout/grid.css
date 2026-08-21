@@ -1,5 +1,3 @@
-/* --- Premium Grid & Section Layout --- */
-
 .container {
   margin-inline: auto;
   padding: 3rem 1.5rem;
@@ -20,9 +18,7 @@
 /* Editorial Title with Left Brand Accent Pill */
 .section__header .title {
   font-size: 1.5rem;
-  /* 24px - perfect readable header scale */
   font-weight: var(--weight-display);
-  /* strong premium weight */
   line-height: 1.2;
   color: var(--foreground);
   letter-spacing: -0.02em;
@@ -41,8 +37,6 @@
   display: inline-block;
 }
 
-/* view all arrows */
-
 .view-all {
   text-decoration: none;
 }
@@ -54,11 +48,8 @@
 
 .view-all:hover i {
   transform: translateX(3px);
-  /* elegant horizontal shift on hover */
 }
 
-
-/* --- Responsive Auto Grids --- */
 .grid-auto {
   display: grid;
   gap: var(--card-gap, 1.5rem);
@@ -82,7 +73,6 @@
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1rem;
   }
-
   .contents-listing .grid-auto {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
@@ -103,13 +93,9 @@
   }
 }
 
-/* --- Horizontal Card Carousels --- */
 .grid-carousel {
-  /* display: flex; */
   overflow-x: auto;
-  /* gap: 1.5rem; */
   padding-bottom: 0.5rem;
-  /* margin-bottom: 0.5rem; */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -125,13 +111,11 @@
   display: none;
 }
 
-/* Progressive Reveal Staggered Animation */
 @keyframes fadeSlideUp {
   from {
     opacity: 0;
     transform: translateY(16px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -147,23 +131,17 @@
   --toggle-bg: var(--accent, #fff);
   --toggle-border: var(--border-color, rgba(0, 0, 0, .08));
   --toggle-text: var(--text-color, #111);
-
   display: block;
   margin: 2rem auto 0;
   padding: .9rem 1.4rem;
-
   border: 1px solid var(--toggle-border);
   border-radius: var(--radius-full);
-
   background: var(--toggle-bg);
   color: var(--toggle-text);
-
   font-size: .95rem;
   font-weight: 600;
   letter-spacing: .01em;
-
   cursor: pointer;
-
   transition:
     transform .2s ease,
     box-shadow .2s ease,
@@ -178,9 +156,7 @@
 
 .section-toggle:hover {
   transform: translateY(-2px);
-
   border-color: var(--accent);
-
   box-shadow:
     0 10px 25px rgba(0, 0, 0, .08),
     0 2px 8px rgba(0, 0, 0, .05);
@@ -195,7 +171,6 @@
   outline-offset: 3px;
 }
 
-
 .grid-carousel>.card {
   min-width: 290px;
   max-width: 320px;
@@ -208,7 +183,6 @@
     gap: 1rem;
     padding-bottom: 0.25rem;
   }
-
   .grid-carousel>.card {
     min-width: 260px;
     max-width: 280px;

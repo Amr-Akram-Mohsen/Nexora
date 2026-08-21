@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const resultsContainer = document.getElementById("scraping-results-container");
     const statsContainer = document.getElementById("scraping-stats");
     const detailsContainer = document.getElementById("scraping-details");
-    
+
     const taskName = document.getElementById("task-name");
     const taskStatus = document.getElementById("task-status");
     const taskProgressFill = document.getElementById("task-progress-fill");
     const taskMeta = document.getElementById("task-meta");
-    
+
     const statTemplate = document.getElementById("stat-card-template");
     const detailTemplate = document.getElementById("detail-row-template");
 
@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         const limit = document.getElementById("scraping-limit").value;
         const btnText = triggerBtn.querySelector('.btn-text');
-        
+
         btnText.textContent = "Starting...";
         triggerBtn.disabled = true;
 
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 resultsContainer.classList.add("scraping-hidden");
                 statsContainer.innerHTML = "";
                 detailsContainer.innerHTML = "";
-                
+
                 pollInterval = setInterval(pollTaskStatus, 2000);
             }
         })
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 taskName.textContent = data.name || "Scraping Batch";
                 taskStatus.textContent = data.status;
                 taskStatus.className = `task-status-badge status-${data.status}`;
-                
+
                 if (data.progress) {
                     taskProgressFill.style.width = `${data.progress}%`;
                 }
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.status === "completed" || data.status === "failed") {
                     clearInterval(pollInterval);
                     resetButton();
-                    
+
                     if (data.status === "completed" && data.result) {
                         renderResults(data.result);
                     }
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const meta = clone.querySelector('.detail-meta');
 
                 title.textContent = item.title || item.url || "Unknown Item";
-                
+
                 if (item.status === "success") {
                     icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
                     icon.classList.add("success");

@@ -1,7 +1,7 @@
 {% from "components/ui/core.html" import badge, button %}
 
 {% macro filter_section(filter_name, options, active_filters, get_filter_url) %}
-{# Determine if ANY option in this group is active #}
+
 {% set group_active = namespace(count=0) %}
 {% for opt in options %}
 {% set slug = opt.slug if opt.slug is defined else opt %}
@@ -58,7 +58,6 @@
       </li>
       {% endfor %}
 
-      {# Clickable "Show more" toggle if list is long (>8) #}
       {% if options | length > 8 %}
       <li class="filter-item filter-item--more-toggle">
         {{ button(class="filter-item__more-link", attrs={"data-action": "toggle-more-filters", "aria-expanded":

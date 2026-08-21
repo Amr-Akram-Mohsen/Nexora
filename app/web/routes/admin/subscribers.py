@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify, request, render_template, make_response
 from app.web.routes.admin.helpers import apply_admin_guard
 from app.web.routes.admin.helpers import parse_pagination_params
-from app.domains.user.service.admin.admin import get_admin_subscribers_paginated
-from app.application.user.admin import delete_subscriber_workflow
+from app.domains.user.service.admin.admin import (
+    get_admin_subscribers_paginated,
+    delete_admin_subscriber,
+)
 
 bp = Blueprint("api_subscribers", __name__, url_prefix="/admin/subscribers")
 
@@ -42,7 +44,7 @@ def subscribers_rows():
 
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_subscriber(id):
-    success = delete_subscriber_workflow(id)
+    success = delete_admin_subscriber(id)
     if not success:
         return jsonify({"error": "Subscriber not found"}), 404
     return jsonify({"success": True})

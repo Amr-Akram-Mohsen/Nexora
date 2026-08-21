@@ -46,9 +46,7 @@ function fetchAndInjectHtml(url, targetElementId, loadingText = "Loading...", co
     });
 }
 
-// ==============================
 // JSON API WRAPPERS
-// ==============================
 function getCsrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.content || '';
 }
@@ -70,7 +68,7 @@ async function apiRequest(url, method = 'GET', body = null, customHeaders = {}) 
     try {
         const response = await fetch(url, { method, headers, body });
         let data = null;
-        
+
         // Some endpoints return 204 No Content
         if (response.status === 204) return null;
 

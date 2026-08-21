@@ -20,10 +20,7 @@ async function showComments(btn) {
     params.append("type", wrapper.dataset.type);
     params.append("id", wrapper.dataset.id);
 
-    // const textMsg = isReply ? 'replies' : 'comments';
-
     let opening = false;
-
 
     if (isReply) {
         const comment = wrapper;
@@ -35,7 +32,6 @@ async function showComments(btn) {
         params.append("parent_id", comment.dataset.commentId);
     }
     else {
-        // const parent = wrapper.closest(".detail-page__extra")
         // wrapper = parent.querySelector(".comments");
         wrapper = wrapper.querySelector(".comments");
         wrapper.classList.toggle("comments--collapsed");
@@ -48,7 +44,6 @@ async function showComments(btn) {
         icon.classList.toggle("fa-chevron-up", opening);
     }
     // Load ONLY the first time it's opened
-    // if (!opening) return;
     if (wrapper.dataset.loaded === "true") return;
 
     try {

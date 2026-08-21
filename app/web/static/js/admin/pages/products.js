@@ -1,40 +1,34 @@
-// ==============================
 // ADMIN — PRODUCTS CONTROL PANEL
 // products.js
-// ==============================
 
 (function () {
   'use strict';
 
-  // ── State ──────────────────────────────
   window.itemsController = null;
 
-  // ── Fetch Dashboard Stats ────────────────
   function loadDashboardStats() {
     window.api.get('/admin/products/health_stats')
       .then(data => {
         const total = data.total_items || 0;
-        
+
         if (window.itemsController) {
           window.itemsController.updateStatsUI(data, {
             total_items: 'stats-total-products',
             stale_sync_items: 'stats-stale-syncs'
           });
         }
-        
+
         const imgPct = total > 0 ? Math.round((data.items_with_images / total) * 100) : 0;
         document.getElementById('stats-image-coverage').textContent = imgPct + '%';
         document.getElementById('stats-meta-images').textContent = `${(total - data.items_with_images).toLocaleString()} missing`;
-        
+
         const brandPct = total > 0 ? Math.round((data.branded_items / total) * 100) : 0;
         document.getElementById('stats-brand-coverage').textContent = brandPct + '%';
         document.getElementById('stats-meta-brands').textContent = `${(total - data.branded_items).toLocaleString()} unbranded`;
-        
+
         const linkPct = total > 0 ? Math.round((data.items_with_links / total) * 100) : 0;
         document.getElementById('stats-link-coverage').textContent = linkPct + '%';
         document.getElementById('stats-meta-links').textContent = `${(total - data.items_with_links).toLocaleString()} missing links`;
-        
-
 
       })
       .catch(err => {
@@ -42,7 +36,6 @@
       });
   }
 
-  // ── Fetch meta for dropdowns ────────────
   function loadMeta() {
     return window.api.get('/admin/products/meta')
       .then(data => {
@@ -82,7 +75,6 @@
       });
   }
 
-  // ── Delete ───────────────────────────────
   function deleteItem(id, name, btn, modal) {
     showModal(
       'Delete Product',
@@ -123,8 +115,6 @@
     });
   }
 
-
-  // ── Event Wiring ─────────────────────────
   function init() {
     // Instantiate products controller
     window.itemsController = new AdminListController({
@@ -157,7 +147,7 @@
         e.preventDefault();
         const filterId = link.getAttribute('data-filter');
         const filterVal = link.getAttribute('data-val');
-        
+
         if (filterId) {
             const select = document.getElementById(filterId);
             if (select) {
@@ -176,17 +166,13 @@
       const modal = document.getElementById("inspect-product-modal");
       deleteItem(parseInt(btn.dataset.id, 10), btn.dataset.name, btn, modal);
     }
-    
+
     const tableContainer = document.getElementById("products-table");
     if (tableContainer) tableContainer.addEventListener("click", itemActionHandler);
 
     const inspectModal = document.getElementById("inspect-product-modal");
     if (inspectModal) inspectModal.addEventListener("click", itemActionHandler);
   }
-
-
-
-
 
   document.addEventListener('DOMContentLoaded', init);
 })();

@@ -26,9 +26,11 @@ from app.application.interaction.newsletter import (
 from app.application.interaction.public import (
     handle_interaction_workflow,
     record_item_click_workflow,
-    track_view_workflow,
-    track_impression_workflow,
-    track_click_workflow,
+)
+from app.domains.interaction.service import (
+    record_view,
+    track_recommendation_impression,
+    track_recommendation_click,
 )
 from app.domains.interaction.constants import INTERACTION_TYPE
 from app.shared.utils.logging import log_route_start, log_route_success
@@ -227,7 +229,9 @@ def add_view():
     user = current_user if current_user.is_authenticated else None
     ip = None if user else get_client_ip()
 
-    result = track_view_workflow(target_id, target_type, user, ip)
+    result = record_view(target_id, target_type, user, ip)
+    from app.core.extensions import db
+    db.session.commit()
     return jsonify(result)
 
 
@@ -324,11 +328,14 @@ def track_impression():
         return jsonify({"success": False, "error": "Missing parameters"}), 400
 
     user_id = current_user.id if current_user.is_authenticated else None
-    success = track_impression_workflow(entity_type, entity_ids, context_id, user_id)
+    from app.core.extensions import db
+    success = track_recommendation_impression(entity_type, entity_ids, context_id, user_id)
 
     if success:
+        db.session.commit()
         return jsonify({"success": True})
     else:
+        db.session.rollback()
         return jsonify({"success": False, "error": "Failed to track impression"}), 500
 
 
@@ -344,11 +351,14 @@ def track_click():
         return jsonify({"success": False, "error": "Missing parameters"}), 400
 
     user_id = current_user.id if current_user.is_authenticated else None
-    success = track_click_workflow(entity_type, entity_id, context_id, user_id)
+    from app.core.extensions import db
+    success = track_recommendation_click(entity_type, entity_id, context_id, user_id)
 
     if success:
+        db.session.commit()
         return jsonify({"success": True})
     else:
+        db.session.rollback()
         return jsonify({"success": False, "error": "Failed to track click"}), 500
 
 

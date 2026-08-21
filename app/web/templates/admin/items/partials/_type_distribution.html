@@ -4,7 +4,7 @@
     {% set pct = ((product.count / total) * 100) | round(1) if total > 0 else 0 %}
     {% set color = colors[loop.index0 % colors | length] %}
     {% set typeName = product.type | capitalize %}
-    
+
     <div class="flex items-center w-full gap-3 py-1 {% if product.type != 'Uncategorized' %}dist-row-link hover-bg-subtle rounded-md px-2 transition-colors cursor-pointer{% endif %}"
          {% if product.type != 'Uncategorized' %}onclick="window.location.href='/admin/products?product_type={{ product.type | urlencode }}'"{% endif %}>
       <div class="overview-breakdown-icon" style="color: {{ color }};">

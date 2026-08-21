@@ -14,8 +14,6 @@
   data-domain-type="content">
   <div class="container">
 
-
-    <!-- Top Nav Row -->
     <div class="detail-page__top flex items-center justify-between gap-6">
       <div class="detail-page__breadcrumbs-wrapper flex items-center">
         {% include "content/features/breadcrumbs.html" %}
@@ -25,7 +23,6 @@
       </div>
     </div>
 
-    <!-- Main -->
     <div class="detail-page__main flex flex-col">
 
       <div class="detail-page__header">
@@ -37,7 +34,6 @@
       <div class="detail-page__content">
         {% block base_content %}{% endblock %}
 
-        {# ── Products Mentioned In Article (directly linked via matcher) ── #}
         {% if content.linked_items and content.linked_items|length > 0 %}
         {% from "content/cards/item-compact.html" import render_item_compact_card %}
         {% call recommendation_box("Products Mentioned", "fas fa-box", "linked") %}
@@ -51,7 +47,6 @@
 
         {% from "components/ui/grid.html" import grid %}
 
-        {# ── Shop Related Products (scored recommendations from Content↔Product matcher) ── #}
         {# Only render when matched_items exist AND they differ from directly linked products #}
         {% if matched_items and matched_items|length > 0 %}
         {% set linked_ids = content.linked_items | map(attribute='id') | list if content.linked_items else [] %}
@@ -66,14 +61,11 @@
         {% endif %}
         {% endif %}
 
-        {# ── Author and Source Discovery Carousels ── #}
         {% block author_carousel %}{% endblock %}
         {% block source_carousel %}{% endblock %}
 
-
       </div>
 
-      <!-- Extra (Moved inside Main) -->
       <div class="detail-page__extra">
         {% include "components/interactions/interactions.html" %}
         {% include "components/interactions/comments.html" %}
@@ -95,7 +87,6 @@
 
     </section>
 
-    <!-- Sidebar -->
     <aside class="detail-page__sidebar">
       {% block base_sidebar %}
       {% if trending_contents and trending_contents|length > 0 %}

@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                {# Basic Info #}
+
                 <tr class="table-row-group">
                     <td colspan="{{ products|length + 1 }}">General Information</td>
                 </tr>
@@ -73,7 +73,6 @@
                     {% endfor %}
                 </tr>
 
-                {# Dynamic Specs from full_details #}
                 {% for cat in all_categories %}
                 <tr class="table-row-group">
                     <td colspan="{{ products|length + 1 }}">{{ cat|capitalize }}</td>

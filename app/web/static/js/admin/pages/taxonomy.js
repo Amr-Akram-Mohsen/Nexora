@@ -1,7 +1,5 @@
-// ==============================
 // ADMIN — TAXONOMY MANAGEMENT
 // taxonomy.js
-// ==============================
 
 (function () {
   'use strict';
@@ -70,7 +68,6 @@
   let intentFacetsController = null;
   let priceTierFacetsController = null;
 
-  // ── Slug helper (mirrors Python's generate_slug) ─────────────
   function slugify(str) {
     return (str || '')
       .toLowerCase()
@@ -80,7 +77,6 @@
       .replace(/^-+|-+$/g, '');
   }
 
-  // ── Tab Switching ─────────────────────────────────────────────
   function initTabs() {
     initAdminTabs('taxonomy-tabs', loadTab);
   }
@@ -99,7 +95,7 @@
   function loadTab(tab) {
     const getController = controllers[tab];
     if (!getController) return;
-    
+
     const controller = getController();
     if (!controller) return;
 
@@ -111,7 +107,6 @@
     }
   }
 
-  // ── CATEGORIES ─────────────────────────────
   function createCategory() {
     const nameInput = document.getElementById('new-category-name');
     const name = nameInput.value.trim();
@@ -150,7 +145,6 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── BRANDS ───────────────────────────────
   function createBrand() {
     const name = document.getElementById('new-brand-name').value.trim();
     const industry = document.getElementById('new-brand-industry').value.trim();
@@ -190,7 +184,6 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── TOPICS ───────────────────────────────
   function createTopic() {
     const name = document.getElementById('new-topic-name').value.trim();
     if (!name) { showToast('Topic name is required.', 'error'); return; }
@@ -228,7 +221,6 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── SECTIONS ─────────────────────────────
   function toggleSectionActive(id, isActive, el) {
     window.api.put(`/admin/taxonomy/sections/${id}`, { is_active: isActive })
       .then(d => {
@@ -239,7 +231,6 @@
       .catch(() => { showToast('Update failed.', 'error'); el.checked = !isActive; });
   }
 
-  // ── ATTRIBUTES ───────────────────────────
   function createAttribute() {
     const name = document.getElementById('new-attribute-name').value.trim();
     if (!name) { showToast('Attribute name is required.', 'error'); return; }
@@ -267,7 +258,6 @@
     });
   }
 
-  // ── Global table event delegation ────────
   function initTableDelegation() {
     document.addEventListener('click', e => {
       const btn = e.target.closest('[data-action]');
@@ -294,7 +284,7 @@
       // Duplicate detection actions
       if (action === 'find-duplicates') openDuplicatesModal(domain);
       if (action === 'merge-duplicate') mergeDuplicate(domain, sourceId, targetId, btn);
-      
+
       // Insight suggestions
       if (action === 'apply-insight') {
           applyInsightSuggestion(id, btn.dataset.insightType, btn.dataset.suggestedId);
@@ -314,11 +304,10 @@
     });
   }
 
-  // ── DUPLICATES LOGIC ───────────────────────
   function openDuplicatesModal(domain) {
     const modal = document.getElementById('admin-duplicates-modal');
     if (modal) modal.classList.add('active');
-    
+
     if (typeof fetchAndInjectHtml === 'function') {
       fetchAndInjectHtml(`/admin/taxonomy/duplicates?type=${domain}`, 'admin-duplicates-body', 'Scanning for duplicates...');
     }
@@ -357,7 +346,6 @@
     }
   }
 
-  // ── Slug Preview Wiring ──────────────────
   function initSlugPreviews() {
     const pairs = [
       ['new-category-name', 'new-category-slug-preview'],
@@ -376,7 +364,6 @@
     });
   }
 
-  // ── Create Buttons ───────────────────────
   function initCreateButtons() {
     document.getElementById('create-category-btn').addEventListener('click', createCategory);
     document.getElementById('create-brand-btn').addEventListener('click', createBrand);
@@ -396,7 +383,6 @@
     });
   }
 
-  // ── Init ─────────────────────────────────
   function init() {
     categoriesController = new AdminListController({
       domain: 'categories',

@@ -11,7 +11,7 @@
 ) }}
 <div class="insights-section">
     <div class="user-analytics-dashboard grid grid-cols-3 gap-4">
-        
+
         {% call admin_panel("Recommendation Receptivity", "System-wide CTR for algorithmic recommendations") %}
         <div>
             <div id="receptivity-ctr" class="text-4xl font-bold text-[var(--brand-purple)]">—%</div>
@@ -32,7 +32,7 @@
         <div>
             <canvas id="powerUserChart" data-chart="doughnut" data-chart-payload="power-user-data"></canvas>
         </div>
-        <!-- Mock payload until we connect it to backend routes properly -->
+
         <script type="application/json" id="power-user-data">
         {
             "labels": ["Active", "Inactive"],
@@ -87,8 +87,6 @@
 </div>
 {% endblock %}
 
-
-
 {% block custom_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/core/charts.js') }}"></script>
@@ -100,13 +98,13 @@
         .then(data => {
             const receptivityCtr = document.getElementById('receptivity-ctr');
             if (receptivityCtr) receptivityCtr.textContent = data.receptivity_ctr + '%';
-            
+
             const receptivityClicks = document.getElementById('receptivity-clicks');
             if (receptivityClicks) receptivityClicks.textContent = parseInt(data.recommendation_clicks).toLocaleString();
-            
+
             const receptivityImpressions = document.getElementById('receptivity-impressions');
             if (receptivityImpressions) receptivityImpressions.textContent = parseInt(data.recommendation_impressions).toLocaleString();
-            
+
             const churnRiskCount = document.getElementById('churn-risk-count');
             if (churnRiskCount) churnRiskCount.textContent = parseInt(data.churn_risk_count).toLocaleString();
         }).catch(err => console.log('Mocking data until hooked up', err));

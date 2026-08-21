@@ -1,5 +1,3 @@
-/* --- Breadcrumbs --- */
-
 .breadcrumbs {
   margin: 0;
   padding: 0;
@@ -17,12 +15,8 @@
 }
 
 .breadcrumbs li {
-  /* display: inline-flex; */
-  /* align-items: center; */
   position: relative;
 }
-
-/* --- Breadcrumb Links --- */
 
 .breadcrumb-link {
   color: var(--muted-foreground);
@@ -50,7 +44,6 @@
   color: var(--foreground);
 }
 
-/* --- Separators --- */
 .breadcrumbs .separator {
   font-size: 8px;
   color: var(--muted-foreground);
@@ -63,7 +56,6 @@
   padding: 0 0.125rem;
 }
 
-/* --- Current Page --- */
 .breadcrumb-current {
   color: var(--muted-foreground);
   font-weight: var(--weight-md);

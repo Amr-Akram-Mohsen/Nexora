@@ -5,7 +5,6 @@
 
 @layer reset, vendor, tokens, base, layout, components, domains, utilities, admin;
 
-/* 1. Base - Variables & Fundamentals */
 @import "all.min.css" layer(vendor);
 @import "base/variables.css" layer(tokens);
 @import "base/reset.css" layer(reset);
@@ -14,14 +13,12 @@
 
 @import "components/theme-variants.css" layer(components);
 
-/* 2. Layout - Site Structure */
 @import "layout/header.css" layer(layout);
 @import "content/catalog/search.css" layer(domains);
 @import "layout/footer.css" layer(layout);
 @import "layout/grid.css" layer(layout);
 @import "layout/logo.css" layer(layout);
 
-/* 3. Components - Reusable UI Elements */
 @import "components/ui/button.css" layer(components);
 @import "components/ui/form.css" layer(components);
 @import "components/ui/badge.css" layer(components);
@@ -40,12 +37,11 @@
 
 @import "commercial/catalog/compare.css" layer(domains);
 @import "commercial/features/rating.css" layer(domains);
-/* Features */
+
 @import "features/page/static-pages.css" layer(domains);
 
-/* 5. Utilities - Global Helpers */
 @import "utilities/alerts.css" layer(utilities);
 @import "utilities/helpers.css" layer(utilities);
 @import "utilities/animations.css" layer(utilities);
 @import "utilities/flex.css" layer(utilities);
-@import "utilities/typography.css" layer(utilities);
+@import "utilities/typography.css" layer(utilities);

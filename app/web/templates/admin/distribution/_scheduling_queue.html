@@ -6,7 +6,7 @@
         <div class="flex justify-between items-start">
             <div class="flex items-center gap-2">
                 <span class="platform-icon">{{ product.platform_icon }}</span>
-                <span class="platform-name font-bold">{{ product.platform }}</span>
+                <span class="platform-name font-semibold">{{ product.platform }}</span>
             </div>
             {% if product.is_overdue %}
             {{ badge(text="OVERDUE", class="status-badge badge-danger") }}
@@ -20,7 +20,7 @@
         </h4>
 
         <div class="rec-action-issue flex gap-2 items-center">
-            <span class="font-bold">Date:</span>
+            <span class="queue-date-label">Date:</span>
             <span>
                 {{ product.publish_date.strftime('%Y-%m-%d %H:%M') }}
             </span>
@@ -31,7 +31,7 @@
         </div>
     </div>
     {% else %}
-    <div class="border rounded bg-light">
+    <div class="empty-state-box">
         No upcoming scheduled posts.
     </div>
     {% endfor %}

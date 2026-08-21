@@ -12,7 +12,7 @@
 {% block card_link %}{{ url_for('product.item_page', product_id=product.id) }}{% endblock %}
 
 {% block image_content %}
-  {# Product type tag #}
+
   {% if product.product_type %}
   <div class="card__tag card__tag--{{ product.product_type }}">{{ product.product_type }}</div>
   {% endif %}
@@ -21,9 +21,9 @@
 
 {% block image_overlays %}
   {{ badge('Product', variant='secondary') }}
-  {# Compare toggle #}
+
   {{ button(class="compare-toggle-btn", attrs={"data-id": product.id, "data-name": product.name, "title": "Add to compare", "aria-label": "Add " ~ product.name ~ " to compare"}, icon="fas fa-balance-scale", unstyled=True) }}
-  {# Discount badge #}
+
   {% if best_link and best_link.old_price and best_link.price %}
   {% set discount = ((best_link.old_price - best_link.price) / best_link.old_price * 100) | int %}
   {% if discount > 0 %}

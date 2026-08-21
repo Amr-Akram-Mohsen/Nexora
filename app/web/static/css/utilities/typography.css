@@ -20,7 +20,6 @@
   line-height: 1.2;
 }
 
-/* Page-level title — used on detail pages */
 .page-title {
   font-size: var(--text-page-title);
   font-weight: var(--weight-display);
@@ -39,7 +38,6 @@
   margin: 0;
 }
 
-/* Muted body text */
 .text-muted {
   color: var(--muted-foreground);
 }
@@ -49,9 +47,6 @@
   font-size: var(--text-sm);
 }
 
-
-
-/* Keyboard shortcut keycap badge */
 .kbd {
   display: inline-flex;
   align-items: center;
@@ -68,7 +63,6 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-/* Standardized metadata dot separator */
 .meta-dot {
   display: inline-flex;
   align-items: center;

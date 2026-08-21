@@ -30,7 +30,6 @@ function handleMobileMenu(e) {
     return true;
 }
 
-
 // Header scroll effect & Back to Top
 function initHeaderScroll() {
     const header = document.querySelector('.site-header');
@@ -58,4 +57,3 @@ function initHeaderScroll() {
         });
     }
 }
-

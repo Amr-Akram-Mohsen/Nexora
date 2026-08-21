@@ -9,7 +9,7 @@
 {% block admin_content %}
 
 {% call inspect_page_shell("User Details", url_for('admin.dashboard_users'), "Back to Users", title) %}
-      
+
       {% if inspect_header is defined and inspect_header %}
       <div class="inspect-header-block">
         <h2>{{ inspect_header.name }}</h2>
@@ -19,7 +19,7 @@
           {% if inspect_header.last_active %}
           <span><strong>Last Active:</strong> {{ inspect_header.last_active|truncate(16, True, '')|replace('T', ' ') }}</span>
           {% endif %}
-          
+
           {% set days = inspect_header.recency_days %}
           {% if days is none %}
             {{ badge("Never", variant="danger") }}
@@ -59,21 +59,21 @@
 
       {% call inspect_section('Management Actions', divider=false) %}
       {% call action_group(extra_class='flex-wrap') %}
-      
+
       {{ action_button(
           "Demote to User" if is_admin else "Promote to Admin",
           action_type="toggle-admin",
           extra_class="user-action-toggle-admin",
           attrs={"data-action": "toggle-admin", "data-id": inspect_id, "data-name": user_name}
       ) }}
-      
+
       {{ action_button(
           "Deactivate Account" if is_active else "Activate Account",
           action_type="toggle-active",
           extra_class="user-action-toggle-active",
           attrs={"data-action": "toggle-active", "data-id": inspect_id, "data-is-active": is_active|string|lower, "data-name": user_name}
       ) }}
-      
+
       {{ action_button(
           "Debug Personalization",
           action_type="view",
@@ -81,7 +81,7 @@
           extra_class="inspect-action-debug-recs",
           attrs={"data-action": "inspect", "data-domain": "recommendations/user_interests", "data-id": inspect_id}
       ) }}
-      
+
       {{ action_button(
           "Delete User",
           action_type="delete",
@@ -89,7 +89,7 @@
           extra_class="user-action-delete",
           attrs={"data-action": "delete-user", "data-id": inspect_id, "data-name": user_name}
       ) }}
-      
+
       {% endcall %}
       {% endcall %}
 

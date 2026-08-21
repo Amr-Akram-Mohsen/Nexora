@@ -12,9 +12,8 @@
 
 <div class="admin-dashboard-page">
 
-    <!-- Row 1: Leaderboards -->
     <div class="gap-6">
-        <!-- Quality Tier Leaderboard -->
+
         {% call admin_panel("Quality Tier Leaderboard", "Ranked source list by average quality score.") %}
         <div>
             {% call standard_table(["Source", "Avg Quality", "Tier"], class="dashboard-table", body_id="quality-leaderboard-tbody") %}
@@ -23,7 +22,6 @@
         </div>
         {% endcall %}
 
-        <!-- Scrape Coverage Leaderboard -->
         {% call admin_panel("Scrape Coverage Leaderboard", "Sources ordered by successful full-text extraction percentage.") %}
         <div>
             {% call standard_table(["Source", "Scrape %", "Health"], class="dashboard-table", body_id="scrape-leaderboard-tbody") %}
@@ -33,9 +31,8 @@
         {% endcall %}
     </div>
 
-    <!-- Row 2: Charts -->
     <div class="gap-6">
-        <!-- Per-source word count distribution -->
+
         {% call admin_panel("Word Count Distribution", "Average word count per source to identify thin-content suppliers.") %}
         <div class="panel-body-padded">
             <div>
@@ -44,7 +41,6 @@
         </div>
         {% endcall %}
 
-        <!-- Ingestion Yield Rate Tracking -->
         {% call admin_panel("Ingestion Yield Rate", "Content produced / fetch attempts per channel over time.") %}
         <div class="panel-body-padded">
             <div>
@@ -54,9 +50,8 @@
         {% endcall %}
     </div>
 
-    <!-- Row 3: Freshness -->
     <div>
-        <!-- Content Freshness Index -->
+
         {% call admin_panel("Content Freshness Index", "Sources ranked by the staleness of their most recent content.") %}
         <div>
             {% call standard_table(["Source", "Last Ingested", "Days Stale", "Severity"], class="dashboard-table", body_id="freshness-index-tbody") %}

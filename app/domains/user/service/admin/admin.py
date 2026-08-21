@@ -14,12 +14,41 @@ def toggle_admin_user(id):
     from app.shared.utils.admin_helpers import toggle_model_flag_workflow
     return toggle_model_flag_workflow(User, id, 'is_admin')
 
+def deactivate_admin_user(id: int) -> bool:
+    from app.domains.user.service import deactivate_user
+    success = deactivate_user(id)
+    if success:
+        db.session.commit()
+    return success
+
+def activate_admin_user(id: int) -> bool:
+    from app.domains.user.service import activate_user
+    success = activate_user(id)
+    if success:
+        db.session.commit()
+    return success
+
+def delete_admin_subscriber(sub_id: int) -> bool:
+    from app.shared.utils.admin_helpers import delete_model_workflow
+    return delete_model_workflow(NewsletterSubscriber, sub_id)
+
 def get_admin_user_inspect_raw(id):
     from sqlalchemy.orm import selectinload
     from app.domains.recommendation.models import UserInterest
     stmt_user = select(User).options(selectinload(User.user_interests).selectinload(UserInterest.entity_scores), selectinload(User.newsletter_subscription)).where(User.id == id)
     user = db.session.scalar(stmt_user)
     return user
+
+def get_admin_user_inspect_data(user_id: int) -> dict:
+    user = get_admin_user_inspect_raw(user_id)
+    if not user:
+        return None
+    from app.domains.user.service.admin.analytics import get_user_analytics_metrics
+    from app.domains.user.serializers import serialize_user_inspect_dto
+    metrics = get_user_analytics_metrics(user_id)
+    brands_map, categories_map, topics_map, items_map, articles_map = build_user_inspect_maps(user)
+    dto = serialize_user_inspect_dto(user, metrics, brands_map, categories_map, topics_map, items_map, articles_map)
+    return {'user_dto': dto}
 
 def build_user_inspect_maps(user):
     from app.domains.taxonomy.models import Category, Entity

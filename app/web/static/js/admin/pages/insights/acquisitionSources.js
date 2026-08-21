@@ -20,22 +20,22 @@ export function renderAcquisitionSources(timeFrame = "7_days") {
 function renderVelocityChart(data) {
   const container = document.getElementById("acquisition-velocity-chart");
   if (!container) return;
-  
+
   if (data.labels.length === 0) {
     renderEmptyState(container, "No data available");
     return;
   }
-  
+
   if (!document.getElementById("velocityCanvas")) {
       container.innerHTML = '<canvas id="velocityCanvas"></canvas>';
   }
-  
+
   const ctx = document.getElementById("velocityCanvas").getContext("2d");
-  
+
   if (acquisitionCharts.velocity) {
       acquisitionCharts.velocity.destroy();
   }
-  
+
   // Nexora theme colors
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
   data.datasets.forEach((ds, i) => {
@@ -64,24 +64,24 @@ function renderVelocityChart(data) {
 function renderContributionChart(data) {
   const container = document.getElementById("source-contribution-chart");
   if (!container) return;
-  
+
   if (data.labels.length === 0) {
     renderEmptyState(container, "No data available");
     return;
   }
-  
+
   if (!document.getElementById("contributionCanvas")) {
       container.innerHTML = '<canvas id="contributionCanvas"></canvas>';
   }
-  
+
   const ctx = document.getElementById("contributionCanvas").getContext("2d");
-  
+
   if (acquisitionCharts.contribution) {
       acquisitionCharts.contribution.destroy();
   }
-  
+
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#6366f1'];
-  
+
   acquisitionCharts.contribution = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -103,22 +103,22 @@ function renderContributionChart(data) {
 function renderAuthorityChart(data) {
   const container = document.getElementById("authority-distribution-chart");
   if (!container) return;
-  
+
   if (data.labels.length === 0) {
     renderEmptyState(container, "No data available");
     return;
   }
-  
+
   if (!document.getElementById("authorityCanvas")) {
       container.innerHTML = '<canvas id="authorityCanvas"></canvas>';
   }
-  
+
   const ctx = document.getElementById("authorityCanvas").getContext("2d");
-  
+
   if (acquisitionCharts.authority) {
       acquisitionCharts.authority.destroy();
   }
-  
+
   acquisitionCharts.authority = new Chart(ctx, {
       type: 'bar',
       data: {

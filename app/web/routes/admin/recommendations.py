@@ -15,11 +15,9 @@ from app.domains.recommendation.service.admin.admin import (
     get_admin_recommendation_health,
     get_admin_recommendation_trend,
     get_admin_slot_analysis,
-)
-from app.application.recommendation.admin import (
-    unlink_match_workflow,
-    get_match_inspect_workflow,
-    get_user_interests_workflow,
+    get_admin_match_inspect_data,
+    get_admin_user_interests_data,
+    delete_admin_match,
 )
 from app.web.routes.admin.builders.recommendation_builder import (
     build_match_inspect_view_model,
@@ -84,7 +82,7 @@ def matches_rows():
 @bp.route("/matches/<int:content_id>/inspect", methods=["GET"])
 def inspect_match(content_id):
     """Return server-rendered HTML for the recommendation inspect modal body."""
-    aggregated_data = get_match_inspect_workflow(content_id)
+    aggregated_data = get_admin_match_inspect_data(content_id)
     if not aggregated_data:
         return "Content not found.", 404
 
@@ -119,7 +117,7 @@ def slot_analysis():
 
 @bp.route("/user_interests/<int:user_id>/inspect", methods=["GET"])
 def inspect_user_interests(user_id):
-    aggregated_data = get_user_interests_workflow(user_id)
+    aggregated_data = get_admin_user_interests_data(user_id)
     if not aggregated_data:
         return "User not found.", 404
 
@@ -130,5 +128,5 @@ def inspect_user_interests(user_id):
 @bp.route("/matches/<int:content_id>/<int:product_id>", methods=["DELETE"])
 def unlink_match(content_id, product_id):
     """Remove a content-product association."""
-    unlink_match_workflow(content_id, product_id)
+    delete_admin_match(content_id, product_id)
     return jsonify({"success": True, "message": "Association removed."})

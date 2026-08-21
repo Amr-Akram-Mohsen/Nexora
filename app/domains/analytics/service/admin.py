@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import func, select, cast, Date
 from app.core.extensions import db
+from app.infrastructure import cache
 from app.domains.content.models import Content, Article, Video, Post
 from app.domains.taxonomy.models import Category, Source
 from app.domains.product.models import Product
@@ -8,6 +9,7 @@ from app.domains.user.models import User
 from app.domains.interaction.service.admin.analytics import get_interactions_breakdown
 from app.domains.interaction.models import Share
 
+@cache.memoize(timeout=300)
 def get_admin_top_contents():
     rows = db.session.execute(
         select(Content.id, Content.title, Content.object_type, Content.view_count)
@@ -21,6 +23,7 @@ def get_admin_top_contents():
         "view_count": r["view_count"] or 0,
     } for r in rows]
 
+@cache.memoize(timeout=300)
 def get_admin_top_items():
     rows = db.session.execute(
         select(Product.id, Product.name, Product.product_type, Product.click_count, Product.rating)
@@ -175,6 +178,7 @@ def _build_recent_ingested(recent_rows, now):
         })
     return recent_ingested
 
+@cache.memoize(timeout=300)
 def get_admin_dashboard_stats_data():
     """Consolidated helper to compute all dashboard statistics."""
     # ── Interaction stats (single cached call) ────────────────────────────
@@ -389,6 +393,7 @@ def _calculate_authority_distribution(source_scores):
         else: dist["Low (0-33)"] += count
     return dist
 
+@cache.memoize(timeout=300)
 def get_admin_content_dashboard_stats():
     type_counts = db.session.execute(select(Content.object_type, func.count(Content.id)).group_by(Content.object_type)).all()
     origin_counts = db.session.execute(select(Content.ingestion_origin, func.count(Content.id)).group_by(Content.ingestion_origin)).all()
@@ -444,30 +449,30 @@ def get_admin_content_dashboard_stats():
         "origin_table": origin_table
     }
 
+@cache.memoize(timeout=300)
 def get_admin_pipeline_stats():
-    origins = db.session.execute(select(Content.ingestion_origin).distinct()).scalars().all()
-    stats_list = []
+    rows = db.session.execute(
+        select(Content.ingestion_origin, Article.status, func.count(Article.id))
+        .join(Content, Content.object_id == Article.id)
+        .where(Content.object_type == "article", Content.ingestion_origin.isnot(None))
+        .group_by(Content.ingestion_origin, Article.status)
+    ).all()
     
-    for origin in origins:
-        if not origin: continue
-        
-        counts = db.session.execute(
-            select(Article.status, func.count(Article.id))
-            .join(Content, Content.object_id == Article.id)
-            .where(Content.object_type == "article")
-            .where(Content.ingestion_origin == origin)
-            .group_by(Article.status)
-        ).all()
-        
-        status_map = {status: count for status, count in counts}
-        total = sum(status_map.values())
-        if total > 0:
-            stats_list.append({
+    origins_map = {}
+    for origin, status, count in rows:
+        if not origin:
+            continue
+        if origin not in origins_map:
+            origins_map[origin] = {
                 "origin": origin,
-                "pending": status_map.get("pending", 0),
-                "enriching": status_map.get("enriching", 0),
-                "failed": status_map.get("failed", 0),
-                "complete": status_map.get("complete", 0),
-                "total": total
-            })
-    return stats_list
+                "pending": 0,
+                "enriching": 0,
+                "failed": 0,
+                "complete": 0,
+                "total": 0
+            }
+        if status in origins_map[origin]:
+            origins_map[origin][status] = count
+        origins_map[origin]["total"] += count
+        
+    return [s for s in origins_map.values() if s["total"] > 0]

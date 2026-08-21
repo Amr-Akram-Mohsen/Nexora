@@ -205,7 +205,6 @@ body.dark-mode .newsletter-more a {
   .newsletter-page-content {
     grid-template-columns: 1fr;
   }
-
   .newsletter-page-subscribe {
     grid-row: auto;
     position: static;
@@ -217,16 +216,13 @@ body.dark-mode .newsletter-more a {
   .newsletter-subscription {
     margin: 2rem 0;
   }
-
   .newsletter-block,
   .newsletter-page-panel {
     padding: 1rem;
   }
-
   .newsletter-page {
     padding: 2rem 0 3rem;
   }
-
   .newsletter-page-hero h1 {
     font-size: var(--text-4xl);
   }

@@ -3,24 +3,20 @@
 {% from "components/ui/core.html" import button %}
 <div class="interaction-panel">
 
-  <!-- Left actions -->
   <div class="interaction-panel__actions flex items-center justify-between gap-2 flex-wrap">
     <div class="flex items-center gap-2 flex-wrap">
       {% set v = 'outline' %}
       {% set class = 'interaction-btn gap-2 ' %}
       {% set icon_class = ' interaction-icon' %}
 
-      <!-- Like -->
       {{ button(text=like_count if like_count > 0 else '', variant=v, class=class ~ "react-btn react-btn--like",
       icon="fa fa-heart" ~ icon_class, attrs={"data-reaction": "like", "aria-label": "Like"})
       }}
 
-      <!-- Dislike -->
       {{ button(variant=v, class=class ~ "react-btn react-btn--dislike",
       icon="fa fa-thumbs-down" ~ icon_class, attrs={"data-reaction": "dislike", "aria-label": "Dislike"})
       }}
 
-      <!-- Save / Watch Later -->
       {% if content.object_type == 'video' %}
       {{ button(variant=v, class=class ~ "save-btn",
       icon="fa fa-clock" ~ icon_class, attrs={"data-collection": "Watch Later", "title": "Watch Later", "aria-label":
@@ -32,13 +28,11 @@
       }}
       {% endif %}
 
-      <!-- Share -->
       {{ button(variant=v, class=class ~ "share-btn",
       icon="fa fa-share-alt", attrs={"aria-label": "Share"})
       }}
     </div>
 
-    <!-- Right side (comment count toggle button) -->
     {% call button(text=comment_count ~ " comments",
     btn_span_class="comments-toggle-content",
     variant=v, icon="fa fa-comment",

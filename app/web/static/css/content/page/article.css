@@ -1,7 +1,6 @@
 @import "style.css";
 @import "article_content.css";
 
-/* --- Article Header --- */
 .article-header {
   margin-bottom: 0.75rem;
 }
@@ -38,9 +37,6 @@
   border-top: 1px solid var(--border);
 }
 
-/* --- Meta Items --- */
-
-
 .meta-author i,
 .meta-source i,
 .meta-date i,
@@ -56,7 +52,6 @@
   font-weight: var(--weight-md);
   color: var(--foreground);
   transition: color 0.15s ease;
-
   /* text-decoration: none; */
 }
 
@@ -77,20 +72,17 @@
   opacity: 0.6;
 }
 
-
 .trusted-badge {
   color: var(--muted-foreground);
   font-size: 0.85em;
   opacity: 0.7;
 }
 
-/* --- Content Area --- */
 .article-content {
   max-width: var(--content-max-width);
   margin-top: var(--space-8);
 }
 
-/* AI Summary Box */
 .article-summary-box {
   background: rgba(var(--domain-primary-rgb), 0.03);
   border: 1px solid rgba(var(--domain-primary-rgb), 0.12);
@@ -123,7 +115,6 @@
   opacity: 0.85;
 }
 
-/* Rich Text */
 .article-rich-text {
   font-size: var(--text-base);
   line-height: 1.8;
@@ -156,7 +147,6 @@
   letter-spacing: -0.015em;
 }
 
-/* --- Sections (Metadata, Sources, Recommendations) --- */
 .article-semantic-metadata,
 .recommendation-box {
   margin-top: 0.5rem;
@@ -182,7 +172,6 @@
   flex-shrink: 0;
 }
 
-/* --- Sources Section (Unboxed Editorial Style) --- */
 .article-sources-box {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--border);
@@ -271,13 +260,11 @@
   display: inline-flex;
 }
 
-/* --- Recommendation icons --- */
 .recommendation-box__icon {
   color: var(--domain-primary);
   font-size: 0.875em;
 }
 
-/* --- Event Summary Card --- */
 .event-summary-card {
   background: rgba(var(--domain-primary-rgb), 0.03);
   border: 1px solid rgba(var(--domain-primary-rgb), 0.1);

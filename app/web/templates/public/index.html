@@ -1,4 +1,3 @@
-<!-- index.html -->
 {% extends "layout/base.html" %}
 {% block title %}Nexora | Home{% endblock %}
 {% block page_css %}
@@ -25,7 +24,6 @@
   {% endcall %}
   {% endif %}
 
-  {# ── Core editorial sections (existing) ─────────────────────────────── #}
   {% set core_sections = [
   {"section": "deals", "section_title": "top deals", "cards": top_deals, "target_type": "commercial", "carousel": true
   },
@@ -44,37 +42,24 @@
   {% endcall %}
   {% endfor %}
 
-  {# ── Popular This Week ────────────────────────────────────────────────
-  Cross-section trending: all content types, ranked by views (7 days).
-  #}
   {% if popular_this_week %}
   {% call section("Popular This Week", more_url=false) %}
   {{ grid(popular_this_week, carousel=true) }}
   {% endcall %}
   {% endif %}
 
-  {# ── Recommended Articles ─────────────────────────────────────────────
-  Article-type trending feed (14-day window).
-  #}
   {% if recommended_articles %}
   {% call section("Recommended Articles", more_url=false) %}
   {{ grid(recommended_articles, carousel=true) }}
   {% endcall %}
   {% endif %}
 
-  {# ── Recommended Videos ───────────────────────────────────────────────
-  Video-type trending feed (14-day window).
-  #}
   {% if recommended_videos %}
   {% call section("Recommended Videos", more_url=false) %}
   {{ grid(recommended_videos, carousel=true) }}
   {% endcall %}
   {% endif %}
 
-  {# ── Featured Products ────────────────────────────────────────────────
-  Items ranked by recent views + clicks (7-day window).
-  Shown after a cross-domain "Shop What You Read" bridge strip.
-  #}
   {% if featured_products %}
   {% include "partials/_cross_domain_bridge.html" %}
 
@@ -83,26 +68,18 @@
   {% endcall %}
   {% endif %}
 
-  {# ── Editor's Picks ───────────────────────────────────────────────────
-  Content with the highest editorial score (Content.score > 0).
-  #}
   {% if editors_picks %}
   {% call section("Editor's Picks", more_url=false) %}
   {{ grid(editors_picks) }}
   {% endcall %}
   {% endif %}
 
-  {# ── Trending Brands ──────────────────────────────────────────────────
-  Brands ranked by recent content view-count (7-day window).
-  Each brand links to its section/catalog page.
-  #}
   {% if trending_brands %}
   {% call section("Trending Brands", more_url=false) %}
   {% include "partials/_trending_brands_strip.html" %}
   {% endcall %}
   {% endif %}
 
-  {# ── Newsletter strip ─────────────────────────────────────────────── #}
   <div class="newsletter-subscription">
     <div class="newsletter-block flex flex-col items-center">
       {% with

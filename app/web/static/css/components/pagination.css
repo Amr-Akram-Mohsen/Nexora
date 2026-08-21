@@ -2,7 +2,6 @@
   margin-top: 1rem;
 }
 
-/* Base Buttons & Pages */
 .pagination__btn {
   width: 2.25rem;
   height: 2.25rem;
@@ -29,7 +28,6 @@
   text-decoration: none;
 }
 
-/* Interactive States */
 .pagination__btn:hover:not(.is-disabled) {
   background: var(--secondary);
   border-color: rgba(var(--domain-primary-rgb), var(--alpha-strong));
@@ -69,7 +67,6 @@
 }
 
 @media (max-width: 480px) {
-
   .pagination__page,
   .pagination__btn {
     width: 2rem;

@@ -1,5 +1,3 @@
-/* --- Horizontal Dashboard Navigation --- */
-
 .dashboard-nav {
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--border);
@@ -30,8 +28,6 @@
     border-bottom: 2px solid var(--brand-blue);
 }
 
-/* --- Control Panel Sidebar Navigation --- */
-
 .admin-sidebar .dashboard-nav {
     flex-direction: column;
     border-bottom: none;
@@ -57,8 +53,6 @@
     font-weight: var(--weight-xbold);
 }
 
-/* --- Navigation Sections --- */
-
 .nav-section {
     padding: 0 1rem;
     margin-bottom: 1.75rem;
@@ -73,8 +67,6 @@
     margin-bottom: 0.625rem;
     padding-left: 0.875rem;
 }
-
-/* --- Sidebar Branding Header --- */
 
 .nav-brand {
     gap: 0.625rem;
@@ -104,8 +96,6 @@
     padding: 0.15rem 0.45rem;
     border-radius: var(--radius-full);
 }
-
-/* --- Navigation Links & Icons --- */
 
 .nav-link {
     width: 100%;
@@ -138,8 +128,6 @@
     text-align: center;
     flex-shrink: 0;
 }
-
-/* --- Admin Tab Bar (Page-level Tab Navigation) --- */
 
 .admin-tabs {
     margin-bottom: 1.5rem;
@@ -185,8 +173,6 @@
     margin-top: 1.5rem;
 }
 
-/* --- Collapsible Sidebar Styles & Transitions --- */
-
 .sidebar-toggle-btn {
     background: transparent;
     border: none;
@@ -208,7 +194,6 @@
     transition: transform 0.3s ease;
 }
 
-/* Collapsed classes */
 .collapsed .nav-brand-name,
 .collapsed .nav-brand-badge,
 .collapsed .nav-title,

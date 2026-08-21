@@ -62,8 +62,6 @@
 </{{ tag }}>
 {% endmacro %}
 
-
-
 {% macro button(text="", btn_span_class="", type="button", variant="primary", class="", icon=None, attrs={}, href=None,
 unstyled=False, id=None) %}
 {% set tag = "a" if href else "button" %}
@@ -122,7 +120,6 @@ unstyled=False, id=None) %}
 </label>
 {% endmacro %}
 
-
 {% macro field(label_text="", for_id="", class="", label_class="", variant="vertical") %}
 <div
   class="field-wrapper flex {{ 'flex-col' if variant == 'vertical' else 'flex-row items-center gap-2' }} {{ class }}">
@@ -130,7 +127,6 @@ unstyled=False, id=None) %}
   {{ caller() }}
 </div>
 {% endmacro %}
-
 
 {% macro form(class="", variant="default", form_action=None, attrs={}, method="POST", include_csrf=True) %}
 {% set default_classes = 'form flex flex-col '
@@ -167,7 +163,6 @@ if type == 'checkbox' else 'input flex'
   {% endif %}
 </a>
 {% endmacro %}
-
 
 {% macro textarea(name="", id=None, rows=4, placeholder="", class="", required=True) %}
 <textarea name="{{ name }}" id="{{ id or name }}" rows="{{ rows }}" placeholder="{{ placeholder }}" {% if required

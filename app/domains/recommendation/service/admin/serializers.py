@@ -16,22 +16,41 @@ def serialize_user_interests_dto(raw_tuple) -> Optional[Dict[str, Any]]:
     if not raw_tuple:
         return None
     user, scores = raw_tuple
+    from sqlalchemy import select
     from app.core.extensions import db
     from app.domains.taxonomy.models import Category, Entity
+
+    entity_ids = [row.entity_id for row in scores if getattr(row, 'entity_id', None)]
+    category_ids = [row.category_id for row in scores if getattr(row, 'category_id', None)]
+
+    entity_map = {
+        e.id: e for e in db.session.execute(
+            select(Entity).where(Entity.id.in_(entity_ids))
+        ).scalars().all()
+    } if entity_ids else {}
+
+    category_map = {
+        c.id: c for c in db.session.execute(
+            select(Category).where(Category.id.in_(category_ids))
+        ).scalars().all()
+    } if category_ids else {}
+
     affinities = []
     for row in scores:
         name = 'Unknown'
-        if getattr(row, 'entity_id', None):
-            entity = db.session.get(Entity, row.entity_id)
+        eid = getattr(row, 'entity_id', None)
+        cid = getattr(row, 'category_id', None)
+        if eid:
+            entity = entity_map.get(eid)
             if entity:
                 if entity.entity_type == 'brand' or entity.origin == 'legacy_brand':
                     name = f'Brand: {entity.name}'
                 else:
                     name = f'Topic: {entity.name}'
             else:
-                name = f'Entity #{row.entity_id}'
-        elif getattr(row, 'category_id', None):
-            category = db.session.get(Category, row.category_id)
-            name = f'Category: {category.name}' if category else f'Category #{row.category_id}'
+                name = f'Entity #{eid}'
+        elif cid:
+            category = category_map.get(cid)
+            name = f'Category: {category.name}' if category else f'Category #{cid}'
         affinities.append({'name': name, 'score': round(row.total_score, 3)})
     return {'user_id': user.id, 'user_name': user.name, 'affinities': affinities}

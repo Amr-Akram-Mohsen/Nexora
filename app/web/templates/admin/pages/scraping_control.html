@@ -17,7 +17,7 @@
   <div class="settings-main">
     {% call admin_settings_card("Trigger Scraping", "Scrape unscraped articles", 'fa-solid fa-spider') %}
     <form id="scraping-form" class="settings-form">
-      
+
       <label class="settings-field">
         <span class="settings-field-label">Batch Limit</span>
         {{ input(type="number", name="limit", id="scraping-limit", value="10", class="settings-input", attrs={"min": "1", "max": "100"}) }}
@@ -42,14 +42,14 @@
           </div>
           <div class="task-meta" id="task-meta"></div>
         </div>
-        
+
         <div id="scraping-results-container" class="scraping-hidden">
           <h4 class="scraping-results-title">Scraping Diagnostics</h4>
           <div class="scraping-stats-grid" id="scraping-stats">
-            <!-- Stats injected here -->
+
           </div>
           <div class="scraping-details-list" id="scraping-details">
-            <!-- Details injected here -->
+
           </div>
         </div>
       {% endcall %}
@@ -57,7 +57,6 @@
   </div>
 </div>
 
-<!-- TEMPLATES -->
 <template id="stat-card-template">
   <div class="scraping-stat-card">
     <div class="stat-label"></div>

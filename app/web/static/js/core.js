@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener("pageshow", initUserInteractions);
 
-
-
 function initApp() {
     initHeroSlider();
     initTheme();

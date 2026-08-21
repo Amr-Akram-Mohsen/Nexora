@@ -5,12 +5,12 @@
   data-id="{{ comment.target_id }}" data-comment-id="{{ comment.id }}">
 
   <div class="comment__inner flex gap-3">
-    <!-- Avatar -->
+
     <img src="{{ comment.user.avatar }}" alt="{{ comment.user.email }}" class="comment__avatar" />
 
     <div class="comment__body">
       <div class="comment__bubble">
-        <!-- Header -->
+
         <div class="comment__header flex items-center gap-2">
           <span class="comment__author">
             {{ comment.user.email }}
@@ -19,12 +19,12 @@
             {{ comment.created_at | format_date('%b %d, %Y') }}
           </span>
         </div>
-        <!-- Text -->
+
         <p class="comment__text">
           {{ comment.content }}
         </p>
       </div>
-      <!-- Interactions -->
+
       <div class="comment__actions flex items-center gap-4">
         {% set v = 'ghost' %}
         {{ button(
@@ -50,11 +50,10 @@
         {% endcall %}
       </div>
 
-      <!-- Replies -->
       <div class="comment__replies flex flex-col">
 
         <div class="comment__replies-list flex flex-col gap-4">
-          <!-- JS injects replies here -->
+
         </div>
 
         {% if current_user.is_authenticated %}

@@ -37,10 +37,10 @@ def sources_rows():
 
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_source(id):
-    from app.application.taxonomy.admin import get_source_inspect_workflow
+    from app.domains.taxonomy.service.admin.admin import get_source_inspect_data
     from app.web.routes.admin.builders.taxonomy_builder import build_source_inspect_view_model
     
-    aggregated_data = get_source_inspect_workflow(id)
+    aggregated_data = get_source_inspect_data(id)
     if not aggregated_data:
         return "Source not found.", 404
         

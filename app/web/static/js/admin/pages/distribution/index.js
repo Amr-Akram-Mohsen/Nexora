@@ -17,7 +17,7 @@ function initDistribution() {
     timeframeSelect.addEventListener("change", () => {
       const timeframe = timeframeSelect.value;
       setSelectedEntity(null);
-      
+
       loadMainWidgets(timeframe)
         .then(() => {
           renderAllWidgets();
@@ -33,7 +33,7 @@ function initDistribution() {
     refreshBtn.addEventListener("click", () => {
       const timeframe = timeframeSelect ? timeframeSelect.value : "7_days";
       setSelectedEntity(null);
-      
+
       window.api.post(`/admin/distribution/recompute?layer=all&time_frame=${timeframe}`)
         .then(() => loadMainWidgets(timeframe))
         .then(() => {

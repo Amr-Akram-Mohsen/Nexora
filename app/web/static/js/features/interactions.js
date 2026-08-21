@@ -153,10 +153,10 @@ function promptCollectionName(targetBtn) {
         const rect = targetBtn.getBoundingClientRect();
         let top = rect.bottom + window.scrollY + 8;
         let left = rect.left + window.scrollX - (240 / 2) + (rect.width / 2);
-        
+
         if (left < 10) left = 10;
         if (left + 250 > window.innerWidth) left = window.innerWidth - 250;
-        
+
         // Prevent going off bottom of screen
         if (top + 150 > window.scrollY + window.innerHeight) {
             top = rect.top + window.scrollY - 150 - 8;
@@ -172,7 +172,7 @@ function promptCollectionName(targetBtn) {
         }
 
         let resolved = false;
-        
+
         const cleanup = (val) => {
             if (!resolved) {
                 resolved = true;
@@ -183,7 +183,7 @@ function promptCollectionName(targetBtn) {
 
         popover.querySelector('#collection-cancel')?.addEventListener('click', () => cleanup(null));
         popover.querySelector('#collection-confirm')?.addEventListener('click', () => cleanup(input ? input.value : null));
-        
+
         input?.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -199,7 +199,7 @@ function promptCollectionName(targetBtn) {
                 }
             };
             document.addEventListener('click', onClickOutside);
-            
+
             const originalCleanup = cleanup;
             cleanup = (val) => {
                 document.removeEventListener('click', onClickOutside);

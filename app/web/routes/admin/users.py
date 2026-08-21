@@ -2,12 +2,12 @@
 Admin user management endpoints.
 """
 from flask import Blueprint, jsonify, request, render_template
-from app.domains.user.service.admin.admin import get_admin_users_paginated
-from app.application.user.admin import (
-    deactivate_user_workflow,
-    activate_user_workflow,
-    toggle_admin_user_workflow,
-    get_user_inspect_workflow,
+from app.domains.user.service.admin.admin import (
+    get_admin_users_paginated,
+    deactivate_admin_user,
+    activate_admin_user,
+    toggle_admin_user,
+    get_admin_user_inspect_data,
 )
 from app.domains.user.service.admin.analytics import get_user_dashboard_stats
 from app.domains.user.serializers import serialize_user_row
@@ -60,7 +60,7 @@ def list_users():
 
 @bp.route("/<int:id>", methods=["DELETE"])
 def delete_user(id):
-    success = deactivate_user_workflow(id)
+    success = deactivate_admin_user(id)
     if not success:
         return jsonify({"error": "User not found"}), 404
     return jsonify({"success": True})
@@ -68,7 +68,7 @@ def delete_user(id):
 
 @bp.route("/<int:id>/activate", methods=["POST"])
 def activate_user(id):
-    success = activate_user_workflow(id)
+    success = activate_admin_user(id)
     if not success:
         return jsonify({"error": "User not found"}), 404
     return jsonify({"success": True})
@@ -106,7 +106,7 @@ def users_rows():
 
 @bp.route("/<int:id>/inspect", methods=["GET"])
 def inspect_user(id):
-    aggregated_data = get_user_inspect_workflow(id)
+    aggregated_data = get_admin_user_inspect_data(id)
     if not aggregated_data:
         return jsonify({"error": "User not found"}), 404
 
@@ -117,7 +117,7 @@ def inspect_user(id):
 
 @bp.route("/<int:id>/toggle-admin", methods=["POST"])
 def toggle_admin(id):
-    user = toggle_admin_user_workflow(id)
+    user = toggle_admin_user(id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     return jsonify({"success": True, "is_admin": user.is_admin})

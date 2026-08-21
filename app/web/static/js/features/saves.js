@@ -46,7 +46,6 @@ async function initAllSaves() {
     }
 }
 
-// Global state for saved products page
 let currentSavedView = 'all';
 
 function updateSavedHeaderCount() {
@@ -55,7 +54,7 @@ function updateSavedHeaderCount() {
     const collectionsContainer = document.querySelector('.saved-collections');
 
     if (!totalCountEl || !collectionsContainer) return;
-    
+
     const numItems = collectionsContainer.querySelectorAll('[data-domain-type="commercial"] .card, [data-domain-type="commercial"] [data-saveable-card]').length;
     const numArticles = collectionsContainer.querySelectorAll('[data-domain-type="content"] .card, [data-domain-type="content"] [data-saveable-card]').length;
     const total = numItems + numArticles;
@@ -96,12 +95,12 @@ function showCollection(hash) {
 function handleSavedItemsFilterClick(e) {
     const filterLink = e.target.closest('.filter-item__link');
     if (!filterLink || !filterLink.closest('.filter-sidebar')) return false;
-    
+
     const filterItem = filterLink.closest('.filter-item');
     if (!filterItem) return false;
 
     const href = filterLink.getAttribute('href');
-    
+
     if (href === '#all') {
         e.preventDefault();
         showSavedAll();
@@ -113,14 +112,14 @@ function handleSavedItemsFilterClick(e) {
         window.location.hash = href.substring(1);
         return true;
     }
-    
+
     return false;
 }
 
 function initSavedItemsPage() {
     const collectionsContainer = document.querySelector('.saved-collections');
-    if (!collectionsContainer) return; // Not on the saved products page
-    
+    if (!collectionsContainer) return;
+
     // Check hash on load
     const hash = window.location.hash;
     if (hash.startsWith('#collection-')) {
@@ -141,15 +140,15 @@ function initSavedItemsPage() {
         // Update sidebar badges
         const badgeAll = document.querySelector('#filter-all .filter-section__badge');
         if (badgeAll) badgeAll.textContent = totalCount;
-        
+
         // Handle fully empty state dynamically if needed
         if (totalCount === 0) {
-            window.location.reload(); // Quick way to show the server-rendered empty state
+            window.location.reload();
         }
     });
 
     observer.observe(collectionsContainer, { childList: true, subtree: true });
-    
+
     // Initialize move collection logic
     initMoveToCollection();
 }
@@ -157,7 +156,7 @@ function initSavedItemsPage() {
 function initMoveToCollection() {
     const collectionsContainer = document.querySelector('.saved-collections');
     if (!collectionsContainer) return;
-    
+
     const collectionElements = document.querySelectorAll('.filter-item:not(#filter-all) .filter-item__link span:first-child');
     const collections = Array.from(collectionElements).map(el => el.textContent.trim());
 
@@ -183,14 +182,14 @@ function initMoveToCollection() {
 async function handleMoveCollectionChange(e) {
     const select = e.target.closest('.move-item-select');
     if (!select) return false;
-    
+
     const newCollection = select.value;
     if (!newCollection) return false;
-    
+
     const card = select.closest('.card, [data-saveable-card]');
     const panel = select.closest('.interaction-panel');
     if (!panel) return false;
-    
+
     const targetType = panel.dataset.type;
     const targetId = panel.dataset.id;
     const currentCollection = card?.closest('.collection-group')?.querySelector('.section-title')?.textContent.trim() || 'General';
@@ -211,7 +210,7 @@ async function handleMoveCollectionChange(e) {
                 old_collection_name: currentCollection
             })
         });
-        
+
         const data = await res.json();
         if (res.ok && data.success) {
             if (typeof showToast === 'function') {

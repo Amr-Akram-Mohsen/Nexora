@@ -35,7 +35,6 @@
   color: var(--domain-primary);
 }
 
-
 .post-content {
   max-width: 800px;
   margin: 0 auto;
@@ -81,7 +80,6 @@ margin-top: 3rem;
 }
 
 @media (max-width: 640px) {
-
 .post-cta-box {
     flex-direction: column;
     text-align: center;

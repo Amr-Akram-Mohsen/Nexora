@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     const chartElements = document.querySelectorAll('canvas[data-chart]');
-    
+
     chartElements.forEach(canvas => {
         const chartType = canvas.getAttribute('data-chart');
         const payloadId = canvas.getAttribute('data-chart-payload');
@@ -35,14 +35,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         try {
             const rawData = JSON.parse(dataElement.textContent);
-            
+
             // Extract options if provided as a JSON attribute
             const optionsAttr = canvas.getAttribute('data-chart-options');
             let options = {};
             if (optionsAttr) {
                 options = JSON.parse(optionsAttr);
             }
-            
+
             // Render the chart using the centralized nexoraCharts wrapper
             window.nexoraCharts.render(chartId, chartType, rawData, options);
 

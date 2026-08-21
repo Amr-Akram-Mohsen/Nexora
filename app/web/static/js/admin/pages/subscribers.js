@@ -1,8 +1,10 @@
 (function () {
   'use strict';
 
+  let subscribersController = null;
+
   document.addEventListener("DOMContentLoaded", () => {
-    window.subscribersController = new AdminListController({
+    subscribersController = new AdminListController({
       domain: "subscribers",
       endpoint: "/admin/subscribers/",
       rowsEndpoint: "/admin/subscribers/rows",
@@ -20,7 +22,7 @@
           const unconfirmed = data.headers.get("X-Unconfirmed");
           const unsubscribed = data.headers.get("X-Unsubscribed");
           const anonymous = data.headers.get("X-Anonymous");
-          
+
           if (total !== null) document.getElementById("funnel-total").textContent = parseInt(total).toLocaleString();
           if (confirmed !== null) {
               document.getElementById("funnel-confirmed").textContent = parseInt(confirmed).toLocaleString();
@@ -28,7 +30,7 @@
           }
           if (unconfirmed !== null) document.getElementById("funnel-unconfirmed").textContent = parseInt(unconfirmed).toLocaleString();
           if (unsubscribed !== null) document.getElementById("funnel-unsubscribed").textContent = parseInt(unsubscribed).toLocaleString();
-          
+
           if (anonymous !== null) {
               document.getElementById("funnel-anonymous").textContent = parseInt(anonymous).toLocaleString();
               document.getElementById("summary-anonymous-count").textContent = `Anonymous: ${parseInt(anonymous).toLocaleString()}`;
@@ -54,7 +56,9 @@
               .then(res => { if (!res.ok) throw new Error(); return res.json(); })
               .then(() => {
                 showToast(`Subscriber has been removed.`);
-                window.subscribersController.load(window.subscribersController.currentPage);
+                if (subscribersController) {
+                  subscribersController.load(subscribersController.currentPage);
+                }
               })
               .catch(() => {
                 showToast("Failed to delete subscriber.", "error");

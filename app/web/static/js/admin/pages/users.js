@@ -7,19 +7,18 @@
 (function () {
   'use strict';
 
-  window.usersController = null;
+  let usersController = null;
 
-  // ── Action Handlers ─────
   function handleToggleAdmin(id, name, btn, modal) {
     if (btn) { btn.disabled = true; btn.textContent = "…"; }
     window.api.post(`/admin/users/${id}/toggle-admin`)
       .then(data => {
         showToast(data.is_admin ? `${name} is now an Admin` : `${name} is now a User`);
-        window.usersController.load(window.usersController.currentPage);
+        if (usersController) usersController.load(usersController.currentPage);
         if (modal) modal.classList.remove("active");
       })
       .catch(() => {
-        window.usersController.load(window.usersController.currentPage);
+        if (usersController) usersController.load(usersController.currentPage);
         if (modal) modal.classList.remove("active");
       });
   }
@@ -27,16 +26,16 @@
   function handleToggleActive(id, isCurrentlyActive, name, btn, modal) {
     const endpoint = isCurrentlyActive ? `/admin/users/${id}` : `/admin/users/${id}/activate`;
     const method = isCurrentlyActive ? window.api.delete : window.api.post;
-    
+
     if (btn) { btn.disabled = true; btn.textContent = "…"; }
     method(endpoint)
       .then(() => {
         showToast(`${name} has been ${isCurrentlyActive ? "deactivated" : "activated"}.`);
-        window.usersController.load(window.usersController.currentPage);
+        if (usersController) usersController.load(usersController.currentPage);
         if (modal) modal.classList.remove("active");
       })
       .catch(() => {
-        window.usersController.load(window.usersController.currentPage);
+        if (usersController) usersController.load(usersController.currentPage);
         if (modal) modal.classList.remove("active");
       });
   }
@@ -50,7 +49,7 @@
         window.api.delete(`/admin/users/${id}`)
           .then(() => {
             showToast(`${name} has been removed.`);
-            window.usersController.load(window.usersController.currentPage);
+            if (usersController) usersController.load(usersController.currentPage);
             if (modal) modal.classList.remove("active");
           })
           .catch(() => {
@@ -60,9 +59,8 @@
     );
   }
 
-  // ── DOMContentLoaded ──────────────────────────────────────────
   document.addEventListener("DOMContentLoaded", () => {
-    window.usersController = new AdminListController({
+    usersController = new AdminListController({
       domain: "users",
       endpoint: "/admin/users/",
       rowsEndpoint: "/admin/users/rows",
@@ -82,7 +80,7 @@
           const admins = data.headers.get("X-Admin-Count");
           const verified = data.headers.get("X-Verified-Count");
           const subbed = data.headers.get("X-Subscribed-Count");
-          
+
           if (active !== null) {
             const el = document.getElementById("summary-active-count");
             if (el) el.textContent = `Active: ${parseInt(active).toLocaleString()}`;
@@ -122,7 +120,7 @@
     document.getElementById("users-table").addEventListener("click", e => {
       const th = e.target.closest("th[data-sort]");
       if (!th) return;
-      
+
       const sortBy = th.dataset.sort;
       if (currentSortBy === sortBy) {
         currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
@@ -130,16 +128,14 @@
         currentSortBy = sortBy;
         currentSortDir = 'desc';
       }
-      
+
       // Update arrows and aria-sort
       document.querySelectorAll("th[data-sort]").forEach(col => {
           col.textContent = col.textContent.replace(/ [↑↓↕]/, ' ↕');
           col.removeAttribute('aria-sort');
       });
       th.textContent = th.textContent.replace(/ [↑↓↕]/, currentSortDir === 'desc' ? ' ↓' : ' ↑');
-      th.setAttribute('aria-sort', currentSortDir === 'desc' ? 'descending' : 'ascending');
-
-      window.usersController.load(1);
+      if (usersController) usersController.load(1);
     });
 
     // Event delegation: inspect modal or detail page action buttons
@@ -166,7 +162,6 @@
     const inspectModal = document.getElementById("inspect-user-modal");
     if (inspectModal) inspectModal.addEventListener("click", userActionHandler);
 
-    // ── Chart Initialization ──────────────────────────────────────
     function initUserCharts() {
       window.api.get('/admin/users/stats')
         .then(data => {

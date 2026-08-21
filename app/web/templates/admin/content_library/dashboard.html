@@ -14,7 +14,6 @@
 {% block admin_content %}
 {{ admin_page_header("Content Analytics Dashboard", "High-level content performance, distribution, and taxonomy coverage metrics.") }}
 
-{# ── KPI Stats Grid ── #}
 <div class="dashboard-stats-grid">
   {{ stat_card("Total Content", value_text=stats.kpi.total, icon="fas fa-database", class="card", inner_class="dashboard-stat-card flex flex-col") }}
   {{ stat_card("Published", value_text=stats.kpi.published, icon="fas fa-check-circle", class="card", inner_class="dashboard-stat-card flex flex-col") }}
@@ -24,11 +23,9 @@
   {{ stat_card("Scrape Coverage", value_text=(stats.kpi.scrape_coverage ~ "%"), icon="fas fa-spider", class="card", inner_class="dashboard-stat-card flex flex-col") }}
 </div>
 
-{# ── Row 1: Charts ── #}
 <div class="overview-top-grid">
 
-  {# Content by Type — Chart.js Doughnut #}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">Content by Type</h3>
       <p class="overview-panel-sub">Distribution across articles, videos, and posts</p>
@@ -43,8 +40,7 @@
     </div>
   </div>
 
-  {# Ingestion Origins — Horizontal Bar #}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">Ingestion Origins</h3>
       <p class="overview-panel-sub">Volume by content source channel</p>
@@ -67,8 +63,7 @@
     </div>
   </div>
 
-  {# Enrichment Status — Chart.js Bar #}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">Article Enrichment Status</h3>
       <p class="overview-panel-sub">Pipeline health distribution across statuses</p>
@@ -84,11 +79,9 @@
   </div>
 </div>
 
-{# ── Row 2: Freshness + Authority ── #}
 <div class="overview-top-grid">
 
-  {# Content Freshness #}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">Content Freshness</h3>
       <p class="overview-panel-sub">Age distribution of published library</p>
@@ -127,8 +120,7 @@
     </div>
   </div>
 
-  {# Source Authority Tier #}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="overview-panel-header">
       <h3 class="overview-panel-title">Source Authority Tier</h3>
       <p class="overview-panel-sub">Content volume by source quality score</p>
@@ -164,8 +156,7 @@
   </div>
 </div>
 
-{# ── Origin Analytics Table ── #}
-<div class="overview-panel bg-card border border-border radius-md">
+<div class="overview-panel">
   <div class="overview-panel-header">
     <h3 class="overview-panel-title">Origin Analytics</h3>
     <p class="overview-panel-sub">Detailed performance and quality metrics by ingestion source</p>
@@ -182,7 +173,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="5" class="text-center">No origin data available.</td>
+          <td colspan="5">No origin data available.</td>
         </tr>
         {% endfor %}
     {% endcall %}

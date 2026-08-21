@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle form submission
     form.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         if (activePollingInterval) {
             clearInterval(activePollingInterval);
         }

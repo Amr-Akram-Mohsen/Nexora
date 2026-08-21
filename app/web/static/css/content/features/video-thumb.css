@@ -23,7 +23,6 @@
   background: rgba(var(--black-rgb), 0.35);
 }
 
-/* --- Play Button --- */
 .video-preview__play-btn {
   width: 56px;
   height: 56px;
@@ -82,10 +81,9 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Embedded Player Wrapper --- */
 .video-player-wrapper {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   height: 0;
   background: var(--background);
 }

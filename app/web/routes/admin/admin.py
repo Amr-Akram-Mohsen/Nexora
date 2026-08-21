@@ -4,15 +4,15 @@ Admin portal page routes and inspect view dispatchers.
 from flask import render_template, Blueprint, abort
 from app.web.routes.admin.tables import CRUD_TABLES, INSIGHTS_TABLES
 from app.web.routes.admin.helpers import apply_admin_guard
-from app.application.analytics.admin import get_admin_dashboard_stats_data
+from app.domains.analytics.service.admin import get_admin_dashboard_stats_data
 
 from app.application.content.admin import get_content_inspect_workflow
 from app.application.product.admin import (
     get_item_inspect_workflow,
     get_store_inspect_workflow,
 )
-from app.application.user.admin import get_user_inspect_workflow
-from app.application.taxonomy.admin import get_source_inspect_workflow
+from app.domains.user.service.admin.admin import get_admin_user_inspect_data
+from app.domains.taxonomy.service.admin.admin import get_source_inspect_data
 from app.domains.interaction.service.admin.inspect import get_comment_inspect_workflow
 from app.web.routes.admin.builders.content_builder import build_content_inspect_view_model
 from app.web.routes.admin.builders.item_builder import (
@@ -201,7 +201,7 @@ def item_detail(id):
 
 @bp.route("/users/<int:id>")
 def user_detail(id):
-    aggregated_data = get_user_inspect_workflow(id)
+    aggregated_data = get_admin_user_inspect_data(id)
     if not aggregated_data:
         abort(404)
 
@@ -221,7 +221,7 @@ def store_detail(id):
 
 @bp.route("/sources/<int:id>")
 def source_detail(id):
-    aggregated_data = get_source_inspect_workflow(id)
+    aggregated_data = get_source_inspect_data(id)
     if not aggregated_data:
         abort(404)
 

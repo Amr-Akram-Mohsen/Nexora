@@ -32,7 +32,6 @@ SLOT: header
 {% if slot == 'header' %}
 {{ listing_header(page_title, results|length, "contents", active_filters, get_sort_url) }}
 
-{# ── Horizontal Topics Ribbon ── #}
 {% if filter_options.get('topic') %}
 <div class="topics-ribbon gap-2 flex items-center">
   {% for opt in filter_options.get('topic', []) %}
@@ -46,15 +45,14 @@ SLOT: header
   {% endfor %}
 </div>
 {% endif %}
-{% endif %}{# end slot == 'header' #}
+{% endif %}
 
 {# ═══════════════════════════════════════
 SLOT: active_filters
 ═══════════════════════════════════════ #}
 {% if slot == 'active_filters' %}
 {{ active_filter_chips(active_filters, get_filter_url, url_for(request.endpoint, **request.view_args)) }}
-{% endif %}{# end slot == 'active_filters' #}
-
+{% endif %}
 
 {# ═══════════════════════════════════════
 SLOT: results
@@ -66,10 +64,8 @@ SLOT: results
 {% endif %}
 {{ grid(results) }}
 
-{# ── Listing Pagination (Directly below catalog results grid) ── #}
 {{ listing_pagination(pagination, get_page_url) }}
 
-{# ── Related / Recommendation Carousels (Below pagination) ── #}
 {{ catalog_recommendations(recommendations, default_target_type='content') }}
 {% endif %}
 
@@ -80,7 +76,7 @@ SLOT: footer
 {% endif %}
 
 {% else %}
-{# Empty state (show in results slot) #}
+
 {% if slot == 'results' %}
 {{ empty_state(
 title="No contents" | title ~ " Found",

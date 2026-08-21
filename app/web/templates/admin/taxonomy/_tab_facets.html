@@ -4,7 +4,6 @@
 {% from "admin/components/ui/toolbar.html" import admin_search_input, admin_toolbar_section %}
 {% from "admin/components/ui/forms.html" import admin_filter_select %}
 
-{# ── Gender Facets Tab ── #}
 {% call admin_tab_panel("gender_facets") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -15,7 +14,6 @@
 {{ admin_crud_table(tables["gender_facets"], "Loading gender facets…", "loading-height-md") }}
 {% endcall %}
 
-{# ── Intent Facets Tab ── #}
 {% call admin_tab_panel("intent_facets") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">
@@ -26,7 +24,6 @@
 {{ admin_crud_table(tables["intent_facets"], "Loading intent facets…", "loading-height-md") }}
 {% endcall %}
 
-{# ── Price Tier Facets Tab ── #}
 {% call admin_tab_panel("price_tier_facets") %}
 {% call admin_toolbar_section() %}
 <div class="admin-toolbar-row flex items-center flex-wrap gap-3">

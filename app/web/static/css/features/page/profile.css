@@ -1,7 +1,3 @@
-/* ==========================================================================
-   Nexora Profile Page Styling (Premium & Consistent)
-   ========================================================================== */
-
 .profile-section {
   min-height: calc(100vh - var(--header-height));
   background: radial-gradient(circle at 10% 20%, rgba(var(--brand-blue-rgb), 0.04) 0%, transparent 40%),
@@ -14,7 +10,6 @@
   padding-block: 3rem;
 }
 
-/* --- Page Header --- */
 .profile-page-header {
   margin-bottom: 2.5rem;
 }
@@ -34,7 +29,6 @@
   margin-top: 0.5rem;
 }
 
-/* --- Responsive Grid Layout --- */
 .profile-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -48,7 +42,6 @@
   }
 }
 
-/* --- Card Base (Consistent with Nexora Cards) --- */
 .profile-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -64,7 +57,6 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* --- Sidebar Overview --- */
 .profile-user-info {
   padding: 2.5rem 1.5rem 1.5rem;
   border-bottom: 1px solid var(--border);
@@ -116,7 +108,6 @@
   border: 1px solid rgba(var(--brand-orange-rgb), 0.2);
 }
 
-/* Sidebar Meta List */
 .profile-meta-list {
   padding: 1.25rem 1.5rem;
 }
@@ -139,7 +130,6 @@
   color: var(--foreground);
 }
 
-/* Verification Alert Card */
 .verification-alert-card {
   padding: 1.5rem;
   margin-top: 1.5rem;
@@ -161,7 +151,6 @@
   line-height: 1.5;
 }
 
-/* --- Main Settings Cards --- */
 .settings-card {
   padding: 2.5rem;
 }
@@ -185,7 +174,6 @@
   margin-bottom: 1.75rem;
 }
 
-/* --- Form Fields & Grid Layout --- */
 .profile-form-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -208,7 +196,6 @@
   justify-content: flex-end;
 }
 
-/* Newsletter row */
 .newsletter-settings-box {
   background: var(--input-background);
   border: 1px solid var(--border);
@@ -232,7 +219,6 @@
   margin-top: 0.25rem;
 }
 
-/* --- Security / Accordion Section --- */
 .border-t-separator {
   border-top: 1px solid var(--border);
   margin-top: 1.5rem;
@@ -276,13 +262,11 @@
   .form-row-grid {
     grid-template-columns: 1fr 1fr;
   }
-
   .form-row-grid .full-width {
     grid-column: span 2;
   }
 }
 
-/* --- Collections Management --- */
 .collection-manage-product {
   padding: 1rem;
   border: 1px solid var(--border);
@@ -313,7 +297,6 @@
   opacity: 0.5;
 }
 
-/* --- Linked Accounts Section --- */
 .profile-linked-accounts-header {
   margin-top: 1rem;
   border-top: 1px solid var(--border);
@@ -396,7 +379,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* --- Danger Zone --- */
 .danger-zone-card {
   border: 1px solid rgba(var(--brand-red-rgb), 0.3);
   background: rgba(var(--brand-red-rgb), 0.05);
@@ -415,7 +397,6 @@
   color: var(--primary-foreground);
 }
 
-/* --- Modals --- */
 .modal-overlay {
   display: none;
   position: fixed;

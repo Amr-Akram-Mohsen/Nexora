@@ -6,7 +6,6 @@ function updateReactionsCount(wrapper, delta = 1) {
     countEl.textContent = Math.max(0, current + delta);
 }
 
-
 function updateReactionUI(targetItem, reactionType, status) {
     const targetBtn =
         targetItem.querySelector(`
@@ -66,7 +65,6 @@ async function initAllReactions() {
 
     if (uniqueTargets.length === 0) return;
 
-    // Prepare query parameters
     const params = new URLSearchParams();
     for (const t of uniqueTargets) {
         params.append("type", t.type);

@@ -16,7 +16,6 @@ function initHeroSlider() {
     document.querySelector(".hero-slider__dot")?.classList.add("active");
 }
 
-
 function handleHeroSliderControls(control) {
     let slideIndex = -1;
 
@@ -37,10 +36,8 @@ function handleHeroSliderControls(control) {
 
     const lastIndex = slides.length - 1;
 
-    /* move slider */
     track.style.transform = `translateX(-${slideIndex * 100}%)`;
 
-    /* update dots */
     document.querySelector(".hero-slider__dot.active")?.classList.remove("active");
     dots[slideIndex]?.classList.add("active");
 

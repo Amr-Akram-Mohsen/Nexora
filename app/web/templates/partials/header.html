@@ -4,13 +4,12 @@
 
   <div class="container">
     <div class="header flex items-center justify-between">
-      <!-- Logo -->
+
       {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2",
       unstyled=True) %}
       {% include "logos/nexora-logo.html" %}
       {% endcall %}
 
-      <!-- Desktop Navigation -->
       <nav class="main-nav md:flex items-center">
         {% for section in main_sections %}
         {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="main-nav__link
@@ -20,12 +19,10 @@
         icon="fas fa-tag", unstyled=True) }}
       </nav>
 
-      <!-- Actions -->
       <div class="header-actions flex items-center">
         {% set v = 'ghost' %}
         {% set class = 'btn--icon ' %}
 
-        <!-- Country Toggle -->
         <div class="header-country">
           {% set current_country = request.cookies.get('country') %}
           <span class="header-country__label flex items-center gap-2">
@@ -45,24 +42,21 @@
           </select>
         </div>
 
-        <!-- Search -->
         {{ button(variant=v,
         class=class ~ "search-toggle",
         icon="fas fa-search",
         attrs={"aria-label": "Open search", "aria-expanded": "false", "aria-controls": "header-search-panel"}) }}
 
-        <!-- Theme -->
         {{ button(variant=v,
         class=class ~ "mode-toggle",
         icon="far fa-sun") }}
 
         {% if is_authenticated %}
-        <!-- Saved (Shortcut) -->
+
         {{ button(href=url_for('interaction.saved_items'), variant="", class="btn--icon gap-2", icon="far fa-bookmark",
         attrs={"title": "Saved Items"}) }}
         {% endif %}
 
-        <!-- User -->
         <div class="nav-user">
           {% set params = {} %}
 
@@ -153,7 +147,6 @@
           </div>
         </div>
 
-        <!-- Mobile Menu -->
         {{ button(
         variant=v,
         class=class ~ "mobile-menu-toggle",
@@ -163,7 +156,6 @@
 
     </div>
 
-    <!-- Search Bar -->
     <div class="header-search" id="header-search-panel">
       {% call form("header-search__form", variant="", form_action=url_for('recommendation.search'), method="GET",
       include_csrf=False, attrs={"role": "search", "aria-label": "Site Search"}) %}
@@ -182,7 +174,6 @@
       {% endcall %}
     </div>
 
-    <!-- Mobile Navigation -->
     <nav class="mobile-nav flex-col">
       {% for section in main_sections %}
       {{ link(text=section.name, href=url_for('content.sections', section_slug=section.slug), class="mobile-nav__link

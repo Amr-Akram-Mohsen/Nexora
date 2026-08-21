@@ -1,23 +1,19 @@
 {# catalog-sidebar.html #}
 {% from "components/ui/core.html" import badge, button %}
 
-{# ── Canonical filter priority order ── #}
 {% set filter_priority = ['category', 'entity', 'author', 'location', 'event', 'source', 'intent', 'price_tier', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
-  {# ── Sidebar brand accent strip ── #}
   <div class="sidebar-accent">
   </div>
 
-  {# ── Sidebar title row ── #}
   <div class="sidebar-heading flex items-center justify-between">
     <span class="sidebar-heading__label">
       <i class="fas fa-filter"></i>
       Filters
     </span>
 
-    {# Reset link — shown only when filters are active #}
     {% set has_active = namespace(value=false) %}
     {% for k, v in active_filters.items() if k not in ['sort'] %}
     {% if v %}{% set has_active.value = true %}{% endif %}
@@ -29,15 +25,13 @@
     {% endif %}
   </div>
 
-
   {# ══════════════════════════════════════════════════
   FILTER GROUPS — rendered in priority order
   Guarantees: category → brand → intent → price_tier → store → type
   ══════════════════════════════════════════════════ #}
 
-  {# Build the ordered list of filters to render #}
   {% set filters_to_render = [] %}
-  {# Priority order first #}
+
   {% for fname in filter_priority %}
   {% if fname in allowed_filters and filter_options.get(fname) %}
   {% if filters_to_render.append(fname) %}{% endif %}
@@ -50,13 +44,11 @@
   {% endif %}
   {% endfor %}
 
-  {# Render each filter group #}
   {% from "components/listing/filter-section.html" import filter_section %}
   {% for filter_name in filters_to_render %}
     {{ filter_section(filter_name, filter_options.get(filter_name, []), active_filters, get_filter_url) }}
   {% endfor %}
 
-    {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     <div class="sidebar-trending">
       <div class="sidebar-trending__header flex items-center gap-2">
         <i class="fas fa-fire"></i>
@@ -93,5 +85,4 @@
       </div>
     </div>
 
-
-</div>{# end .filter-sidebar #}
+</div>

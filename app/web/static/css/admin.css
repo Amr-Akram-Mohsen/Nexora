@@ -1,8 +1,3 @@
-/* --- Nexora Administrative Style Architecture ---
-   Consolidated & modularized layout, navigation, dashboard, table, form, modal, settings, and component styles.
-   Templates and scripts remain unchanged while imports resolve sequentially.
---- */
-
 @layer reset, vendor, tokens, base, layout, components, domains, utilities, admin;
 
 @import "./admin/layout/layout.css" layer(admin);

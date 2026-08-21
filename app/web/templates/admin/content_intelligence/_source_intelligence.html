@@ -7,7 +7,7 @@
         <td>{{ "{:,}".format(src.active_links) }}</td>
         <td class="col-metric">{{ src.stale_links_pct }}%</td>
         <td>{{ "{:,}".format(src.total_clicks) }}</td>
-        <td class="col-metric">{{ src.conversion_potential }}% 
+        <td class="col-metric">{{ src.conversion_potential }}%
           {% if src.is_simulated %}<span class="status-badge">Simulated</span>{% endif %}
         </td>
         <td class="col-metric">{{ src.health_score }}</td>

@@ -1,6 +1,6 @@
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-satellite-dish"></i> Acquisition & Sources Analytics</h2>
 <div class="overview-top-grid insights-section">
-  <!-- Content Acquisition Velocity -->
+
   {% call admin_panel("Content Acquisition Velocity", "Volume of content ingested over time by top sources.") %}
   <div class="panel-body-padded">
     <div id="acquisition-velocity-chart" class="insight-chart-container">
@@ -9,7 +9,6 @@
   </div>
   {% endcall %}
 
-  <!-- Source Contribution Analysis -->
   {% call admin_panel("Source Contribution Analysis", "Distribution of total content volume by source.") %}
   <div class="panel-body-padded">
     <div id="source-contribution-chart" class="insight-chart-container">
@@ -20,7 +19,7 @@
 </div>
 
 <div class="overview-top-grid insights-section">
-  <!-- Authority Distribution -->
+
   {% call admin_panel("Authority Distribution", "Histogram of source authority scores.") %}
   <div class="panel-body-padded">
     <div id="authority-distribution-chart" class="insight-chart-container">
@@ -29,7 +28,6 @@
   </div>
   {% endcall %}
 
-  <!-- Category x Source Coverage -->
   {% call admin_panel("Category × Source Coverage Matrix", "Content coverage density across top categories and sources.") %}
   <div class="panel-body-padded">
     <div id="category-source-matrix-container" class="insight-table-container">

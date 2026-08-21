@@ -50,7 +50,7 @@ current_per_page=current_per_page | default(20)) }}
 {% endblock %}
 
 {% block admin_scripts %}
-<div id="crud-auto-init" data-crud-domain="{{ domain }}" 
+<div id="crud-auto-init" data-crud-domain="{{ domain }}"
      {% if domain in ['sources', 'stores'] %}
      data-crud-endpoint="/admin/providers/{{ domain }}"
      {% elif domain == 'rec' %}

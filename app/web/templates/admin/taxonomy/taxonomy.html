@@ -15,9 +15,8 @@
 "Manage categories, brands, topics, and sections used across content and products"
 ) }}
 
-{# Analytics Dashboard Container #}
 <div id="taxonomy-analytics-dashboard" class="dashboard-widgets-grid is-hidden">
-  <!-- Filled dynamically by JS -->
+
 </div>
 
 <div id="taxonomy-stats-bar" class="flex items-center flex-wrap gap-2 is-hidden taxonomy-stats-bar">
@@ -28,7 +27,6 @@
   {% call badge(class="badge-orange badge-compact") %}Missing Brand: <span id="stat-missing-brand">0</span>{% endcall %}
 </div>
 
-{# Tab Navigation #}
 {{ admin_tab_navigation("taxonomy", [
 {"id": "insights", "label": 'Insights', "icon": "fa-solid fa-lightbulb", "active": true},
 {"id": "categories", "label": 'Categories', "icon": "fa-solid fa-folder"},
@@ -50,9 +48,8 @@
   {% include "admin/taxonomy/_tab_sections.html" %}
   {% include "admin/taxonomy/_tab_attributes.html" %}
   {% include "admin/taxonomy/_tab_facets.html" %}
-</div>{# End max-width wrapper #}
+</div>
 
-{# Inspect Modals #}
 {{ admin_inspect_modal("category", "Category Details", 'fa-solid fa-folder') }}
 {{ admin_inspect_modal("brand", "Brand Details", 'fa-solid fa-industry') }}
 {{ admin_inspect_modal("topic", "Topic Details", 'fa-solid fa-tag') }}
@@ -62,7 +59,6 @@
 {{ admin_inspect_modal("intent_facet", "Intent Facet Details", 'fa-solid fa-bullseye') }}
 {{ admin_inspect_modal("price_tier_facet", "Price Tier Facet Details", 'fa-solid fa-sack-dollar') }}
 
-{# Duplicates Modal #}
 {% call modal(id="admin-duplicates-modal", title="Duplicate Candidate Detection", icon='fa-solid fa-magnifying-glass', class="admin-duplicates-modal") %}
 <div id="admin-duplicates-body">
   <div>Scanning for duplicates...</div>

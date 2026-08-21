@@ -56,7 +56,6 @@
   .brands-strip {
     gap: 0.5rem;
   }
-
   .brand-chip {
     padding: 0.45rem 0.8rem 0.45rem 0.6rem;
     font-size: var(--text-xs);
@@ -154,20 +153,16 @@
   .cross-domain-bridge {
     padding: 1.75rem 1.5rem;
   }
-
   .cross-domain-bridge__inner {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .cross-domain-bridge__title {
     font-size: var(--text-xl);
   }
-
   .cross-domain-bridge__cta {
     width: 100%;
   }
-
   .cross-domain-bridge__cta .btn {
     width: 100%;
     justify-content: center;

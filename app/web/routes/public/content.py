@@ -75,7 +75,6 @@ def source_page(source_slug):
             "content/catalog/catalog-page.html",
             target_type="content",
             active_filters={"source": [source_slug]},
-            section={"name": data["source"].get("name", "Source"), "slug": "sources"},
             **data,
         )
     except Exception as e:

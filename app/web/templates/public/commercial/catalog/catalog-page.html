@@ -31,15 +31,14 @@ SLOT: header
 ═══════════════════════════════════════ #}
 {% if slot == 'header' %}
 {{ listing_header(page_title, results|length, target_type, active_filters, get_sort_url) }}
-{% endif %}{# end slot == 'header' #}
+{% endif %}
 
 {# ═══════════════════════════════════════
 SLOT: active_filters
 ═══════════════════════════════════════ #}
 {% if slot == 'active_filters' %}
 {{ active_filter_chips(active_filters, get_filter_url, url_for(request.endpoint, **request.view_args)) }}
-{% endif %}{# end slot == 'active_filters' #}
-
+{% endif %}
 
 {# ═══════════════════════════════════════
 SLOT: results
@@ -59,7 +58,7 @@ SLOT: footer (pagination)
 {% endif %}
 
 {% else %}
-{# Empty state (show in results slot) #}
+
 {% if slot == 'results' %}
 {{ empty_state(
 title="No " ~ target_type | title ~ " Found",

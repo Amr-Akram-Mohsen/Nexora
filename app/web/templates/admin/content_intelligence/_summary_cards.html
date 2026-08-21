@@ -3,7 +3,6 @@
 {% from "admin/distribution/_components.html" import metric_card %}
 {% from "admin/components/ui/tables.html" import standard_table %}
 
-<!-- Section 1: Recommendation CTR Dashboard -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-link"></i> Recommendation Widget Performance</h2>
 <div class="dashboard-stats-grid" id="recommendation-ctr-grid">
   {% if metrics %}
@@ -19,13 +18,12 @@
   {% endif %}
 </div>
 
-<!-- Section 1.5: Recommendation Intelligence Summary -->
 <h2 class="insight-group-title flex gap-3 items-center"><i class="fa-solid fa-brain"></i> Recommendation Intelligence Summary</h2>
 <div class="insights-double-grid" id="recommendation-intelligence-panel" >
-  <!-- Left Side: Quality Scores & Benchmark -->
+
   {% call admin_panel('Quality Scores & Benchmarks', "Normalized CTR weighted by page/category engagement volume and taxonomy baseline comparison.", icon="fa-solid fa-chart-pie") %}
     <div class="benchmark-list flex gap-3">
-      <!-- Cross Category Benchmarking Widget -->
+
       <div class="benchmark-card">
         <h4 class="benchmark-header gap-2 flex items-center">
           <i class="fas fa-chart-line"></i> Cross-Category Benchmarks
@@ -34,14 +32,14 @@
           {% if metrics and metrics.benchmarking %}
             {% set bench = metrics.benchmarking %}
             <div class="benchmark- gap-2 flex">
-              <div><i class="fa-solid fa-trophy"></i> Best Performing Category: 
+              <div><i class="fa-solid fa-trophy"></i> Best Performing Category:
                 {% if bench.best_category and bench.best_category.name != "N/A" %}
                   <span class="status-badge">{{ bench.best_category.name }}</span> with <strong>{{ "%.2f"|format(bench.best_category.ctr) }}%</strong> CTR (+{{ "%.2f"|format(bench.best_category.deviation) }}% dev)
                 {% else %}
                   <span class="status-badge">N/A</span>
                 {% endif %}
               </div>
-              <div><i class="fa-solid fa-triangle-exclamation"></i> Worst Performing Category: 
+              <div><i class="fa-solid fa-triangle-exclamation"></i> Worst Performing Category:
                 {% if bench.worst_category and bench.worst_category.name != "N/A" %}
                   <span class="status-badge">{{ bench.worst_category.name }}</span> with <strong>{{ "%.2f"|format(bench.worst_category.ctr) }}%</strong> CTR ({{ "%.2f"|format(bench.worst_category.deviation) }}% dev)
                 {% else %}
@@ -58,7 +56,6 @@
         </div>
       </div>
 
-      <!-- Quality Scores Tabular View -->
       <div class="quality-score-section">
         <h4 class="quality-score-header gap-2 flex items-center">
           <i class="fas fa-star"></i> Quality Score Breakdown
@@ -67,7 +64,7 @@
           {% call standard_table(["Segment", "Type / Name", "CTR", "Quality Score"], id="quality-scores-table", body_id="quality-scores-table-body") %}
               {% if metrics and metrics.quality_scores %}
                 {% set qScores = metrics.quality_scores %}
-                <!-- A. Render Recommendation Types -->
+
                 {% for rdata in qScores.recommendation_types_list %}
                   <tr>
                     <td><span class="status-badge badge-type-compact">Rec Type</span></td>
@@ -76,7 +73,7 @@
                     <td class="col-metric">{{ "%.2f"|format(rdata.quality_score) }}</td>
                   </tr>
                 {% endfor %}
-                <!-- B. Render Page Types -->
+
                 {% for pdata in qScores.page_types_list %}
                   <tr>
                     <td><span class="status-badge badge-type-compact">Page Context</span></td>
@@ -85,7 +82,7 @@
                     <td class="col-metric">{{ "%.2f"|format(pdata.quality_score) }}</td>
                   </tr>
                 {% endfor %}
-                <!-- C. Render Top 3 Categories by Quality Score -->
+
                 {% for cdata in qScores.top_categories %}
                   <tr>
                     <td><span class="status-badge badge-type-compact">Category</span></td>
@@ -103,7 +100,6 @@
     </div>
   {% endcall %}
 
-  <!-- Right Side: Action Suggestions List -->
   {% call admin_panel('Action Suggestions Engine', "Behavior-driven diagnoses and recommended actions per recommendation module.", icon="fa-solid fa-lightbulb") %}
     <div id="rec-action-suggestions-list" class="suggestions-list-scroll flex gap-3">
       {% if metrics and metrics.diagnoses_list %}

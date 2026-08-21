@@ -8,9 +8,7 @@
   let selectedIds = new Set();
   let categoriesList = [];
 
-  // ==============================
   // INITIALIZATION
-  // ==============================
   document.addEventListener("DOMContentLoaded", () => {
     loadMetadata();
     loadStats();
@@ -52,9 +50,7 @@
       .catch(err => console.error("Error loading stats:", err));
   }
 
-  // ==============================
   // LOAD DYNAMIC FILTERS DATA
-  // ==============================
   function loadMetadata() {
     window.api.get("/admin/contents/meta")
       .then((meta) => {
@@ -156,11 +152,7 @@
       });
   }
 
-
-
-  // ==============================
   // STATE SELECTIONS
-  // ==============================
   function toggleItemSelection(id, isSelected) {
     if (isSelected) {
       selectedIds.add(id);
@@ -186,9 +178,7 @@
     }
   }
 
-  // ==============================
   // ACTIONS EXECUTION
-  // ==============================
   function performSingleDelete(id) {
     window.api.delete(`/admin/contents/${id}`)
       .then((res) => {
@@ -258,9 +248,7 @@
     );
   }
 
-  // ==============================
   // QUICK RECATEGORIZE MODAL
-  // ==============================
   function showQuickCategoryModal(contentId, currentCategoryId) {
     const modal = document.getElementById("quick-category-modal");
     const idInput = document.getElementById("quick-cat-content-id");
@@ -305,9 +293,7 @@
       });
   }
 
-  // ==============================
   // QUICK PUBLISH ACTION
-  // ==============================
   function togglePublish(id, action) {
     window.api.post(`/admin/contents/${id}/toggle-publish`, { action: action })
       .then((res) => {
@@ -351,23 +337,15 @@
     });
   }
 
-
-
-
-  // ==============================
-  // EVENT LISTENERS BINDING
-  // ==============================
   function setupEventListeners() {
     const clearBtn = document.getElementById("clear-filters-btn");
     const selectAllCheckbox = document.getElementById("select-all-contents");
     const bulkActionSelect = document.getElementById("bulk-action-select");
     const bulkApplyBtn = document.getElementById("bulk-apply-btn");
 
-    // Modal listeners
     const modalCancel = document.getElementById("quick-cat-cancel");
     const modalConfirm = document.getElementById("quick-cat-confirm");
 
-    // Reset filters action
     clearBtn.addEventListener("click", () => {
       document.getElementById("content-search").value = "";
       document.getElementById("filter-type").value = "";
@@ -391,7 +369,6 @@
       contentsController.load(1);
     });
 
-    // Select All binding
     if (selectAllCheckbox) {
       selectAllCheckbox.addEventListener("change", (e) => {
         const isChecked = e.target.checked;
@@ -413,7 +390,6 @@
       });
     }
 
-    // Bulk actions display and enabling
     bulkActionSelect.addEventListener("change", (e) => {
       const action = e.target.value;
       const bulkCategorySelect = document.getElementById("bulk-category-select");
@@ -427,15 +403,12 @@
       bulkApplyBtn.disabled = !action;
     });
 
-    // Apply bulk action
     bulkApplyBtn.addEventListener("click", () => {
       applyBulkAction();
     });
 
-    // Quick Category modal triggers
     modalConfirm.addEventListener("click", saveQuickCategory);
 
-    // Table body event delegation
     const tableBody = document.getElementById("contents-table-body");
     tableBody.addEventListener("click", (e) => {
       const row = e.target.closest("tr");
@@ -502,7 +475,6 @@
     });
   }
 
-  // Define Controller Configuration
   contentsController = new AdminListController({
     domain: "contents",
     endpoint: "/admin/contents/",

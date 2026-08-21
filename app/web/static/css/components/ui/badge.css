@@ -26,8 +26,6 @@
   padding: var(--space-1) var(--space-2);
 }
 
-/* --- Status Badges (Migrated) --- */
-
 .status-badge {
   font-size: var(--text-2xs);
   font-weight: var(--weight-bold);
@@ -38,7 +36,6 @@
   white-space: nowrap;
   display: inline-block;
   line-height: 1.2;
-
   background-color: var(--variant-bg, transparent);
   color: var(--variant-color, inherit);
 }
@@ -63,7 +60,6 @@
   --variant-color: var(--brand-red);
 }
 
-/* Compact badge modifier */
 .badge-compact {
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-xs);
@@ -90,8 +86,6 @@
   --variant-color: var(--brand-green-dark);
 }
 
-
-/* Smaller type compact variant */
 .badge-type-compact {
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-2xs);

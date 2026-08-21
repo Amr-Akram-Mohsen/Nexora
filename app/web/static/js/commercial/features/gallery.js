@@ -137,7 +137,6 @@ const Gallery = {
 }
 
 function handleGalleryClick(e) {
-    // ---------- Gallery open / close / arrow clicks ----------
     const galleryOverlay = document.querySelector("[data-gallery-overlay]");
     const openGalleryBtn = e.target.closest("[data-gallery-open]");
     if (openGalleryBtn) {

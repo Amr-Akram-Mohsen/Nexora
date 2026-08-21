@@ -1,4 +1,3 @@
-<!-- _social_distribution.html -->
 {% from "admin/components/ui/panels.html" import admin_panel, admin_table_panel %}
 {% from "admin/components/ui/tables.html" import admin_crud_table %}
 {% from "components/ui/spinner.html" import spinner, table_spinner %}
@@ -19,7 +18,6 @@ platforms.", actions='') %}
 {{ admin_crud_table(tables['social_distribution'], loading_text="Loading distribution history...") }}
 {% endcall %}
 
-<!-- Social Distribution Modal -->
 {% call modal("distributionDraftModal", "Distribution Post", class="modal-content-lg") %}
 <div id="distribution-draft-content">
   <div>

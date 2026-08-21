@@ -8,14 +8,12 @@
   <title>{% block title %}{% endblock %}</title>
   <meta name="verify-admitad" content="382e912a3b" />
 
-  <!-- Primary Meta Tags -->
   <meta name="title" content="{% block seo_title %}{{ self.title() }}{% endblock %}">
   <meta name="description"
     content="{% block description %}Nexora is your premium source for technology, perfumes, accessories and fasion  news, reviews, and deals in Saudi Arabia and the UAE.{% endblock %}">
 
-
   {% block meta %}
-  <!-- Open Graph / Facebook -->
+
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:url" content="{{ request.url }}">
   <meta property="og:title" content="{{ self.seo_title() }}">
@@ -23,7 +21,6 @@
   <meta property="og:image"
     content="{% block og_image %}{{ url_for('static', filename='img/og-preview.jpg', _external=True) }}{% endblock %}">
 
-  <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="{{ request.url }}">
   <meta property="twitter:title" content="{{ self.seo_title() }}">
@@ -31,10 +28,9 @@
   <meta property="twitter:image" content="{{ self.og_image() }}">
 
   {% endblock %}
-  <!-- JSON-LD Structured Data -->
+
   {% block structured_data %}{% endblock %}
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -42,7 +38,6 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
 
-  <!-- Core CSS file -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
   {% block page_css %}{% endblock %}
@@ -67,12 +62,13 @@
         renameCollection: {{ url_for('interaction.rename_collection_route') | tojson }},
         deleteCollection: {{ url_for('interaction.delete_collection_route') | tojson }},
         setCountry: {{ url_for('system.set_country') | tojson }},
-        productClickPrefix: {{ url_for('interaction.item_click', link_id=0).replace('/0', '') | tojson }}
+        productClickPrefix: {{ url_for('interaction.item_click', link_id=0).replace('/0', '') | tojson }},
+        globeData: {{ url_for('content.globe_data') | tojson }}
       }
     };
   </script>
   {% endblock %}
-  <!-- Core JavaScript files -->
+
   <script>
     (function () {
       if (localStorage.getItem("theme") === "dark") {
@@ -155,15 +151,13 @@
   {% endblock %}
 
   {% block additional_content %}
-  <!-- Back to Top Button -->
+
   <span id="inline-tooltip" class="inline-tooltip is-hidden"></span>
   {{ button(id="back-to-top", class="back-to-top is-hidden", attrs={"aria-label": "Go to top"}, icon="fas
   fa-chevron-up", unstyled=True) }}
 
-  <!-- Collection Popover Template -->
   {% include "components/ui/_collection_popover.html" %}
 
-  <!-- Floating Compare Bar (hidden by default) -->
   <div id="compare-floating-bar" class="compare-bar flex items-center justify-between" style="display: none;">
     <div class="compare-bar__info flex items-center">
       <div class="compare-bar__count">0</div>

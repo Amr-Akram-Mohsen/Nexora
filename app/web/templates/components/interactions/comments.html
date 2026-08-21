@@ -1,7 +1,7 @@
 {% from "components/ui/core.html" import button, form, textarea %}
 
 <div class="comments comments--collapsed">
-  <!-- Comment Form -->
+
   {% if current_user.is_authenticated %}
   {% call form("comment-form comment__form flex flex-col") %}
   {{ textarea(
@@ -21,9 +21,8 @@
   </p>
   {% endif %}
 
-  <!-- Comments List -->
   <div class="comments__list flex flex-col gap-6">
-    <!-- JS injects comment-card here -->
+
   </div>
 
 </div>

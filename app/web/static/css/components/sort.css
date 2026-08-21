@@ -2,7 +2,6 @@
   gap: 0.6rem;
 }
 
-
 .sort-label {
   font-size: var(--text-sm);
   color: var(--muted-foreground);
@@ -40,7 +39,6 @@
   border-color: var(--brand-blue);
   box-shadow: 0 0 0 3px rgba(var(--brand-blue-rgb), var(--alpha-soft));
 }
-
 
 .sort-select--compact {
   min-width: 120px;

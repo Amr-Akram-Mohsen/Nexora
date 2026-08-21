@@ -1,5 +1,3 @@
-/* --- Affiliate Marketing Styling --- */
-
 .affiliate-trust-banner {
   background: var(--accent); /* subtle professional backdrop, no bright primary gradients */
   border: 1px solid var(--border);
@@ -23,8 +21,6 @@ margin-bottom: 2rem;
   line-height: 1.5;
   color: var(--muted-foreground);
 }
-
-/* --- Partner Card grid --- */
 
 .affiliate-partners {margin-top: 1.5rem;
   margin-bottom: 2.5rem;
@@ -65,8 +61,6 @@ margin-bottom: 2rem;
   color: var(--foreground);
   margin: 0;
 }
-
-/* --- Advisory Disclosure Callouts --- */
 
 .affiliate-disclosure-banner {
   background: rgba(var(--domain-primary-rgb, var(--primary-rgb)), 0.05);

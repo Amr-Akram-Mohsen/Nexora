@@ -1,12 +1,10 @@
-// ==============================
 // ADMIN — RECOMMENDATIONS
 // Refactored: HTML partial mode — no renderRow, no JS HTML building
-// ==============================
 
 (function () {
   'use strict';
 
-  window.recController = null;
+  let recController = null;
 
   function loadStats() {
     fetch('/admin/recommendations/stats')
@@ -51,7 +49,9 @@
           .then(d => {
             if (d.success) {
               showToast('Association removed.', 'success');
-              window.recController.load(window.recController.currentPage);
+              if (recController) {
+                recController.load(recController.currentPage);
+              }
               loadStats();
               if (modal) modal.classList.remove("active");
             } else {
@@ -63,8 +63,6 @@
       }
     );
   }
-
-
 
   function loadContextPerformance() {
     if (typeof fetchAndInjectHtml === 'function') {
@@ -86,7 +84,7 @@
         const list = document.getElementById('health-signals-list');
         const iconContainer = document.querySelector('.alert-icon');
         const banner = document.querySelector('.alert-banner');
-        
+
         if (!container || !list) return;
 
         list.replaceChildren();
@@ -96,23 +94,23 @@
           if (s.level === 'critical') { iconStr = '🚨'; cls = 'text-danger font-bold'; }
           else if (s.level === 'warning') { iconStr = '⚠️'; cls = 'text-warning font-bold'; }
           else if (s.level === 'success') { iconStr = '✅'; cls = 'text-success'; }
-          
+
           const div = document.createElement('div');
           div.className = cls;
-          
+
           const iconSpan = document.createElement('span');
           iconSpan.className = 'mr-1';
           iconSpan.textContent = iconStr;
-          
+
           div.appendChild(iconSpan);
           div.appendChild(document.createTextNode(` ${s.message}`));
-          
+
           list.appendChild(div);
         });
 
         iconContainer.replaceChildren();
         const mainIconSpan = document.createElement('span');
-        
+
         banner.classList.remove('alert-danger', 'alert-warning', 'alert-success');
         if (d.status === 'critical') {
           banner.classList.add('alert-danger');
@@ -141,7 +139,7 @@
   function loadTrendChart() {
     const ctx = document.getElementById('recTrendChart');
     if (!ctx) return;
-    
+
     fetch('/admin/recommendations/trend')
       .then(r => r.json())
       .then(data => {
@@ -194,7 +192,7 @@
   function loadSlotChart() {
     const ctx = document.getElementById('recSlotChart');
     if (!ctx) return;
-    
+
     fetch('/admin/recommendations/slot-analysis')
       .then(r => r.json())
       .then(data => {
@@ -239,7 +237,7 @@
     loadTrendChart();
     loadSlotChart();
 
-    window.recController = new AdminListController({
+    recController = new AdminListController({
       domain: 'rec',
       endpoint: '/admin/recommendations/matches',
       rowsEndpoint: '/admin/recommendations/matches/rows',
@@ -247,8 +245,7 @@
       colspan: 7,
       autoInit: false
     });
-    window.recController.init();
-
+    recController.init();
 
     // Inspect modal: unlink action delegation (rendered by _inspect.html)
     const modal = document.getElementById("inspect-rec-modal");

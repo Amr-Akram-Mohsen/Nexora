@@ -42,7 +42,6 @@
   gap: 0.2rem;
 }
 
-/* Dot separator between meta products */
 .detail-page__meta .meta-product + .product-rating::before,
 .detail-page__meta .product-rating + .product-reviews-count::before {
   content: "·";

@@ -50,7 +50,6 @@
     );
   }
 
-  // ── Event delegation for retry buttons inside the dynamically loaded partial ──
   container.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-action="retry-failed"]');
     if (btn) {

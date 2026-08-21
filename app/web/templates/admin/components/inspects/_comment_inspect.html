@@ -9,7 +9,7 @@
 {% block admin_content %}
 
 {% call inspect_page_shell("Comment Details", url_for('admin.dashboard_audience'), "Back to Audience", title) %}
-      
+
       {% if inspect_table and inspect_table is mapping %}
       {% for section_name, section_data in inspect_table.items() %}
       {% call inspect_section(section_name|title) %}
@@ -20,7 +20,7 @@
 
       {% call inspect_section('Management Actions', divider=false) %}
       {% call action_group(extra_class='flex-wrap') %}
-      
+
       {{ action_button(
           "Already Flagged" if sentiment == 'spam' else "Flag as Spam",
           action_type="toggle-active",
@@ -28,7 +28,7 @@
           disabled=(sentiment == 'spam'),
           attrs={"data-action": "flag-comment", "data-id": inspect_id}
       ) }}
-      
+
       {{ action_button(
           "Delete Comment",
           action_type="delete",
@@ -36,7 +36,7 @@
           extra_class="inspect-delete-btn",
           attrs={"data-action": "delete-comment", "data-id": inspect_id}
       ) }}
-      
+
       {% endcall %}
       {% endcall %}
 

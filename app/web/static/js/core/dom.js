@@ -1,6 +1,4 @@
-// ==============================
 // GLOBAL MODAL SYSTEM
-// ==============================
 let activeModalCallback = null;
 let previousActiveElement = null;
 
@@ -90,9 +88,7 @@ function closeModal() {
   }
 }
 
-// ==============================
 // GLOBAL MODAL EVENT DELEGATION
-// ==============================
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
     // Backdrop click

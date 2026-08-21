@@ -93,6 +93,23 @@ def get_distribution_history(target_type: str, target_id: int) -> list[dict]:
 
     return distribution_history
 
+def _batch_hydrate_source_titles(posts):
+    from app.core.extensions import db
+    from sqlalchemy import select
+    from app.domains.content.models import Content
+    from app.domains.product.models import Product
+    
+    content_ids = {p.source_target_id for p in posts if p.source_target_type == "content"}
+    product_ids = {p.source_target_id for p in posts if p.source_target_type == "product"}
+    titles = {}
+    if content_ids:
+        for cid, title in db.session.execute(select(Content.id, Content.title).where(Content.id.in_(content_ids))).all():
+            titles[("content", cid)] = title or f"Content #{cid}"
+    if product_ids:
+        for pid, name in db.session.execute(select(Product.id, Product.name).where(Product.id.in_(product_ids))).all():
+            titles[("product", pid)] = name or f"Product #{pid}"
+    return titles
+
 def get_admin_social_distribution(status_filter=None, platform_filter=None, source_type_filter=None, page=1, per_page=50):
     from app.core.extensions import db
     from sqlalchemy import select, desc
@@ -130,11 +147,10 @@ def get_admin_social_distribution(status_filter=None, platform_filter=None, sour
     }
     
     summary_stats = get_social_distribution_summary()
+    titles_map = _batch_hydrate_source_titles([p[0] for p in posts_paginated.products])
     
     for post, p_name in posts_paginated.products:
-        source_title = "Unknown"
-        if post.source:
-            source_title = getattr(post.source, "title", getattr(post.source, "name", f"ID: {post.source_target_id}"))
+        source_title = titles_map.get((post.source_target_type, post.source_target_id), f"Unknown {post.source_target_type}")
             
         is_overdue = False
         if post.status == "scheduled" and post.publish_date and post.publish_date < now_utc:
@@ -173,7 +189,7 @@ def get_admin_scheduling_queue():
     from sqlalchemy import select
     from app.domains.distribution.models import DistributionPost, DistributionPlatform
     from datetime import datetime, timezone
-    from app.domains.shared_lookups import get_platform_icon, get_source_title
+    from app.domains.shared_lookups import get_platform_icon
     
     query = (
         select(DistributionPost, DistributionPlatform.name.label("platform_name"))
@@ -187,6 +203,8 @@ def get_admin_scheduling_queue():
     
     view_models = []
     now_utc = datetime.now(timezone.utc)
+    titles_map = _batch_hydrate_source_titles([p[0] for p in scheduled_posts])
+    
     for post, platform_name in scheduled_posts:
         platform_icon = get_platform_icon(platform_name)
         is_overdue = post.publish_date and post.publish_date < now_utc
@@ -196,7 +214,8 @@ def get_admin_scheduling_queue():
             "platform": platform_name,
             "platform_icon": platform_icon,
             "source_type": post.source_target_type,
-            "source_title": get_source_title(post.source_target_type, post.source_target_id),
+            "source_id": post.source_target_id,
+            "source_title": titles_map.get((post.source_target_type, post.source_target_id), f"Unknown {post.source_target_type}"),
             "publish_date": post.publish_date,
             "is_overdue": is_overdue
         })

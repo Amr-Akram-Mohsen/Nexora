@@ -12,22 +12,21 @@
 ) }}
 
 <div class="admin-dashboard-page">
-    <!-- Channel Status Grid -->
+
     <div>
         <h3>Channel Status Grid</h3>
         <div class="dashboard-stats-grid" id="ingestions-status-grid">
-            <!-- Populated by JS -->
+
             {{ spinner("Loading channel status...") }}
         </div>
     </div>
 
-    <!-- Recent Ingestion Events List -->
     {% from "components/ui/core.html" import button %}
     {% set refresh_btn = button(id="refresh-logs-btn", class="admin-btn-secondary", icon="fa-solid fa-rotate-right", text="Refresh", unstyled=True) %}
-    
+
     {% call admin_table_panel("Recent Ingestion Events", actions=refresh_btn) %}
         {% call standard_table(["Time", "Channel", "Type", "Target / Query", "Category", "Status"], class="dashboard-table", body_id="ingestions-logs-tbody") %}
-            <!-- Populated by JS -->
+
             {{ table_spinner(colspan=6, text="Loading recent events...") }}
         {% endcall %}
     {% endcall %}

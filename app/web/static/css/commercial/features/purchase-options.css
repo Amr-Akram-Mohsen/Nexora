@@ -50,8 +50,6 @@
 
 /* ─── Links list ─────────────────────────────────────────────────────── */
 
-
-
 /* ─── Individual buy link row ────────────────────────────────────────── */
 
 .product-buy-link {
@@ -141,7 +139,6 @@ flex-shrink: 0;
   transform: translateX(3px);
 }
 
-/* Legacy icon selector kept for compat */
 .product-buy-link__icon {
   font-size: var(--text-sm);
   color: var(--muted-foreground);

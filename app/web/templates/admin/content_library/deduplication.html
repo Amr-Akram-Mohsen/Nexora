@@ -14,7 +14,7 @@
 <div class="flex flex-col gap-4">
   {% if duplicate_groups %}
     {% for group in duplicate_groups %}
-    <div class="overview-panel bg-card border border-border radius-md dup-group-panel"
+    <div class="overview-panel dup-group-panel"
          id="dup-group-{{ loop.index }}">
       <div class="dup-group-header flex justify-between items-center">
         <div>
@@ -52,7 +52,7 @@
     </div>
     {% endfor %}
   {% else %}
-  <div class="overview-panel bg-card border border-border radius-md">
+  <div class="overview-panel">
     <div class="dup-empty-state">
       <i class="fas fa-check-circle dup-empty-icon"></i>
       <h3 class="dup-empty-title">No Duplicates Found</h3>

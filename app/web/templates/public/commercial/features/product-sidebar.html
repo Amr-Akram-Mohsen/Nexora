@@ -1,23 +1,19 @@
 {# catalog-sidebar.html #}
 {% from "components/ui/core.html" import badge, button, input %}
 
-{# ── Canonical filter priority order ── #}
 {% set filter_priority = ['category', 'brand', 'store', 'type'] %}
 
 <div class="filter-sidebar flex flex-col">
 
-  {# ── Sidebar brand accent strip ── #}
   <div class="sidebar-accent">
   </div>
 
-  {# ── Sidebar title row ── #}
   <div class="sidebar-heading flex items-center justify-between">
     <span class="sidebar-heading__label">
       <i class="{{ 'fas fa-newspaper' if target_type == 'articles' else 'fas fa-box-open' }}"></i>
       {{ 'Article Filters' if target_type == 'articles' else 'Product Filters' }}
     </span>
 
-    {# Reset link — shown only when filters are active #}
     {% set has_active = namespace(value=false) %}
     {% for k, v in active_filters.items() if k not in ['sort'] %}
     {% if v %}{% set has_active.value = true %}{% endif %}
@@ -29,7 +25,6 @@
     {% endif %}
   </div>
 
-  {# ── Price active indicator (products only, shown when price filter is active) ── #}
   {% if target_type == 'product' and (active_filters.min_price or active_filters.max_price) %}
   <div class="sidebar-price-active flex items-center">
     <i class="fas fa-dollar-sign"></i>
@@ -52,9 +47,8 @@
   Guarantees: category → topic → brand → store → type
   ══════════════════════════════════════════════════ #}
 
-  {# Build the ordered list of filters to render #}
   {% set filters_to_render = [] %}
-  {# Priority order first #}
+
   {% for fname in filter_priority %}
   {% if fname in allowed_filters and filter_options.get(fname) %}
   {% if filters_to_render.append(fname) %}{% endif %}
@@ -67,13 +61,11 @@
   {% endif %}
   {% endfor %}
 
-  {# Render each filter group #}
   {% from "components/listing/filter-section.html" import filter_section %}
   {% for filter_name in filters_to_render %}
     {{ filter_section(filter_name, filter_options.get(filter_name, []), active_filters, get_filter_url) }}
   {% endfor %}
 
-    {# ── Price Range (products only) ── #}
     {% if target_type == 'product' %}
     <details class="filter-section filter-section--price" {{ 'open' if active_filters.min_price or
       active_filters.max_price else 'open' }}>
@@ -91,7 +83,7 @@
 
       <form action="{{ url_for(request.endpoint, **request.view_args) }}" method="get"
         class="price-range-form flex flex-col gap-3">
-        {# Persist existing filters #}
+
         {% for key, vals in request.args.to_dict(flat=False).items() %}
         {% if key not in ['min_price', 'max_price'] %}
         {% for v in vals %}{{ input(type="hidden", name=key, value=v, required=False) }}{% endfor %}
@@ -121,7 +113,6 @@
     </details>
     {% endif %}
 
-    {# ── ARTICLES: Trending section (replaces the generic promo, shows actual trending topics) ── #}
     {% if target_type == 'articles' %}
     <div class="sidebar-trending">
       <div class="sidebar-trending__header flex items-center gap-2">
@@ -130,7 +121,6 @@
       </div>
       <div class="sidebar-trending__links flex flex-col gap-1">
 
-        {# Show active topic quick-links if topics available #}
         {% set topic_opts = filter_options.get('topic', []) %}
         {% if topic_opts %}
         {% for opt in topic_opts[:5] %}
@@ -176,4 +166,4 @@
     </div>
     {% endif %}
 
-</div>{# end .filter-sidebar #}
+</div>

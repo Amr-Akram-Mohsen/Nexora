@@ -12,7 +12,7 @@ from app.domains.content.service.admin.admin import (
     get_admin_content_stats,
     get_admin_deduplication_groups,
 )
-from app.application.analytics.admin import (
+from app.domains.analytics.service.admin import (
     get_admin_content_dashboard_stats,
     get_admin_pipeline_stats,
 )

@@ -1,6 +1,4 @@
-// ==============================
 // ADMIN LIST CONTROLLER CLASS
-// ==============================
 class AdminListController {
   constructor(config) {
     this.domain = config.domain;
@@ -181,20 +179,18 @@ class AdminListController {
   }
 }
 
-// ==============================
 // INSPECT MODAL HELPER
-// ==============================
 window.openInspectModal = function(url, modalId, title) {
   const modal = document.getElementById(modalId);
   const titleEl = document.getElementById(`${modalId}-title`);
   if (titleEl && title) {
     titleEl.textContent = title;
   }
-  
+
   if (modal) {
     modal.classList.add("active");
   }
-  
+
   if (typeof fetchAndInjectHtml === "function") {
     return fetchAndInjectHtml(url, `${modalId}-body`, 'Loading details...');
   } else {
@@ -203,18 +199,16 @@ window.openInspectModal = function(url, modalId, title) {
   }
 };
 
-// ==============================
 // GLOBAL INSPECT HANDLER
-// ==============================
 document.addEventListener("click", e => {
   const btn = e.target.closest('[data-action="global-inspect"]');
   if (!btn) return;
-  
+
   const domain = btn.dataset.domain;
   const id = btn.dataset.id;
   const title = btn.dataset.title;
   let url = btn.dataset.url;
-  
+
   if (!url) {
     if (domain === "rec") {
       const parts = id.split('-');
@@ -228,25 +222,23 @@ document.addEventListener("click", e => {
       url = `/admin/${domain}s/${id}/inspect`;
     }
   }
-  
+
   const modalId = `inspect-${domain}-modal`;
   const modalTitle = title ? `Inspect: ${title}` : `Inspect ${domain.charAt(0).toUpperCase() + domain.slice(1)}`;
-  
+
   if (typeof window.openInspectModal === "function") {
     window.openInspectModal(url, modalId, modalTitle);
   }
 });
 
-// ==============================
 // GENERIC CRUD BOOTSTRAP
-// ==============================
 document.addEventListener("DOMContentLoaded", () => {
   const crudMarker = document.querySelector('[data-crud-domain]');
   if (crudMarker) {
     const domain = crudMarker.dataset.crudDomain;
     const endpoint = crudMarker.dataset.crudEndpoint || `/admin/${domain}`;
     const rowsEndpoint = crudMarker.dataset.crudRowsEndpoint || `${endpoint}/rows`;
-    
+
     // Only auto-init if there isn't already a script handling this domain
     if (!window[`${domain}Controller`]) {
       const controller = new AdminListController({
@@ -261,9 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ==============================
 // GLOBAL API CONTRACT & UTILITIES
-// ==============================
 /*
  * Implicit Globals Documentation (provided by base layout / helpers.js):
  * - getTableSpinnerHtml(colspan): Returns HTML string for table loading row
@@ -273,11 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
  * - showModal(title, body, onConfirm): Displays a confirmation modal
  */
 
-/**
- * Shared utility for admin tab switching logic.
- * @param {string} tabsId - The ID of the tabs container
- * @param {function} onSwitch - Callback fired when a tab is selected, receives (tabId)
- */
 function initAdminTabs(tabsId, onSwitch) {
   const tabsContainer = document.getElementById(tabsId);
   if (!tabsContainer) return;
@@ -299,7 +284,7 @@ function initAdminTabs(tabsId, onSwitch) {
       p.classList.remove("active");
       p.style.display = ""; // clear inline display if it existed
     });
-    
+
     // Look for ID either exactly as tabId, or prefixed with tab-panel-
     const activePanel = document.getElementById(`tab-panel-${tabId}`) || document.getElementById(tabId);
     if (activePanel) {
@@ -323,7 +308,7 @@ function initSidebar() {
   const toggleBtn = document.getElementById('sidebar-toggle');
   const layout = document.querySelector('.admin-layout');
   const isMobile = window.innerWidth <= 768;
-  
+
   if (!sidebar || !layout || !toggleBtn) return;
 
   // Restore state
@@ -355,9 +340,6 @@ function initSidebar() {
 
 document.addEventListener("DOMContentLoaded", initSidebar);
 
-/**
- * Standardized template rendering functions
- */
 function renderSpinner(container, text = "Loading…") {
   if (!container) return;
   const tpl = document.getElementById('global-spinner-template');
@@ -379,7 +361,7 @@ function renderEmptyState(container, message = "No products found.", submessage 
   const tpl = document.getElementById('global-empty-template');
   if (!tpl) return;
   const clone = tpl.content.cloneNode(true);
-  
+
   if (message) {
       const msgEl = clone.querySelector('.empty-message');
       if (msgEl) msgEl.textContent = message;

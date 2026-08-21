@@ -1,4 +1,3 @@
-// ── Lazy Video Thumbnail Player ────────────────────────────────────────────────
 function handleLazyVideoClick(e) {
     const btn = e.target.closest('[data-action="lazy-play"]');
     if (!btn) return false;
@@ -35,9 +34,9 @@ function handleLazyVideoClick(e) {
                 <i class="fas fa-arrows-alt-v"></i>
             </div>
             <div class="video-player-wrapper">
-                <iframe class="video-player-iframe" 
-                        src="${embedUrl}" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                <iframe class="video-player-iframe"
+                        src="${embedUrl}"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                 </iframe>
             </div>

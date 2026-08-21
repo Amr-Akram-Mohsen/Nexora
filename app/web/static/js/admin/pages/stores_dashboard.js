@@ -30,15 +30,15 @@
   function renderAvailabilityChart(breakdown) {
     const ctx = document.getElementById('chart-availability');
     if (!ctx || !breakdown || typeof Chart === 'undefined') return;
-    
+
     const palette = window.nexoraCharts.getColors();
     availabilityChart = window.nexoraCharts.render('chart-availability', 'doughnut', {
         labels: ['InStock', 'OutOfStock', 'PreOrder', 'Unknown'],
         datasets: [{
           data: [
-            breakdown.InStock || 0, 
-            breakdown.OutOfStock || 0, 
-            breakdown.PreOrder || 0, 
+            breakdown.InStock || 0,
+            breakdown.OutOfStock || 0,
+            breakdown.PreOrder || 0,
             breakdown.Unknown || 0
           ],
           backgroundColor: [palette[3], palette[1], palette[2], '#9ca3af'],
@@ -52,7 +52,7 @@
   function renderSyncCadenceChart(cadenceData) {
     const ctx = document.getElementById('chart-sync-cadence');
     if (!ctx || !cadenceData || !cadenceData.length || typeof Chart === 'undefined') return;
-    
+
     const labels = cadenceData.map(d => d.date);
     const dataPoints = cadenceData.map(d => d.count);
     const palette = window.nexoraCharts.getColors();
@@ -78,7 +78,7 @@
   function renderAvgSyncAgeChart(storeData) {
     const ctx = document.getElementById('chart-sync-age');
     if (!ctx || !storeData || !storeData.length || typeof Chart === 'undefined') return;
-    
+
     const labels = storeData.map(d => d.name);
     const dataPoints = storeData.map(d => d.avg_age_days);
     const palette = window.nexoraCharts.getColors();
@@ -100,7 +100,7 @@
       .then(data => {
         const catContainer = document.getElementById('stats-category-coverage');
         if (catContainer) catContainer.innerHTML = data.category_coverage_html;
-        
+
         const commContainer = document.getElementById('stats-commission-rates');
         if (commContainer) commContainer.innerHTML = data.commission_rates_html;
       })
@@ -112,16 +112,16 @@
       .then(data => {
         const statsAvg = document.getElementById('stats-avg-commission');
         if (statsAvg) statsAvg.textContent = (data.avg_commission_rate || 0).toFixed(2) + '%';
-        
+
         const statsWith = document.getElementById('stats-links-with-commission');
         if (statsWith) statsWith.textContent = (data.links_with_commission || 0).toLocaleString();
-        
+
         const statsWithout = document.getElementById('stats-links-without-commission');
         if (statsWithout) statsWithout.textContent = (data.links_without_commission || 0).toLocaleString();
-        
+
         const statsTop = document.getElementById('stats-top-program');
         if (statsTop) statsTop.textContent = data.top_program || 'None';
-        
+
         const totalLinks = (data.links_with_commission || 0) + (data.links_without_commission || 0);
         if (totalLinks > 0) {
             const gapPct = ((data.links_without_commission || 0) / totalLinks) * 100;
@@ -134,7 +134,7 @@
                 }
             }
         }
-        
+
         renderTrackingCoverageChart(data.tracking_coverage);
         renderDeeplinkFreshnessChart(data.deeplink_freshness);
         renderProgramDistributionChart(data.program_distribution);
@@ -147,7 +147,7 @@
   function renderTrackingCoverageChart(coverage) {
     const ctx = document.getElementById('chart-tracking-coverage');
     if (!ctx || !coverage || typeof Chart === 'undefined') return;
-    
+
     const palette = window.nexoraCharts.getColors();
     trackingCoverageChart = window.nexoraCharts.render('chart-tracking-coverage', 'doughnut', {
         labels: Object.keys(coverage),
@@ -164,7 +164,7 @@
   function renderDeeplinkFreshnessChart(freshness) {
     const ctx = document.getElementById('chart-deeplink-freshness');
     if (!ctx || !freshness || typeof Chart === 'undefined') return;
-    
+
     const palette = window.nexoraCharts.getColors();
     deeplinkFreshnessChart = window.nexoraCharts.render('chart-deeplink-freshness', 'doughnut', {
         labels: Object.keys(freshness),
@@ -181,7 +181,7 @@
   function renderProgramDistributionChart(distribution) {
     const ctx = document.getElementById('chart-program-distribution');
     if (!ctx || !distribution || !distribution.length || typeof Chart === 'undefined') return;
-    
+
     const palette = window.nexoraCharts.getColors();
     programDistributionChart = window.nexoraCharts.render('chart-program-distribution', 'bar', {
         labels: distribution.map(d => d.name),
@@ -201,22 +201,22 @@
       .then(data => {
         const statsNull = document.getElementById('stats-null-prices');
         if (statsNull) statsNull.textContent = (data.null_price_count || 0).toLocaleString();
-        
+
         const statsStale = document.getElementById('stats-stale-prices');
         if (statsStale) statsStale.textContent = (data.stale_price_count || 0).toLocaleString();
-        
+
         const statsDiscount = document.getElementById('stats-avg-discount');
         if (statsDiscount) statsDiscount.textContent = (data.avg_discount_percentage || 0).toFixed(1) + '%';
-        
+
         const alertsContainer = document.getElementById('pricing-alerts-container');
         const alertsList = document.getElementById('pricing-alerts-list');
         if (alertsContainer && alertsList) {
             alertsList.innerHTML = data.pricing_alerts_html || '';
             if (data.pricing_alerts_html) alertsContainer.classList.remove('is-hidden');
         }
-        
+
         renderCurrencyMixChart(data.currency_mix);
-        
+
         const discountContainer = document.getElementById('list-discount-stores');
         if (discountContainer) discountContainer.innerHTML = data.discount_depth_ranking_html;
 
@@ -228,7 +228,7 @@
   function renderCurrencyMixChart(currencyData) {
     const ctx = document.getElementById('chart-currency-mix');
     if (!ctx || !currencyData || typeof Chart === 'undefined') return;
-    
+
     const palette = window.nexoraCharts.getColors();
     currencyMixChart = window.nexoraCharts.render('chart-currency-mix', 'doughnut', {
         labels: Object.keys(currencyData),
@@ -245,7 +245,7 @@
   function renderPriceStalenessChart(gridData) {
     const ctx = document.getElementById('chart-price-staleness');
     if (!ctx || !gridData || !gridData.length || typeof Chart === 'undefined') return;
-    
+
     const labels = gridData.map(d => d.name);
     const freshData = gridData.map(d => d.fresh_count);
     const staleData = gridData.map(d => d.stale_count);

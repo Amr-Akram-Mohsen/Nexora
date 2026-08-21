@@ -74,7 +74,6 @@
     );
   }
 
-  // ── Event delegation ──
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-action]');
     if (!btn) return;

@@ -9,77 +9,62 @@
 
 {{ admin_page_header("Dashboard Overview", "Platform-wide metrics and at-a-glance system health") }}
 
-<!-- Stats Cards -->
 <div id="dashboard-overview-container" class="dashboard-stats-grid">
   {% include "admin/dashboard/widgets/_stats_grid.html" %}
 </div>
 
-<!-- Dashboard Main Grid -->
 <div class="overview-top-grid">
 
-  <!-- Catalog Health & Review Queue -->
   {% call admin_padded_panel('Catalog Health & Moderation', "Queue Status", icon="fa-solid fa-shield-halved", inner_id="catalog-health-container") %}
     {% include "admin/dashboard/widgets/_catalog_health.html" %}
   {% endcall %}
 
-  <!-- Real-time Ingest Log -->
   {% call admin_list_panel('Real-time Ingest Log', "Latest Aggregations", icon="fa-solid fa-bolt", inner_id="recent-ingest-container", scrollable=True) %}
     {% include "admin/dashboard/widgets/_recent_ingest.html" %}
   {% endcall %}
 
-  <!-- Review Queue Aging -->
   {% call admin_list_panel('Review Queue Aging', "Oldest Pending Reviews", icon="fa-solid fa-hourglass-half", inner_id="review-queue-aging-container", scrollable=True) %}
     {% include "admin/dashboard/widgets/_review_queue_aging.html" %}
   {% endcall %}
 
-  <!-- Categories Distribution -->
   {% call admin_padded_panel('Top Categories', "Volume Breakdown", icon="fa-solid fa-tag", inner_id="categories-distribution-container") %}
     {% include "admin/dashboard/widgets/_categories_distribution.html" %}
   {% endcall %}
 
-  <!-- Sources Distribution -->
   {% call admin_padded_panel('Top Content Sources', "Volume Breakdown", icon="fa-solid fa-satellite-dish", inner_id="sources-distribution-container") %}
     {% include "admin/dashboard/widgets/_sources_distribution.html" %}
   {% endcall %}
 
-  <!-- Top Articles by views -->
   {% call admin_table_panel('Top Articles', "by view count", icon="fa-solid fa-newspaper", inner_id="top-articles-container") %}
     {% set products = stats.top_articles %}
     {% include "admin/dashboard/widgets/_top_articles.html" %}
   {% endcall %}
 
-  <!-- Top Items by clicks -->
   {% call admin_table_panel('Top Items', "by click count", icon="fa-solid fa-bag-shopping", inner_id="top-products-container") %}
     {% set products = stats.top_items %}
     {% include "admin/dashboard/widgets/_top_products.html" %}
   {% endcall %}
 
-  <!-- Top Performing Providers -->
   {% call admin_table_panel('Top Content Providers', "By Total Views", icon="fa-solid fa-chart-line", inner_id="top-content-providers-container", scroll_class="panel-body-padded admin-table-scrollable") %}
     {% include "admin/dashboard/widgets/_top_content_providers.html" %}
   {% endcall %}
 
-  <!-- Top Acquisition Channels -->
   {% call admin_table_panel('Top Acquisition Channels', "By Content Yield", icon="fa-solid fa-plug", inner_id="top-acquisition-channels-container", scroll_class="panel-body-padded admin-table-scrollable") %}
     {% include "admin/dashboard/widgets/_top_acquisition_channels.html" %}
   {% endcall %}
 
-  <!-- Top Merchant Sources -->
   {% call admin_table_panel('Top Merchant Sources', "By Affiliate Clicks", icon="fa-solid fa-cart-shopping", inner_id="top-product-providers-container", scroll_class="panel-body-padded admin-table-scrollable") %}
     {% include "admin/dashboard/widgets/_top_product_providers.html" %}
   {% endcall %}
 
-  <!-- Product Sources Distribution -->
   {% call admin_padded_panel('Product Sources', "Marketplace Volume", icon="fa-solid fa-bag-shopping", inner_id="product-sources-distribution-container") %}
     {% include "admin/dashboard/widgets/_product_sources_distribution.html" %}
   {% endcall %}
 
-  <!-- Provider Activity Summary -->
   {% call admin_list_panel('Active Publisher Status', "Latest Content Generation", icon="fa-solid fa-newspaper", inner_id="provider-activities-container", scrollable=True) %}
     {% include "admin/dashboard/widgets/_provider_activities.html" %}
   {% endcall %}
 
-  <!-- Interaction Breakdown -->
   {% call admin_padded_panel('Interaction Breakdown', "all time", icon="fa-solid fa-chart-pie", inner_id="overview-interactions-container") %}
     {% include "admin/dashboard/widgets/_interactions_breakdown.html" %}
   {% endcall %}

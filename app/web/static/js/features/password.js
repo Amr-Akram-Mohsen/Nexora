@@ -1,4 +1,3 @@
-// ── Password visibility toggle ─────────────────────────────────────────────────
 function togglePasswordVisibility(btn) {
     const wrapper = btn.closest(".password-wrapper");
     const input = wrapper?.querySelector("input");
@@ -19,8 +18,6 @@ function initPasswordToggles() {
     // Retained as a no-op for backward compatibility since handlePasswordClick handles this via delegation
 }
 
-
-// ── Password strength meter ────────────────────────────────────────────────────
 function getPasswordStrength(pwd) {
     if (!pwd || pwd.length < 8) return "weak";
 
@@ -69,12 +66,9 @@ function initPasswordStrength() {
         updateStrengthMeter(strength);
     });
 
-    // Start hidden
     meter.style.display = "none";
 }
 
-
-// ── Confirm-password match indicator ──────────────────────────────────────────
 function initConfirmMatch() {
     const pwdInput = document.getElementById("password");
     const confirmInput = document.getElementById("confirm_password");

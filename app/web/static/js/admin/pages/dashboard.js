@@ -5,7 +5,6 @@
 (function () {
   'use strict';
 
-  // ── Apply data-pct widths via CSS custom property (no inline styles) ──
   document.querySelectorAll('.stacked-bar-segment[data-pct]').forEach(function (el) {
     el.style.setProperty('--seg-width', el.dataset.pct + '%');
   });
@@ -14,7 +13,6 @@
     el.style.setProperty('--seg-width', el.dataset.pct + '%');
   });
 
-  // ── Palette from the shared nexoraCharts colour engine ──
   var palette = window.nexoraCharts ? window.nexoraCharts.getColors() : [];
 
   var STATUS_COLORS = {
@@ -24,7 +22,6 @@
     enriching: palette[2] || '#2D9CDB'   // teal
   };
 
-  // ── Content by Type — Doughnut ──
   var typeCanvas = document.getElementById('chart-content-type');
   if (typeCanvas) {
     var typeLabels = JSON.parse(typeCanvas.dataset.chartLabels || '[]');
@@ -64,7 +61,6 @@
     }
   }
 
-  // ── Enrichment Status — Horizontal Bar ──
   var enrichCanvas = document.getElementById('chart-enrichment-status');
   if (enrichCanvas) {
     var enrichLabels = JSON.parse(enrichCanvas.dataset.chartLabels || '[]');

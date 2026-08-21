@@ -1,5 +1,3 @@
-// app/static/js/compare.js
-
 class CompareManager {
     constructor() {
         this.storageKey = 'nexora_compare_ids';
@@ -48,12 +46,10 @@ class CompareManager {
             }
         });
 
-        // Initial UI update
         this.updateUI();
     }
 
     updateUI() {
-        // Update all buttons status
         document.querySelectorAll('.compare-toggle-btn').forEach(btn => {
             const id = parseInt(btn.dataset.id);
             btn.classList.toggle('active', this.compareIds.includes(id));
@@ -65,7 +61,7 @@ class CompareManager {
     renderCompareBar() {
         let bar = document.getElementById('compare-floating-bar');
         if (!bar) return;
-        
+
         if (this.compareIds.length === 0) {
             bar.style.display = 'none';
             return;
@@ -73,10 +69,10 @@ class CompareManager {
 
         bar.style.display = 'flex';
         const compareUrl = `/compare?ids=${this.compareIds.join(',')}`;
-        
+
         const countEl = bar.querySelector('.compare-bar__count');
         if (countEl) countEl.textContent = this.compareIds.length;
-        
+
         const linkEl = bar.querySelector('.compare-bar__link');
         if (linkEl) linkEl.href = compareUrl;
 
@@ -92,7 +88,6 @@ class CompareManager {
     }
 }
 
-// Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     window.compareManager = new CompareManager();
 });

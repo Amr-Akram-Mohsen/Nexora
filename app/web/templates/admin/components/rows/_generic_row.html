@@ -2,7 +2,7 @@
 {% from "admin/components/ui/actions.html" import inspect_btn_cell %}
 
 {% set ignored_keys = [
-    "slug", "id", "is_published", "image_url", 
+    "slug", "id", "is_published", "image_url",
     "has-discount", "is_verified", "recency_days", "logo-url"
 ] %}
 
@@ -21,7 +21,7 @@
         'ok': {'tooltip': None, 'text': 'OK', 'variant': 'success'}
     } %}
     {% set config = health_config.get(value, {'tooltip': None, 'text': value|title, 'variant': 'secondary'}) %}
-    
+
     {% if config.tooltip %}<span title="{{ config.tooltip }}">{% endif %}
     {{ badge(config.text, variant=config.variant) }}
     {% if config.tooltip %}</span>{% endif %}

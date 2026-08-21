@@ -5,7 +5,6 @@
 
 <div class="product-gallery" data-gallery>
 
-  <!-- MAIN IMAGE -->
   <div class="product-gallery__viewer">
 
     {{ render_image_url(
@@ -15,16 +14,13 @@
     {'data-gallery-main': '1'}
     ) }}
 
-    <!-- Fullscreen button -->
     {{ button(type="button", class="product-gallery__fullscreen", attrs={"data-gallery-open": "1", "aria-label": "Zoom image"}, icon="fa fa-expand", unstyled=True) }}
 
     {% if product.images|length > 1 %}
 
-    <!-- arrows -->
     {{ button(type="button", class="product-gallery__nav product-gallery__nav--prev", attrs={"data-gallery-new-image": "0", "disabled": "", "aria-label": "Previous image"}, icon="fa fa-chevron-left", unstyled=True) }}
     {{ button(type="button", class="product-gallery__nav product-gallery__nav--next", attrs={"data-gallery-new-image": "2", "aria-label": "Next image"}, icon="fa fa-chevron-right", unstyled=True) }}
 
-    <!-- counter -->
     <div class="product-gallery__counter">
       <span data-gallery-index>1</span> /
       <span data-gallery-length>{{ product.images|length }}</span>
@@ -36,7 +32,6 @@
 
   {% if product.images|length > 1 %}
 
-  <!-- thumbnails -->
   <div class="product-gallery__thumbs">
 
     {% for image in product.images %}

@@ -1,5 +1,5 @@
 <div class="health-list flex gap-3">
-  <!-- Active contents row -->
+
   <div>
     <div class="health-row flex justify-between">
       <span class="flex items-center gap-2">
@@ -15,7 +15,6 @@
     </div>
   </div>
 
-  <!-- Inactive contents row -->
   <div>
     <div class="health-row flex justify-between">
       <span class="flex items-center gap-2">
@@ -30,7 +29,6 @@
     </div>
   </div>
 
-  <!-- Moderation Queue Link -->
   <a class="dashboard-stat-card clickable-card moderation-queue-link flex items-center justify-between" href="/admin/contents?published=false">
     <div class="flex items-center gap-sm">
       <span class="text-lg-icon"><i class="fa-solid fa-hourglass-half"></i></span>
@@ -42,7 +40,6 @@
     <span class="status-badge badge-pending">{{ stats.review_queue_count }} pending</span>
   </a>
 
-  <!-- Ingestion Growth Trend -->
   {% if stats.growth_trends and stats.growth_trends | length > 0 %}
     {% set max_count = namespace(val=1) %}
     {% for trend in stats.growth_trends %}

@@ -2,10 +2,8 @@
   {% from "components/ui/core.html" import button, link %}
     <div class="container">
 
-    <!-- Main Footer -->
     <div class="footer-grid">
 
-      <!-- Column 1: Brand -->
       <div class="footer-column footer-brand flex flex-col items-start gap-3">
         {% call link(href="/", class="logo group flex items-center main-nav__link site-logo gap-2 inline-flex", unstyled=True) %}
           {% include "logos/nexora-logo.html" %}
@@ -23,7 +21,6 @@
         </div>
       </div>
 
-      <!-- Column 2: Explore -->
       <div class="footer-column">
         <h4 class="footer-title">Explore</h4>
         <ul class="footer-products flex flex-col gap-3">
@@ -40,7 +37,6 @@
         </ul>
       </div>
 
-      <!-- Column 3: Support -->
       <div class="footer-column">
         <h4 class="footer-title">Support & Legal</h4>
         {# <div class="footer-contact flex flex-col">
@@ -58,7 +54,6 @@
         </ul>
       </div>
 
-      <!-- Column 4: Newsletter -->
       <div class="footer-column footer-newsletter">
         <h4 class="footer-title">Stay Updated</h4>
         <p class="footer-text">
@@ -69,7 +64,6 @@
 
     </div>
 
-    <!-- Bottom -->
     <div class="footer-bottom flex flex-col gap-4">
       <p class="footer-disclaimer">
         Nexora is reader-supported. When you buy through links on our site, we may earn an affiliate commission.

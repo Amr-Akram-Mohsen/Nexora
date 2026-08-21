@@ -1,5 +1,3 @@
-/* --- Inline Product Card (Compact Vertical) --- */
-
 .inline-item-card {flex-direction: column;
 background: var(--card);
   border: 1px solid var(--border);

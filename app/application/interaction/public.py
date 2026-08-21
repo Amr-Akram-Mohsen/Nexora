@@ -87,10 +87,6 @@ def get_saved_products_workflow(user_id):
     serialized = get_items_by_ids(product_ids, serialize=True, load='card')
     return _attach_collection_names(serialized, saves)
 
-def get_user_collection_counts_workflow(user_id):
-    rows = get_collection_counts_by_user(user_id)
-    return [{'name': row.collection_name or 'General', 'count': row.count} for row in rows]
-
 def record_item_click_workflow(link_id, user, ip_address, user_agent, referrer, country):
     link = db.session.get(ProductStoreLink, link_id)
     if not link:
@@ -107,25 +103,6 @@ def record_item_click_workflow(link_id, user, ip_address, user_agent, referrer, 
     if user and user.is_authenticated:
         handle_interaction_interest(user=user, target=link.product, action='item_click', session=db.session)
     return link.affiliate_url
-
-def track_view_workflow(target_id: int, target_type, user, ip: str) -> dict:
-    result = record_view(target_id, target_type, user, ip)
-    db.session.commit()
-    return result
-
-def _execute_tracking(operation, *args, **kwargs) -> bool:
-    success = operation(*args, **kwargs)
-    if success:
-        db.session.commit()
-    else:
-        db.session.rollback()
-    return success
-
-def track_impression_workflow(entity_type: str, entity_ids: list, context_id: str, user_id: int) -> bool:
-    return _execute_tracking(track_recommendation_impression, entity_type, entity_ids, context_id, user_id)
-
-def track_click_workflow(entity_type: str, entity_id: int, context_id: str, user_id: int) -> bool:
-    return _execute_tracking(track_recommendation_click, entity_type, entity_id, context_id, user_id)
 
 def handle_interaction_workflow(user, target_type, target_id, interaction_type, reaction_type=None, comment_content=None, comment_id=None, collection_name=None):
     try:

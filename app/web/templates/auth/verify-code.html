@@ -15,9 +15,9 @@
     </div>
 
     {% from "components/ui/core.html" import button, field, form, input, link %}
-                    
+
     {% call form("auth-form", form_action=request.path, attrs={"id": "auth-form"}) %}
-      
+
     {{ input(name="email", type="hidden", value=email) }}
 
     {% call field(label_text="6-Digit Code", for_id="code") %}
