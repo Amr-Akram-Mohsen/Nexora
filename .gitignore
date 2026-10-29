@@ -49,6 +49,9 @@ scraper_tests/
 helpers/
 scripts/
 migrations/
+!migrations/
+!migrations/versions/
+!migrations/versions/*.py
 scratch/
 
 local_backup.dump
